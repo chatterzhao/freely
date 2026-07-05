@@ -19,7 +19,7 @@ description: >- 评估并约束 mem9 作为 Freely 可选连续性后端的接�
 ## 不负责
 
 - 不把 mem9 提升为 Freely 的正式治理事实源。
-- 不替代 `docs/CONSTITUTION.md`、`docs/LAWS.md`、`docs/PROJECT_INTENT.md` 或 `docs/pre-brainstorms/`。
+- 不替代 `docs/CONSTITUTION.md`、`docs/LAWS.md`、`docs/PROJECT_INTENT.md` 或 `docs/B1-docs/`。
 - 不直接实现网络调用、鉴权或同步代码。
 
 ## 工作流

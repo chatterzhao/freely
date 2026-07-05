@@ -155,8 +155,8 @@ Freely 的角色组织遵循四层：
 - 需要跨工具或子代理进行分歧收敛。
 
 最小产物：
-- `docs/pre-brainstorms/<id>/brainstorms.md`
-- `docs/pre-brainstorms/<id>/candidates.md`
+- `docs/B1-docs/<id>/brainstorms.md`
+- `docs/B1-docs/<id>/candidates.md`
 - 会话证据（jsonl）在 `candidates.md` 的 `session_refs` 留痕，并在后续 issue / progress / recovery 中继续传播。
 
 ## 完成

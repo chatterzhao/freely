@@ -67,7 +67,7 @@ description: >- 统一 Freely 外层监督与恢复控制面。覆盖 availabili
 - continuity trigger matrix
 
 事实来源：
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/**`
+- `docs/B2-docs/token-efficient-session-continuity-and-rotation-governance/**`
 - `skill:freely-continuity-watchdog`
 
 不负责：

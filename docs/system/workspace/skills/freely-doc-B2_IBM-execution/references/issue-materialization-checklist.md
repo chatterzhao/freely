@@ -43,7 +43,7 @@ docs/B2-docs/{epic-name}/                               ← epic：一个能力�
 - 一个 epic 放多个 story；一个 story 放多个 `raw-{raw key}` 目录
 - 新 raw → 看归哪个已有 story（如重构 story、修复 story），或新建 story
 - 同名 `raw-{raw key}` → 续到已有 story 下的已有目录
-- 门禁检查：目录名 `raw-{raw key}` 与 `docs/issues/raw-{raw key}/` 的 raw issue 不匹配 → 拦截
+- 门禁检查：目录名 `raw-{raw key}` 与 `docs/B1-docs/raw-{raw key}/` 的 raw issue 不匹配 → 拦截
 - 门禁检查：I-* 文件名中的 `{raw key}` 与目录名不一致 → 拦截
 
 ### 如何确定 epic-name 和 story-name

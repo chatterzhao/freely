@@ -47,7 +47,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **B1_IBM 回答**：这个值得做吗？排在哪？边界是什么？
 
-**目录**：`docs/pre-brainstorms/{b1-id}/`
+**目录**：`docs/B1-docs/{b1-id}/`
 
 ```
 {b1-id}/
@@ -71,7 +71,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **B2_IBM 回答**：怎么做？怎么验收？替代方案是什么？
 
-**目录**：`docs/epics/{epic-name}/{story-name}/`
+**目录**：`docs/B2-docs/{epic-name}/{story-name}/`
 
 ```
 {story-name}/
@@ -237,9 +237,9 @@ body 结构（I-*）：
 <从 candidate.md 或 issue doc 提取的 scope/non-goals>
 
 ### References
-- B1 预研: docs/pre-brainstorms/<b1-id>/
-- Candidate: docs/pre-brainstorms/<b1-id>/candidates.md#c-xxx
-- 正式 Issue: docs/epics/<epic>/<story>/issues/<name>.md
+- B1 预研: docs/B1-docs/<b1-id>/
+- Candidate: docs/B1-docs/<b1-id>/candidates.md#c-xxx
+- 正式 Issue: docs/B2-docs/<epic>/<story>/issues/<name>.md
 ```
 
 ## 术语约定
@@ -268,7 +268,7 @@ platform_ids:
   github: {issue_id: "42", url: "https://...", synced_at: "..."}
   gitee: {issue_id: "IJFOAK", url: "https://...", synced_at: "..."}
 primary_platform: github
-canonical_issue_path: "docs/epics/.../issues/....md"
+canonical_issue_path: "docs/B2-docs/.../issues/....md"
 last_synced_comment_at:
   github: "2026-04-27T10:25:00Z"
   gitee: "2026-04-27T10:25:00Z"
@@ -286,8 +286,8 @@ session_refs:
 <scope/non-goals>
 
 ## References
-- B1: docs/pre-brainstorms/{b1-id}/
-- Issue: docs/epics/{epic}/{story}/issues/{name}.md
+- B1: docs/B1-docs/{b1-id}/
+- Issue: docs/B2-docs/{epic}/{story}/issues/{name}.md
 
 ## Comments
 

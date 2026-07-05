@@ -78,7 +78,7 @@
 ### 2. 读 rationale + raw issue（限时 30 秒）
 
 - `rationale` 格式必须是 `"因为 {X}，所以做 {Y}"`。不成立 → `worker_handoff_needed`
-- Task 提到了 raw-xxx → 读 `docs/issues/raw-{key}/issue.md` 获取背景
+- Task 提到了 raw-xxx → 读 `docs/B1-docs/raw-{key}/issue.md` 获取背景
 - 不要为此跑 scan、读 LAWS.md、查 a2a_tasks——Manager 做过了
 
 ### 3. 执行 Task

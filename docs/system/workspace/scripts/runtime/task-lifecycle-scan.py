@@ -353,7 +353,7 @@ class A2AChecker:
 def read_issues_dir(project: Path) -> list[dict]:
     """Read all raw-* and I-* issues from docs/issues/ and docs/B2-docs/."""
     issues = []
-    issues_dir = project / "docs" / "issues"
+    issues_dir = project / "docs" / "B1-docs"
     if issues_dir.is_dir():
         for d in sorted(issues_dir.iterdir()):
             if not d.is_dir():

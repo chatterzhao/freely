@@ -49,8 +49,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
 ## Receipt Gap: 890e24d5f971ad95a5b91b565911e5c432112bf3
 
@@ -60,8 +60,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
 ## Receipt Gap: b05d485923c49bbef4412b32596e8d8596999ee9
 
@@ -71,8 +71,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
 ## Receipt Gap: 9cb3236d2c297e3b8b36bb4613c3f0d8dbb69e98
 
@@ -82,8 +82,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
 ## Receipt Gap: dc436573e5f3f995ed936e7b21c65f9440fffae9
 
@@ -93,8 +93,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ## Receipt Gap: f7145cc889c3919cbe21b1162f96d14d736b83b7
 
@@ -104,8 +104,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ## Receipt Gap: f3dcbbd8fe4da12377f7e533dc162c649792bc69
 
@@ -117,11 +117,11 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+- bounded_issue: `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- verification_ref: `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: 8674e717fd4c8d5a4dde465cd01d9dd34ecbbad2
 
@@ -133,11 +133,11 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+- bounded_issue: `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- verification_ref: `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 ## Receipt Gap: 3e226fa9865973d5964e0bd5ec8a124452c49118
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
@@ -146,8 +146,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: ad339d264c87ae382e8398ecbcd5de01802e3372
 
@@ -157,8 +157,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: 8cb050abdead5c338d7dd4a5e3d0cbc0a98d809e
 
@@ -168,8 +168,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: c4de46907e4acfff31e2454c1aff592f7b1631ad
 
@@ -179,8 +179,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: ee5b7073eba487cdefca39b0f6ff07b5ad82c980
 
@@ -190,8 +190,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Receipt Gap: 908a6ad9f96a1a76a22f1f44f3b5438e23f6c6e0
 
@@ -201,8 +201,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 
 ## Receipt Gap: 5da463c9d2ddd284ddc45f085a789cb8b092c1a8
 
@@ -212,8 +212,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 
 ## Receipt Gap: eec65f3a00586f64d47ecd441779690b3f729719
 
@@ -223,8 +223,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-protected-branch-merge-receipt-gap-followthrough-verification.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-protected-branch-merge-receipt-gap-followthrough-verification.md`
 
 ## Receipt Gap: dfbca95b4066cb562f093ad16c83d687f47f9aa6
 
@@ -234,8 +234,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
 
 ## Receipt Gap: 3de9c27009ac2cf52c7a17b7bf559f8eb22d6943
 
@@ -245,8 +245,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
 
 ## Receipt Gap: ec36ebe0d5215315c18c6081f854b60b0a712cf2
 
@@ -256,8 +256,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
 
 ## Receipt Gap: 9e35ed77f37a3f9ab77ff1e033c10bb376d6aac3
 
@@ -267,8 +267,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260405-cli-output-style-A`
 - evidence_refs:
-  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
-  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+  - `docs/B2-docs/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+  - `docs/B2-docs/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
 
 ## Receipt Gap: c20c6bd4a09112287a8b2ec6bd9148981946b86b
 
@@ -278,8 +278,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260405-cli-output-style-A`
 - evidence_refs:
-  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
-  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+  - `docs/B2-docs/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+  - `docs/B2-docs/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
 
 ## Receipt Gap: 9fa8ec35bb9532235bd8cb51b6e20c6730836d7c
 
@@ -289,9 +289,9 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-2148-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
 
 ## Receipt Gap: 6969be7e02ea0c380a9e9fc892b5184168d261fb
 
@@ -301,9 +301,9 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-2148-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+  - `docs/B2-docs/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
 
 ## Receipt Gap: 01e3263d6382c6b35a8714c44db9bd2c01b9a5e8
 
@@ -313,10 +313,10 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260405-worktree-bootstrap-closeout-merge-receipt-gap-verification.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260405-worktree-bootstrap-closeout-merge-receipt-gap-verification.md`
+  - `docs/B2-docs/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
 
 ## Receipt Gap: 01e3263d6382c6b35a8714c44db9bd2c01b9a5e8
 
@@ -326,8 +326,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260403-2041-A`
 - evidence_refs:
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+  - `docs/B2-docs/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
 
 ## Receipt Gap: 63c9e509e9b2cb5ba99969622527a560d02f56cc
 
@@ -337,8 +337,8 @@
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260408-1200-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+  - `docs/B2-docs/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+  - `docs/B2-docs/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ## Receipt Gap: 357c18bb39286580a9c07856d0a1858867dd7d58
 
@@ -350,12 +350,12 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
 ## Receipt Gap: 8069bced62af4dc1e6c46387fa715613628f291a
 
@@ -367,12 +367,12 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
 ## Receipt Gap: 497c474abd9ecb4776462aa9416b59f7cc45a1f8
 
@@ -384,12 +384,12 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
 ## Receipt Gap: c235976621a36a1f89db5dda83676d3b4370278d
 
@@ -401,12 +401,12 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
 ## Receipt Gap: ae09968a60d722deb11e59ca43b1239dab694c5c
 
@@ -418,12 +418,12 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
 ## Receipt Gap: 88dd9eaabbcda45b2b7127da7dea9ec3f68e4df2
 
@@ -435,9 +435,9 @@
 - canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
-- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`

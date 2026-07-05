@@ -595,7 +595,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
                 raw_key = standard_key
                 target_dir = target_dir.parent / f"raw-{raw_key}"
 
-    # 4. Materialize to docs/issues/raw-{key}/issue.md
+    # 4. Materialize to docs/B1-docs/raw-{key}/issue.md
     target_dir.mkdir(parents=True, exist_ok=True)
     issue_file = target_dir / "issue.md"
 
@@ -734,7 +734,7 @@ if __name__ == "__main__":
         print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "pull":
         raw_key = sys.argv[2]
-        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/issues/raw-{raw_key}")
+        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/B1-docs/raw-{raw_key}")
         result = pull_raw_issue(raw_key, target)
         print(json.dumps(result, indent=2, default=str))
     elif len(sys.argv) > 1 and sys.argv[1] == "create-pr":

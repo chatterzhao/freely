@@ -107,7 +107,7 @@ hotfix/*          → main + develop
 #### 0a. 思考 + 搜索相似 raw issue
 
 把问题想清楚，然后搜索是否已有类似 raw issue：
-- 搜 `docs/issues/raw-*/issue.md` 的标题和正文
+- 搜 `docs/B1-docs/raw-*/issue.md` 的标题和正文
 - 搜平台（GitHub/Gitee）上的 open issue
 - 搜 `docs/milestones.md` 看看是否已被某个 candidate/issue 覆盖
 

@@ -120,7 +120,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 
 | gate 报错关键词 | 原因 | 正确格式 | 示例 |
 |-----------|------|---------|------|
-| no valid source_candidate / missing a valid source_candidate | source_candidate 需完整文件路径，不能只写 ID | docs/B1-docs/raw-{key}/candidates.md#C-xxx | `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A` |
+| no valid source_candidate / missing a valid source_candidate | source_candidate 需完整文件路径，不能只写 ID | docs/B1-docs/raw-{key}/candidates.md#C-xxx | `docs/B1-docs/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A` |
 | contains no recognizable candidate heading | candidates.md heading 需 ## 或 ### 开头 | `## C-xxx` | `## C-20260508T011858Z-A: 标题` |
 | phase_state is invalid for B1 | raw issue phase_state 合法值 | proposed / absorbed / dropped | `phase_state: absorbed` |
 | no absorbed_into field | phase_state=absorbed 时必须写吸收目标 | I-* issue ID | `absorbed_into: I-20260508T011858Z-A` |

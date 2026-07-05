@@ -3,7 +3,7 @@
 ## Before writing
 
 - 只读分析可以先在当前上下文判断
-- 一旦要写 `docs/pre-brainstorms/**`，必须确认当前 worktree 合法
+- 一旦要写 `docs/B1-docs/**`，必须确认当前 worktree 合法
 
 ## Worktree rules
 
