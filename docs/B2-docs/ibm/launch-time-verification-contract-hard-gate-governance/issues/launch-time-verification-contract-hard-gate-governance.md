@@ -8,8 +8,8 @@
 - story-name: `launch-time-verification-contract-hard-gate-governance`
 - issue-name: `launch-time-verification-contract-hard-gate-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260411/candidates.md#c-20260411-1414-a`
-- source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411T141600Z/candidates.md#c-20260411-1414-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
@@ -55,7 +55,7 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260411/candidates.md`
+- `docs/B1-docs/raw-20260411T141600Z/candidates.md`
 - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
 - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/brainstorms/b-launch-time-verification-contract-hard-gate-governance.md`
 - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/prd.md`

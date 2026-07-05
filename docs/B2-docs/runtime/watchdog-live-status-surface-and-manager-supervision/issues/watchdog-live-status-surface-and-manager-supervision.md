@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `watchdog-live-status-surface-and-manager-supervision`
 - issue-name: `watchdog-live-status-surface-and-manager-supervision`
-- source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-1945-a`
-- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320T174500Z/candidates.md#c-20260320-1945-a`
+- source_brainstorm: `docs/B1-docs/raw-20260320T174500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`

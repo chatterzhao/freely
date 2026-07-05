@@ -3,8 +3,8 @@ local_id: I-20260624T004510Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260624T004510Z
-source_candidate: docs/B1-docs/raw-20260624T004510Z/candidates.md#C-20260624T004510Z-A
+promoted_from: raw-20260624T004510Z10Z
+source_candidate: docs/B1-docs/raw-20260624T004510Z10Z/candidates.md#C-20260624T004510Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T004510Z-A/issue.md
 milestone: "M-20260624T004510Z-A"
 title: "fix: deploy-skills opencode wildcard fix + registry-driven default tool detection"
@@ -26,7 +26,7 @@ verification_artifact_dir: docs/B2-docs/deploy-skills-registry-default/code-revi
 
 # I-20260624T004510Z-A: deploy-skills opencode 通配符修复 + registry 驱动默认 tool 检测
 
-- source_candidate: `docs/B1-docs/raw-20260624T004510Z/candidates.md#C-20260624T004510Z-A`
+- source_candidate: `docs/B1-docs/raw-20260624T004510Z10Z/candidates.md#C-20260624T004510Z-A`
 - pre_tests_path: `docs/B2-docs/deploy-skills-registry-default/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/deploy-skills-registry-default/code-reviews`
 - milestone: M-20260624T004510Z-A

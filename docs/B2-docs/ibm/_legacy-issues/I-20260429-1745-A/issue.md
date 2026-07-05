@@ -3,7 +3,7 @@ local_id: I-20260429-1745-A
 issue_title: Fix daemon self-detection suicide + bash 3.2 pipefail crash
 kind: linked
 phase_state: completed
-promoted_from: raw-20260429-1745
+promoted_from: raw-20260429T174500Z
 platform_ids:
   github:
     issue_id: '216'
@@ -34,5 +34,5 @@ Minimal changes to `docs/system/workspace/scripts/runtime/freely`.
 
 ## References
 
-- B1: docs/B1-docs/raw-20260429/
+- B1: docs/B1-docs/raw-20260429T122700Z/
 - Issue: docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md

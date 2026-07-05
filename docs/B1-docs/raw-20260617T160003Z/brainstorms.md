@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw-20260617T160003Z (GitHub #2934)
+- raw-20260617T160003Z03Z (GitHub #2934)
 - 发现方式：收口 fleet 时观察到 develop 变脏，追溯发现 wt-close --force 覆盖了 pr-merge-guarded 的 absorbed frontmatter
 
 ### 问题

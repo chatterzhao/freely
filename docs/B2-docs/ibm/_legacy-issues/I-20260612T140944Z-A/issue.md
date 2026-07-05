@@ -15,10 +15,10 @@ hash: ''
 created_at: '2026-06-13T01:20:00Z'
 updated_at: '2026-06-13T10:42:58Z'
 platform_state: closed
-linked_raw: raw-20260612T140944Z
+linked_raw: raw-20260612T140944Z44Z
 linked_candidate: C-20260612T140944Z-A
 source_candidate: docs/candidates/C-20260612T140944Z-A.md
-worktree: fix/raw-20260612T140944Z-a2a-handoff-compat
+worktree: fix/raw-20260612T140944Z44Z-a2a-handoff-compat
 ---
 
 # I-20260612T140944Z-A: 彻底 A2A 重构

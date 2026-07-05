@@ -8,8 +8,8 @@
 - story-name: `build-artifact-exposure-and-release-allowlist-audit-governance`
 - issue-name: `build-artifact-exposure-and-release-allowlist-audit-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-2245-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-2245-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`
@@ -62,8 +62,8 @@ This owner fixes that first concrete gap without pretending to solve the entire 
 ## Completion
 
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
 - `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`

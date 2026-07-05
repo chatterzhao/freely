@@ -3,7 +3,7 @@
 - id: `C-20260402T030800Z-A`
 - candidate_format_version: `v2`
 - title: Materialize host-local rendering for human-readable runtime status time surfaces
-- source_brainstorm: `docs/B1-docs/raw-20260402-0308/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260402T030800Z/brainstorms.md`
 - problem: Freely already moved Probe Recent Activity plus `freely ai` and watchdog cooldown helper output onto host-local display time with timezone labels, but core runtime status surfaces still echo raw ISO/UTC truth for humans. That leaves the same product with split display semantics and no dedicated owner for the runtime slice.
 - why_now:
   - the broader time-boundary research is already merged and should not remain half-absorbed under a frontend owner

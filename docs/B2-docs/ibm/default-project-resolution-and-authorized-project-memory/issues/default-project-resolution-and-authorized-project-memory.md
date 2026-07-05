@@ -8,8 +8,8 @@
 - story-name: `default-project-resolution-and-authorized-project-memory`
 - issue-name: `default-project-resolution-and-authorized-project-memory`
 - verification_artifact_dir: `docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260320/candidates.md`
-- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320T174500Z/candidates.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320T174500Z/brainstorms.md`
 - execution_base: `feature/project-resolution-defaults-20260320-0005`
 - integration_target: `develop`
 - depends_on: `none`

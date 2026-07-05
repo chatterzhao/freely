@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/gate/gitignore/raw-20260705T122651Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/gate/gitignore/raw-20260705T122651Z51Z/verification/test-evidence/at-001.log
 - test_command: '! grep -nE "docs/B2-docs/[a-z-]+/code-reviews|docs/B2-docs/[a-z-]+/verification|docs/B2-docs/[a-z-]+/test-evidence" docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md | grep -v "raw-\|{raw key}" && echo PASS'
 - expected_output: PASS (no bare paths without raw/key)
 - expected_RED_output: found bare paths
@@ -28,7 +28,7 @@
 - target_environment: feature-local
 - required_evidence: grep 不存在
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/gate/gitignore/raw-20260705T122651Z/verification/test-evidence/at-002.log
+- artifact_ref: docs/B2-docs/gate/gitignore/raw-20260705T122651Z51Z/verification/test-evidence/at-002.log
 - test_command: '! grep -q "docs/B2-docs/git-worktree/code-reviews" bin/pr-review-guarded && echo PASS'
 - expected_output: PASS
 - expected_RED_output: found fallback string

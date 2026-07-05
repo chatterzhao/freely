@@ -1,6 +1,6 @@
 # PRD: cmd_feedback 对齐 issue-sync 多平台架构
 
-- issue_id: raw-20260624T141559Z
+- issue_id: raw-20260624T141559Z59Z
 - candidate: C-20260624T141559Z-A
 - milestone: M-20260624T141559Z-A
 

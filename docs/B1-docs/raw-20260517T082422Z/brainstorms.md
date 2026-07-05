@@ -2,7 +2,7 @@
 
 ## Discovery
 
-- **来源**: chat-inbox → `raw-20260517T082422Z` (GitHub #502)
+- **来源**: chat-inbox → `raw-20260517T082453Z22Z` (GitHub #502)
 - **摘要**: runtime supervisor 上报 bash at freely:18777 以 rc=0 退出并被判定为 crash。
 - **现场信息**:
   - `tool`: cc-ds-flash-auto (Claude Code deepseek flash auto mode)
@@ -17,13 +17,13 @@
 
 | pre-brainstorm | raw issue | 时间 | GitHub |
 |---|---|---|---|
-| `20260517T082453Z--supervisor-bash-rc0-crash` | `raw-20260517T082453Z` | 08:24:53Z | #503 |
-| `20260517T083030Z--supervisor-bash-rc0-crash` | `raw-20260517T083030Z` | 08:30:30Z | #504 |
-| `20260517T083200Z--supervisor-crash-bash-rc0` | `raw-20260517T083200Z` | 08:32:00Z | #505 |
+| `20260517T082453Z--supervisor-bash-rc0-crash` | `raw-20260517T082453Z53Z` | 08:24:53Z | #503 |
+| `20260517T083030Z--supervisor-bash-rc0-crash` | `raw-20260517T083030Z30Z` | 08:30:30Z | #504 |
+| `20260517T083200Z--supervisor-crash-bash-rc0` | `raw-20260517T083200Z00Z` | 08:32:00Z | #505 |
 
 其中 `20260517T082453Z` 已有完整的发散→收敛→决策分析，定位核心问题为 **"supervisor 未区分进程正常退出 (rc=0) 和异常崩溃 (rc!=0)"**；`083030Z` 和 `083200Z` 均已进入 milestones.md 的 candidate_issues 队列，status=needs_research。
 
-本 raw issue `raw-20260517T082422Z` 是同一主题的最早实例（GitHub #502，08:24:22Z），已被上述 brainstorms 覆盖。
+本 raw issue `raw-20260517T082453Z22Z` 是同一主题的最早实例（GitHub #502，08:24:22Z），已被上述 brainstorms 覆盖。
 
 **判定**: 无需重复发散收敛，吸收到已有 candidate 中。
 
@@ -36,7 +36,7 @@
 3. **launch_kind=prompt**：一次性 prompt 启动，任务完成后进程退出是预期行为。
 4. **可能性 A（正常退出被误分类）最可能**：supervisor 将"进程不再运行"一律视为 crash，未识别正常退出的生命周期语义。
 
-详细分析参照 `docs/B1-docs/raw-20260517T082453Z/brainstorms.md`。
+详细分析参照 `docs/B1-docs/raw-20260517T082453Z53Z/brainstorms.md`。
 
 ## Decision
 

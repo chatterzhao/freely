@@ -1,7 +1,7 @@
 # Code Review: pr-merge-guarded fix/* whitelist
 
-- issue_id: `raw-20260506T1400Z`
-- issue_path: `docs/B1-docs/raw-20260506T1400Z/issue.md`
+- issue_id: `raw-20260506T140000Z`
+- issue_path: `docs/B1-docs/raw-20260506T140000Z/issue.md`
 
 ## Implementation Decision Note
 - decision: Add fix/* to pr-merge-guarded whitelist

@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T021946Z
 phase_state: completed
-source_raw: raw-20260630T021946Z
+source_raw: raw-20260630T021946Z46Z
 source_url: https://github.com/chatterzhao/freely/issues/3639
 produced_candidate: C-20260630T021946Z-A
 created_at: 2026-06-30
@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: a2a_tasks 状态对齐 Google A2A 标准
 
 ## Input
-- 来源：GitHub #3639 raw-20260630T021946Z
+- 来源：GitHub #3639 raw-20260630T021946Z46Z
 - kind：fix
 - 触发：supervisor-cycle B1 预研中发现 Freely 使用自定义状态名 `blocked`，Google A2A 标准对应态是 `input-required`，且缺少 `canceled`
 

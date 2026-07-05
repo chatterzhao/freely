@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260619T043000Z-A
 status: promoted
-source_raw: raw-20260619T043000Z
+source_raw: raw-20260619T043000Z00Z
 created_at: 2026-06-19
 milestone: M-20260619T043000Z-A
 ---

@@ -8,8 +8,8 @@
 - story-name: `runtime-selfhost-continuity-gap-and-status-truth-governance`
 - issue-name: `runtime-selfhost-continuity-gap-and-status-truth-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260407/candidates.md#c-20260407-0215-a`
-- source_brainstorm: `docs/B1-docs/raw-20260407/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260407T103600Z/candidates.md#c-20260407-0215-a`
+- source_brainstorm: `docs/B1-docs/raw-20260407T103600Z/brainstorms.md`
 - execution_base: `feature/runtime-live-status-and-manager-continuity-followthrough-20260407`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
@@ -60,8 +60,8 @@ This is not a CLI-first owner and not a generic watchdog redesign. It is the nex
 
 ## Completion
 
-- `docs/B1-docs/raw-20260407/brainstorms.md`
-- `docs/B1-docs/raw-20260407/candidates.md`
+- `docs/B1-docs/raw-20260407T103600Z/brainstorms.md`
+- `docs/B1-docs/raw-20260407T103600Z/candidates.md`
 - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/brainstorms/b-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/prd.md`

@@ -3,8 +3,8 @@ local_id: I-20260617T090413Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260617T090413Z
-source_candidate: docs/B1-docs/raw-20260617T090413Z/candidates.md
+promoted_from: raw-20260617T090408Z13Z
+source_candidate: docs/B1-docs/raw-20260617T090408Z13Z/candidates.md
 verification_artifact_dir: docs/B2-docs/fix-rest-routing/code-reviews
 ---
 # I-20260617T090413Z-A: REST routing for a2a-exit

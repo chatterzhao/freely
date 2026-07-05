@@ -1,6 +1,6 @@
 # PR Review: #3110
 - pr_number: 3110
-- branch: fix/raw-20260620T000012Z-worker-self-heal
+- branch: fix/raw-20260620T000012Z12Z-worker-self-heal
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T00:04:51Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T000012Z-worker-self-heal branch=fix/raw-20260620T000012Z-worker-self-heal clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T000012Z12Z-worker-self-heal branch=fix/raw-20260620T000012Z12Z-worker-self-heal clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

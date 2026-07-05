@@ -3,8 +3,8 @@ local_id: I-20260510T1339Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260510T1339Z
-source_candidate: docs/B1-docs/raw-20260510T1339Z/candidates.md
+promoted_from: raw-20260510T133900Z
+source_candidate: docs/B1-docs/raw-20260510T133900Z/candidates.md
 verification_artifact_dir: docs/B2-docs/wt-create-order/code-reviews
 pre_tests_path: docs/B2-docs/wt-create-order/verification/pre-tests.md
 platform_state: closed

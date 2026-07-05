@@ -2,14 +2,14 @@
 - kind: fix
 - phase_state: done_b2_ibm
 - milestone: M-20260624T155212Z-A
-- source_candidate: docs/B1-docs/raw-20260624T155212Z/candidates.md#C-20260624T155212Z-A
+- source_candidate: docs/B1-docs/raw-20260624T155212Z12Z/candidates.md#C-20260624T155212Z-A
 - verification_artifact_dir: docs/B2-docs/pretests-retirement-gate-fallback/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T155212Z-A/issue.md
 - title: pretests-retirement-gate fallback for missing workcell-state.env
 
 # I-20260624T155212Z-A: pretests-retirement-gate fallback for missing workcell-state.env
 
-- source_candidate: docs/B1-docs/raw-20260624T155212Z/candidates.md#C-20260624T155212Z-A
+- source_candidate: docs/B1-docs/raw-20260624T155212Z12Z/candidates.md#C-20260624T155212Z-A
 - verification_artifact_dir: docs/B2-docs/pretests-retirement-gate-fallback/code-reviews
 - pre_tests_path: docs/B2-docs/pretests-retirement-gate-fallback/pre-tests.md
 

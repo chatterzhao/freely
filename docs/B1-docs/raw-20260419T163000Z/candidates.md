@@ -1,6 +1,6 @@
 # Candidates - 20260419-1630--runtime-startup-self-healing-boundary
 
-- Source brainstorm: `docs/B1-docs/raw-20260419-1630/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419T163000Z/brainstorms.md`
 
 ### C-20260419T163000Z-A: legacy issue
 

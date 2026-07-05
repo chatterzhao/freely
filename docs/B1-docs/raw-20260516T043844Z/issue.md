@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260516T043844Z
+local_id: raw-20260516T043844Z44Z
 kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -25,7 +25,7 @@ platform_state: closed
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260516T043844Z` |
+| local_id | `raw-20260516T043844Z44Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -35,7 +35,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260516T043844Z`。实现前请用 `wt-create --raw-key 20260516T043844Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260516T043844Z44Z`。实现前请用 `wt-create --raw-key 20260516T043844Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

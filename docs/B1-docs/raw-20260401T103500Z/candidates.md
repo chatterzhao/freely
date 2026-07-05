@@ -3,7 +3,7 @@
 - id: `C-20260401T103500Z-A`
 - candidate_format_version: `v2`
 - title: Materialize develop push-pending governance after protected-branch merge
-- source_brainstorm: `docs/B1-docs/raw-20260401-1035/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401T103500Z/brainstorms.md`
 - problem: Freely currently enforces branch protection and develop-bound merge governance, but it still lacks a canonical state for “merge already happened on local develop, remote push has not happened yet”. Without that state, post-merge acceptance, push debt, cleanup, and next-lane sequencing can blur together, which allows false completion or long-lived local-only truth.
 - why_now:
   - protected-branch merge governance is already strict, but post-merge push sequencing is still mostly implicit

@@ -1,6 +1,6 @@
 # PR Review: #3547
 - pr_number: 3547
-- branch: fix/raw-20260626T075340Z-cline-registry-fix
+- branch: fix/raw-20260626T075340Z40Z-cline-registry-fix
 - base: develop
 - reviewer: subagent (2 independent reviewers)
 - review_date: 2026-06-26T11:40:00Z

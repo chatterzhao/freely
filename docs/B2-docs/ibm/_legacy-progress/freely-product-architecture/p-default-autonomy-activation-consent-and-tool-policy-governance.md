@@ -14,7 +14,7 @@
   - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
   - `docs/B2-docs/config/packaging/prd.md`
   - `docs/B2-docs/config/packaging/pre-tests.md`
-  - `docs/B1-docs/raw-20260401/brainstorms.md`
+  - `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
   - `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
   - `docs/B2-docs/config/packaging/code-reviews/20260401-default-autonomy-activation-consent-verification.md`
 - next:

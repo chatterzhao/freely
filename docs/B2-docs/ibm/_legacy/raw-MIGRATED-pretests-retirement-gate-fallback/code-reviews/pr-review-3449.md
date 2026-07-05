@@ -1,6 +1,6 @@
 # PR Review: #3449
 - pr_number: 3449
-- branch: fix/raw-20260624T155212Z-pretests-retirement-gate-fallback
+- branch: fix/raw-20260624T155212Z12Z-pretests-retirement-gate-fallback
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T16:08:59Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T155212Z-pretests-retirement-gate-fallback branch=fix/raw-20260624T155212Z-pretests-retirement-gate-fallback clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T155212Z12Z-pretests-retirement-gate-fallback branch=fix/raw-20260624T155212Z12Z-pretests-retirement-gate-fallback clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

@@ -1,6 +1,6 @@
 # Brainstorm: Agent Handoff Protocol
 
-- 来源: raw-20260514T103532Z (#344)
+- 来源: raw-20260514T103532Z32Z (#344)
 - 日期: 2026-05-14
 - 基于: #343 handoff pipeline disconnect 根因分析、handoffs 表实际使用情况审视
 

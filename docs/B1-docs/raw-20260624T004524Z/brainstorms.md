@@ -32,7 +32,7 @@
 EOF
 
 # B1: candidates
-cat > docs/B1-docs/raw-20260624T004524Z/candidates.md << 'CEOF'
+cat > docs/B1-docs/raw-20260624T004510Z24Z/candidates.md << 'CEOF'
 # Candidates
 
 ## C-20260624T004524Z-A: A2A server _restore_tasks 异步化
@@ -68,8 +68,8 @@ local_id: I-20260624T004524Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260624T004524Z
-source_candidate: docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A
+promoted_from: raw-20260624T004510Z24Z
+source_candidate: docs/B1-docs/raw-20260624T004510Z24Z/candidates.md#C-20260624T004524Z-A
 canonical_issue_path: docs/B1-docs/raw-I-20260624T004524Z-A/issue.md
 milestone: "M-20260624T004524Z-A"
 title: "fix: defer _restore_tasks to background thread to prevent A2A startup timeout"
@@ -91,7 +91,7 @@ verification_artifact_dir: docs/B2-docs/a2a-restore-async/code-reviews
 
 # I-20260624T004524Z-A: A2A server _restore_tasks 异步化
 
-- source_candidate: `docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A`
+- source_candidate: `docs/B1-docs/raw-20260624T004510Z24Z/candidates.md#C-20260624T004524Z-A`
 - pre_tests_path: `docs/B2-docs/a2a-restore-async/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/a2a-restore-async/code-reviews`
 - milestone: M-20260624T004524Z-A

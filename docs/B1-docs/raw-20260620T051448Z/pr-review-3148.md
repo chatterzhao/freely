@@ -1,6 +1,6 @@
 # PR Review: #3148
 - pr_number: 3148
-- branch: feature/raw-20260620T051448Z-manager-patrol-flow
+- branch: feature/raw-20260620T051448Z48Z-manager-patrol-flow
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T05:51:22Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260620T051448Z-manager-patrol-flow branch=feature/raw-20260620T051448Z-manager-patrol-flow clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260620T051448Z48Z-manager-patrol-flow branch=feature/raw-20260620T051448Z48Z-manager-patrol-flow clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

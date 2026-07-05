@@ -3,8 +3,8 @@ local_id: I-20260519T155813Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260519T155813Z
-source_candidate: docs/B1-docs/raw-20260519T155813Z/candidates.md
+promoted_from: raw-20260519T155813Z13Z
+source_candidate: docs/B1-docs/raw-20260519T155813Z13Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:

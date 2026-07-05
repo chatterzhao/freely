@@ -2,10 +2,10 @@
 local_id: I-20260621T130954Z-A
 kind: I
 phase_state: completed
-source_candidate: `docs/B1-docs/raw-20260621T130954Z/candidates.md#c-20260621T130954Z-A`
-verification_artifact_dir: docs/B1-docs/raw-20260621T130954Z
+source_candidate: `docs/B1-docs/raw-20260621T130954Z54Z/candidates.md#c-20260621T130954Z-A`
+verification_artifact_dir: docs/B1-docs/raw-20260621T130954Z54Z
 raw_refs:
-  - raw-20260621T130954Z
+  - raw-20260621T130954Z54Z
 candidate_refs:
   - C-20260621T130954Z-A
 created_at: '2026-06-21T13:10:12Z'

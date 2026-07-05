@@ -8,8 +8,8 @@
 - story-name: `fresh-project-bootstrap-and-baseline-scoping-followthrough-governance`
 - issue-name: `fresh-project-bootstrap-and-baseline-scoping-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-2358-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-2358-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
@@ -64,7 +64,7 @@ This is a first-hop CLI contract bug. If fresh-project bootstrap is wrong, every
 
 ## Completion
 
-- `docs/B1-docs/raw-20260405/candidates.md`
+- `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`

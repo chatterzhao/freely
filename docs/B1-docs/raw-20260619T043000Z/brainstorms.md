@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260619T043000Z
 phase_state: completed
-source_raw: raw-20260619T043000Z
+source_raw: raw-20260619T043000Z00Z
 source_url: https://github.com/chatterzhao/freely/issues/3026
 produced_candidate: C-20260619T043000Z-A
 created_at: 2026-06-19
@@ -12,7 +12,7 @@ created_at: 2026-06-19
 ## Input
 
 - GitHub #3026
-- Raw issue: docs/B1-docs/raw-20260619T043000Z/issue.md
+- Raw issue: docs/B1-docs/raw-20260619T043000Z00Z/issue.md
 
 ## Problem
 

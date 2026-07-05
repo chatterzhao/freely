@@ -1,6 +1,6 @@
 # PR Review: #local
 - pr_number: local
-- branch: fix/raw-20260624T004510Z-deploy-skills-all-tools
+- branch: fix/raw-20260624T004510Z10Z-deploy-skills-all-tools
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T05:15:57Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T004510Z-deploy-skills-all-tools branch=fix/raw-20260624T004510Z-deploy-skills-all-tools clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T004510Z10Z-deploy-skills-all-tools branch=fix/raw-20260624T004510Z10Z-deploy-skills-all-tools clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

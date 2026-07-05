@@ -1,7 +1,7 @@
 # Brainstorm: raw-issue-pull 工位拦截
 
 ## 来源
-- `docs/B1-docs/raw-20260507T143544Z/issue.md` — GitHub #247
+- `docs/B1-docs/raw-20260507T143545Z44Z/issue.md` — GitHub #247
 - 实际操作中发现：从 `develop` 分支直接调用 `raw-issue-pull` 可拉取任意 issue，绕过工位隔离
 
 ## 问题边界

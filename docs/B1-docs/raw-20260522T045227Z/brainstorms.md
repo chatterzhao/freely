@@ -1,7 +1,7 @@
 # Brainstorm: probe say hi
 
 ## Source
-- GitHub issue #2111 (raw-20260522T045227Z)
+- GitHub issue #2111 (raw-20260522T045227Z27Z)
 - Title: slot_probe 用 say hi 替代 hi
 
 ## Discovery

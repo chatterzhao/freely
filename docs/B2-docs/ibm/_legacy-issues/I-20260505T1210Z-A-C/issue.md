@@ -3,7 +3,7 @@ local_id: I-20260505T1210Z-A-C
 issue_title: 'governance gate: platform_state vs phase_state 一致性 + schema 兜底'
 kind: linked
 phase_state: completed
-promoted_from: raw-20260505T1210Z
+promoted_from: raw-20260505T121000Z
 platform_ids:
   github:
     issue_id: '214'

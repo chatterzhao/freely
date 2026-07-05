@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260704T004227Z
 phase_state: completed
-source_raw: raw-20260704T004227Z
+source_raw: raw-20260704T004227Z27Z
 source_url: https://github.com/chatterzhao/freely/issues/3722
 produced_candidate: C-20260704T004227Z-A
 created_at: 2026-07-04
@@ -11,7 +11,7 @@ created_at: 2026-07-04
 
 ## Input
 
-- **来源**: raw-20260704T004227Z (GitHub #3722, Gitee IJYPWD)
+- **来源**: raw-20260704T004227Z27Z (GitHub #3722, Gitee IJYPWD)
 - **类型**: fix — agent-table.toml 配置的 slot 与实际执行不一致
 - **严重程度**: 高 — 使用了错误的 ACP binary (claude-agent-acp) + 错误的模型 (deepseek-v4-pro)
 

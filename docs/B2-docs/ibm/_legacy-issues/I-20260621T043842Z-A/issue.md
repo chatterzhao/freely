@@ -2,10 +2,10 @@
 local_id: I-20260621T043842Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/B1-docs/raw-20260621T043842Z/candidates.md#C-20260621T043842Z-A
+source_candidate: docs/B1-docs/raw-20260621T043842Z42Z/candidates.md#C-20260621T043842Z-A
 platform_ids: {}
 primary_platform: github
-canonical_issue_path: docs/B1-docs/raw-20260621T043842Z/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260621T043842Z42Z/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-21T04:38:42Z'
@@ -14,7 +14,7 @@ intake_id: ''
 author: claude
 channel: claude
 session_refs: []
-source_raw: raw-20260621T043842Z
+source_raw: raw-20260621T043842Z42Z
 candidate_id: C-20260621T043842Z-A
 milestone_id: M-20260621T043842Z-A
 ---

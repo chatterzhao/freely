@@ -8,8 +8,8 @@
 - story-name: `acp-optional-adapter-boundary-governance`
 - issue-name: `acp-optional-adapter-boundary-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1545-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-1545-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`
@@ -111,8 +111,8 @@ ACP 预研现在已经有稳定边界：
 
 ## Implementation References
 
-- `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/brainstorms/b-acp-optional-adapter-boundary-governance.md`
 - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/prd.md`
 - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`

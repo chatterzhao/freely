@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: Registry 查询 claude adapters.supported 返回 direct,acp
 - testing_layer: unit
-- target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
+- target_environment: fix/raw-20260627T030447Z47Z-claude-acp-adapter-fix
 - required_evidence: 输出包含 acp
 - test_command: python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml claude adapters.supported | grep -q acp && echo "PASS: acp found" || echo "FAIL: acp not found"
 - expected_output: "PASS: acp found"
@@ -18,7 +18,7 @@
 ### acceptance-2
 - acceptance_target: Registry 查询 cline adapters.supported 返回 direct,acp
 - testing_layer: unit
-- target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
+- target_environment: fix/raw-20260627T030447Z47Z-claude-acp-adapter-fix
 - required_evidence: 输出包含 acp
 - test_command: python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml cline adapters.supported | grep -q acp && echo "PASS: acp found" || echo "FAIL: acp not found"
 - expected_output: "PASS: acp found"
@@ -30,7 +30,7 @@
 ### acceptance-3
 - acceptance_target: Registry 查询 claude adapters.default 返回 acp
 - testing_layer: unit
-- target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
+- target_environment: fix/raw-20260627T030447Z47Z-claude-acp-adapter-fix
 - required_evidence: 输出为 acp
 - test_command: result=$(python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml claude adapters.default) && [[ "$result" == "acp" ]] && echo "PASS: $result" || echo "FAIL: $result"
 - expected_output: "PASS: acp"
@@ -42,7 +42,7 @@
 ### acceptance-4
 - acceptance_target: 未注册工具触发保守回退（返回 direct）
 - testing_layer: unit
-- target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
+- target_environment: fix/raw-20260627T030447Z47Z-claude-acp-adapter-fix
 - required_evidence: registry 查询失败，代码回退到 printf direct
 - test_command: python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml nonexistent adapters.supported 2>&1; echo "EXIT: $?"
 - expected_output: registry 返回错误，_tool_registry_get 回退到空字符串，触发 conservative fallback → direct
@@ -54,7 +54,7 @@
 ## Unit
 - acceptance_target: 所有已注册工具 (claude, cline, codex, opencode) 的 adapters.supported 均包含 acp
 - testing_layer: unit
-- target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
+- target_environment: fix/raw-20260627T030447Z47Z-claude-acp-adapter-fix
 - required_evidence: 四个工具全部返回 direct,acp
 
 ## Integration

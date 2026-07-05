@@ -1,7 +1,7 @@
 ---
 id: C-20260619T111454Z-platform-sync-batch
 status: promoted
-source: raw-20260619T111454Z
+source: raw-20260619T111454Z54Z
 promoted_to: I-20260619T111454Z-A
 promoted_at: '2026-06-19T12:50:00Z'
 acceptance_criteria:

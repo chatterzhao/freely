@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260505T231000Z
+local_id: raw-20260505T231000Z00Z
 issue_title: "fix: secret detection false positive on file paths with sk- prefix"
 kind: raw
 phase_state: completed

@@ -11,7 +11,7 @@
 | Worktree | 分支 | 状态 |
 |----------|------|------|
 | 主目录 | develop | 受保护 |
-| feature-raw-20260612T000223Z-a2a-replace-handoff | feature/* | 活跃开发中 |
+| feature-raw-20260612T000223Z23Z-a2a-replace-handoff | feature/* | 活跃开发中 |
 | test-pre-merge-20260612T000223Z-a2a-replace-handoff | test-pre-merge-* | 验证中 |
 
 ### 活跃 Milestone

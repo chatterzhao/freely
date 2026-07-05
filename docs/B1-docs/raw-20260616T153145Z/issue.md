@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260616T153145Z
+local_id: raw-20260616T153145Z45Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260616T044030Z-A
@@ -22,7 +22,7 @@ session_refs: []
 
 ## Problem
 
-`raw-20260616T044030Z` (config.toml migration) 的 brainstorms.md 在 merge 时写的选定方案是"自动迁移（渐进式，保留 config.env 回退）"，但实际实现做的是"彻底 TOML-only，零 config.env 回退"。governance-merge-gate 只验证了文档存在性，没发现文档描述与实现不一致。
+`raw-20260616T044030Z30Z` (config.toml migration) 的 brainstorms.md 在 merge 时写的选定方案是"自动迁移（渐进式，保留 config.env 回退）"，但实际实现做的是"彻底 TOML-only，零 config.env 回退"。governance-merge-gate 只验证了文档存在性，没发现文档描述与实现不一致。
 
 ## 根因
 

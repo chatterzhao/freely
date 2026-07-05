@@ -1,6 +1,6 @@
 ---
-local_id: raw-20260517T030000Z
-id: raw-20260517T030000Z
+local_id: raw-20260517T030000Z00Z
+id: raw-20260517T030000Z00Z
 kind: raw
 title: 'batch closeout round 4: remaining lifecycle items'
 phase_state: dropped

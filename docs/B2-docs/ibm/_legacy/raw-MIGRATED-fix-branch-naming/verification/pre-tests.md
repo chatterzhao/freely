@@ -4,7 +4,7 @@
 ## Unit
 - acceptance target: `fix-execution SKILL.md uses fix/* in all 5 changed locations`
 - testing layer: `unit`
-- target environment: `fix/raw-20260507T0100Z-fix-execution-branch-naming`
+- target environment: `fix/raw-20260507T010000Z-fix-execution-branch-naming`
 - required evidence: `grep confirms fix/* prefix`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -14,7 +14,7 @@
 ## Integration
 - acceptance target: `governance-merge-gate passes`
 - testing layer: `integration`
-- target environment: `fix/raw-20260507T0100Z-fix-execution-branch-naming`
+- target environment: `fix/raw-20260507T010000Z-fix-execution-branch-naming`
 - required evidence: `gate output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `./bin/governance-merge-gate --range develop..HEAD`

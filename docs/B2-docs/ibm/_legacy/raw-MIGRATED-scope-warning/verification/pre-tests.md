@@ -8,7 +8,7 @@
 - requirement: pre-commit hook --fail-on-required removed, scope note replaces hard block
 - acceptance_target: pre-commit hook --fail-on-required removed, scope note replaces hard block
 - testing_layer: unit
-- target_environment: fix-raw-20260628T054513Z-scope-warning
+- target_environment: fix-raw-20260628T054513Z13Z-scope-warning
 - required_evidence: grep confirms --fail-on-required not in hook
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/scope-warning/test-evidence/acceptance-1.log
@@ -44,7 +44,7 @@
 ## Unit
 - acceptance_target: hook text and AGENTS.md changes are correct
 - testing_layer: unit
-- target_environment: fix-raw-20260628T054513Z-scope-warning
+- target_environment: fix-raw-20260628T054513Z13Z-scope-warning
 - required_evidence: manual grep verification
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: human_observation_only

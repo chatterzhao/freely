@@ -1,6 +1,6 @@
 # PR Review: #3024
 - pr_number: 3024
-- branch: fix/raw-20260619T035704Z-parse-candidate-heading-regex
+- branch: fix/raw-20260619T035704Z04Z-parse-candidate-heading-regex
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T04:21:48Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T035704Z-parse-candidate-heading-regex branch=fix/raw-20260619T035704Z-parse-candidate-heading-regex clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T035704Z04Z-parse-candidate-heading-regex branch=fix/raw-20260619T035704Z04Z-parse-candidate-heading-regex clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

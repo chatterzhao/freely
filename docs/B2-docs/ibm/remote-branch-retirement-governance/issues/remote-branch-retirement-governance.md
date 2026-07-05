@@ -8,8 +8,8 @@
 - story-name: `remote-branch-retirement-governance`
 - issue-name: `remote-branch-retirement-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/remote-branch-retirement-governance/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1515-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-1515-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
@@ -50,8 +50,8 @@ Freely 当前已经能：
 
 ## Completion
 
-- `docs/B1-docs/raw-20260321/brainstorms.md`
-- `docs/B1-docs/raw-20260321/candidates.md`
+- `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
+- `docs/B1-docs/raw-20260321T170600Z/candidates.md`
 - `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`
 - `docs/system/workspace/skills/worktree-maintenance-governance/references/fleet-closure.md`
 - `docs/system/workspace/skills/worktree-maintenance-governance/references/retirement-handoff.md`

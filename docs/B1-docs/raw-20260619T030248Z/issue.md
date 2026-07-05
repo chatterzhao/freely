@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260619T030248Z
+local_id: raw-20260619T030248Z48Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260619T030248Z-A
@@ -22,7 +22,7 @@ session_refs: []
 
 ## 问题
 
-`fix/raw-20260618T114441Z-platform-sync` worktree 中 199 个 issue.md 被 `issue-sync` 改脏（git 未 add 的 modified）。
+`fix/raw-20260618T091116Z41Z-platform-sync` worktree 中 199 个 issue.md 被 `issue-sync` 改脏（git 未 add 的 modified）。
 
 实际分析发现是三个独立问题，分别涉及不同的代码逻辑：
 

@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`
 - issue-name: `doc-loop-dev-loop-handoff-bootstrap`
-- source_candidate: `docs/B1-docs/raw-20260306/candidates.md#c-20260306-1104`
+- source_candidate: `docs/B1-docs/raw-20260306T001600Z/candidates.md#c-20260306-1104`
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 
 ## Outcome

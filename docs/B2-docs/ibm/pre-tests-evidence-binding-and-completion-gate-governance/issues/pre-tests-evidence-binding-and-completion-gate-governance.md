@@ -8,8 +8,8 @@
 - story-name: `pre-tests-evidence-binding-and-completion-gate-governance`
 - issue-name: `pre-tests-evidence-binding-and-completion-gate-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-0651-a`
-- source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327T200600Z/candidates.md#c-20260327-0651-a`
+- source_brainstorm: `docs/B1-docs/raw-20260327T200600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`

@@ -10,11 +10,11 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/326
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/B1-docs/raw-20260513T010343Z/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260513T010343Z43Z/candidates.md
 created_at: '2026-05-13T01:03:43Z'
 updated_at: '2026-05-17T12:25:53Z'
 promoted_from: C-20260513T010343Z-A
-source_candidate: docs/B1-docs/raw-20260513T010343Z/candidates.md#C-20260513T010343Z-A
+source_candidate: docs/B1-docs/raw-20260513T010343Z43Z/candidates.md#C-20260513T010343Z-A
 pre_tests_path: ''
 verification_artifact_dir: docs/B2-docs/ibm/raw-key-seconds-cleanup/code-reviews/
 platform_state: closed

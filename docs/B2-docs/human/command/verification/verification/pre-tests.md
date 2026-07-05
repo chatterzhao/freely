@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z-hook-scripts-bin-to-freely
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/hooks/pre-merge-commit.sh docs/system/workspace/hooks/pre-push.sh docs/system/workspace/hooks/reference-transaction.sh docs/system/workspace/scripts/start-lead-agent.sh; do
     matches=$(grep -nE '(\.\/bin\/freely |\.\/bin\/pr-|\.\/bin\/wt-)' "$f" 2>/dev/null || true)
     if [ -n "$matches" ]; then echo "FAIL: $f" && echo "$matches" && exit 1; fi
@@ -40,7 +40,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z-hook-scripts-bin-to-freely
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh; do
     grep -q 'source.*worktree-common.sh' "$f" || { echo "FAIL: $f"; exit 1; }
   done
@@ -65,7 +65,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z-hook-scripts-bin-to-freely
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh; do
     grep -q '\[\[ -x "\.\/bin\/governance-merge-gate" \]\]' "$f" || { echo "FAIL: $f"; exit 1; }
   done
@@ -90,7 +90,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-4.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z-hook-scripts-bin-to-freely
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/hooks/pre-merge-commit.sh docs/system/workspace/hooks/pre-push.sh docs/system/workspace/hooks/reference-transaction.sh docs/system/workspace/scripts/start-lead-agent.sh; do
     matches=$(grep -nE '(\.\/bin\/freely |\.\/bin\/pr-|\.\/bin\/wt-)' "$f" 2>/dev/null || true)
     if [ -n "$matches" ]; then echo "FAIL: $f" && echo "$matches" && exit 1; fi

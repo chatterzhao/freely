@@ -4,14 +4,14 @@ kind: fix
 phase_state: completed
 verification_artifact_dir: docs/B2-docs/runtime/verify
 milestone: ""
-source_candidate: docs/B1-docs/raw-20260620T083454Z/candidates.md#C-20260620T083454Z-A
+source_candidate: docs/B1-docs/raw-20260620T083454Z54Z/candidates.md#C-20260620T083454Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T083454Z-A/issue.md
 title: "fix: task-source-scan check phase_state before reporting incomplete"
 created_at: "2026-06-20T09:50:00Z"
 author: manager
-parent_raw: raw-20260620T083454Z
+parent_raw: raw-20260620T083454Z54Z
 implemented_in:
-  branch: fix/raw-20260620T083454Z-scan-fix
+  branch: fix/raw-20260620T083454Z54Z-scan-fix
   commits:
   - d7f3433e4
   - 2adaf04e5
@@ -36,6 +36,6 @@ In `docs/system/workspace/scripts/runtime/task-lifecycle-scan.py`:
 
 ## Verification
 
-- [x] Code change committed on fix/raw-20260620T083454Z-scan-fix
+- [x] Code change committed on fix/raw-20260620T083454Z54Z-scan-fix
 - [ ] PR review needed
 - [ ] merge to develop via PR

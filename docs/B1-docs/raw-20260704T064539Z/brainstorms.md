@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260704T064539Z
 phase_state: completed
-source_raw: raw-20260704T064539Z
+source_raw: raw-20260704T064539Z39Z
 source_url: https://github.com/chatterzhao/freely/issues/3726
 produced_candidate: C-20260704T064539Z-A
 created_at: 2026-07-04
@@ -10,8 +10,8 @@ created_at: 2026-07-04
 # B1_IBM: 统一 ACP session 管理 + Bridge 解耦
 
 ## Input
-- raw-20260704T064539Z (GitHub #3726)
-- 关联: raw-20260704T080808Z (多 bridge 并行, GitHub #3727)
+- raw-20260704T064539Z39Z (GitHub #3726)
+- 关联: raw-20260704T080808Z08Z (多 bridge 并行, GitHub #3727)
 
 ## Problem
 

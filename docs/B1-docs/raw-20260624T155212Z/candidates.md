@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260624T155212Z-A
 status: promoted
-source_raw: raw-20260624T155212Z
+source_raw: raw-20260624T155212Z12Z
 created_at: 2026-06-24
 milestone: M-20260624T155212Z-A
 ---
@@ -12,7 +12,7 @@ milestone: M-20260624T155212Z-A
 - title: pretests-retirement-gate fallback for missing workcell-state.env
 - status: promoted
 - decision_reason: Option C (fallback scan of worktree pre-tests.md) is the minimal change that preserves backward compatibility and adds validation for the manual-execution path
-- next_action: code committed in fix/raw-20260624T155212Z-pretests-retirement-gate-fallback; ready for B2_IBM governance and PR
+- next_action: code committed in fix/raw-20260624T155212Z12Z-pretests-retirement-gate-fallback; ready for B2_IBM governance and PR
 - revisit_trigger: N/A (fix is already implemented and committed)
 - acceptance_criteria:
   - pretests-retirement-gate no longer exits immediately when workcell-state.env is missing

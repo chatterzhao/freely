@@ -2,7 +2,7 @@
 
 ## 背景
 
-`raw-20260519T004246Z` (GitHub #581) 报告了 agent 文档 4 个致命问题。经 Brainstorm 验证（docs/B1-docs/raw-20260519T004246Z/brainstorms.md），#2-#4 已在 `5b19bc25` 中修复，仅 #1（evidence_paths 必填/可选不一致）仍需修复。
+`raw-20260519T004246Z46Z` (GitHub #581) 报告了 agent 文档 4 个致命问题。经 Brainstorm 验证（docs/B1-docs/raw-20260519T004246Z46Z/brainstorms.md），#2-#4 已在 `5b19bc25` 中修复，仅 #1（evidence_paths 必填/可选不一致）仍需修复。
 
 **缺口**: handoff.py:30 REQUIRED_FIELDS['worker_done'] = ['completion_summary']，缺少 evidence_paths。runtime 的 validate_worker_exit_contract_for_project 要求 evidence_paths 为必填，导致 handoff.py 层不对缺失 evidence_paths 做校验，问题延迟到 runtime 才暴露。
 

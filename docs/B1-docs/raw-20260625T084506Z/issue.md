@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260625T084506Z
+local_id: raw-20260625T084522Z06Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260625T084506Z-A
@@ -18,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-source_candidate: docs/B1-docs/raw-20260625T084506Z/candidates.md#C-20260625T084506Z-A
+source_candidate: docs/B1-docs/raw-20260625T084522Z06Z/candidates.md#C-20260625T084506Z-A
 promoted_issue_path: docs/issues/I-20260625T084506Z-A/issue.md
 pre_tests_path: docs/B2-docs/b2-ibm-anti-cheating/verification/pre-tests.md
 ---

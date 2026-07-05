@@ -8,8 +8,8 @@
 - story-name: `worktree-fleet-governance-closure`
 - issue-name: `worktree-fleet-governance-closure`
 - verification_artifact_dir: `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-0257-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-0257-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`

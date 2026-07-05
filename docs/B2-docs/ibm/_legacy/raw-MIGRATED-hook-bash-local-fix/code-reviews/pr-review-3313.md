@@ -1,6 +1,6 @@
 # PR Review: #3313
 - pr_number: 3313
-- branch: fix/raw-20260622T003231Z-hook-fix
+- branch: fix/raw-20260622T003231Z31Z-hook-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T02:06:22Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T003231Z-hook-fix branch=fix/raw-20260622T003231Z-hook-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T003231Z31Z-hook-fix branch=fix/raw-20260622T003231Z31Z-hook-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

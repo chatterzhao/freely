@@ -6,7 +6,7 @@
 
 - acceptance target: `package-allowlist.txt 精确定义产品交付边界，不含开发/治理文件，且随 workspace 结构变化可维护。`
 - testing layer: `unit`
-- target environment: `feature/raw-20260520T013044Z-packaging-selfhost`
+- target environment: `feature/raw-20260520T000000Z44Z-packaging-selfhost`
 - required evidence: `docs/system/workspace/package-allowlist.txt 存在且内容符合允许范围`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -17,7 +17,7 @@
 
 - acceptance target: `bin/freely-package 能根据 allowlist 正确打包，产物结构完整，版本号正确，允许清单遗漏导致失败。`
 - testing layer: `integration`
-- target environment: `feature/raw-20260520T013044Z-packaging-selfhost`
+- target environment: `feature/raw-20260520T000000Z44Z-packaging-selfhost`
 - required evidence: `bin/freely-package 运行输出和产物验证`
 - blocker taxonomy: `execution_pending_or_failed`
 1. 运行 `freely-package --version 20260520-test --output /tmp/freely-pkg-test`

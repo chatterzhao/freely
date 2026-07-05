@@ -8,8 +8,8 @@
 - story-name: `auth-switch-real-environment-and-e2e-adequacy-governance`
 - issue-name: `auth-switch-real-environment-and-e2e-adequacy-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260410/candidates.md#c-20260410-1835-a`
-- source_brainstorm: `docs/B1-docs/raw-20260410/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260410T143000Z/candidates.md#c-20260410-1835-a`
+- source_brainstorm: `docs/B1-docs/raw-20260410T143000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/pre-tests.md`

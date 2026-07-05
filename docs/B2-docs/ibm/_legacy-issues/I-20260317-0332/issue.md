@@ -31,8 +31,8 @@ platform_state: closed
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-runtime-baseline-for-probe`
 - issue-name: `frontend-runtime-baseline-for-probe`
-- source_candidate: `docs/B1-docs/raw-20260317/candidates.md#c-20260317-1101`
-- source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260317T110100Z/candidates.md#c-20260317-1101`
+- source_brainstorm: `docs/B1-docs/raw-20260317T110100Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`

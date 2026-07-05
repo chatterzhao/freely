@@ -8,14 +8,14 @@
 - requirement: wt-create 接受 --skill freely-feature-execution 为合法参数
 - acceptance_target: wt-create 验证逻辑已更新
 - testing_layer: unit
-- target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
+- target_environment: fix/raw-20260629T030408Z08Z-feat-to-feature-complete worktree
 - required_evidence: grep 确认 wt-create 中无 freely-feat-execution 残留
 - evidence_level: mock
-- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-1.log
 - test_command: grep -c "freely-feat-execution" docs/system/workspace/scripts/worktree/wt-create && echo "FAIL: still has feat-execution" || echo "PASS: clean"
 - expected_output: PASS: clean
 - actual_output: PASS: clean — 0 occurrences of freely-feat-execution in wt-create
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -25,14 +25,14 @@
 - requirement: 活跃代码（scripts/hooks/AGENTS.md）中不再出现 freely-feat-execution 或 feat-execution
 - acceptance_target: grep 返回零匹配
 - testing_layer: unit
-- target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
+- target_environment: fix/raw-20260629T030408Z08Z-feat-to-feature-complete worktree
 - required_evidence: grep 在 scripts/ .githooks/ AGENTS.md 中无 feat-execution 命中
 - evidence_level: mock
-- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -rn "feat-execution\|freely-feat" docs/system/workspace/scripts/ .githooks/ AGENTS.md 2>/dev/null | grep -v "feature" | grep -v '.bak' && echo "FAIL: residual feat found" || echo "PASS: zero feat-execution residuals"
 - expected_output: PASS: zero feat-execution residuals
 - actual_output: PASS: zero feat-execution residuals — grep returned no matches
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -42,14 +42,14 @@
 - requirement: AGENTS.md 第25行流程描述使用 feature: 前缀
 - acceptance_target: AGENTS.md 中没有 feat: 简写
 - testing_layer: unit
-- target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
+- target_environment: fix/raw-20260629T030408Z08Z-feat-to-feature-complete worktree
 - required_evidence: grep 确认 AGENTS.md 中 feat: 已改为 feature:
 - evidence_level: mock
-- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-3.log
 - test_command: grep "^feature: (" AGENTS.md >/dev/null && echo "PASS: feature: found" || echo "FAIL: feature: not found"
 - expected_output: PASS: feature: found
 - actual_output: PASS: feature: found — line 25 starts with "feature: ("
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z08Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -57,7 +57,7 @@
 ## Unit
 - acceptance_target: 8个活跃代码文件中无 feat-execution 残留
 - testing_layer: unit
-- target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
+- target_environment: fix/raw-20260629T030408Z08Z-feat-to-feature-complete worktree
 - required_evidence: grep 验证通过
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface

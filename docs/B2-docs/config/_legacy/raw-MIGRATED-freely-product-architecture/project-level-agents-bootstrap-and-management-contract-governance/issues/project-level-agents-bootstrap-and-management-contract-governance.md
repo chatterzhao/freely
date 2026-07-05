@@ -8,8 +8,8 @@
 - story-name: `project-level-agents-bootstrap-and-management-contract-governance`
 - issue-name: `project-level-agents-bootstrap-and-management-contract-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-1130-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-1130-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
@@ -65,8 +65,8 @@ But that behavior has been scattered across runtime code, tests, and high-level 
 
 ## Completion
 
-- `docs/B1-docs/raw-20260405/brainstorms.md`
-- `docs/B1-docs/raw-20260405/candidates.md`
+- `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
+- `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - `docs/B2-docs/config/packaging/brainstorms/b-project-level-agents-bootstrap-and-management-contract-governance.md`

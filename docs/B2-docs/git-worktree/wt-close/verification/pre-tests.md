@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z03Z-wt-close-args-d-fix"
   bash -n "$_wt/docs/system/workspace/scripts/worktree/wt-close" || { echo "FAIL: syntax error"; exit 1; }
   grep -q '#args' "$_wt/docs/system/workspace/scripts/worktree/wt-close" || { echo "FAIL: no args guard"; exit 1; }
   echo "PASS: args guard found"
@@ -38,7 +38,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z03Z-wt-close-args-d-fix"
   # Check that test-pre-merge branch deletion uses -D (not just -d)
   grep -A2 'test-pre-merge' "$_wt/docs/system/workspace/scripts/worktree/wt-close" | grep -q '\-D' || { echo "FAIL: test-pre-merge delete not using -D"; exit 1; }
   echo "PASS: test-pre-merge uses -D"
@@ -62,7 +62,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z03Z-wt-close-args-d-fix"
   source "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || true
   result=$(bash -c 'source "$1"; _extract_raw_key "20260629T165403Z"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
   [[ "$result" == "20260629T165403Z" ]] && echo "PASS: bare key extracted" || { echo "FAIL: got '$result'"; exit 1; }
@@ -78,7 +78,7 @@
 
 ### AT-004 --raw-key raw-{key} 格式
 - id: AT-004
-- requirement: _extract_raw_key "raw-20260629T165403Z" 返回 "20260629T165403Z"
+- requirement: _extract_raw_key "raw-20260629T165403Z03Z" 返回 "20260629T165403Z"
 - acceptance_target: raw- 前缀输入正确 strip
 - testing_layer: unit
 - target_environment: fix worktree
@@ -86,8 +86,8 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-4.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
-  result=$(bash -c 'source "$1"; _extract_raw_key "raw-20260629T165403Z"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z03Z-wt-close-args-d-fix"
+  result=$(bash -c 'source "$1"; _extract_raw_key "raw-20260629T165403Z03Z"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
   [[ "$result" == "20260629T165403Z" ]] && echo "PASS: raw- prefix stripped" || { echo "FAIL: got '$result'"; exit 1; }
 - expected_output: "PASS: raw- prefix stripped"
 - expected_RED_output: N/A (regression test)
@@ -101,7 +101,7 @@
 
 ### AT-005 --raw-key fix/raw-{key}-{slug} 格式
 - id: AT-005
-- requirement: _extract_raw_key "fix/raw-20260629T165403Z-wt-close-args-d-fix" 返回 "20260629T165403Z"
+- requirement: _extract_raw_key "fix/raw-20260629T165403Z03Z-wt-close-args-d-fix" 返回 "20260629T165403Z"
 - acceptance_target: fix/ 前缀和 slug 都被正确 strip
 - testing_layer: unit
 - target_environment: fix worktree
@@ -109,8 +109,8 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-5.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
-  result=$(bash -c 'source "$1"; _extract_raw_key "fix/raw-20260629T165403Z-wt-close-args-d-fix"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z03Z-wt-close-args-d-fix"
+  result=$(bash -c 'source "$1"; _extract_raw_key "fix/raw-20260629T165403Z03Z-wt-close-args-d-fix"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
   [[ "$result" == "20260629T165403Z" ]] && echo "PASS: fix/ branch format parsed" || { echo "FAIL: got '$result'"; exit 1; }
 - expected_output: "PASS: fix/ branch format parsed"
 - expected_RED_output: N/A (regression test)

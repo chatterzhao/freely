@@ -1,8 +1,8 @@
 - issue_id: I-20260626T075106Z-A
 - kind: fix
 - phase_state: completed
-- source_candidate: docs/B1-docs/raw-20260626T075106Z/candidates.md#C-20260626T075106Z-A
-- source_raw: raw-20260626T075106Z
+- source_candidate: docs/B1-docs/raw-20260626T075106Z06Z/candidates.md#C-20260626T075106Z-A
+- source_raw: raw-20260626T075106Z06Z
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T075106Z-A/issue.md
 - pre_tests_path: docs/B2-docs/family-registry-driven/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/family-registry-driven/verification
@@ -10,7 +10,7 @@
 
 # I-20260626T075106Z-A: tool family de-hardcode + AGENT_AI_TOOL + agent-id.env + reviewer
 
-- source_candidate: docs/B1-docs/raw-20260626T075106Z/candidates.md#C-20260626T075106Z-A
+- source_candidate: docs/B1-docs/raw-20260626T075106Z06Z/candidates.md#C-20260626T075106Z-A
 
 ## 实现
 

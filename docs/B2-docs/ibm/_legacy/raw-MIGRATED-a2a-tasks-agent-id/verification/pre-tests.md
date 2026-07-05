@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: insert 后 agent_id 为具体编号
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084545Z-a2a-tasks-agent-id
+- target_environment: fix/raw-20260627T084545Z45Z-a2a-tasks-agent-id
 - required_evidence: SQLite 查询返回 worker_01
 - test_command: grep -c "LIKE 'worker_%'" docs/system/workspace/scripts/runtime/freely_db_manager.py && echo "PASS"
 - expected_output: PASS
@@ -18,7 +18,7 @@
 ### acceptance-2
 - acceptance_target: a2a_task.py 查询兼容 worker_ prefix
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084545Z-a2a-tasks-agent-id
+- target_environment: fix/raw-20260627T084545Z45Z-a2a-tasks-agent-id
 - required_evidence: startswith 替代 ==
 - test_command: grep -c "startswith('worker')" docs/system/workspace/scripts/runtime/a2a_task.py && echo "PASS"
 - expected_output: PASS

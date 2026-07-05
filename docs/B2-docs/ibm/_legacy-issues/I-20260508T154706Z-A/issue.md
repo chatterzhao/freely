@@ -2,8 +2,8 @@
 local_id: I-20260508T154706Z-A
 kind: linked
 phase_state: absorbed
-promoted_from: raw-20260508T154706Z
-source_candidate: docs/B1-docs/raw-20260508T154706Z/candidates.md#C-20260508T154706Z-A
+promoted_from: raw-20260508T154706Z06Z
+source_candidate: docs/B1-docs/raw-20260508T154706Z06Z/candidates.md#C-20260508T154706Z-A
 verification_artifact_dir: docs/B2-docs/skill-name-reminder/code-reviews
 pre_tests_path: docs/B2-docs/skill-name-reminder/verification/pre-tests.md
 platform_state: open

@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260629T160852Z
+local_id: raw-20260629T160852Z52Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260629T160852Z-A
@@ -29,7 +29,7 @@ Phase 6b 已经自动关联 test-pre-merge，但 help 文案没有明确说明�
 ## 改动
 
 ### 1. 新增 raw-{key} 参数
-支持 wt-close raw-20260629T132042Z 直接传 raw key，内部推导 fix/feature 分支名。
+支持 wt-close raw-20260629T132042Z42Z 直接传 raw key，内部推导 fix/feature 分支名。
 
 ### 2. help 强调
 明确写传 fix|feature 分支名，不要传 test-pre-merge，会自动通过 raw key 关联处理。

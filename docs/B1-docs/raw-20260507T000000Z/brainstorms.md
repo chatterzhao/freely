@@ -3,7 +3,7 @@
 ## Discovery
 
 ### 来源
-- Raw issue: `raw-20260507T0700Z`
+- Raw issue: `raw-20260507T070000Z`
 - GitHub issue #243 — platform
 - created_at: 2026-05-07T10:30:15Z
 - platform_state: open

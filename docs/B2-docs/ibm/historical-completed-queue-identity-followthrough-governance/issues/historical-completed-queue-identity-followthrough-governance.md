@@ -8,8 +8,8 @@
 - story-name: `historical-completed-queue-identity-followthrough-governance`
 - issue-name: `historical-completed-queue-identity-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-1230-a`
-- source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260412T184500Z/candidates.md#c-20260412-1230-a`
+- source_brainstorm: `docs/B1-docs/raw-20260412T184500Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - reopen_reason: `guarded develop replay still warns because docs/milestones.md carries the completed watchdog owner under legacy candidate identity C-20260324-0405-A instead of canonical issue identity I-20260324-0405`
 - execution_base: `develop`
@@ -51,8 +51,8 @@ Canonical milestone queue policy is already frozen, but one historical completed
 
 ## Completion
 
-- `docs/B1-docs/raw-20260412/brainstorms.md`
-- `docs/B1-docs/raw-20260412/candidates.md`
+- `docs/B1-docs/raw-20260412T184500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260412T184500Z/candidates.md`
 - `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
 - `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/prd.md`
 - `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/pre-tests.md`

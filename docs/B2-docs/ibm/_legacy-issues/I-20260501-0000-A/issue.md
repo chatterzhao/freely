@@ -4,7 +4,7 @@ issue_title: PR scan surface + FREELY_REPO_PLATFORMS config
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260501-0000
+promoted_from: raw-20260501T000000Z
 platform_ids:
   github:
     issue_id: '2591'

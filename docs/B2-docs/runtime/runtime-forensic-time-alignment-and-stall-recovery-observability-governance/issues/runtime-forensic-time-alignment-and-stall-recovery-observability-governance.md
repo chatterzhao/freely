@@ -8,8 +8,8 @@
 - story-name: `runtime-forensic-time-alignment-and-stall-recovery-observability-governance`
 - issue-name: `runtime-forensic-time-alignment-and-stall-recovery-observability-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-1845-a`
-- source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260412T184500Z/candidates.md#c-20260412-1845-a`
+- source_brainstorm: `docs/B1-docs/raw-20260412T184500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/pre-tests.md`
@@ -71,8 +71,8 @@ So the real gap is not human-readable time-display policy. The gap is runtime fo
 
 ## Completion
 
-- `docs/B1-docs/raw-20260412/brainstorms.md`
-- `docs/B1-docs/raw-20260412/candidates.md`
+- `docs/B1-docs/raw-20260412T184500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260412T184500Z/candidates.md`
 - `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/brainstorms/b-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/prd.md`

@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS chats (
 ### 参考文档
 
 - `docs/B1-docs/raw-issue-state-lifecycle.md` §6, §7.3 — issue 状态生命周期和 chat-inbox scan 阶段
-- `docs/B1-docs/raw-20260429-2040/brainstorms.md` — chat-inbox SQLite 原始设计
-- `docs/B1-docs/raw-20260518T020345Z/brainstorms.md` — freely comment 命令设计
+- `docs/B1-docs/raw-20260429T204000Z/brainstorms.md` — chat-inbox SQLite 原始设计
+- `docs/B1-docs/raw-20260518T020345Z45Z/brainstorms.md` — freely comment 命令设计
 - `docs/system/workspace/scripts/runtime/chat-inbox.py` — chat-inbox 模块源码
 - `docs/system/workspace/scripts/runtime/task-lifecycle-scan.py` — scan_chat_inbox 实现
 

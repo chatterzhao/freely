@@ -8,8 +8,8 @@
 - story-name: `ai-auth-change-wake-command-lifecycle-governance`
 - issue-name: `ai-auth-change-wake-command-lifecycle-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260329/candidates.md#c-20260329-2045-a`
-- source_brainstorm: `docs/B1-docs/raw-20260329/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260329T204500Z/candidates.md#c-20260329-2045-a`
+- source_brainstorm: `docs/B1-docs/raw-20260329T204500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

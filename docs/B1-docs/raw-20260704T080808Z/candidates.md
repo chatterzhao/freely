@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260704T080808Z-A
 status: promoted
-source_raw: raw-20260704T080808Z
+source_raw: raw-20260704T080808Z08Z
 created_at: 2026-07-04
 milestone: M-20260704T080808Z-A
 ---
@@ -13,7 +13,7 @@ milestone: M-20260704T080808Z-A
 - status: absorbed
 - absorbed_into: I-20260704T080808Z-A
 - decision_reason: |
-  前置依赖 (raw-20260704T064539Z) 已合并，bridge 签名已预留 base_tool。
+  前置依赖 (raw-20260704T064539Z39Z) 已合并，bridge 签名已预留 base_tool。
   本期启用: socket/pid 命名 per-tool, daemon 扫描 agent-table 启动所有 bridge,
   _resolve_bridge_socket 按 base_tool 路由。
   

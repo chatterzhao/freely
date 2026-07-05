@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   bin/freely cycle --help 2>&1 | grep -q 'raw-key\|Usage' && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (命令不存在)
@@ -36,7 +36,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   output=$(bin/freely cycle --raw-key 20260630T002621Z --json 2>&1)
   echo "$output" | python3 -c "import json,sys; json.load(sys.stdin); print('PASS')" 2>/dev/null || echo "FAIL: $output"
 - expected_output: PASS
@@ -59,7 +59,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   # 创建测试 task
   python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
     --state input-required --raw-key 20260630T002621Z --message '{"phase":"B1","status":"done"}' 2>&1 | head -1
@@ -86,7 +86,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-4.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -q '\[CMD\].*called.*raw-key' bin/pr-create-guarded 2>/dev/null && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL ([CMD] 日志不存在)
@@ -108,7 +108,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-5.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -r 'PRE_CHECK_MAP\|check_b1_artifacts\|check_b2_artifacts' docs/system/workspace/scripts/ --include='*.sh' --include='*.py' -l | head -1 | xargs grep -q 'pr-create-guarded' && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (PRE_CHECK_MAP 不存在)
@@ -130,7 +130,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-6.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z-supervisor-cycle-monitor
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -r 'review_assigned\|防重复\|duplicate.*dispatch' docs/system/workspace/scripts/ --include='*.sh' --include='*.py' -l | head -1 | xargs grep -q 'review_assigned' && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (守卫逻辑不存在)

@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - promoted_issue_id: `I-20260405T002700Z-A`
-- source_brainstorm: `docs/B1-docs/raw-20260406-0715/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260406T071500Z/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

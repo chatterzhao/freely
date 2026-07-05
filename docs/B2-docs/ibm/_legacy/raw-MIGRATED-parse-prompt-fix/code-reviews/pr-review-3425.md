@@ -1,6 +1,6 @@
 # PR Review: #3425
 - pr_number: 3425
-- branch: fix/raw-20260624T085740Z-parse-prompt-fix-recovery
+- branch: fix/raw-20260624T085740Z40Z-parse-prompt-fix-recovery
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T10:17:23Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T085740Z-parse-prompt-fix-recovery branch=fix/raw-20260624T085740Z-parse-prompt-fix-recovery clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T085740Z40Z-parse-prompt-fix-recovery branch=fix/raw-20260624T085740Z40Z-parse-prompt-fix-recovery clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

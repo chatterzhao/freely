@@ -8,8 +8,8 @@
 - story-name: `cli-help-and-dry-run-contract-followthrough-governance`
 - issue-name: `cli-help-and-dry-run-contract-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-2358-d`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-2358-d`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `feature/cli-help-dry-run-contract-followthrough-20260406-0408`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/pre-tests.md`

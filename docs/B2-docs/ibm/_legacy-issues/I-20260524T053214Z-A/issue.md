@@ -4,8 +4,8 @@ kind: linked
 status: completed
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260524T053214Z
-source_candidate: docs/B1-docs/raw-20260524T053214Z/candidates.md
+promoted_from: raw-20260524T053214Z14Z
+source_candidate: docs/B1-docs/raw-20260524T053214Z14Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -21,7 +21,7 @@ intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/B1-docs/raw-20260524T053214Z/pre-tests.md
+pre_tests_path: docs/B1-docs/raw-20260524T053214Z14Z/pre-tests.md
 verification_artifact_dir: docs/B2-docs/acp-tool-switch-integration/code-reviews
 milestone: M-20260524T053214Z-A
 milestone_state: committed
@@ -30,8 +30,8 @@ platform_state: closed
 
 # I-20260524T053214Z-A: ACP session 生命周期接入 tool_switch_events
 
-- source_candidate: `docs/B1-docs/raw-20260524T053214Z/candidates.md`
-- pre_tests_path: `docs/B1-docs/raw-20260524T053214Z/pre-tests.md`
+- source_candidate: `docs/B1-docs/raw-20260524T053214Z14Z/candidates.md`
+- pre_tests_path: `docs/B1-docs/raw-20260524T053214Z14Z/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/acp-tool-switch-integration/code-reviews`
 
 ## 问题

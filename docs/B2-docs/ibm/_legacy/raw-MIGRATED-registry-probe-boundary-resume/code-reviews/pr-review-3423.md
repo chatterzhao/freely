@@ -1,6 +1,6 @@
 # PR Review: #3423
 - pr_number: 3423
-- branch: fix/raw-20260624T090651Z-registry-probe-boundary-resume
+- branch: fix/raw-20260624T090635Z51Z-registry-probe-boundary-resume
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T09:43:12Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T090651Z-registry-probe-boundary-resume branch=fix/raw-20260624T090651Z-registry-probe-boundary-resume clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T090635Z51Z-registry-probe-boundary-resume branch=fix/raw-20260624T090635Z51Z-registry-probe-boundary-resume clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

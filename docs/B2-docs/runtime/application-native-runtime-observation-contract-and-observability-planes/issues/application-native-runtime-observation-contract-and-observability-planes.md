@@ -9,9 +9,9 @@
 - issue-name: `application-native-runtime-observation-contract-and-observability-planes`
 - verification_artifact_dir: `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260324/candidates.md#c-20260324-0415-a`
-- source_brainstorm: `docs/B1-docs/raw-20260324/brainstorms.md`
-- source_candidates: `docs/B1-docs/raw-20260324/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260324T041500Z/candidates.md#c-20260324-0415-a`
+- source_brainstorm: `docs/B1-docs/raw-20260324T041500Z/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260324T041500Z/candidates.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

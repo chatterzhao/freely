@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T023000Z
+local_id: raw-20260506T023000Z00Z
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -17,7 +17,7 @@ created_at: '2026-05-10T09:29:55Z'
 platform_state: closed
 ---
 
-# raw-20260506T0230Z: governance-merge-gate 应识别 raw issue 作为生命周期入口
+# raw-20260506T023000Z: governance-merge-gate 应识别 raw issue 作为生命周期入口
 
 ## 现象
 
@@ -25,7 +25,7 @@ merge 到 develop 时，governance-merge-gate 报错：
 
 > This develop-bound merge has no candidate-driven lifecycle evidence
 
-但 diff 中已有 3 个 raw issue（raw-20260506T0100Z, raw-20260506T0130Z, raw-20260506T0200Z）。
+但 diff 中已有 3 个 raw issue（raw-20260506T010000Z, raw-20260506T013000Z, raw-20260506T020000Z）。
 
 ## 根因
 

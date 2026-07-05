@@ -8,8 +8,8 @@
 - story-name: `live-status-current-runtime-state-reconciliation-governance`
 - issue-name: `live-status-current-runtime-state-reconciliation-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260328/candidates.md#c-20260328-0745-a`
-- source_brainstorm: `docs/B1-docs/raw-20260328/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260328T074500Z/candidates.md#c-20260328-0745-a`
+- source_brainstorm: `docs/B1-docs/raw-20260328T074500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`

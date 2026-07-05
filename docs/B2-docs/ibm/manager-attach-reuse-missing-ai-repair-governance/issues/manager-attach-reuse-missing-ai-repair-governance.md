@@ -8,8 +8,8 @@
 - story-name: `manager-attach-reuse-missing-ai-repair-governance`
 - issue-name: `manager-attach-reuse-missing-ai-repair-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260330/candidates.md#c-20260330-2318-a`
-- source_brainstorm: `docs/B1-docs/raw-20260330/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260330T235800Z/candidates.md#c-20260330-2318-a`
+- source_brainstorm: `docs/B1-docs/raw-20260330T235800Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/pre-tests.md`

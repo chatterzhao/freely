@@ -3,8 +3,8 @@ local_id: I-20260617T055840Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260617T055840Z
-source_candidate: docs/B1-docs/raw-20260617T055840Z/candidates.md
+promoted_from: raw-20260617T055840Z40Z
+source_candidate: docs/B1-docs/raw-20260617T055840Z40Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -27,10 +27,10 @@ platform_state: closed
 
 # I-20260617T055840Z-A: Merge Guard + Rebase Integrity
 
-- source_candidate: `docs/B1-docs/raw-20260617T055840Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260617T055840Z40Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/merge-guard-rebase-integrity/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/merge-guard-rebase-integrity/code-reviews`
-- branch: `fix/raw-20260617T055840Z-merge-guard-rebase-integrity`
+- branch: `fix/raw-20260617T055840Z40Z-merge-guard-rebase-integrity`
 
 ## 目标
 

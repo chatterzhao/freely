@@ -8,8 +8,8 @@
 - story-name: `slot-switch-startup-preflight-and-lock-observability-governance`
 - issue-name: `slot-switch-startup-preflight-and-lock-observability-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-2148-a`
-- source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404T214800Z/candidates.md#c-20260404-2148-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
@@ -60,8 +60,8 @@ That combination means the immediate operator diagnosis is currently too implici
 
 ## Completion
 
-- `docs/B1-docs/raw-20260404/brainstorms.md`
-- `docs/B1-docs/raw-20260404/candidates.md`
+- `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
+- `docs/B1-docs/raw-20260404T214800Z/candidates.md`
 - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`

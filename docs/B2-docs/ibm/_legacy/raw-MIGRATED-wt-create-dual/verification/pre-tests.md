@@ -1,11 +1,11 @@
 # Pre-Tests: wt-create Dual Worktree Creation
 
-- issue_id: raw-20260506T1230Z
+- issue_id: raw-20260506T123000Z
 
 ## Unit
 - acceptance target: `CLI parsing accepts valid args, rejects invalid args.`
 - testing layer: `unit`
-- target environment: `feature/raw-20260506T1230Z-wt-create-dual`
+- target environment: `feature/raw-20260506T123000Z-wt-create-dual`
 - required evidence: `bash -n syntax check + CLI arg parsing tests`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Test --help output
@@ -16,7 +16,7 @@
 ## Integration
 - acceptance target: `wt-create creates two worktrees with correct parent relationship.`
 - testing layer: `integration`
-- target environment: `feature/raw-20260506T1230Z-wt-create-dual`
+- target environment: `feature/raw-20260506T123000Z-wt-create-dual`
 - required evidence: `git merge-base check confirms fix is descendant of test-pre-merge`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run wt-create --raw-key --prefix --skill --slug

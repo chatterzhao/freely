@@ -1,6 +1,6 @@
 # PR Review: #3292
 - pr_number: 3292
-- branch: fix/raw-20260621T195456Z-manager-dispatch-model
+- branch: fix/raw-20260621T195456Z56Z-manager-dispatch-model
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T20:51:49Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T195456Z-manager-dispatch-model branch=fix/raw-20260621T195456Z-manager-dispatch-model clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T195456Z56Z-manager-dispatch-model branch=fix/raw-20260621T195456Z56Z-manager-dispatch-model clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

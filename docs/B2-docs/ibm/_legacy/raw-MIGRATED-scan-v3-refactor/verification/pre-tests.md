@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: Cat 1a 扫出新 raw issue
 - testing_layer: unit
-- target_environment: fix/raw-20260627T062554Z-scan-v3-refactor
+- target_environment: fix/raw-20260627T062554Z54Z-scan-v3-refactor
 - required_evidence: 创建测试平台 issue，scan 输出 Cat 1a
 - test_command: python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py . | python3 -c "import json,sys; d=json.load(sys.stdin); cat1=[i for i in d['items'] if i['subcategory']=='1a_fresh']; print(f'1a_fresh={len(cat1)}')"
 - expected_output: "1a_fresh=2"（至少 2 个测试 issue）
@@ -18,7 +18,7 @@
 ### acceptance-2
 - acceptance_target: Cat 2a 扫出非 terminal phase
 - testing_layer: unit
-- target_environment: fix/raw-20260627T062554Z-scan-v3-refactor
+- target_environment: fix/raw-20260627T062554Z54Z-scan-v3-refactor
 - required_evidence: 输出含 2a_non_terminal
 - test_command: python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py . | python3 -c "import json,sys; d=json.load(sys.stdin); non=[i for i in d['items'] if i['subcategory']=='2a_non_terminal']; print(f'2a_non_terminal={len(non)}')"
 - expected_output: "2a_non_terminal=39"
@@ -30,7 +30,7 @@
 ### acceptance-3
 - acceptance_target: Cat 3 扫出 agent 未绑定
 - testing_layer: unit
-- target_environment: fix/raw-20260627T062554Z-scan-v3-refactor
+- target_environment: fix/raw-20260627T062554Z54Z-scan-v3-refactor
 - required_evidence: 输出含 3a_never_bound
 - test_command: python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py . | python3 -c "import json,sys; d=json.load(sys.stdin); dead=[i for i in d['items'] if i['subcategory']=='3a_never_bound']; print(f'3a_never_bound={len(dead)}')"
 - expected_output: "3a_never_bound=1"
@@ -42,7 +42,7 @@
 ### acceptance-4
 - acceptance_target: 无 push=176 误报
 - testing_layer: unit
-- target_environment: fix/raw-20260627T062554Z-scan-v3-refactor
+- target_environment: fix/raw-20260627T062554Z54Z-scan-v3-refactor
 - required_evidence: scan 不含旧 platform_sync_batch
 - test_command: python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py . | python3 -c "import json,sys; d=json.load(sys.stdin); batch=[i for i in d['items'] if 'platform_sync' in i.get('subcategory','')]; print(f'batch={len(batch)}'); assert len(batch)==0"
 - expected_output: "batch=0"

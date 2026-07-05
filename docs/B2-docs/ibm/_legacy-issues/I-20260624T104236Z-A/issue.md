@@ -3,8 +3,8 @@ local_id: I-20260624T104236Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260624T104236Z
-source_candidate: docs/B1-docs/raw-20260624T104236Z/candidates.md#C-20260624T104236Z-A
+promoted_from: raw-20260624T104229Z36Z
+source_candidate: docs/B1-docs/raw-20260624T104229Z36Z/candidates.md#C-20260624T104236Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T104236Z-A/issue.md
 milestone: M-20260624T104236Z-A
 title: 'fix: add pointer to full skill doc after Fix/Govern first mentions'

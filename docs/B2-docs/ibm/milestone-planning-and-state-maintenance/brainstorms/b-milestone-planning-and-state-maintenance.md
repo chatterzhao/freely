@@ -1,6 +1,6 @@
 # Brainstorm: milestone-planning-and-state-maintenance
 
-- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320T174500Z/brainstorms.md`
 - canonical_issue: `docs/B2-docs/ibm/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
 
 ## Key Decisions

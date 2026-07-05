@@ -8,8 +8,8 @@
 - story-name: `codex-verified-resume-evidence-governance`
 - issue-name: `codex-verified-resume-evidence-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260328/candidates.md#c-20260328-2105-a`
-- source_brainstorm: `docs/B1-docs/raw-20260328/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260328T074500Z/candidates.md#c-20260328-2105-a`
+- source_brainstorm: `docs/B1-docs/raw-20260328T074500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

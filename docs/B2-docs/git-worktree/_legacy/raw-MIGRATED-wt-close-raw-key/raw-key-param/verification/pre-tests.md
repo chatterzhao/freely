@@ -6,7 +6,7 @@
 
 ### AT-001 raw-{key} 参数解析正确
 - id: AT-001
-- requirement: wt-close 接受 raw-20260629T160852Z 格式输入，正确推导为 fix/raw-20260629T160852Z-wt-close-raw-key-param 分支名
+- requirement: wt-close 接受 raw-20260629T160852Z52Z 格式输入，正确推导为 fix/raw-20260629T160852Z52Z-wt-close-raw-key-param 分支名
 - acceptance_target: raw key 输入能解析为正确的 fix 分支名
 - testing_layer: unit
 - target_environment: fix worktree
@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z52Z-wt-close-raw-key-param
   # 检查 wt-close 脚本中 raw key 解析逻辑存在
   grep -q 'raw-[0-9]' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL: no raw key parsing"; exit 1; }
   echo "PASS: raw key parsing logic present"
@@ -38,7 +38,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z52Z-wt-close-raw-key-param
   grep -q 'test-pre-merge\|自动' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL: help missing test-pre-merge note"; exit 1; }
   echo "PASS: help mentions test-pre-merge auto-cleanup"
 - expected_output: "PASS: help mentions test-pre-merge auto-cleanup"
@@ -61,7 +61,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z52Z-wt-close-raw-key-param
   grep -q '_resolve_branch' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL: _resolve_branch removed"; exit 1; }
   echo "PASS: _resolve_branch preserved for branch input"
 - expected_output: "PASS: _resolve_branch preserved for branch input"
@@ -88,7 +88,7 @@
 - acceptance_target: dry-run 验证 raw key 输入不报错
 - testing_layer: integration
 - target_environment: test-pre-merge worktree
-- required_evidence: wt-close --dry-run raw-20260629T160852Z 不报参数错误
+- required_evidence: wt-close --dry-run raw-20260629T160852Z52Z 不报参数错误
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: protected_environment_only
 - not_applicable_explanation: 完整 wt-close 流程需要真实 PR merge 后才能测试，dry-run 在 dev 阶段验证
@@ -98,7 +98,7 @@
 - acceptance_target: 本 PR 合并后通过 wt-close 收口自身工位，验证 raw key 参数
 - testing_layer: end-to-end
 - target_environment: develop merge chain
-- required_evidence: 本 fix 工位通过 wt-close raw-20260629T160852Z 关闭
+- required_evidence: 本 fix 工位通过 wt-close raw-20260629T160852Z52Z 关闭
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: protected_environment_only
 - not_applicable_explanation: E2E 通过本 PR 自身的 merge + wt-close 完成验证

@@ -65,7 +65,7 @@ promote 时 I-* 继承 raw 的 platform_ids，不创建新 issue。
 raw issue：
 ```yaml
 # ── 标识 ──
-local_id: raw-20260505T121000Z
+local_id: raw-20260505T121000Z00Z
 kind: raw
 
 # ── 状态 ──
@@ -107,7 +107,7 @@ platform_ids:
     issue_id: '214'                 # ← 和 raw 共享同一个
 
 # ── 生命周期关联 ──
-promoted_from: raw-20260505T1210Z
+promoted_from: raw-20260505T121000Z
 
 # ── 元数据 ──
 issue_title: "…"

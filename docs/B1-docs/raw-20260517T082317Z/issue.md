@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260517T082317Z
+local_id: raw-20260517T082350Z17Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -20,11 +20,11 @@ session_refs: []
 platform_state: closed
 ---
 
-## raw-20260517T082317Z
+## raw-20260517T082350Z17Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260517T082317Z` |
+| local_id | `raw-20260517T082350Z17Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -34,7 +34,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260517T082317Z`。实现前请用 `wt-create --raw-key 20260517T082317Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260517T082350Z17Z`。实现前请用 `wt-create --raw-key 20260517T082317Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

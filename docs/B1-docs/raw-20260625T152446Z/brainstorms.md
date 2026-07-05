@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260625T152446Z
 phase_state: completed
-source_raw: raw-20260625T152446Z
+source_raw: raw-20260625T152446Z46Z
 source_url: https://github.com/chatterzhao/freely/issues/3507
 produced_candidate: C-20260625T152446Z-A
 created_at: 2026-06-25
@@ -10,7 +10,7 @@ created_at: 2026-06-25
 # B1_IBM: pr-review-guarded ACP TDD Reviewer
 
 ## Input
-- source: raw-20260625T152446Z
+- source: raw-20260625T152446Z46Z
 
 ## Problem
 - pr-review-guarded 是 bash 自审，同一 agent 没有独立性

@@ -1,6 +1,6 @@
 # PR Review: #3177
 - pr_number: 3177
-- branch: fix/raw-20260619T061448Z-a2a-non-http-probe
+- branch: fix/raw-20260619T061441Z48Z-a2a-non-http-probe
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T19:18:16Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T061448Z-a2a-non-http-probe branch=fix/raw-20260619T061448Z-a2a-non-http-probe clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T061441Z48Z-a2a-non-http-probe branch=fix/raw-20260619T061441Z48Z-a2a-non-http-probe clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

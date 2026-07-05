@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260519T190823Z
+local_id: raw-20260519T190823Z23Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -22,11 +22,11 @@ force_closed_at: '2026-05-19T23:09:08Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
-## raw-20260519T190823Z
+## raw-20260519T190823Z23Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260519T190823Z` |
+| local_id | `raw-20260519T190823Z23Z` |
 | kind | `raw` |
 | phase_state | `proposed` |
 | canonical | `none` |
@@ -35,7 +35,7 @@ force_closed_reason: 'wt-close --force: worktree retired without completed phase
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260519T190823Z`。实现前请用 `wt-create --raw-key 20260519T190823Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260519T190823Z23Z`。实现前请用 `wt-create --raw-key 20260519T190823Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 phase_state: absorbed

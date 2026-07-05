@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260519T155813Z
+local_id: raw-20260519T155813Z13Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260519T155813Z-A
@@ -18,16 +18,16 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-dropped_reason: Fix merged to develop via fix/raw-20260519T155813Z-launchable-reason.
+dropped_reason: Fix merged to develop via fix/raw-20260519T155813Z13Z-launchable-reason.
   Runtime bug fix.
 platform_state: closed
 ---
 
-## raw-20260519T155813Z
+## raw-20260519T155813Z13Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260519T155813Z` |
+| local_id | `raw-20260519T155813Z13Z` |
 | kind | `raw` |
 | phase_state | `proposed` |
 | canonical | `none` |
@@ -36,7 +36,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260519T155813Z`。实现前请用 `wt-create --raw-key 20260519T155813Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260519T155813Z13Z`。实现前请用 `wt-create --raw-key 20260519T155813Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 ## 问题
 
 `worker_prompt_launchable_for_manager_project` 多个失败路径没有设置 `LAUNCH_REJECT_REASON`，fallback 为 `launchable check failed`，Manager 无法根据原因修复。

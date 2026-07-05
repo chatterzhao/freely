@@ -1,7 +1,7 @@
 # PR Review: #3039
 - pr_number: 3039
 - issue_id: I-20260616T140126Z-A
-- branch: feature/raw-20260616T140126Z-ai-auth-template
+- branch: feature/raw-20260616T140126Z26Z-ai-auth-template
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T06:42:06Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260616T140126Z-ai-auth-template-7b54cd43 branch=feature/raw-20260616T140126Z-ai-auth-template clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260616T140126Z26Z-ai-auth-template-7b54cd43 branch=feature/raw-20260616T140126Z26Z-ai-auth-template clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

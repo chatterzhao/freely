@@ -14,7 +14,7 @@
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/LAWS.md`
 - `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
-- `docs/B1-docs/raw-20260325/candidates.md`
+- `docs/B1-docs/raw-20260325T033300Z/candidates.md`
 - `docs/milestones.md`
 
 ## Findings

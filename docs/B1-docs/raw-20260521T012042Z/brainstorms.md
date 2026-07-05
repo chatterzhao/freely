@@ -4,7 +4,7 @@
 
 ### 来源
 
-- Raw issue: `raw-20260521T012042Z` (GitHub #1519)
+- Raw issue: `raw-20260521T012042Z42Z` (GitHub #1519)
 - 创建时间: 2026-05-21T01:20:55Z
 - 来源渠道: GitHub issue (platform)
 - 背景: 2026-05-20 Runtime Crash Postmortem 暴露的 worker 生命周期管理缺陷。该 postmortem 记录了 SIGTERM leak、error classification gap 与 stop path broken 三个失效模式，本 issue 是其衍生修复之一。

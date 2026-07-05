@@ -8,8 +8,8 @@
 - story-name: `codex-probe-success-shape-and-quota-slot-recovery-governance`
 - issue-name: `codex-probe-success-shape-and-quota-slot-recovery-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-0907-a`
-- source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260412T184500Z/candidates.md#c-20260412-0907-a`
+- source_brainstorm: `docs/B1-docs/raw-20260412T184500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/pre-tests.md`

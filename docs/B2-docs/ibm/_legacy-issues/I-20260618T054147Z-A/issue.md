@@ -3,8 +3,8 @@ local_id: I-20260618T054147Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260618T054147Z
-source_candidate: docs/B1-docs/raw-20260618T054147Z/candidates.md
+promoted_from: raw-20260618T054147Z47Z
+source_candidate: docs/B1-docs/raw-20260618T054147Z47Z/candidates.md
 verification_artifact_dir: docs/B2-docs/wt-close-prune-stale-refs/code-reviews
 platform_ids: {}
 primary_platform: ""

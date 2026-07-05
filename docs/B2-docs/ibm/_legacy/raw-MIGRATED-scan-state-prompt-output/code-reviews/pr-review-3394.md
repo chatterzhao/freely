@@ -1,6 +1,6 @@
 # PR Review: #3394
 - pr_number: 3394
-- branch: fix/raw-20260623T162243Z-scan-state-prompt-output
+- branch: fix/raw-20260623T162243Z43Z-scan-state-prompt-output
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-23T16:44:05Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260623T162243Z-scan-state-prompt-output branch=fix/raw-20260623T162243Z-scan-state-prompt-output clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260623T162243Z43Z-scan-state-prompt-output branch=fix/raw-20260623T162243Z43Z-scan-state-prompt-output clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

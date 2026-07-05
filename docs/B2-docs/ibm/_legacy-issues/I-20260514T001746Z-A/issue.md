@@ -4,8 +4,8 @@ kind: linked
 phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
-promoted_from: raw-20260514T001746Z
-source_candidate: docs/B1-docs/raw-20260514T001746Z/candidates.md#C-20260514T001746Z-A
+promoted_from: raw-20260514T001746Z46Z
+source_candidate: docs/B1-docs/raw-20260514T001746Z46Z/candidates.md#C-20260514T001746Z-A
 verification_artifact_dir: docs/B2-docs/stdio-transport/code-reviews
 pre_tests_path: docs/B2-docs/stdio-transport/verification/pre-tests.md
 platform_ids:

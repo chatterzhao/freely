@@ -1,6 +1,6 @@
 # PR Review: #3368
 - pr_number: 3368
-- branch: feature/raw-20260622T123158Z-agent-tool-policy
+- branch: feature/raw-20260622T123158Z58Z-agent-tool-policy
 - base: develop
 - reviewer: Claude
 - review_date: 2026-06-22T14:16:03Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T123158Z-agent-tool-policy branch=feature/raw-20260622T123158Z-agent-tool-policy clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T123158Z58Z-agent-tool-policy branch=feature/raw-20260622T123158Z58Z-agent-tool-policy clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

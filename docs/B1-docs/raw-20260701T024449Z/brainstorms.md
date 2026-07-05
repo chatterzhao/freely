@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260701T024449Z
 phase_state: completed
-source_raw: raw-20260701T024449Z
+source_raw: raw-20260701T024449Z49Z
 source_url: https://github.com/chatterzhao/freely/issues/3676
 produced_candidate: C-20260701T024449Z-A
 created_at: 2026-07-01
@@ -10,7 +10,7 @@ created_at: 2026-07-01
 # B1_IBM: pr-review-guarded _review_guide unbound variable crash
 
 ## Input
-- **Raw issue**: raw-20260701T024449Z
+- **Raw issue**: raw-20260701T024449Z49Z
 - **Platform**: GitHub #3676 / Gitee IJY01L
 - **Source**: daemon 启动后观察 pr-review-guarded 执行时发现
 

@@ -8,8 +8,8 @@
 - story-name: `session-lifecycle-rotation-and-handoff-governance`
 - issue-name: `session-lifecycle-rotation-and-handoff-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260303/candidates.md#c-20260303-103`
-- source_brainstorm: `docs/B1-docs/raw-20260303/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260303T000000Z/candidates.md#c-20260303-103`
+- source_brainstorm: `docs/B1-docs/raw-20260303T000000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/runtime/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`

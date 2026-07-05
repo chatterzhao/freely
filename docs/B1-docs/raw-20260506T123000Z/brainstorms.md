@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- Raw issue: `docs/B1-docs/raw-20260506T1230Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260506T123000Z/issue.md`
 - GitHub: https://github.com/chatterzhao/freely/issues/280
 - Created: 2026-05-06, author: zhaoquan
 - Channel: github

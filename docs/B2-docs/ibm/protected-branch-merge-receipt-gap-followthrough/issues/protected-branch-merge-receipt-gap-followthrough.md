@@ -8,8 +8,8 @@
 - story-name: `protected-branch-merge-receipt-gap-followthrough`
 - issue-name: `protected-branch-merge-receipt-gap-followthrough`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-0640-a`
-- source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404T214800Z/candidates.md#c-20260404-0640-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
@@ -52,8 +52,8 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 
 ## Completion
 
-- `docs/B1-docs/raw-20260404/brainstorms.md`
-- `docs/B1-docs/raw-20260404/candidates.md`
+- `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
+- `docs/B1-docs/raw-20260404T214800Z/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`

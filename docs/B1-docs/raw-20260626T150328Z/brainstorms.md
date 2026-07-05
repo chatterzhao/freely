@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260626T150328Z
 phase_state: completed
-source_raw: raw-20260626T150328Z
+source_raw: raw-20260626T150328Z28Z
 source_url: https://github.com/chatterzhao/freely/issues/3563
 produced_candidate: C-20260626T150328Z-A
 created_at: 2026-06-26
@@ -10,7 +10,7 @@ created_at: 2026-06-26
 # B1_IBM: TOML array join delimiter mismatch breaks ACP adapter detection
 
 ## Input
-- **source_raw**: raw-20260626T150328Z
+- **source_raw**: raw-20260626T150328Z28Z
 - **source_url**: https://github.com/chatterzhao/freely/issues/3563
 - **discovered during**: Freely daemon start with --task-mode auto
 - **symptom**: All AI tools (claude, opencode, codex) fail with `unsupported adapter 'acp'` despite acp being in the supported list

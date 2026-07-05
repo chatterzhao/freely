@@ -1,6 +1,6 @@
 # PR Review: #3325
 - pr_number: 3325
-- branch: fix/raw-20260622T025044Z-platform-sync
+- branch: fix/raw-20260622T025044Z44Z-platform-sync
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T02:53:32Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T025044Z-platform-sync branch=fix/raw-20260622T025044Z-platform-sync clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T025044Z44Z-platform-sync branch=fix/raw-20260622T025044Z44Z-platform-sync clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

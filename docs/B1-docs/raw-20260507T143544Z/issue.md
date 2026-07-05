@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260507T143544Z
+local_id: raw-20260507T143545Z44Z
 kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
@@ -21,7 +21,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/raw-issue-pull-intercept/verification/pre-tests.md
 verification_artifact_dir: docs/B2-docs/raw-issue-pull-intercept/code-reviews
-source_candidate: docs/B1-docs/raw-20260507T143544Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143545Z44Z/candidates.md
 platform_state: closed
 ---
 

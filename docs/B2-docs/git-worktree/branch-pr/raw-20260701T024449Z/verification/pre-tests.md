@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T024449Z-review-guide-unbound
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z49Z/verification/acceptance-1.log
 - test_command: grep -c '_review_guide' bin/pr-review-guarded; test $? -eq 1
 - expected_output: exit code 1 (no match — _review_guide no longer referenced)
 - expected_RED_output: grep 匹配到 1 处 `_review_guide` 引用且无定义
 - actual_RED_output: grep 确认 L506 引用 _review_guide，脚本中无定义 — RED 确认
 - actual_output: grep 返回 1（无匹配），_review_guide 已移除
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z49Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: (失败时填写)
@@ -31,13 +31,13 @@
 - target_environment: test-pre-merge-20260701T024449Z-review-guide-unbound
 - required_evidence: 源代码行验证
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-2.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z49Z/verification/acceptance-2.log
 - test_command: grep 'skill:freely-tdd-review' bin/pr-review-guarded
 - expected_output: L506 包含 `skill:freely-tdd-review`
 - expected_RED_output: L506 包含 `$_review_guide` 变量引用
 - actual_RED_output: grep 确认 L506 引用 _review_guide，脚本中无定义 — RED 确认
 - actual_output: grep 确认 L506 为字符串字面量 skill:freely-tdd-review
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-2.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z49Z/verification/acceptance-2.log
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -49,14 +49,14 @@
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: Unit 测试（bash -n 语法检查）已被 AT-001 覆盖，不再单独执行
 - replacement_evidence: AT-001 绿色证据
-- target_environment: fix/raw-20260701T024449Z-review-guide-unbound
+- target_environment: fix/raw-20260701T024449Z49Z-review-guide-unbound
 - required_evidence: bash -n 输出为空（无语法错误）
 - blocker_taxonomy: execution_pending_or_failed
 - test_command: bash -n bin/pr-review-guarded && echo "PASS"
 - expected_output: PASS (语法正确)
 - status: passed
 - actual_output: bash -n 语法检查通过
-- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z49Z/verification/acceptance-1.log
 
 ## Integration
 - acceptance_target: set -euo pipefail 下脚本不因 _review_guide crash

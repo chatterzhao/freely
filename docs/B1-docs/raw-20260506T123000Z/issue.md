@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T123000Z
+local_id: raw-20260506T123000Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260506T123000Z-A
@@ -10,7 +10,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/280
     synced_at: '2026-05-10T09:29:50Z'
 primary_platform: github
-source_candidate: docs/B1-docs/raw-20260506/candidates.md
+source_candidate: docs/B1-docs/raw-20260506T000000Z/candidates.md
 created_at: 2026-05-06 12:30:00+00:00
 updated_at: '2026-06-17T00:23:28Z'
 author: zhaoquan

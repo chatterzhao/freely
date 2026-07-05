@@ -3,7 +3,7 @@
 - id: `C-20260411T141500Z-A`
 - candidate_format_version: `v2`
 - title: Materialize richer pre-tests adequacy item schema without introducing parallel test truth
-- source_brainstorm: `docs/B1-docs/raw-20260411-1415/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141500Z/brainstorms.md`
 - problem: `pre-tests.md` is already the canonical test truth, but executable gates still mostly consume the minimal five acceptance-item fields (`id/requirement/evidence_level/status/artifact_ref`). This can prove that some tests ran, but cannot reliably prove that enough tests ran for the intended lane and promotion gate.
 - why_now:
   - repeated misses are now concentrated in adequacy discrimination, not lane existence or basic evidence binding

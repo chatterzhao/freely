@@ -1,6 +1,6 @@
 # PR Review: #3297
 - pr_number: 3297
-- branch: fix/raw-20260621T203349Z-scan-lifecycle
+- branch: fix/raw-20260621T203349Z49Z-scan-lifecycle
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T21:32:40Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T203349Z-scan-lifecycle branch=fix/raw-20260621T203349Z-scan-lifecycle clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T203349Z49Z-scan-lifecycle branch=fix/raw-20260621T203349Z49Z-scan-lifecycle clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

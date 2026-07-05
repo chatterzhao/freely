@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T124528Z
 phase_state: completed
-source_raw: raw-20260630T124528Z
+source_raw: raw-20260630T124528Z28Z
 source_url: https://github.com/chatterzhao/freely/issues/3657
 produced_candidate: C-20260630T124528Z-A
 created_at: 2026-06-30
@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: freely init ACP 工具准备 + tool-registry 下载配置
 
 ## Input
-- raw issue: `docs/B1-docs/raw-20260630T124528Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260630T124528Z28Z/issue.md`
 - 平台: GitHub #3657
 
 ## Discovery — 现状调研

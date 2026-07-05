@@ -8,8 +8,8 @@
 - story-name: `runtime-blocked-intake-and-continuity-truth-governance`
 - issue-name: `runtime-blocked-intake-and-continuity-truth-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-1545-a`
-- source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404T214800Z/candidates.md#c-20260404-1545-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
@@ -90,8 +90,8 @@ Freely 现在已经分别具备：
 
 ## Completion
 
-- `docs/B1-docs/raw-20260404/brainstorms.md`
-- `docs/B1-docs/raw-20260404/candidates.md`
+- `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
+- `docs/B1-docs/raw-20260404T214800Z/candidates.md`
 - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/brainstorms/b-runtime-blocked-intake-and-continuity-truth-governance.md`
 - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
@@ -138,7 +138,7 @@ Freely 现在已经分别具备：
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
-- review `docs/B1-docs/raw-20260404/brainstorms.md`
+- review `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 - review `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - review `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - confirm the resulting docs do not claim broader watchdog redesign or GitHub issue automation

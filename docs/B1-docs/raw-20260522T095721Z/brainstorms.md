@@ -2,7 +2,7 @@
 
 ## Discovery
 
-- Source: GitHub issue #2125 (raw-20260522T095721Z)
+- Source: GitHub issue #2125 (raw-20260522T095721Z21Z)
 - Proposed at: 2026-05-22T09:57:21Z
 - Still relevant: Yes — ACP is the default adapter; missing lifecycle handling causes silent failures.
 

@@ -3,7 +3,7 @@ local_id: I-20260502-1028-A
 issue_title: 'fix: clean stale start lock before daemon stop'
 kind: linked
 phase_state: completed
-promoted_from: raw-20260502-1028
+promoted_from: raw-20260502T102800Z
 platform_ids:
   github:
     issue_id: '210'
@@ -34,6 +34,6 @@ One function call added before lock acquisition. No other changes.
 
 ## References
 
-- B1: docs/B1-docs/raw-20260502/
+- B1: docs/B1-docs/raw-20260502T000000Z/
 - Issue: docs/B2-docs/runtime/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
 - Progress: docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md

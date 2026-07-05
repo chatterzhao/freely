@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260630T224941Z-A
-issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md
+issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z41Z/issues/I-20260630T224941Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260630T224941Z-A
-- issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md
+- issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z41Z/issues/I-20260630T224941Z-A.md
 
 ## Implementation Decision Note
 

@@ -9,9 +9,9 @@
 - issue-name: `token-efficient-session-continuity-and-rotation-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-0018-a`
-- source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
-- source_candidate: `docs/B1-docs/raw-20260319/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260319T050000Z/candidates.md#c-20260319-0018-a`
+- source_brainstorm: `docs/B1-docs/raw-20260319T050000Z/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260319T050000Z/candidates.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

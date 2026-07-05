@@ -9,8 +9,8 @@
 - story-name: `freely-start-auto-recovery-rootcause-governance`
 - issue-name: `freely-start-auto-recovery-rootcause-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260414/candidates.md#c-20260414-0255-a`
-- source_brainstorm: `docs/B1-docs/raw-20260414/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260414T025500Z/candidates.md#c-20260414-0255-a`
+- source_brainstorm: `docs/B1-docs/raw-20260414T025500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/pre-tests.md`

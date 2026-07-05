@@ -4,7 +4,7 @@
 
 - candidate_format_version: `v2`
 - title: `External issue identity, mapping, and publication model after source-family contraction`
-- source_brainstorm: `docs/B1-docs/raw-20260407-1042/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407T104200Z/brainstorms.md`
 - problem: `After contracting durable source families, Freely needs a family-specific external-issue model that can handle user-created GitHub issue style inputs and AI-discovered problems that deserve formal external publication, without collapsing durable source identity, public-progress mirroring, and internal canonical ownership into one unstable GitHub object or one overloaded owner family.`
 - why_now:
   - the older `20260403-1000` GitHub issue pre-research explored useful mapping ideas, but mixed source ingestion, publication, internal owner truth, and self-evolution scheduling too broadly

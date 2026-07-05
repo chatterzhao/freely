@@ -1,7 +1,7 @@
 # Brainstorm: 时间戳格式升级为带秒
 
 ## 来源
-- `docs/B1-docs/raw-20260507T143545Z/issue.md` — GitHub #248
+- `docs/B1-docs/raw-20260507T143545Z45Z/issue.md` — GitHub #248
 - #247 开发过程中发现 `_extract_issue_key` 正则 `\d{4}` 截断了 6 位秒
 
 ## 当前为什么不能直接进入 dev

@@ -1,9 +1,9 @@
 # Pre-Tests: GATE 1 timestamp
-- issue_id: raw-20260507T0300Z
+- issue_id: raw-20260507T030000Z
 ## Unit
 - acceptance target: `timestamp mismatch between branch and governance chain is caught`
 - testing layer: `unit`
-- target environment: `fix/raw-20260507T0300Z-gate1-timestamp-check`
+- target environment: `fix/raw-20260507T030000Z-gate1-timestamp-check`
 - required evidence: `gate output`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -12,7 +12,7 @@
 ## Integration
 - acceptance target: `governance-merge-gate passes`
 - testing layer: `integration`
-- target environment: `fix/raw-20260507T0300Z-gate1-timestamp-check`
+- target environment: `fix/raw-20260507T030000Z-gate1-timestamp-check`
 - required evidence: `gate output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `./bin/governance-merge-gate --range develop..HEAD`

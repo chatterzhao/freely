@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T002621Z
 phase_state: completed
-source_raw: raw-20260630T002621Z
+source_raw: raw-20260630T002621Z21Z
 source_url: https://github.com/chatterzhao/freely/issues/3638
 produced_candidate: C-20260630T002621Z-A
 created_at: 2026-06-30
@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: 主管持续监督与中途介入
 
 ## Input
-- 来源：GitHub #3638 raw-20260630T002621Z
+- 来源：GitHub #3638 raw-20260630T002621Z21Z
 - kind：feature（新能力，非 bug 修复）
 - 触发：本轮会话连续 6 个 PR 中，Worker RED 阶段全部糊弄（actual_RED_output = "code written before RED" × N），Manager 完全不知情
 
@@ -1216,8 +1216,8 @@ Claude Code:
   "phase": "B1",
   "status": "done",
   "artifacts": [
-    "docs/B1-docs/raw-20260630T002621Z/brainstorms.md",
-    "docs/B1-docs/raw-20260630T002621Z/candidates.md"
+    "docs/B1-docs/raw-20260630T002621Z21Z/brainstorms.md",
+    "docs/B1-docs/raw-20260630T002621Z21Z/candidates.md"
   ],
   "next_phase": "B2",
   "timestamp": "2026-06-30T01:00:00Z"
@@ -1921,7 +1921,7 @@ def check_b1_artifacts(worktree: str, raw_key: str) -> CheckResult:
          │
          ▼
 agent-id.env:
-  /path/fix-raw-20260630T002621Z-supervisor-cycle-monitor = worker = worker_03 = session_id = abc123
+  /path/fix-raw-20260630T002621Z21Z-supervisor-cycle-monitor = worker = worker_03 = session_id = abc123
   /path/test-pre-merge-20260630T002621Z-supervisor-cycle-monitor = worker = worker_03 = session_id = def456
          │
          │  worktree 路径含 raw-key → 精确匹配

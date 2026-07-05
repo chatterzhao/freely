@@ -2,7 +2,7 @@
 
 ## C-20260615T235818Z-A: legacy issue
 
-- raw_issue: raw-20260615T235818Z
+- raw_issue: raw-20260615T235818Z18Z
 - milestone: M-20260615T235818Z-A
 - status: `promoted`
 - acceptance_criteria:

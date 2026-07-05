@@ -2,7 +2,7 @@
 
 - id: `C-20260322T044500Z-A`
 - title: Make manager runtime consume the latest manager continuity and worker prompt set
-- source_brainstorm: `docs/B1-docs/raw-20260322-0445/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322T044500Z/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`

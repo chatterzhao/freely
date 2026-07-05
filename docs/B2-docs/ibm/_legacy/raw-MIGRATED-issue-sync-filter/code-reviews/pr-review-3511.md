@@ -1,6 +1,6 @@
 # PR Review: #3511
 - pr_number: 3511
-- branch: fix/raw-20260625T044836Z-issue-sync-filter
+- branch: fix/raw-20260625T044836Z36Z-issue-sync-filter
 - base: develop
 - reviewer: tdd-agent (ACP TDD, slot=claude-apikey-ds-pro-auto)
 - review_date: 2026-06-25T20:49:23Z

@@ -20,7 +20,7 @@
 ### acceptance-2
 - acceptance_target: fork code includes session/fork try/except
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084551Z-acp-session-fork
+- target_environment: fix/raw-20260627T084545Z51Z-acp-session-fork
 - required_evidence: session/fork 和 session/new 都在代码中
 - test_command: grep -c "session/fork" docs/system/workspace/scripts/runtime/run-acp-prompt.py && grep -c "session/new" docs/system/workspace/scripts/runtime/run-acp-prompt.py && echo "PASS"
 - expected_output: PASS
@@ -32,7 +32,7 @@
 ### acceptance-3
 - acceptance_target: ensure-codex-acp reads .toml
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084551Z-acp-session-fork
+- target_environment: fix/raw-20260627T084545Z51Z-acp-session-fork
 - required_evidence: REGISTRY=.toml
 - test_command: grep "REGISTRY=" docs/system/workspace/scripts/runtime/ensure-codex-acp | grep -q ".toml" && echo "PASS" || echo "FAIL"
 - expected_output: PASS

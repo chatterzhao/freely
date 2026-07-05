@@ -3,8 +3,8 @@ local_id: I-20260618T071502Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260618T071502Z
-source_candidate: docs/B1-docs/raw-20260618T071502Z/candidates.md
+promoted_from: raw-20260618T071502Z02Z
+source_candidate: docs/B1-docs/raw-20260618T071502Z02Z/candidates.md
 verification_artifact_dir: docs/B2-docs/pr-merge-local-merge/code-reviews
 platform_ids: {}
 primary_platform: ''

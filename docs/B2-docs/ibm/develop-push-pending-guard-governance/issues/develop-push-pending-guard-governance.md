@@ -8,8 +8,8 @@
 - story-name: `develop-push-pending-guard-governance`
 - issue-name: `develop-push-pending-guard-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1035-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-1035-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/develop-push-pending-guard-governance/pre-tests.md`
@@ -61,8 +61,8 @@ This owner fixes that governance gap without auto-pushing on behalf of the opera
 
 ## Completion
 
-- `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`

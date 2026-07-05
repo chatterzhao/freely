@@ -31,8 +31,8 @@ platform_state: closed
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `incremental-dogfooding-gate-for-backend-increments`
 - issue-name: `incremental-dogfooding-gate-for-backend-increments`
-- source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-1244-04`
-- source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308T163000Z/candidates.md#c-20260308-1244-04`
+- source_brainstorm: `docs/B1-docs/raw-20260308T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`

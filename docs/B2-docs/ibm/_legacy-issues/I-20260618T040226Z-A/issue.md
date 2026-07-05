@@ -3,8 +3,8 @@ local_id: I-20260618T040226Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260618T040226Z
-source_candidate: docs/B1-docs/raw-20260618T040226Z/candidates.md
+promoted_from: raw-20260618T040226Z26Z
+source_candidate: docs/B1-docs/raw-20260618T040226Z26Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""

@@ -1,6 +1,6 @@
 # Tasks: cmd_feedback → issue-sync alignment
 
-- issue_id: raw-20260624T141559Z
+- issue_id: raw-20260624T141559Z59Z
 
 ## Task List
 

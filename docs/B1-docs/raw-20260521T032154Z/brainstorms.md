@@ -4,7 +4,7 @@
 
 ### 来源
 
-- Raw issue: `raw-20260521T032154Z` (GitHub #1523)
+- Raw issue: `raw-20260521T032154Z54Z` (GitHub #1523)
 - 创建时间: 2026-05-21T03:22:06Z
 - 来源渠道: GitHub issue (platform)
 - Crash: `supervisor crash: [[ at freely:18951 (rc=1)`
@@ -133,7 +133,7 @@ _on_supervisor_err() {
 
 ### 与 bash rc=0 假阳性的关系
 
-| 维度 | bash rc=0 (C-20260517T083030Z-A) | 本 issue (raw-20260521T032154Z) |
+| 维度 | bash rc=0 (C-20260517T083030Z-A) | 本 issue (raw-20260521T032154Z54Z) |
 |------|----------------------------------|----------------------------------|
 | 触发命令 | `bash` | `[[` |
 | 退出码 | 0 (成功) | 1 (条件 false) |
@@ -150,7 +150,7 @@ _on_supervisor_err() {
 
 ### 决策
 
-**新建 candidate C-raw-20260521T032154Z-A，状态 `needs_research`**。理由：
+**新建 candidate C-raw-20260521T032154Z54Z-A，状态 `needs_research`**。理由：
 
 1. 根因已定位到 `_on_supervisor_err` 函数内 BASH_COMMAND 捕获顺序问题
 2. 修复方案明确（方案 A 或 B），改动范围不超过 3 行

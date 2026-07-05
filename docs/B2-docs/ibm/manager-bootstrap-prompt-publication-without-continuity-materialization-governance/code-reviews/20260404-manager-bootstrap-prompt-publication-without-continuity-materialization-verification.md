@@ -23,8 +23,8 @@
 
 ## Evidence Read
 
-- `docs/B1-docs/raw-20260404/brainstorms.md`
-- `docs/B1-docs/raw-20260404/candidates.md`
+- `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
+- `docs/B1-docs/raw-20260404T214800Z/candidates.md`
 - `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`

@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260627T021849Z-A
-source_raw: raw-20260627T021849Z
+source_raw: raw-20260627T021849Z49Z
 ---
 ## C-20260627T021849Z-A: legacy issue
 - candidate_format_version: v2; title: wt-close --platform-only platform search fallback

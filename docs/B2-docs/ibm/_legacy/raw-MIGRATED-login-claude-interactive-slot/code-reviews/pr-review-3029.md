@@ -2,7 +2,7 @@
 - pr_number: 3029
 - issue_id: I-20260619T033758Z-A
 - issue_path: docs/issues/I-20260619T033758Z-A/issue.md
-- branch: fix/raw-20260619T033758Z-login-claude-interactive-slot
+- branch: fix/raw-20260619T033758Z58Z-login-claude-interactive-slot
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T04:49:40Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T033758Z-login-claude-interactive-slot branch=fix/raw-20260619T033758Z-login-claude-interactive-slot clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T033758Z58Z-login-claude-interactive-slot branch=fix/raw-20260619T033758Z58Z-login-claude-interactive-slot clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

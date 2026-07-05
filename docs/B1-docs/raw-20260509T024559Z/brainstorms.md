@@ -1,6 +1,6 @@
 # Brainstorm: 多项目、多 Issue 并发隔离
 
-- 来源: raw-20260509T024559Z (#265)
+- 来源: raw-20260509T024559Z59Z (#265)
 - 日期: 2026-05-09
 - 核心问题: 如何保证 AI 不工作在错误工位？
 
@@ -397,8 +397,8 @@ Manager AI cycle
           {
             "delegation_id": "20260509T024559Z-001",
             "raw_key": "20260509T024559Z",
-            "worktree": "/path/to/fix/raw-20260509T024559Z-multi-project-isolation",
-            "branch": "fix/raw-20260509T024559Z-multi-project-isolation",
+            "worktree": "/path/to/fix/raw-20260509T024559Z59Z-multi-project-isolation",
+            "branch": "fix/raw-20260509T024559Z59Z-multi-project-isolation",
             "prompt_file": "/path/to/worker-prompts/p1.txt"
           }
         ]

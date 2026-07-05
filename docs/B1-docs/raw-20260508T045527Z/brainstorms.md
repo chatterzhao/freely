@@ -2,7 +2,7 @@
 
 ## Discovery
 
-raw-20260508T045527Z 提出：`task-source-scan.py` 已被 `task-lifecycle-scan.py` 取代，但仍留在代码库中造成噪音和混淆。
+raw-20260508T045527Z27Z 提出：`task-source-scan.py` 已被 `task-lifecycle-scan.py` 取代，但仍留在代码库中造成噪音和混淆。
 
 ### 现状确认
 

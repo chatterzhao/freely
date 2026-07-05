@@ -5,7 +5,7 @@
 - candidate_format_version: v2
 - title: 修复 _on_supervisor_err 递归 ERR trap 导致的假阳性 crash 报告
 - status: promoted
-- decision_reason: raw-20260521T032154Z (GitHub #1523) 在 ERR trap handler 内部，`[[ "$_err_rc" -eq 0 ]]` 触发递归 ERR trap，递归展开后 `_err_cmd` 从 `BASH_COMMAND` 捕获的值不等 `[[`，导致 benign check 失败，生成假阳性 crash 报告。根因已定位，修复方案明确（提前捕获 BASH_COMMAND）。
+- decision_reason: raw-20260521T032154Z54Z (GitHub #1523) 在 ERR trap handler 内部，`[[ "$_err_rc" -eq 0 ]]` 触发递归 ERR trap，递归展开后 `_err_cmd` 从 `BASH_COMMAND` 捕获的值不等 `[[`，导致 benign check 失败，生成假阳性 crash 报告。根因已定位，修复方案明确（提前捕获 BASH_COMMAND）。
 - next_action: B2_IBM materialize（实现方案 A：提前捕获 BASH_COMMAND）
 - revisit_trigger: B2_IBM 完成后进入 dev-loop
 - acceptance_criteria:

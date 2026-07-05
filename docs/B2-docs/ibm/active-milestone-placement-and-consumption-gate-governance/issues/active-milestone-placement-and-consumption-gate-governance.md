@@ -8,16 +8,16 @@
 - story-name: `active-milestone-placement-and-consumption-gate-governance`
 - issue-name: `active-milestone-placement-and-consumption-gate-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260331/candidates.md#c-20260331-2012-a`
-- source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260331T183000Z/candidates.md#c-20260331-2012-a`
+- source_brainstorm: `docs/B1-docs/raw-20260331T183000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews`
 - depends_on:
-  - `docs/B1-docs/raw-20260320/candidates.md`
-  - `docs/B1-docs/raw-20260321/brainstorms.md`
-  - `docs/B1-docs/raw-20260327/brainstorms.md`
+  - `docs/B1-docs/raw-20260320T174500Z/candidates.md`
+  - `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
+  - `docs/B1-docs/raw-20260327T200600Z/brainstorms.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -67,8 +67,8 @@ Freely 已经把两条规则写成 canonical truth：
 
 ## Completion
 
-- `docs/B1-docs/raw-20260331/brainstorms.md`
-- `docs/B1-docs/raw-20260331/candidates.md`
+- `docs/B1-docs/raw-20260331T183000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260331T183000Z/candidates.md`
 - `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/brainstorms/b-active-milestone-placement-and-consumption-gate-governance.md`
 - `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
 - `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/prd.md`

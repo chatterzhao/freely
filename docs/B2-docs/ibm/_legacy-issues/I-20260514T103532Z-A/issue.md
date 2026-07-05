@@ -2,8 +2,8 @@
 local_id: I-20260514T103532Z-A
 kind: linked
 phase_state: completed
-promoted_from: raw-20260514T103532Z
-source_candidate: docs/B1-docs/raw-20260514T103532Z/candidates.md
+promoted_from: raw-20260514T103532Z32Z
+source_candidate: docs/B1-docs/raw-20260514T103532Z32Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -25,7 +25,7 @@ platform_state: closed
 
 # I-20260514T103532Z-A: agent handoff protocol v2
 
-- source_candidate: `docs/B1-docs/raw-20260514T103532Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260514T103532Z32Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/agent-handoff-protocol/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/agent-handoff-protocol/code-reviews`
 

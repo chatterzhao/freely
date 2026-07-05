@@ -5,7 +5,7 @@
 - candidate_format_version: v2
 - title: delegate_workers 被 exclusive_fields_conflict 拒绝
 - status: absorbed
-- decision_reason: Runtime bug found via scan patrol: validate_manager_exit_contract_for_project reads `reason` field into `stop_reason`, causing exclusive_fields_conflict on delegate_workers. Fix merged directly into develop via fix/raw-20260516* worktree. Absorbed as runtime fix without separate I-* materialization.
+- decision_reason: Runtime bug found via scan patrol: validate_manager_exit_contract_for_project reads `reason` field into `stop_reason`, causing exclusive_fields_conflict on delegate_workers. Fix merged directly into develop via fix/raw-20260516T014923Z* worktree. Absorbed as runtime fix without separate I-* materialization.
 - next_action: None (already merged)
 - revisit_trigger: If exclusive_fields_conflict pattern changes in handoff validation
 - acceptance_criteria:

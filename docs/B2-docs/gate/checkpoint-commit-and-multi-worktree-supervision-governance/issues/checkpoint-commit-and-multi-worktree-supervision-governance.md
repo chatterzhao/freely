@@ -8,11 +8,11 @@
 - story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - issue-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-A`
+- source_candidate: `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-A`
 - additional_source_candidates:
-  - `docs/B1-docs/raw-20260318/candidates.md#c-20260318-2358-a`
-  - `docs/B1-docs/raw-20260318/candidates.md#c-20260318-2358-b`
-- source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
+  - `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-2358-a`
+  - `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-2358-b`
+- source_brainstorm: `docs/B1-docs/raw-20260317T110100Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`

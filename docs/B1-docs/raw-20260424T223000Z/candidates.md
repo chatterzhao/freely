@@ -1,7 +1,7 @@
 # Candidates - 20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260424-2230/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260424T223000Z/brainstorms.md`
 - Status: `absorbed`
 - Route: `absorb-into-i-20260421-1200-a-runtime-daemon-self-loop-followthrough-governance`
 

@@ -1,5 +1,5 @@
 ---
-source: raw-20260624T152500Z
+source: raw-20260624T152500Z00Z
 ---
 
 ## C-20260624T152500Z-A: legacy issue

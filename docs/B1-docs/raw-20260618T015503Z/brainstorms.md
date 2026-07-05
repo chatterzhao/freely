@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw-20260618T015503Z (GitHub #2956)
+- raw-20260618T015503Z03Z (GitHub #2956)
 - 发现链：develop 反复被弄脏 → 追踪到 _absorb_close_frontmatter → 发现全链路路径问题
 
 ### 问题全貌

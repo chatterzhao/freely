@@ -1,9 +1,9 @@
 ---
-local_id: raw-20260619T043000Z
+local_id: raw-20260619T043000Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260619T043000Z-A
-source_candidate: docs/B1-docs/raw-20260619T043000Z/candidates.md#C-20260619T043000Z-A
+source_candidate: docs/B1-docs/raw-20260619T043000Z00Z/candidates.md#C-20260619T043000Z-A
 platform_ids:
   github:
     issue_id: '3026'

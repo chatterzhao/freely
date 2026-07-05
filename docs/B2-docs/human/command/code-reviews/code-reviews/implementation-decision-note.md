@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260629T132042Z-A
-issue_path: docs/B2-docs/human/command/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md
+issue_path: docs/B2-docs/human/command/raw-20260629T132042Z42Z/issues/I-20260629T132042Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260629T132042Z-A
-- issue_path: docs/B2-docs/human/command/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md
+- issue_path: docs/B2-docs/human/command/raw-20260629T132042Z42Z/issues/I-20260629T132042Z-A.md
 
 ## Implementation Decision Note
 

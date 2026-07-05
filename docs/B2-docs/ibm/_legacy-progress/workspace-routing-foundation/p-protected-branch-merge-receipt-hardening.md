@@ -33,7 +33,7 @@
 7. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 8. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 9. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
-10. `docs/B1-docs/raw-20260402/brainstorms.md`
+10. `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
 11. `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
 12. `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
 

@@ -8,8 +8,8 @@
 - story-name: `milestone-completed-queue-closeout-governance`
 - issue-name: `milestone-completed-queue-closeout-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260406/candidates.md#c-20260406-1105-a`
-- source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260406T110500Z/candidates.md#c-20260406-1105-a`
+- source_brainstorm: `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/pre-tests.md`

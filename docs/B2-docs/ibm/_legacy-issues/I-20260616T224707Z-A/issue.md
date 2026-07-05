@@ -3,8 +3,8 @@ local_id: I-20260616T224707Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260616T224707Z
-source_candidate: docs/B1-docs/raw-20260616T224707Z/candidates.md
+promoted_from: raw-20260616T224707Z07Z
+source_candidate: docs/B1-docs/raw-20260616T224707Z07Z/candidates.md
 canonical_issue_path: ''
 platform_ids: {}
 primary_platform: ''
@@ -23,9 +23,9 @@ platform_state: closed
 
 # I-20260616T224707Z-A: ACP Session ID 格式污染修复
 
-- source_candidate: `docs/B1-docs/raw-20260616T224707Z/candidates.md`
-- pre_tests_path: `docs/B1-docs/raw-20260616T224707Z/pre-tests.md`
-- verification_artifact_dir: `docs/B1-docs/raw-20260616T224707Z/code-reviews`
+- source_candidate: `docs/B1-docs/raw-20260616T224707Z07Z/candidates.md`
+- pre_tests_path: `docs/B1-docs/raw-20260616T224707Z07Z/pre-tests.md`
+- verification_artifact_dir: `docs/B1-docs/raw-20260616T224707Z07Z/code-reviews`
 - milestone: M-20260616T224707Z-A
 - acceptance_criteria:
   - `run-acp-prompt.py` 所有 launch_kind 分支输出统一 clean line 1 + label line 2

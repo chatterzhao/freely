@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '3324'
     url: https://github.com/chatterzhao/freely/issues/3324
 primary_platform: github
-source_candidate: docs/B1-docs/raw-20260622T025044Z/candidates.md#C-20260622T025044Z-A
+source_candidate: docs/B1-docs/raw-20260622T025044Z44Z/candidates.md#C-20260622T025044Z-A
 created_at: '2026-06-22T02:50:44Z'
 updated_at: '2026-06-22T02:50:44Z'
 author: platform

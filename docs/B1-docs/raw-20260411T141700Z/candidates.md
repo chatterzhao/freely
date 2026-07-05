@@ -19,7 +19,7 @@
 - session_refs: []
 - next_action: `Candidate mirror only. I-20260411T141700Z-A is authoritative and now parked at completed; use the owner package for delivered reconcile truth instead of reopening raw pre-brainstorm debate.`
 - revisit_trigger: `Any new audit still reports implemented gate/hook behavior as missing because a pre-brainstorm statement remained unreconciled, and current reconcile labels cannot explain the gap.`
-- source_brainstorm: `docs/B1-docs/raw-20260411-1417/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141700Z/brainstorms.md`
 - promotion_gate:
   - `Owner scope is documentation-truth reconcile only; no runtime/gate behavior changes are mixed in.`
   - `Each reconcile patch includes explicit canonical evidence pointers.`
@@ -53,7 +53,7 @@
 - promoted_issue_path_role: `absorbed-into-successor`
 - next_action: `Do not reopen C-20260411T141700Z-B; use I-20260408T120500Z-A as canonical truth for the verification contract and premerge adequacy chain.`
 - revisit_trigger: `Never unless the canonical verification-contract owner itself is reopened.`
-- source_brainstorm: `docs/B1-docs/raw-20260411-1417/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141700Z/brainstorms.md`
 - promotion_gate:
   - `Must be implemented in dedicated runtime owner, not bundled into reconcile-only owner.`
 - open_questions:

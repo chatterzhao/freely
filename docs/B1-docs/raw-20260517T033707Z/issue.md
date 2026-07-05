@@ -1,6 +1,6 @@
 ---
-local_id: raw-20260517T033707Z
-id: raw-20260517T033707Z
+local_id: raw-20260517T033707Z07Z
+id: raw-20260517T033707Z07Z
 kind: raw
 title: 'batch closeout round 5: remaining lifecycle items'
 phase_state: absorbed

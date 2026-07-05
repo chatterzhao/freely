@@ -4,7 +4,7 @@
 ## Unit
 - acceptance target: deploy-skills --dry-run shows all 33 skills OK
 - testing layer: unit
-- target environment: feature/raw-20260508T005431Z-skill-standardize
+- target environment: feature/raw-20260508T005431Z31Z-skill-standardize
 - required evidence: deployed=33 updated=0 failed=0
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: human_observation_only
@@ -14,7 +14,7 @@
 ## Integration
 - acceptance target: gate passes for this doc-only merge
 - testing layer: integration
-- target environment: feature/raw-20260508T005431Z-skill-standardize
+- target environment: feature/raw-20260508T005431Z31Z-skill-standardize
 - required evidence: pr-merge-guarded accepts the merge
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer

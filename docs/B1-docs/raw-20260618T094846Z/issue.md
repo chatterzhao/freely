@@ -1,16 +1,16 @@
 ---
-local_id: raw-20260618T094846Z
+local_id: raw-20260618T094846Z46Z
 kind: raw
 phase_state: absorbed
-source_candidate: docs/B1-docs/raw-20260618T094846Z/candidates.md#C-20260618T094846Z-A
+source_candidate: docs/B1-docs/raw-20260618T094846Z46Z/candidates.md#C-20260618T094846Z-A
 platform_ids:
   github:
     issue_id: '2988'
     url: https://github.com/chatterzhao/freely/issues/2988
     synced_at: ''
 primary_platform: github
-canonical_issue_path: raw-20260618T094846Z
-absorbed_into: raw-20260618T094846Z
+canonical_issue_path: raw-20260618T094846Z46Z
+absorbed_into: raw-20260618T094846Z46Z
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-18T09:49:02Z'

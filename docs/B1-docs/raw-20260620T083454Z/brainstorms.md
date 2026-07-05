@@ -1,7 +1,7 @@
 # B1 Brainstorm: lifecycle-scan-phase-state
 
 ## Discovery
-- source: raw-20260620T083454Z (GitHub #3153)
+- source: raw-20260620T083454Z54Z (GitHub #3153)
 - problem: task-source-scan reports 74+ items as incomplete despite phase_state=absorbed/dropped/completed
 - root cause: scan checks file/directory existence, not frontmatter phase_state
 

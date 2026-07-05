@@ -8,19 +8,19 @@
 - target_environment: test-pre-merge-20260701T061531Z-gate-summary-output
 - required_evidence: code review
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T061531Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T061531Z31Z/verification/acceptance-1.log
 - test_command: grep -c "需要阅读的 Skill" docs/system/workspace/scripts/quality/governance-merge-gate
 - expected_output: >=2
 - actual_RED_output: 0 (修复前无分组输出)
 - actual_output: 2 matches
-- evidence_file: docs/B2-docs/gate/governance/raw-20260701T061531Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/gate/governance/raw-20260701T061531Z31Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 旧版无分组输出
 ## Unit
 - acceptance_target: python syntax valid
 - testing_layer: unit
-- target_environment: feature/raw-20260701T061531Z-gate-summary-output
+- target_environment: feature/raw-20260701T061531Z31Z-gate-summary-output
 - required_evidence: compile check
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface

@@ -21,7 +21,7 @@ Fix the delimiter mismatch between Python `tool-registry-query.py` (space-joined
 
 ## Dev-Loop Handoff
 
-- Code already committed on `fix/raw-20260626T150328Z-toml-array-comma-join`
+- Code already committed on `fix/raw-20260626T150328Z28Z-toml-array-comma-join`
 - B1_IBM governance done (brainstorms.md, candidates.md, milestones.md)
 - B2_IBM governance in progress (this PRD + pre-tests + tasks + code-review)
 - Next: pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close

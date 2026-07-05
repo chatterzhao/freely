@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- Raw issue: `docs/B1-docs/raw-20260506T1200Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260506T120000Z/issue.md`
 - GitHub: https://github.com/chatterzhao/freely/issues/285
 - Created: 2026-05-06, author: zhaoquan
 - 原始问题：`doc-pre-brainstorm-execution` / `doc-ibm-execution` 命名未体现 B1_IBM/B2_IBM，I→B→M 骨架未被下层 skill 强制消费。

@@ -1,7 +1,7 @@
 # Candidates - 20260411-1414--launch-time-verification-contract-hard-gate
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260411-1414/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260411T141400Z/brainstorms.md`
 - Status: proposed
 - Scope: freeze launch-time verification contract hard gate as phase-one owner, keep adequacy schema expansion and retirement enforcement as follow-ons
 
@@ -33,7 +33,7 @@
 - priority: `P0`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/B1-docs/raw-20260411-1414/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141400Z/brainstorms.md`
 - session_refs: []
 - promoted_issue_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
 - next_action: candidate mirror only. `I-20260411T141400Z-A` is now the canonical owner for launch-time verification contract hard gating.
@@ -53,7 +53,7 @@
 - status: `absorbed`
 - adoption_type: `follow_on_owner_materialized`
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/B1-docs/raw-20260411-1414/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141400Z/brainstorms.md`
 - session_refs: []
 - promoted_issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
 - promoted_issue_id: `I-20260411T141500Z-A`

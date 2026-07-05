@@ -5,7 +5,7 @@
 - candidate_format_version: `v2`
 - title: Tool authorization bootstrap and post-consent materialization contract
 - status: `promoted`
-- source_brainstorm: `docs/B1-docs/raw-20260405-1235/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260405T123500Z/brainstorms.md`
 - problem: Freely 已具备 activation consent、tool policy materialization、worktree boundary bootstrap 与 adapter axis，但仍没有单独 contract 定义用户显式同意后如何为各外部工具完成 project authorization/bootstrap、哪些能力能自动 materialize、哪些仍需手工 trust，以及在未同意/未完成时系统应如何解释退化行为。
 - why_now:
   - 当前 dogfooding 已明确要求 `freely init` 只能由用户主动触发，不能静默 auto-trust 项目

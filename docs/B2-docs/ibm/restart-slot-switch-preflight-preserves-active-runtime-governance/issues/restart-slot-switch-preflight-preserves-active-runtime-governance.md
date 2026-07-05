@@ -8,8 +8,8 @@
 - story-name: `restart-slot-switch-preflight-preserves-active-runtime-governance`
 - issue-name: `restart-slot-switch-preflight-preserves-active-runtime-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-2055-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-2055-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
@@ -68,8 +68,8 @@ Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 star
 
 ## Completion
 
-- `docs/B1-docs/raw-20260405/brainstorms.md`
-- `docs/B1-docs/raw-20260405/candidates.md`
+- `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
+- `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/brainstorms/b-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/prd.md`

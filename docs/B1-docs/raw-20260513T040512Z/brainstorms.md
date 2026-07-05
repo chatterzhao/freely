@@ -3,7 +3,7 @@
 ## Discovery
 
 ### 来源
-- GitHub issue #327 (`raw-20260513T040512Z`) from platform
+- GitHub issue #327 (`raw-20260513T040512Z12Z`) from platform
 - 相关已完成的 issue: `I-20260503T020000Z-A` (scan lifecycle migration v2)
 
 ### 时效性评估

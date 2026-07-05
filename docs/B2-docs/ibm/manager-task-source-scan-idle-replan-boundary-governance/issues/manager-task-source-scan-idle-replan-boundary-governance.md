@@ -8,8 +8,8 @@
 - story-name: `manager-task-source-scan-idle-replan-boundary-governance`
 - issue-name: `manager-task-source-scan-idle-replan-boundary-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260420/candidates.md#c-20260420-1130-a`
-- source_brainstorm: `docs/B1-docs/raw-20260420/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260420T113000Z/candidates.md#c-20260420-1130-a`
+- source_brainstorm: `docs/B1-docs/raw-20260420T113000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
@@ -17,7 +17,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
 - verification_artifact_dir: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews`
 - depends_on:
-  - `docs/B1-docs/raw-20260407/candidates.md#c-20260407-0817-a`
+  - `docs/B1-docs/raw-20260407T103600Z/candidates.md#c-20260407-0817-a`
   - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
   - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - created_at: `2026-04-20`
@@ -74,8 +74,8 @@ This owner freezes the idle/replan scan boundary and lands the first machine-rea
 
 ## Completion
 
-- `docs/B1-docs/raw-20260420/brainstorms.md`
-- `docs/B1-docs/raw-20260420/candidates.md`
+- `docs/B1-docs/raw-20260420T113000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260420T113000Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
 - `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`

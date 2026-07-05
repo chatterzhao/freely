@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260701T085407Z
 phase_state: completed
-source_raw: raw-20260701T085407Z
+source_raw: raw-20260701T085407Z07Z
 source_url: https://github.com/chatterzhao/freely/issues/3697
 produced_candidate: C-20260701T085407Z-A
 created_at: 2026-07-01
@@ -172,8 +172,8 @@ agent 设 input-required 时不手写 message。Runtime 根据参数自动生成
 模板: "{from_agent} 在 raw_key={raw_key} 完成 {review_stage}，需要 {reason}。
        产物路径: docs/B2-docs/{epic}/{story}/raw-{raw_key}/..."
 
-示例: "worker_03 在 raw-20260701T085407Z 完成 B1，需要 needs-review:b1。
-       产物路径: docs/B2-docs/a2a/phase1/raw-20260701T085407Z/..."
+示例: "worker_03 在 raw-20260701T085407Z07Z 完成 B1，需要 needs-review:b1。
+       产物路径: docs/B2-docs/a2a/phase1/raw-20260701T085407Z07Z/..."
 ```
 
 message 保证接收方 agent 有足够上下文开始工作，不需要回头查任何表。

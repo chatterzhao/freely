@@ -1,7 +1,7 @@
 # Candidates - 20260421-1200--runtime-daemon-self-loop-followthrough
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260421-1200/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260421T120000Z/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-daemon-self-loop-followthrough-owner-and-replay-through-guarded-develop`
 

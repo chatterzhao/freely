@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260701T061924Z-A
 status: promoted
-source_raw: raw-20260701T061924Z
+source_raw: raw-20260701T061924Z24Z
 milestone: M-20260701T061924Z-A
 ---
 ## C-20260701T061924Z-A: legacy issue

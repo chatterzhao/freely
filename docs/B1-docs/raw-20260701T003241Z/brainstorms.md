@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260701T003241Z
 phase_state: completed
-source_raw: raw-20260701T003241Z
+source_raw: raw-20260701T003241Z41Z
 produced_candidate: C-20260701T003241Z-A
 ---
 # B1: remove --ai, deprecate AI tool fields, block init on config

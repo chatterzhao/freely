@@ -9,8 +9,8 @@
 - issue-name: `manager-delegated-intake-absorption-closure-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260326/candidates.md#c-20260326-0445-a`
-- source_brainstorm: `docs/B1-docs/raw-20260326/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260326T181000Z/candidates.md#c-20260326-0445-a`
+- source_brainstorm: `docs/B1-docs/raw-20260326T181000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

@@ -1,8 +1,8 @@
 ---
-local_id: raw-20260613T110000Z
+local_id: raw-20260613T110000Z00Z
 kind: raw
 phase_state: absorbed
-absorbed_into: raw-20260614T103101Z
+absorbed_into: raw-20260614T103101Z01Z
 absorbed_at: '2026-06-14T00:00:00Z'
 platform_ids: {}
 primary_platform: local

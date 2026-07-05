@@ -2,11 +2,11 @@
 local_id: I-20260619T061441Z-A
 kind: i_issue
 phase_state: completed
-verification_artifact_dir: docs/B1-docs/raw-20260619T061441Z/
+verification_artifact_dir: docs/B1-docs/raw-20260619T061441Z41Z/
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260619T061441Z-A/issue.md
-source_candidate: docs/B1-docs/raw-20260619T061441Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260619T061441Z41Z/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-19T06:20:00Z'
@@ -15,13 +15,13 @@ intake_id: ''
 author: fix-execution
 channel: ''
 session_refs: []
-raw_ref: raw-20260619T061441Z
+raw_ref: raw-20260619T061441Z41Z
 ---
 
 # I-20260619T061441Z-A: a2a-exit --role vs --agent-id 参数不匹配修复
 
 ## 所属 Raw Issue
-- raw-20260619T061441Z
+- raw-20260619T061441Z41Z
 - GitHub: https://github.com/chatterzhao/freely/issues/3036
 
 ## 影响
@@ -42,8 +42,8 @@ raw_ref: raw-20260619T061441Z
 7. `docs/system/workspace/three-loop-lifecycle.svg`: Runtime Task Launcher 组件 + 接口陷阱标注
 
 ## B1_IBM
-- brainstorms: docs/B1-docs/raw-20260619T061441Z/brainstorms.md
-- candidates: docs/B1-docs/raw-20260619T061441Z/candidates.md
+- brainstorms: docs/B1-docs/raw-20260619T061441Z41Z/brainstorms.md
+- candidates: docs/B1-docs/raw-20260619T061441Z41Z/candidates.md
 - decision: promote (方案 B)
 
 ## 验证
@@ -53,7 +53,7 @@ raw_ref: raw-20260619T061441Z
 - [x] build 完整性确认：4 文件修改 + 3 文档更新 + 3 B1/B2 artifacts
 
 ### Verification Artifact
-- brainstorms: docs/B1-docs/raw-20260619T061441Z/brainstorms.md
-- candidates: docs/B1-docs/raw-20260619T061441Z/candidates.md
+- brainstorms: docs/B1-docs/raw-20260619T061441Z41Z/brainstorms.md
+- candidates: docs/B1-docs/raw-20260619T061441Z41Z/candidates.md
 - test results: config_bool_enabled() unit test passed in test-pre-merge environment
 - backward compat: a2a-exit handler fallback logic validated

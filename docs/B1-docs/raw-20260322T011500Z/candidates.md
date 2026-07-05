@@ -4,7 +4,7 @@
 - title: Unify Freely as the only front-door control surface
 - status: promoted
 - adoption_type: n/a
-- source_brainstorm: `docs/B1-docs/raw-20260322-0115/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322T011500Z/brainstorms.md`
 - why_now: 当前 `chat` 与 `tui` 的 high-level 语义已经接近，但 post-submit runtime chain 仍不完全统一，阻碍 `freely` 成为唯一正式前台入口，也阻碍后续把 CLI 面当作 TUI/GUI 的 canonical backend。
 - proposed_scope:
   - freeze CLI-first control surface contract

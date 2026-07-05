@@ -2,8 +2,8 @@
 local_id: I-20260508T005431Z-A
 kind: linked
 phase_state: completed
-promoted_from: raw-20260508T005431Z
-source_candidate: docs/B1-docs/raw-20260508T005431Z/candidates.md
+promoted_from: raw-20260508T005431Z31Z
+source_candidate: docs/B1-docs/raw-20260508T005431Z31Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -26,7 +26,7 @@ platform_state: closed
 
 - pre_tests_path: docs/B2-docs/ibm/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/ibm/code-reviews
-- source_candidate: docs/B1-docs/raw-20260508T005431Z/candidates.md
+- source_candidate: docs/B1-docs/raw-20260508T005431Z31Z/candidates.md
 
 ## 实现
 - bin/deploy-skills: 增量部署脚本

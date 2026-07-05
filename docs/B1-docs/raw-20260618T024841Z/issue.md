@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260618T024841Z
+local_id: raw-20260618T024841Z41Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260618T024841Z-A
@@ -49,7 +49,7 @@ platform_state: closed
 当前架构下 raw issue 在 worktree 的 docs/issues/ 中。wt-close 删除 worktree 后：
 - raw issue 通过 merge 进入了 develop 的 docs/issues/ ✅
 - 但如果在 develop 上再次 wt-close --force（清理残留），可能覆盖 develop 上的 raw issue
-- raw-20260617T162853Z 的 worktree 被删后，本地 raw issue 文件丢失
+- raw-20260617T103956Z53Z 的 worktree 被删后，本地 raw issue 文件丢失
 
 ## 修复方向
 

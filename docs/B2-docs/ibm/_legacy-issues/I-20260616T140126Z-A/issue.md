@@ -18,9 +18,9 @@ promotion_gate:
   - All 7 template files reviewed
   - freely init integration tested
   - Cross-references validated
-source: raw-20260616T140126Z
+source: raw-20260616T140126Z26Z
 raw_key: 20260616T140126Z
-source_candidate: docs/B1-docs/raw-20260616T140126Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260616T140126Z26Z/candidates.md
 created: 2026-06-18T08:05:54Z
 updated: 2026-06-19T06:20:00Z
 ---

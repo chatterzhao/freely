@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T100000Z
+local_id: raw-20260506T010000Z00Z
 kind: raw
 phase_state: proposed
 platform_ids:
@@ -22,11 +22,11 @@ force_closed_at: '2026-05-19T22:48:21Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
-## raw-20260506T1000Z
+## raw-20260506T010000Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260506T1000Z` |
+| local_id | `raw-20260506T010000Z` |
 | kind | `raw` |
 | status | `unknown` |
 | phase | `proposed` |
@@ -36,7 +36,7 @@ force_closed_reason: 'wt-close --force: worktree retired without completed phase
 
 ---
 
-local_id: raw-20260506T100000Z
+local_id: raw-20260506T010000Z00Z
 kind: raw
 phase_state: proposed
 platform_ids:

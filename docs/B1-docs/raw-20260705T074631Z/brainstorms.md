@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260705T074631Z
 phase_state: completed
-source_raw: raw-20260705T074631Z
+source_raw: raw-20260705T074631Z31Z
 produced_candidate: C-20260705T074631Z-A
 ---
 # B1: 全部持续写入日志 rotation

@@ -3,7 +3,7 @@
 ## 来源
 
 - `C-20260619T033758Z-A` — B1_IBM 阶段 produce，状态 promoted
-- `raw-20260619T033758Z` — 初始 feedback issue
+- `raw-20260619T033758Z58Z` — 初始 feedback issue
 
 ## 实现前置设计
 

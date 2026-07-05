@@ -8,8 +8,8 @@
 - story-name: `codex-current-live-apikey-bootstrap-without-saved-slot-governance`
 - issue-name: `codex-current-live-apikey-bootstrap-without-saved-slot-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260406/candidates.md#c-20260406-1829-a`
-- source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260406T110500Z/candidates.md#c-20260406-1829-a`
+- source_brainstorm: `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/pre-tests.md`

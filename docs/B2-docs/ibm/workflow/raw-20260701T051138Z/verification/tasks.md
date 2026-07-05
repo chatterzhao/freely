@@ -8,12 +8,12 @@
 - target_environment: test-pre-merge-20260701T051138Z-workflow-before-feedback
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/ibm/workflow/raw-20260701T051138Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/ibm/workflow/raw-20260701T051138Z38Z/verification/acceptance-1.log
 - test_command: grep -rn "freely feedback → \[skill\]" docs/system/workspace/skills/ AGENTS.md; test $? -eq 1
 - expected_output: exit 1 (no old chains)
 - actual_RED_output: 7 files had old chain order — RED confirmed
 - actual_output: 7 files fixed, 0 old chains remain
-- evidence_file: docs/B2-docs/ibm/workflow/raw-20260701T051138Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/ibm/workflow/raw-20260701T051138Z38Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 7 files had workflow skill after feedback in chain, moved before

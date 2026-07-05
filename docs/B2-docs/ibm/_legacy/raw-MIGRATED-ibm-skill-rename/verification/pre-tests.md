@@ -5,7 +5,7 @@
 ## Unit
 - acceptance target: `All old skill names replaced, no remaining references.`
 - testing layer: `unit`
-- target environment: `feature/raw-20260506T1200Z-ibm-skill-rename`
+- target environment: `feature/raw-20260506T120000Z-ibm-skill-rename`
 - required evidence: `grep for old names returns 0`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -15,7 +15,7 @@
 ## Integration
 - acceptance target: `governance-merge-gate passes with renamed skills.`
 - testing layer: `integration`
-- target environment: `feature/raw-20260506T1200Z-ibm-skill-rename`
+- target environment: `feature/raw-20260506T120000Z-ibm-skill-rename`
 - required evidence: `governance-merge-gate output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `./bin/governance-merge-gate --range develop..HEAD`

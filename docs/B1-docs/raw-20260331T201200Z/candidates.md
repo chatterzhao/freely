@@ -3,7 +3,7 @@
 - id: `C-20260331T201200Z-A`
 - candidate_format_version: `v2`
 - title: Enforce active milestone placement correctness for unresolved candidates
-- source_brainstorm: `docs/B1-docs/raw-20260331-2012/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260331T201200Z/brainstorms.md`
 - problem: Freely's current governance already requires active candidates to remain visible in `docs/milestones.md`, and the merge gate already checks candidate visibility plus `C/M/I` traceability. But the current contract still treats "present in some milestone queue" as sufficient, without proving that the candidate is attached to the correct and still-active milestone. This allows important current research to remain effectively unconsumed via `milestone: unassigned`, placement in the wrong milestone, or placement in a completed milestone that will never schedule it.
 - why_now:
   - 当前仓库已经把 unresolved research persistence 与 develop merge `C/M/I` gate 都写成 canonical rule，但两者中间仍缺“milestone 放置正确性”这一层。
@@ -49,9 +49,9 @@
   - `docs/milestones.md`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
-  - `docs/B1-docs/raw-20260320-0908/candidates.md`
-  - `docs/B1-docs/raw-20260321-1835/brainstorms.md`
-  - `docs/B1-docs/raw-20260327-1003/brainstorms.md`
+  - `docs/B1-docs/raw-20260320T090800Z/candidates.md`
+  - `docs/B1-docs/raw-20260321T183500Z/brainstorms.md`
+  - `docs/B1-docs/raw-20260327T100300Z/brainstorms.md`
 - decision_reason:
   - 现有治理已经证明“candidate 必须可见”和“develop merge 需要 `C/M/I` owner 链”都成立，但还不足以防止 candidate 被挂进错误或不会消费的 milestone。
   - 另一个真实缺口是：`needs_research` 即使没有丢失，也可能长期挂在当前不会消费它的 milestone 中；因此 placement correctness 必须连同 rehome-or-drop contract 一起冻结。

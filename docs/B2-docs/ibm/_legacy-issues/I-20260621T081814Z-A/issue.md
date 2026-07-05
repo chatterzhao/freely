@@ -2,14 +2,14 @@
 local_id: I-20260621T081814Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/B1-docs/raw-20260621T081814Z/candidates.md#C-20260621T081814Z-A
+source_candidate: docs/B1-docs/raw-20260621T081814Z14Z/candidates.md#C-20260621T081814Z-A
 platform_ids: {}
 primary_platform: github
-canonical_issue_path: docs/B1-docs/raw-20260621T081814Z/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260621T081814Z14Z/candidates.md
 created_at: '2026-06-21T08:18:14Z'
 author: claude
 channel: claude
-source_raw: raw-20260621T081814Z
+source_raw: raw-20260621T081814Z14Z
 candidate_id: C-20260621T081814Z-A
 milestone_id: M-20260621T081814Z-A
 ---

@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `candidate-acceptance-review-governance`
 - issue-name: `candidate-acceptance-review-governance`
-- source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-0500-a`
-- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320T174500Z/candidates.md#c-20260320-0500-a`
+- source_brainstorm: `docs/B1-docs/raw-20260320T174500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

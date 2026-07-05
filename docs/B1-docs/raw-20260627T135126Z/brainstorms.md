@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T135126Z
 phase_state: completed
-source_raw: raw-20260627T135126Z
+source_raw: raw-20260627T135126Z26Z
 source_url: https://github.com/chatterzhao/freely/issues/3596
 produced_candidate: C-20260627T135126Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: pr-create rebase→merge + checkpoint scope 放行
 
 ## Input
-- 来源信息: raw-20260627T135126Z (GitHub #3596)
+- 来源信息: raw-20260627T135126Z26Z (GitHub #3596)
 - 症状: 多工位并行时 pr-create Step 3 rebase 反复冲突，checkpoint scope 误拦 git merge develop
 
 ## Problem

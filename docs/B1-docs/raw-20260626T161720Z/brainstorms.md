@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260626T161720Z
 phase_state: completed
-source_raw: raw-20260626T161720Z
+source_raw: raw-20260626T161720Z20Z
 source_url: https://github.com/chatterzhao/freely/issues/3567
 produced_candidate: C-20260626T161720Z-A
 created_at: 2026-06-26
@@ -10,7 +10,7 @@ created_at: 2026-06-26
 # B1_IBM: 废弃 AI_TOOL，agent-table 成为唯一真相源
 
 ## Input
-- source_raw: raw-20260626T161720Z
+- source_raw: raw-20260626T161720Z20Z
 - discovered during: Freely daemon start, Manager 降级到 kiro-cli alias 导致无法启动
 
 ## Problem

@@ -3,7 +3,7 @@ local_id: I-20260429-2000-A
 issue_title: 'Gate dev experience: --range pre-flight + secret detection FP fix'
 kind: linked
 phase_state: completed
-promoted_from: raw-20260429-2000
+promoted_from: raw-20260429T200000Z
 platform_ids:
   github:
     issue_id: '218'
@@ -34,5 +34,5 @@ governance-merge-gate --range, pr-merge-guarded pre-flight, pre-commit FP fix.
 
 ## References
 
-- B1: docs/B1-docs/raw-20260429/
+- B1: docs/B1-docs/raw-20260429T122700Z/
 - Issue: docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md

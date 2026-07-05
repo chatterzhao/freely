@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw issue: `raw-20260623T100903Z` (GitHub #3388)
+- raw issue: `raw-20260623T100903Z03Z` (GitHub #3388)
 - 上游分析: #3381 — 14 条评论完成完整根因分析，结论是 SSE 缺失是所有问题的中枢
 
 ### 时效性判断

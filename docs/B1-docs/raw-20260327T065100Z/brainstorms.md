@@ -136,7 +136,7 @@
 
 ## Likely Landing Zones
 
-- `docs/B1-docs/raw-20260327-0651/*`
+- `docs/B1-docs/raw-20260327T065100Z/*`
 - `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/**`
 - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/**`
 - `docs/system/workspace/scripts/runtime/freely`

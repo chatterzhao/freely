@@ -1,8 +1,8 @@
 ---
-local_id: raw-20260615T235818Z
+local_id: raw-20260615T235818Z18Z
 kind: raw
 phase_state: absorbed
-source_candidate: docs/B1-docs/raw-20260615T235818Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260615T235818Z18Z/candidates.md
 absorbed_into: I-20260615T235818Z-config-toml
 canonical_issue_path: docs/issues/I-20260615T235818Z-config-toml/issue.md
 created_at: '2026-06-15T23:58:00Z'

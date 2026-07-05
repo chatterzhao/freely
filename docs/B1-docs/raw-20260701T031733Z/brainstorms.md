@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260701T031733Z
 phase_state: completed
-source_raw: raw-20260701T031733Z
+source_raw: raw-20260701T031733Z33Z
 source_url: https://github.com/chatterzhao/freely/issues/3680
 produced_candidate: C-20260701T031733Z-A
 created_at: 2026-07-01
@@ -10,7 +10,7 @@ created_at: 2026-07-01
 # B1_IBM: pr-create pre-flight self-check + skill-gate alignment
 
 ## Input
-- **Raw issue**: raw-20260701T031733Z
+- **Raw issue**: raw-20260701T031733Z33Z
 - **Platform**: GitHub #3680 / Gitee IJY0HM
 - **Source**: 连续 3 个 PR 在门禁阶段反复失败，每次需 2-8 轮修复
 

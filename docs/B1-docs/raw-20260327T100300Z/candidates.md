@@ -2,7 +2,7 @@
 
 - id: `C-20260327T100300Z-A`
 - title: Pre-brainstorm materialization audit and normalization follow-up
-- source_brainstorm: `docs/B1-docs/raw-20260327-1003/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260327T100300Z/brainstorms.md`
 - status: `candidate`
 - adoption_type: `planning_truth`
 - milestone: `M-20260306-workspace-routing-foundation`

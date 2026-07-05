@@ -3,7 +3,7 @@
 - id: `C-20260416T044800Z-A`
 - candidate_format_version: `v2`
 - title: Align canonical Freely root bootstrap metadata with the MemArk protected-root init contract
-- source_brainstorm: `docs/B1-docs/raw-20260416-0448/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260416T044800Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - reopen_reason: `memark 0.1.1 now correctly requires canonical repo roots to ignore .memark/ and corpus/ before root init, and Freely root still lacked those ignore entries`
 - problem: canonical Freely root failed the new MemArk root-init prerequisite because `.gitignore` did not ignore `.memark/` and `corpus/`, even though linked worktrees were already using MemArk successfully.

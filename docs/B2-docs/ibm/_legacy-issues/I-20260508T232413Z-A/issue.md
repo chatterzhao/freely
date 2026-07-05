@@ -2,8 +2,8 @@
 local_id: I-20260508T232413Z-A
 kind: linked
 phase_state: absorbed
-promoted_from: raw-20260508T232413Z
-source_candidate: docs/B1-docs/raw-20260508T232413Z/candidates.md#C-20260508T232413Z-A
+promoted_from: raw-20260508T232413Z13Z
+source_candidate: docs/B1-docs/raw-20260508T232413Z13Z/candidates.md#C-20260508T232413Z-A
 verification_artifact_dir: docs/B2-docs/merge-error-ibm-guide/code-reviews
 pre_tests_path: docs/B2-docs/merge-error-ibm-guide/verification/pre-tests.md
 platform_state: open

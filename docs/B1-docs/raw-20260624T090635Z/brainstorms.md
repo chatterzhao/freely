@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Input
-`docs/B1-docs/raw-20260624T090635Z/issue.md`：tool-registry.toml Phase 1+2 完成了 TOML 格式迁移和 config_schema 字段抽象，但 runtime 中 adapter 查询、launch_kind、ACP dispatch、tool family 解析仍用硬编码 case 分支。新增工具（如 Cline）即使已配好 registry，也无法通过 ACP 启动。
+`docs/B1-docs/raw-20260624T090635Z35Z/issue.md`：tool-registry.toml Phase 1+2 完成了 TOML 格式迁移和 config_schema 字段抽象，但 runtime 中 adapter 查询、launch_kind、ACP dispatch、tool family 解析仍用硬编码 case 分支。新增工具（如 Cline）即使已配好 registry，也无法通过 ACP 启动。
 
 ### 当前硬编码分布
 | 函数 | 行号 | 问题 |

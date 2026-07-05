@@ -40,6 +40,6 @@ platform_state: closed
 
 ## References
 
-- B1: docs/B1-docs/raw-20260502/
+- B1: docs/B1-docs/raw-20260502T000000Z/
 - Issue: docs/B2-docs/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - Progress: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md

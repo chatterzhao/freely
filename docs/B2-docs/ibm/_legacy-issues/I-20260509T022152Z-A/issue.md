@@ -2,8 +2,8 @@
 local_id: I-20260509T022152Z-A
 kind: linked
 phase_state: absorbed
-promoted_from: raw-20260509T022152Z
-source_candidate: docs/B1-docs/raw-20260509T022152Z/candidates.md
+promoted_from: raw-20260509T022152Z52Z
+source_candidate: docs/B1-docs/raw-20260509T022152Z52Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -26,7 +26,7 @@ platform_state: open
 
 # I-20260509T022152Z-A: worker launch 验证 target 必须是 fix/feature
 
-- source_candidate: `docs/B1-docs/raw-20260509T022152Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260509T022152Z52Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/worker-launch-writable-redirect/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/worker-launch-writable-redirect/code-reviews`
 

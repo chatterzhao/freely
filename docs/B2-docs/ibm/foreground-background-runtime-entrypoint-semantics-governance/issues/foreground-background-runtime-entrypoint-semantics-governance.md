@@ -8,8 +8,8 @@
 - story-name: `foreground-background-runtime-entrypoint-semantics-governance`
 - issue-name: `foreground-background-runtime-entrypoint-semantics-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260413/candidates.md#c-20260413-0208-a`
-- source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413T020800Z/candidates.md#c-20260413-0208-a`
+- source_brainstorm: `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
@@ -83,7 +83,7 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 
 ## Completion
 
-- `docs/B1-docs/raw-20260413/candidates.md`
+- `docs/B1-docs/raw-20260413T020800Z/candidates.md`
 - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/brainstorms/b-foreground-background-runtime-entrypoint-semantics-governance.md`
 - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/prd.md`

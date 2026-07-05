@@ -3,7 +3,7 @@
 ## Discovery
 
 ### 来源
-- GitHub issue #1520 (raw-20260521T014556Z)
+- GitHub issue #1520 (raw-20260521T014556Z56Z)
 - 类型: runtime anomaly — Manager 委派 Worker 后无即时反馈导致空等
 
 ### 问题描述

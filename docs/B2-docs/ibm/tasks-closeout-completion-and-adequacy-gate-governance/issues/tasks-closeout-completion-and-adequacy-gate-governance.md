@@ -9,8 +9,8 @@
 - story-name: `tasks-closeout-completion-and-adequacy-gate-governance`
 - issue-name: `tasks-closeout-completion-and-adequacy-gate-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260413/candidates.md#c-20260413-1640-a`
-- source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413T020800Z/candidates.md#c-20260413-1640-a`
+- source_brainstorm: `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - reopen_reason: `a real owner audit proved closeout hardening still omitted tasks.md, letting completed lifecycle truth drift from unchecked execution closeout boxes`
 - execution_base: `develop`
@@ -50,7 +50,7 @@ The missing contract was not in merge orchestration. `pretests-gate` already own
 
 ## Completion
 
-- `docs/B1-docs/raw-20260413/candidates.md`
+- `docs/B1-docs/raw-20260413T020800Z/candidates.md`
 - `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
 - `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/brainstorms/b-tasks-closeout-completion-and-adequacy-gate-governance.md`
 - `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`

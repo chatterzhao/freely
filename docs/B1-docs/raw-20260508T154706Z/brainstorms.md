@@ -1,5 +1,5 @@
 # Brainstorm: wt-create --skill name + reminder
-- 来源: raw-20260508T154706Z (#260)
+- 来源: raw-20260508T154706Z06Z (#260)
 ## Discovery
 --skill 传长路径易错，且 wt-create 成功后没有提醒读 skill。
 ## Decision

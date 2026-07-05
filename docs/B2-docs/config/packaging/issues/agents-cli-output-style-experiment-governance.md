@@ -8,8 +8,8 @@
 - story-name: `agents-cli-output-style-experiment-governance`
 - issue-name: `agents-cli-output-style-experiment-governance`
 - priority: P2
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-cli-output-style`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-cli-output-style`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
@@ -61,8 +61,8 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 
 - `AGENTS.md`
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260405/brainstorms.md`
-- `docs/B1-docs/raw-20260405/candidates.md`
+- `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
+- `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
 - `docs/B2-docs/config/packaging/brainstorms/b-agents-cli-output-style-experiment-governance.md`

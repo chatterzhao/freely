@@ -8,8 +8,8 @@
 - story-name: `protected-branch-ref-only-entrypoint-enforcement-governance`
 - issue-name: `protected-branch-ref-only-entrypoint-enforcement-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260419/candidates.md#c-20260419-0210-a`
-- source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260419T150500Z/candidates.md#c-20260419-0210-a`
+- source_brainstorm: `docs/B1-docs/raw-20260419T150500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - prd_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/prd.md`

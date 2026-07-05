@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260601T030401Z
+local_id: raw-20260601T030401Z01Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -20,4 +20,4 @@ session_refs: []
 platform_state: closed
 ---
 
-Platform sync batch for fix branch: fix/raw-20260601T030401Z-platform-sync.
+Platform sync batch for fix branch: fix/raw-20260601T030401Z01Z-platform-sync.

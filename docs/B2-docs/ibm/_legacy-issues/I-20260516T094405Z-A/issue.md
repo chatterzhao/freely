@@ -3,8 +3,8 @@ local_id: I-20260516T094405Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260516T094405Z
-source_candidate: docs/B1-docs/raw-20260516T094405Z/candidates.md
+promoted_from: raw-20260516T094405Z05Z
+source_candidate: docs/B1-docs/raw-20260516T094405Z05Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -27,6 +27,6 @@ platform_state: closed
 
 # I-20260516T094405Z-A: delegate_workers 被 exclusive_fields_conflict 拒绝
 
-Runtime bug fix absorbed directly into develop via fix/raw-20260516* worktree.
+Runtime bug fix absorbed directly into develop via fix/raw-20260516T014923Z* worktree.
 
 Changes: validate_manager_exit_contract_for_project — stop_reason should only be read for exit_kind=stop_ai.

@@ -4,7 +4,7 @@
 
 ### 问题审视
 
-raw-20260524T053214Z 诊断发现：`tool_switch_events` 表及配套函数已实现但从未在 ACP 路径中集成。项目从 May 21 起全部使用 ACP 模式（direct 废弃），导致 session 切换、bridge 重启场景下 session 生命周期管理完全失效。
+raw-20260524T053214Z14Z 诊断发现：`tool_switch_events` 表及配套函数已实现但从未在 ACP 路径中集成。项目从 May 21 起全部使用 ACP 模式（direct 废弃），导致 session 切换、bridge 重启场景下 session 生命周期管理完全失效。
 
 **价值与时效性**：当前 Freely 运行时正处于死锁状态——stale session ID `3e21494d` 被反复使用，所有 AI cycle 因 "Session not found" 故障无法产出。这是阻塞级问题，必须立即修复。
 

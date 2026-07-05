@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T030408Z
 phase_state: completed
-source_raw: raw-20260629T030408Z
+source_raw: raw-20260629T030408Z08Z
 source_url: https://github.com/chatterzhao/freely/issues/3617
 produced_candidate: C-20260629T030408Z-A
 created_at: 2026-06-29
@@ -10,8 +10,8 @@ created_at: 2026-06-29
 # B1_IBM: 完成 feat → feature 重命名
 
 ## Input
-- 来源: raw-20260629T030408Z (GitHub #3617, Gitee IJXH5I)
-- 之前的重命名 (raw-20260625T235017Z) 将 skill 名从 `freely-feat-execution` 改为 `freely-feature-execution`，但不彻底
+- 来源: raw-20260629T030408Z08Z (GitHub #3617, Gitee IJXH5I)
+- 之前的重命名 (raw-20260625T235017Z17Z) 将 skill 名从 `freely-feat-execution` 改为 `freely-feature-execution`，但不彻底
 
 ## Problem
 - wt-create 仍校验 `freely-feat-execution`，拒绝 `freely-feature-execution`

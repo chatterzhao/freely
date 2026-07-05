@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: bash -n 输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z20Z/verification/test-evidence/at-001.log
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && bash -n docs/system/workspace/scripts/runtime/sse-watchdog.sh && echo PASS
 - expected_output: PASS
 - expected_RED_output: syntax error
@@ -28,7 +28,7 @@
 - target_environment: feature-local
 - required_evidence: grep 确认
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z/verification/test-evidence/at-002.log
+- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z20Z/verification/test-evidence/at-002.log
 - test_command: grep -c 'agent opencode' docs/system/workspace/scripts/runtime/freely | grep -v '#\|help\|usage\|示例\|test_command\|pool' && echo "FAIL: still hardcoded" || echo "PASS"
 - expected_output: PASS
 - expected_RED_output: FAIL: still hardcoded
@@ -47,7 +47,7 @@
 - target_environment: feature-local
 - required_evidence: grep 确认
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z/verification/test-evidence/at-003.log
+- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T024320Z20Z/verification/test-evidence/at-003.log
 - test_command: grep -A3 '_acp_session_close()' docs/system/workspace/scripts/runtime/freely | grep -c 'base_tool' && echo "PASS: has base_tool" || echo "FAIL"
 - expected_output: PASS: has base_tool
 - expected_RED_output: FAIL

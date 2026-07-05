@@ -1,11 +1,11 @@
 ---
-local_id: raw-20260519T145435Z
+local_id: raw-20260519T145435Z35Z
 kind: raw
 <<<<<<< HEAD
 phase_state: dropped
 =======
 phase_state: absorbed
->>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume
+>>>>>>> fix/raw-20260519T145435Z35Z-consumed-by-auto-consume
 platform_ids:
   github:
     issue_id: '655'
@@ -25,14 +25,14 @@ session_refs: []
 dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug fix
   does not warrant full B1→I-* chain.
 =======
->>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume
+>>>>>>> fix/raw-20260519T145435Z35Z-consumed-by-auto-consume
 ---
 
-## raw-20260519T145435Z
+## raw-20260519T145435Z35Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260519T145435Z` |
+| local_id | `raw-20260519T145435Z35Z` |
 | kind | `raw` |
 | phase_state | `proposed` |
 | canonical | `none` |
@@ -41,7 +41,7 @@ dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260519T145435Z`。实现前请用 `wt-create --raw-key 20260519T145435Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260519T145435Z35Z`。实现前请用 `wt-create --raw-key 20260519T145435Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 phase_state: absorbed

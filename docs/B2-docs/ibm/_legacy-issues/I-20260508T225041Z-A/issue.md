@@ -3,8 +3,8 @@ local_id: I-20260508T225041Z-A
 kind: linked
 phase_state: absorbed
 platform_state: open
-promoted_from: raw-20260508T225041Z
-source_candidate: docs/B1-docs/raw-20260508T225041Z/candidates.md#C-20260508T225041Z-A
+promoted_from: raw-20260508T225041Z41Z
+source_candidate: docs/B1-docs/raw-20260508T225041Z41Z/candidates.md#C-20260508T225041Z-A
 verification_artifact_dir: docs/B2-docs/acp-bridge-restart-storm/code-reviews
 pre_tests_path: docs/B2-docs/acp-bridge-restart-storm/verification/pre-tests.md
 platform_ids:

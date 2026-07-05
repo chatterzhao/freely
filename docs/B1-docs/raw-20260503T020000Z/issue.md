@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260503T020000Z
+local_id: raw-20260503T020000Z00Z
 issue_title: 'scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace'
 kind: raw
 phase_state: completed

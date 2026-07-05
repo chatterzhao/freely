@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `mem9-continuity-bridge`
 - issue-name: `mem9-continuity-bridge`
-- source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-1222-01`
-- source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-1222-01`
+- source_brainstorm: `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
 - execution_base: `feature/mem9-research-20260318`
 - integration_target: `develop`
 - depends_on: `none`
@@ -40,8 +40,8 @@ Freely 已经拥有本地 continuity / recovery / session rotation / multi-workt
 
 ## Completion
 
-- `docs/B1-docs/raw-20260318/brainstorms.md`
-- `docs/B1-docs/raw-20260318/candidates.md`
+- `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260318T163000Z/candidates.md`
 - `docs/system/workspace/skills/mem9-continuity-bridge/SKILL.md`
 - `docs/system/workspace/skills/README.md`
 

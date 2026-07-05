@@ -43,7 +43,7 @@
 - priority: `P0`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260405T161500Z/brainstorms.md`
 - promoted_issue_id: `I-20260405T161500Z-A`
 - promoted_issue_path: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 - session_refs:

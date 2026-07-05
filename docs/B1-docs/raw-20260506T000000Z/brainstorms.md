@@ -6,7 +6,7 @@
 - GitHub issue #273 — zhaoquan
 - created_at: 2026-05-06 14:00 UTC
 - platform_state: open
-- raw issue local_id: raw-20260506T140000Z
+- raw issue local_id: raw-20260506T140000Z00Z
 
 ### 问题陈述
 pr-merge-guarded 只接受 `feature/*` 和 `hotfix/*` → `test-pre-merge-*` 方向，`fix/*` 不在白名单。但 `fix-execution` skill 产出 `fix/*` 分支，需要合法的 merge 路径进入 `test-pre-merge-*`。

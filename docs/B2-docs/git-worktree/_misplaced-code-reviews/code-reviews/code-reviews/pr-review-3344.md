@@ -1,6 +1,6 @@
 # PR Review: #3344
 - pr_number: 3344
-- branch: fix/raw-20260622T083634Z-reason-regex
+- branch: fix/raw-20260622T083634Z34Z-reason-regex
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T08:48:13Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T083634Z-reason-regex branch=fix/raw-20260622T083634Z-reason-regex clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T083634Z34Z-reason-regex branch=fix/raw-20260622T083634Z34Z-reason-regex clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

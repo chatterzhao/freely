@@ -8,8 +8,8 @@
 - story-name: `memark-protected-root-bootstrap-followthrough-governance`
 - issue-name: `memark-protected-root-bootstrap-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260416/candidates.md#c-20260416-0448-a`
-- source_brainstorm: `docs/B1-docs/raw-20260416/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260416T044800Z/candidates.md#c-20260416-0448-a`
+- source_brainstorm: `docs/B1-docs/raw-20260416T044800Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - reopen_reason: `memark 0.1.1 requires canonical repo roots to ignore .memark/ and corpus/ before root init, and Freely root still lacked those ignore entries`
 - execution_base: `develop`

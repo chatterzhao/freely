@@ -8,7 +8,7 @@
   2. Freely 还没有显式策略决定什么时候应该继续原会话、什么时候应该切 fresh session、什么时候应该附带交接摘要
 - 现象证据：同一 worktree 的 `loop.log` 出现密集 `resume` 批次；cycle log 中能看到 `context compacted` 后又重复首跳路由输出，说明“会话仍可 resume”不等于“继续 resume 仍是最优决策”。
 - 相关历史输入：
-  - `docs/B1-docs/raw-20260303-0000/candidates.md` 已有 `C-20260303-103 会话管理机制（恢复/压缩/新会话）`
+  - `docs/B1-docs/raw-20260303T000000Z/candidates.md` 已有 `C-20260303-103 会话管理机制（恢复/压缩/新会话）`
   - `docs/LAWS.md` 已明确恢复优先与 `resume_hint` 语义，但还没有把“何时停止 resume、改走 fresh_with_handoff”写成具体运行策略
 
 ## 现状观察

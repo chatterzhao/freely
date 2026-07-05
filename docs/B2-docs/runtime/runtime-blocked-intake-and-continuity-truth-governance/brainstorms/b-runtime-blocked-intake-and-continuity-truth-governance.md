@@ -19,7 +19,7 @@ The first implementation lane must consume:
 2. `prd.md`
 3. `pre-tests.md`
 4. `tasks.md`
-5. `docs/B1-docs/raw-20260404/brainstorms.md`
+5. `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 6. `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 7. `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 

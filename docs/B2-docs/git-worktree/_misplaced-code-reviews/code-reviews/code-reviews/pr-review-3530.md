@@ -1,6 +1,6 @@
 # PR Review: #3530
 - pr_number: 3530
-- branch: fix/raw-20260625T211813Z-agent-table-reconcile
+- branch: fix/raw-20260625T211813Z13Z-agent-table-reconcile
 - base: develop
 - reviewer: tdd-agent (ACP TDD, slot=claude-apikey-ds-pro-auto)
 - review_date: 2026-06-26T02:09:26Z

@@ -2,7 +2,7 @@
 
 - id: `C-20260325T052500Z-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
-- source_brainstorm: `docs/B1-docs/raw-20260325-0525/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260325T052500Z/brainstorms.md`
 - status: `absorbed`
 - adoption_type: `supporting_evidence`
 - milestone: `M-20260306-workspace-routing-foundation`

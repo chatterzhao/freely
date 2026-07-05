@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - promoted_issue_id: `I-20260406T182900Z-A`
-- source_brainstorm: `docs/B1-docs/raw-20260406-1829/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260406T182900Z/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

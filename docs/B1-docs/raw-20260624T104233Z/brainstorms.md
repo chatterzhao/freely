@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260624T104233Z
 phase_state: completed
-source_raw: raw-20260624T104233Z
+source_raw: raw-20260624T104229Z33Z
 source_url: https://github.com/chatterzhao/freely/issues/3427
 produced_candidate: C-20260624T104233Z-A
 created_at: 2026-06-24
@@ -12,7 +12,7 @@ created_at: 2026-06-24
 ## Input
 - GitHub issue: #3427
 - RAW key: 20260624T104233Z
-- Previous fix: raw-20260624T081358Z (issue #3411) — 已修 SKILL.md 和 AGENTS.md
+- Previous fix: raw-20260624T081358Z58Z (issue #3411) — 已修 SKILL.md 和 AGENTS.md
 - 当前问题：AGENTS.md 中仍保留硬编码的 numbered steps（pre-init-runtime、freely-package、start daemon、verify Manager cycle）
 
 ## Problem

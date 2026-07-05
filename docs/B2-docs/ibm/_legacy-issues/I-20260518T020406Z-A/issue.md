@@ -2,8 +2,8 @@
 local_id: I-20260518T020406Z-A
 kind: linked
 phase_state: completed
-promoted_from: raw-20260518T020406Z
-source_candidate: docs/B1-docs/raw-20260518T020406Z/candidates.md
+promoted_from: raw-20260518T020406Z06Z
+source_candidate: docs/B1-docs/raw-20260518T020406Z06Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -25,7 +25,7 @@ platform_state: closed
 
 # I-20260518T020406Z-A: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
 
-- source_candidate: `docs/B1-docs/raw-20260518T020406Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260518T020406Z06Z/candidates.md`
 - execution_base: `develop`
 - integration_target: `develop`
 

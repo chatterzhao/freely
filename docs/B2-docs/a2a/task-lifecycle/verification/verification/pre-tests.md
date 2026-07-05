@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z46Z-a2a-state-standard"
   grep -q 'INPUT_REQUIRED.*input-required' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: INPUT_REQUIRED not found"; exit 1; }
   grep -q 'CANCELED.*canceled' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: CANCELED not found"; exit 1; }
   grep 'BLOCKED.*blocked' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" | grep -qv '#' && { echo "FAIL: BLOCKED still present"; exit 1; } || true
@@ -39,7 +39,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z46Z-a2a-state-standard"
   grep -q 'add_argument.*--state' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: --state arg not found"; exit 1; }
   grep 'add_argument.*--kind' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" | grep -qv '#' && { echo "FAIL: --kind still present"; exit 1; } || true
   echo "PASS: --state present, --kind removed"
@@ -63,7 +63,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z46Z-a2a-state-standard"
   for f in "$_wt/docs/system/workspace/a2a/exit-kind-mapping.md" "$_wt/docs/system/workspace/a2a/protocol-design.md" "$_wt/docs/system/workspace/a2a/agent-card-schema.md"; do
     grep 'blocked' "$f" | grep -qvi 'input-required\|#\|说明' && { echo "FAIL: $f still has old blocked reference"; exit 1; } || true
   done
@@ -88,7 +88,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-4.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z46Z-a2a-state-standard"
   grep -q 'input-required.*canceled\|canceled.*input-required' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: CHECK constraint not updated"; exit 1; }
   echo "PASS: CHECK constraint includes input-required + canceled"
 - expected_output: "PASS: CHECK constraint includes input-required + canceled"
@@ -111,7 +111,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-5.txt
 - test_command: |
-  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
+  _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z46Z-a2a-state-standard"
   grep "'blocked'.*'input-required'" "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" && { echo "FAIL: old mapping still present"; exit 1; } || true
   echo "PASS: old mapping removed"
 - expected_output: "PASS: old mapping removed"

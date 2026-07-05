@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260601T074306Z
+local_id: raw-20260601T074306Z06Z
 kind: raw
 phase_state: absorbed
 platform_ids:

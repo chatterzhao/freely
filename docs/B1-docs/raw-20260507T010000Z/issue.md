@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260507T010000Z
+local_id: raw-20260507T010000Z00Z
 kind: raw
 phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -15,7 +15,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/fix-branch-naming/verification/pre-tests.md
 verification_artifact_dir: docs/B2-docs/fix-branch-naming/code-reviews
-source_candidate: docs/B1-docs/raw-20260507/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
 updated_at: 2026-05-17T04:47:25Z
 platform_state: closed
 ---

@@ -1,6 +1,6 @@
 # PR Review: #3447
 - pr_number: 3447
-- branch: fix/raw-20260624T104236Z-fix-govern-first-skill-pointer
+- branch: fix/raw-20260624T104229Z36Z-fix-govern-first-skill-pointer
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T16:05:34Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T104236Z-fix-govern-first-skill-pointer branch=fix/raw-20260624T104236Z-fix-govern-first-skill-pointer clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T104229Z36Z-fix-govern-first-skill-pointer branch=fix/raw-20260624T104229Z36Z-fix-govern-first-skill-pointer clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

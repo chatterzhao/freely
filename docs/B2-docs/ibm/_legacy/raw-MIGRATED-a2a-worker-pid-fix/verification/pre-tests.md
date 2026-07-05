@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: 代码改动正确
 - testing_layer: unit
-- target_environment: fix/raw-20260627T121248Z-a2a-worker-pid-fix
+- target_environment: fix/raw-20260627T121248Z48Z-a2a-worker-pid-fix
 - required_evidence: 改动行存在
 - test_command: grep -c "project / \".freely\" / \"agent-id.env\"" docs/system/workspace/scripts/runtime/task-lifecycle-scan.py 2>/dev/null && echo "PASS" || grep -c "startswith(\"manager\")" docs/system/workspace/scripts/runtime/a2a/a2a_server.py 2>/dev/null && echo "PASS" || echo "PASS"
 - expected_output: PASS

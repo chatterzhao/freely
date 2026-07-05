@@ -2,7 +2,7 @@
 
 ## Discovery
 
-**Source**: Local raw issue (raw-20260616T044825Z) — direct implementation task from human instruction.
+**Source**: Local raw issue (raw-20260616T044825Z25Z) — direct implementation task from human instruction.
 
 **Original problem**: BRIDGE_TIMEOUT=1800s imposes an absolute 30-minute wall-clock limit on session/prompt in `acp-bridge.py`. This kills legitimate long-running AI sessions even when the AI is actively producing output. The timeout is unconditional — it does not distinguish between an idle session and a session that is actively producing output but happens to run past 30 minutes.
 

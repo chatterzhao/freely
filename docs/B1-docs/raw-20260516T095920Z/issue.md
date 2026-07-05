@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260516T095920Z
+local_id: raw-20260516T095920Z20Z
 kind: raw
 updated_at: '2026-06-17T00:21:52Z'
 phase_state: absorbed
@@ -23,11 +23,11 @@ platform_state: closed
 absorbed_into: infra-githooks
 ---
 
-## raw-20260516T095920Z
+## raw-20260516T095920Z20Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260516T095920Z` |
+| local_id | `raw-20260516T095920Z20Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -37,7 +37,7 @@ absorbed_into: infra-githooks
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260516T095920Z`。实现前请用 `wt-create --raw-key 20260516T095920Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260516T095920Z20Z`。实现前请用 `wt-create --raw-key 20260516T095920Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

@@ -6,7 +6,7 @@
 - **premerge**: allowed
 - **priority**: P1
 - **title**: Investigate and fix systematic stale_pid — worker process exits before producing handoff
-- **source_raw**: `raw-20260519T015638Z` (GitHub #601)
+- **source_raw**: `raw-20260519T015638Z38Z` (GitHub #601)
 
 ### acceptance_criteria
 

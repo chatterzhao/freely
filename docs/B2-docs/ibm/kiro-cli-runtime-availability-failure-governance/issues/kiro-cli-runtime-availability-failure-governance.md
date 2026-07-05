@@ -8,8 +8,8 @@
 - story-name: `kiro-cli-runtime-availability-failure-governance`
 - issue-name: `kiro-cli-runtime-availability-failure-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260331/candidates.md#c-20260331-1830-a`
-- source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260331T183000Z/candidates.md#c-20260331-1830-a`
+- source_brainstorm: `docs/B1-docs/raw-20260331T183000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/pre-tests.md`

@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260705T072052Z-A
 status: absorbed
-source_raw: raw-20260705T072052Z
+source_raw: raw-20260705T072052Z52Z
 milestone: M-20260705T072052Z-A
 ---
 ## C-20260705T072052Z-A: legacy issue

@@ -1,6 +1,6 @@
 # PR Review: #3042
 - pr_number: 3042
-- branch: fix/raw-20260619T030248Z-issue-sync-yaml-fix
+- branch: fix/raw-20260619T030248Z48Z-issue-sync-yaml-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T07:20:59Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T030248Z-issue-sync-yaml-fix branch=fix/raw-20260619T030248Z-issue-sync-yaml-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T030248Z48Z-issue-sync-yaml-fix branch=fix/raw-20260619T030248Z48Z-issue-sync-yaml-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

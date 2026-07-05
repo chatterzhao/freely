@@ -15,7 +15,7 @@
 
 1. `./bin/governance-check`
 2. `git diff --check`
-3. `rg -n "promoted_issue_(path|id)|phase_state" docs/B1-docs/raw-20260405/candidates.md docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md docs/milestones.md`
+3. `rg -n "promoted_issue_(path|id)|phase_state" docs/B1-docs/raw-20260405T230200Z/candidates.md docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md docs/milestones.md`
 
 ## Implementation Decision Note
 

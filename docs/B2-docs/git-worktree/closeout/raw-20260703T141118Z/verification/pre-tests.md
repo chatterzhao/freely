@@ -15,13 +15,13 @@
 - target_environment: test-pre-merge
 - required_evidence: 0 bridge restarts
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z18Z/verification/test-evidence/acceptance-1.log
 - test_command: grep "binary changed\|tool changed" .freely/logs/daemon-launch.log | wc -l
 - expected_output: 0
 - expected_RED_output: 3 per 3 cycles
 - actual_RED_output: 3+ bridge restarts every cycle (before fix)
 - actual_output: 0 bridge restarts after 2 cycles
-- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z18Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: before fix: bridge restarted every cycle due to full path vs short name mismatch
@@ -38,13 +38,13 @@
 - target_environment: test-pre-merge
 - required_evidence: 0 tool registry errors
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z18Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -c "未在 tool-registry" .freely/logs/daemon-launch.log
 - expected_output: 0
 - expected_RED_output: 17 occurrences
 - actual_RED_output: 17 occurrences (before fix)
 - actual_output: 0
-- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T141118Z18Z/verification/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: before fix: shell for-loop matching failed despite opencode being in registry list

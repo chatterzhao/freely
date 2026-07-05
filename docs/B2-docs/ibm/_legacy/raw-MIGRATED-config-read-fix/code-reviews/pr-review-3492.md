@@ -1,6 +1,6 @@
 # PR Review: #3492
 - pr_number: 3492
-- branch: fix/raw-20260625T081835Z-config-read-fix
+- branch: fix/raw-20260625T081835Z35Z-config-read-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-25T08:28:11Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T081835Z-config-read-fix branch=fix/raw-20260625T081835Z-config-read-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T081835Z35Z-config-read-fix branch=fix/raw-20260625T081835Z35Z-config-read-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

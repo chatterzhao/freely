@@ -1,6 +1,6 @@
 # Candidates - 20260426-0003--ibm-framework-docs
 
-- Source brainstorm: `docs/B1-docs/raw-20260426-0003/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260426T000300Z/brainstorms.md`
 
 ### C-20260426T000300Z-A: legacy issue
 

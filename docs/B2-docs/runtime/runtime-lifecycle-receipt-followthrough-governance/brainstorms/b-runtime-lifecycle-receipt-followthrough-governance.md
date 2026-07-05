@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260418-1900-A`
 - date: `2026-04-18`
-- source_candidate: `docs/B1-docs/raw-20260418/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260418T190000Z/brainstorms.md`
 
 ## Problem slice
 

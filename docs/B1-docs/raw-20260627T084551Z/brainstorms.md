@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T084551Z
 phase_state: completed
-source_raw: raw-20260627T084551Z
+source_raw: raw-20260627T084545Z51Z
 source_url: https://github.com/chatterzhao/freely/issues/3586
 produced_candidate: C-20260627T084551Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: run-acp-prompt.py fork 改用 session/fork
 
 ## Input
-- 来源: raw-20260627T084551Z (GitHub #3586)
+- 来源: raw-20260627T084545Z51Z (GitHub #3586)
 - 调研文档: .acp-session-fork-review.md
 
 ## 调用链追踪

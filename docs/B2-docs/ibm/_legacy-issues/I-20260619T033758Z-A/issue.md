@@ -4,8 +4,8 @@ kind: linked
 status: completed
 phase_state: completed
 completion_evidence: docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md
-promoted_from: raw-20260619T033758Z
-source_candidate: docs/B1-docs/raw-20260619T033758Z/candidates.md
+promoted_from: raw-20260619T033758Z58Z
+source_candidate: docs/B1-docs/raw-20260619T033758Z58Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""
@@ -23,7 +23,7 @@ verification_artifact_dir: docs/B2-docs/login-claude-interactive-slot/code-revie
 
 # I-20260619T033758Z-A: login claude 交互式 slot 命名与 alias 创建
 
-- source_candidate: `docs/B1-docs/raw-20260619T033758Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260619T033758Z58Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/login-claude-interactive-slot/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/login-claude-interactive-slot/code-reviews`
 

@@ -1,6 +1,6 @@
 # PR Review: #3486
 - pr_number: 3486
-- branch: fix/raw-20260624T235907Z-red-green-separation
+- branch: fix/raw-20260624T235907Z07Z-red-green-separation
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-25T07:43:32Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T235907Z-red-green-separation branch=fix/raw-20260624T235907Z-red-green-separation clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T235907Z07Z-red-green-separation branch=fix/raw-20260624T235907Z07Z-red-green-separation clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

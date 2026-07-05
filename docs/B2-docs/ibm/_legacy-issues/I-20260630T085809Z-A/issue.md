@@ -2,7 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260630T085809Z-A
-- source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
+- source_candidate: docs/B1-docs/raw-20260630T085809Z09Z/candidates.md#C-20260630T085809Z-A
 - verification_artifact_dir: docs/B2-docs/a2a/protocol-health/code-reviews
 - pre_tests_path: docs/B2-docs/a2a/protocol-health/pre-tests.md
 - canonical_issue_path: ""
@@ -10,7 +10,7 @@
 
 # I-20260630T085809Z-A: A2A Server 健康检查修复
 
-- source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
+- source_candidate: docs/B1-docs/raw-20260630T085809Z09Z/candidates.md#C-20260630T085809Z-A
 - verification_artifact_dir: docs/B2-docs/a2a/protocol-health/code-reviews
 
 ## 实现

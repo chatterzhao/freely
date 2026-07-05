@@ -8,8 +8,8 @@
 - story-name: `sensitive-local-artifact-ignore-governance`
 - issue-name: `sensitive-local-artifact-ignore-governance`
 - priority: P2
-- source_candidate: `docs/B1-docs/raw-20260329/candidates.md#c-20260329-2155-a`
-- source_brainstorm: `docs/B1-docs/raw-20260329/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260329T204500Z/candidates.md#c-20260329-2155-a`
+- source_brainstorm: `docs/B1-docs/raw-20260329T204500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/pre-tests.md`
@@ -56,7 +56,7 @@
 
 - `.gitignore`
 - `docs/system/workspace/scripts/tests/test-sensitive-local-artifact-ignore-governance`
-- `docs/B1-docs/raw-20260329/brainstorms.md`
+- `docs/B1-docs/raw-20260329T204500Z/brainstorms.md`
 - `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/pre-tests.md`
 - `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/tasks.md`
 

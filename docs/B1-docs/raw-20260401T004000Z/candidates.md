@@ -3,7 +3,7 @@
 - id: `C-20260401T004000Z-A`
 - candidate_format_version: `v2`
 - title: Early placeholder for supply-chain audit and install-intake capability
-- source_brainstorm: `docs/B1-docs/raw-20260401-0040/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401T004000Z/brainstorms.md`
 - problem: This directory existed as an early placeholder for the same security capability family, but it never became a machine-consumable candidate and therefore could not safely guide implementation.
 - why_now:
   - governance must not leave empty pre-brainstorm directories hanging without explicit disposition

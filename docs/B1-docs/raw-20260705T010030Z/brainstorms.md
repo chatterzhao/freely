@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260705T010030Z
 phase_state: completed
-source_raw: raw-20260705T010030Z
+source_raw: raw-20260705T010030Z30Z
 source_url: https://github.com/chatterzhao/freely/issues/3734
 produced_candidate: C-20260705T010030Z-A
 created_at: 2026-07-05
@@ -10,7 +10,7 @@ created_at: 2026-07-05
 # B1_IBM: wt-close --raw-key 唯一入口重构
 
 ## Input
-- raw-20260705T010030Z (GitHub #3734)
+- raw-20260705T010030Z30Z (GitHub #3734)
 
 ## Problem
 

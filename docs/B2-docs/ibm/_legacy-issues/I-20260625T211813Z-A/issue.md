@@ -2,8 +2,8 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260625T211813Z-A
-- source_candidate: docs/B1-docs/raw-20260625T211813Z/candidates.md#C-20260625T211813Z-A
-- source_raw: raw-20260625T211813Z
+- source_candidate: docs/B1-docs/raw-20260625T211813Z13Z/candidates.md#C-20260625T211813Z-A
+- source_raw: raw-20260625T211813Z13Z
 - pre_tests_path: docs/B2-docs/agent-table-reconcile/verification/pre-tests.md
 - title: agent-table reconciliation
 

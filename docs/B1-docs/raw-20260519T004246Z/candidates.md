@@ -6,7 +6,7 @@
 - **premerge**: allowed
 - **priority**: P0
 - **title**: handoff.py 增加 evidence_paths 为 worker_done 必填字段，对齐 agent 文档与 runtime 验证
-- **source_raw**: `raw-20260519T004246Z` (GitHub #581)
+- **source_raw**: `raw-20260519T004246Z46Z` (GitHub #581)
 
 ### acceptance_criteria
 

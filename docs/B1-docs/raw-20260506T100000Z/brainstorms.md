@@ -1,4 +1,4 @@
-# Brainstorms — raw-20260506T1000Z: task_mode=wait 前置轮询门禁
+# Brainstorms — raw-20260506T010000Z: task_mode=wait 前置轮询门禁
 
 ## Discovery
 

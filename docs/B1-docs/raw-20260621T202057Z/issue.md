@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260621T202057Z
+local_id: raw-20260621T202057Z57Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260621T202057Z-A
@@ -60,16 +60,16 @@ session_refs: []
 ## 阻塞提示示例
 
 ```
-[GATE] Worker launch blocked: raw-20260621T123324Z
+[GATE] Worker launch blocked: raw-20260621T133847Z24Z
 
-  raw issue 不存在: docs/B1-docs/raw-20260621T123324Z/issue.md
+  raw issue 不存在: docs/B1-docs/raw-20260621T133847Z24Z/issue.md
   请仔细检查该任务是否有对应的 raw issue。
-  按 raw_key 查找: gh issue list --search "raw-20260621T123324Z in:title"
+  按 raw_key 查找: gh issue list --search "raw-20260621T133847Z24Z in:title"
   或语义搜索: gh issue list --search "关键词 in:title" --state open
 ```
 
 ```
-[GATE] Worker launch blocked: raw-20260522T053702Z
+[GATE] Worker launch blocked: raw-20260522T053702Z02Z
 
   raw issue 已关闭: phase_state=absorbed
   请检查为什么是关闭的:

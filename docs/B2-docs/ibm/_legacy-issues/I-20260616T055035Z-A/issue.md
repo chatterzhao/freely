@@ -2,8 +2,8 @@
 local_id: I-20260616T055035Z-A
 kind: linked
 phase_state: completed
-promoted_from: raw-20260616T055035Z
-source_candidate: docs/B1-docs/raw-20260616T055035Z/candidates.md
+promoted_from: raw-20260616T055035Z35Z
+source_candidate: docs/B1-docs/raw-20260616T055035Z35Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""
@@ -20,7 +20,7 @@ verification_artifact_dir: docs/B2-docs/a2a-hygiene-after-run/code-reviews
 
 # I-20260616T055035Z-A: A2A server hygiene + after-run worker detection for prompt mode
 
-- source_candidate: `docs/B1-docs/raw-20260616T055035Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260616T055035Z35Z/candidates.md`
 - verification_artifact_dir: `docs/B2-docs/a2a-hygiene-after-run/code-reviews`
 
 ## Summary

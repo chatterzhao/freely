@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260618T094846Z
 phase_state: completed
-source_raw: raw-20260618T094846Z
+source_raw: raw-20260618T094846Z46Z
 source_url: https://github.com/chatterzhao/freely/issues/2988
 produced_candidate: C-20260618T094846Z-A
 created_at: 2026-06-18
@@ -12,7 +12,7 @@ created_at: 2026-06-18
 ## Input Source
 
 - GitHub issue #2988: https://github.com/chatterzhao/freely/issues/2988
-- Raw issue: `docs/B1-docs/raw-20260618T094846Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260618T094846Z46Z/issue.md`
 - Filed by: platform (AI agent), 2026-06-18
 
 ## Problem
@@ -37,6 +37,6 @@ Agent Role-driven architecture with five execution layers and three distinguishe
 ## Candidate
 
 - **candidate_id**: C-20260618T094846Z-A
-- **status**: absorbed (doc-only change, absorbed into raw-20260618T094846Z)
-- **absorbed_into**: raw-20260618T094846Z
+- **status**: absorbed (doc-only change, absorbed into raw-20260618T094846Z46Z)
+- **absorbed_into**: raw-20260618T094846Z46Z
 - **milestone**: unassigned (doc-only)

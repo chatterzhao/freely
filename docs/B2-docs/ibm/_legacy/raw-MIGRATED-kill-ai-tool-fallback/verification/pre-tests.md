@@ -50,7 +50,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T161720Z-kill-ai-tool-fallback
 - required_evidence: --dry-run 成功
-- test_command: freely pr-merge-guarded develop fix/raw-20260626T161720Z-kill-ai-tool-fallback --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260626T161720Z20Z-kill-ai-tool-fallback --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
 - evidence_file: (执行后填写)

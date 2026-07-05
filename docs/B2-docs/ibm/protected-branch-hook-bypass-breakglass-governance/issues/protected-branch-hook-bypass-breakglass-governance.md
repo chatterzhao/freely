@@ -8,8 +8,8 @@
 - story-name: `protected-branch-hook-bypass-breakglass-governance`
 - issue-name: `protected-branch-hook-bypass-breakglass-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0020-a`
-- source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402T191200Z/candidates.md#c-20260402-0020-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/pre-tests.md`
@@ -61,8 +61,8 @@ Freely 当前已经有 protected-branch hooks、`pr-merge-guarded`、develop-bou
 
 ## Current Artifact Set
 
-- `docs/B1-docs/raw-20260402/brainstorms.md`
-- `docs/B1-docs/raw-20260402/candidates.md`
+- `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
+- `docs/B1-docs/raw-20260402T191200Z/candidates.md`
 - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
 - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/prd.md`

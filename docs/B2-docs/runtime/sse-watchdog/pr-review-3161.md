@@ -1,6 +1,6 @@
 # PR Review: #3161
 - pr_number: 3161
-- branch: feature/raw-20260620T104526Z-worker-sse-supervision
+- branch: feature/raw-20260620T104526Z26Z-worker-sse-supervision
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T11:33:02Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260620T104526Z-worker-sse-supervision branch=feature/raw-20260620T104526Z-worker-sse-supervision clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260620T104526Z26Z-worker-sse-supervision branch=feature/raw-20260620T104526Z26Z-worker-sse-supervision clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

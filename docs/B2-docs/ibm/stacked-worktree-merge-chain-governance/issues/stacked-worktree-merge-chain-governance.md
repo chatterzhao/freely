@@ -8,8 +8,8 @@
 - story-name: `stacked-worktree-merge-chain-governance`
 - issue-name: `stacked-worktree-merge-chain-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1045-001`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-1045-001`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`

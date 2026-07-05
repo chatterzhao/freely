@@ -1,7 +1,7 @@
 # B2 Brainstorm: Worker Launch 保护工位重定向
 
 - I-*: I-20260509T022152Z-A
-- source_candidate: `docs/B1-docs/raw-20260509T022152Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260509T022152Z52Z/candidates.md`
 - 日期: 2026-05-09
 
 ## B1 已收敛的决策

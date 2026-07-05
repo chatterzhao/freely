@@ -1,6 +1,6 @@
 # PR Review: #3591
 - pr_number: 3591
-- branch: fix/raw-20260627T062554Z-scan-v3-refactor
+- branch: fix/raw-20260627T062554Z54Z-scan-v3-refactor
 - base: develop
 - reviewer: claude
 - verdict: pass

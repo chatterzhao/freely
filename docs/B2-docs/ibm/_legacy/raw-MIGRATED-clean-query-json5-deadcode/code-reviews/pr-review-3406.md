@@ -1,6 +1,6 @@
 # PR Review: #3406
 - pr_number: 3406
-- branch: fix/raw-20260624T061532Z-clean-query-json5-deadcode
+- branch: fix/raw-20260624T061532Z32Z-clean-query-json5-deadcode
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T06:20:19Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T061532Z-clean-query-json5-deadcode branch=fix/raw-20260624T061532Z-clean-query-json5-deadcode clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T061532Z32Z-clean-query-json5-deadcode branch=fix/raw-20260624T061532Z32Z-clean-query-json5-deadcode clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

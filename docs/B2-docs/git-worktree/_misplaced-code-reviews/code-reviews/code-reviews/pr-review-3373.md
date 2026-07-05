@@ -1,6 +1,6 @@
 # PR Review: #3373
 - pr_number: 3373
-- branch: feature/raw-20260622T234854Z-adapter-chat-cleanup
+- branch: feature/raw-20260622T234854Z54Z-adapter-chat-cleanup
 - base: develop
 - reviewer: Claude
 - review_date: 2026-06-22T23:54:28Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T234854Z-adapter-chat-cleanup branch=feature/raw-20260622T234854Z-adapter-chat-cleanup clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T234854Z54Z-adapter-chat-cleanup branch=feature/raw-20260622T234854Z54Z-adapter-chat-cleanup clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

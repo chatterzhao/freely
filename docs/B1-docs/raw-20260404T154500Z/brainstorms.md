@@ -69,7 +69,7 @@
 
 现有证据仍支持：
 
-- GitHub issue create/sync 相关能力目前只停留在 `docs/B1-docs/raw-20260403-1000/*`
+- GitHub issue create/sync 相关能力目前只停留在 `docs/B1-docs/raw-20260403T110000Z/*`
 - 当前没有已 materialize 的 runnable `scan/create/sync/close` 能力面
 
 因此这轮监督里不能把“没有自动创建 GitHub issue”误判成 runtime 消费错误；真实情况是该能力本来就还在预研。

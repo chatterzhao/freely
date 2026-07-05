@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T010000Z
+local_id: raw-20260506T010000Z00Z
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -17,13 +17,13 @@ created_at: '2026-05-10T09:29:04Z'
 platform_state: closed
 ---
 
-# raw-20260506T0100Z: scan 盲区——文档链解析错误和断链导致漏扫
+# raw-20260506T010000Z: scan 盲区——文档链解析错误和断链导致漏扫
 
 ## 现象
 
 `task-lifecycle-scan.py` 漏扫了两类本该出现的项：
 
-1. `raw-20260505T1210Z`（issue state refactor）在 milestone 已有 3 个 committed I-* issue，但 scan 误报 `b1_candidate`（candidate 未决策），因为 candidates.md 中 `status: promoted` 的条目未被识别
+1. `raw-20260505T121000Z`（issue state refactor）在 milestone 已有 3 个 committed I-* issue，但 scan 误报 `b1_candidate`（candidate 未决策），因为 candidates.md 中 `status: promoted` 的条目未被识别
 2. `I-20260421T153000Z-A`（live-status scan summary）在 milestone 标记 `in_verification`，但 scan 完全没输出——raw dir 已清理，I-* child 孤立
 
 ## 根因

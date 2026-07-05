@@ -18,7 +18,7 @@ The current implementation lane must consume:
 2. `prd.md`
 3. `pre-tests.md`
 4. `tasks.md`
-5. `docs/B1-docs/raw-20260407/brainstorms.md`
+5. `docs/B1-docs/raw-20260407T103600Z/brainstorms.md`
 6. `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 
 ## Boundary Summary

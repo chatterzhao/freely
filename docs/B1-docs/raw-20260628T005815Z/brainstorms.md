@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260628T005815Z
 phase_state: completed
-source_raw: raw-20260628T005815Z
+source_raw: raw-20260628T005815Z15Z
 source_url: https://github.com/chatterzhao/freely/issues/3601
 produced_candidate: C-20260628T005815Z-A
 created_at: 2026-06-28
@@ -10,7 +10,7 @@ created_at: 2026-06-28
 # B1_IBM: chat 重构 — 拆分为 comment 和 discuss
 
 ## Input
-- 来源：GitHub issue #3601 `raw-20260628T005815Z`
+- 来源：GitHub issue #3601 `raw-20260628T005815Z15Z`
 - 平台评论含完整检查清单和补充设计（comment #4823655300、#4823715542）
 - 前置讨论在中进行了深入设计（评论/讨论分离、群聊模型、讨论执行 skill、导出 skill）
 

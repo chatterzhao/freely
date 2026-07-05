@@ -2,7 +2,7 @@
 
 ## C-20260616T110714Z-A: legacy issue
 
-- raw_issue: raw-20260616T110714Z
+- raw_issue: raw-20260616T110714Z14Z
 - milestone: M-20260616T110714Z-A
 - status: `promoted`
 - promoted_issue_id: I-20260616T110714Z-A

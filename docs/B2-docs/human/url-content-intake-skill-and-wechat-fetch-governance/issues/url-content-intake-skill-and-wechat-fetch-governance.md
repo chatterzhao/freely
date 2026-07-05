@@ -8,8 +8,8 @@
 - story-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - issue-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260318/candidates.md`
-- source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318T163000Z/candidates.md`
+- source_brainstorm: `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
@@ -52,8 +52,8 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260318/brainstorms.md`
-- `docs/B1-docs/raw-20260318/candidates.md`
+- `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260318T163000Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
 - `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`

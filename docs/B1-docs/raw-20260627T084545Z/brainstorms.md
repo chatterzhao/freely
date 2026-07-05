@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T084545Z
 phase_state: completed
-source_raw: raw-20260627T084545Z
+source_raw: raw-20260627T084545Z45Z
 source_url: https://github.com/chatterzhao/freely/issues/3585
 produced_candidate: C-20260627T084545Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: a2a_tasks agent_id 改具体编号 + 字段补全
 
 ## Input
-- 来源: raw-20260627T084545Z (GitHub #3585)
+- 来源: raw-20260627T084545Z45Z (GitHub #3585)
 - 调研文档: .a2a-tasks-review.md
 
 ## 调用链追踪

@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260703T114618Z
 phase_state: completed
-source_raw: raw-20260703T114618Z
+source_raw: raw-20260703T114618Z18Z
 produced_candidate: C-20260703T114618Z-A
 ---
 

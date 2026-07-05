@@ -8,7 +8,7 @@
 - requirement: tool-registry 四个工具都有 install_method + download_url 字段
 - acceptance_target: grep 确认 claude/codex/opencode/cline 的 [tool.acp] 节含这两个字段
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 四个工具的 registry 条目完整
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-5.log
@@ -32,7 +32,7 @@
 - requirement: ensure-acp-binary 通用化 — 接受 --tool 参数，从 registry 读配置下载
 - acceptance_target: `ensure-acp-binary --tool codex` 输出有效 binary 路径
 - testing_layer: integration
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 脚本执行成功，输出可执行文件路径
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-2.log
@@ -54,7 +54,7 @@
 - requirement: cmd_init() 的 ACP 检查不再是硬编码 codex vs *，改为循环 registry
 - acceptance_target: grep 确认 cmd_init() 不含 `case "$tool" in codex)` 硬编码分支
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 代码中无不区分工具的硬编码分支
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-3.log
@@ -79,7 +79,7 @@
 - requirement: config.toml 新增 FREELY_ACP_<TOOL>_BIN 字段，runtime 从 config.toml 读 ACP binary 路径
 - acceptance_target: _ensure_acp_bridge_running 优先读 config.toml 的 FREELY_ACP_<TOOL>_BIN
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 代码中包含 get_config FREELY_ACP_ 的调用
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-4.log
@@ -103,7 +103,7 @@
 - requirement: _acp_bridge_health_check Shell 注入修复
 - acceptance_target: socket 路径通过 env var FREELY_ACP_HEALTH_SOCKET 传递，不直接拼接到 Python 字符串
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 代码中无 `sock.connect('$socket')` 模式
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-5.log
@@ -132,7 +132,7 @@
 - requirement: 每个工具的 download_url 只允许下载自己的 binary，不会交叉
 - acceptance_target: claude 的 download_url 不指向 codex-acp，codex 的不指向 claude-agent-acp
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: 四个工具的 download_url 与 acp.binary 名一致
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-6.log
@@ -154,7 +154,7 @@
 ## Unit
 - acceptance_target: bash -n freely + ensure-acp-binary syntax check
 - testing_layer: unit
-- target_environment: feature-raw-20260630T124528Z-acp-init-registry
+- target_environment: feature-raw-20260630T124528Z28Z-acp-init-registry
 - required_evidence: Syntax OK for all modified files
 - blocker_taxonomy: execution_pending_or_failed
 - status: passed

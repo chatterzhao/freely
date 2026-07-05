@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260625T020000Z-A
 status: promoted
-source_raw: raw-20260625T020000Z
+source_raw: raw-20260625T020000Z00Z
 milestone: M-20260625T020000Z-A
 promoted_issue_path: docs/issues/I-20260625T020000Z-A/issue.md
 ---

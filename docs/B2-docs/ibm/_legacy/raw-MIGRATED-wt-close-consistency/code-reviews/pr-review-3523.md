@@ -1,6 +1,6 @@
 # PR Review: #3523
 - pr_number: 3523
-- branch: fix/raw-20260625T235348Z-wt-close-consistency
+- branch: fix/raw-20260625T235348Z48Z-wt-close-consistency
 - base: develop
 - reviewer: tdd-agent (ACP TDD, slot=claude-apikey-ds-pro-auto, worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20260625T235348Z-wt-close-consistency)
 - review_date: 2026-06-25T23:57:57Z

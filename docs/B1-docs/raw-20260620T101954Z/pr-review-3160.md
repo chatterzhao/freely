@@ -1,6 +1,6 @@
 # PR Review: #3160
 - pr_number: 3160
-- branch: fix/raw-20260620T101954Z-worker-prompt-context
+- branch: fix/raw-20260620T101954Z54Z-worker-prompt-context
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T10:52:48Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T101954Z-worker-prompt-context branch=fix/raw-20260620T101954Z-worker-prompt-context clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T101954Z54Z-worker-prompt-context branch=fix/raw-20260620T101954Z54Z-worker-prompt-context clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

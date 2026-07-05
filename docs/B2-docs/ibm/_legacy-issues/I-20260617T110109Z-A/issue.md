@@ -3,8 +3,8 @@ local_id: I-20260617T110109Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-source_candidate: docs/B1-docs/raw-20260617T110109Z/candidates.md
-promoted_from: raw-20260617T110109Z
+source_candidate: docs/B1-docs/raw-20260617T110109Z09Z/candidates.md
+promoted_from: raw-20260617T110109Z09Z
 verification_artifact_dir: docs/B2-docs/remove-prompt-file/code-reviews
 platform_ids:
   github:

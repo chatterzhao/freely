@@ -9,8 +9,8 @@
 - issue-name: `human-chat-intake-and-manager-delegation`
 - verification_artifact_dir: `docs/B2-docs/human/human-chat-intake-and-manager-delegation/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-1715-a`
-- source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260319T050000Z/candidates.md#c-20260319-1715-a`
+- source_brainstorm: `docs/B1-docs/raw-20260319T050000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

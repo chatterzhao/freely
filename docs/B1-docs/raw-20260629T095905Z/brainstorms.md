@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T095905Z
 phase_state: completed
-source_raw: raw-20260629T095905Z
+source_raw: raw-20260629T095905Z05Z
 source_url: https://github.com/chatterzhao/freely/issues/3620
 produced_candidate: C-20260629T095905Z-A
 created_at: 2026-06-29
@@ -10,7 +10,7 @@ created_at: 2026-06-29
 # B1_IBM: 优化 workflow skill 覆盖缺口
 
 ## Input
-- raw issue: raw-20260629T095905Z
+- raw issue: raw-20260629T095905Z05Z
 - 发现问题：AI 在执行开发任务时跳过 B1_IBM/B2_IBM/RED 直接写代码
 - 根因追踪：workflow skill 没有覆盖"无 raw issue"场景和"cd 到工位"操作
 

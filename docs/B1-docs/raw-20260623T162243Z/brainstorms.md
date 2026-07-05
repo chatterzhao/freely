@@ -1,7 +1,7 @@
 # Brainstorm: scan_state 输出到 Manager prompt
 
 ## Discovery
-- raw issue: raw-20260623T162243Z (GitHub #3393)
+- raw issue: raw-20260623T162243Z43Z (GitHub #3393)
 - 上游: #3381 问题 4 — Manager 看不到 scan_state
 
 ## Research

@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260704T234812Z
 phase_state: completed
-source_raw: raw-20260704T234812Z
+source_raw: raw-20260704T234812Z12Z
 source_url: https://github.com/chatterzhao/freely/issues/3732
 produced_candidate: C-20260704T234812Z-A
 created_at: 2026-07-04
@@ -10,9 +10,9 @@ created_at: 2026-07-04
 # B1_IBM: #3731 ACP cleanup 遗漏修复 + hook 提示改进
 
 ## Input
-- raw-20260704T234812Z (GitHub #3732)
-- 前置: raw-20260704T064539Z (#3728 session-lifecycle-unify) + raw-20260704T080808Z (#3729 multi-bridge-per-tool)
-- 关联: raw-20260704T164337Z (#3730/#3731 acp cleanup)
+- raw-20260704T234812Z12Z (GitHub #3732)
+- 前置: raw-20260704T064539Z39Z (#3728 session-lifecycle-unify) + raw-20260704T080808Z08Z (#3729 multi-bridge-per-tool)
+- 关联: raw-20260704T164337Z37Z (#3730/#3731 acp cleanup)
 
 ## Problem
 

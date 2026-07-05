@@ -8,8 +8,8 @@
 - story-name: `source-routing-and-derived-worktree-governance`
 - issue-name: `source-routing-and-derived-worktree-governance`
 - verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `source-routing-and-derived-worktree-governance`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260307/candidates.md#c-20260307-1201`
-- source_brainstorm: `docs/B1-docs/raw-20260307/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260307T053700Z/candidates.md#c-20260307-1201`
+- source_brainstorm: `docs/B1-docs/raw-20260307T053700Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

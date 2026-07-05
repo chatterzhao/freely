@@ -2,8 +2,8 @@
 local_id: I-20260513T224509Z-A
 kind: linked
 phase_state: absorbed
-promoted_from: raw-20260513T224509Z
-source_candidate: docs/B1-docs/raw-20260513T224509Z/candidates.md#C-20260513T224509Z-A
+promoted_from: raw-20260513T224509Z09Z
+source_candidate: docs/B1-docs/raw-20260513T224509Z09Z/candidates.md#C-20260513T224509Z-A
 verification_artifact_dir: docs/B2-docs/sup-pid-file-fix/code-reviews
 pre_tests_path: docs/B2-docs/sup-pid-file-fix/verification/pre-tests.md
 platform_state: closed

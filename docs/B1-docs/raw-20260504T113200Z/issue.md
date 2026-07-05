@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260504T113200Z
+local_id: raw-20260504T113200Z00Z
 issue_title: raw key 格式规范重构：统一为 YYYYMMDDTHHMMZ 分钟精度
 kind: raw
 phase_state: absorbed
@@ -23,7 +23,7 @@ platform_state: closed
 当前三套 raw key 命名并存，互相不兼容：
 
 - GitHub: `RAW-20260504T1145Z` (ISO 8601, T/Z 分隔)
-- 本地: `raw-20260503-0200` (YYYYMMDD-HHMM)
+- 本地: `raw-20260503T020000Z` (YYYYMMDD-HHMM)
 - chat DB: `20260503105742` (14 位秒精度)
 
 ## 影响

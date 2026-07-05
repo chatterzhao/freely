@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260625T084506Z
 phase_state: completed
-source_raw: raw-20260625T084506Z
+source_raw: raw-20260625T084522Z06Z
 source_url: https://github.com/chatterzhao/freely/issues/3494
 produced_candidate: C-20260625T084506Z-A
 created_at: 2026-06-25
@@ -10,7 +10,7 @@ created_at: 2026-06-25
 # B1_IBM: B2_IBM skill 反糊弄铁律
 
 ## Input
-- source: raw-20260625T084506Z (GitHub #3494)
+- source: raw-20260625T084522Z06Z (GitHub #3494)
 - 问题: B2_IBM skill 当前只提供 pre-tests.md 模板，没有告诫用户不要凑字段糊弄门禁
 - 用户倾向全部写 not_applicable + mock 绕过检查
 

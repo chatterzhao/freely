@@ -1,7 +1,7 @@
 # Candidates - 20260616T055035Z--a2a-hygiene-after-run
 
 ## Context
-- Source: raw-20260616T055035Z (A2A server hygiene + after-run worker detection)
+- Source: raw-20260616T055035Z35Z (A2A server hygiene + after-run worker detection)
 - Status: completed
 
 ## Candidates

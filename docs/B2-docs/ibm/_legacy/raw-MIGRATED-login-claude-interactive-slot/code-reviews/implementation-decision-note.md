@@ -2,7 +2,7 @@
 
 - issue_id: I-20260619T033758Z-A
 - issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260619T033758Z-A/issue.md
-- source_candidate: docs/B1-docs/raw-20260619T033758Z/candidates.md
+- source_candidate: docs/B1-docs/raw-20260619T033758Z58Z/candidates.md
 
 ## decision
 

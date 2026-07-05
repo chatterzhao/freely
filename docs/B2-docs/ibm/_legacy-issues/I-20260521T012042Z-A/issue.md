@@ -1,16 +1,16 @@
 # I-20260521T012042Z-A: Manager keepalive stale-pid scanning
 
 - title: Manager keepalive stale-pid scanning
-- source: `raw-20260521T012042Z` (GitHub #1519, Runtime Crash Postmortem)
+- source: `raw-20260521T012042Z42Z` (GitHub #1519, Runtime Crash Postmortem)
 - milestone: M-20260521T012042Z-A
-- source_candidate: `docs/B1-docs/raw-20260521T012042Z/candidates.md#C-20260521T012042Z-A`
+- source_candidate: `docs/B1-docs/raw-20260521T012042Z42Z/candidates.md#C-20260521T012042Z-A`
 - issue_id: I-20260521T012042Z-A
 - phase_state: completed
 - component: runtime
 
 ## Branch
 
-- feature branch: `feature/raw-20260521T012042Z-stale-pid-keepalive`
+- feature branch: `feature/raw-20260521T012042Z42Z-stale-pid-keepalive`
 - implementation commit: `36e1b480`
 - merged to develop: pending (pr-merge-guarded)
 

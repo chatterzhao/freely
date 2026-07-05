@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260516T095158Z
+local_id: raw-20260516T095158Z58Z
 kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -23,11 +23,11 @@ force_closed_at: '2026-05-16T09:55:40Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
-## raw-20260516T095158Z
+## raw-20260516T095158Z58Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260516T095158Z` |
+| local_id | `raw-20260516T095158Z58Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -37,7 +37,7 @@ force_closed_reason: 'wt-close --force: worktree retired without completed phase
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260516T095158Z`。实现前请用 `wt-create --raw-key 20260516T095158Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260516T095158Z58Z`。实现前请用 `wt-create --raw-key 20260516T095158Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

@@ -5,7 +5,7 @@
 ## Unit
 - acceptance target: `Keep the governance-merge-gate parser/validator narrow enough that missing C/M/I lifecycle links are surfaced as structured errors rather than silent omissions.`
 - testing layer: `unit`
-- target environment: `feature/raw-20260503T0915Z-enforce-test-pre-merge`
+- target environment: `feature/raw-20260503T091500Z-enforce-test-pre-merge`
 - required evidence: `./bin/governance-merge-gate --range develop..HEAD or explicit lawful replacement evidence`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -28,7 +28,7 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded feature→test-pre-merge→develop merge receipts plus owner review artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/raw-20260503T0915Z-enforce-test-pre-merge` into `test-pre-merge-enforce-gate-20260503` via `freely pr-merge-guarded`.
+1. Merge `feature/raw-20260503T091500Z-enforce-test-pre-merge` into `test-pre-merge-enforce-gate-20260503` via `freely pr-merge-guarded`.
 2. Merge `test-pre-merge-enforce-gate-20260503` into `develop` via `freely pr-merge-guarded`.
 3. Verify `Freely-Merge-Path`, `Freely-Bypass-Mode`, `Freely-Source-Branch` trailers in merge commit messages.
 
@@ -80,7 +80,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `T-005 in docs/B2-docs/test-pre-merge-enforcement/tasks.md`
-- case_design: `Merge feature/raw-20260503T0915Z-enforce-test-pre-merge into test-pre-merge-enforce-gate-20260503 via pr-merge-guarded, then merge into develop via pr-merge-guarded, verifying each step produces guarded receipts and passes governance gates.`
+- case_design: `Merge feature/raw-20260503T091500Z-enforce-test-pre-merge into test-pre-merge-enforce-gate-20260503 via pr-merge-guarded, then merge into develop via pr-merge-guarded, verifying each step produces guarded receipts and passes governance gates.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`

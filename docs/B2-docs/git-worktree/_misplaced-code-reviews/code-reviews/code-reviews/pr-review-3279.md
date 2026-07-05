@@ -1,6 +1,6 @@
 # PR Review: #3279
 - pr_number: 3279
-- branch: fix/raw-20260621T181901Z-platform-sync
+- branch: fix/raw-20260621T181901Z01Z-platform-sync
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T18:40:00Z
@@ -29,7 +29,7 @@
 
 ## 6. Phase State
 ^- status: passed
-- evidence: raw-20260621T181901Z phase_state=absorbed
+- evidence: raw-20260621T181901Z01Z phase_state=absorbed
 
 ## Overall Verdict
 - verdict: pass

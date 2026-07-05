@@ -3,8 +3,8 @@ local_id: I-20260519T004246Z-A
 kind: i_issue
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260519T004246Z
-source_candidate: docs/B1-docs/raw-20260519T004246Z/candidates.md
+promoted_from: raw-20260519T004246Z46Z
+source_candidate: docs/B1-docs/raw-20260519T004246Z46Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -26,7 +26,7 @@ platform_state: closed
 
 # I-20260519T004246Z-A: handoff.py 增加 evidence_paths 为 worker_done 必填字段
 
-- source_candidate: `docs/B1-docs/raw-20260519T004246Z/candidates.md` (C-20260519T004246Z-A)
+- source_candidate: `docs/B1-docs/raw-20260519T004246Z46Z/candidates.md` (C-20260519T004246Z-A)
 - candidate: C-20260519T004246Z-A
 - milestone: M-20260519T004246Z-A
 - execution_base: `develop`

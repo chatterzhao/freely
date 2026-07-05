@@ -1,14 +1,14 @@
 ---
-local_id: raw-20260513T080636Z
+local_id: raw-20260513T080636Z36Z
 kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-source_candidate: docs/B1-docs/raw-20260513T080636Z/candidates.md#C-20260513T080636Z-A
+source_candidate: docs/B1-docs/raw-20260513T080636Z36Z/candidates.md#C-20260513T080636Z-A
 priority: P2
 source: platform
 created_at: '2026-05-13T09:49:13Z'
-title: '[RAW-20260513T080636Z] raw-20260513T080636Z'
+title: '[RAW-20260513T080636Z] raw-20260513T080636Z36Z'
 updated_at: '2026-06-17T00:25:19Z'
 platform_ids:
   github:
@@ -19,11 +19,11 @@ primary_platform: github
 platform_state: closed
 ---
 
-## raw-20260513T080636Z
+## raw-20260513T080636Z36Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260513T080636Z` |
+| local_id | `raw-20260513T080636Z36Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -33,7 +33,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260513T080636Z`。实现前请用 `wt-create --raw-key 20260513T080636Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260513T080636Z36Z`。实现前请用 `wt-create --raw-key 20260513T080636Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

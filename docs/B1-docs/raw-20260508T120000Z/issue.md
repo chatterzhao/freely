@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260508T120000Z
+local_id: raw-20260508T120000Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260508T120000Z-A
@@ -21,7 +21,7 @@ session_refs: []
 platform_state: closed
 ---
 
-# raw-20260508T120000Z: wt-create fix
+# raw-20260508T120000Z00Z: wt-create fix
 
 Source: GitHub issue #253 — wt-create script truncates 6-digit raw issue keys.
 

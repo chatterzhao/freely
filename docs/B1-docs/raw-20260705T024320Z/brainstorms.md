@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260705T024320Z
 phase_state: completed
-source_raw: raw-20260705T024320Z
+source_raw: raw-20260705T024320Z20Z
 source_url: https://github.com/chatterzhao/freely/issues/3737
 produced_candidate: C-20260705T024320Z-A
 created_at: 2026-07-05
@@ -10,7 +10,7 @@ created_at: 2026-07-05
 # B1_IBM: 全链路 per-agent tool/slot 支持
 
 ## Input
-- raw-20260705T024320Z (GitHub #3737)
+- raw-20260705T024320Z20Z (GitHub #3737)
 - agent-table: manager=claude, worker=opencode, reviewer=cline（三个不同 base_tool）
 
 ## 10 维度全链路审计结果

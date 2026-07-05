@@ -1,5 +1,5 @@
 # Pre-Tests
-- issue_id: raw-20260503T1428Z
+- issue_id: raw-20260503T142800Z
 ## Unit
 - acceptance target: bridge disconnect race fixed via end_turn grace + broken pipe tolerance
 - testing layer: unit

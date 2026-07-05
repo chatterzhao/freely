@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T050000Z
+local_id: raw-20260506T050000Z00Z
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -17,7 +17,7 @@ created_at: '2026-05-10T09:29:11Z'
 platform_state: closed
 ---
 
-# raw-20260506T0500Z: scan 增加远端分支治理面
+# raw-20260506T050000Z: scan 增加远端分支治理面
 
 ## 现象
 

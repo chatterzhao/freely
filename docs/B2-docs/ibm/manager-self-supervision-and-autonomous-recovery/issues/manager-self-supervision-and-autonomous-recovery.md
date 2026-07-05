@@ -8,8 +8,8 @@
 - story-name: `manager-self-supervision-and-autonomous-recovery`
 - issue-name: `manager-self-supervision-and-autonomous-recovery`
 - verification_artifact_dir: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-a`
-- source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-a`
+- source_brainstorm: `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`

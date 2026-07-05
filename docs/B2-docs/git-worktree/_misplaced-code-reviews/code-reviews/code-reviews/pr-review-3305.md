@@ -1,6 +1,6 @@
 # PR Review: #3305
 - pr_number: 3305
-- branch: fix/raw-20260622T000033Z-idle-timeout-fix
+- branch: fix/raw-20260622T000033Z33Z-idle-timeout-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T00:07:59Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T000033Z-idle-timeout-fix branch=fix/raw-20260622T000033Z-idle-timeout-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T000033Z33Z-idle-timeout-fix branch=fix/raw-20260622T000033Z33Z-idle-timeout-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

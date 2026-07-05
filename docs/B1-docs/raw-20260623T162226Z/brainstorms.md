@@ -1,7 +1,7 @@
 # Brainstorm: L0-L3 兜底死循环检测
 
 ## Discovery
-- raw issue: raw-20260623T162226Z (#3392)
+- raw issue: raw-20260623T162243Z26Z (#3392)
 - 上游: #3381 空循环分析 — semantic_loop Guard 10 盲区，SSE/状态管理已修但缺安全网
 
 ## Research

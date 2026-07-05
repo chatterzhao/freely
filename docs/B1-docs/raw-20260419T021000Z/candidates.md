@@ -1,6 +1,6 @@
 # Candidates - 20260419-0210--protected-branch-ref-only-entrypoint-gap
 
-- Source brainstorm: `docs/B1-docs/raw-20260419-0210/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419T021000Z/brainstorms.md`
 
 ### C-20260419T021000Z-A: legacy issue
 

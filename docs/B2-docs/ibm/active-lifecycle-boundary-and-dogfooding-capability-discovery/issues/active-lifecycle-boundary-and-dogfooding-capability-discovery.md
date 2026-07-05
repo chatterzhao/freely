@@ -8,8 +8,8 @@
 - story-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`
 - issue-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`
 - verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1745-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-1745-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`

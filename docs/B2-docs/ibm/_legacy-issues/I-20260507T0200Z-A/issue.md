@@ -3,7 +3,7 @@ local_id: I-20260507T0200Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-source_candidate: docs/B1-docs/raw-20260507/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
 milestone: M-20260507T0200Z-A
 verification_artifact_dir: docs/B2-docs/promoted-gate-fix/code-reviews
 pre_tests_path: docs/B2-docs/promoted-gate-fix/verification/pre-tests.md

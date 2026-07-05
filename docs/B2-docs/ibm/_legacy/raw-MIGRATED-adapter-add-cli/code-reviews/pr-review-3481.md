@@ -1,6 +1,6 @@
 # PR Review: #3481
 - pr_number: 3481
-- branch: fix/raw-20260625T045400Z-adapter-add-cli
+- branch: fix/raw-20260625T045412Z00Z-adapter-add-cli
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-25T05:00:04Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T045400Z-adapter-add-cli branch=fix/raw-20260625T045400Z-adapter-add-cli clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T045412Z00Z-adapter-add-cli branch=fix/raw-20260625T045412Z00Z-adapter-add-cli clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

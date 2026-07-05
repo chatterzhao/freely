@@ -3,8 +3,8 @@ local_id: I-20260618T024841Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260618T024841Z
-source_candidate: docs/B1-docs/raw-20260618T024841Z/candidates.md
+promoted_from: raw-20260618T024841Z41Z
+source_candidate: docs/B1-docs/raw-20260618T024841Z41Z/candidates.md
 canonical_issue_path: ''
 pre_tests_path: docs/B2-docs/raw-issue-review-fixes/verification/pre-tests.md
 verification_artifact_dir: docs/B2-docs/raw-issue-review-fixes/code-reviews

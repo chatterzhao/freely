@@ -3,8 +3,8 @@ local_id: I-20260617T160003Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260617T160003Z
-source_candidate: docs/B1-docs/raw-20260617T160003Z/candidates.md
+promoted_from: raw-20260617T160003Z03Z
+source_candidate: docs/B1-docs/raw-20260617T160003Z03Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""
@@ -22,7 +22,7 @@ verification_artifact_dir: docs/B2-docs/wt-close-force-overwrite-fix/code-review
 
 # I-20260617T160003Z-A: Fix wt-close --force overwriting pr-merge-guarded frontmatter
 
-- source_candidate: docs/B1-docs/raw-20260617T160003Z/candidates.md
+- source_candidate: docs/B1-docs/raw-20260617T160003Z03Z/candidates.md
 - pre_tests_path: docs/B2-docs/wt-close-force-overwrite-fix/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/wt-close-force-overwrite-fix/code-reviews
 

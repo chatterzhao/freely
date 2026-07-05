@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260513T120944Z
+local_id: raw-20260513T120944Z44Z
 kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
@@ -23,11 +23,11 @@ session_refs: []
 platform_state: closed
 ---
 
-## raw-20260513T120944Z
+## raw-20260513T120944Z44Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260513T120944Z` |
+| local_id | `raw-20260513T120944Z44Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -37,7 +37,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260513T120944Z`。实现前请用 `wt-create --raw-key 20260513T120944Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260513T120944Z44Z`。实现前请用 `wt-create --raw-key 20260513T120944Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open

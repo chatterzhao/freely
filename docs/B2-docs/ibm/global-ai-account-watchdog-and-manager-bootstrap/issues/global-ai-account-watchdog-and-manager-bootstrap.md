@@ -8,10 +8,10 @@
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
 - issue-name: `global-ai-account-watchdog-and-manager-bootstrap`
 - verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `global-ai-account-watchdog-and-manager-bootstrap`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-a`
+- source_candidate: `docs/B1-docs/raw-20260318T163000Z/candidates.md#c-20260318-a`
 - additional_source_candidates:
-  - `docs/B1-docs/raw-20260323/candidates.md#c-20260323-1135-a`
-- source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
+  - `docs/B1-docs/raw-20260323T204500Z/candidates.md#c-20260323-1135-a`
+- source_brainstorm: `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
@@ -76,7 +76,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Completion
 
-- `docs/B1-docs/raw-20260318/*`
+- `docs/B1-docs/raw-20260318T163000Z/*`
 - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/pre-tests.md`
 - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
@@ -155,7 +155,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `rate limit`、`deactivated_workspace`、auth failure / invalid auth file、slot probe failure，都应统一进入 failure-driven full slot sweep
     - 真实 probe 成功前，不允许把某个 slot 的授权文件切进真实 Codex 工作位；否则无效授权会直接阻塞正在执行的 `codex exec`
     - `all slots unavailable` 时允许保留 earliest-reset 作为 debug / 排序提示，但恢复主路径应基于低频真实 reprobe，而不是继续以 cooldown ledger 为控制面真相
-    - 该结论来自 `docs/B1-docs/raw-20260325/*`，并已明确判定为同族 supporting evidence，由本 issue 吸收，不新开平行 issue
+    - 该结论来自 `docs/B1-docs/raw-20260325T033300Z/*`，并已明确判定为同族 supporting evidence，由本 issue 吸收，不新开平行 issue
   - 2026-03-25 当前 continuation 已把上述 contract 写入能力真源并通过 focused verification：
     - `availability-watchdog.sh` 的 `ensure_codex_slot_ready_for_manager()` 现改为 current-slot probe + full saved-slot sweep；不再先信 cooldown ledger 再决定 manager bootstrap
     - `probe_all_codex_slots_and_update_cooldown()` sweep 失败时会恢复原 auth / active-slot，避免把最后一个失败 slot 留在真实 Codex 工作位；返回 usable 结果前会把 active slot 对齐回该 usable slot

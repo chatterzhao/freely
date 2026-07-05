@@ -1,6 +1,6 @@
 # PR Review: #3060
 - pr_number: 3060
-- branch: fix/raw-20260619T113256Z-a2a-list-rest-fix
+- branch: fix/raw-20260619T113256Z56Z-a2a-list-rest-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T11:38:47Z
@@ -8,7 +8,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T113256Z-a2a-list-rest-fix branch=fix/raw-20260619T113256Z-a2a-list-rest-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T113256Z56Z-a2a-list-rest-fix branch=fix/raw-20260619T113256Z56Z-a2a-list-rest-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

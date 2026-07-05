@@ -3,7 +3,7 @@
 - id: `C-20260404T011900Z-A`
 - candidate_format_version: `v2`
 - title: Governance merge gate milestone status followthrough
-- source_brainstorm: `docs/B1-docs/raw-20260404-0119/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260404T011900Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - reopen_reason: `a real develop replay exposed that governance-merge-gate misread nested queue item status lines in docs/milestones.md as the parent milestone status, falsely blocking an unrelated active candidate lane`
 - problem: `governance-merge-gate` currently treats nested queue item `- status:` fields inside `docs/milestones.md` as if they were the milestone's own top-level status, so active milestones can be misclassified as `needs_research` and wrongly block develop-bound replay.

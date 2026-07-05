@@ -175,7 +175,7 @@ owner:
   - 这些内容更适合作为新的治理 pre-brainstorm 输入，而不是继续保留老 worktree 作为活跃执行枝
 
 handoff target:
-- `docs/B1-docs/raw-20260319-0220/*`
+- `docs/B1-docs/raw-20260319T022000Z/*`
 
 retirement precondition:
 - 新 pre-brainstorm 已记录 umbrella term、skill/runtime 分层、旧 worktree disposition
@@ -194,8 +194,8 @@ retirement after:
 
 ## Intended Landing
 
-- `docs/B1-docs/raw-20260319-0220/brainstorms.md`
-- `docs/B1-docs/raw-20260319-0220/candidates.md`
+- `docs/B1-docs/raw-20260319T022000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260319T022000Z/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 
 后续如继续 materialize，目标应是：
@@ -269,7 +269,7 @@ retirement after:
 
 ### Next recommended action
 
-- 继续作为 `pre_brainstorm` 留在 `docs/B1-docs/raw-20260319-0220/`
+- 继续作为 `pre_brainstorm` 留在 `docs/B1-docs/raw-20260319T022000Z/`
 - 把 A / C 从 active candidate queue 收口为 archive trace
 - 把 B 提升并绑定到 `I-20260319T001800Z`，从 active candidate queue 移出
 - 当前 pre-brainstorm 已完成 binding 和 archive，不再继续扩研究 scope

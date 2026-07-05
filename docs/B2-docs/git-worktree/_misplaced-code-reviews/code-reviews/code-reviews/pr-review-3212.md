@@ -1,6 +1,6 @@
 # PR Review: #3212
 - pr_number: 3212
-- branch: fix/raw-20260621T090002Z-verification-gate-rebind-fix
+- branch: fix/raw-20260621T090002Z02Z-verification-gate-rebind-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T09:34:57Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T090002Z-verification-gate-rebind-fix branch=fix/raw-20260621T090002Z-verification-gate-rebind-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T090002Z02Z-verification-gate-rebind-fix branch=fix/raw-20260621T090002Z02Z-verification-gate-rebind-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

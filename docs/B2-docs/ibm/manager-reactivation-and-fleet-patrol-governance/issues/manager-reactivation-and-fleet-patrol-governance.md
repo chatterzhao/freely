@@ -8,8 +8,8 @@
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
 - issue-name: `manager-reactivation-and-fleet-patrol-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-0345-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-0345-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`

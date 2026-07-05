@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260517T060000Z
+local_id: raw-20260517T060000Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260413T042000Z-A
@@ -22,11 +22,11 @@ session_refs: []
 platform_state: closed
 ---
 
-## raw-20260517T0600Z
+## raw-20260517T060000Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260517T0600Z` |
+| local_id | `raw-20260517T060000Z` |
 | kind | `raw` |
 | status | `unknown` |
 | phase | `proposed` |
@@ -36,9 +36,9 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260517T0600Z`。实现前请用 `wt-create --raw-key 20260517T0600Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260517T060000Z`。实现前请用 `wt-create --raw-key 20260517T0600Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
-local_id: raw-20260517T060000Z
+local_id: raw-20260517T060000Z00Z
 title: 'develop closeout ops: push + dirty state commit'
 phase_state: absorbed
 absorbed_into: I-20260413T042000Z-A

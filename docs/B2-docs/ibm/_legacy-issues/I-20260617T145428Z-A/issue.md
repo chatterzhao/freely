@@ -3,8 +3,8 @@ local_id: I-20260617T145428Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260617T145428Z
-source_candidate: docs/B1-docs/raw-20260617T145428Z/candidates.md
+promoted_from: raw-20260617T145428Z28Z
+source_candidate: docs/B1-docs/raw-20260617T145428Z28Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -27,7 +27,7 @@ platform_state: closed
 
 # I-20260617T145428Z-A: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
 
-- source_candidate: `docs/B1-docs/raw-20260617T145428Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260617T145428Z28Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/freely-db-cli-agents-fix/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/freely-db-cli-agents-fix/code-reviews`
 

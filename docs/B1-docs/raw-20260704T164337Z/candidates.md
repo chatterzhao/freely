@@ -2,7 +2,7 @@
 candidate_id: C-20260704T164337Z-A
 status: absorbed
 absorbed_into: I-20260704T164337Z-A
-source_raw: raw-20260704T164337Z
+source_raw: raw-20260704T164337Z37Z
 milestone: M-20260704T164337Z-A
 ---
 ## C-20260704T164337Z-A: legacy issue

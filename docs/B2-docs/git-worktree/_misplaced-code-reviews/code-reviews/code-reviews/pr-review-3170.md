@@ -1,6 +1,6 @@
 # PR Review: #3170
 - pr_number: 3170
-- branch: fix/raw-20260618T091116Z-write-task-mode-after-ensure-db
+- branch: fix/raw-20260618T091116Z16Z-write-task-mode-after-ensure-db
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T13:24:45Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260618T091116Z-write-task-mode-after-ensure-db branch=fix/raw-20260618T091116Z-write-task-mode-after-ensure-db clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260618T091116Z16Z-write-task-mode-after-ensure-db branch=fix/raw-20260618T091116Z16Z-write-task-mode-after-ensure-db clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

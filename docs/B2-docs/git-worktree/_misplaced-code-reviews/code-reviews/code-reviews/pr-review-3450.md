@@ -1,6 +1,6 @@
 # PR Review: #3450
 - pr_number: 3450
-- branch: fix/raw-20260624T152500Z-add-pretests-gate-to-pr-create
+- branch: fix/raw-20260624T152500Z00Z-add-pretests-gate-to-pr-create
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T16:26:17Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T152500Z-add-pretests-gate-to-pr-create branch=fix/raw-20260624T152500Z-add-pretests-gate-to-pr-create clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T152500Z00Z-add-pretests-gate-to-pr-create branch=fix/raw-20260624T152500Z00Z-add-pretests-gate-to-pr-create clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

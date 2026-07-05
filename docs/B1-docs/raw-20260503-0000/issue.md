@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260503T000000Z
+local_id: raw-20260503-000000Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260503T000000Z-A

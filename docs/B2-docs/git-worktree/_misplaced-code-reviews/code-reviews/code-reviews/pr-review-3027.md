@@ -1,6 +1,6 @@
 # PR Review: #3027
 - pr_number: 3027
-- branch: feature/raw-20260619T043000Z-ibm-gate-to-skill-quickref
+- branch: feature/raw-20260619T043000Z00Z-ibm-gate-to-skill-quickref
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-19T04:42:35Z
@@ -10,11 +10,11 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260619T043000Z-ibm-gate-to-skill-quickref branch=feature/raw-20260619T043000Z-ibm-gate-to-skill-quickref clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260619T043000Z00Z-ibm-gate-to-skill-quickref branch=feature/raw-20260619T043000Z00Z-ibm-gate-to-skill-quickref clean=true
 
 ## 2. IBM Completeness
 ^- status: passed
-- evidence: [SKIP-IBM-GATE] All paths governance-only. B1+B2 artifacts present. The following raw/C/M/I lifecycle links are incomplete or inconsistent: - C-20260619T043000Z-A in docs/B1-docs/raw-20260619T043000Z/candidates.md is promoted but has no candidate_issues entry in docs/milestones.md. Promoted candidates must flow through milestone candidate_issues -> committed_issues. Add C-20260619T043000Z-A as M-20260619T043000Z-A to the active milestone's candidate_issues queue. 
+- evidence: [SKIP-IBM-GATE] All paths governance-only. B1+B2 artifacts present. The following raw/C/M/I lifecycle links are incomplete or inconsistent: - C-20260619T043000Z-A in docs/B1-docs/raw-20260619T043000Z00Z/candidates.md is promoted but has no candidate_issues entry in docs/milestones.md. Promoted candidates must flow through milestone candidate_issues -> committed_issues. Add C-20260619T043000Z-A as M-20260619T043000Z-A to the active milestone's candidate_issues queue. 
 
 ## 3. Code Review Evidence
 ^- status: passed

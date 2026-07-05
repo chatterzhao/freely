@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260624T141559Z
 phase_state: completed
-source_raw: raw-20260624T141559Z
+source_raw: raw-20260624T141559Z59Z
 source_url: https://github.com/chatterzhao/freely/issues/3435
 produced_candidate: C-20260624T141559Z-A
 created_at: 2026-06-24
@@ -11,7 +11,7 @@ created_at: 2026-06-24
 
 ## Input
 
-- **raw issue**: `raw-20260624T141559Z` — `cmd_feedback` 绕过 `issue-sync` 直接用 `gh`，不支持多平台且 `--repo` 应自动获取
+- **raw issue**: `raw-20260624T141559Z59Z` — `cmd_feedback` 绕过 `issue-sync` 直接用 `gh`，不支持多平台且 `--repo` 应自动获取
 - **来源**: 用户在使用 `freely feedback` 时发现必须手工传 `--repo` 参数，且只能创建到 GitHub
 
 ## Problem

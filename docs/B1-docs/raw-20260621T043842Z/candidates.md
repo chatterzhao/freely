@@ -20,4 +20,4 @@
     启动 freely daemon 观察 worker 分配行为，确认无重复 worker。
 - session_refs: |
     GitHub #3200, #3201, #3202
-    raw-20260621T043836Z, raw-20260621T043842Z, raw-20260621T043850Z
+    raw-20260621T043842Z36Z, raw-20260621T043842Z42Z, raw-20260621T043842Z50Z

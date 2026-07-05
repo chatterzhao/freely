@@ -8,8 +8,8 @@
 - story-name: `codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance`
 - issue-name: `codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260406/candidates.md#c-20260406-0901-a`
-- source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260406T110500Z/candidates.md#c-20260406-0901-a`
+- source_brainstorm: `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/pre-tests.md`
@@ -61,7 +61,7 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
   - 在现有 `feature/codex-hi-fast-fail-and-runtime-availability` worktree 中继续 bounded implementation。
   - 只吸收与 `network_failure` fast-fail / classification 直接相关的 residual changes；旧的 live-auth identity reconciliation 残差不在本 owner scope。
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260406/brainstorms.md`
+  - `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
   - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/prd.md`
   - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/pre-tests.md`
   - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/tasks.md`
@@ -90,7 +90,7 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
 ## Verification
 
 - `./bin/governance-check`
-- review `docs/B1-docs/raw-20260406/brainstorms.md`
+- review `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
 - review `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 - review `docs/system/workspace/scripts/runtime/ai-cli`
 - review `docs/system/workspace/scripts/runtime/freely`

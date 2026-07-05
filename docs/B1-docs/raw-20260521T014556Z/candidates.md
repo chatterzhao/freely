@@ -5,7 +5,7 @@
 - candidate_format_version: v2
 - title: Manager prompt 注入 dispatch results section，消除委派结果信息 gap
 - status: needs_research
-- decision_reason: raw-20260521T014556Z (GitHub #1520) Manager 委派 Worker 后无即时反馈，导致 launch_failed/stale_pid/初始化超时时空等 15+ 轮。在 `append_manager_handoff_context_if_needed` 中增加"委派结果" section，Manager 下一轮即可看到 dispatch 结果并正确决策
+- decision_reason: raw-20260521T014556Z56Z (GitHub #1520) Manager 委派 Worker 后无即时反馈，导致 launch_failed/stale_pid/初始化超时时空等 15+ 轮。在 `append_manager_handoff_context_if_needed` 中增加"委派结果" section，Manager 下一轮即可看到 dispatch 结果并正确决策
 - next_action: 确认代码中 Runtime handoff 保留 dispatch result 的精确字段；确认 `append_manager_handoff_context_if_needed` 插入点；产出 acceptance review → B2 materialize
 - revisit_trigger: acceptance review 完成后进入 B2_IBM
 - acceptance_criteria:

@@ -1,6 +1,6 @@
 # PR Review: #3215
 - pr_number: 3215
-- branch: fix/raw-20260621T081814Z-manager-review-gate
+- branch: fix/raw-20260621T081814Z14Z-manager-review-gate
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T11:40:56Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T081814Z-manager-review-gate branch=fix/raw-20260621T081814Z-manager-review-gate clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T081814Z14Z-manager-review-gate branch=fix/raw-20260621T081814Z14Z-manager-review-gate clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

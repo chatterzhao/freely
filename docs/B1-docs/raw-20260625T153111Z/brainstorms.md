@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260625T153111Z
 phase_state: completed
-source_raw: raw-20260625T153111Z
+source_raw: raw-20260625T153111Z11Z
 source_url: https://github.com/chatterzhao/freely/issues/3508
 produced_candidate: C-20260625T153111Z-A
 created_at: 2026-06-25
@@ -10,7 +10,7 @@ created_at: 2026-06-25
 # B1_IBM: agent-table.toml 多 agent 分身注册
 
 ## Input
-- source: raw-20260625T153111Z (GitHub #3508)
+- source: raw-20260625T153111Z11Z (GitHub #3508)
 - 需求: 声明所有 agent 实例，Manager/Wroker/Reviewer 按表分配 slot
 
 ## Problem

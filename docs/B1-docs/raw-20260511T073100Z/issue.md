@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260511T073100Z
+local_id: raw-20260511T073100Z00Z
 kind: raw
 phase_state: completed
 platform_ids:

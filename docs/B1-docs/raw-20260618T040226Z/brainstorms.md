@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw-20260618T040226Z (GitHub #2966)
+- raw-20260618T040226Z26Z (GitHub #2966)
 - 发现链：ef251886 receipt fix 被 15fa666c 静默覆盖 → receipt 丢失 → develop 死锁 → 反思缺少 pre-merge review
 
 ### 问题

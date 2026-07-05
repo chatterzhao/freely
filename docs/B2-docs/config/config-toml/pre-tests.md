@@ -8,7 +8,7 @@
 - requirement: example 废弃字段已移除，默认值对齐代码
 - acceptance_target: IFLOW_MAX_TURNS 不存在；AUTO_SWITCH_TOOL=false, RESTART_STORM_COUNT=4, PROCESS_CHURN_PEAK=3, CONTEXT_ROTATE_RATIO=0.70
 - testing_layer: unit
-- target_environment: feature-raw-20260630T224941Z-config-example-overhaul
+- target_environment: feature-raw-20260630T224941Z41Z-config-example-overhaul
 - required_evidence: grep 确认字段值和存在性
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-1.log
@@ -38,7 +38,7 @@
 - requirement: init 无 config.toml 时自动从 example 创建
 - acceptance_target: 删除 config.toml 后运行 init --auto，config.toml 被创建且含 PROJECT_ROOT 等代填值
 - testing_layer: end-to-end
-- target_environment: feature-raw-20260630T224941Z-config-example-overhaul
+- target_environment: feature-raw-20260630T224941Z41Z-config-example-overhaul
 - required_evidence: config.toml 文件存在，PROJECT_ROOT 非空
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-2.log
@@ -63,7 +63,7 @@
 - requirement: --reset 备份旧文件 + 用 example 覆盖
 - acceptance_target: 运行 init --reset --auto 后旧文件被备份(时间戳名)，config.toml 被重置
 - testing_layer: integration
-- target_environment: feature-raw-20260630T224941Z-config-example-overhaul
+- target_environment: feature-raw-20260630T224941Z41Z-config-example-overhaul
 - required_evidence: 存在备份文件，config.toml 内容与 example 一致(除代填字段)
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-3.log
@@ -86,7 +86,7 @@
 - requirement: merge lock 死锁诊断 — 区分真实并发 vs 死锁
 - acceptance_target: acquire_merge_lock 写 PID；等待时若进程不存在则提示死锁+清理指引
 - testing_layer: unit
-- target_environment: feature-raw-20260630T224941Z-config-example-overhaul
+- target_environment: feature-raw-20260630T224941Z41Z-config-example-overhaul
 - required_evidence: 代码含 PID 写入和 kill -0 检查
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-4.log
@@ -106,7 +106,7 @@
 ## Unit
 - acceptance_target: bash -n 语法检查全部通过
 - testing_layer: unit
-- target_environment: feature-raw-20260630T224941Z-config-example-overhaul
+- target_environment: feature-raw-20260630T224941Z41Z-config-example-overhaul
 - required_evidence: freely + pr-merge-guarded 语法无错误
 - blocker_taxonomy: execution_pending_or_failed
 - status: not_applicable

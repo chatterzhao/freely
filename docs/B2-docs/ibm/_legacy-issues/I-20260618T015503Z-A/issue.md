@@ -3,8 +3,8 @@ local_id: I-20260618T015503Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-promoted_from: raw-20260618T015503Z
-source_candidate: docs/B1-docs/raw-20260618T015503Z/candidates.md
+promoted_from: raw-20260618T015503Z03Z
+source_candidate: docs/B1-docs/raw-20260618T015503Z03Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -24,7 +24,7 @@ updated_at: '2026-06-21T18:24:53Z'
 
 # I-20260618T015503Z-A: Fix worktree path architecture
 
-- source_candidate: docs/B1-docs/raw-20260618T015503Z/candidates.md
+- source_candidate: docs/B1-docs/raw-20260618T015503Z03Z/candidates.md
 - pre_tests_path: docs/B2-docs/worktree-path-architecture/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/worktree-path-architecture/code-reviews
 

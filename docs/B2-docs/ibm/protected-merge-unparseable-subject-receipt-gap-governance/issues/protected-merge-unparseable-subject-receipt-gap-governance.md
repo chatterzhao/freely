@@ -8,8 +8,8 @@
 - story-name: `protected-merge-unparseable-subject-receipt-gap-governance`
 - issue-name: `protected-merge-unparseable-subject-receipt-gap-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260411/candidates.md#c-20260411-0217-a`
-- source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411T141600Z/candidates.md#c-20260411-0217-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
@@ -61,7 +61,7 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
   - Prefer an explicit `validation_mode` in the existing ledger unless implementation evidence proves a separate ledger is materially safer.
   - Do not touch canonical ledger entries for the April 10 preferred-auth batch until tests and parser changes are both green.
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260411/brainstorms.md`
+  - `docs/B1-docs/raw-20260411T141600Z/brainstorms.md`
   - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/brainstorms/b-protected-merge-unparseable-subject-receipt-gap-governance.md`
   - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
   - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
@@ -78,8 +78,8 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
 ## Completion
 
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260411/brainstorms.md`
-- `docs/B1-docs/raw-20260411/candidates.md`
+- `docs/B1-docs/raw-20260411T141600Z/brainstorms.md`
+- `docs/B1-docs/raw-20260411T141600Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`

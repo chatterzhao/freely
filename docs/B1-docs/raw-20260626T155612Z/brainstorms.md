@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260626T155612Z
 phase_state: completed
-source_raw: raw-20260626T155612Z
+source_raw: raw-20260626T155612Z12Z
 source_url: https://github.com/chatterzhao/freely/issues/3565
 produced_candidate: C-20260626T155612Z-A
 created_at: 2026-06-26
@@ -10,7 +10,7 @@ created_at: 2026-06-26
 # B1_IBM: pr-merge-guarded issue-sync after merge dirties source worktree
 
 ## Input
-- source_raw: raw-20260626T155612Z
+- source_raw: raw-20260626T155612Z12Z
 - source_url: https://github.com/chatterzhao/freely/issues/3565
 - discovered during: wt-close blocked after PR #3564 merge
 

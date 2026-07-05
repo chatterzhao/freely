@@ -1,7 +1,7 @@
 # Candidates - 20260419-0915--three-loop-single-source-followthrough
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260419-0915/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419T091500Z/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-three-loop-single-source-followthrough-owner`
 

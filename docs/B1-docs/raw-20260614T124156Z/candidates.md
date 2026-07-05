@@ -1,6 +1,6 @@
 ---
 b1_id: 20260614T124156Z--platform-batch-sync
-raw_key: raw-20260614T124156Z
+raw_key: raw-20260614T124156Z56Z
 status: proposed
 promotion_gate:
   logic: absorbed

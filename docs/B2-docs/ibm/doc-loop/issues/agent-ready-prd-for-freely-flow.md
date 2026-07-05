@@ -7,8 +7,8 @@
 - epic-name: `ai-native-doc-loop`
 - story-name: `agent-ready-prd-for-freely-flow`
 - issue-name: `agent-ready-prd-for-freely-flow`
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1530-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-1530-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
@@ -46,8 +46,8 @@ Freely 现有的 `prd.md` 普遍偏短，能表达“这轮要做什么”，但
 
 ## Completion
 
-- `docs/B1-docs/raw-20260321/brainstorms.md`
-- `docs/B1-docs/raw-20260321/candidates.md`
+- `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
+- `docs/B1-docs/raw-20260321T170600Z/candidates.md`
 - `docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md`
 - `docs/B2-docs/ibm/doc-loop/brainstorms/b-agent-ready-prd-for-freely-flow.md`
 - `docs/B2-docs/ibm/doc-loop/prd.md`

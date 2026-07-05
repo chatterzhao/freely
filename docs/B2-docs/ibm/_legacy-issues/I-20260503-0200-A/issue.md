@@ -5,7 +5,7 @@ kind: linked
 phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
-promoted_from: raw-20260503-0200
+promoted_from: raw-20260503T020000Z
 platform_ids:
   github:
     issue_id: '227'

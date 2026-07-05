@@ -1,5 +1,5 @@
 # Pre-Tests: cmd_feedback → issue-sync alignment
-- issue_id: raw-20260624T141559Z
+- issue_id: raw-20260624T141559Z59Z
 
 ## Acceptance Items
 
@@ -50,7 +50,7 @@
 ### acceptance-4: 本地文件创建
 - acceptance_target: 调用 feedback 后生成 `docs/B1-docs/raw-{key}/issue.md`
 - testing_layer: end-to-end
-- target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
+- target_environment: fix/raw-20260624T141559Z59Z-feedback-issue-sync
 - required_evidence: issue.md 存在且包含正确的 frontmatter 字段
 - test_command: |
   freely feedback --title "e2e test" --body "test body" 2>&1
@@ -67,7 +67,7 @@
 ### acceptance-5: issue-sync 委托
 - acceptance_target: feedback 创建 issue 后 GitHub 上出现对应 issue
 - testing_layer: end-to-end
-- target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
+- target_environment: fix/raw-20260624T141559Z59Z-feedback-issue-sync
 - required_evidence: GitHub issue URL 出现在 feedback 输出中
 - test_command: |
   freely feedback --title "pre-test e2e" --body "test" 2>&1 | grep "github.com"
@@ -89,7 +89,7 @@
 ## Integration
 - acceptance_target: `issue-sync create` 在 fix worktree 上成功创建 GitHub issue
 - testing_layer: integration
-- target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
+- target_environment: fix/raw-20260624T141559Z59Z-feedback-issue-sync
 - required_evidence: issue-sync create 输出包含 "GitHub: creating issue..." 和 URL
 
 ## End-to-End

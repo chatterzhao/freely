@@ -2,7 +2,7 @@
 
 ## Discovery
 
-- **来源**: chat-inbox → `raw-20260517T083200Z` (GitHub #505)
+- **来源**: chat-inbox → `raw-20260517T083200Z00Z` (GitHub #505)
 - **摘要**: 运行时 supervisor (`freely:18777`) 上报 AI CLI 进程 crash。异常点：bash exit code 为 **0**（正常退出），但 supervisor 将其判定为 crash。
 - **现场信息**:
   - `tool`: cc-ds-flash-auto (Claude Code deepseek flash auto mode)

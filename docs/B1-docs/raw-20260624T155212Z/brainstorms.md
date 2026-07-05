@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260624T155212Z
 phase_state: completed
-source_raw: raw-20260624T155212Z
+source_raw: raw-20260624T155212Z12Z
 source_url: https://github.com/chatterzhao/freely/issues/3446
 produced_candidate: C-20260624T155212Z-A
 created_at: 2026-06-24
@@ -10,9 +10,9 @@ created_at: 2026-06-24
 # B1_IBM: pretests-retirement-gate fallback for missing workcell-state.env
 
 ## Input
-- raw issue: `docs/B1-docs/raw-20260624T155212Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260624T155212Z12Z/issue.md`
 - GitHub issue #3446: pretests-retirement-gate fails immediately when workcell-state.env doesn't exist
-- Worktree: fix/raw-20260624T155212Z-pretests-retirement-gate-fallback
+- Worktree: fix/raw-20260624T155212Z12Z-pretests-retirement-gate-fallback
 
 ## Problem
 The `pretests-retirement-gate` script at `docs/system/workspace/scripts/quality/pretests-retirement-gate` exits with code 1 (line ~103) when `workcell-state.env` does not exist in the worktree being retired.

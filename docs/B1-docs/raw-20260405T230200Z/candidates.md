@@ -38,7 +38,7 @@
 - priority: `P1`
 - status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
-- source_brainstorm: `docs/B1-docs/raw-20260405-2302/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - promoted_issue_id: `I-20260405T230200Z-A`
 - promoted_issue_path: `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
 - session_refs:

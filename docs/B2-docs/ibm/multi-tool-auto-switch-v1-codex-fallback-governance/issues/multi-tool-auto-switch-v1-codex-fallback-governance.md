@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `multi-tool-auto-switch-v1-codex-fallback-governance`
 - issue-name: `multi-tool-auto-switch-v1-codex-fallback-governance`
-- source_candidate: `docs/B1-docs/raw-20260331/candidates.md#c-20260331-1840-a`
-- source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260331T183000Z/candidates.md#c-20260331-1840-a`
+- source_brainstorm: `docs/B1-docs/raw-20260331T183000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/pre-tests.md`
@@ -56,7 +56,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 
 ## Completion
 
-- `docs/B1-docs/raw-20260331/candidates.md`
+- `docs/B1-docs/raw-20260331T183000Z/candidates.md`
 - `docs/milestones.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`

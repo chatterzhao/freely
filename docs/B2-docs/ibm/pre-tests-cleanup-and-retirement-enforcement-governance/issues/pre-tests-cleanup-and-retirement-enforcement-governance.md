@@ -8,8 +8,8 @@
 - story-name: `pre-tests-cleanup-and-retirement-enforcement-governance`
 - issue-name: `pre-tests-cleanup-and-retirement-enforcement-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260411/candidates.md#c-20260411-1416-a`
-- source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411T141600Z/candidates.md#c-20260411-1416-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411T141600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
@@ -52,7 +52,7 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260411/candidates.md`
+- `docs/B1-docs/raw-20260411T141600Z/candidates.md`
 - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/brainstorms/b-pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`

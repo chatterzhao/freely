@@ -8,8 +8,8 @@
 - story-name: `worktree-exclusive-ownership-and-promotion-lease-governance`
 - issue-name: `worktree-exclusive-ownership-and-promotion-lease-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0455-a`
-- source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402T191200Z/candidates.md#c-20260402-0455-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
@@ -75,8 +75,8 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 
 ## Current Artifact Set
 
-- `docs/B1-docs/raw-20260402/brainstorms.md`
-- `docs/B1-docs/raw-20260402/candidates.md`
+- `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
+- `docs/B1-docs/raw-20260402T191200Z/candidates.md`
 - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`

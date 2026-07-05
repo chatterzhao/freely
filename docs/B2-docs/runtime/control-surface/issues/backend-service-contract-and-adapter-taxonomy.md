@@ -8,8 +8,8 @@
 - story-name: `backend-service-contract-and-adapter-taxonomy`
 - issue-name: `backend-service-contract-and-adapter-taxonomy`
 - verification_artifact_dir: `docs/B2-docs/- epic-name: `control-surface-runtime-convergence`/- story-name: `backend-service-contract-and-adapter-taxonomy`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260312/candidates.md#c-20260312-0011-a`
-- source_brainstorm: `docs/B1-docs/raw-20260312/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260312T001100Z/candidates.md#c-20260312-0011-a`
+- source_brainstorm: `docs/B1-docs/raw-20260312T001100Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
@@ -54,8 +54,8 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
 - implementation_scope_summary:
   - 先把 Freely 的 contract 真源与 adapter taxonomy 冻结下来，为后续 control surface、runtime baseline 与 human intervention issue 提供统一边界。
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260312/brainstorms.md`
-  - `docs/B1-docs/raw-20260312/candidates.md`
+  - `docs/B1-docs/raw-20260312T001100Z/brainstorms.md`
+  - `docs/B1-docs/raw-20260312T001100Z/candidates.md`
   - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
   - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 

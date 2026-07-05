@@ -13,10 +13,10 @@
 
 1. `./bin/governance-check`
 2. Manual reconcile diff review of:
-   - `docs/B1-docs/raw-20260408/brainstorms.md`
-   - `docs/B1-docs/raw-20260406/brainstorms.md`
-   - `docs/B1-docs/raw-20260327/brainstorms.md`
-   - `docs/B1-docs/raw-20260405/brainstorms.md`
+   - `docs/B1-docs/raw-20260408T120500Z/brainstorms.md`
+   - `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
+   - `docs/B1-docs/raw-20260327T200600Z/brainstorms.md`
+   - `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 
 ## Reconcile Matrix
 
@@ -32,10 +32,10 @@
 ## Result
 
 - `PASS`: the owner pre-tests file now carries item-level metadata that is specific to this documentation-only owner, and all acceptance items point at one canonical verification receipt.
-- `PASS`: `docs/B1-docs/raw-20260408/brainstorms.md` is reconciled as `stale_with_follow_on`; it now points at the adequacy owner without claiming that all stronger gate behavior has already landed on current `develop`.
-- `PASS`: `docs/B1-docs/raw-20260406/brainstorms.md` remains the absorbed/closed sample and does not reopen an already-completed follow-on.
-- `PASS`: `docs/B1-docs/raw-20260327/brainstorms.md` is reconciled as `deferred_split`; it keeps the original mixed vision but no longer implies that the earliest pretests owner completed retirement automation and proxy capability together.
-- `PASS`: `docs/B1-docs/raw-20260405/brainstorms.md` is reconciled as `partially_materialized_and_deferred`; it cites landed promotion/lane owners only and leaves family lifecycle automation explicitly deferred.
+- `PASS`: `docs/B1-docs/raw-20260408T120500Z/brainstorms.md` is reconciled as `stale_with_follow_on`; it now points at the adequacy owner without claiming that all stronger gate behavior has already landed on current `develop`.
+- `PASS`: `docs/B1-docs/raw-20260406T110500Z/brainstorms.md` remains the absorbed/closed sample and does not reopen an already-completed follow-on.
+- `PASS`: `docs/B1-docs/raw-20260327T200600Z/brainstorms.md` is reconciled as `deferred_split`; it keeps the original mixed vision but no longer implies that the earliest pretests owner completed retirement automation and proxy capability together.
+- `PASS`: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md` is reconciled as `partially_materialized_and_deferred`; it cites landed promotion/lane owners only and leaves family lifecycle automation explicitly deferred.
 - `PASS`: each sample was updated with pointer-based `Status Reconcile` notes only; no runtime, hook, or quality gate behavior was changed in this batch, and shared indexes only received standard owner-registration append entries.
 - `PASS`: `pre-tests.md` remains the single success-standard/test-task artifact name; no parallel `tests.md` truth was introduced.
 - `PASS`: this receipt records IBM materialization evidence only; the owner remains `phase_state: in_ibm` until a later round decides whether any further execution-facing owner is actually needed.

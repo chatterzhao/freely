@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260625T084522Z
+local_id: raw-20260625T084522Z22Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T084522Z-A
-source_candidate: docs/B1-docs/raw-20260625T084522Z/candidates.md#C-20260625T084522Z-A
+source_candidate: docs/B1-docs/raw-20260625T084522Z22Z/candidates.md#C-20260625T084522Z-A
 promoted_issue_path: docs/issues/I-20260625T084522Z-A/issue.md
 pre_tests_path: docs/B2-docs/test-exec-anti-ghost-pass/verification/pre-tests.md
 ---

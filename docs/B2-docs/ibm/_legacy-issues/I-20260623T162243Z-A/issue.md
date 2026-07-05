@@ -3,8 +3,8 @@ local_id: I-20260623T162243Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260623T162243Z
-source_candidate: docs/B1-docs/raw-20260623T162243Z/candidates.md
+promoted_from: raw-20260623T162243Z43Z
+source_candidate: docs/B1-docs/raw-20260623T162243Z43Z/candidates.md
 pre_tests_path: ""
 verification_artifact_dir: docs/B2-docs/scan-state-prompt-output/code-reviews
 ---

@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260705T042057Z
 phase_state: completed
-source_raw: raw-20260705T042057Z
+source_raw: raw-20260705T042057Z57Z
 produced_candidate: C-20260705T042057Z-A
 ---
 # B1: base_tool validation + slot naming

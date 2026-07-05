@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: bash -n 通过
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260705T012851Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260705T012851Z51Z/verification/test-evidence/at-001.log
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo "PASS"
 - expected_output: PASS
 - expected_RED_output: syntax error

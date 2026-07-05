@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260616T224707Z
+local_id: raw-20260616T224707Z07Z
 kind: raw
 phase_state: proposed
 platform_ids:

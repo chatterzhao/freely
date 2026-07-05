@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 集成验证通过 wt-create e2e
-- replacement_evidence: materialized raw-20260508T121541Z
+- replacement_evidence: materialized raw-20260508T121541Z41Z
 ## End-to-End
 - acceptance target: fix → merge → develop
 - testing layer: end_to_end

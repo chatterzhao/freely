@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T164530Z
 phase_state: completed
-source_raw: raw-20260629T164530Z
+source_raw: raw-20260629T164530Z30Z
 source_url: https://github.com/chatterzhao/freely/issues/3632
 produced_candidate: C-20260629T164530Z-A
 created_at: 2026-06-29
@@ -10,7 +10,7 @@ created_at: 2026-06-29
 # B1_IBM: wt-close --raw-key flag 重构
 
 ## Input
-- 来源：GitHub #3632 raw-20260629T164530Z
+- 来源：GitHub #3632 raw-20260629T164530Z30Z
 - kind：fix
 
 ## Discovery

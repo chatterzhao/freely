@@ -1,6 +1,6 @@
 # PR Review: #3296
 - pr_number: 3296
-- branch: fix/raw-20260621T192047Z-wt-close-worker-shutdown
+- branch: fix/raw-20260621T192047Z47Z-wt-close-worker-shutdown
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T21:21:04Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T192047Z-wt-close-worker-shutdown branch=fix/raw-20260621T192047Z-wt-close-worker-shutdown clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T192047Z47Z-wt-close-worker-shutdown branch=fix/raw-20260621T192047Z47Z-wt-close-worker-shutdown clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

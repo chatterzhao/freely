@@ -3,7 +3,7 @@
 ## Unit
 - acceptance target: `--source missing shows clear error with scan file path`
 - testing layer: `unit`
-- target environment: `feature/raw-20260507T0730Z-source-param`
+- target environment: `feature/raw-20260507T073000Z-source-param`
 - required evidence: `CLI parsing tests`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -12,7 +12,7 @@
 ## Integration
 - acceptance target: `scan matching validates source_family`
 - testing layer: `integration`
-- target environment: `feature/raw-20260507T0730Z-source-param`
+- target environment: `feature/raw-20260507T073000Z-source-param`
 - required evidence: `gate output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `./bin/governance-merge-gate --range develop..HEAD`

@@ -1,5 +1,5 @@
 # Brainstorm: wt-create pull 必须等 fix/feature 工位创建后执行
-- 来源: raw-20260508T124041Z (#258)
+- 来源: raw-20260508T124041Z41Z (#258)
 - 日期: 2026-05-08
 ## Discovery
 wt-create 在 `_require_issue_exists` 中调 `_pull_raw_issue`，此时工位未创建。`raw-issue-pull` 要求分支名含 raw-key，在 develop 上被拦截。

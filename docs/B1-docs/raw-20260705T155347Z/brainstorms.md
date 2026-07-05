@@ -1,14 +1,14 @@
 ---
 b1_id: B1-20260705T155347Z
 phase_state: completed
-source_raw: raw-20260705T155347Z
+source_raw: raw-20260705T155347Z47Z
 produced_candidate: C-20260705T155347Z-A
 ---
 
 # B1: docs/ 目录结构重构 + 8 epic 收敛
 
 ## Input
-- `docs/B1-docs/raw-20260705T155347Z/issue.md`
+- `docs/B1-docs/raw-20260705T155347Z47Z/issue.md`
 - 8 层 epic 设计（acp/a2a/runtime/git-worktree/ibm/gate/human/config）
 - B1/B2 skill 现有结构
 

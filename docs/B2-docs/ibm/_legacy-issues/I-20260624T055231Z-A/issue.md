@@ -3,8 +3,8 @@ local_id: I-20260624T055231Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260624T055231Z
-source_candidate: docs/B1-docs/raw-20260624T055231Z/candidates.md#C-20260624T055231Z-A
+promoted_from: raw-20260624T055231Z31Z
+source_candidate: docs/B1-docs/raw-20260624T055231Z31Z/candidates.md#C-20260624T055231Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T055231Z-A/issue.md
 milestone: "M-20260624T055231Z-A"
 title: "fix: remove JSON5 fallback — complete TOML-only migration"

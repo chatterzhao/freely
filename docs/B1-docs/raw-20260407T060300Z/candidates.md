@@ -40,7 +40,7 @@
 - superseded_by:
   - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
   - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/B1-docs/raw-20260408-0231/brainstorms.md`
+  - `docs/B1-docs/raw-20260408T023100Z/brainstorms.md`
 - promotion_gate:
   - prove no existing milestone-owned issue already absorbs this full boundary package
   - freeze a minimum provenance field set, source artifact class taxonomy, and absorption decision surface narrow enough for an IBM handoff

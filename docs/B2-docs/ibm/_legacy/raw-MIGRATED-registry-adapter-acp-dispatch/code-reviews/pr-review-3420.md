@@ -1,6 +1,6 @@
 # PR Review: #3420
 - pr_number: 3420
-- branch: feature/raw-20260624T090635Z-registry-adapter-acp-dispatch
+- branch: feature/raw-20260624T090635Z35Z-registry-adapter-acp-dispatch
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T09:22:32Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260624T090635Z-registry-adapter-acp-dispatch branch=feature/raw-20260624T090635Z-registry-adapter-acp-dispatch clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260624T090635Z35Z-registry-adapter-acp-dispatch branch=feature/raw-20260624T090635Z35Z-registry-adapter-acp-dispatch clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

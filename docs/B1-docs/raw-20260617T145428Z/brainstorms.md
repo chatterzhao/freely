@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw-20260617T145428Z（GitHub issue #2932）
+- raw-20260617T145428Z28Z（GitHub issue #2932）
 - 发现方式：daemon 重启时 `ensure_freely_db` 所有 CLI 操作（db.ping 等）均失败
 
 ### Bug 1: freely-db-cli IndentationError

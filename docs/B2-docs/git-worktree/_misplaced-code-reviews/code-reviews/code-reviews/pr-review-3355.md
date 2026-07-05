@@ -1,6 +1,6 @@
 # PR Review: #3355
 - pr_number: 3355
-- branch: fix/raw-20260622T113847Z-platform-only-close
+- branch: fix/raw-20260622T113847Z47Z-platform-only-close
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T11:43:08Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T113847Z-platform-only-close branch=fix/raw-20260622T113847Z-platform-only-close clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T113847Z47Z-platform-only-close branch=fix/raw-20260622T113847Z47Z-platform-only-close clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

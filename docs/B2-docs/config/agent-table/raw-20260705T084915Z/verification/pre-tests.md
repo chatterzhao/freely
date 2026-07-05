@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T084915Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T084915Z15Z/verification/test-evidence/at-001.log
 - test_command: grep -c 'local _current_base="${base_tool:-claude}"' docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: 0 (uses AGENT_AI_TOOL)

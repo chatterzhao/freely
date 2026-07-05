@@ -1,6 +1,6 @@
 # PR Review: #3176
 - pr_number: 3176
-- branch: fix/raw-20260620T142847Z-pr-review-worktree-detection
+- branch: fix/raw-20260620T142847Z47Z-pr-review-worktree-detection
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T14:44:04Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T142847Z-pr-review-worktree-detection branch=fix/raw-20260620T142847Z-pr-review-worktree-detection clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260620T142847Z47Z-pr-review-worktree-detection branch=fix/raw-20260620T142847Z47Z-pr-review-worktree-detection clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

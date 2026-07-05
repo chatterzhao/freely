@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260521T115809Z
+local_id: raw-20260521T115809Z09Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260521T115809Z-A
@@ -25,7 +25,7 @@ platform_state: closed
 
 ## 问题
 
-执行 `freely pr-merge-guarded develop fix/raw-20260521T095313Z-type-based-alias-resolution` 后，合并提交信息为：
+执行 `freely pr-merge-guarded develop fix/raw-20260521T095313Z13Z-type-based-alias-resolution` 后，合并提交信息为：
 
 ```
 Merge branch forbidden into develop
@@ -33,7 +33,7 @@ Freely-Bypass-Mode: forbidden
 Freely-Source-Branch: forbidden
 ```
 
-`Freely-Source-Branch` 应该是 `fix/raw-20260521T095313Z-type-based-alias-resolution`，但实际值为 `forbidden`。
+`Freely-Source-Branch` 应该是 `fix/raw-20260521T095313Z13Z-type-based-alias-resolution`，但实际值为 `forbidden`。
 
 ## 根因分析
 

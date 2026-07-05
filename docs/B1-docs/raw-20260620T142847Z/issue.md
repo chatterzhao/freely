@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260620T142847Z
+local_id: raw-20260620T142847Z47Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260620T142847Z-A
@@ -49,7 +49,7 @@ pr-review-guarded 自动生成 pr-review-xxx.md 不包含 `- issue_id`，导致 
 
 ### 自动生成 issue_id
 
-解析 branch 名提取 raw-key（如 `fix/raw-20260618T091116Z-xxx` → `20260618T091116Z`），查找 `docs/issues/I-{key}-*/issue.md`，提取 `issue_id`，写入 review doc。
+解析 branch 名提取 raw-key（如 `fix/raw-20260618T091116Z16Z-xxx` → `20260618T091116Z`），查找 `docs/issues/I-{key}-*/issue.md`，提取 `issue_id`，写入 review doc。
 
 ### 无参数校验
 

@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260612T140944Z
+local_id: raw-20260612T140944Z44Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260612T140944Z-A
@@ -18,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs:
-- fix/raw-20260612T140944Z-a2a-handoff-compat
+- fix/raw-20260612T140944Z44Z-a2a-handoff-compat
 platform_state: closed
 ---
 

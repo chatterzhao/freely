@@ -1,6 +1,6 @@
 # PR Review: #3597
 - pr_number: 3597
-- branch: fix/raw-20260627T135126Z-checkpoint-merge-fix
+- branch: fix/raw-20260627T135126Z26Z-checkpoint-merge-fix
 - base: develop
 - reviewer: claude
 - verdict: pass

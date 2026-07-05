@@ -1,6 +1,6 @@
 # PR Review: #3343
 - pr_number: 3343
-- branch: fix/raw-20260622T000649Z-reason-gate
+- branch: fix/raw-20260622T000649Z49Z-reason-gate
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T07:18:33Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T000649Z-reason-gate branch=fix/raw-20260622T000649Z-reason-gate clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T000649Z49Z-reason-gate branch=fix/raw-20260622T000649Z49Z-reason-gate clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

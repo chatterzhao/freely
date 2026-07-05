@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260701T031733Z-A
-issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md
+issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z33Z/issues/I-20260701T031733Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260701T031733Z-A
-- issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md
+- issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z33Z/issues/I-20260701T031733Z-A.md
 
 ## Implementation Decision Note
 

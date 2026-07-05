@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260516T041048Z
+local_id: raw-20260516T041048Z48Z
 kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -21,11 +21,11 @@ session_refs: []
 platform_state: closed
 ---
 
-## raw-20260516T041048Z
+## raw-20260516T041048Z48Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260516T041048Z` |
+| local_id | `raw-20260516T041048Z48Z` |
 | kind | `raw` |
 | status | `open` |
 | phase | `none` |
@@ -35,7 +35,7 @@ platform_state: closed
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260516T041048Z`。实现前请用 `wt-create --raw-key 20260516T041048Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260516T041048Z48Z`。实现前请用 `wt-create --raw-key 20260516T041048Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 status: open
@@ -49,7 +49,7 @@ governance-merge-gate GATE 1 在做时间戳一致性检查时（branch key vs `
 
 当前报错示例：
 ```
-GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z' (20260514T1035)
+GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z32Z' (20260514T1035)
 vs issue raw-20260515T125610Z (20260515T1256) in docs/B1-docs/raw-20260515T125610Z/issue.md.
 The raw/C/I lifecycle must share the same date-time key.
 ```
@@ -74,7 +74,7 @@ GATE 1 时间戳不一致时，报错信息应包含结构化的诊断路径：
 
 改进后的报错示例格式：
 ```
-GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z' (20260514T1035)
+GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z32Z' (20260514T1035)
 vs issue raw-20260515T125610Z (20260515T1256) in docs/B1-docs/raw-20260515T125610Z/issue.md.
 
 诊断步骤：

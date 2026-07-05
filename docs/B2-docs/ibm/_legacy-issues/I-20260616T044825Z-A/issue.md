@@ -3,8 +3,8 @@ local_id: I-20260616T044825Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260616T044825Z
-source_candidate: docs/B1-docs/raw-20260616T044825Z/candidates.md
+promoted_from: raw-20260616T044825Z25Z
+source_candidate: docs/B1-docs/raw-20260616T044825Z25Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -27,7 +27,7 @@ platform_state: closed
 
 # I-20260616T044825Z-A: Remove BRIDGE_TIMEOUT absolute cap for session/prompt in acp-bridge.py
 
-- source_candidate: `docs/B1-docs/raw-20260616T044825Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260616T044825Z25Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/runtime/timeout/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/runtime/timeout/code-reviews`
 

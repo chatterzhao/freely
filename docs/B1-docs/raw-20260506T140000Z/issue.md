@@ -1,9 +1,9 @@
 ---
-local_id: raw-20260506T140000Z
+local_id: raw-20260506T140000Z00Z
 kind: raw
 phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-source_candidate: docs/B1-docs/raw-20260506/candidates.md
+source_candidate: docs/B1-docs/raw-20260506T000000Z/candidates.md
 platform_ids:
   github:
     issue_id: '273'

@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260501T000000Z
+local_id: raw-20260501T000000Z00Z
 issue_title: PR scan surface + FREELY_REPO_PLATFORMS config
 kind: raw
 phase_state: absorbed

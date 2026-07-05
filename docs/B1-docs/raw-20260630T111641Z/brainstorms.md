@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T111641Z
 phase_state: completed
-source_raw: raw-20260630T111641Z
+source_raw: raw-20260630T111641Z41Z
 produced_candidate: C-20260630T111641Z-A
 ---
 # B1: pr-review-guarded writes state, wt-close stops modifying files

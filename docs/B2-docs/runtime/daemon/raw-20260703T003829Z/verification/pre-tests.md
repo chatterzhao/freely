@@ -17,7 +17,7 @@
 - target_environment: test-pre-merge-20260703T003829Z-safe-env-source
 - required_evidence: daemon 启动日志显示 supervisor 正常运行
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-1.log
 - test_command: ./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20260703T003829Z-safe-env-source --task-mode auto
 - expected_output: daemon_status: running, supervisor_pid 非空
 - expected_RED_output: daemon 启动失败，日志中出现 pr-create-guarded 被意外执行
@@ -32,7 +32,7 @@
     daemon_status: running
     supervisor_pid: 3226
     test-pre-merge daemon 成功启动，无命令注入
-- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: (失败时填写)
@@ -49,7 +49,7 @@
 - target_environment: test-pre-merge-20260703T003829Z-safe-env-source
 - required_evidence: 生成的 env 文件所有行格式为 KEY="value"
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -c '=' .freely/run/workcell-state.env && ! grep -E '^[A-Z_]+=[^"].* .*[^"]$' .freely/run/workcell-state.env
 - expected_output: 所有行都有 KEY="value" 格式，无未引号多词值
 - expected_RED_output: LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded 存在未引号多词值
@@ -59,7 +59,7 @@
     （无引号，含空格——符合 RED 预期）
 - actual_output: |
     ALL VALUES PROPERLY QUOTED - PASS
-- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 - blocker: (失败时填写)
@@ -76,7 +76,7 @@
 - target_environment: test-pre-merge-20260703T003829Z-safe-env-source
 - required_evidence: git ls-files .freely/run/workcell-state.env 返回空
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-3.log
 - test_command: git ls-files .freely/run/workcell-state.env | grep -c . || echo "not tracked - PASS"
 - expected_output: not tracked - PASS
 - expected_RED_output: .freely/run/workcell-state.env（文件在 git 跟踪中）
@@ -87,7 +87,7 @@
 - actual_output: |
     not tracked - PASS
     git ls-files returns empty
-- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/verification/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260703T003829Z29Z/verification/test-evidence/acceptance-3.log
 - red-green-status: green
 - status: passed
 - blocker: (失败时填写)

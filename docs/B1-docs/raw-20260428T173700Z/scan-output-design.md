@@ -9,7 +9,7 @@
 ```json
 {
   "key": "20260428-1737",
-  "raw_id": "raw-20260428-1737",
+  "raw_id": "raw-20260428T173700Z",
   "stage": "promoting",
   "title": "issue 生命周期与 scan 梳理重构",
   "children": [

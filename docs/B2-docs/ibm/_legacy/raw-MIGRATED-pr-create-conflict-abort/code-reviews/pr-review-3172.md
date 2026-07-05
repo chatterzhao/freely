@@ -1,6 +1,6 @@
 # PR Review: #3172
 - pr_number: 3172
-- branch: fix/raw-20260617T130029Z-pr-create-conflict-abort
+- branch: fix/raw-20260617T130029Z29Z-pr-create-conflict-abort
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-20T13:44:15Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260617T130029Z-pr-create-conflict-abort branch=fix/raw-20260617T130029Z-pr-create-conflict-abort clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260617T130029Z29Z-pr-create-conflict-abort branch=fix/raw-20260617T130029Z29Z-pr-create-conflict-abort clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

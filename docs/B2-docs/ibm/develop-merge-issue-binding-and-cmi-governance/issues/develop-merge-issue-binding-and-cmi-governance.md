@@ -8,8 +8,8 @@
 - story-name: `develop-merge-issue-binding-and-cmi-governance`
 - issue-name: `develop-merge-issue-binding-and-cmi-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1835-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321T170600Z/candidates.md#c-20260321-1835-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`

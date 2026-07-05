@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260623T140410Z
+local_id: raw-20260623T140410Z10Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260623T140410Z-A
@@ -47,7 +47,7 @@ Worker 在等待 Manager 输入，但工位已经被 wt-close 删了。当前：
 
 ## 内存优先架构 (acp-a2a-refactor)
 
-现有 raw issue `raw-20260617T011030Z`（ACP/A2A 架构重构），10 个任务全部 `pending`：
+现有 raw issue `raw-20260617T011030Z30Z`（ACP/A2A 架构重构），10 个任务全部 `pending`：
 
 | 任务 | 内容 |
 |------|------|
@@ -65,4 +65,4 @@ Worker 在等待 Manager 输入，但工位已经被 wt-close 删了。当前：
 ## 参考
 - SSE 实现 #3388：https://github.com/chatterzhao/freely/pull/3389
 - acp-a2a-refactor：`docs/B2-docs/acp-a2a-refactor/tasks.md`（10 pending）
-- raw-20260617T011030Z：`docs/B1-docs/raw-20260617T011030Z/issue.md`
+- raw-20260617T011030Z30Z：`docs/B1-docs/raw-20260617T011030Z30Z/issue.md`

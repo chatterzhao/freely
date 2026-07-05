@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260623T075200Z
+local_id: raw-20260623T075200Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260623T075200Z-A
@@ -70,7 +70,7 @@ ACP 服务器（claude-agent-acp）不把底层模型 API 返回的 `usage` 透�
 ## 参考
 - 原始分析：https://github.com/chatterzhao/freely/issues/3381
 - 会话 ID 污染 Bug（已修复于 `7974c4305`）
-- #498：`raw-20260517T082233Z`
+- #498：`raw-20260517T082247Z33Z`
 - `run-acp-prompt.py` usage 读取：第 545-552 行
 - `cache_metrics` 事件：`freely` 第 21589 行
 

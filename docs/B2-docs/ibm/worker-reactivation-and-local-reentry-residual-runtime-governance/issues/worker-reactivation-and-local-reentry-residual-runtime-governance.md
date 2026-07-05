@@ -8,8 +8,8 @@
 - story-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
 - issue-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1831-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-1831-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
@@ -68,8 +68,8 @@
 - `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/prd.md`
 - `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
 - `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/tasks.md`
-- `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/milestones.md`
 
 ## Current Evidence

@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: pr-create-guarded 使用 merge 策略
 - testing_layer: unit
-- target_environment: fix/raw-20260627T135126Z-checkpoint-merge-fix
+- target_environment: fix/raw-20260627T135126Z26Z-checkpoint-merge-fix
 - required_evidence: 代码不含 --rebase
 - test_command: grep -L "pull --rebase" docs/system/workspace/scripts/worktree/pr-create-guarded && echo "PASS" || echo "FAIL"
 - expected_output: PASS
@@ -18,7 +18,7 @@
 ### acceptance-2
 - acceptance_target: checkpoint-guard merge 时跳过 scope
 - testing_layer: unit
-- target_environment: fix/raw-20260627T135126Z-checkpoint-merge-fix
+- target_environment: fix/raw-20260627T135126Z26Z-checkpoint-merge-fix
 - required_evidence: _is_merge_commit 函数存在
 - test_command: grep -c "_is_merge_commit" docs/system/workspace/scripts/quality/checkpoint-guard && echo "PASS" || echo "FAIL"
 - expected_output: PASS

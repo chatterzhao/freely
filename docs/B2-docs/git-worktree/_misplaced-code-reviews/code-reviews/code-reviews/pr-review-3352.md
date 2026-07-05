@@ -1,6 +1,6 @@
 # PR Review: #3352
 - pr_number: 3352
-- branch: fix/raw-20260622T110050Z-wt-close-phase-gate-msg
+- branch: fix/raw-20260622T110050Z50Z-wt-close-phase-gate-msg
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T11:04:14Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T110050Z-wt-close-phase-gate-msg branch=fix/raw-20260622T110050Z-wt-close-phase-gate-msg clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T110050Z50Z-wt-close-phase-gate-msg branch=fix/raw-20260622T110050Z50Z-wt-close-phase-gate-msg clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

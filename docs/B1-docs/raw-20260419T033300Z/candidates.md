@@ -1,7 +1,7 @@
 # Candidates - 20260419-0333--runtime-closeout-selfhost-validation-followthrough
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260419-0333/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419T033300Z/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-bounded-runtime-closeout-selfhost-followthrough-owner`
 

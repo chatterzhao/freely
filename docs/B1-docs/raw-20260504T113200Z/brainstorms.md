@@ -6,10 +6,10 @@
 来源                         格式                      示例
 ──────────────────────────────────────────────────────────────────
 GitHub issue title           RAW-YYYYMMDDTHHMMZ        RAW-20260504T1145Z
-本地 docs/B1-docs/ 目录        raw-YYYYMMDD-HHMM          raw-20260503-0200
+本地 docs/B1-docs/ 目录        raw-YYYYMMDD-HHMM          raw-20260503T020000Z
 chat-inbox freely.db         YYYYMMDDHHMMSS (14位)      20260503105742
 pre-brainstorm 目录           {key}--{slug}              20260503-0200--scan-lifecycle
-feature 分支                  feature/raw-{key}-{slug}   feature/raw-20260503-0200-foo
+feature 分支                  feature/raw-{key}-{slug}   feature/raw-20260503T020000Z-foo
 ```
 
 ## 为什么有问题

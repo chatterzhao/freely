@@ -1,7 +1,7 @@
 # Candidates - 20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260417-0445/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260417T044500Z/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-bounded-runtime-owner-and-replay-through-guarded-premerge`
 

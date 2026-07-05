@@ -4,14 +4,14 @@ kind: fix
 phase_state: completed
 verification_artifact_dir: docs/B2-docs/runtime/verify
 milestone: M-20260620T104526Z-A
-source_candidate: docs/B1-docs/raw-20260620T104526Z/candidates.md#C-20260620T104526Z-A
+source_candidate: docs/B1-docs/raw-20260620T104526Z26Z/candidates.md#C-20260620T104526Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T104526Z-A/issue.md
-parent_raw: raw-20260620T104526Z
+parent_raw: raw-20260620T104526Z26Z
 title: "fix: A2A SSE supervision — store worker session_id, enable session/prompt intervention"
 created_at: "2026-06-20T11:10:00Z"
 author: manager
 implemented_in:
-  branch: feature/raw-20260620T104526Z-worker-sse-supervision
+  branch: feature/raw-20260620T104526Z26Z-worker-sse-supervision
   commits: []
 ---
 

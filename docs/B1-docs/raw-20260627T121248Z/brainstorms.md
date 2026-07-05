@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T121248Z
 phase_state: completed
-source_raw: raw-20260627T121248Z
+source_raw: raw-20260627T121248Z48Z
 source_url: https://github.com/chatterzhao/freely/issues/3593
 produced_candidate: C-20260627T121248Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: a2a_tasks worker_pid + a2a_server manager 修复
 
 ## Input
-- 来源: raw-20260627T121248Z (GitHub #3593)
+- 来源: raw-20260627T121248Z48Z (GitHub #3593)
 - 症状: 
   1. --worker-pid 基础设施存在但 insert 时未传入
   2. a2a_server.py 仍硬编码 `agent_id == "manager"`

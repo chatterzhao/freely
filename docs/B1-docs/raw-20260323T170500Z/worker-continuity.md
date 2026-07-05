@@ -18,8 +18,8 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B1-docs/raw-20260323-1705/brainstorms.md`
-  - `docs/B1-docs/raw-20260323-1705/candidates.md`
+  - `docs/B1-docs/raw-20260323T170500Z/brainstorms.md`
+  - `docs/B1-docs/raw-20260323T170500Z/candidates.md`
   - `docs/milestones.md`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
 - canonical_writeback_decision: `keep-and-commit`

@@ -26,8 +26,8 @@
 
 ## Evidence Read
 
-- `docs/B1-docs/raw-20260403/brainstorms.md`
-- `docs/B1-docs/raw-20260403/candidates.md`
+- `docs/B1-docs/raw-20260403T110000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260403T110000Z/candidates.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`

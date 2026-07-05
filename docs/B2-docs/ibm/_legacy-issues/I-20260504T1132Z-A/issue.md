@@ -3,7 +3,7 @@ local_id: I-20260504T1132Z-A
 issue_title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
 kind: linked
 phase_state: completed
-promoted_from: raw-20260504T1132Z
+promoted_from: raw-20260504T113200Z
 platform_ids:
   github:
     issue_id: '203'

@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T084523Z
 phase_state: completed
-source_raw: raw-20260627T084523Z
+source_raw: raw-20260627T084545Z23Z
 source_url: https://github.com/chatterzhao/freely/issues/3584
 produced_candidate: C-20260627T084523Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: Agent 生命周期管理
 
 ## Input
-- 来源: raw-20260627T084523Z (GitHub #3584)
+- 来源: raw-20260627T084545Z23Z (GitHub #3584)
 - 调研文档: .agent-lifecycle-review.md
 
 ## 调用链分析

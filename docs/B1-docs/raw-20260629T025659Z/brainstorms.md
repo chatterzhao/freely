@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T025659Z
 phase_state: completed
-source_raw: raw-20260629T025659Z
+source_raw: raw-20260629T025659Z59Z
 source_url: https://github.com/chatterzhao/freely/issues/3616
 produced_candidate: C-20260629T025659Z-A
 created_at: 2026-06-29
@@ -16,7 +16,7 @@ created_at: 2026-06-29
 - 价值确认: ✅ 值得投入。统一 fix/feature 流程是架构级改进，影响所有后续工位
 
 ## Input
-- 来源: raw-20260629T025659Z (GitHub #3616, Gitee IJXH20)
+- 来源: raw-20260629T025659Z59Z (GitHub #3616, Gitee IJXH20)
 - 当前 fix skill 流程: `wt-create → dev → test → B1 → B2 → pr`
 - 当前 feature skill 流程: `wt-create → B1 → B2 → dev → test → pr`
 - three-loop 真源定义的 Fix 变体路径（§变体路径）: 治理后置

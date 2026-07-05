@@ -1,6 +1,6 @@
 # PR Review: #3288
 - pr_number: 3288
-- branch: fix/raw-20260621T194428Z-close-local
+- branch: fix/raw-20260621T194428Z28Z-close-local
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T20:17:46Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T194428Z-close-local branch=fix/raw-20260621T194428Z-close-local clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T194428Z28Z-close-local branch=fix/raw-20260621T194428Z28Z-close-local clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

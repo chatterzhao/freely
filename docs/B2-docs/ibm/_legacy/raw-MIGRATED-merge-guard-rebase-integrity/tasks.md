@@ -27,5 +27,5 @@
 - [ ] AT-001–AT-005, AT-008–AT-009: feature-local tests
 - [ ] pr-create-guarded
 - [ ] test-pre-merge: AT-006, AT-007 (GitHub environment)
-- [ ] pr-merge-guarded develop fix/raw-20260617T055840Z-merge-guard-rebase-integrity
+- [ ] pr-merge-guarded develop fix/raw-20260617T055840Z40Z-merge-guard-rebase-integrity
 - [ ] wt-close

@@ -16,17 +16,17 @@
 
 架构主文档：
 
-- `docs/B1-docs/raw-20260303-0000/brainstorms.md`
-- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
-- `docs/B1-docs/raw-20260308-1244/brainstorms.md`
+- `docs/B1-docs/raw-20260303T000000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260304T000000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260308T124400Z/brainstorms.md`
 - `docs/B2-docs/human/tui/prd.md`
 - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
 
 第三方生态与扩展研究：
 
-- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
-- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
-- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
+- `docs/B1-docs/raw-20260304T000000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260304T000000Z/brainstorms.md`
+- `docs/B1-docs/raw-20260304T000000Z/brainstorms.md`
 
 ## 先给统一结论
 

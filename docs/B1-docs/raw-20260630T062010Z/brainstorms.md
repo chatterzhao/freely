@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T062010Z
 phase_state: completed
-source_raw: raw-20260630T062010Z
+source_raw: raw-20260630T062010Z10Z
 produced_candidate: C-20260630T062010Z-A
 ---
 # B1_IBM: wt-close remove Phase 3.6 + --force semantics

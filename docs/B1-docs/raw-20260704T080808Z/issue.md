@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260704T080808Z
+local_id: raw-20260704T080808Z08Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -39,10 +39,10 @@ session_refs: []
 - 每个 base_tool 起一个独立的 ACP bridge
 - agent 创建 session 时，根据其 slot 的 base_tool 连到对应的 bridge
 
-## 与 raw-20260704T064539Z 的协调
+## 与 raw-20260704T064539Z39Z 的协调
 
 两个 issue 需协同设计:
-- raw-20260704T064539Z (本期): 统一 session 管理方法 acp_session_connect()
+- raw-20260704T064539Z39Z (本期): 统一 session 管理方法 acp_session_connect()
 - 本 issue (下期): 多 bridge 并行
 
 acp_session_connect() 需要知道: 当前 agent 的 slot → base_tool → 哪个 bridge socket。本期设计时预留 bridge 选择参数。

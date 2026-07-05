@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260625T061044Z
+local_id: raw-20260625T061044Z44Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T061044Z-A
-source_candidate: docs/B1-docs/raw-20260625T061044Z/candidates.md#C-20260625T061044Z-A
+source_candidate: docs/B1-docs/raw-20260625T061044Z44Z/candidates.md#C-20260625T061044Z-A
 promoted_issue_path: docs/issues/I-20260625T061044Z-A/issue.md
 pre_tests_path: docs/B2-docs/issue-sync-batch/verification/pre-tests.md
 ---

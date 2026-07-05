@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260625T003331Z
 phase_state: completed
-source_raw: raw-20260625T003331Z
+source_raw: raw-20260625T003331Z31Z
 produced_candidate: C-20260625T003331Z-A
 ---
 # B1: feedback platform-only

@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/B1-docs/raw-20260413-0208/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`
 - Status: promoted
 
 ## Candidates
@@ -26,7 +26,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260413T020800Z-A`
 - promoted_issue_path: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
-- source_brainstorm: `docs/B1-docs/raw-20260413-0208/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`
 - session_refs:
   - tool: codex
     session_id: current-thread

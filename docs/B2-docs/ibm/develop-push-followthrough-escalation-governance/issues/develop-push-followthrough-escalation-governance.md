@@ -8,8 +8,8 @@
 - story-name: `develop-push-followthrough-escalation-governance`
 - issue-name: `develop-push-followthrough-escalation-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260408/candidates.md#c-20260408-1200-a`
-- source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260408T120500Z/candidates.md#c-20260408-1200-a`
+- source_brainstorm: `docs/B1-docs/raw-20260408T120500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/pre-tests.md`

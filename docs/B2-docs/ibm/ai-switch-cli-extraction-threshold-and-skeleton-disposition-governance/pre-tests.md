@@ -16,7 +16,7 @@
 - target environment: `canonical repo docs in a dedicated closeout worktree`
 - required evidence: `reviewed owner package plus governance artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Review `docs/B1-docs/raw-20260405/brainstorms.md`.
+1. Review `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`.
 2. Review `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/brainstorms/b-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
 3. Review `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`.
 4. Review `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`.

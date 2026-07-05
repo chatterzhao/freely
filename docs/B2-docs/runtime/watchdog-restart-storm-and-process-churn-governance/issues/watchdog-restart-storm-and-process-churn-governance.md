@@ -9,9 +9,9 @@
 - issue-name: `watchdog-restart-storm-and-process-churn-governance`
 - verification_artifact_dir: `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260324/candidates.md#c-20260324-0405-a`
-- source_brainstorm: `docs/B1-docs/raw-20260324/brainstorms.md`
-- source_candidates: `docs/B1-docs/raw-20260324/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260324T041500Z/candidates.md#c-20260324-0405-a`
+- source_brainstorm: `docs/B1-docs/raw-20260324T041500Z/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260324T041500Z/candidates.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

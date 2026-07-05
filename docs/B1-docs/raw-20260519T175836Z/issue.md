@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260519T175836Z
+local_id: raw-20260519T175836Z36Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -25,11 +25,11 @@ force_closed_reason: 'wt-close --force: worktree retired without completed phase
 absorbed_into: infra-githooks
 ---
 
-## raw-20260519T175836Z
+## raw-20260519T175836Z36Z
 
 | Field | Value |
 |-------|-------|
-| local_id | `raw-20260519T175836Z` |
+| local_id | `raw-20260519T175836Z36Z` |
 | kind | `raw` |
 | phase_state | `proposed` |
 | canonical | `none` |
@@ -38,7 +38,7 @@ absorbed_into: infra-githooks
 
 ---
 
-> **Freely 治理**：这是 raw issue `raw-20260519T175836Z`。实现前请用 `wt-create --raw-key 20260519T175836Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+> **Freely 治理**：这是 raw issue `raw-20260519T175836Z36Z`。实现前请用 `wt-create --raw-key 20260519T175836Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
 phase_state: absorbed

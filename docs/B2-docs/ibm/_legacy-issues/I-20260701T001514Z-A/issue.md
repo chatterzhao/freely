@@ -6,5 +6,5 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260701T001514Z-A
-- source_candidate: docs/B1-docs/raw-20260701T001514Z/candidates.md#C-20260701T001514Z-A
+- source_candidate: docs/B1-docs/raw-20260701T001514Z14Z/candidates.md#C-20260701T001514Z-A
 - title: fix --reset timeout msg

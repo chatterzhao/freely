@@ -2,8 +2,8 @@
 local_id: I-20260617T133709Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/B1-docs/raw-20260617T133709Z/candidates.md
-promoted_from: raw-20260617T133709Z
+source_candidate: docs/B1-docs/raw-20260617T133709Z09Z/candidates.md
+promoted_from: raw-20260617T133709Z09Z
 verification_artifact_dir: docs/B2-docs/gh-merge-receipt/code-reviews
 platform_state: closed
 platform_ids:

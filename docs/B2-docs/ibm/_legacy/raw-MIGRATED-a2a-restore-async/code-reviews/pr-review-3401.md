@@ -1,6 +1,6 @@
 # PR Review: #3401
 - pr_number: 3401
-- branch: fix/raw-20260624T004524Z-a2a-restore-async
+- branch: fix/raw-20260624T004510Z24Z-a2a-restore-async
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-24T05:28:17Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T004524Z-a2a-restore-async branch=fix/raw-20260624T004524Z-a2a-restore-async clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T004510Z24Z-a2a-restore-async branch=fix/raw-20260624T004510Z24Z-a2a-restore-async clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

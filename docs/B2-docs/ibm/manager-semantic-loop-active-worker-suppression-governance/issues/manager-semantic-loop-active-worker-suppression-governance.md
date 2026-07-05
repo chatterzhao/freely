@@ -8,8 +8,8 @@
 - story-name: `manager-semantic-loop-active-worker-suppression-governance`
 - issue-name: `manager-semantic-loop-active-worker-suppression-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-1505-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405T230200Z/candidates.md#c-20260405-1505-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/pre-tests.md`

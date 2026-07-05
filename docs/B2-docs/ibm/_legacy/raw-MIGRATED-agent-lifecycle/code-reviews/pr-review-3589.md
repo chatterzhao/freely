@@ -1,6 +1,6 @@
 # PR Review: #3589
 - pr_number: 3589
-- branch: fix/raw-20260627T084523Z-agent-lifecycle
+- branch: fix/raw-20260627T084545Z23Z-agent-lifecycle
 - base: develop
 - reviewer: claude
 - verdict: pass

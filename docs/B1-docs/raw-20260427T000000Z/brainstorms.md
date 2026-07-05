@@ -198,7 +198,7 @@ primary_platform: github
 
 **raw issue 到 linked issue 的关联**：
 - raw issue 的 issue.md frontmatter 记录其 B2 关联
-- linked issue 的 frontmatter 反向引用：`source_raw_issue: raw-20260427-1030`
+- linked issue 的 frontmatter 反向引用：`source_raw_issue: raw-20260427T000000Z`
 - sync 脚本通过 frontmatter 的 `platform_ids` 找到对应的平台 issue
 
 ### 12. 本地存储组织形式
@@ -211,7 +211,7 @@ primary_platform: github
 docs/B1-docs/                    # 所有 issue 的本地存储（git 管理）
 ├── .scan-state                 # { last_scan_at: "..." }
 ├── ISSUES.md                   # 索引缓存（脚本维护）
-├── raw-20260427-1030/          # raw issue（B1 输入）
+├── raw-20260427T000000Z/          # raw issue（B1 输入）
 │   └── issue.md                # frontmatter + 正文 + ## Comments
 └── I-20260427T103000Z-A/          # linked issue（B2 产物）
     └── issue.md                # frontmatter + 摘要 + ## Comments
@@ -452,8 +452,8 @@ chat → 创建 raw issue (proposed) → scan → B1 预研 → candidate 标记
 **之后**：只有一个 Input source——issue。
 
 用户的任何输入都是 issue 上的操作：
-- 新话题 → 新建 raw issue（`freely chat "新想法"` → `docs/B1-docs/raw-20260427-1030/issue.md`）
-- 已有工作相关 → 对应 issue 的评论（`freely chat --issue raw-20260427-1000 "补充"` → 追加到该 issue.md 的 `## Comments`）
+- 新话题 → 新建 raw issue（`freely chat "新想法"` → `docs/B1-docs/raw-20260427T000000Z/issue.md`）
+- 已有工作相关 → 对应 issue 的评论（`freely chat --issue raw-20260427T000000Z "补充"` → 追加到该 issue.md 的 `## Comments`）
 
 `freely chat` 不是 Input source——它是本地的 issue 创建/评论工具。Input source 永远是 issue。
 
@@ -462,7 +462,7 @@ chat → 创建 raw issue (proposed) → scan → B1 预研 → candidate 标记
 raw、C、I 共享同一个 date-time key：
 
 ```
-raw-20260427-1030       key = "20260427-1030"
+raw-20260427T000000Z       key = "20260427-1030"
     ↓ B1_IBM
 C-20260427T103000Z-A       key = "20260427-1030-A"    ← 以 raw key 开头
     ↓ milestone

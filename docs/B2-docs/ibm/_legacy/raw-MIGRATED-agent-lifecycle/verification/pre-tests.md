@@ -6,7 +6,7 @@
 ### acceptance-1
 - acceptance_target: manager_reconcile 可被 sync_tooling 调用
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084523Z-agent-lifecycle
+- target_environment: fix/raw-20260627T084545Z23Z-agent-lifecycle
 - required_evidence: 函数返回 0
 - test_command: source docs/system/workspace/scripts/runtime/freely && manager_reconcile_agent_id_env && echo "PASS" || echo "FAIL"
 - expected_output: PASS
@@ -18,7 +18,7 @@
 ### acceptance-2
 - acceptance_target: --list worker 返回 10 个具体编号
 - testing_layer: unit
-- target_environment: fix/raw-20260627T084523Z-agent-lifecycle
+- target_environment: fix/raw-20260627T084545Z23Z-agent-lifecycle
 - required_evidence: 输出含 worker_02
 - test_command: ./bin/agent-table-query --list worker | grep -c "worker_" 
 - expected_output: "10"
@@ -32,7 +32,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260627T084523Z-agent-lifecycle
 - required_evidence: agent-id.env 不含该 raw-key
-- test_command: grep -c "raw-20260627T084523Z" .freely/agent-id.env && echo "FAIL: zombie found" || echo "PASS: clean"
+- test_command: grep -c "raw-20260627T084545Z23Z" .freely/agent-id.env && echo "FAIL: zombie found" || echo "PASS: clean"
 - expected_output: "PASS: clean"
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log

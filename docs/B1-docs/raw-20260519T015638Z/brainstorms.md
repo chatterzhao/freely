@@ -2,7 +2,7 @@
 
 ## Discovery
 
-Raw issue `raw-20260519T015638Z` (GitHub #601) 报告了系统性 worker 进程 stale_pid 问题：
+Raw issue `raw-20260519T015638Z38Z` (GitHub #601) 报告了系统性 worker 进程 stale_pid 问题：
 
 - **时间窗口**: 2026-05-18T23:49 至 2026-05-19T01:45
 - **频率**: 21 次连续 worker launch

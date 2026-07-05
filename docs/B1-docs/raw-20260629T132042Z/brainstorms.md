@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T132042Z
 phase_state: completed
-source_raw: raw-20260629T132042Z
+source_raw: raw-20260629T132042Z42Z
 source_url: https://github.com/chatterzhao/freely/issues/3624
 produced_candidate: C-20260629T132042Z-A
 created_at: 2026-06-29

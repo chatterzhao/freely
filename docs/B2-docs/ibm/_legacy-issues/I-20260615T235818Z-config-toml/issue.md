@@ -9,7 +9,7 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
-source_candidate: docs/B1-docs/raw-20260615T235818Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260615T235818Z18Z/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-15T23:58:34Z'

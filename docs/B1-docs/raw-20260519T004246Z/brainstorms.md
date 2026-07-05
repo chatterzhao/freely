@@ -2,7 +2,7 @@
 
 ## Discovery
 
-Raw issue `raw-20260519T004246Z` (GitHub #581) 报告了 agent 文档中 4 个致命问题：
+Raw issue `raw-20260519T004246Z46Z` (GitHub #581) 报告了 agent 文档中 4 个致命问题：
 
 ### 1. evidence_paths 必填/可选不一致
 

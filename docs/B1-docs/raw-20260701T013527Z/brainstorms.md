@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260701T013527Z
 phase_state: completed
-source_raw: raw-20260701T013527Z
+source_raw: raw-20260701T013527Z27Z
 source_url: https://github.com/chatterzhao/freely/issues/3674
 produced_candidate: C-20260701T013527Z-A
 created_at: 2026-07-01
@@ -10,7 +10,7 @@ created_at: 2026-07-01
 # B1_IBM: get_config undefined in runtime script
 
 ## Input
-- **Raw issue**: raw-20260701T013527Z
+- **Raw issue**: raw-20260701T013527Z27Z
 - **Platform**: GitHub #3674 / Gitee IJXYY1
 - **Source**: daemon startup log observation
 

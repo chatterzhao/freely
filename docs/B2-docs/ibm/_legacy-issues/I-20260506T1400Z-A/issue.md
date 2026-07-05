@@ -3,7 +3,7 @@ local_id: I-20260506T1400Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-source_candidate: docs/B1-docs/raw-20260506/candidates.md
+source_candidate: docs/B1-docs/raw-20260506T000000Z/candidates.md
 milestone: M-20260506T1400Z-A
 verification_artifact_dir: docs/B2-docs/merge-guarded-fix-whitelist/code-reviews
 pre_tests_path: docs/B2-docs/merge-guarded-fix-whitelist/verification/pre-tests.md

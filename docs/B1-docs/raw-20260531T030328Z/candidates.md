@@ -1,7 +1,7 @@
 ---
 candidate_id: C-20260531T030328Z-A
 status: absorbed
-source_raw: raw-20260531T030328Z
+source_raw: raw-20260531T030328Z28Z
 milestone: M-20260531T030328Z-A
 ---
 

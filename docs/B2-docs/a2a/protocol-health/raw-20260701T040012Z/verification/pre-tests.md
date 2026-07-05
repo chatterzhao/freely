@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T040012Z-a2a-healthcheck-log
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z12Z/verification/acceptance-1.log
 - test_command: grep -c "Uvicorn running on unix socket" docs/system/workspace/scripts/runtime/freely && grep -c "socket connect health check" docs/system/workspace/scripts/runtime/freely
 - expected_output: log-based: 1-2 occurrences, old socket code: 0
 - expected_RED_output: old socket code present, log-based absent
 - actual_RED_output: old socket code 1 occurrence, log-based 0 — RED 确认
 - actual_output: log-based 2 occurrences, old socket code 0
-- evidence_file: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z12Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -29,14 +29,14 @@
 - not_applicable_explanation: Unit 测试（bash -n）已被 AT-001 覆盖
 - replacement_evidence: AT-001 绿色证据
 - testing_layer: unit
-- target_environment: fix/raw-20260701T040012Z-a2a-healthcheck-log
+- target_environment: fix/raw-20260701T040012Z12Z-a2a-healthcheck-log
 - required_evidence: bash -n 无错误
 - blocker_taxonomy: execution_pending_or_failed
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - status: passed
 - actual_output: bash -n 语法检查通过
-- evidence_file: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z12Z/verification/acceptance-1.log
 
 ## Integration
 - acceptance_target: 健康检查在 A2A 进程存活时能正确检测就绪

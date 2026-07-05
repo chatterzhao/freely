@@ -1,6 +1,6 @@
 # PR Review: #3348
 - pr_number: 3348
-- branch: feature/raw-20260622T100348Z-help-reason-docs
+- branch: feature/raw-20260622T100348Z48Z-help-reason-docs
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T10:17:19Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T100348Z-help-reason-docs branch=feature/raw-20260622T100348Z-help-reason-docs clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260622T100348Z48Z-help-reason-docs branch=feature/raw-20260622T100348Z48Z-help-reason-docs clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

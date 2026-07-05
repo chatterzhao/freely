@@ -59,7 +59,7 @@ Freely 的目标不是“一个保守的 AI 辅助壳”，而是 owner-grade AI
 
 已有最接近的前史是：
 
-- `docs/B1-docs/raw-20260329-2155/**`
+- `docs/B1-docs/raw-20260329T215500Z/**`
 - `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/**`
 
 这条线已经证明：

@@ -1,11 +1,11 @@
 # Pre-Tests: pr-merge-guarded fix/* whitelist
 
-- issue_id: raw-20260506T1400Z
+- issue_id: raw-20260506T140000Z
 
 ## Unit
 - acceptance target: `pr-merge-guarded accepts fix/* → test-pre-merge-* direction`
 - testing layer: `unit`
-- target environment: `feature/raw-20260506T1400Z-pr-merge-guarded-bootstrap`
+- target environment: `feature/raw-20260506T140000Z-pr-merge-guarded-bootstrap`
 - required evidence: `pr-merge-guarded validation output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Verify fix/* is in case pattern

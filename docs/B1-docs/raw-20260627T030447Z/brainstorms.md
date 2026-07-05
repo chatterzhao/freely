@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T030447Z
 phase_state: completed
-source_raw: raw-20260627T030447Z
+source_raw: raw-20260627T030447Z47Z
 source_url: https://github.com/chatterzhao/freely/issues/3578
 produced_candidate: C-20260627T030447Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: claude ACP adapter 不被支持 — 工具适配器注册表硬编码遗漏
 
 ## Input
-- 来源: raw-20260627T030447Z (GitHub #3578)
+- 来源: raw-20260627T030447Z47Z (GitHub #3578)
 - 症状: Freely daemon 启动后 manager 无法通过 ACP 启动 claude，报 "unsupported adapter 'acp' for tool 'claude' (supported: direct)"
 
 ## Problem

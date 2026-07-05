@@ -2,7 +2,7 @@
 
 ## Discovery
 
-- **来源**: GitHub issue #504 (`raw-20260517T083030Z`), chat-inbox, P2
+- **来源**: GitHub issue #504 (`raw-20260517T083030Z30Z`), chat-inbox, P2
 - **原始描述**: supervisor 检测到 bash 在 freely:18777 以 rc=0 退出，判定为 crash
 - **last_exit_reason_before_crash**: `set_e_exit_cmd=bash@freely:18777_rc_0`
 - **工具/模式**: `cc-ds-flash-auto` (Claude Code deepseek flash, auto mode)

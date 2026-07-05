@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260625T020333Z
+local_id: raw-20260625T020333Z33Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260625T020333Z-A
@@ -14,7 +14,7 @@ intake_id: ''
 author: ai-manager
 channel: internal
 session_refs: []
-source_candidate: docs/B1-docs/raw-20260625T020333Z/candidates.md#C-20260625T020333Z-A
+source_candidate: docs/B1-docs/raw-20260625T020333Z33Z/candidates.md#C-20260625T020333Z-A
 ---
 
 ## 问题

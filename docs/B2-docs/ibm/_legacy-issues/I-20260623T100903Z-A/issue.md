@@ -3,8 +3,8 @@ local_id: I-20260623T100903Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260623T100903Z
-source_candidate: docs/B1-docs/raw-20260623T100903Z/candidates.md
+promoted_from: raw-20260623T100903Z03Z
+source_candidate: docs/B1-docs/raw-20260623T100903Z03Z/candidates.md
 canonical_issue_path: ""
 platform_ids:
   github:
@@ -28,7 +28,7 @@ verification_artifact_dir: docs/B2-docs/sse-full-implementation/code-reviews
 
 # I-20260623T100903Z-A: 彻底实现 SSE
 
-- source_candidate: `docs/B1-docs/raw-20260623T100903Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260623T100903Z03Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/sse-full-implementation/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/sse-full-implementation/code-reviews`
 

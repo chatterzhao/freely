@@ -3,7 +3,7 @@
 - candidate_format_version: `v2`
 - id: `C-20260323T170500Z-A`
 - title: Detect and recover manager delegated continuation stalls after prompt absorption
-- source_brainstorm: `docs/B1-docs/raw-20260323-1705/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260323T170500Z/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`

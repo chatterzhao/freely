@@ -2,7 +2,7 @@
 
 ## discovery
 
-- **来源**: `raw-20260619T033758Z` — `freely feedback` 创建，触发于开发过程中发现 `freely ai login claude` 行为不符合预期
+- **来源**: `raw-20260619T033758Z58Z` — `freely feedback` 创建，触发于开发过程中发现 `freely ai login claude` 行为不符合预期
 - **时效性**: 新鲜 issue（2026-06-19），核心命令交互缺陷，当前项目阶段高度相关
 - **覆盖检查**: 未被其他 issue/candidate 覆盖；这是 `ai-cli` 脚本中非 codex 工具登录路径的独立缺陷
 

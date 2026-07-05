@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260704T080808Z
 phase_state: completed
-source_raw: raw-20260704T080808Z
+source_raw: raw-20260704T080808Z08Z
 source_url: https://github.com/chatterzhao/freely/issues/3727
 produced_candidate: C-20260704T080808Z-A
 created_at: 2026-07-04
@@ -10,8 +10,8 @@ created_at: 2026-07-04
 # B1_IBM: 多 ACP bridge 并行 — per-agent tool/slot 支持
 
 ## Input
-- raw-20260704T080808Z (GitHub #3727)
-- 前置依赖: raw-20260704T064539Z (session 统一, 已合并到 develop)
+- raw-20260704T080808Z08Z (GitHub #3727)
+- 前置依赖: raw-20260704T064539Z39Z (session 统一, 已合并到 develop)
 
 ## Problem
 

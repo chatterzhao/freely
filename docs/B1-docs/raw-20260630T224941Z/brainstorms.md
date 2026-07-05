@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260630T224941Z
 phase_state: completed
-source_raw: raw-20260630T224941Z
+source_raw: raw-20260630T224941Z41Z
 source_url: https://github.com/chatterzhao/freely/issues/3669
 produced_candidate: C-20260630T224941Z-A
 created_at: 2026-06-30
@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: config.toml.example 全面修订 + init 自动创建 config.toml
 
 ## Input
-- raw issue: `docs/B1-docs/raw-20260630T224941Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260630T224941Z41Z/issue.md`
 - 平台: GitHub #3669
 
 ## Discovery — 现状调研

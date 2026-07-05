@@ -8,8 +8,8 @@
 - story-name: `verification-contract-and-premerge-adequacy-governance`
 - issue-name: `verification-contract-and-premerge-adequacy-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260408/candidates.md#c-20260408-1205-a`
-- source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260408T120500Z/candidates.md#c-20260408-1205-a`
+- source_brainstorm: `docs/B1-docs/raw-20260408T120500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
@@ -109,7 +109,7 @@ Freely 现在已经有测试真源，但没有形成闭环：
 1. next_action: `completed`
 2. revisit_trigger: 若后续发现 manager handoff、worker recovery、或 develop-bound adequacy gate 仍出现“contract 已写但 runtime state / review 无法恢复”的漏口，再开 follow-on issue 继续收紧 launch 恢复与 merge followthrough。
 3. absorbed_follow_ons:
-   - `C-20260411-1417-B` from `docs/B1-docs/raw-20260411/candidates.md`, because the stale-truth audit confirmed this canonical owner already closed the verification-contract / premerge-adequacy chain and no separate runtime owner should be reopened.
+   - `C-20260411-1417-B` from `docs/B1-docs/raw-20260411T141600Z/candidates.md`, because the stale-truth audit confirmed this canonical owner already closed the verification-contract / premerge-adequacy chain and no separate runtime owner should be reopened.
 
 ## Completion
 

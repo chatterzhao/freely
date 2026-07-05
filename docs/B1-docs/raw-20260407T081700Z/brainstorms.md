@@ -327,7 +327,7 @@ Current reality:
 
 - product/law routing truth explicitly names `github-issue` as a discovery source
 - there is already an older dedicated pre-research line:
-  - `docs/B1-docs/raw-20260403-1000/**`
+  - `docs/B1-docs/raw-20260403T110000Z/**`
 - current repo does not yet show an equivalent durable local source-document layer for GitHub issues
 - no evidence yet of a unified source inbox path or generic source document for external issues
 

@@ -52,7 +52,7 @@
 - requirement: Shell 注入修复 — socket 路径通过环境变量传递，不直接拼接到 Python -c 字符串
 - acceptance_target: grep 确认 $a2a_socket 不再出现在 Python -c 字符串中
 - testing_layer: unit
-- target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
+- target_environment: fix-raw-20260630T085809Z09Z-a2a-healthcheck-fix
 - required_evidence: 代码中无 `s.connect('$a2a_socket')` 模式
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-2.log
@@ -113,7 +113,7 @@
 - requirement: A2A 启动超时从 10 秒延长到 30 秒
 - acceptance_target: 健康检查等待循环最大重试次数 >= 30 或总等待时间 >= 30 秒
 - testing_layer: unit
-- target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
+- target_environment: fix-raw-20260630T085809Z09Z-a2a-healthcheck-fix
 - required_evidence: 代码中 _health_waited 上限 >= 30
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-4.log
@@ -148,7 +148,7 @@
 - requirement: A2A Server 日志包含时间戳格式
 - acceptance_target: uvicorn 日志格式包含 %(asctime)s 时间戳
 - testing_layer: unit
-- target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
+- target_environment: fix-raw-20260630T085809Z09Z-a2a-healthcheck-fix
 - required_evidence: a2a_server.py 的 _a2a_uvicorn_log_config() 或 uvicorn.Config 中包含时间戳格式
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-5.log
@@ -180,7 +180,7 @@
 ## Unit
 - acceptance_target: 语法检查 — bash -n freely 脚本 + python3 -c "import a2a_server" 编译检查
 - testing_layer: unit
-- target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
+- target_environment: fix-raw-20260630T085809Z09Z-a2a-healthcheck-fix
 - required_evidence: bash 语法无错误，Python 语法无错误
 - blocker_taxonomy: execution_pending_or_failed
 

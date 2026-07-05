@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260627T062554Z
 phase_state: completed
-source_raw: raw-20260627T062554Z
+source_raw: raw-20260627T062554Z54Z
 source_url: https://github.com/chatterzhao/freely/issues/3583
 produced_candidate: C-20260627T062554Z-A
 created_at: 2026-06-27
@@ -10,7 +10,7 @@ created_at: 2026-06-27
 # B1_IBM: task-lifecycle-scan v3 — 三分类重构
 
 ## Input
-- 来源: raw-20260627T062554Z (GitHub #3583)
+- 来源: raw-20260627T062554Z54Z (GitHub #3583)
 - 调研文档: .scan-review-findings.md（9 个 Bug + 6 条设计原则）
 - 新实现: task-lifecycle-scan.py (~800 行, 旧版 2007 行)
 

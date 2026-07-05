@@ -32,7 +32,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
 - required_evidence: --dry-run 执行成功，exit 0
-- test_command: freely pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260626T155612Z12Z-issue-sync-before-merge --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
@@ -50,7 +50,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
 - required_evidence: acceptance-3 pass
-- test_command: freely pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260626T155612Z12Z-issue-sync-before-merge --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-3.log

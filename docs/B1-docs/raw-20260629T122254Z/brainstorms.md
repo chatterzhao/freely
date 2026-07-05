@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T122254Z
 phase_state: completed
-source_raw: raw-20260629T122254Z
+source_raw: raw-20260629T122254Z54Z
 produced_candidate: C-20260629T122254Z-A
 ---
 # B1_IBM: command standardization — freely subcommands

@@ -2,7 +2,7 @@
 
 - id: `C-20260322T022800Z-A`
 - title: Make manager stop patrolling and delegate once worktree evidence is sufficient
-- source_brainstorm: `docs/B1-docs/raw-20260322-0228/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322T022800Z/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`

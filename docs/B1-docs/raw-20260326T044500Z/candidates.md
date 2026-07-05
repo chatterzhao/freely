@@ -2,7 +2,7 @@
 
 - id: `C-20260326T044500Z-A`
 - title: Close manager-delegated intake lifecycle after successful continuity publication
-- source_brainstorm: `docs/B1-docs/raw-20260326-0445/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260326T044500Z/brainstorms.md`
 - status: `promoted`
 - adoption_type: `new_issue`
 - milestone: `M-20260306-workspace-routing-foundation`

@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- raw-20260618T065221Z (GitHub #2981)
+- raw-20260618T065221Z21Z (GitHub #2981)
 - 发现链：origin 持续落后 → 追踪到 git pull 被 receipt hook 拦截 → 发现 gh pr merge --merge --body 无效
 
 ### 根因验证

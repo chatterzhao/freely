@@ -31,8 +31,8 @@ platform_state: closed
 - epic-name: `workspace-routing-foundation`
 - story-name: `business-block-vs-system-crash-recovery`
 - issue-name: `business-block-vs-system-crash-recovery`
-- source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-1931`
-- source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308T163000Z/candidates.md#c-20260308-1931`
+- source_brainstorm: `docs/B1-docs/raw-20260308T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/B2-docs/ibm/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`

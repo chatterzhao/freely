@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260629T164530Z
+local_id: raw-20260629T164530Z30Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260629T164530Z-A
@@ -33,10 +33,10 @@ session_refs: []
 ### --raw-key 与 --branch 并列
 
     wt-close --raw-key 20260629T160852Z
-    wt-close --raw-key raw-20260629T160852Z
-    wt-close --raw-key fix/raw-20260629T160852Z-wt-close-raw-key-param
-    wt-close --raw-key feature/raw-20260629T160852Z-my-feat
-    wt-close --branch fix/raw-20260629T160852Z-my-fix
+    wt-close --raw-key raw-20260629T160852Z52Z
+    wt-close --raw-key fix/raw-20260629T160852Z52Z-wt-close-raw-key-param
+    wt-close --raw-key feature/raw-20260629T160852Z52Z-my-feat
+    wt-close --branch fix/raw-20260629T160852Z52Z-my-fix
 
 --raw-key 自动提取 raw key（兼容 raw-{key}、fix/raw-{key}-{slug}、feature/raw-{key}-{slug}），然后查找对应的 fix|feature 分支。--branch 保留原有行为。
 

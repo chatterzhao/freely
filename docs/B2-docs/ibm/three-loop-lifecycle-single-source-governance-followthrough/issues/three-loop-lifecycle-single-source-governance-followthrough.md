@@ -8,8 +8,8 @@
 - story-name: `three-loop-lifecycle-single-source-governance-followthrough`
 - issue-name: `three-loop-lifecycle-single-source-governance-followthrough`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260419/candidates.md#c-20260419-0915-a`
-- source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260419T150500Z/candidates.md#c-20260419-0915-a`
+- source_brainstorm: `docs/B1-docs/raw-20260419T150500Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
 - reopen_reason: `the original three-loop model owner already completed, but this follow-on governance pass still needs to land the single detailed truth rule and consumer read/sync contract through a lawful protected-branch path`
 - execution_base: `develop`
@@ -67,8 +67,8 @@ Because the earlier three-loop architecture owner is already `completed`, this g
 
 ## Completion
 
-- `docs/B1-docs/raw-20260419/brainstorms.md`
-- `docs/B1-docs/raw-20260419/candidates.md`
+- `docs/B1-docs/raw-20260419T150500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260419T150500Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`

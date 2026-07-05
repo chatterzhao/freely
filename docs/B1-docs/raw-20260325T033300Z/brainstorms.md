@@ -172,7 +172,7 @@ Freely 正在用 Freely 开发 Freely。最近这一轮同 family runtime/parser
 
 ## 预期落点
 
-- `docs/B1-docs/raw-20260325-0333/`
+- `docs/B1-docs/raw-20260325T033300Z/`
 - `docs/milestones.md`
 - 后续若 materialize，再落到：
   - `docs/system/workspace/scripts/tests/**`

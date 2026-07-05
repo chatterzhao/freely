@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260506T020000Z
+local_id: raw-20260506T020000Z00Z
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
@@ -17,15 +17,15 @@ created_at: '2026-05-10T09:30:21Z'
 platform_state: closed
 ---
 
-# raw-20260506T0200Z: 评论消费链路——DB → issue.md → 平台 三段状态追踪
+# raw-20260506T020000Z: 评论消费链路——DB → issue.md → 平台 三段状态追踪
 
 ## 现象
 
 39 条 comment-type chat 全部 stuck 在 consumed=0：
 
 - `raw-guidance`（35 条）— 目标 issue 不存在
-- `raw-20260503-0945`（3 条）— 目标 issue 不存在
-- `raw-20260503-1010`（1 条）— 目标 issue 不存在
+- `raw-20260503T094500Z`（3 条）— 目标 issue 不存在
+- `raw-20260503T101000Z`（1 条）— 目标 issue 不存在
 
 0 条已消费，0 条 issue.md 中有 comment 节，0 条同步到平台。
 

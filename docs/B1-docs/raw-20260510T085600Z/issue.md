@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260510T085600Z
+local_id: raw-20260510T085600Z00Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260510T085600Z-A
@@ -35,11 +35,11 @@ platform_state: closed
 ---
 
 
-local_id: raw-20260510T085600Z
+local_id: raw-20260510T085600Z00Z
 kind: linked
 phase_state: completed
-promoted_from: raw-20260510T0856Z
-source_candidate: docs/B1-docs/raw-20260510T0856Z/candidates.md
+promoted_from: raw-20260510T085600Z
+source_candidate: docs/B1-docs/raw-20260510T085600Z/candidates.md
 verification_artifact_dir: docs/B2-docs/mode-switch-guard/code-reviews
 pre_tests_path: docs/B2-docs/mode-switch-guard/verification/pre-tests.md
 platform_state: ''

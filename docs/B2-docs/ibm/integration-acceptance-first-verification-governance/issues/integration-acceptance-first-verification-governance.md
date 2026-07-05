@@ -9,8 +9,8 @@
 - issue-name: `integration-acceptance-first-verification-governance`
 - verification_artifact_dir: `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0135-a`
-- source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260322T071500Z/candidates.md#c-20260322-0135-a`
+- source_brainstorm: `docs/B1-docs/raw-20260322T071500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

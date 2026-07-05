@@ -1,7 +1,7 @@
 # Candidates - 20260418-1900--runtime-lifecycle-receipt-followthrough
 
 ## Context
-- Source brainstorm: `docs/B1-docs/raw-20260418-1900/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260418T190000Z/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-receipt-ledger-followthrough-owner-and-retire-temporary-worktrees`
 

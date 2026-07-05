@@ -1,6 +1,6 @@
 # PR Review: #3335
 - pr_number: 3335
-- branch: fix/raw-20260622T032117Z-scan-api-timeout-fix
+- branch: fix/raw-20260622T032117Z17Z-scan-api-timeout-fix
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-22T04:22:24Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T032117Z-scan-api-timeout-fix branch=fix/raw-20260622T032117Z-scan-api-timeout-fix clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T032117Z17Z-scan-api-timeout-fix branch=fix/raw-20260622T032117Z17Z-scan-api-timeout-fix clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

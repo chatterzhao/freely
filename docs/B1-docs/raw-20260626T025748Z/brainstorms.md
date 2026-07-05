@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260626T025748Z
 phase_state: completed
-source_raw: raw-20260626T025748Z
+source_raw: raw-20260626T025748Z48Z
 produced_candidate: C-20260626T025748Z-A
 ---
 # B1: A2A review states

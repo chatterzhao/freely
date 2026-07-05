@@ -1,6 +1,6 @@
 # PR Review: #3462
 - pr_number: 3462
-- branch: fix/raw-20260625T020333Z-force-abandon-only
+- branch: fix/raw-20260625T020333Z33Z-force-abandon-only
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-25T02:13:35Z
@@ -10,7 +10,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T020333Z-force-abandon-only branch=fix/raw-20260625T020333Z-force-abandon-only clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260625T020333Z33Z-force-abandon-only branch=fix/raw-20260625T020333Z33Z-force-abandon-only clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

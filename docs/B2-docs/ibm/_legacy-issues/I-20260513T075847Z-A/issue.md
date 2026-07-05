@@ -4,8 +4,8 @@ kind: linked
 phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
-promoted_from: raw-20260513T075847Z
-source_candidate: docs/B1-docs/raw-20260513T075847Z/candidates.md#C-20260513T075847Z-A
+promoted_from: raw-20260513T075847Z47Z
+source_candidate: docs/B1-docs/raw-20260513T075847Z47Z/candidates.md#C-20260513T075847Z-A
 verification_artifact_dir: docs/B2-docs/scan-non-rawkey-visibility/code-reviews
 pre_tests_path: docs/B2-docs/scan-non-rawkey-visibility/verification/pre-tests.md
 platform_ids:

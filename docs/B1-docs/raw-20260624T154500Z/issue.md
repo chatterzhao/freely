@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260624T154500Z
+local_id: raw-20260624T154500Z00Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260624T154500Z-A
-source_candidate: docs/B1-docs/raw-20260624T154500Z/candidates.md#C-20260624T154500Z-A
+source_candidate: docs/B1-docs/raw-20260624T154500Z00Z/candidates.md#C-20260624T154500Z-A
 ---
 
 ## 根因

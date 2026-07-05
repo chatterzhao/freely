@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-command-semantics-and-restore-work-governance`
 - issue-name: `project-command-semantics-and-restore-work-governance`
-- source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-2006-a`
-- source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327T200600Z/candidates.md#c-20260327-2006-a`
+- source_brainstorm: `docs/B1-docs/raw-20260327T200600Z/brainstorms.md`
 - pre_tests_path: `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/code-reviews/`
 - execution_base: `develop`

@@ -3,8 +3,8 @@ local_id: I-20260521T032154Z-A
 kind: linked
 status: done_b2_ibm
 phase_state: done_b2_ibm
-promoted_from: raw-20260521T032154Z
-source_candidate: docs/B1-docs/raw-20260521T032154Z/candidates.md
+promoted_from: raw-20260521T032154Z54Z
+source_candidate: docs/B1-docs/raw-20260521T032154Z54Z/candidates.md
 canonical_issue_path: ""
 platform_ids:
   github:
@@ -27,7 +27,7 @@ milestone: M-20260521T032154Z-A
 
 # I-20260521T032154Z-A: Fix _on_supervisor_err recursive ERR trap false positive
 
-- source_candidate: `docs/B1-docs/raw-20260521T032154Z/candidates.md#C-20260521T032154Z-A`
+- source_candidate: `docs/B1-docs/raw-20260521T032154Z54Z/candidates.md#C-20260521T032154Z-A`
 - pre_tests_path: `docs/B2-docs/supervisor-crash/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/supervisor-crash/code-reviews`
 - milestone: M-20260521T032154Z-A

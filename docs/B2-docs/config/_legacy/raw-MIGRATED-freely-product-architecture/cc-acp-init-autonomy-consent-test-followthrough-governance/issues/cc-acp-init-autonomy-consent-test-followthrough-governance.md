@@ -8,8 +8,8 @@
 - story-name: `cc-acp-init-autonomy-consent-test-followthrough-governance`
 - issue-name: `cc-acp-init-autonomy-consent-test-followthrough-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-2316-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-2316-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - reopen_of_issue: `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - reopen_reason: `canonical cc:auto ACP init now requires --accept-default-autonomy, but test-freely-init-cc-config still used the old invocation`
 - execution_base: `develop`
@@ -51,8 +51,8 @@ Because the develop merge gate requires every develop-bound replay to remain can
 ## Completion
 
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
+- `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/milestones.md`
 - `docs/B2-docs/config/packaging/brainstorms/b-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
 - `docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`

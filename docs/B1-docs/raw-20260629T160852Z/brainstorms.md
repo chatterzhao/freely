@@ -1,7 +1,7 @@
 ---
 b1_id: B1-20260629T160852Z
 phase_state: completed
-source_raw: raw-20260629T160852Z
+source_raw: raw-20260629T160852Z52Z
 source_url: https://github.com/chatterzhao/freely/issues/3628
 produced_candidate: C-20260629T160852Z-A
 created_at: 2026-06-29
@@ -10,7 +10,7 @@ created_at: 2026-06-29
 # B1_IBM: wt-close 支持 raw-{key} 参数 + help 强调不要传 test 分支
 
 ## Input
-- 来源：GitHub issue #3628 raw-20260629T160852Z
+- 来源：GitHub issue #3628 raw-20260629T160852Z52Z
 - kind：fix
 - 触发：上一个 issue (#3624) 执行 wt-close 时反复传 test-pre-merge 分支名，未意识到 Phase 6b 已自动处理
 

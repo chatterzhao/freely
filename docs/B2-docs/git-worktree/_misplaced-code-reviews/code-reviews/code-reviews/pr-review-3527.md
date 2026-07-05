@@ -1,6 +1,6 @@
 # PR Review: #3527
 - pr_number: 3527
-- branch: fix/raw-20260625T234406Z-fix-feature-consistency
+- branch: fix/raw-20260625T234406Z06Z-fix-feature-consistency
 - base: develop
 - reviewer: tdd-agent (ACP TDD, slot=claude-apikey-ds-pro-auto)
 - review_date: 2026-06-26T00:28:39Z

@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260617T063755Z
+local_id: raw-20260617T063755Z55Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260617T063755Z-B
@@ -22,7 +22,7 @@ session_refs: []
 
 ## 问题
 
-raw-20260617T011030Z Phase A 规定的 A2A 目标架构未完全实现：
+raw-20260617T011030Z30Z Phase A 规定的 A2A 目标架构未完全实现：
 
 ### 1. _db_rpc 绕过 A2A Server
 a2a_task.py 的 6 个 Freely 特有方法通过 _db_rpc 直连 db_manager → SQLite，完全绕过 A2A Server：

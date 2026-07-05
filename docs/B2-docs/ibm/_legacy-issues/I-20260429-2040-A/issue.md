@@ -3,7 +3,7 @@ local_id: I-20260429-2040-A
 issue_title: SQLite chat-inbox staging for protected-branch chat intake
 kind: linked
 phase_state: completed
-promoted_from: raw-20260429-2040
+promoted_from: raw-20260429T204000Z
 platform_ids:
   github:
     issue_id: '220'

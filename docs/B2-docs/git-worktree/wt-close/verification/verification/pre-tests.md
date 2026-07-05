@@ -14,7 +14,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z-wt-close-raw-key-flag
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -q '_extract_raw_key\|grep -oE.*raw-' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL"; exit 1; }
   echo "PASS: _extract_raw_key with grep -oE found"
 - expected_output: "PASS: _extract_raw_key with grep -oE found"
@@ -37,7 +37,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z-wt-close-raw-key-flag
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -A3 'PLATFORM_ONLY.*true' docs/system/workspace/scripts/worktree/wt-close | grep -q 'raw_key=' || { echo "FAIL"; exit 1; }
   echo "PASS: platform-only sets raw_key from _raw_key"
 - expected_output: "PASS: platform-only sets raw_key from _raw_key"
@@ -60,7 +60,7 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - test_command: |
-  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z-wt-close-raw-key-flag
+  cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -q 's/\^\[\*+ \]\*//' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL"; exit 1; }
   echo "PASS: + prefix stripped"
 - expected_output: "PASS: + prefix stripped"

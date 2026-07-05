@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260513T040512Z
+local_id: raw-20260513T040512Z12Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -58,4 +58,4 @@ Phase 3 — Lifecycle chain trace
 - 扫描总耗时 < 5s（之前 > 2min）
 - 分类结果：本地有平台没有、本地没有平台有、状态不一致三类都能正确识别
 
-<!-- raw-20260513T040512Z -->
+<!-- raw-20260513T040512Z12Z -->

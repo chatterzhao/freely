@@ -4,7 +4,7 @@ issue_title: "fix: defer worker auto-recovery to after first AI patrol"
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260503T1235Z
+promoted_from: raw-20260503T123500Z
 source_candidate: docs/B1-docs/raw-20260503/candidates.md#C-20260503T1235Z-A
 platform_ids:
   github:

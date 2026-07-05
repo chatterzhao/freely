@@ -24,6 +24,6 @@
 - milestone: M-20260517T083030Z-A
 - session_refs:
   - tool: cc-ds-flash-auto
-  - session_id: raw-20260517T083030Z
+  - session_id: raw-20260517T083030Z30Z
   - jsonl_path: unavailable://platform-session-not-local
   - role: worker

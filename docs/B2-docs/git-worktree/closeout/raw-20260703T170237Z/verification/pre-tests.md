@@ -13,13 +13,13 @@
 - target_environment: test-pre-merge
 - required_evidence: crash log created on non-zero exit
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T170237Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T170237Z37Z/verification/test-evidence/acceptance-1.log
 - test_command: 触发 AI crash, 检查 .freely/logs/crash-*.log
 - expected_output: crash-{tool}-*.log 文件存在且非空
 - expected_RED_output: 无 crash log
 - actual_RED_output: 14:42 opencode crash 后 debug log 被清理，无 crash log
 - actual_output: 待实际 crash 触发验证
-- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T170237Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T170237Z37Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 修复前 crash 证据随 cycle log 清理丢失

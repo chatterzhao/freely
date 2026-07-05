@@ -2,7 +2,7 @@
 
 ## Discovery
 
-Raw issue `raw-20260522T051507Z` (GitHub #2112) titled "slot 全名统一". The Freely codebase had multiple slot naming conventions (short forms like `account-*`, `apikey-*` vs full names like `codex-apikey-xxx`). This caused mismatches in:
+Raw issue `raw-20260522T051507Z07Z` (GitHub #2112) titled "slot 全名统一". The Freely codebase had multiple slot naming conventions (short forms like `account-*`, `apikey-*` vs full names like `codex-apikey-xxx`). This caused mismatches in:
 
 1. `codex_infer_slot_kind_from_slot` — used prefix match on `account-*/apikey-*`, fails with full names
 2. `cmd_switch` generic path — constructed `alias_name="${tool}-${slot}"`, double-prefixing with full names

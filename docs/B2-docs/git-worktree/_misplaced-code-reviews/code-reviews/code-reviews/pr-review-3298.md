@@ -1,6 +1,6 @@
 # PR Review: #3298
 - pr_number: 3298
-- branch: fix/raw-20260621T190007Z-bypass-gates
+- branch: fix/raw-20260621T190007Z07Z-bypass-gates
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-21T22:13:04Z
@@ -9,7 +9,7 @@
 
 ## 1. Worktree Check
 ^- status: passed
-- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T190007Z-bypass-gates branch=fix/raw-20260621T190007Z-bypass-gates clean=true
+- evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260621T190007Z07Z-bypass-gates branch=fix/raw-20260621T190007Z07Z-bypass-gates clean=true
 
 ## 2. IBM Completeness
 ^- status: passed

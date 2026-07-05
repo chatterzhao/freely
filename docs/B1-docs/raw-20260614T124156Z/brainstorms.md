@@ -1,6 +1,6 @@
 ---
 name: platform-batch-sync
-raw_key: raw-20260614T124156Z
+raw_key: raw-20260614T124156Z56Z
 created: 2026-06-14T12:42:00Z
 status: proposed
 ---

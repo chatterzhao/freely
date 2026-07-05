@@ -4,7 +4,7 @@ issue_title: 修正 scan 常量对齐 IBM Framework §89 + 迁移现有 issue
 kind: linked
 phase_state: absorbed
 absorbed_at: '2026-05-16T14:27:11Z'
-promoted_from: raw-20260505T1210Z
+promoted_from: raw-20260505T121000Z
 platform_ids:
   github:
     issue_id: '214'

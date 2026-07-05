@@ -24,8 +24,8 @@ Verify that the new owner:
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/tasks.md`
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
-- `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/B1-docs/raw-20260413/brainstorms.md`
+- `docs/B1-docs/raw-20260413T020800Z/candidates.md`
+- `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`
 - `docs/milestones.md`
 
 ## Verification Result
