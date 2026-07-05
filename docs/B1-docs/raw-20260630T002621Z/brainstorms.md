@@ -981,7 +981,7 @@ def cycle(raw_key):
 ```
 Phase    必须存在                              必须不存在（下一 phase 未开始）
 ──────   ──────────────────────────────────    ──────────────────────────────────
-B1       candidates.md + brainstorms.md        docs/epics/*/ 下无此 raw key 目录
+B1       candidates.md + brainstorms.md        docs/B2-docs/*/ 下无此 raw key 目录
          且 candidate.status=promoted           (B2 尚未物化)
 
 B2       pre-tests.md + tasks.md               pre-tests 全部 pending

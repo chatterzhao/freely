@@ -45,7 +45,7 @@
 ### Freely 的差异
 
 1. **Reviewer 可能是 AI**：subagent 或独立 Claude 进程做 review。需要明确的 review prompt 和评判标准。
-2. **Review 证据落盘**：不像 GitHub 的 review comment 留在 PR 页面，Freely 需要 review 产物存入 `docs/epics/.../code-reviews/`。
+2. **Review 证据落盘**：不像 GitHub 的 review comment 留在 PR 页面，Freely 需要 review 产物存入 `docs/B2-docs/.../code-reviews/`。
 3. **Review 维度更广**：除了代码正确性，还要检查 Freely 特定的治理 invariant（receipt 完整性、phase_state 一致性、worktree 关联）。
 
 ### 可行性
@@ -69,7 +69,7 @@ freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs
 1. 验证 PR 存在（gh pr view）
 2. 获取 PR diff（governance-merge-gate --range "base..HEAD"）
 3. 执行 review 维度检查（见下文）
-4. 生成 review 文档（docs/epics/.../code-reviews/pr-review-{PR#}.md）
+4. 生成 review 文档（docs/B2-docs/.../code-reviews/pr-review-{PR#}.md）
 5. 输出 verdict
 6. 可选：同步 GitHub PR review（gh pr review --approve / --request-changes）
 ```
@@ -87,7 +87,7 @@ freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs
 
 ### Review 文档格式
 
-`docs/epics/{name}/code-reviews/pr-review-{PR#}.md`：
+`docs/B2-docs/{name}/code-reviews/pr-review-{PR#}.md`：
 
 ```markdown
 # PR Review: #{PR#}
@@ -131,7 +131,7 @@ freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs
 
 **pr-merge-guarded 修改**：执行前检查 review 文档存在且 verdict=pass：
 ```
-if ! grep -q 'verdict: pass' "docs/epics/.../code-reviews/pr-review-{PR#}.md"; then
+if ! grep -q 'verdict: pass' "docs/B2-docs/.../code-reviews/pr-review-{PR#}.md"; then
   echo "[MERGE-GUARD] PR review not passed. Run pr-review-guarded first."
   exit 1
 fi

@@ -20,12 +20,12 @@ author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/skill-ref-cleanup/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
+verification_artifact_dir: docs/B2-docs/skill-ref-cleanup/code-reviews
 platform_state: closed
 ---
 
 - pre_tests_path: docs/B2-docs/skill-ref-cleanup/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
+- verification_artifact_dir: docs/B2-docs/skill-ref-cleanup/code-reviews
 
 ## 背景
 

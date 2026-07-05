@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `source-routing-and-derived-worktree-governance`
 - issue-name: `source-routing-and-derived-worktree-governance`
-- verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `source-routing-and-derived-worktree-governance`/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `source-routing-and-derived-worktree-governance`/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260307/candidates.md#c-20260307-1201`
 - source_brainstorm: `docs/B1-docs/raw-20260307/brainstorms.md`
 - execution_base: `develop`
@@ -33,7 +33,7 @@
 2. 更新 `context-source-skill`、`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution`、`branch-management`。
 3. 增加标准 worktree 创建入口 `freely wt-create`。
 4. 更新 hook / AGENTS 提示，使其支持 derived worktree 语义。
-5. 明确 IBM 正式产物目录必须在 `docs/epics/{epic-name}/{story-name}/...`。
+5. 明确 IBM 正式产物目录必须在 `docs/B2-docs/{epic-name}/{story-name}/...`。
 6. 对齐 `lead-agent`、`workspace/tools.md`、首跳启动 prompt 与脚本回归，禁止同工具场景只输出 `next_prompt` 结束。
 
 ## Acceptance

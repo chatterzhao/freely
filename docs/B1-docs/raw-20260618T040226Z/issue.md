@@ -56,7 +56,7 @@ pr-create-guarded  →  pr-review-guarded  →  pr-merge-guarded
 
 - PR 编号或 branch name
 - PR diff（governance-merge-gate --range "base..HEAD"）
-- 已有 code-review 文档（docs/epics/.../code-reviews/）
+- 已有 code-review 文档（docs/B2-docs/.../code-reviews/）
 
 ### Review 维度
 
@@ -71,7 +71,7 @@ pr-create-guarded  →  pr-review-guarded  →  pr-merge-guarded
 
 ### Review 产物
 
-`docs/epics/{name}/code-reviews/pr-review-{PR#}.md`：
+`docs/B2-docs/{name}/code-reviews/pr-review-{PR#}.md`：
 
 ```markdown
 # PR Review: #{PR#}

@@ -20,12 +20,12 @@ author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
-verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
+verification_artifact_dir: docs/B2-docs/platform-pull-standardize/code-reviews
 platform_state: closed
 ---
 
 - pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
+- verification_artifact_dir: docs/B2-docs/platform-pull-standardize/code-reviews
 
 ## 问题
 用户手动创建的 issue 标题 key 可能缺秒，需自动标准化。

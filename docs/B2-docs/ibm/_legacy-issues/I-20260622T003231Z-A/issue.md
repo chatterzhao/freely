@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '3307'
     url: https://github.com/chatterzhao/freely/issues/3307
 primary_platform: github
-canonical_issue_path: docs/epics/hook-bash-local-fix
+canonical_issue_path: docs/B2-docs/hook-bash-local-fix
 source_candidate: docs/B1-docs/raw-20260622T003231Z/candidates.md#C-20260622T003231Z-A
 verification_artifact_dir: docs/B2-docs/hook-bash-local-fix/code-reviews
 created_at: '2026-06-22T00:32:48Z'

@@ -60,7 +60,7 @@ freely chat "xxx"
 | | raw issue | linked issue |
 |---|---|---|
 | 来源 | 用户直接创建（平台 or chat） | B2_IBM 产出，freely 创建 |
-| 状态 | 未与 canonical docs 关联 | 已关联 `docs/epics/.../issues/` |
+| 状态 | 未与 canonical docs 关联 | 已关联 `docs/B2-docs/.../issues/` |
 | scan 行为 | `restart_point=pre_brainstorm` | `restart_point=cleanup` |
 | 用户评论 | 自由评论 | 评论触发 drift reconcile |
 | 关闭时机 | B2 完成后由 freely 关闭 | 不需要关闭（或跟随 canonical completion） |
@@ -205,7 +205,7 @@ primary_platform: github
 
 **参考 issueme**：Story = Issue 目录，`M{milestone}-{story-name}/` 包含 issue.md + requirements.md + pre-tests.md + tasks.md。目录名直接带 milestone 前缀，方便查找。
 
-**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `docs/B1-docs/raw-` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
+**freely 的差异**：freely 已有 `docs/B2-docs/{epic}/{story}/` 目录结构，不需要改名。但 `docs/B1-docs/raw-` 可以作为平台 issue 的本地缓存层，与 `docs/B2-docs/` 的 B2 产物分离：
 
 ```
 docs/B1-docs/                    # 所有 issue 的本地存储（git 管理）
@@ -216,7 +216,7 @@ docs/B1-docs/                    # 所有 issue 的本地存储（git 管理）
 └── I-20260427-1030-A/          # linked issue（B2 产物）
     └── issue.md                # frontmatter + 摘要 + ## Comments
 
-docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
+docs/B2-docs/{epic}/{story}/      # B2 治理产物（canonical docs）
 ├── issues/
 │   └── {issue-name}.md         # canonical issue 规格
 ├── pre-tests.md
@@ -224,7 +224,7 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 └── code-reviews/
 ```
 
-两层不重复——`docs/epics/` 是 B2 治理产物，`docs/B1-docs/raw-` 是平台同步存储。linked issue 的 frontmatter 中 `canonical_issue_path` 关联两边的文档。
+两层不重复——`docs/B2-docs/` 是 B2 治理产物，`docs/B1-docs/raw-` 是平台同步存储。linked issue 的 frontmatter 中 `canonical_issue_path` 关联两边的文档。
 
 ### 13. issueme 可借鉴的设计
 
@@ -233,7 +233,7 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 | `platform_ids` frontmatter | ✅ 直接复用 | 多平台 ID 映射 |
 | `primary_platform` | ✅ 直接复用 | 主平台标记 |
 | hash 幂等 | ✅ 直接复用 | 变更检测，避免重复同步 |
-| Story = Issue 目录 | 🔶 部分复用 | freely 已有 `docs/epics/{epic}/{story}/` |
+| Story = Issue 目录 | 🔶 部分复用 | freely 已有 `docs/B2-docs/{epic}/{story}/` |
 | 讨论平台化存储 | ✅ 直接复用 | 评论存平台，本地只存元数据 |
 | 快速失败策略 | ✅ 直接复用 | 多平台网络检测 |
 | `sync.on_partial_failure` | ✅ 直接复用 | 部分平台失败时的行为 |
@@ -260,11 +260,11 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 | B1 预研讨论 | 本地 `docs/B1-docs/raw-{id}/brainstorms.md` | AI 内部分析，不上平台 |
 | B1 candidate | 本地 `docs/B1-docs/raw-{id}/candidates.md` | 本地治理产物 |
 | 里程碑 issue 规格 | **平台 linked issue body** | 正式 issue 文档的摘要：scope、acceptance、状态 |
-| 里程碑 issue 完整规格 | 本地 `docs/epics/{epic}/{story}/issues/{name}.md` | 详细版，平台 body 是摘要 |
-| B2/IBM 实现头脑风暴 | 本地 `docs/epics/{epic}/{story}/brainstorms/b-{issue}.md` | AI 实现设计，不上平台 |
-| PRD | 本地 `docs/epics/{epic}/{story}/prd.md` | 不上平台（可选） |
-| pre-tests | 本地 `docs/epics/{epic}/{story}/pre-tests.md` | 不上平台 |
-| tasks | 本地 `docs/epics/{epic}/{story}/tasks.md` | 不上平台 |
+| 里程碑 issue 完整规格 | 本地 `docs/B2-docs/{epic}/{story}/issues/{name}.md` | 详细版，平台 body 是摘要 |
+| B2/IBM 实现头脑风暴 | 本地 `docs/B2-docs/{epic}/{story}/brainstorms/b-{issue}.md` | AI 实现设计，不上平台 |
+| PRD | 本地 `docs/B2-docs/{epic}/{story}/prd.md` | 不上平台（可选） |
+| pre-tests | 本地 `docs/B2-docs/{epic}/{story}/pre-tests.md` | 不上平台 |
+| tasks | 本地 `docs/B2-docs/{epic}/{story}/tasks.md` | 不上平台 |
 | 用户反馈 | 平台 issue comment | 用户在平台上对里程碑 issue 的评论 |
 | AI 进展更新 | 平台 issue comment | freely 在关键节点写评论（如：B2 完成、进入 dev、合并） |
 
@@ -282,14 +282,14 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 
 ## Status
 - phase_state: in_dev
-- canonical: docs/epics/{epic}/{story}/issues/{name}.md
+- canonical: docs/B2-docs/{epic}/{story}/issues/{name}.md
 ```
 
 **原始 raw issue 的关闭**：当 raw issue 被 promote 为里程碑 issue 后，freely 在 raw issue 上写一条评论引用新的里程碑 issue，然后关闭 raw issue。评论内容：
 
 ```
 This issue has been promoted to a milestone issue: {platform_link}
-Canonical docs: docs/epics/{epic}/{story}/issues/{name}.md
+Canonical docs: docs/B2-docs/{epic}/{story}/issues/{name}.md
 ```
 
 这样用户在平台上看到 raw issue 已关闭，知道要去新的里程碑 issue 跟踪进展。
@@ -300,7 +300,7 @@ Canonical docs: docs/epics/{epic}/{story}/issues/{name}.md
 
 **本地 → 平台**（通过 issue.md frontmatter）：
 ```yaml
-# docs/epics/.../issues/{name}.md frontmatter
+# docs/B2-docs/.../issues/{name}.md frontmatter
 platform_ids:
   github:
     issue_id: "42"
@@ -309,12 +309,12 @@ platform_ids:
 
 **平台 → 本地**（通过 issue body 中的链接）：
 ```markdown
-canonical: docs/epics/{epic}/{story}/issues/{name}.md
+canonical: docs/B2-docs/{epic}/{story}/issues/{name}.md
 ```
 
 **sync 脚本查找本地文档**：给定一个平台 issue URL，sync 脚本通过以下方式找到对应的本地文档：
 1. 查 ISSUES.md 索引（最快）
-2. 搜 `docs/epics/` 下所有 issue.md 的 frontmatter（兜底）
+2. 搜 `docs/B2-docs/` 下所有 issue.md 的 frontmatter（兜底）
 
 ### 16. 核心架构原则：平台与本地隔离，AI 只读本地
 

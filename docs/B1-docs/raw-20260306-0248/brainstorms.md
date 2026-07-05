@@ -104,7 +104,7 @@
 之前的 brainstorm-routing 结论并没有失效，但它现在属于更大主题下的治理子问题：
 
 - 没有明确 issue 证据时，brainstorm 文档默认落到 `docs/B1-docs/raw-`
-- 只有存在明确 issue 证据时，brainstorm 文档才允许落到 `docs/epics/.../brainstorms/`
+- 只有存在明确 issue 证据时，brainstorm 文档才允许落到 `docs/B2-docs/.../brainstorms/`
 - 这条规则只解决“brainstorm 文档落位”
 - 它不能单独决定总任务路由
 
@@ -184,7 +184,7 @@
 
 - `AGENTS.md`
   - 非 issue 前置研究 -> `docs/B1-docs/raw-`
-  - 基于已有 issue 的 IBM brainstorm -> `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
+  - 基于已有 issue 的 IBM brainstorm -> `docs/B2-docs/{epic}/{story}/brainstorms/b-{issue-name}.md`
 - `PROJECT_INTENT.md`
   - chat / review / 新问题先进入 `pre-brainstorms`
   - ready issue / in-progress issue 再进入正式工作流
@@ -320,11 +320,11 @@
 `has-usable-issue-skill` 的职责不是一句“有 issue 就继续”就结束，而是要把 issue-bound `doc-loop(IBM+G)` 接入做完整：
 
 - 若进入 `IBM`，应要求 issue 目录下至少维护：
-  - `docs/epics/{epic}/{story}/issues/{issue-name}.md`
-  - `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
-  - `docs/epics/{epic}/{story}/prd.md`
-  - `docs/epics/{epic}/{story}/pre-tests.md`
-  - `docs/epics/{epic}/{story}/tasks.md`
+  - `docs/B2-docs/{epic}/{story}/issues/{issue-name}.md`
+  - `docs/B2-docs/{epic}/{story}/brainstorms/b-{issue-name}.md`
+  - `docs/B2-docs/{epic}/{story}/prd.md`
+  - `docs/B2-docs/{epic}/{story}/pre-tests.md`
+  - `docs/B2-docs/{epic}/{story}/tasks.md`
 - `no-usable-issue-skill` 负责 `pre-brainstorm -> candidate -> milestone`
 - `has-usable-issue-skill` 负责 `usable issue -> doc-loop(IBM+G)`
 - `dev-loop-execution` 负责 `DDD`
@@ -1008,7 +1008,7 @@ route = context_match(milestone, issue, candidate)
 3. 先建立或进入正式目录：
 
 ```text
-docs/epics/{epic-name}/{story-name}/
+docs/B2-docs/{epic-name}/{story-name}/
 ```
 
 然后再继续 `IBM`。
@@ -1068,7 +1068,7 @@ docs/epics/{epic-name}/{story-name}/
 
 后续如果修流程图和 guidance，需补上这条：
 - `doc-loop(IBM)` 一旦启动，就不再把产物留在 `pre-brainstorms`
-- 正式产物进入 `docs/epics/{epic}/{story}/`
+- 正式产物进入 `docs/B2-docs/{epic}/{story}/`
 - milestone 继续保持独立
 
 
@@ -1333,7 +1333,7 @@ iflow -p -y "<user-input>or<other input>,<milestone-path>；根据输入，分�
 2. 子层：
 - 当需要写 brainstorm 文档时，它应落在：
   - `docs/B1-docs/raw-`
-  - 或 `docs/epics/{epic}/{story}/brainstorms/`
+  - 或 `docs/B2-docs/{epic}/{story}/brainstorms/`
 
 换句话说：
 - **brainstorm 路由不是顶层调度器**
@@ -1364,7 +1364,7 @@ iflow -p -y "<user-input>or<other input>,<milestone-path>；根据输入，分�
 此时应：
 
 - 先确认 `epic/story`
-- 再把 brainstorm 放到 `docs/epics/{epic}/{story}/brainstorms/`
+- 再把 brainstorm 放到 `docs/B2-docs/{epic}/{story}/brainstorms/`
 
 只有在以下情况，才应重新进入新的 `pre-brainstorms`：
 
@@ -1491,7 +1491,7 @@ flowchart TD
     subgraph STATE["shared state / artifacts"]
         S0["docs/milestones.md"]
         S1["docs/B1-docs/raw-**"]
-        S2["docs/epics/**"]
+        S2["docs/B2-docs/**"]
         S3["docs/progress/**"]
     end
 

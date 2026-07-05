@@ -25,7 +25,7 @@ source_candidate: docs/B1-docs/raw-20260624T235907Z/candidates.md#C-20260624T235
 
 `pretests-retirement-gate` 的 GREEN 检查逻辑错误：
 
-1. **现状**：`workcell-state.env` 不存在时（#3446 fallback）扫描 `docs/epics/**/pre-tests.md` 文件存在就放行
+1. **现状**：`workcell-state.env` 不存在时（#3446 fallback）扫描 `docs/B2-docs/**/pre-tests.md` 文件存在就放行
 2. **问题**：pre-tests.md 存在只证明 RED（文档写好了），不代表 GREEN（测试执行了）
 3. **后果**：`pr-create-guarded` Step 2c 形同虚设——只要有 B2 文档就能过
 
@@ -46,7 +46,7 @@ source_candidate: docs/B1-docs/raw-20260624T235907Z/candidates.md#C-20260624T235
 ### GREEN 检查逻辑（不依赖 Worker）
 
 1. 有 `workcell-state.env` → 从中读 pre_tests_path（快速定位）
-2. 没有 → 扫描 `docs/epics/**/pre-tests.md`
+2. 没有 → 扫描 `docs/B2-docs/**/pre-tests.md`
 3. 无论哪种 → 最终都检查每个 acceptance item：
    - `actual_output` ≠ 占位符（如 "(执行后填写)"）
    - `status` == "pass"

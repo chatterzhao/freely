@@ -177,7 +177,7 @@
 
 ### [KEEP] 9.2 现有目录
 - docs/B1-docs/raw-（不变）
-- docs/epics/（不变）
+- docs/B2-docs/（不变）
 - docs/progress/（不变）
 - docs/system/workspace/（不变）
 

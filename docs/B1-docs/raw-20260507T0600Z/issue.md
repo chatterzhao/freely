@@ -13,7 +13,7 @@ created_at: 2026-05-07 06:00:00+00:00
 author: zhaoquan
 session_refs: []
 pre_tests_path: docs/B2-docs/raw-issue-pull/verification/pre-tests.md
-verification_artifact_dir: docs/epics/raw-issue-pull/code-reviews
+verification_artifact_dir: docs/B2-docs/raw-issue-pull/code-reviews
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 updated_at: 2026-05-17T04:47:25Z
 platform_state: closed
@@ -22,4 +22,4 @@ platform_state: closed
 从平台拉取 raw issue 到本地 docs/issues/
 
 - pre_tests_path: `docs/B2-docs/raw-issue-pull/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/raw-issue-pull/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/raw-issue-pull/code-reviews`

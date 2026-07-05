@@ -64,5 +64,5 @@ Worker 在等待 Manager 输入，但工位已经被 wt-close 删了。当前：
 
 ## 参考
 - SSE 实现 #3388：https://github.com/chatterzhao/freely/pull/3389
-- acp-a2a-refactor：`docs/epics/acp-a2a-refactor/tasks.md`（10 pending）
+- acp-a2a-refactor：`docs/B2-docs/acp-a2a-refactor/tasks.md`（10 pending）
 - raw-20260617T011030Z：`docs/B1-docs/raw-20260617T011030Z/issue.md`

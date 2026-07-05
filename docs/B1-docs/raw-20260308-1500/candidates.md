@@ -15,6 +15,6 @@
 - scope:
   - LAWS 2C 流程标识词典
   - milestones.md milestone_state_policy
-  - 所有 docs/epics/**/issues/*.md 状态字段
+  - 所有 docs/B2-docs/**/issues/*.md 状态字段
   - 相关 skills 状态判断逻辑
 - impact: 中等 - 需要更新多个文档，但语法层面兼容（只是值域变化）

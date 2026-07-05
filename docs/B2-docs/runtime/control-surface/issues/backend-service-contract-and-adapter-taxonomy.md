@@ -7,7 +7,7 @@
 - epic-name: `control-surface-runtime-convergence`
 - story-name: `backend-service-contract-and-adapter-taxonomy`
 - issue-name: `backend-service-contract-and-adapter-taxonomy`
-- verification_artifact_dir: `docs/epics/- epic-name: `control-surface-runtime-convergence`/- story-name: `backend-service-contract-and-adapter-taxonomy`/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/- epic-name: `control-surface-runtime-convergence`/- story-name: `backend-service-contract-and-adapter-taxonomy`/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260312/candidates.md#c-20260312-0011-a`
 - source_brainstorm: `docs/B1-docs/raw-20260312/brainstorms.md`
 - execution_base: `develop`
@@ -61,7 +61,7 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
 
 ## Verification
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/B2-docs/frontend-probe-dogfooding-loop -g '*.md'`
 - `rg -n "I-20260312-0011|backend-service-contract-and-adapter-taxonomy" docs -g '*.md'`
 - `./bin/governance-check`
 

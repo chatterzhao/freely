@@ -54,7 +54,7 @@ AI 永远不直接读/写平台——`issue-sync` 和 `task-source-scan` 是唯�
 Pull 时从两边拉取、去重、合并。平台只是通道，不绑定。
 
 ### 5. 本地保留完整数据
-即使平台全部丢失，本地 `docs/issues/` + `docs/B1-docs/raw-` + `docs/epics/` 包含完整的 issue 生命周期数据。可从本地 `issue-sync create` 重建平台。
+即使平台全部丢失，本地 `docs/issues/` + `docs/B1-docs/raw-` + `docs/B2-docs/` 包含完整的 issue 生命周期数据。可从本地 `issue-sync create` 重建平台。
 
 ## 需要更新的文档
 

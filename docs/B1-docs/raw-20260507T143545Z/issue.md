@@ -20,12 +20,12 @@ author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
-verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
+verification_artifact_dir: docs/B2-docs/timestamp-seconds-upgrade/code-reviews
 platform_state: closed
 ---
 
 - pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
+- verification_artifact_dir: docs/B2-docs/timestamp-seconds-upgrade/code-reviews
 
 ## 问题
 YYYYMMDDTHHMMZ 格式缺少秒，导致同分钟内 key 碰撞风险。正则 \d{4} 截断 6 位秒导致门禁假阳性。

@@ -185,7 +185,7 @@ standing source -> scan -> derived problem signal
 #### `review finding`
 
 - canonical source record:
-  - `docs/epics/**/code-reviews/*.md`
+  - `docs/B2-docs/**/code-reviews/*.md`
 - manager activation:
   - review 完成后或主管扫描 review backlog 时
 - manager first job:
@@ -252,7 +252,7 @@ standing source -> scan -> derived problem signal
 
 - canonical source record:
   - `docs/milestones.md`
-  - `docs/epics/**`
+  - `docs/B2-docs/**`
   - `docs/progress/**`
   - `docs/recovery/**`
 - scan mode:
@@ -646,7 +646,7 @@ Freely 作为自治开发应用，不仅要响应 signal，还应主动看：
 
 - 新模糊问题 -> `docs/B1-docs/raw-**`
 - 已有候选提升 -> `docs/milestones.md`
-- issue 边界不足 -> `docs/epics/**`
+- issue 边界不足 -> `docs/B2-docs/**`
 - dev continuation -> `progress` / code / tests
 - verification/review -> review / verification artifacts
 - runtime supervision -> `.freely/run/**` / continuity / cleanup evidence

@@ -104,7 +104,7 @@
 
 1. `docs/B1-docs/raw-<id>/brainstorms.md`
    - 优先在被推翻段落旁追加 `Status Reconcile` 小节；若原文跨度过长且集中补注更清晰，可在文末集中追加并显式指回 stale statement
-2. `docs/epics/.../issues/*.md` 或 `prd.md`
+2. `docs/B2-docs/.../issues/*.md` 或 `prd.md`
    - 当 pre-brainstorm 引述 owner 状态错误时，补 canonical pointer
 3. `docs/system/workspace/scripts/quality/*` 与测试脚本
    - 仅作为事实引用来源，不在本条 reconcile owner 中改逻辑

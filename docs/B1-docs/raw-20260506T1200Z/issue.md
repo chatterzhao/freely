@@ -16,7 +16,7 @@ author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/ibm-skill-rename/verification/pre-tests.md
-verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
+verification_artifact_dir: docs/B2-docs/ibm-skill-rename/code-reviews
 updated_at: '2026-06-15T06:12:40Z'
 platform_state: closed
 ---
@@ -32,4 +32,4 @@ I→B→M 骨架未被下层 skill 强制消费。
 
 
 - pre_tests_path: `docs/B2-docs/ibm-skill-rename/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm-skill-rename/code-reviews`

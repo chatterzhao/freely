@@ -26,4 +26,4 @@ pretests-retirement-gate 在 workcell-state.env 不存在时直接 exit 1。手�
 
 ## 修复
 
-无 workcell-state.env 时 scan docs/epics/ 查找对应 pre-tests.md 直接验证。
+无 workcell-state.env 时 scan docs/B2-docs/ 查找对应 pre-tests.md 直接验证。

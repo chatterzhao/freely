@@ -12,9 +12,9 @@
 
 ## Product Surface
 
-- `docs/epics/**/prd.md`
-- `docs/epics/**/pre-tests.md`
-- `docs/epics/**/tasks.md`
+- `docs/B2-docs/**/prd.md`
+- `docs/B2-docs/**/pre-tests.md`
+- `docs/B2-docs/**/tasks.md`
 - `doc-ibm-execution` 对 `prd.md` 的完成判断
 
 ## Non-Goals

@@ -5,14 +5,14 @@
 
 ### acceptance-1: freely-review uses new glob patterns
 - id: AT-001
-- requirement: bin/freely-review searches pre-tests and I-* at new docs/epics/*/*/raw-{key}/ location
+- requirement: bin/freely-review searches pre-tests and I-* at new docs/B2-docs/*/*/raw-{key}/ location
 - acceptance_target: grep confirms new glob patterns in freely-review
 - testing_layer: unit
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: grep output confirms all old paths replaced
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
-- test_command: grep -c "docs/epics/\*/\*/raw-" bin/freely-review && ! grep "docs/issues/I-" bin/freely-review
+- test_command: grep -c "docs/B2-docs/\*/\*/raw-" bin/freely-review && ! grep "docs/issues/I-" bin/freely-review
 - expected_output: 新glob匹配，旧I-*路径无匹配
 - actual_output: 2 new glob matches, 0 old I-* matches — all paths updated correctly
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
@@ -28,7 +28,7 @@
 - required_evidence: grep confirms all old paths replaced
 - evidence_level: mock
 - artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
-- test_command: grep -c "docs/epics/\*/\*/raw-" bin/pr-review-guarded && ! grep "docs/issues/I-" bin/pr-review-guarded
+- test_command: grep -c "docs/B2-docs/\*/\*/raw-" bin/pr-review-guarded && ! grep "docs/issues/I-" bin/pr-review-guarded
 - expected_output: 新glob匹配，旧I-*路径无匹配
 - actual_output: 9 new glob matches, 0 old I-* matches — all paths updated correctly
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log

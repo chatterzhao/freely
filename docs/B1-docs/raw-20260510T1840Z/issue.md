@@ -39,6 +39,6 @@ kind: linked
 phase_state: completed
 promoted_from: raw-20260510T1840Z
 source_candidate: docs/B1-docs/raw-20260510T1840Z/candidates.md
-verification_artifact_dir: docs/epics/branch-check-no-bypass/code-reviews
+verification_artifact_dir: docs/B2-docs/branch-check-no-bypass/code-reviews
 pre_tests_path: docs/B2-docs/branch-check-no-bypass/verification/pre-tests.md
 platform_state: ''

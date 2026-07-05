@@ -65,4 +65,4 @@ pr-merge-guarded 第 292-303 行报错输出改为：
 修复后在 source worktree 重试: cd <worktree> && freely pr-merge-guarded ...
 ```
 - pre_tests_path: docs/B2-docs/merge-error-ibm-guide/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews
+- verification_artifact_dir: docs/B2-docs/merge-error-ibm-guide/code-reviews

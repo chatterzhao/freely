@@ -19,7 +19,7 @@ author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/unified-platform/verification/pre-tests.md
-verification_artifact_dir: docs/epics/unified-platform/code-reviews
+verification_artifact_dir: docs/B2-docs/unified-platform/code-reviews
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 platform_state: closed
 ---
@@ -87,4 +87,4 @@ freely → unified platform layer
 - 只有一个 entry point 调用平台 API：`issue-sync`
 
 - pre_tests_path: `docs/B2-docs/unified-platform/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/unified-platform/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/unified-platform/code-reviews`

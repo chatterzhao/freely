@@ -42,4 +42,4 @@ platform_state: closed
 - #257 platform-adapter.py 标题 key 标准化 bug
 
 - pre_tests_path: docs/B2-docs/wt-create-pull-after-worktree/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/wt-create-pull-after-worktree/code-reviews
+- verification_artifact_dir: docs/B2-docs/wt-create-pull-after-worktree/code-reviews

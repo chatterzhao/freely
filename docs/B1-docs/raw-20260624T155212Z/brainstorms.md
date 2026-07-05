@@ -31,7 +31,7 @@ This `.freely/run/workcell-state.env` file is only created by the Worker executi
 - Problem: still needs to find the right issue and pre-tests to validate
 
 ### Option C: Fallback scan of worktree pre-tests.md (chosen)
-- When state_file missing, scan `$WORKTREE_PATH/docs/epics/` for `**/pre-tests.md` files
+- When state_file missing, scan `$WORKTREE_PATH/docs/B2-docs/` for `**/pre-tests.md` files
 - For each pre-tests.md, find the owning issue by matching `pre_tests_path` field in issue files
 - Run `pretests-gate --project $WORKTREE_PATH --issue $issue_path` for each
 - This directly validates the pre-tests without needing Worker metadata
@@ -50,7 +50,7 @@ This `.freely/run/workcell-state.env` file is only created by the Worker executi
 Change in `docs/system/workspace/scripts/quality/pretests-retirement-gate`:
 
 Replace the `if not state_file.exists(): sys.exit(1)` block (lines 103-105) with a fallback that:
-1. Scans `$WORKTREE_PATH/docs/epics/**/pre-tests.md` for pre-tests files
+1. Scans `$WORKTREE_PATH/docs/B2-docs/**/pre-tests.md` for pre-tests files
 2. For each, resolves the owning issue by matching the `pre_tests_path` field in issue files
 3. Runs `pretests-gate --project $WORKTREE_PATH --issue <issue_path>` for each found issue
 4. Exits 0 if all pass, 1 if any fail

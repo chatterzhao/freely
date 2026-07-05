@@ -16,8 +16,8 @@
 
 - `docs/milestones.md`
 - `docs/B1-docs/raw-**`
-- `docs/epics/**/issues/*.md`
-- `docs/epics/**/code-reviews/*.md`
+- `docs/B2-docs/**/issues/*.md`
+- `docs/B2-docs/**/code-reviews/*.md`
 - `docs/progress/**`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 

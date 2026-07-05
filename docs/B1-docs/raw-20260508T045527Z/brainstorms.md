@@ -29,4 +29,4 @@ raw-20260508T045527Z 提出：`task-source-scan.py` 已被 `task-lifecycle-scan.
 
 ## 收敛
 
-此 issue 已完整执行：task-source-scan.py 已删除，CONSTITUTION.md 已更新，I-20260508T045527Z-A 标记为 phase_state: completed。epic `docs/epics/cleanup-scan/` 包含 code-review 和 verification 证据。
+此 issue 已完整执行：task-source-scan.py 已删除，CONSTITUTION.md 已更新，I-20260508T045527Z-A 标记为 phase_state: completed。epic `docs/B2-docs/cleanup-scan/` 包含 code-review 和 verification 证据。

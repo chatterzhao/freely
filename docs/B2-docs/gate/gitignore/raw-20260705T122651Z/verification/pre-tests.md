@@ -10,7 +10,7 @@
 - required_evidence: grep
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/gate/gitignore/raw-20260705T122651Z/verification/test-evidence/at-001.log
-- test_command: '! grep -nE "docs/epics/[a-z-]+/code-reviews|docs/epics/[a-z-]+/verification|docs/epics/[a-z-]+/test-evidence" docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md | grep -v "raw-\|{raw key}" && echo PASS'
+- test_command: '! grep -nE "docs/B2-docs/[a-z-]+/code-reviews|docs/B2-docs/[a-z-]+/verification|docs/B2-docs/[a-z-]+/test-evidence" docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md | grep -v "raw-\|{raw key}" && echo PASS'
 - expected_output: PASS (no bare paths without raw/key)
 - expected_RED_output: found bare paths
 - actual_RED_output: 10处缺层路径

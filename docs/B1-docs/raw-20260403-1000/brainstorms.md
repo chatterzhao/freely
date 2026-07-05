@@ -203,7 +203,7 @@ Issue 完成              ──►  标签 status: completed
 阶段              编号格式              位置                        是否同步到 GitHub
 ──────────────   ──────────────────   ────────────────────────   ────────────────
 候选 issue       C-YYYYMMDD-HHMM-序号  pre-brainstorms/*/candidates.md   ❌ 内部
-里程碑 issue     I-YYYYMMDD-HHMM-序号  docs/epics/*/issues/*.md          ✅ 是
+里程碑 issue     I-YYYYMMDD-HHMM-序号  docs/B2-docs/*/issues/*.md          ✅ 是
 ```
 
 **里程碑 issue 对应 GitHub issue 的理由：**
@@ -351,7 +351,7 @@ completed:
       │  状态同步                               │
       ▼                                        ▼
   用户可见进展                      Freely 内部追踪 (phase_state)
-                                  + docs/epics/*/issues/*.md
+                                  + docs/B2-docs/*/issues/*.md
 ```
 
 ### 状态同步机制

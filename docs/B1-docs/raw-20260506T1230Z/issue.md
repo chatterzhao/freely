@@ -17,7 +17,7 @@ author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/wt-create-dual/verification/pre-tests.md
-verification_artifact_dir: docs/epics/wt-create-dual/code-reviews
+verification_artifact_dir: docs/B2-docs/wt-create-dual/code-reviews
 platform_state: closed
 ---
 
@@ -29,4 +29,4 @@ wt-create 每次只创建一个工位，fix/feat 和 test-pre-merge 都基于 de
 fix→test-pre-merge 变为 fast-forward。
 
 - pre_tests_path: `docs/B2-docs/wt-create-dual/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/wt-create-dual/code-reviews`

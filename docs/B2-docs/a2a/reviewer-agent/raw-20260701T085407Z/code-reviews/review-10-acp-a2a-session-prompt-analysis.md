@@ -70,7 +70,7 @@ Worker 完成阶段
   │     "从 Manager 的对话分叉一个新对话给 Reviewer"
   │
   ├─ ACP: session/prompt → 投入审查任务
-  │     "这是 B1 产物路径: docs/epics/.../brainstorms.md，请审查"
+  │     "这是 B1 产物路径: docs/B2-docs/.../brainstorms.md，请审查"
   │
   └─ Reviewer 审查 → 产出 verdict
        │
@@ -121,7 +121,7 @@ session 已就绪（无论 new/fork/resume 哪种方式启动的）
        ├─ message 内容:
        │   "你的角色: Reviewer
        │    审查阶段: B1
-       │    产物路径: docs/epics/.../brainstorms.md
+       │    产物路径: docs/B2-docs/.../brainstorms.md
        │    验收标准: 根因分析是否充分，candidate 格式是否完备"
        │
        └─ AI 收到后 → 在**同一段对话里**继续处理
@@ -220,7 +220,7 @@ Worker B1 完成
   │
   ├─ watchdog: session/prompt(ses_rev_001,
   │     "你是 Reviewer。Worker B1 完成了 raw_key=xxx。
-  │      产物: docs/epics/.../brainstorms.md。请审查根因分析是否充分。")
+  │      产物: docs/B2-docs/.../brainstorms.md。请审查根因分析是否充分。")
   │
   ├─ Reviewer AI 处理 → 审查 brainstorms.md → 产出 verdict
   │

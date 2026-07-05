@@ -26,7 +26,7 @@
   - gate 校验 issue 文档元数据规范
 - non_goals:
   - 不实现 TUI/GUI issue 界面（CLI-first）
-  - 不改变 `docs/epics/` B2 产物目录结构
+  - 不改变 `docs/B2-docs/` B2 产物目录结构
   - 不改变 `task-source-scan.py` 的扫描逻辑（下载到本地不变）
 - session_refs:
   - {tool: ccds, session_id: "20260427-b1-intake-design", jsonl_path: "unavailable://manual", role: "author"}

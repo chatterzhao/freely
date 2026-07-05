@@ -12,8 +12,8 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: docs/issues/I-20260509T022152Z-A/issue.md
-pre_tests_path: docs/epics/worker-launch-writable-redirect/pre-tests.md
-verification_artifact_dir: docs/epics/worker-launch-writable-redirect/code-reviews
+pre_tests_path: docs/B2-docs/worker-launch-writable-redirect/pre-tests.md
+verification_artifact_dir: docs/B2-docs/worker-launch-writable-redirect/code-reviews
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-09T02:22:01Z'
@@ -24,8 +24,8 @@ session_refs: []
 platform_state: open
 ---
 
-- pre_tests_path: `docs/epics/worker-launch-writable-redirect/pre-tests.md`
-- verification_artifact_dir: `docs/epics/worker-launch-writable-redirect/code-reviews`
+- pre_tests_path: `docs/B2-docs/worker-launch-writable-redirect/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/worker-launch-writable-redirect/code-reviews`
 
 ## 根因链
 

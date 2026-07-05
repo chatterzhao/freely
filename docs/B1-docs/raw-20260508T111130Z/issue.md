@@ -41,7 +41,7 @@ kind: linked
 phase_state: absorbed
 promoted_from: raw-20260508T111130Z
 source_candidate: docs/B1-docs/raw-20260508T111130Z/candidates.md#C-20260508T111130Z-A
-verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
+verification_artifact_dir: docs/B2-docs/reference-transaction-delete-fix/code-reviews
 pre_tests_path: docs/B2-docs/reference-transaction-delete-fix/verification/pre-tests.md
 platform_ids: {}
 platform_state: open
@@ -49,4 +49,4 @@ platform_state: open
 # I-20260508T111130Z-A: reference-transaction hook delete fix
 
 - pre_tests_path: docs/B2-docs/reference-transaction-delete-fix/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
+- verification_artifact_dir: docs/B2-docs/reference-transaction-delete-fix/code-reviews

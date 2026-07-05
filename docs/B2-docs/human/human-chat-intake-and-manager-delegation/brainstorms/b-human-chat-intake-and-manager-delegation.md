@@ -9,7 +9,7 @@
 1. raw human chat 先进入 `.freely/intake/**`，而不是直接注入某个 AI 会话。
 2. manager 负责 notice / claim / reaction / delegate / absorption target，不负责深度解释。
 3. `skill:human-interruption-handling` 负责深度解释、worker handoff 与 resolution artifact。
-4. `.freely/intake/**` 是短期事件池，长期 canonical facts 仍回到 `docs/B1-docs/raw-**`、`docs/epics/**`、`docs/progress/**` 与 `docs/recovery/**`。
+4. `.freely/intake/**` 是短期事件池，长期 canonical facts 仍回到 `docs/B1-docs/raw-**`、`docs/B2-docs/**`、`docs/progress/**` 与 `docs/recovery/**`。
 
 ## Open Checks
 

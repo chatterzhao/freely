@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - issue-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
-- verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/- epic-name: `workspace-routing-foundation`/- story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-A`
 - additional_source_candidates:
   - `docs/B1-docs/raw-20260318/candidates.md#c-20260318-2358-a`

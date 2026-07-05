@@ -19,7 +19,7 @@
   - `docs/milestones.md`
 - route_verdict: `still_pre_brainstorm`
 - why:
-  - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this bounded patrol-scan slice
+  - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/B2-docs/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this bounded patrol-scan slice
   - the already-landed runtime/doc/test commits on this branch still point to the same idle/replan patrol seam: stale delegated continuation stops counting as current-round active intake, idle managers get a machine-readable patrol seed, active workers suppress broad patrol, and launch-time worker prompts preserve the intended handoff state
   - the older `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md` owner is already `completed` and only freezes patrol-completeness semantics; it does not absorb this newer idle/replan scan-trigger contract
   - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabfa-babb-7a22-bca4-63ce4693ea81` `fresh_with_handoff` restart after `context compacted` only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign

@@ -16,7 +16,7 @@ milestone: M-20260624T155212Z-A
 - revisit_trigger: N/A (fix is already implemented and committed)
 - acceptance_criteria:
   - pretests-retirement-gate no longer exits immediately when workcell-state.env is missing
-  - Fallback scans worktree docs/epics/ for pre-tests.md files and validates via pretests-gate
+  - Fallback scans worktree docs/B2-docs/ for pre-tests.md files and validates via pretests-gate
   - When Worker metadata exists, original behavior is unchanged
   - manually-executed worktrees can be closed without --force
 - promotion_gate: code change committed, tested against actual worktree

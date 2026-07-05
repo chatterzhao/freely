@@ -31,7 +31,7 @@
       状态机、乐观锁、JSON 协议、上下文分层等核心设计细节完整。
       #343 的四个 bug 在新协议下结构上不再存在（promotion_gate 结构满足）。
       open_questions 为空，B2_IBM 已完全 materialize：
-      PRD、pre-tests、tasks、code-reviews 均已完成（at docs/epics/agent-handoff-protocol/）。
+      PRD、pre-tests、tasks、code-reviews 均已完成（at docs/B2-docs/agent-handoff-protocol/）。
       Issue I-20260514T103532Z-A phase_state=completed、platform_state=closed。
       无阻拦项，建议正式 promote。
     findings:

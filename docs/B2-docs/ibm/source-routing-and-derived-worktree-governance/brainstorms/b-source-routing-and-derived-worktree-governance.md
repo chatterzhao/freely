@@ -12,7 +12,7 @@
 4. `progress` 只跟踪 dev-loop。
 5. pre-brainstorm 写入应发生在合适的 dedicated worktree。
 6. derived worktree 默认允许，但必须显式记录 `execution_base / integration_target / depends_on`。
-7. IBM 正式产物必须落在 `docs/epics/{epic-name}/{story-name}/...`。
+7. IBM 正式产物必须落在 `docs/B2-docs/{epic-name}/{story-name}/...`。
 8. 首跳若选中与当前相同的工具，必须在同一会话内继续执行第二跳；`next_prompt` 只是可追溯中间产物。
 
 ## Open Questions

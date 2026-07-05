@@ -31,7 +31,7 @@ pr-merge-guarded 只接受 `feature/*` 和 `hotfix/*` → `test-pre-merge-*` 方
 - 不涉及其他 merge 方向（`main`、`develop`、`release/*` 等方向不受影响）
 
 ### 依赖检查
-- 已有 `docs/epics/pr-merge-guarded-fix-whitelist/` 体系
+- 已有 `docs/B2-docs/pr-merge-guarded-fix-whitelist/` 体系
 - `pre-tests.md` 已定义三个测试层（unit / integration / end-to-end）
 - `tasks.md` 已拆分三个任务并标记 completed
 - `code-reviews/review.md` 已记录 implementation decision

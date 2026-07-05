@@ -12,7 +12,7 @@
 - why_this_pool_first:
   - delegated continuation handoff 已直接命中 `C-20260323-1705-A`
   - `docs/milestones.md` 仍将该条目标记为 `candidate` / `in_pre_brainstorm`
-  - 未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 的 canonical owner 接管该 contract
+  - 未发现 `docs/B2-docs/**`、`docs/progress/**` 或 `docs/recovery/**` 的 canonical owner 接管该 contract
 - restart_point: `continuation`
 - workspace_action: `reuse-current-feature-worktree`
 - execution_base: `develop`
@@ -38,7 +38,7 @@
   - 当前最接近的 stalled specimen 仍是 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`，但 runtime 尚未把其中哪一个明确标成“当前 stalled intake”
   - 当前 runtime / tests 还额外暴露了 continuity generated/consumed truth，但整体仍只冻结到“prompt 已吸收 delegated continuation 且之后没有新的 continuity / handoff”这层 recovery contract，尚未证明 consumed truth 与当前 prompt cycle / stalled intake 的稳定绑定
   - runtime 还没有暴露足以冻结 promotion gate 的 prompt-bound consumed anchor，因此无法证明当前 stalled intake 已被当前 prompt cycle 稳定吸收
-  - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
+  - 也未发现 `docs/B2-docs/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
   - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
 - hygiene_judgement:
   - canonical writeback 已继续收敛到 develop-facing merge-prep owner line，当前 worktree 为 `CLEAN`

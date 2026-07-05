@@ -27,7 +27,7 @@
 
 ## Verification Checks
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/B2-docs/frontend-probe-dogfooding-loop -g '*.md'`
 - `rg -n "I-20260312-0011|backend-service-contract-and-adapter-taxonomy" docs -g '*.md'`
 - `./bin/governance-check`
 

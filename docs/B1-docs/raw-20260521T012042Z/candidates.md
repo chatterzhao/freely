@@ -8,7 +8,7 @@
 - priority: P1
 - source_raw: `raw-20260521T012042Z` (GitHub #1519)
 - decision_reason: 2026-05-20 Runtime Crash Postmortem 暴露两个关联的 worker 生命周期管理缺陷。子问题 1（keepalive 不扫描）有明确修复方向；子问题 2（ACP init 超时）与 C-20260519T015638Z-A 重叠需协调。合并为一个 candidate 因为共享同一代码域且修复链互补。
-- next_action: 子问题 1 B2 已完成（见 `docs/epics/stale-pid-keepalive/`），进入 dev 实现；子问题 2 与 C-20260519T015638Z-A 协调研究根因
+- next_action: 子问题 1 B2 已完成（见 `docs/B2-docs/stale-pid-keepalive/`），进入 dev 实现；子问题 2 与 C-20260519T015638Z-A 协调研究根因
 - revisit_trigger: 子问题 2 的根因研究有结论时重新评估
 - acceptance_criteria:
   ### 子问题 1 — keepalive 扫描 launched worker [B2_COMPLETE]
@@ -29,9 +29,9 @@
   - [ ] 与 C-20260519T015638Z-A 的协调结论记录在案
   - [ ] governance-check passes
 - b2_deliverables:
-  - prd: `docs/epics/stale-pid-keepalive/prd.md`
-  - pre-tests: `docs/epics/stale-pid-keepalive/pre-tests.md`
-  - tasks: `docs/epics/stale-pid-keepalive/tasks.md`
+  - prd: `docs/B2-docs/stale-pid-keepalive/prd.md`
+  - pre-tests: `docs/B2-docs/stale-pid-keepalive/pre-tests.md`
+  - tasks: `docs/B2-docs/stale-pid-keepalive/tasks.md`
   - code-reviews: `docs/B2-docs/stale-pid-keepalive/code-reviews/`
 - open_questions:
   - Manager 是否有权限访问所有活跃 worker 的 PID？(同用户/同进程组/跨容器)

@@ -45,4 +45,4 @@ daemon → Unix socket → bridge(Python) → stdin/stdout → claude-agent-acp
 - 或提高 storm 阈值/改为基于实际 crash 而非重启次数
 
 - pre_tests_path: docs/B2-docs/acp-bridge-restart-storm/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/acp-bridge-restart-storm/code-reviews
+- verification_artifact_dir: docs/B2-docs/acp-bridge-restart-storm/code-reviews

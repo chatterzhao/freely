@@ -641,4 +641,4 @@ IBM 应按固定顺序 materialize，避免重新混层：
 - 当前轮次完成形态: `promotion handoff ready`
 - 下一跳应进入 `skill:doc-ibm-execution`
 - 本轮已把最后一个 promotion gate 关闭：follow-on IBM 不再保持单 issue，而是按 owner 切成 `project command semantics` 与 `global restart restore memory` 两个紧邻 issue
-- 由于当前 worker write scope 只允许 pre-brainstorm / milestone / continuity surfaces，本轮在 promotion handoff 停止，不直接写 `docs/epics/**`
+- 由于当前 worker write scope 只允许 pre-brainstorm / milestone / continuity surfaces，本轮在 promotion handoff 停止，不直接写 `docs/B2-docs/**`

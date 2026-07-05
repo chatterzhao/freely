@@ -304,7 +304,7 @@ Validation batch governance:
 - retire_evidence_ref: unavailable
 - remaining_cleanup_requirement: post_merge_acceptance;verified-retirable;retired
 - acceptance_contract_state: incomplete
-- acceptance_contract_source: /abs/docs/epics/.../pre-tests.md
+- acceptance_contract_source: /abs/docs/B2-docs/.../pre-tests.md
 - acceptance_contract_blocker: missing_post_merge_acceptance
 - superseded_worker_prompts: /abs/.freely/run/worker-prompts/old-a.txt
 - superseded_worker_prompts_applied_at: unavailable

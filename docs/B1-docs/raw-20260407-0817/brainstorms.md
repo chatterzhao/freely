@@ -1470,7 +1470,7 @@ This matrix is the current safest framing for future hook/gate design.
   - manager direct answer / runtime-local resolution
 - canonical absorption target:
   - `docs/B1-docs/raw-**`
-  - `docs/epics/**`
+  - `docs/B2-docs/**`
   - `docs/progress/**` / `docs/recovery/**`
   - runtime-local resolution artifact for direct-answer class
 - unresolved exit condition:

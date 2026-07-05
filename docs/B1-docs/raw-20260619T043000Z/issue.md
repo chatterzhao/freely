@@ -49,7 +49,7 @@ session_refs: []
 
 | gate 报错 | 原因 | 正确格式 |
 |-----------|------|---------|
-| verification_artifact_dir too broad | 需 /code-reviews 结尾 | docs/epics/{epic}/code-reviews |
+| verification_artifact_dir too broad | 需 /code-reviews 结尾 | docs/B2-docs/{epic}/code-reviews |
 | implementation decision incomplete | 需 5 个字段 | decision/why_this/alternatives_considered/boundary_non_goals/residual_risk |
 
 新增: `## 规范文档示例`

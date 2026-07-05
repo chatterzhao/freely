@@ -14,8 +14,8 @@ produced_candidate: C-20260705T155347Z-A
 
 ## Problem
 1. B1 产物散落在 `docs/B1-docs/raw-{key}--{slug}/`，无 raw key 目录包裹
-2. B2 产物散落在 `docs/epics/` 下 245 个伪 epic，大多实为 story
-3. skill/代码中硬编码旧路径（`docs/epics/`, `docs/B1-docs/raw-`），新 raw issue 会放错位置
+2. B2 产物散落在 `docs/B2-docs/` 下 245 个伪 epic，大多实为 story
+3. skill/代码中硬编码旧路径（`docs/B2-docs/`, `docs/B1-docs/raw-`），新 raw issue 会放错位置
 4. B1/B2 产物互不可追溯——同一个 raw key 在两个地方
 
 ## Discovery
@@ -25,7 +25,7 @@ produced_candidate: C-20260705T155347Z-A
 | 当前 | 目标 |
 |------|------|
 | `docs/B1-docs/raw-{key}--{slug}/` | `docs/B1-docs/raw-{key}/` |
-| `docs/epics/{old-epic}/{old-story}/` | `docs/B2-docs/{new-epic}/{new-story}/raw-{key}/` |
+| `docs/B2-docs/{old-epic}/{old-story}/` | `docs/B2-docs/{new-epic}/{new-story}/raw-{key}/` |
 | `docs/B1-docs/raw-{key}/` | → `docs/B1-docs/raw-{key}/`（迁入 B1） |
 | `docs/epics-map.svg` | 指向 `docs/B2-docs/`，删除重建 |
 | `docs/milestones.md` | 保留，路径引用更新 |

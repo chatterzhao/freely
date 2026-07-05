@@ -203,7 +203,7 @@
   - canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，而不是未提交 dirty delta
   - 当前 `git status --short` 已 clean，没有发现超出本候选 write scope 的残留脏项
   - 因此这轮不再需要额外 checkpoint/commit；后续 cleanup 判断的关键前提改为“这些提交何时被上游吸收”，而不是“是否还有未提交 dirty delta”
-- 当前仓库扫描未发现 `docs/progress/**`、`docs/epics/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
+- 当前仓库扫描未发现 `docs/progress/**`、`docs/B2-docs/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
 - 当前分支 `feature/manager-delegated-continuation-stall-materialization-20260323` 仍未被 `develop` 吸收；这说明 worktree cleanup 与 candidate materialization 仍应分开判断，不能因为已有 canonical writeback 提交就把该候选视为已关闭
 
 ## 需求池扫描与优先级
@@ -212,7 +212,7 @@
   - delegated continuation handoff 明确把当前输入收束到 `C-20260323-1705-A` 的 continuation
   - `milestones.md` 仍把该条目保留在 `candidate_issues`，且 `phase_state=in_pre_brainstorm`
 - 已核对但未接管的池：
-  - `docs/epics/**`：未发现该候选的 milestone-owned issue 真源
+  - `docs/B2-docs/**`：未发现该候选的 milestone-owned issue 真源
   - `docs/progress/**` / `docs/recovery/**`：未发现接管这条线的 continuation artifact；按法律这也说明当前不能降级成 dev-loop / recovery continuation
   - review / test / acceptance review：只提供相邻 issue 与 runtime patch 的 supporting evidence，不构成对本候选的 canonical owner
   - human chat / session evidence：当前 handoff 与 `session_refs` 只证明 continuation 来源和 fresh re-entry 背景，不足以替代 pre-brainstorm canonical artifacts
@@ -237,7 +237,7 @@
 - 因此当前真实问题不是“是否保留 dirty delta”，而是“这些 canonical pre-brainstorm writeback 提交是否仍应保留为独有分支提交，还是应该冻结/丢弃”
 - 本轮再次核对：
   - `docs/milestones.md` 仍把 `C-20260323-1705-A` 保留在 `candidate_issues`
-  - 未发现 `docs/progress/**`、`docs/recovery/**`、`docs/epics/**` 的 issue/progress/recovery 真源接管该候选
+  - 未发现 `docs/progress/**`、`docs/recovery/**`、`docs/B2-docs/**` 的 issue/progress/recovery 真源接管该候选
   - `freely live-status` 当前显示 `role_hint: worker`、`activity_state: ai_active`、`last_ai_state: down`、`last_exit_reason: ai_exit_rc_0`、`last_launch_kind: fresh_with_handoff`、`last_rotation_reason: context_compacted`，且 delegated continuation 仍在当前 prompt 上下文中
 - 结论：
   - route_kind 继续保持 `pre_brainstorm`

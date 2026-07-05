@@ -660,7 +660,7 @@ OpenClaw 目前最有价值的不是替代 Freely 的产品，而是：
 按现有设计，这些连续性至少可由以下事实组合承担：
 
 - `docs/milestones.md`
-- `docs/epics/**`
+- `docs/B2-docs/**`
 - `docs/progress/**` / `docs/recovery/**`
 - `.freely/logs/*`
 - `.freely/run/*`

@@ -17,7 +17,7 @@
 The `pretests-retirement-gate` script exits with code 1 when workcell-state.env doesn't exist. Manually-executed worktrees without a Worker must use --force to close.
 
 ## Solution
-Add a fallback: when workcell-state.env is missing, scan the worktree for pre-tests.md files under docs/epics/ and validate them via pretests-gate.
+Add a fallback: when workcell-state.env is missing, scan the worktree for pre-tests.md files under docs/B2-docs/ and validate them via pretests-gate.
 
 ## Implementation
 Changed `docs/system/workspace/scripts/quality/pretests-retirement-gate`:

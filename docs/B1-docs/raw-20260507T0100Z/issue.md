@@ -14,7 +14,7 @@ author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/fix-branch-naming/verification/pre-tests.md
-verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
+verification_artifact_dir: docs/B2-docs/fix-branch-naming/code-reviews
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 updated_at: 2026-05-17T04:47:25Z
 platform_state: closed
@@ -27,4 +27,4 @@ fix-execution SKILL.md 分支规范表中普通 fix 的分支前缀是 feature/ 
 7 处 feature/ → fix/，使用 raw-{raw-key}-{slug} 格式。
 
 - pre_tests_path: `docs/B2-docs/fix-branch-naming/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/fix-branch-naming/code-reviews`

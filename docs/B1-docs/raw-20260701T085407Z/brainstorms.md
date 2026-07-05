@@ -170,7 +170,7 @@ agent 设 input-required 时不手写 message。Runtime 根据参数自动生成
 
 ```
 模板: "{from_agent} 在 raw_key={raw_key} 完成 {review_stage}，需要 {reason}。
-       产物路径: docs/epics/{epic}/{story}/raw-{raw_key}/..."
+       产物路径: docs/B2-docs/{epic}/{story}/raw-{raw_key}/..."
 
 示例: "worker_03 在 raw-20260701T085407Z 完成 B1，需要 needs-review:b1。
        产物路径: docs/B2-docs/a2a/phase1/raw-20260701T085407Z/..."
@@ -450,7 +450,7 @@ Freely 的等价:
 
 > 更新日期: 2026-07-02
 > 来源: 3 轮 subagent 审查 + 连通性审计 + 73 测试 + 69 commits
-> 审查文档: review-01~09 (docs/epics/.../code-reviews/)
+> 审查文档: review-01~09 (docs/B2-docs/.../code-reviews/)
 
 ### 18.1 SSE 事件格式（设计 vs 实现）
 
@@ -586,7 +586,7 @@ raw_key, review_stage
 ```
 "agent 设 input-required 时不手写 message。Runtime 根据参数自动生成：
  {from_agent} 在 raw_key={raw_key} 完成 {review_stage}，需要 {reason}。
- 产物路径: docs/epics/{epic}/{story}/raw-{raw_key}/..."
+ 产物路径: docs/B2-docs/{epic}/{story}/raw-{raw_key}/..."
 ```
 
 **实际状态**: 此功能尚未实现。message 字段通过 PATCH handler 的 `message` 参数手动传入。

@@ -55,7 +55,7 @@
   - prioritized_pool: `candidate_issues + source pre-brainstorm artifacts`
   - why_prioritized: 当前 delegated continuation handoff 直接指向 `C-20260323-1705-A`，且 `docs/milestones.md` 仍将其标记为 `candidate` / `in_pre_brainstorm`
   - checked_but_not_owner:
-    - `docs/epics/**`: 未发现 milestone-owned issue 接管
+    - `docs/B2-docs/**`: 未发现 milestone-owned issue 接管
     - `docs/progress/**`: 未发现 dev-loop continuation 接管
     - `docs/recovery/**`: 未发现 recovery artifact 接管
     - `review/test`: 仅提供 supporting evidence，不改变 canonical route
@@ -142,7 +142,7 @@
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex-explorer:Goodall`
     mode: `subagent-owner-scan`
-    summary: `独立只读扫描确认 `docs/epics/**`、`docs/progress/**` 与缺失的 `docs/recovery/**` 中都没有接管 `C-20260323-1705-A` 的 canonical owner；当前最关键缺口仍是把 consumed truth 稳定绑定到当前 manager prompt cycle / 当前 stalled intake 的 runtime-visible anchor。`
+    summary: `独立只读扫描确认 `docs/B2-docs/**`、`docs/progress/**` 与缺失的 `docs/recovery/**` 中都没有接管 `C-20260323-1705-A` 的 canonical owner；当前最关键缺口仍是把 consumed truth 稳定绑定到当前 manager prompt cycle / 当前 stalled intake 的 runtime-visible anchor。`
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex-explorer:Ramanujan`
     mode: `subagent-owner-scan`
@@ -170,7 +170,7 @@
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex-explorer:Huygens`
     mode: `subagent-owner-boundary-review`
-    summary: `独立只读扫描再次确认没有新的 canonical owner：`docs/recovery/**` 当前不存在，`docs/epics/**` 中最接近的相邻 issue 仍只覆盖 delegated handoff consumed/pending evidence、latest continuity consumption、worker active reentry 或 generic stalled-AI recovery；它们都没有接管“manager prompt 已吸收 continuation 但无新 continuity / handoff”的 acceptance boundary。`
+    summary: `独立只读扫描再次确认没有新的 canonical owner：`docs/recovery/**` 当前不存在，`docs/B2-docs/**` 中最接近的相邻 issue 仍只覆盖 delegated handoff consumed/pending evidence、latest continuity consumption、worker active reentry 或 generic stalled-AI recovery；它们都没有接管“manager prompt 已吸收 continuation 但无新 continuity / handoff”的 acceptance boundary。`
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex:gpt-5.4`
     mode: `worker-continuity-refresh`

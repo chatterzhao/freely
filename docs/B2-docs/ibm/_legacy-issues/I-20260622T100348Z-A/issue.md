@@ -3,7 +3,7 @@ local_id: I-20260622T100348Z-A
 kind: I
 phase_state: completed
 source_candidate: docs/B1-docs/raw-20260622T100348Z/candidates.md#C-20260622T100348Z-A
-verification_artifact_dir: docs/epics/I-20260622T100348Z-A/code-reviews
+verification_artifact_dir: docs/B2-docs/I-20260622T100348Z-A/code-reviews
 raw_refs:
   - raw-20260622T100348Z
 candidate_refs:

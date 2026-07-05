@@ -9,7 +9,7 @@
 
 - `PASS`: `pretests-gate` now requires at least one adequacy-v2 Acceptance Item for the targeted lane/gate pair instead of letting develop-bound adequacy pass with legacy-only items.
 - `PASS`: staged `test-pre-merge-* -> develop` promote now requires a fresh staged review artifact under the owner-bound `verification_artifact_dir`, so reused committed artifacts no longer satisfy guarded completion.
-- `PASS`: `governance-merge-gate` now rejects overly broad `verification_artifact_dir` values and only accepts canonical `docs/epics/.../code-reviews` ownership.
+- `PASS`: `governance-merge-gate` now rejects overly broad `verification_artifact_dir` values and only accepts canonical `docs/B2-docs/.../code-reviews` ownership.
 - `PASS`: IBM/doc truth now teaches new owners to write adequacy-v2 fields instead of leaving schema uptake implicit.
 - `PASS`: the guarded `pre-merge-commit` hook path was replayed end-to-end, including the docs-only promote case where owner `pre-tests.md` stays pending until adequacy evidence is staged.
 - `PASS`: a disposable `test-pre-merge-20260411-pretests-adequacy-closeout` batch, assembled through `pr-merge-guarded`, passed `premerge-integration` checks and exposed the missing `premerge-integration:develop_merge` adequacy statement that is now materialized in the owner `pre-tests.md`.

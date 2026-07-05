@@ -60,7 +60,7 @@ cat > docs/B1-docs/raw-20260624T004524Z/candidates.md << 'CEOF'
 CEOF
 
 # B2: I-issue + pre-tests + tasks + code-review
-mkdir -p docs/B1-docs/raw-I-20260624T004524Z-A docs/epics/a2a-restore-async/{verification,code-reviews}
+mkdir -p docs/B1-docs/raw-I-20260624T004524Z-A docs/B2-docs/a2a-restore-async/{verification,code-reviews}
 
 cat > docs/B1-docs/raw-I-20260624T004524Z-A/issue.md << 'IEOF'
 ---
@@ -86,14 +86,14 @@ author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/a2a-restore-async/verification/pre-tests.md
-verification_artifact_dir: docs/epics/a2a-restore-async/code-reviews
+verification_artifact_dir: docs/B2-docs/a2a-restore-async/code-reviews
 ---
 
 # I-20260624T004524Z-A: A2A server _restore_tasks 异步化
 
 - source_candidate: `docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A`
 - pre_tests_path: `docs/B2-docs/a2a-restore-async/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/a2a-restore-async/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/a2a-restore-async/code-reviews`
 - milestone: M-20260624T004524Z-A
 
 ## 实现
@@ -156,7 +156,7 @@ cat > docs/B2-docs/a2a-restore-async/verification/pre-tests.md << 'PEOF'
 PEOF
 
 # B2: tasks
-cat > docs/epics/a2a-restore-async/tasks.md << 'TEOF'
+cat > docs/B2-docs/a2a-restore-async/tasks.md << 'TEOF'
 # Tasks: A2A server _restore_tasks 异步化
 
 - issue_id: I-20260624T004524Z-A

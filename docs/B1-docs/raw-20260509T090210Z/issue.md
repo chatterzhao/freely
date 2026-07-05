@@ -102,7 +102,7 @@ platform_state: closed
 "-- 主管最新 patrol prompt"
 "SELECT AGENTS.md Cargo.lock Cargo.toml README.md bin bun.lock docs index.html package.json public src src-tauri templates tests tsconfig.json vite.config.ts FROM handoffs WHERE role=manager ORDER BY created_at DESC LIMIT 1
 - pre_tests_path: docs/B2-docs/handoff-sqlite-refactor/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/handoff-sqlite-refactor/code-reviews
+- verification_artifact_dir: docs/B2-docs/handoff-sqlite-refactor/code-reviews
 
 - pre_tests_path: docs/B2-docs/handoff-sqlite-refactor/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/handoff-sqlite-refactor/code-reviews
+- verification_artifact_dir: docs/B2-docs/handoff-sqlite-refactor/code-reviews

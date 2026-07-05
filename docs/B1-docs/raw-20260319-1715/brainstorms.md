@@ -241,7 +241,7 @@ UI 可以后续补，但只能是这个 CLI intake 的前端：
 
 - `.freely/intake/**` 是 intake 层事实源
 - 它不是新的 issue 系统
-- 它不替代 `pre-brainstorms/**`、`docs/epics/**`、`docs/progress/**`、`docs/recovery/**`
+- 它不替代 `pre-brainstorms/**`、`docs/B2-docs/**`、`docs/progress/**`、`docs/recovery/**`
 - 它只保存原始插话、仲裁状态和链接关系
 
 ### 6. manager 的 completion signal 不应是“我看过了”
