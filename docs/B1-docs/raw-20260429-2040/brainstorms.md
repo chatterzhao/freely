@@ -2,7 +2,7 @@
 
 ## 问题
 
-`freely chat` 直接写 `docs/B1-docs/` 污染 develop（protected branch）。
+`freely chat` 直接写 `docs/B1-docs/raw-` 污染 develop（protected branch）。
 
 ## 核心约束
 
@@ -111,7 +111,7 @@ scan_chat_inbox:
 | 2 | `--issue` 评论，工位存在 | 触发点1(直接同步) ✓ |
 | 3 | `--issue` 评论，无工位 | 触发点1(留DB) → 触发点3(AI追加) |
 | 4 | "你好" 噪声 | 触发点1(留DB) → 触发点3(AI标-1) |
-| 5 | wt-create I-* 重新开工 | 触发点2(docs/B1-docs/找到) |
+| 5 | wt-create I-* 重新开工 | 触发点2(docs/B1-docs/raw-找到) |
 | 6 | 同秒两个 chat | INSERT OR IGNORE + +1s 重试 |
 | 7 | materialize 失败 | 触发点2 回滚 worktree |
 | 8 | consumed=1 但 issue 缺失 | 触发点2 异常恢复 reset→0 |

@@ -136,7 +136,7 @@
 
 ## Likely Landing Zones
 
-- `docs/B1-docs/20260327-0651--pretests-gate-and-network-proxy-config/*`
+- `docs/B1-docs/raw-20260327-0651/*`
 - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/**`
 - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/**`
 - `docs/system/workspace/scripts/runtime/freely`

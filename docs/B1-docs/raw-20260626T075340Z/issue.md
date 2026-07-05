@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260626T075340Z-A
-source_candidate: docs/B1-docs/20260626T075340Z--cline-registry-fix/candidates.md#C-20260626T075340Z-A
+source_candidate: docs/B1-docs/raw-20260626T075340Z/candidates.md#C-20260626T075340Z-A
 ---
 
 ## 问题

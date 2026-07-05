@@ -154,7 +154,7 @@ Freely 后续应具备能力去判断：
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-- `docs/B1-docs/**`
+- `docs/B1-docs/raw-**`
 - `docs/milestones.md`
 
 ## 最新 dogfood 发现

@@ -115,7 +115,7 @@ Current test evidence already proves several distinct closure or handoff paths:
   - intake record creation via `freely intake chat`
   - claim/classification writeback
   - resolution artifact creation
-  - final `STATUS="absorbed"` with `ABSORPTION_TARGET` pointing to `docs/B1-docs/**`
+  - final `STATUS="absorbed"` with `ABSORPTION_TARGET` pointing to `docs/B1-docs/raw-**`
 - `test-freely-interruption-direct-answer` also proves a nearby but distinct path:
   - discovery may be handed off as `delegated + discovery + handoff://pre_brainstorm`
   - so the family already supports both direct absorption and delegated pre-brainstorm routing, depending on runtime context

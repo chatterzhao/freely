@@ -103,7 +103,7 @@
 
 之前的 brainstorm-routing 结论并没有失效，但它现在属于更大主题下的治理子问题：
 
-- 没有明确 issue 证据时，brainstorm 文档默认落到 `docs/B1-docs/`
+- 没有明确 issue 证据时，brainstorm 文档默认落到 `docs/B1-docs/raw-`
 - 只有存在明确 issue 证据时，brainstorm 文档才允许落到 `docs/epics/.../brainstorms/`
 - 这条规则只解决“brainstorm 文档落位”
 - 它不能单独决定总任务路由
@@ -183,7 +183,7 @@
 ### 1. 已有规则来源
 
 - `AGENTS.md`
-  - 非 issue 前置研究 -> `docs/B1-docs/`
+  - 非 issue 前置研究 -> `docs/B1-docs/raw-`
   - 基于已有 issue 的 IBM brainstorm -> `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
 - `PROJECT_INTENT.md`
   - chat / review / 新问题先进入 `pre-brainstorms`
@@ -311,8 +311,8 @@
 
 `no-usable-issue-skill` 的结束产物应保持在 pre-brainstorm 侧：
 
-- `docs/B1-docs/<id>/brainstorms.md`
-- `docs/B1-docs/<id>/candidates.md`
+- `docs/B1-docs/raw-<id>/brainstorms.md`
+- `docs/B1-docs/raw-<id>/candidates.md`
 - `docs/milestones.md` 中的 candidate entry
 
 它负责把“原始问题”收敛成 candidate，并把 candidate 同步进 milestone；它不直接产出正式 story 目录下的 issue / brainstorm / prd / pre-tests / tasks。
@@ -962,7 +962,7 @@ route = context_match(milestone, issue, candidate)
 - 仍写“更新候选项路由/状态记录”
 - 后续应改为：产出 candidate，并同步 milestone，由 milestone 承担活跃任务路由
 
-4. `docs/B1-docs/README.md`
+4. `docs/B1-docs/raw-README.md`
 - 当前虽然要求 `milestone` 字段显式填写
 - 但尚未明确：
   - 非 dropped candidate 必须进入 milestone 活跃面
@@ -1332,7 +1332,7 @@ iflow -p -y "<user-input>or<other input>,<milestone-path>；根据输入，分�
 
 2. 子层：
 - 当需要写 brainstorm 文档时，它应落在：
-  - `docs/B1-docs/`
+  - `docs/B1-docs/raw-`
   - 或 `docs/epics/{epic}/{story}/brainstorms/`
 
 换句话说：
@@ -1490,7 +1490,7 @@ flowchart TD
 
     subgraph STATE["shared state / artifacts"]
         S0["docs/milestones.md"]
-        S1["docs/B1-docs/**"]
+        S1["docs/B1-docs/raw-**"]
         S2["docs/epics/**"]
         S3["docs/progress/**"]
     end

@@ -3,7 +3,7 @@
 - id: `C-20260401-0840-A`
 - candidate_format_version: `v2`
 - title: Materialize unified slot contract across all runtime tools
-- source_brainstorm: `docs/B1-docs/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401-0840/brainstorms.md`
 - problem: Freely now has ordered cross-tool fallback, but same-tool slot recovery truth is still effectively Codex-specific. As a result, runtime state mixes `current` and `last` semantics, non-Codex tools cannot participate in a uniform slot-first scheduler, and the final contract requested by users remains unmaterialized.
 - why_now:
   - `I-20260331-1840-A` already restored ordered cross-tool fallback and explicit waiting truth, but it intentionally stopped short of all-tools slot parity.

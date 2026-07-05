@@ -28,7 +28,7 @@
 - 不在本条预研中直接改 runtime、hook 或 quality gate 逻辑
 - 不做 pre-brainstorms 全量风格统一或历史术语重写
 - 不把已拆分 owner 的 deferred scope 强行回填到当前 owner
-- 不做 `docs/B1-docs/INDEX.md`、`docs/milestones.md` 或其他共享索引的批量重写；若 owner materialization 依规范必须追加注册条目，只允许最小 append
+- 不做 `docs/B1-docs/raw-INDEX.md`、`docs/milestones.md` 或其他共享索引的批量重写；若 owner materialization 依规范必须追加注册条目，只允许最小 append
 
 ## Confirmed Stale Or Superseded Statements
 
@@ -102,7 +102,7 @@
 
 ## Landing Zones
 
-1. `docs/B1-docs/<id>/brainstorms.md`
+1. `docs/B1-docs/raw-<id>/brainstorms.md`
    - 优先在被推翻段落旁追加 `Status Reconcile` 小节；若原文跨度过长且集中补注更清晰，可在文末集中追加并显式指回 stale statement
 2. `docs/epics/.../issues/*.md` 或 `prd.md`
    - 当 pre-brainstorm 引述 owner 状态错误时，补 canonical pointer

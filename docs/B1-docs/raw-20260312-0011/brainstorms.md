@@ -16,17 +16,17 @@
 
 架构主文档：
 
-- `docs/B1-docs/20260303-0000--cli-orchestration-architecture/brainstorms.md`
-- `docs/B1-docs/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md`
-- `docs/B1-docs/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- `docs/B1-docs/raw-20260303-0000/brainstorms.md`
+- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
+- `docs/B1-docs/raw-20260308-1244/brainstorms.md`
 - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/prd.md`
 - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
 
 第三方生态与扩展研究：
 
-- `docs/B1-docs/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md`
-- `docs/B1-docs/20260304-0000--evolver-integration/brainstorms.md`
-- `docs/B1-docs/20260304-0000--evomap-ecosystem-freely/brainstorms.md`
+- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
+- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
+- `docs/B1-docs/raw-20260304-0000/brainstorms.md`
 
 ## 先给统一结论
 
@@ -644,7 +644,7 @@ OpenClaw 目前最有价值的不是替代 Freely 的产品，而是：
 
 研究优先阶段补充：
 
-- 若 `docs/progress/**` / `docs/recovery/**` 尚未完全启用，当前仍允许 `docs/B1-docs/CONVERGENCE.md` 作为等价证据落点
+- 若 `docs/progress/**` / `docs/recovery/**` 尚未完全启用，当前仍允许 `docs/B1-docs/raw-CONVERGENCE.md` 作为等价证据落点
 
 ### 3. 无 OpenClaw 时，memory 不能消失，只是实现形态不同
 

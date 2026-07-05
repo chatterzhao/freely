@@ -176,7 +176,7 @@
 - issue phase_state: in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed（不变）
 
 ### [KEEP] 9.2 现有目录
-- docs/B1-docs/（不变）
+- docs/B1-docs/raw-（不变）
 - docs/epics/（不变）
 - docs/progress/（不变）
 - docs/system/workspace/（不变）

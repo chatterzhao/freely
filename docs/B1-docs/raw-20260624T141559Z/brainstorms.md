@@ -27,7 +27,7 @@ created_at: 2026-06-24
 三个具体问题：
 1. 硬编码 `gh issue create`，不支持 Gitee
 2. `--repo` 参数需要用户手工传，而 `issue-sync` 已有 `_gh_repo()`/`_gitee_repo()` 自动检测
-3. 不写本地 `docs/B1-docs/` 文件，与 `issue-sync` 的 local-first 设计脱节
+3. 不写本地 `docs/B1-docs/raw-` 文件，与 `issue-sync` 的 local-first 设计脱节
 
 ## Brainstorm
 

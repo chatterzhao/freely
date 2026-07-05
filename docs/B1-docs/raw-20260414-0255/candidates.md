@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/B1-docs/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260414-0255/brainstorms.md`
 - Status: `reviewed`
 
 ## Candidates
@@ -11,7 +11,7 @@
 
 - candidate_format_version: `v2`
 - title: `Freely start codex after-failure recovery must honor saved-slot order`
-- source_brainstorm: `docs/B1-docs/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260414-0255/brainstorms.md`
 - follow_on_to: `I-20260410-1835-B`
 - problem: `After a real codex runtime failure, manager recovery still reused the cache-filtered ready-slot selector, so saved codex slots like 1012 and a1018-1 could be skipped before they were actually executed. This broke the intended same-tool inner loop, made root-cause analysis drift toward failure-type labels, and could delay or derail the outer cross-tool recovery loop.`
 - why_now:

@@ -19,7 +19,7 @@ channel: github
 session_refs: []
 platform_state: open
 absorbed_into: I-20260624T141559Z-A
-source_candidate: docs/B1-docs/20260624T141559Z--feedback-issue-sync/candidates.md#C-20260624T141559Z-A
+source_candidate: docs/B1-docs/raw-20260624T141559Z/candidates.md#C-20260624T141559Z-A
 ---
 
 ## 问题

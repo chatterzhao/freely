@@ -3,7 +3,7 @@ local_id: raw-20260619T043000Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260619T043000Z-A
-source_candidate: docs/B1-docs/20260619T043000Z--ibm-gate-to-skill-quickref/candidates.md#C-20260619T043000Z-A
+source_candidate: docs/B1-docs/raw-20260619T043000Z/candidates.md#C-20260619T043000Z-A
 platform_ids:
   github:
     issue_id: '3026'
@@ -34,7 +34,7 @@ session_refs: []
 
 | gate 报错 | 原因 | 正确格式 | 示例 |
 |-----------|------|---------|------|
-| cannot read C-xxx | source_candidate 需完整路径 | 文件路径#ID | docs/B1-docs/{key}--{slug}/candidates.md#C-xxx |
+| cannot read C-xxx | source_candidate 需完整路径 | 文件路径#ID | docs/B1-docs/raw-{key}--{slug}/candidates.md#C-xxx |
 | no valid source_candidate | candidates.md heading 需 ## 开头 | ## C-xxx | ## C-20260508T011858Z-A |
 | phase_state is invalid | raw issue 合法值 | proposed/absorbed/dropped | phase_state: absorbed |
 | no absorbed_into field | absorbed 必须写吸收目标 | I-* issue ID | absorbed_into: I-20260508T011858Z-A |

@@ -1,6 +1,6 @@
 # Candidates - 20260419-1505--runtime-supervisor-attach-reuse-followthrough
 
-- Source brainstorm: `docs/B1-docs/20260419-1505--runtime-supervisor-attach-reuse-followthrough/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419-1505/brainstorms.md`
 
 ### C-20260419-1505-A
 

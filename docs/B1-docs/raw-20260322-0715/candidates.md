@@ -3,7 +3,7 @@
 - id: `C-20260322-0715-A`
 - title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
 - note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
-- source_brainstorm: `docs/B1-docs/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322-0715/brainstorms.md`
 - status: `needs_research`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`

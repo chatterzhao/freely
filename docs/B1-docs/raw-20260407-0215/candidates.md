@@ -5,7 +5,7 @@
 - title: Runtime self-host continuity gap and status truth followthrough
 - status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/B1-docs/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0215/brainstorms.md`
 - problem: On canonical `develop`, Freely self-host supervision can generate a fresh manager prompt that explicitly requires a new continuity file, yet the latest generated continuity remains older and status surfaces previously did not make that gap explicit. `live-status` was also brittle enough to exit blank when PID hint validation failed under `set -e`, which hides the self-host stall instead of describing it.
 - why_now:
   - the user explicitly wants this class of failure to become Freely capability rather than manual repo cleanup

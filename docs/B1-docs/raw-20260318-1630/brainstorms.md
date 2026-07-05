@@ -134,7 +134,7 @@ Freely 需要新增一个比主管更外层的 global control-plane：
 
 ## Intended Landing
 
-- `docs/B1-docs/`
+- `docs/B1-docs/raw-`
 - `docs/LAWS.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`

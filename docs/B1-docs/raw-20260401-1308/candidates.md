@@ -3,7 +3,7 @@
 - id: `C-20260401-1308-A`
 - candidate_format_version: `v2`
 - title: Define reusable workspace security capabilities instead of burying all security logic inside runtime
-- source_brainstorm: `docs/B1-docs/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401-1308/brainstorms.md`
 - problem: Freely has multiple security-relevant concerns across supply chain, secrets, source map exposure, autonomous execution posture verification, and agent execution, but no reusable capability layer that lets these workflows be invoked, evolved, and audited as explicit skills.
 - why_now:
   - the current discussion already separates product baseline from reusable capability

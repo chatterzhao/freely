@@ -86,7 +86,7 @@ wt-create（在 develop 执行）
 fix worktree（可写工位）
   ├─ docs/B1-docs/raw-{key}/issue.md  ← phase_state 在这里
   ├─ docs/epics/{name}/              ← code-review 等在这里
-  ├─ docs/B1-docs/{key}/     ← brainstorms/candidates 在这里
+  ├─ docs/B1-docs/raw-{key}/     ← brainstorms/candidates 在这里
   ├─ 代码修改
   └─ git commit（phase_state 变更作为普通 commit 提交）
 

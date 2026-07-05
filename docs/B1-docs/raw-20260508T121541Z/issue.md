@@ -40,7 +40,7 @@ local_id: I-20260508T121541Z-A
 kind: linked
 phase_state: absorbed
 promoted_from: raw-20260508T121541Z
-source_candidate: docs/B1-docs/20260508T121541Z--platform-adapter-title-key/candidates.md#C-20260508T121541Z-A
+source_candidate: docs/B1-docs/raw-20260508T121541Z/candidates.md#C-20260508T121541Z-A
 verification_artifact_dir: docs/epics/platform-adapter-title-key/code-reviews
 pre_tests_path: docs/epics/platform-adapter-title-key/verification/pre-tests.md
 platform_state: open

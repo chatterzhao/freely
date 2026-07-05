@@ -15,7 +15,7 @@ Freely 已经把 `pre-tests.md` 作为 IBM 阶段的成功标准与测试任务�
 ## 已确认事实（来自既有预研与 owner）
 
 1. 早期预研已明确提出“`pre-tests.md` 不应只用于可读文档，应进入 completion / merge / retirement gate”：
-- `docs/B1-docs/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
+- `docs/B1-docs/raw-20260327-0651/brainstorms.md`
 
 2. owner `pre-tests-evidence-binding-and-completion-gate-governance` 明确只先实现 completion gate，并把 retirement auto-check 设为后续：
 - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`

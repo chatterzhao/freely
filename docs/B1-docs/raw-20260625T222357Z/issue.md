@@ -3,7 +3,7 @@ local_id: raw-20260625T222357Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260625T222357Z-A
-source_candidate: docs/B1-docs/20260625T222357Z--review-test-worktree/candidates.md#C-20260625T222357Z-A
+source_candidate: docs/B1-docs/raw-20260625T222357Z/candidates.md#C-20260625T222357Z-A
 promoted_issue_path: docs/issues/I-20260625T222357Z-A/issue.md
 pre_tests_path: docs/epics/review-test-worktree/verification/pre-tests.md
 platform_ids:

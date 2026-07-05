@@ -2,7 +2,7 @@
 
 - id: `C-20260323-1835-A`
 - title: Detect and recover active worker delegated-continuation stalls
-- source_brainstorm: `docs/B1-docs/20260323-1835--worker-delegated-continuation-active-stall-recovery/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260323-1835/brainstorms.md`
 - status: `needs_research`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://worker-delegated-continuation-active-stall-recovery-materialization`

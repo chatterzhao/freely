@@ -3,7 +3,7 @@ local_id: raw-20260619T035704Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260619T035704Z-A
-source_candidate: docs/B1-docs/20260619T035704Z--parse-candidate-heading-regex/candidates.md#C-20260619T035704Z-A
+source_candidate: docs/B1-docs/raw-20260619T035704Z/candidates.md#C-20260619T035704Z-A
 platform_ids:
   github:
     issue_id: '3022'

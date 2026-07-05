@@ -2,7 +2,7 @@
 
 - id: `C-20260323-1135-A`
 - title: Codex account active probe and cooldown recovery governance
-- source_brainstorm: `docs/B1-docs/20260323-1135--codex-account-active-probe-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260323-1135/brainstorms.md`
 - status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`

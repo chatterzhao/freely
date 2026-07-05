@@ -31,7 +31,7 @@ created_at: 2026-06-16
 
 限制 governance-only 路径为：
 - `AGENTS.md`, `CONSTITUTION.md`, `LAWS.md`, `PROJECT_INTENT.md`
-- `docs/milestones.md`, `docs/B1-docs/`, `docs/epics/`, `docs/progress/`, `docs/B1-docs/`
+- `docs/milestones.md`, `docs/B1-docs/raw-`, `docs/epics/`, `docs/progress/`, `docs/B1-docs/raw-`
 
 所有 workspace 脚本（`docs/system/workspace/scripts/runtime/`, `worktree/`, `hooks/`）**必须走 IBM 生命周期**。
 

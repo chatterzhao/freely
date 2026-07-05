@@ -1,6 +1,6 @@
 # Candidates - 20260419-1630--runtime-startup-self-healing-boundary
 
-- Source brainstorm: `docs/B1-docs/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419-1630/brainstorms.md`
 
 ### C-20260419-1630-A
 

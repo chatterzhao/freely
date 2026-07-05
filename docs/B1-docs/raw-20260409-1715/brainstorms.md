@@ -4,7 +4,7 @@
 
 - date: `2026-04-09`
 - source: `develop-bound push gate followthrough after retiring C-20260407-0603-A`
-- related_candidate: `docs/B1-docs/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/candidates.md#c-20260407-0603-a`
+- related_candidate: `docs/B1-docs/raw-20260407-0603/candidates.md#c-20260407-0603-a`
 - related_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260407-060440-feature-runtime-evidence-provenance-and-canonical-absorption-gate`
 
 ## Observation

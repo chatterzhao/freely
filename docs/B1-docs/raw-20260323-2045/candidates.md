@@ -2,7 +2,7 @@
 
 - id: `C-20260323-2045-A`
 - title: Add capacity-aware queueing for manager worker prompt sets
-- source_brainstorm: `docs/B1-docs/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260323-2045/brainstorms.md`
 - status: `absorbed`
 - adoption_type: `supporting_evidence`
 - milestone: `M-20260306-workspace-routing-foundation`

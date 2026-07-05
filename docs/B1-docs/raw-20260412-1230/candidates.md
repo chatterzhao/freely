@@ -3,7 +3,7 @@
 - id: `C-20260412-1230-A`
 - candidate_format_version: `v2`
 - title: Normalize historical completed-queue entries to canonical issue identities
-- source_brainstorm: `docs/B1-docs/20260412-1230--historical-completed-queue-identity-followthrough/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260412-1230/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - reopen_reason: `a real guarded develop replay still warns because the completed watchdog owner is listed in docs/milestones.md by legacy candidate identity C-20260324-0405-A instead of canonical issue identity I-20260324-0405`
 - problem: `The completed milestone queue still carries one historical legacy candidate identity, which keeps governance warnings alive even though the owner issue itself is already completed and canonical.`

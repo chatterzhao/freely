@@ -2,7 +2,7 @@
 
 - id: `C-20260326-1825-A`
 - title: 大重构前的 fleet sequencing audit 与 upstream merge order
-- source_brainstorm: `docs/B1-docs/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260326-1825/brainstorms.md`
 - status: `candidate`
 - adoption_type: `planning_truth`
 - milestone: `M-20260306-workspace-routing-foundation`

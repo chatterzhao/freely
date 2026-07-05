@@ -15,7 +15,7 @@
 - promotion_gate: N/A（absorbed）
 - open_questions: []
 - acceptance_reviews: []
-- promoted_issue_path: docs/B1-docs/20260517T083030Z--supervisor-bash-rc0-crash/candidates.md
+- promoted_issue_path: docs/B1-docs/raw-20260517T083030Z/candidates.md
 - milestone: M-20260517T083030Z-A
 - session_refs:
   - tool: cc

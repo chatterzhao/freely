@@ -3,7 +3,7 @@
 - id: `C-20260408-1205-A`
 - candidate_format_version: `v2`
 - title: Freeze verification handoff contract and premerge adequacy derivation for Freely-owned work
-- source_brainstorm: `docs/B1-docs/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260408-1205/brainstorms.md`
 - problem: Freely already defines `pre-tests.md`, canonical test lanes, and completion-gate evidence binding, but manager/worker handoff still lacks a machine-readable verification contract and `test-pre-merge-*` still lacks a stable rule for deriving which issue-bound acceptance items must be rerun before merge. As a result, workers can execute some tests on the correct lane yet still under-test the actual acceptance contract, leaving bugs to surface only during later dogfood or real-environment followthrough.
 - why_now:
   - repeated dogfood escapes indicate the remaining problem is adequacy and contract consumption, not absence of test-doc vocabulary

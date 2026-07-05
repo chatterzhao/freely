@@ -1,6 +1,6 @@
 # Candidates - 20260427-0000--b1-intake-issue-sync
 
-- Source brainstorm: `docs/B1-docs/20260427-0000--b1-intake-issue-sync/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260427-0000/brainstorms.md`
 
 ### C-20260427-0000-A
 

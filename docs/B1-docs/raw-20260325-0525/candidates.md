@@ -2,7 +2,7 @@
 
 - id: `C-20260325-0525-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
-- source_brainstorm: `docs/B1-docs/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260325-0525/brainstorms.md`
 - status: `absorbed`
 - adoption_type: `supporting_evidence`
 - milestone: `M-20260306-workspace-routing-foundation`

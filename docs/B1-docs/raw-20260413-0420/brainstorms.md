@@ -205,7 +205,7 @@
 
 ### 2. This is not just a daemon bug or a foreground bug
 
-- `docs/B1-docs/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md` already established a product-level distinction:
+- `docs/B1-docs/raw-20260413-0208/brainstorms.md` already established a product-level distinction:
   - `freely start` is foreground-attached runtime
   - `freely daemon start` is the explicit detached runtime contract
 - That entrypoint distinction is still correct.

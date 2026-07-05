@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T061044Z-A
-source_candidate: docs/B1-docs/20260625T061044Z--issue-sync-batch/candidates.md#C-20260625T061044Z-A
+source_candidate: docs/B1-docs/raw-20260625T061044Z/candidates.md#C-20260625T061044Z-A
 promoted_issue_path: docs/issues/I-20260625T061044Z-A/issue.md
 pre_tests_path: docs/epics/issue-sync-batch/verification/pre-tests.md
 ---

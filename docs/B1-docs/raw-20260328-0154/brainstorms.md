@@ -94,7 +94,7 @@
 - 该 worktree 已新增：
   - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/**`
   - `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/**`
-  - `docs/B1-docs/20260327-2006--start-restart-control-plane-semantics/**`
+  - `docs/B1-docs/raw-20260327-2006/**`
 - 其中两份 issue 文档已经写成 `done_ibm`：
   - `I-20260327-2006-A`
   - `I-20260327-2006-B`

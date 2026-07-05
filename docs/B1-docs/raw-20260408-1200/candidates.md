@@ -3,7 +3,7 @@
 - id: `C-20260408-1200-A`
 - candidate_format_version: `v2`
 - title: Freeze develop push urgency and upstream-resync escalation after protected-branch merge
-- source_brainstorm: `docs/B1-docs/20260408-1200--develop-push-followthrough-escalation/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260408-1200/brainstorms.md`
 - problem: Freely already exposes `push_pending` / `push_deferred` after lawful `develop` merge, but it still lacks a canonical contract for when unresolved push debt must become the manager's first followthrough action and when active worktrees must absorb the latest `develop` before continuing owner judgment. Without that contract, local-only canonical truth can linger and stale worktrees can continue making governance decisions on outdated upstream state.
 - why_now:
   - root `develop` is currently ahead of `origin/develop`, which proves the repo can remain in lawful-but-local-only followthrough state for a meaningful window

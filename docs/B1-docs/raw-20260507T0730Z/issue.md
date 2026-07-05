@@ -20,7 +20,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/source-param/verification/pre-tests.md
 verification_artifact_dir: docs/epics/source-param/code-reviews
-source_candidate: docs/B1-docs/20260507-source-param/candidates.md
+source_candidate: docs/B1-docs/raw-20260507-source-param/candidates.md
 platform_state: closed
 ---
 

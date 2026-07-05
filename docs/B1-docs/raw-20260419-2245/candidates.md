@@ -1,6 +1,6 @@
 # Candidates - 20260419-2245--runtime-claude-launch-and-session-evidence
 
-- Source brainstorm: `docs/B1-docs/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260419-2245/brainstorms.md`
 
 ### C-20260419-2245-A
 

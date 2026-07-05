@@ -3,7 +3,7 @@
 - id: `C-20260402-0540-A`
 - candidate_format_version: `v2`
 - title: Label runtime loop log timestamps with the host timezone
-- source_brainstorm: `docs/B1-docs/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260402-0540/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - reopen_reason: `a repo-wide audit found that loop.log headers still printed local wall-clock time without a timezone label after the runtime time-display owner had otherwise closed`
 - problem: `freely` loop logs still expose one human-readable timestamp surface without the timezone label required by the canonical host-local display rule.

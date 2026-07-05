@@ -10,7 +10,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/280
     synced_at: '2026-05-10T09:29:50Z'
 primary_platform: github
-source_candidate: docs/B1-docs/20260506-wt-create-dual/candidates.md
+source_candidate: docs/B1-docs/raw-20260506-wt-create-dual/candidates.md
 created_at: 2026-05-06 12:30:00+00:00
 updated_at: '2026-06-17T00:23:28Z'
 author: zhaoquan

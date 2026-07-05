@@ -5,7 +5,7 @@
 - id: `C-20260412-1845-A`
 - candidate_format_version: `v2`
 - title: `Runtime forensic time alignment and stall recovery observability`
-- source_brainstorm: `docs/B1-docs/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260412-1845/brainstorms.md`
 - problem: `Freely already governs human-readable time display, but cross-surface runtime forensics still lack a canonical alignment contract. UTC runtime events, host-local file mtimes, and state artifacts can describe the same run differently, and stall recovery used to leave no explicit runtime event, making real recoveries look like no-ops until state files are inspected manually.`
 - why_now:
   - this exact manager-stall investigation initially lost time on UTC vs host-local evidence alignment before the same-run correlation was proven

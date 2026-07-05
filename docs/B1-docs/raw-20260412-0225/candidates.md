@@ -5,7 +5,7 @@
 - id: `C-20260412-0225-A`
 - candidate_format_version: `v2`
 - title: `Structured closeout gate context and fresh review evidence governance`
-- source_brainstorm: `docs/B1-docs/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260412-0225/brainstorms.md`
 - problem: `develop` merge gate already fail-closes on missing owner-scoped staged review artifacts, but runtime/worker closeout state still stores only a weak free-text closeout command and does not carry lane/gate/evidence-policy context. This leaves cleanup replay and human operators unable to recover the full adequacy contract before the final guarded merge blocks.`
 - why_now:
   - repeated gate confusion is now backed by fresh field evidence from a real `test-pre-merge-* -> develop` replay, not just theory

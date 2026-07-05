@@ -644,7 +644,7 @@ Freely 作为自治开发应用，不仅要响应 signal，还应主动看：
 
 问题一旦确定 restart point，就应进入对应 canonical pool：
 
-- 新模糊问题 -> `docs/B1-docs/**`
+- 新模糊问题 -> `docs/B1-docs/raw-**`
 - 已有候选提升 -> `docs/milestones.md`
 - issue 边界不足 -> `docs/epics/**`
 - dev continuation -> `progress` / code / tests

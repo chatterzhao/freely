@@ -30,4 +30,4 @@ revisit_trigger: 无
 
 ## 关联预研
 
-`docs/B1-docs/20260502-0500--freely-packaging-selfhost/brainstorms.md`
+`docs/B1-docs/raw-20260502-0500/brainstorms.md`

@@ -3,7 +3,7 @@
 - id: `C-20260401-2245-A`
 - candidate_format_version: `v2`
 - title: Materialize build artifact exposure audit and release allowlist as an automation-first security capability
-- source_brainstorm: `docs/B1-docs/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401-2245/brainstorms.md`
 - problem: Freely currently relies too much on human memory to catch `.map`, `.env`, secret-bearing files, and unintended build side products before release-facing outputs are consumed. There is no canonical build artifact exposure audit or release allowlist gate in `doctor` or the build path.
 - why_now:
   - recent security review confirmed that automation and enforced workflow must replace operator memory where possible

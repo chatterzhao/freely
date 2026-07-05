@@ -1,6 +1,6 @@
 # Candidates - 20260426-0000--opencode-direct-launcher-integration
 
-- Source brainstorm: `docs/B1-docs/20260426-0000--opencode-direct-launcher-integration/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260426-0000/brainstorms.md`
 
 ### C-20260426-0000-A
 

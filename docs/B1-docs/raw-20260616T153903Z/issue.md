@@ -19,4 +19,4 @@ channel: github
 session_refs: []
 ---
 
-Acceptance review needed for C-20260514T103532Z-A (agent handoff protocol v2).\n\nPre-brainstorm: docs/B1-docs/20260514T103532Z--agent-handoff-protocol/\nCandidate status: completed, acceptance_reviews: []\nPromoted issue: I-20260514T103532Z-A\n\nDecision needed: promote/absorb/drop
+Acceptance review needed for C-20260514T103532Z-A (agent handoff protocol v2).\n\nPre-brainstorm: docs/B1-docs/raw-20260514T103532Z/\nCandidate status: completed, acceptance_reviews: []\nPromoted issue: I-20260514T103532Z-A\n\nDecision needed: promote/absorb/drop

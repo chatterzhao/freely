@@ -4,11 +4,11 @@
 
 - candidate_format_version: `v2`
 - title: `Source inbox, routing absorption boundary, and manager/worker audit contract`
-- source_brainstorm: `docs/B1-docs/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0817/brainstorms.md`
 - problem: `Freely lacks a clean problem-source visibility surface distinct from pre-brainstorm registry and runtime-local intake. The right unification target is not “every raw signal”, but “every source that has been judged to be a real governed problem”. Those problem-sources should stay short, remain two-state, and be consumed into pre-brainstorm as the common first digestion step, while analysis continues in pre-brainstorm and downstream canonical artifacts.`
 - why_now:
   - current source visibility is fragmented across runtime intake, pre-brainstorms, milestones, reviews, tests, and patrol
-  - `docs/B1-docs/INDEX.md` is a registry, not a compact unconsumed inbox
+  - `docs/B1-docs/raw-INDEX.md` is a registry, not a compact unconsumed inbox
   - protected-root manager work needs a clearer handoff boundary between discovery, dispatch, and canonical writeback
   - status drift between docs and implementation remains a recurring dogfooding problem
 - acceptance_criteria:
@@ -38,7 +38,7 @@
 - open_questions:
   - should the live unresolved source inbox live under `~/.freely/projects/<project-hash>/`, project `.freely/**`, or a mixed adapter model
   - should current human interruption storage remain family-local runtime state with an unresolved-index overlay, or be rehomed into a more general project-global local source inbox for the contracted durable families
-  - how should this work align with the older GitHub issue pre-research in `docs/B1-docs/20260403-1000--external-issue-integration-and-self-evolution/**`, instead of silently replacing or duplicating it
+  - how should this work align with the older GitHub issue pre-research in `docs/B1-docs/raw-20260403-1000/**`, instead of silently replacing or duplicating it
   - is there any durable family beyond `human interruption` and `external issue` that truly cannot be modeled as one of those two
   - how should one source map to multiple owners or multiple sources collapse into one owner
   - what is the exact first slice: schema only, storage boundary only, human-intake refactor, or gate backstop
@@ -96,7 +96,7 @@
 
 - candidate_format_version: `v2`
 - title: `Family-validated minimal source view and unresolved-index contract`
-- source_brainstorm: `docs/B1-docs/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0817/brainstorms.md`
 - problem: `Freely still lacks a stable minimal contract for a durable source-facing view and corresponding unresolved index, but freezing that contract as a generic architecture before any family proves it would over-abstract past current runtime truth. The contract must therefore be derived from a first validated family slice, then narrowed to the reusable subset only if that subset survives contact with reality.`
 - why_now:
   - the umbrella research now rejects repo-wide rollout and needs a bounded first slice
@@ -141,7 +141,7 @@
 
 - candidate_format_version: `v2`
 - title: `Human interruption and local intake alignment with narrow source contract`
-- source_brainstorm: `docs/B1-docs/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0817/brainstorms.md`
 - problem: `Current .freely/intake/** and interruption resolution already provide partial durable source behavior, but the writeback semantics and manager-facing unresolved view are runtime-oriented rather than the narrowed source contract now under review.`
 - why_now:
   - this is the strongest first implementation family because runtime truth already exists
@@ -181,7 +181,7 @@
 
 - candidate_format_version: `v2`
 - title: `Stage-based source absorption backstop`
-- source_brainstorm: `docs/B1-docs/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0817/brainstorms.md`
 - problem: `Current governance gates validate candidate/milestone/owner chains, but they do not yet provide a narrow backstop that verifies a durable source item actually leaves the unresolved queue once canonical absorption is claimed.`
 - why_now:
   - the real dogfooding pain includes fake closure and stale unresolved truth

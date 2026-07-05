@@ -38,7 +38,7 @@
 
 ### 参考文档
 
-- `docs/B1-docs/issue-state-lifecycle.md` §5, §7.2 — phase_state 生命周期与 issue 状态转换
+- `docs/B1-docs/raw-issue-state-lifecycle.md` §5, §7.2 — phase_state 生命周期与 issue 状态转换
 
 ## 设计决策
 

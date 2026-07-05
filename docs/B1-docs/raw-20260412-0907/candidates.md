@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/B1-docs/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/raw-20260412-0907/brainstorms.md`
 - Status: promoted
 - Reopens: the completed Codex slot-recovery family through a new bounded follow-on owner
 
@@ -25,7 +25,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260412-0907-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
-- source_brainstorm: `docs/B1-docs/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260412-0907/brainstorms.md`
 - session_refs: []
 - follow_on_to: `I-20260410-1835-B`
 - next_action: Land the bounded follow-on owner, verify the real bad-account replay, and merge through `test-pre-merge-runtime-slot-recovery-20260412-0916`.

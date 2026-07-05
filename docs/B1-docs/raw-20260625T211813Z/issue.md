@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T211813Z-A
-source_candidate: docs/B1-docs/20260625T211813Z--agent-table-reconcile/candidates.md#C-20260625T211813Z-A
+source_candidate: docs/B1-docs/raw-20260625T211813Z/candidates.md#C-20260625T211813Z-A
 promoted_issue_path: docs/issues/I-20260625T211813Z-A/issue.md
 pre_tests_path: docs/epics/agent-table-reconcile/verification/pre-tests.md
 ---

@@ -5,7 +5,7 @@
 - candidate_format_version: `v2`
 - title: Runtime audio notifier and sound semantics
 - status: `promoted`
-- source_brainstorm: `docs/B1-docs/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260405-1215/brainstorms.md`
 - problem: Freely 缺少稳定的自治运行时声音语义系统，无法让用户通过不同提示音区分 manager / worker 的开始、结束、失败、阻塞与 interruption。
 - why_now:
   - 用户明确要求“任务执行完有语音提醒”，且 manager / worker / started / completed 应有不同声音

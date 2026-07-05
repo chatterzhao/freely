@@ -132,7 +132,7 @@ TUI 的正确站位应是：
 | - [new] ...                                                                      |
 |                                                                                  |
 | Recent Resolutions                                                               |
-| - discovery -> docs/B1-docs/...                                          |
+| - discovery -> docs/B1-docs/raw-...                                          |
 | - continuation -> docs/epics/...                                                 |
 |                                                                                  |
 | Supervisor Snapshot                                                              |

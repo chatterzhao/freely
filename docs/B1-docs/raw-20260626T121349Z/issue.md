@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260626T121349Z-A
-source_candidate: docs/B1-docs/20260626T121349Z--consistency-cleanup/candidates.md#C-20260626T121349Z-A
+source_candidate: docs/B1-docs/raw-20260626T121349Z/candidates.md#C-20260626T121349Z-A
 ---
 
 ## 背景

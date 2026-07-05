@@ -4,7 +4,7 @@
 - title: Ensure delegated manager continuation handoffs are consumed by supervisor main loop
 - status: promoted
 - adoption_type: n/a
-- source_brainstorm: `docs/B1-docs/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322-0049/brainstorms.md`
 - why_now: Dogfood shows interruption triage already returns manager-owned `handoff://continuation`, but manager runtime does not reliably convert that into new project-level supervision output.
 - proposed_scope:
   - define canonical consumption rule for delegated manager continuation

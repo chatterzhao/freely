@@ -3,7 +3,7 @@
 - candidate_format_version: `v2`
 - id: `C-20260323-1705-A`
 - title: Detect and recover manager delegated continuation stalls after prompt absorption
-- source_brainstorm: `docs/B1-docs/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260323-1705/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
@@ -118,7 +118,7 @@
     - which prompt cycle is current
     - which consumed event anchor belongs to that pair
     - why `no-new-continuity/handoff` applies to that same pair rather than to a historical consumed echo
-  - 保持 `docs/B1-docs/**` 与 `docs/milestones.md` 对 candidate 状态、下一跳和重判条件的一致性，不让该研究项从扫描面消失。
+  - 保持 `docs/B1-docs/raw-**` 与 `docs/milestones.md` 对 candidate 状态、下一跳和重判条件的一致性，不让该研究项从扫描面消失。
 - promotion_gate:
   - 至少再有一轮真实 dogfood 证明这条 stall contract 能稳定解释 cleanup / retirement followthrough 中的假活，而不是一次性偶发现象。
   - 确认这条 contract 不会被更高层的 manager recovery / stall issue 自然吸收，或者已经具备清晰的 issue-owned 承接位置。

@@ -3,7 +3,7 @@ local_id: raw-20260506T1400Z
 kind: raw
 phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-source_candidate: docs/B1-docs/20260506-merge-guarded-fix/candidates.md
+source_candidate: docs/B1-docs/raw-20260506-merge-guarded-fix/candidates.md
 platform_ids:
   github:
     issue_id: '273'

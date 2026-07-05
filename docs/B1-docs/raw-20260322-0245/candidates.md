@@ -10,7 +10,7 @@
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
 - legacy_id_mapping: I-20260322-0245  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/B1-docs/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260322-0245/brainstorms.md`
 - session_refs: []
 - next_action: materialize IBM 产物，然后在 runtime / watchdog 真源里实现最小 worker launch linkage 与 stalled AI recovery
 - revisit_trigger: 若 runtime 改动后仍无法把 manager handoff 转成 worker execution，或 stall recovery 仍无法让新 intake 进入下一轮 prompt，再开下一条 lifecycle

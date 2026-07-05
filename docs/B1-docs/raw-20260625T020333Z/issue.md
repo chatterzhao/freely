@@ -14,7 +14,7 @@ intake_id: ''
 author: ai-manager
 channel: internal
 session_refs: []
-source_candidate: docs/B1-docs/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A
+source_candidate: docs/B1-docs/raw-20260625T020333Z/candidates.md#C-20260625T020333Z-A
 ---
 
 ## 问题

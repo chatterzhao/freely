@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260626T142357Z-A
-source_candidate: docs/B1-docs/20260626T142357Z--wt-close-local-fix/candidates.md#C-20260626T142357Z-A
+source_candidate: docs/B1-docs/raw-20260626T142357Z/candidates.md#C-20260626T142357Z-A
 ---
 
 ## 问题

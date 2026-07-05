@@ -9,7 +9,7 @@
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - acceptance_hint: 本候选不再单独 materialize；后续统一以 `phase_state` 词典、`done_ibm` handoff 和恢复边界治理作为正式实现口径。
 - superseded_by:
-  - `docs/B1-docs/20260308-1630--stage-prefixed-progress-identifier/candidates.md#c-20260308-1631`
+  - `docs/B1-docs/raw-20260308-1630/candidates.md#c-20260308-1631`
   - `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
 - scope:

@@ -3,7 +3,7 @@
 - id: `C-20260401-1545-A`
 - candidate_format_version: `v2`
 - title: Materialize ACP as an optional adapter boundary between Freely and external code agents
-- source_brainstorm: `docs/B1-docs/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260401-1545/brainstorms.md`
 - problem: Freely already orchestrates multiple external code agents, but the current integration surface is tool-specific. Session semantics, permission handling, and tool/runtime adapters differ across canonical tools such as `codex`, `kiro-cli`, and `iflow`, plus experimental current implementations such as `cc`. ACP may offer a more uniform client-to-agent contract, but it is still unclear whether that benefit outweighs bridge cost, token overhead, and mismatch with Freely's autonomy-first governance.
 - why_now:
   - Freely has already materialized multi-tool runtime governance, slot contracts, session continuity, and auto-approve paths, so the adapter layer is now visible as a distinct concern

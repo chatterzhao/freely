@@ -15,7 +15,7 @@ acceptance_criteria:
 acceptance_reviews: []
 created: 2026-06-18T08:05:54Z
 updated: 2026-06-18T08:05:54Z
-b1_dir: docs/B1-docs/20260616T140126Z--ai-auth-template
+b1_dir: docs/B1-docs/raw-20260616T140126Z
 ---
 
 # 创建 templates/ai-auth/ slot 配置示例模板，解决新用户安装后不知道如何配置 ~/.ai-auth/ slot 的问题。
