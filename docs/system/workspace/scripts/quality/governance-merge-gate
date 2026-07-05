@@ -674,7 +674,7 @@ def build_issue_index() -> Dict[str, IssueRecord]:
     # Fallback: filesystem scan at ROOT_DIR (works when running from the
     # worktree that actually has the files on disk).
     if not USE_RANGE_VIEW or not RANGE_SOURCE_REF:
-        issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+        issues_dir = os.path.join(ROOT_DIR, "docs", "B1-docs")
         if os.path.isdir(issues_dir):
             for d in sorted(os.listdir(issues_dir)):
                 if d.startswith("raw-") or d.startswith("I-"):
@@ -796,7 +796,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
             match = re.search(r"^absorbed_into:\s*(.+?)\s*$", text, re.MULTILINE)
         if match:
             target_id = match.group(1).strip("`").strip('"').strip("'")
-            target_dir = os.path.join(ROOT_DIR, "docs", "issues", target_id)
+            target_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", target_id)
             found = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "issue.md"))
             if not found:
                 for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "epics")):
@@ -1073,7 +1073,7 @@ def main() -> int:
                             chat_id, chat_issue_id, consumed_val, materialized_as = row
                             # Only consume the chat whose issue_id matches the branch key
                             if chat_issue_id == branch_issue_key or chat_issue_id.startswith(branch_issue_key):
-                                raw_dir = os.path.join(ROOT_DIR, "docs", "issues", branch_issue_key)
+                                raw_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", branch_issue_key)
                                 # Auto-materialize to docs/B1-docs/ if missing
                                 if not os.path.isdir(raw_dir) or not os.path.isfile(os.path.join(raw_dir, "issue.md")):
                                     os.makedirs(raw_dir, exist_ok=True)
@@ -1123,7 +1123,7 @@ def main() -> int:
 
         # 2b: Platform raw issue check — ensure raw-* has platform_ids or clear waiver
         if branch_issue_key.startswith("raw-"):
-            raw_issue_file = os.path.join(ROOT_DIR, "docs", "issues", branch_issue_key, "issue.md")
+            raw_issue_file = os.path.join(ROOT_DIR, "docs", "B1-docs", branch_issue_key, "issue.md")
             if os.path.isfile(raw_issue_file):
                 try:
                     with open(raw_issue_file, encoding="utf-8") as f:
@@ -1412,7 +1412,7 @@ def main() -> int:
                     f"Add C-{key} as M-{key} to the active milestone's candidate_issues queue."
                 )
             # Check raw→C key chain: promoted candidates should have a matching raw issue
-            issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+            issues_dir = os.path.join(ROOT_DIR, "docs", "B1-docs")
             raw_ids: set[str] = set()
             if os.path.isdir(issues_dir):
                 for entry in os.listdir(issues_dir):
@@ -1782,7 +1782,7 @@ def main() -> int:
         if not matched:
             continue
         issue_local_id = matched.group(1)
-        docs_issue_file = os.path.join(ROOT_DIR, "docs", "issues", issue_local_id, "issue.md")
+        docs_issue_file = os.path.join(ROOT_DIR, "docs", "B1-docs", issue_local_id, "issue.md")
         if os.path.exists(docs_issue_file):
             with open(docs_issue_file) as f:
                 docs_text = f.read()
@@ -1806,7 +1806,7 @@ def main() -> int:
         if not matched:
             continue
         issue_local_id = matched.group(1)
-        docs_issue_file = os.path.join(ROOT_DIR, "docs", "issues", issue_local_id, "issue.md")
+        docs_issue_file = os.path.join(ROOT_DIR, "docs", "B1-docs", issue_local_id, "issue.md")
         if not os.path.exists(docs_issue_file):
             continue
         with open(docs_issue_file) as f:
