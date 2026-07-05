@@ -2909,3 +2909,12 @@
 - milestone: M-20260705T084915Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T084915Z-A`
+
+## M-20260705T111413Z-A
+- title: chore — gitignore projects.tsv
+- status: active
+### candidate_issues
+1. C-20260705T111413Z-A — absorbed → I-20260705T111413Z-A
+### committed_issues
+1. I-20260705T111413Z-A — phase_state completed
+- path: docs/epics/runtime-core/gitignore-tsv/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
