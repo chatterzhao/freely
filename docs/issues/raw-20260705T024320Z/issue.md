@@ -2,6 +2,7 @@
 local_id: raw-20260705T024320Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260705T024320Z-A
 platform_ids:
   github:
     issue_id: '3738'

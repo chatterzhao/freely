@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260705T024320Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260705T024320Z
 created_at: 2026-07-05
 milestone: M-20260705T024320Z-A
@@ -8,7 +8,7 @@ milestone: M-20260705T024320Z-A
 ## C-20260705T024320Z-A: per-agent tool/slot 全链路修复
 - candidate_format_version: v2
 - title: 支持不同 role agent 使用不同 base_tool 或同 base_tool 不同 slot
-- status: promoted
+- status: absorbed
 - decision_reason: 6 个 bug 根因一致——该传 base_tool/slot 处用了全局 AGENT_AI_TOOL 或不传参
 - next_action: B2 设计 → dev 实现 → merge
 - acceptance_criteria:
