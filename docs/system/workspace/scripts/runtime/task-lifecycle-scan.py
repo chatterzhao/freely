@@ -351,7 +351,7 @@ class A2AChecker:
 # ── Local issue reader ──────────────────────────────────────────────
 
 def read_issues_dir(project: Path) -> list[dict]:
-    """Read all raw-* and I-* issues from docs/issues/ and docs/B2-docs/."""
+    """Read all raw-* and I-* issues from docs/B1-docs/ and docs/B2-docs/."""
     issues = []
     issues_dir = project / "docs" / "B1-docs"
     if issues_dir.is_dir():
