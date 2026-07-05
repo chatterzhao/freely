@@ -3,7 +3,7 @@ issue_id: raw-20260519T091633Z
 kind: raw
 priority: P1
 phase_state: absorbed
-absorbed_into: I-20260413-0420-A
+absorbed_into: I-20260413T042000Z-A
 source: feedback
 created_at: '2026-05-19T09:16:33Z'
 title: handoffs 积压≥5 时跳过 scan，优先处理积压

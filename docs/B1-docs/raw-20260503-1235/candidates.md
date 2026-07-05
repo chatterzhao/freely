@@ -2,13 +2,13 @@
 
 ## Candidate Issues
 
-### C-20260503-1235-A: legacy issue
+### C-20260503T123500Z-A: legacy issue
 
 - title: `Defer manager_runtime_launch_workers_from_latest_handoff to after first AI patrol cycle`
 - status: `promoted`
 - adoption_type: `code_change`
 - decision_reason: Root cause 已确认——`manager_runtime_recover_workers_if_needed` 在第一个 AI cycle 完成前调用 `manager_runtime_launch_workers_from_latest_handoff`（已标记为废弃旧路径），此时 fleet cache 未填充，worker launch 必然失败。该旧路径调用从未被移除，注释与代码不一致。
-- promoted_issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
+- promoted_issue_path: `docs/issues/I-20260503T123500Z-A/issue.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/B1-docs/raw-20260503-1235/brainstorms.md`
 - session_refs:

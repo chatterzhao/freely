@@ -1,0 +1,94 @@
+# Candidates - 20260407-1042--external-issue-identity-and-publication-boundary
+
+## C-20260407T104200Z-A: legacy issue
+
+- candidate_format_version: `v2`
+- title: `External issue identity, mapping, and publication model after source-family contraction`
+- source_brainstorm: `docs/B1-docs/raw-20260407-1042/brainstorms.md`
+- problem: `After contracting durable source families, Freely needs a family-specific external-issue model that can handle user-created GitHub issue style inputs and AI-discovered problems that deserve formal external publication, without collapsing durable source identity, public-progress mirroring, and internal canonical ownership into one unstable GitHub object or one overloaded owner family.`
+- why_now:
+  - the older `20260403-1000` GitHub issue pre-research explored useful mapping ideas, but mixed source ingestion, publication, internal owner truth, and self-evolution scheduling too broadly
+  - the newer source-governance umbrella now explicitly narrows durable source families to `human interruption` and `external issue`, which makes the external-issue family boundary first-class
+  - AI-discovered problems need a bounded rule for when they formalize into external-issue lineage instead of being treated as raw human interruption or generic runtime noise
+- acceptance_criteria:
+  - define `external issue` family identity after contraction and separate `source loop`, `owner loop`, and `publication loop`
+  - define how user-created GitHub issue style inputs enter the source loop
+  - define when AI-discovered problems qualify for external-issue formalization, and when they remain internal-only
+  - define the relationship among `source issue`, optional `publication target`, and canonical internal owner
+  - define a minimum mapping contract that supports `source_ref`, `internal_owner_ref`, `publication_ref`, and bounded `publication_mode` without freezing implementation storage too early
+  - define mapping invariants that keep `internal owner` canonical even when `source issue` and `publication target` coincide
+  - freeze the GitHub-first minimum field contract for `source_ref`, `internal_owner_ref`, and `publication_ref` before any storage/API shape is proposed
+  - define a formalization decision table for user-created versus AI-discovered external-issue entry, including internal-only, source-only, and source-plus-publication cases
+  - freeze the formalization invariants that prevent current-line absorption, internal-only owner evidence, and publication policy from collapsing into one decision
+  - define a label taxonomy whose dimensions are explicitly separated:
+    - identity / role
+    - publication policy
+    - public status
+  - define GitHub writeback boundaries for comments, labels, closeout, and “no writeback” cases without making GitHub the internal truth source
+  - define the minimum publication policy distinctions among:
+    - externally-created issue reused as source-only/public surface
+    - externally-created issue plus separate public tracking issue
+    - AI-discovered issue kept internal-only
+    - AI-discovered issue later published externally
+  - critically re-review `20260403-1000--external-issue-integration-and-self-evolution` and preserve only the parts that remain governance-safe under the contracted-family model
+  - produce an explicit keep / split / reject table for `20260403-1000` so later work does not silently re-import bundled assumptions
+  - define the minimum consumption / dedupe evidence needed to prevent already-consumed external source issues from being re-scanned as fresh intake
+  - define which canonical repo-native linkage is the decisive dedupe authority versus optional external mirrors
+  - prove the minimum field contract is sufficient for GitHub-first policy and dedupe decisions without freezing a mapping file format
+  - freeze the raw external source scan-eligibility contract so scan covers only open and unconsumed source issues rather than all open issues
+  - freeze the suspicion rule that AI-written external labels/comments are hints and canonical repo-native linkage remains decisive
+  - freeze the minimum canonical source metadata contract, including bounded `source_consumption_state` and `publication_mode`
+  - define the full source lifecycle after consumption into `pre-brainstorm`, including:
+    - source stays open while pre-research is in flight
+    - discard closes a user-created source issue with a reasoned comment
+    - accept binds to canonical milestone-owned followthrough and then closes the original source issue once forward linkage is durable
+  - define when a separate public milestone tracking issue should be created, and when `source_only` or `none` remains correct
+  - define the default external writeback surface as issue comments rather than GitHub Discussions
+  - produce a testable scenario matrix covering raw-source intake, discard closeout, accept-and-bind, AI-internal-only, and stale-external-mirror replay
+- promotion_gate:
+  - prove the result stays compatible with the umbrella source-governance contract and does not reopen a generic repo-wide source-ledger rollout by stealth
+  - prove the result does not collapse `human interruption` back into generic intake, and does not collapse AI-discovered problems into “always publish externally”
+  - prove internal canonical truth remains in repo docs rather than on GitHub
+  - prove the family does not assume GitHub create/sync automation already exists in runtime or manager paths
+  - prove any recommended status vocabulary is publication-facing only and not a second `phase_state`
+  - prove the first slice can remain storage-agnostic if mapping invariants are stable, instead of forcing premature `.freely/*` local-state design
+  - prove source closeout semantics do not leave user-created source issues indefinitely open after discard or successful milestone binding
+  - prove separate public milestone creation is policy-gated and not the default for every accepted source issue
+- open_questions:
+  - what durable evidence should the owner loop record when an AI-discovered problem is intentionally kept internal-only?
+  - is a canonical mapping artifact required in the first slice, or can storage stay deferred until a later GitHub-first policy/schema owner?
+- acceptance_reviews:
+  - reviewer: `human`
+    verdict: `supports-with-boundary-tightening`
+    note: The candidate is viable if it freezes loop separation, canonical owner truth, and publication limits first; it becomes unsafe again if GitHub labels or local mapping files are chosen before those invariants are explicit.
+- decision_reason:
+  - external-issue handling now sits on the source-storage boundary and cannot be reduced to a GitHub sync implementation detail
+  - the highest-risk failure mode is lifecycle collapse, where source, owner, and publication silently become the same object
+  - freezing boundary semantics before storage or automation choices is the lowest-risk path to a governance-compatible first slice
+- priority: `P1`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_id: `I-20260407T104200Z-A`
+- recommendation: `materialized as a bounded GitHub-first owner because source scan, canonical metadata, and source closeout now have a stable enough contract to guide `context-source-skill` and later runtime implementation without widening into generic multi-platform sync.`
+- dependencies:
+  - `source-routing-and-derived-worktree-governance`
+  - `milestone-planning-and-state-maintenance`
+  - `three-loop-lifecycle-single-source-governance-followthrough`
+- landing_zones:
+  - `docs/system/workspace/skills/context-source-skill/SKILL.md`
+  - `docs/system/workspace/skills/context-source-skill/references/source-classification.md`
+  - `docs/system/workspace/agents/lead-agent.md`
+  - `docs/system/workspace/scripts/start-lead-agent.sh`
+  - `docs/system/workspace/scripts/tests/`
+  - `docs/system/workspace/scripts/runtime/freely`
+- promoted_issue_path: `docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
+- next_action:
+  - candidate mirror only. `I-20260407T104200Z-A` is now the canonical owner for GitHub-first external issue source scan, canonical metadata, source closeout, and policy-gated public milestone creation governance.
+  - first implementation should update `context-source-skill` and adjacent prompt truth before widening into runtime create/sync automation.
+- revisit_trigger:
+  - revisit when implementation discovery shows the bounded GitHub-first owner still lacks a required internal-only AI field or truly needs a dedicated mapping artifact before document-driven rollout can work

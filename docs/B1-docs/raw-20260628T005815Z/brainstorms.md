@@ -85,7 +85,7 @@ created_at: 2026-06-28
 |------|------|------|
 | chat-conversation-extension (I-20260518T020406Z-A) | completed | 本重构基于其 conversation_id 分组能力，但替换物化路径 |
 | freely-comment (C-20260518T020345Z-A) | needs_research | 本设计的 comment 模块将取代该 candidate。其 phase_state redirect 已过时（I-* 不对外维护） |
-| chat-inbox-sqlite (I-20260429-2040-A) | completed | 保留 chats 表查询能力，删除 materialize 路径 |
+| chat-inbox-sqlite (I-20260429T204000Z-A) | completed | 保留 chats 表查询能力，删除 materialize 路径 |
 | #3599 (B1/B2 模板修复) | 独立 issue | 不依赖 |
 | #3600 (wt-create assignee) | 独立 issue | 不依赖，但 wt-create 重构后 assignee 感知与 comment 的 ACP 通知互补 |
 

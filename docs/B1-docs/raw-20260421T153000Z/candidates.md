@@ -1,0 +1,57 @@
+# Candidates - 20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading
+
+- Source brainstorm: `docs/B1-docs/raw-20260421-1530/brainstorms.md`
+
+### C-20260421T153000Z-A: legacy issue
+
+- candidate_format_version: `v2`
+- title: `Scan-owned patrol inventory and live-status on-demand reading contract`
+- source_class: `discovery`
+- route_kind: `ibm`
+- phase_state: `todo_ibm`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- priority: `P0`
+- promoted_issue_id: `I-20260421T153000Z-A`
+- promoted_issue_path: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- problem: `Freely currently risks mixing patrol inventory semantics with current-state observation semantics. Prompt-history lookup can identify a current execution contract only partially, cannot describe all unresolved surfaces, and becomes especially misleading once manager plus multiple worker prompts coexist.`
+- why_now:
+  - this round's runtime and doc audit confirmed `task-source-scan` is already the patrol-seed mechanism, while `live-status` is already the current-state plane
+  - protected-root replay shows the run-dir history is large enough that repeated prompt-history inference is both semantically weak and operationally unnecessary
+  - user review sharpened the real target: unresolved follow-up should be driven by scan results and typed references, not by guessing from the newest prompt file
+- proposed_scope:
+  - freeze `scan` as a standalone patrol inventory owner with typed unresolved item refs
+  - freeze `live-status` as runtime truth plus optional scan summary, not a prompt-history patrol scanner
+  - freeze a reference-driven, on-demand file-reading strategy based on runtime anchors and scan item paths
+  - freeze startup to bounded control-plane publication plus optional scan inventory, not deep unresolved-body expansion
+  - freeze a staged refactor plan that preserves current supervision, deep-ref, patrol, and worker-lane visibility capabilities
+  - explicitly reject a heavyweight prompt lifecycle index for this slice
+- non_goals:
+  - building a full prompt lifecycle ledger
+  - widening scan into canonical completion proof
+  - widening live-status into a full every-surface patrol engine
+  - generic status-family redesign beyond this contract
+- acceptance_criteria:
+  - a new pre-brainstorm freezes the distinct owners for patrol inventory and current-state observation
+  - the reading strategy is explicit: runtime anchors first, scan inventory second, referenced files on demand
+  - the pre-research explains why prompt files remain execution contracts rather than unresolved-work truth
+  - the pre-research explains why the multi-worker case breaks naive "latest prompt" semantics
+  - the pre-research explains why bounded startup inventory is acceptable but startup-time deep expansion is not
+  - the pre-research explicitly names which existing Freely capabilities must not regress during refactor
+  - the pre-research includes a staged migration plan that avoids field-breakage and capability drop
+  - the pre-research explains why a heavy prompt lifecycle index is not justified in this owner
+  - the analysis is anchored in real repo/runtime evidence from this round, including protected-root run-dir scale and passing bounded scan-trigger regressions
+  - the success standard explicitly requires that `daemon start` still leads to lawful task selection and standards-compliant Freely completion rather than merely bounded startup plus observability
+  - the success standard explicitly requires that the active worktree reaches a clean closeout state after the in-scope changes and evidence are complete
+- depends_on:
+  - `docs/B1-docs/raw-20260420-1130/candidates.md#C-20260420T113000Z-A`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/system/workspace/three-loop-capability-lifecycle.md`
+- next_action: `Candidate mirror only. I-20260421T153000Z-A is now the canonical owner for the bounded implementation slice that keeps prompt anchors authoritative, adds advisory scan-summary consumption to live-status, and proves the develop-bound path through guarded test-pre-merge plus develop replay.`
+- revisit_trigger: `Re-open only if later implementation needs a heavier typed scan-item schema, a broader status-family redesign, or a different owner for daemon-start autonomous completion proof.`
+- session_refs:
+  - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
+- next_recommended_route: `doc-pre-brainstorm-execution`
+- restart_point: `continuation`
+- ownership: `worker-canonical-pre-brainstorm-writeback`
+- checkpoint_decision: `clean-hold-after-design-freeze`

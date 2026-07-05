@@ -1,12 +1,12 @@
-# C-20260503-0000-B: fix-execution skill
+# C-20260503T000000Z-B: fix-execution skill
 
-- candidate_id: `C-20260503-0000-B`
+- candidate_id: `C-20260503T000000Z-B`
 - title: `fix-execution skill for rapid bug fix workflow`
 - status: `promoted`
 - priority: `P1`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_to: `I-20260503-0000-B`
-- promoted_issue_path: `docs/B2-docs/ibm/fix-execution-skill/issues/I-20260503-0000-B.md`
+- promoted_to: `I-20260503T000000Z-B`
+- promoted_issue_path: `docs/B2-docs/ibm/fix-execution-skill/issues/I-20260503T000000Z-B.md`
 - source_intake: `raw-20260503-fix-skill`
 
 ## Problem

@@ -4,13 +4,13 @@
 
 ### 来源
 - GitHub issue #327 (`raw-20260513T040512Z`) from platform
-- 相关已完成的 issue: `I-20260503-0200-A` (scan lifecycle migration v2)
+- 相关已完成的 issue: `I-20260503T020000Z-A` (scan lifecycle migration v2)
 
 ### 时效性评估
 当前 `task-lifecycle-scan.py` 已从 v1（废弃的 `task-source-scan.py`）切换到 v2 chain trace，但性能瓶颈仍然存在：对每个 lifecycle item 调用 `_is_github_closed()` → `gh issue view N`，O(n) API 导致扫描耗时数分钟甚至超时。该问题是当前扫描链路最明显的性能短板，值得投入。
 
 ### 是否已被覆盖
-原始 `I-20260503-0200-A`（scan lifecycle migration）完成了链跟踪、信号扫描、分支治理、socket 修复，但未解决 per-item API 调用性能问题。本 issue 是其性能优化的自然延续，不属于重复。
+原始 `I-20260503T020000Z-A`（scan lifecycle migration）完成了链跟踪、信号扫描、分支治理、socket 修复，但未解决 per-item API 调用性能问题。本 issue 是其性能优化的自然延续，不属于重复。
 
 ### 当前为什么不能直接进入 B2_IBM
 - 属于新功能/大型改动（`freely-feat-execution`），必须走 B1_IBM → B2_IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → dry-run门禁 → dev合并develop 完整链路

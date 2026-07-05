@@ -13,7 +13,7 @@ platform_ids:
 updated_at: '2026-06-15T06:13:09Z'
 primary_platform: github
 phase_state: absorbed
-absorbed_into: I-20260413-0420-A
+absorbed_into: I-20260413T042000Z-A
 platform_state: closed
 ---
 

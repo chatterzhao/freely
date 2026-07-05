@@ -3,7 +3,7 @@ issue_id: raw-20260519T094555Z
 kind: raw
 priority: P0
 phase_state: absorbed
-absorbed_into: I-20260413-0420-A
+absorbed_into: I-20260413T042000Z-A
 source: feedback
 created_at: '2026-05-19T09:45:55Z'
 title: extract_handoff_block 兼容 json fence——AI写json非handoff

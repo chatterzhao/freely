@@ -52,7 +52,7 @@ title: "governance: update phase_state to completed for ACP issues already merge
 - 当前 `phase_state: in_b2_ibm` → 应为 `completed`
 - 缺少 `platform_state` 字段
 
-### 2. I-20260503-0000-A (ACP bridge crash resilience)
+### 2. I-20260503T000000Z-A (ACP bridge crash resilience)
 
 - 代码已合并：`7851a9a0` (hotfix/acp-bridge-crash-resilience-20260502 → develop)
 - 短路径 issue.md 已正确标记 `phase_state=completed`，但 canonical epic issue 仍写 `phase_state: in_dev`
@@ -64,5 +64,5 @@ title: "governance: update phase_state to completed for ACP issues already merge
 
 文件：
 - `docs/issues/I-20260508T225041Z-A/issue.md` — phase_state → completed
-- `docs/B2-docs/acp/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md` — phase_state → completed
+- `docs/B2-docs/acp/acp-bridge-crash-resilience/issues/I-20260503T000000Z-A.md` — phase_state → completed
 - `docs/milestones.md` — 同步 milestone 状态

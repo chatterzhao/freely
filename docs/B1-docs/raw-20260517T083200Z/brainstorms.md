@@ -19,8 +19,8 @@
 2. **ACP bridge exit code 透传**：ACP bridge 是否在底层进程 crash 时仍返回 rc=0？bridge 本身异常退出和子进程 crash 的 exit code 是否区分？
 3. **Resume 会话的特殊性**：`launch_kind: resume` 是否引入了特殊退出路径？续接会话的进程终止是否更容易被误报为 crash？
 4. **已知关联 issue**：
-   - `I-20260503-0000-A` ACP bridge crash resilience with self-healing——已处理 bridge crash 场景，但未覆盖 rc=0 被误判为 crash 的问题。
-   - `I-20260413-0420-A` runtime supervisor attach reuse followthrough——涉及 supervisor 生命周期管理，与本问题有接触面。
+   - `I-20260503T000000Z-A` ACP bridge crash resilience with self-healing——已处理 bridge crash 场景，但未覆盖 rc=0 被误判为 crash 的问题。
+   - `I-20260413T042000Z-A` runtime supervisor attach reuse followthrough——涉及 supervisor 生命周期管理，与本问题有接触面。
 
 ### 当前可判断
 

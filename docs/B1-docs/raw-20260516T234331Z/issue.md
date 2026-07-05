@@ -13,7 +13,7 @@ platform_ids:
 updated_at: '2026-06-17T00:20:10Z'
 primary_platform: github
 phase_state: absorbed
-absorbed_into: I-20260413-0420-A
+absorbed_into: I-20260413T042000Z-A
 platform_state: closed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 ---

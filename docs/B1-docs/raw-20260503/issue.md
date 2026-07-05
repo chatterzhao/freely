@@ -3,8 +3,8 @@ local_id: raw-20260503
 issue_title: ACP bridge hash-based socket path sync
 kind: raw
 phase_state: absorbed
-absorbed_into: I-20260503-0115-A
-promoted_to: C-20260503-0115-A
+absorbed_into: I-20260503T011500Z-A
+promoted_to: C-20260503T011500Z-A
 platform_ids:
   github:
     issue_id: '516'
