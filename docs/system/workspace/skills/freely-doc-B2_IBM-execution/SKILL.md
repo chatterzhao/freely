@@ -311,7 +311,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
-- [ ] `docs/B2-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
+- [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
 - [ ] 下一跳明确：进入 skill `freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
@@ -351,7 +351,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | 文件 | 路径 | 更新什么 |
 |------|------|---------|
 | milestones.md | `docs/milestones.md` | I-* issue 写入 `committed_issues`（含 `path:` 字段指向 epics 下真实路径） |
-| epics-map.svg | `docs/B2-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
+| epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
 | test-gate.env | `{test-worktree}/.freely/run/test-gate.env` | 测试证据（wt-create 创建，daemon 启停更新，门禁检查） |
 | worker-verification-contract.env | `{worker-worktree}/.freely/run/worker-verification-contract.env` | Worker closeout 上下文（manager 委派 worker 时写入） |
 

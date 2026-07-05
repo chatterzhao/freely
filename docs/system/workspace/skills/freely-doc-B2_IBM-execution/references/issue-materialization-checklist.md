@@ -80,7 +80,7 @@ Epic `ai-session-continuity` 下：
 
 #### 决策流程
 
-1. **读全貌**：`docs/B2-map.svg` 了解已有 epic 和 story。epics-map.svg 是架构地图——每个 `<rect id="epic-{name}">` 是一个能力域，其下 `<rect id="story-{name}">` 是各 epic 的子交付切片。
+1. **读全貌**：`docs/epics-map.svg` 了解已有 epic 和 story。epics-map.svg 是架构地图——每个 `<rect id="epic-{name}">` 是一个能力域，其下 `<rect id="story-{name}">` 是各 epic 的子交付切片。
 2. **读 candidate**：理解这个 raw issue 到底在解决什么**能力层面**的问题。不是"修了一个 bug"，而是"这个 bug 属于哪个能力域的哪个切面"。
 3. **判是否已有 epic 覆盖**：
    - 涉及的**能力域**与已有 epic 重叠 → 复用该 epic。例如：raw issue 修的是 session ID 提取的 OpenCode 兼容问题 → epic `ai-session-continuity`（不是 `acp-session-id-format-fix`——那是修复手段，不是能力域）
@@ -89,7 +89,7 @@ Epic `ai-session-continuity` 下：
    - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw key}` 目录
    - 是 epic 下的新子问题 → 新建 story
 5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
-6. **更新 `docs/B2-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/B2-docs/` 目录结构是否对齐——不对齐则拦截
+6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/B2-docs/` 目录结构是否对齐——不对齐则拦截
 
 #### 层级模型
 
@@ -111,7 +111,7 @@ docs/B2-docs/
 
 B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写文件不更新索引：
 
-1. **新建 epic 时**：在 `docs/B2-map.svg` 中添加 `<rect id="epic-{name}">`，放在合适的垂直位置（按字母序或能力关联）
+1. **新建 epic 时**：在 `docs/epics-map.svg` 中添加 `<rect id="epic-{name}">`，放在合适的垂直位置（按字母序或能力关联）
 2. **新建 story 时**：在对应 epic 的 `<rect>` 下方添加 `<rect id="story-{name}">`
 3. **复用已有 epic/story 时**：如果 SVG 中没有对应条目（epic/story 在文件系统存在但 SVG 未记录），补上
 4. **写完后验证**：运行 `./bin/check-epics-map --project .` 确认对齐。不对齐 → 门禁拦截，必须修正后再继续
