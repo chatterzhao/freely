@@ -32,8 +32,8 @@ platform_state: closed
 - story-name: `state-sync-and-session-evidence-governance`
 - issue-name: `state-sync-and-session-evidence-governance`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `state-sync-and-session-evidence-governance`/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260308-0145/candidates.md#c-20260308-0101`
-- source_brainstorm: `docs/B1-docs/raw-20260308-0145/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-0101`
+- source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

@@ -8,8 +8,8 @@
 - story-name: `runtime-loop-log-timezone-label-followthrough-governance`
 - issue-name: `runtime-loop-log-timezone-label-followthrough-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260402-0540/candidates.md#c-20260402-0540-a`
-- source_brainstorm: `docs/B1-docs/raw-20260402-0540/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0540-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - reopen_reason: `a repo-wide time display audit found that loop.log headers still omitted timezone labels after the broader runtime time-display owner completed`
 - execution_base: `develop`

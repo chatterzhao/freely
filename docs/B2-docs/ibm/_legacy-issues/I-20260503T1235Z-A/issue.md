@@ -5,7 +5,7 @@ kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260503T1235Z
-source_candidate: docs/B1-docs/raw-20260503-1235/candidates.md#C-20260503T1235Z-A
+source_candidate: docs/B1-docs/raw-20260503/candidates.md#C-20260503T1235Z-A
 platform_ids:
   github:
     issue_id: "186"

@@ -8,8 +8,8 @@
 - story-name: `runtime-supervisor-attach-reuse-followthrough-governance`
 - issue-name: `runtime-supervisor-attach-reuse-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260419-1505/candidates.md#c-20260419-1505-a`
-- source_brainstorm: `docs/B1-docs/raw-20260419-1505/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260419/candidates.md#c-20260419-1505-a`
+- source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`

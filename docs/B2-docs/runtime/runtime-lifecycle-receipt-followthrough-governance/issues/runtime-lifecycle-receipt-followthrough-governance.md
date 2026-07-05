@@ -9,8 +9,8 @@
 - story-name: `runtime-lifecycle-receipt-followthrough-governance`
 - issue-name: `runtime-lifecycle-receipt-followthrough-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260418-1900/candidates.md#c-20260418-1900-a`
-- source_brainstorm: `docs/B1-docs/raw-20260418-1900/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260418/candidates.md#c-20260418-1900-a`
+- source_brainstorm: `docs/B1-docs/raw-20260418/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - reopen_reason: `post-merge governance replay proved two historical receipt-gap entries for the absorbed runtime lifecycle test-pre-merge batch were still missing from the protected-branch backfill ledger`
 - execution_base: `develop`
@@ -72,8 +72,8 @@ Continuation `2026-04-25`: the stale replay batch `test-pre-merge-runtime-lifecy
 
 ## Completion
 
-- `docs/B1-docs/raw-20260418-1900/brainstorms.md`
-- `docs/B1-docs/raw-20260418-1900/candidates.md`
+- `docs/B1-docs/raw-20260418/brainstorms.md`
+- `docs/B1-docs/raw-20260418/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/tasks.md`

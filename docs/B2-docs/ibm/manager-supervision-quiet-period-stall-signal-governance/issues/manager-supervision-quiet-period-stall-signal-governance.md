@@ -8,8 +8,8 @@
 - story-name: `manager-supervision-quiet-period-stall-signal-governance`
 - issue-name: `manager-supervision-quiet-period-stall-signal-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260328-0335/candidates.md#c-20260328-0335-a`
-- source_brainstorm: `docs/B1-docs/raw-20260328-0335/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260328/candidates.md#c-20260328-0335-a`
+- source_brainstorm: `docs/B1-docs/raw-20260328/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

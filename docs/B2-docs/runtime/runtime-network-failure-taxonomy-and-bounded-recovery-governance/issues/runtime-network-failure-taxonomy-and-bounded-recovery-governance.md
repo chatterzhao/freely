@@ -8,8 +8,8 @@
 - story-name: `runtime-network-failure-taxonomy-and-bounded-recovery-governance`
 - issue-name: `runtime-network-failure-taxonomy-and-bounded-recovery-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260330-2358/candidates.md#c-20260330-2358-a`
-- source_brainstorm: `docs/B1-docs/raw-20260330-2358/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260330/candidates.md#c-20260330-2358-a`
+- source_brainstorm: `docs/B1-docs/raw-20260330/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/pre-tests.md`
@@ -67,8 +67,8 @@ This owner fixes that narrow gap without redesigning the broader availability sy
 
 ## Completion
 
-- `docs/B1-docs/raw-20260330-2358/brainstorms.md`
-- `docs/B1-docs/raw-20260330-2358/candidates.md`
+- `docs/B1-docs/raw-20260330/brainstorms.md`
+- `docs/B1-docs/raw-20260330/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`

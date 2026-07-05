@@ -8,8 +8,8 @@
 - story-name: `live-status-scan-summary-and-prompt-anchor-governance`
 - issue-name: `live-status-scan-summary-and-prompt-anchor-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260421-1530/candidates.md#C-20260421-1530-A`
-- source_brainstorm: `docs/B1-docs/raw-20260421-1530/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260421/candidates.md#C-20260421-1530-A`
+- source_brainstorm: `docs/B1-docs/raw-20260421/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
@@ -76,8 +76,8 @@ What was still missing was a narrow implementation owner that applies the separa
 
 ## Completion
 
-- `docs/B1-docs/raw-20260421-1530/brainstorms.md`
-- `docs/B1-docs/raw-20260421-1530/candidates.md`
+- `docs/B1-docs/raw-20260421/brainstorms.md`
+- `docs/B1-docs/raw-20260421/candidates.md`
 - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
 - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`

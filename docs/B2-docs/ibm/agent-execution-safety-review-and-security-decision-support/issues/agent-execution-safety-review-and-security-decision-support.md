@@ -8,8 +8,8 @@
 - story-name: `agent-execution-safety-review-and-security-decision-support`
 - issue-name: `agent-execution-safety-review-and-security-decision-support`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260401-1308/candidates.md#c-20260401-1308-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401-1308/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1308-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
@@ -84,7 +84,7 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 - `docs/system/workspace/skills/agent-execution-safety-review/references/evidence-writeback.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`
-- `docs/B1-docs/raw-20260401-1308/candidates.md`
+- `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/milestones.md`
 
 ## Verification

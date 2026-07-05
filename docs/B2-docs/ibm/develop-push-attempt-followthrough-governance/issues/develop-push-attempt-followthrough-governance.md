@@ -8,8 +8,8 @@
 - story-name: `develop-push-attempt-followthrough-governance`
 - issue-name: `develop-push-attempt-followthrough-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260412-1721/candidates.md#c-20260412-1721-a`
-- source_brainstorm: `docs/B1-docs/raw-20260412-1721/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-1721-a`
+- source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/pre-tests.md`
@@ -61,8 +61,8 @@ Freely already exposes develop push debt as explicit truth, but it still stops s
   - This owner is the execution follow-on for the completed develop-push governance family.
   - It adds one explicit push-attempt action and explicit blocked-attempt writeback, while preserving the no-hidden-auto-push boundary.
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260412-1721/brainstorms.md`
-  - `docs/B1-docs/raw-20260412-1721/candidates.md`
+  - `docs/B1-docs/raw-20260412/brainstorms.md`
+  - `docs/B1-docs/raw-20260412/candidates.md`
   - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/tasks.md`

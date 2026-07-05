@@ -8,8 +8,8 @@
 - story-name: `github-first-external-issue-source-governance`
 - issue-name: `github-first-external-issue-source-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260407-1042/candidates.md#c-20260407-1042-a`
-- source_brainstorm: `docs/B1-docs/raw-20260407-1042/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260407/candidates.md#c-20260407-1042-a`
+- source_brainstorm: `docs/B1-docs/raw-20260407/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
@@ -68,8 +68,8 @@ This owner freezes the GitHub-first contract and lands the first consumer-facing
   - This owner freezes the GitHub-first external-source contract and lands the first consumer-facing documentation updates in the source-routing skill stack.
   - Follow-on implementation should start from this contract when adding actual external-source scan, canonical metadata persistence, and closeout/writeback behavior in runtime code.
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260407-1042/brainstorms.md`
-  - `docs/B1-docs/raw-20260407-1042/candidates.md`
+  - `docs/B1-docs/raw-20260407/brainstorms.md`
+  - `docs/B1-docs/raw-20260407/candidates.md`
   - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`
   - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
@@ -88,8 +88,8 @@ This owner freezes the GitHub-first contract and lands the first consumer-facing
 
 ## Completion
 
-- `docs/B1-docs/raw-20260407-1042/brainstorms.md`
-- `docs/B1-docs/raw-20260407-1042/candidates.md`
+- `docs/B1-docs/raw-20260407/brainstorms.md`
+- `docs/B1-docs/raw-20260407/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`

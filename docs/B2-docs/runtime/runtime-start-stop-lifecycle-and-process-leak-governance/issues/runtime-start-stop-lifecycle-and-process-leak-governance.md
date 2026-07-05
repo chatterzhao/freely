@@ -9,8 +9,8 @@
 - story-name: `runtime-start-stop-lifecycle-and-process-leak-governance`
 - issue-name: `runtime-start-stop-lifecycle-and-process-leak-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260417-0445/candidates.md#c-20260417-0445-a`
-- source_brainstorm: `docs/B1-docs/raw-20260417-0445/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260417/candidates.md#c-20260417-0445-a`
+- source_brainstorm: `docs/B1-docs/raw-20260417/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`

@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `baseline-status-command-and-status-family-governance`
 - issue-name: `baseline-status-command-and-status-family-governance`
-- source_candidate: `docs/B1-docs/raw-20260320-2105/candidates.md#c-20260320-2105-a`
-- source_brainstorm: `docs/B1-docs/raw-20260320-2105/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-2105-a`
+- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`

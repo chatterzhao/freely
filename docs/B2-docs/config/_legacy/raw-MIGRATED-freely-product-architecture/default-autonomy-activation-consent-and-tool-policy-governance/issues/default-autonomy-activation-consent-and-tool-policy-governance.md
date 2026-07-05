@@ -8,8 +8,8 @@
 - story-name: `default-autonomy-activation-consent-and-tool-policy-governance`
 - issue-name: `default-autonomy-activation-consent-and-tool-policy-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260401-1303/candidates.md#c-20260401-1303-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401-1303/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1303-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/pre-tests.md`
@@ -92,7 +92,7 @@ Freely 当前的产品真相还分裂着：
 - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/prd.md`
 - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/pre-tests.md`
 - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/tasks.md`
-- `docs/B1-docs/raw-20260401-1303/candidates.md`
+- `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
 

@@ -8,8 +8,8 @@
 - story-name: `manager-startup-continuity-contract-governance`
 - issue-name: `manager-startup-continuity-contract-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260413-0420/candidates.md#c-20260413-0420-b`
-- source_brainstorm: `docs/B1-docs/raw-20260413-0420/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413/candidates.md#c-20260413-0420-b`
+- source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
@@ -61,8 +61,8 @@ This owner is the contract-freezing follow-on to startup authority. It decides w
   - This owner freezes the manager startup handoff contract and the first implementation seam, but intentionally stops before runtime code changes.
   - The follow-on implementation owner should start from the frozen contract here: runtime seeds the expected continuity artifact on the normal path, manager enriches it, status exposes handoff state, and stop fallback remains repair-only.
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260413-0420/brainstorms.md`
-  - `docs/B1-docs/raw-20260413-0420/candidates.md`
+  - `docs/B1-docs/raw-20260413/brainstorms.md`
+  - `docs/B1-docs/raw-20260413/candidates.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
@@ -80,7 +80,7 @@ This owner is the contract-freezing follow-on to startup authority. It decides w
 
 ## Completion
 
-- `docs/B1-docs/raw-20260413-0420/candidates.md`
+- `docs/B1-docs/raw-20260413/candidates.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/prd.md`

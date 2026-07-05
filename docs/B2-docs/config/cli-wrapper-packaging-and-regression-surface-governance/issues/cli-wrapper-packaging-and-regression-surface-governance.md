@@ -8,8 +8,8 @@
 - story-name: `cli-wrapper-packaging-and-regression-surface-governance`
 - issue-name: `cli-wrapper-packaging-and-regression-surface-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260405-2358/candidates.md#c-20260405-2358-c`
-- source_brainstorm: `docs/B1-docs/raw-20260405-2358/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-2358-c`
+- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `feature/cli-command-audit-20260406-0015`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/pre-tests.md`

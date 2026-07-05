@@ -9,8 +9,8 @@
 - issue-name: `human-chat-intake-and-manager-delegation`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260319-1715/candidates.md#c-20260319-1715-a`
-- source_brainstorm: `docs/B1-docs/raw-20260319-1715/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-1715-a`
+- source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

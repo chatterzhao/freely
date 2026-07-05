@@ -8,8 +8,8 @@
 - story-name: `canonical-product-posture-bootstrap-reconciliation-governance`
 - issue-name: `canonical-product-posture-bootstrap-reconciliation-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260402-0403/candidates.md#c-20260402-0403-a`
-- source_brainstorm: `docs/B1-docs/raw-20260402-0403/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0403-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/pre-tests.md`
@@ -56,8 +56,8 @@ This owner reconciles canonical tracked `.codex/config.toml` plus canonical loca
 
 ## Completion
 
-- `docs/B1-docs/raw-20260402-0403/brainstorms.md`
-- `docs/B1-docs/raw-20260402-0403/candidates.md`
+- `docs/B1-docs/raw-20260402/brainstorms.md`
+- `docs/B1-docs/raw-20260402/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`

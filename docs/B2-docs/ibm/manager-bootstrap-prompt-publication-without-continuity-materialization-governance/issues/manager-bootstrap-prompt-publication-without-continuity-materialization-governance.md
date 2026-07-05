@@ -8,8 +8,8 @@
 - story-name: `manager-bootstrap-prompt-publication-without-continuity-materialization-governance`
 - issue-name: `manager-bootstrap-prompt-publication-without-continuity-materialization-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260404-1405/candidates.md#c-20260404-1405-a`
-- source_brainstorm: `docs/B1-docs/raw-20260404-1405/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-1405-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/pre-tests.md`

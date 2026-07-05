@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`
 - issue-name: `doc-pre-brainstorm-execution-bootstrap`
-- source_candidate: `docs/B1-docs/raw-20260306-0248/candidates.md#c-20260306-1103`
+- source_candidate: `docs/B1-docs/raw-20260306/candidates.md#c-20260306-1103`
 - evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
 
 ## Outcome

@@ -8,8 +8,8 @@
 - story-name: `worktree-tool-boundary-bootstrap-governance`
 - issue-name: `worktree-tool-boundary-bootstrap-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260403-2041/candidates.md#c-20260403-2041-a`
-- source_brainstorm: `docs/B1-docs/raw-20260403-2041/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260403/candidates.md#c-20260403-2041-a`
+- source_brainstorm: `docs/B1-docs/raw-20260403/brainstorms.md`
 - reopen_of_issue: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - reopen_reason: `the first tool-materialization slice did not yet rematerialize managed local tool boundaries into sibling worktrees or normalize raw worktree entrypoints around that contract`
 - execution_base: `develop`
@@ -67,8 +67,8 @@ If that gap remains, the canonical workflow still tempts operators back toward p
 ## Completion
 
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260403-2041/brainstorms.md`
-- `docs/B1-docs/raw-20260403-2041/candidates.md`
+- `docs/B1-docs/raw-20260403/brainstorms.md`
+- `docs/B1-docs/raw-20260403/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
 - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/brainstorms/b-worktree-tool-boundary-bootstrap-governance.md`

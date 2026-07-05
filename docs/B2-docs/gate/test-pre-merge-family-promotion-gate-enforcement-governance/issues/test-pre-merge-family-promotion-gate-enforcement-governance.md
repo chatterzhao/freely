@@ -8,8 +8,8 @@
 - story-name: `test-pre-merge-family-promotion-gate-enforcement-governance`
 - issue-name: `test-pre-merge-family-promotion-gate-enforcement-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260405-1805/candidates.md#c-20260405-1805-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405-1805/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-1805-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
@@ -88,8 +88,8 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260405-1805/brainstorms.md`
-- `docs/B1-docs/raw-20260405-1805/candidates.md`
+- `docs/B1-docs/raw-20260405/brainstorms.md`
+- `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/CONSTITUTION.md`

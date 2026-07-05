@@ -8,8 +8,8 @@
 - story-name: `structured-closeout-gate-context-and-review-evidence-governance`
 - issue-name: `structured-closeout-gate-context-and-review-evidence-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260412-0225/candidates.md#c-20260412-0225-a`
-- source_brainstorm: `docs/B1-docs/raw-20260412-0225/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-0225-a`
+- source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
@@ -52,7 +52,7 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260412-0225/candidates.md`
+- `docs/B1-docs/raw-20260412/candidates.md`
 - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/brainstorms/b-structured-closeout-gate-context-and-review-evidence-governance.md`
 - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/prd.md`

@@ -8,8 +8,8 @@
 - story-name: `worktree-hygiene-supervision-control-plane`
 - issue-name: `worktree-hygiene-supervision-control-plane`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260318-1825/candidates.md#C-20260318-1825-A`
-- source_brainstorm: `docs/B1-docs/raw-20260318-1825/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318/candidates.md#C-20260318-1825-A`
+- source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`

@@ -8,8 +8,8 @@
 - story-name: `codex-interactive-login-and-apikey-input-flow-governance`
 - issue-name: `codex-interactive-login-and-apikey-input-flow-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260406-1851/candidates.md#c-20260406-1851-a`
-- source_brainstorm: `docs/B1-docs/raw-20260406-1851/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260406/candidates.md#c-20260406-1851-a`
+- source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/pre-tests.md`

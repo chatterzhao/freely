@@ -8,8 +8,8 @@
 - story-name: `pretests-adequacy-item-schema-materialization-governance`
 - issue-name: `pretests-adequacy-item-schema-materialization-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260411-1415/candidates.md#c-20260411-1415-a`
-- source_brainstorm: `docs/B1-docs/raw-20260411-1415/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411/candidates.md#c-20260411-1415-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
@@ -26,7 +26,7 @@
 
 ## Absorbed Provenance
 
-- `C-20260411-1414-B` from `docs/B1-docs/raw-20260411-1414/candidates.md` was intentionally split out of the launch-time hard-gate brainstorm and is canonically absorbed here so launch-time contract enforcement and adequacy-v2 schema materialization remain separate owners.
+- `C-20260411-1414-B` from `docs/B1-docs/raw-20260411/candidates.md` was intentionally split out of the launch-time hard-gate brainstorm and is canonically absorbed here so launch-time contract enforcement and adequacy-v2 schema materialization remain separate owners.
 
 ## Scope
 
@@ -57,7 +57,7 @@
 
 ## Completion
 
-- `docs/B1-docs/raw-20260411-1415/candidates.md`
+- `docs/B1-docs/raw-20260411/candidates.md`
 - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
 - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/brainstorms/b-pretests-adequacy-item-schema-materialization-governance.md`
 - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/prd.md`

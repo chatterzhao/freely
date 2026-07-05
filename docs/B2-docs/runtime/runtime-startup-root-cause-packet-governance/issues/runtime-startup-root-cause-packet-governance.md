@@ -8,8 +8,8 @@
 - story-name: `runtime-startup-root-cause-packet-governance`
 - issue-name: `runtime-startup-root-cause-packet-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260413-0420/candidates.md#c-20260413-0420-c`
-- source_brainstorm: `docs/B1-docs/raw-20260413-0420/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413/candidates.md#c-20260413-0420-c`
+- source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-root-cause-packet-governance.md`
@@ -45,16 +45,16 @@
   - 这是一个 packet/routing owner，不是 runtime implementation owner。
   - 它的职责是把已经稳定的根因拆分和后续路由 canonicalize 到 `develop`。
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260413-0420/brainstorms.md`
-  - `docs/B1-docs/raw-20260413-0420/candidates.md`
+  - `docs/B1-docs/raw-20260413/brainstorms.md`
+  - `docs/B1-docs/raw-20260413/candidates.md`
   - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/tasks.md`
 
 ## Completion
 
-- `docs/B1-docs/raw-20260413-0420/brainstorms.md`
-- `docs/B1-docs/raw-20260413-0420/candidates.md`
+- `docs/B1-docs/raw-20260413/brainstorms.md`
+- `docs/B1-docs/raw-20260413/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/brainstorms/b-runtime-startup-root-cause-packet-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/prd.md`

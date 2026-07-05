@@ -7,8 +7,8 @@
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-runtime-baseline-for-probe`
 - issue-name: `frontend-runtime-baseline-for-probe`
-- source_candidate: `docs/B1-docs/raw-20260317-1101/candidates.md#c-20260317-1101`
-- source_brainstorm: `docs/B1-docs/raw-20260317-1101/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260317/candidates.md#c-20260317-1101`
+- source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`
@@ -65,7 +65,7 @@
   - 把 `Frontend Probe v0` 中暴露出来的基础设施缺口独立成专门 issue，避免继续污染当前 UI issue 的边界。
   - 当前阶段仍是 issue-bound IBM 收敛，不进入实现代码。
 - required_doc_refs:
-  - `docs/B1-docs/raw-20260317-1101/brainstorms.md`
+  - `docs/B1-docs/raw-20260317/brainstorms.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/brainstorms/b-frontend-runtime-baseline-for-probe.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/prd.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`

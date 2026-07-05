@@ -8,8 +8,8 @@
 - story-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
 - issue-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
 - priority: `P1`
-- source_candidate: `docs/B1-docs/raw-20260405-0027/candidates.md#c-20260405-0027-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405-0027/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-0027-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
@@ -86,7 +86,7 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 ## Verification
 
 - `./bin/governance-check`
-- review `docs/B1-docs/raw-20260405-0027/brainstorms.md`
+- review `docs/B1-docs/raw-20260405/brainstorms.md`
 - review `docs/system/workspace/scripts/runtime/ai-cli`
 - review `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 - confirm the IBM docs do not claim non-Codex probe/materialization parity without verified evidence

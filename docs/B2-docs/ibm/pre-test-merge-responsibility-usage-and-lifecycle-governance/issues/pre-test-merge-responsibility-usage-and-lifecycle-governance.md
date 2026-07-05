@@ -9,8 +9,8 @@
 - issue-name: `pre-test-merge-responsibility-usage-and-lifecycle-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260322-1801/candidates.md#c-20260322-1801-a`
-- source_brainstorm: `docs/B1-docs/raw-20260322-1801/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-1801-a`
+- source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -76,7 +76,7 @@ Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merg
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
 - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
-- `docs/B1-docs/raw-20260322-1801/candidates.md`
+- `docs/B1-docs/raw-20260322/candidates.md`
 - `docs/milestones.md`
 
 ## Verification

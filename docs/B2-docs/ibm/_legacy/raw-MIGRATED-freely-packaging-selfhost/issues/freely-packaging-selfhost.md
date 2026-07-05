@@ -1,7 +1,7 @@
 # Issue: Freely 打包与自举验证
 
 - issue_id: I-20260502-0500-A
-- source_candidate: docs/B1-docs/raw-20260502-0500/candidates.md#c-20260502-0500-a
+- source_candidate: docs/B1-docs/raw-20260502/candidates.md#c-20260502-0500-a
 - phase_state: completed
 - milestone: current
 - pre_tests_path: docs/epics/freely-packaging-selfhost/pre-tests.md

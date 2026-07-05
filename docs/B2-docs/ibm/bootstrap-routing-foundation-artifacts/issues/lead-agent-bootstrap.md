@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`
 - issue-name: `lead-agent-bootstrap`
-- source_candidate: `docs/B1-docs/raw-20260306-0248/candidates.md#c-20260306-1101`
+- source_candidate: `docs/B1-docs/raw-20260306/candidates.md#c-20260306-1101`
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 
 ## Outcome

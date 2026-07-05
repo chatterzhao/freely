@@ -8,8 +8,8 @@
 - story-name: `runtime-concurrent-start-stop-followthrough-governance`
 - issue-name: `runtime-concurrent-start-stop-followthrough-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260408-0231/candidates.md#c-20260408-0231-a`
-- source_brainstorm: `docs/B1-docs/raw-20260408-0231/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260408/candidates.md#c-20260408-0231-a`
+- source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/pre-tests.md`
@@ -76,7 +76,7 @@ That remaining work needs a bounded develop-bound owner instead of staying as ca
 
 ## Completion
 
-- `docs/B1-docs/raw-20260408-0231/candidates.md`
+- `docs/B1-docs/raw-20260408/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/brainstorms/b-runtime-concurrent-start-stop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/prd.md`

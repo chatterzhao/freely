@@ -30,7 +30,7 @@
    - `PASS`: direct-exec wrapper starts the Vite/Tauri dev flow on canonical `develop`; the session was then cleanly interrupted after startup evidence was captured.
 9. `./bin/governance-check`
    - `REROUTED`: post-merge followthrough exposed a new ancestry-audit false positive on internal merge `ab7a9b8`, where `governance-check` validates the nested feature -> `test-pre-merge` merge as if it landed directly on `develop`.
-   - This is routed to `docs/B1-docs/raw-20260406-0055/` and is not absorbed into this packaging owner.
+   - This is routed to `docs/B1-docs/raw-20260406/` and is not absorbed into this packaging owner.
 
 ## Verdict
 

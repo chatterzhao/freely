@@ -34,6 +34,6 @@ One function call added before lock acquisition. No other changes.
 
 ## References
 
-- B1: docs/B1-docs/raw-20260502-1028/
+- B1: docs/B1-docs/raw-20260502/
 - Issue: docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
 - Progress: docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md

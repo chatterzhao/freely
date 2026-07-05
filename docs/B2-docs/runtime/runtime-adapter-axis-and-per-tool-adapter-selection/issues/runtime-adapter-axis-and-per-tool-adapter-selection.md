@@ -8,8 +8,8 @@
 - story-name: `runtime-adapter-axis-and-per-tool-adapter-selection`
 - issue-name: `runtime-adapter-axis-and-per-tool-adapter-selection`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260401-1703/candidates.md#c-20260401-1703-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401-1703/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1703-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/pre-tests.md`

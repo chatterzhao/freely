@@ -8,8 +8,8 @@
 - story-name: `feature-owned-test-pre-merge-family-promotion-model-governance`
 - issue-name: `feature-owned-test-pre-merge-family-promotion-model-governance`
 - priority: `P0`
-- source_candidate: `docs/B1-docs/raw-20260405-1615/candidates.md#c-20260405-1615-a`
-- source_brainstorm: `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405/candidates.md#c-20260405-1615-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
@@ -19,7 +19,7 @@
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
   - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
-  - `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+  - `docs/B1-docs/raw-20260405/brainstorms.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -89,18 +89,18 @@
   - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/tasks.md`
-  - `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+  - `docs/B1-docs/raw-20260405/brainstorms.md`
 
 ## Verification
 
 - `./bin/governance-check`
-- review `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+- review `docs/B1-docs/raw-20260405/brainstorms.md`
 - confirm this owner does not itself claim hook/script enforcement has already landed
 
 ## Completion
 
-- `docs/B1-docs/raw-20260405-1615/brainstorms.md`
-- `docs/B1-docs/raw-20260405-1615/candidates.md`
+- `docs/B1-docs/raw-20260405/brainstorms.md`
+- `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`

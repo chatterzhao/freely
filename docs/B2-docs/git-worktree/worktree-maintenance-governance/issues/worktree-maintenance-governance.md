@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-maintenance-governance`
 - issue-name: `worktree-maintenance-governance`
-- source_candidate: `docs/B1-docs/raw-20260320-1410/candidates.md#c-20260320-1410-a`
-- source_brainstorm: `docs/B1-docs/raw-20260320-1410/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-1410-a`
+- source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]

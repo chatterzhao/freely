@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260417-0445-A`
 - date: `2026-04-18`
-- source_candidate: `docs/B1-docs/raw-20260417-0445/candidates.md#c-20260417-0445-a`
+- source_candidate: `docs/B1-docs/raw-20260417/candidates.md#c-20260417-0445-a`
 
 ## Problem slice
 

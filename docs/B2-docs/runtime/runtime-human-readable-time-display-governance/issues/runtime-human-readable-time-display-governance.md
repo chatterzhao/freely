@@ -8,8 +8,8 @@
 - story-name: `runtime-human-readable-time-display-governance`
 - issue-name: `runtime-human-readable-time-display-governance`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260402-0308/candidates.md#c-20260402-0308-a`
-- source_brainstorm: `docs/B1-docs/raw-20260402-0308/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0308-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/pre-tests.md`
@@ -72,9 +72,9 @@ After the status-tail closeout landed, a runtime follow-up found one more consis
 ## Completion
 
 - `docs/B1-docs/raw-INDEX.md`
-- `docs/B1-docs/raw-20260402-0130/candidates.md`
-- `docs/B1-docs/raw-20260402-0308/brainstorms.md`
-- `docs/B1-docs/raw-20260402-0308/candidates.md`
+- `docs/B1-docs/raw-20260402/candidates.md`
+- `docs/B1-docs/raw-20260402/brainstorms.md`
+- `docs/B1-docs/raw-20260402/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/brainstorms/b-runtime-human-readable-time-display-governance.md`

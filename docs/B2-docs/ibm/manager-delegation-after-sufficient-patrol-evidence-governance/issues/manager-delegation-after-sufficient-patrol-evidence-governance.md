@@ -9,8 +9,8 @@
 - issue-name: `manager-delegation-after-sufficient-patrol-evidence-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260322-0228/candidates.md#c-20260322-0228-a`
-- source_brainstorm: `docs/B1-docs/raw-20260322-0228/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0228-a`
+- source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

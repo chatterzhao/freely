@@ -32,8 +32,8 @@ platform_state: closed
 - story-name: `internal-frontend-backend-architecture-review`
 - issue-name: `internal-frontend-backend-architecture-review`
 - verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/code-reviews`
-- source_candidate: `docs/B1-docs/raw-20260308-1244/candidates.md#c-20260308-1244-01`
-- source_brainstorm: `docs/B1-docs/raw-20260308-1244/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-1244-01`
+- source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

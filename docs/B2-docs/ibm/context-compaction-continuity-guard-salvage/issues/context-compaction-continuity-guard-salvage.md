@@ -12,8 +12,8 @@
 - integration_target: `develop`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-- source_brainstorm: `docs/B1-docs/raw-20260319-0148/brainstorms.md`
-- source_candidate: `docs/B1-docs/raw-20260319-0148/candidates.md`
+- source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260319/candidates.md`
 
 ## Problem
 

@@ -8,8 +8,8 @@
 - story-name: `freely-tool-autonomy-policy-materialization-governance`
 - issue-name: `freely-tool-autonomy-policy-materialization-governance`
 - priority: P0
-- source_candidate: `docs/B1-docs/raw-20260401-1303/candidates.md#c-20260401-1303-a`
-- source_brainstorm: `docs/B1-docs/raw-20260401-1303/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401/candidates.md#c-20260401-1303-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/pre-tests.md`
@@ -66,10 +66,10 @@ Freely 已经明确选择默认高自治方向，但“这份姿势如何被具�
 - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/prd.md`
 - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/pre-tests.md`
 - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/tasks.md`
-- `docs/B1-docs/raw-20260401-1303/brainstorms.md`
-- `docs/B1-docs/raw-20260401-1303/candidates.md`
-- `docs/B1-docs/raw-20260323-1435/brainstorms.md`
-- `docs/B1-docs/raw-20260323-1435/candidates.md`
+- `docs/B1-docs/raw-20260401/brainstorms.md`
+- `docs/B1-docs/raw-20260401/candidates.md`
+- `docs/B1-docs/raw-20260323/brainstorms.md`
+- `docs/B1-docs/raw-20260323/candidates.md`
 - `docs/milestones.md`
 
 ## Verification
@@ -104,7 +104,7 @@ Freely 已经明确选择默认高自治方向，但“这份姿势如何被具�
   - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
   - `./bin/governance-check`
 - observed but not absorbed into this issue:
-  - the worker-reactivation and local-reentry residuals were split out to `docs/B1-docs/raw-20260401-1831/`, then promoted to separate owner `I-20260401-1831-A`
+  - the worker-reactivation and local-reentry residuals were split out to `docs/B1-docs/raw-20260401/`, then promoted to separate owner `I-20260401-1831-A`
   - they are now tracked as separate workspace-routing truth rather than open regressions in this issue
 
 ## Next

@@ -16,13 +16,13 @@ Establish a narrow reconcile policy for pre-brainstorms whose statements are sta
 ## Representative Batch For First Materialization
 
 1. Superseded-by-implementation sample:
-   - `docs/B1-docs/raw-20260408-1205/brainstorms.md`
+   - `docs/B1-docs/raw-20260408/brainstorms.md`
 2. Absorbed-and-closed sample:
-   - `docs/B1-docs/raw-20260406-0055/brainstorms.md`
+   - `docs/B1-docs/raw-20260406/brainstorms.md`
 3. Deferred-by-owner-boundary sample:
-   - `docs/B1-docs/raw-20260327-0651/brainstorms.md`
+   - `docs/B1-docs/raw-20260327/brainstorms.md`
 4. Split-and-partially-materialized sample:
-   - `docs/B1-docs/raw-20260405-1615/brainstorms.md`
+   - `docs/B1-docs/raw-20260405/brainstorms.md`
 
 ## Non-Requirements
 

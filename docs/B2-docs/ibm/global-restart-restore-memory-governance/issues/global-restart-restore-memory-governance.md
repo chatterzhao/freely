@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-restart-restore-memory-governance`
 - issue-name: `global-restart-restore-memory-governance`
-- source_candidate: `docs/B1-docs/raw-20260327-2006/candidates.md#c-20260327-2006-a`
-- source_brainstorm: `docs/B1-docs/raw-20260327-2006/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-2006-a`
+- source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/pre-tests.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/`
 - execution_base: `develop`

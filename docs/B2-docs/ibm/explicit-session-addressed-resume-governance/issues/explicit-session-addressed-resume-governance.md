@@ -9,8 +9,8 @@
 - issue-name: `explicit-session-addressed-resume-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews`
 - priority: P1
-- source_candidate: `docs/B1-docs/raw-20260321-2010/candidates.md#c-20260321-2010-a`
-- source_brainstorm: `docs/B1-docs/raw-20260321-2010/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-2010-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
