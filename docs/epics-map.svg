@@ -968,6 +968,10 @@
   <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-hygiene</text>
   <rect id="story-untracked-pycache" x="55" y="18265" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18280" font-size="11" fill="#333">untracked-pycache</text>
+
+  <rect id="story-gitignore-guidelines" x="55" y="18287" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18302" font-size="11" fill="#34a853">gitignore-guidelines</text>
+
   <rect id="epic-closeout-chain" x="35" y="18327" width="700" height="250" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18351" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>
   <rect id="story-wt-close-test-gate" x="55" y="18335" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
@@ -996,11 +1000,5 @@
 <text x="50" y="18637" font-size="13" font-weight="bold" fill="#1a73e8">workflow</text>
 <rect id="story-wt-close" x="65" y="18653" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="18675" font-size="12" fill="#1a73e8">wt-close</text>
-
-  <rect id="epic-git-guidelines" x="35" y="18400" width="700" height="55" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
-  <text x="50" y="18424" font-size="13" font-weight="bold" fill="#1a73e8">git-guidelines</text>
-  <rect id="story-gitignore-guidelines" x="55" y="18408" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <text x="65" y="18423" font-size="11" fill="#34a853">gitignore-guidelines</text>
-
 </svg>
 
