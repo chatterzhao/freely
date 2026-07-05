@@ -953,7 +953,7 @@
   <rect id="story-safe-state-io" x="55" y="18195" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <rect id="story-bridge-init" x="55" y="18217" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <rect id="story-a2a-log-rotation" x="55" y="18239" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <rect id="story-log-rotation-full" x="55" y="18261" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <rect id="story-log-rotation-full" x="55" y="18245" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18276" font-size="11" fill="#34a853">log-rotation-full</text>
 
   <text x="65" y="18254" font-size="11" fill="#34a853">a2a-log-rotation</text>
