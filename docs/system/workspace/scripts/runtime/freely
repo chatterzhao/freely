@@ -8636,6 +8636,8 @@ ensure_freely_db() {
 
   # Start daemon in foreground mode, background it
   log_info "starting freely-db daemon for $project"
+  _rotate_log "$project/.freely/run/db-daemon.log"
+
   python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &
   local daemon_pid=$!
   disown "$daemon_pid"
@@ -8714,11 +8716,8 @@ print(h)" 2>/dev/null || true).pid"
   # Supports local (Unix socket) and remote (TCP)
   # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
   log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
-<<<<<<< Updated upstream
   _rotate_log "$project/.freely/run/a2a-server.log"
-=======
   : > "$project/.freely/run/a2a-server.log"
->>>>>>> Stashed changes
 
   python3 "$a2a_server_py" --project "$project" --start \
     --listen-mode "${A2A_LISTEN_MODE:-unix}" \
