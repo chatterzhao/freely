@@ -2771,5 +2771,21 @@
 - status: active
 ### candidate_issues
 1. `C-20260705T012851Z-A`
-- milestone: M-20260705T012851Z-A; status: promoted
-- promoted_issue_id: `I-20260705T012851Z-A`
+- milestone: M-20260705T012851Z-A; status: absorbed
+- absorbed_into: `I-20260705T012851Z-A`
+### committed_issues
+1. `I-20260705T012851Z-A`
+- title: fix — _unique_tools crash + dirty message
+- milestone: M-20260705T012851Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
+### completed_issues
+1. `I-20260705T012851Z-A`
+- title: fix — _unique_tools crash + dirty message
+- milestone: M-20260705T012851Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
+2. `C-20260705T012851Z-A`
+- milestone: M-20260705T012851Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T012851Z-A`
