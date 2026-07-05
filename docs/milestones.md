@@ -2931,3 +2931,12 @@
 1. I-20260705T122651Z-A — phase_state completed
 - path: docs/epics/git-guidelines/docs-epics-path-fix/raw-20260705T122651Z/issues/I-20260705T122651Z-A.md
 2. C-20260705T122651Z-A — absorbed → I-20260705T122651Z-A
+
+## M-20260705T155347Z-A
+- title: feat — B1/B2 目录结构重构 + 8 epic 收敛
+- status: active
+### candidate_issues
+1. `C-20260705T155347Z-A`
+- milestone: M-20260705T155347Z-A
+- status: promoted
+- promoted_issue_id: `I-20260705T155347Z-A`
