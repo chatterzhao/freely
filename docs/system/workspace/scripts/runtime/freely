@@ -8636,6 +8636,8 @@ ensure_freely_db() {
 
   # Start daemon in foreground mode, background it
   log_info "starting freely-db daemon for $project"
+  _rotate_log "$project/.freely/run/db-daemon.log"
+
   python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &
   local daemon_pid=$!
   disown "$daemon_pid"
@@ -8715,6 +8717,7 @@ print(h)" 2>/dev/null || true).pid"
   # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
   log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
   _rotate_log "$project/.freely/run/a2a-server.log"
+  : > "$project/.freely/run/a2a-server.log"
 
   python3 "$a2a_server_py" --project "$project" --start \
     --listen-mode "${A2A_LISTEN_MODE:-unix}" \
@@ -22375,6 +22378,11 @@ ${_msg}" >/dev/null 2>&1 || true
     while kill -0 $_supervisor_pid 2>/dev/null; do
       _update_heartbeat "$PROJECT_ROOT"
     _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/lifecycle-trace.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/runtime-events.log" 2>/dev/null || true
+
       sleep 2
     done
   ) &
@@ -22401,6 +22409,11 @@ print('ok')
   while true; do
     _update_heartbeat "$PROJECT_ROOT"
     _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/lifecycle-trace.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/runtime-events.log" 2>/dev/null || true
+
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
 
@@ -22525,6 +22538,11 @@ print(ready)
     local prompt_utf8_invalid_count="0"
     _update_heartbeat "$PROJECT_ROOT"
     _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/lifecycle-trace.log" 2>/dev/null || true
+    _rotate_log "$PROJECT_ROOT/.freely/logs/runtime-events.log" 2>/dev/null || true
+
     if ! build_prompt >"$prompt_file"; then
       LAST_WORKCELL_EXIT_REASON="prompt_build_failed"
       write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
