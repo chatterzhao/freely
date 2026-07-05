@@ -17,3 +17,7 @@
 - `grep 'docs/issues\|docs/epics'` 核心脚本归零
 - 端到端路径验证：B1-docs 633 个 raw issue、B2-docs 94 个 I-* 文件全部可达
 - wt-create --source platform 功能正常
+
+## Owner Issue
+- I-20260705T231131Z-A: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+- C-20260705T231131Z-A: docs/B1-docs/raw-20260705T231131Z/candidates.md

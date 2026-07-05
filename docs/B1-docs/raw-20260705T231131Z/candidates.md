@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260705T231131Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260705T231131Z
 milestone: M-20260705T231131Z-A
 ---
@@ -9,7 +9,8 @@ milestone: M-20260705T231131Z-A
 
 - candidate_format_version: v2
 - title: 19个执行脚本 docs/issues→docs/B1-docs + docs/epics→docs/B2-docs
-- status: promoted
+- absorbed_into: I-20260705T231131Z-A
+- status: absorbed
 - decision_reason: |
     上一个 PR docs-structure-refactor 遗漏了 bin/ + scripts/ 执行层。
     B1-docs: raw-{key}/issue.md (目录+文件)
