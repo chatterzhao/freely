@@ -1,7 +1,7 @@
 ---
 issue_id: I-20260705T042057Z-A
 issue_path: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
-phase_state: in_dev
+phase_state: completed
 ---
 - issue_id: I-20260705T042057Z-A
 ## Implementation Decision Note
