@@ -47,10 +47,10 @@ EOT
   echo "$dir"
 }
 
-# CASE-001: pre-brainstorms 缺失时 doctor 失败
+# CASE-001: B1-docs 缺失时 doctor 失败
 p1="$(new_project)"
-rm -rf "$p1/docs/pre-brainstorms"
-expect_fail "CASE-001 doctor fails when pre-brainstorms missing" "$FREELY" doctor --project "$p1"
+rm -rf "$p1/docs/B1-docs"
+expect_fail "CASE-001 doctor fails when B1-docs missing" "$FREELY" doctor --project "$p1"
 
 # CASE-002: 缺失 AGENTS 时 doctor 失败
 p2="$(new_project)"
