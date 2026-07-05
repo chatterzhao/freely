@@ -303,7 +303,7 @@ def is_governance_only_path(rel_path: str) -> bool:
         "docs/LAWS.md",
         "docs/PROJECT_INTENT.md",
         "docs/milestones.md",
-        "docs/epics-map.svg",
+        "docs/B2-map.svg",
         "docs/system/workspace/ibm-framework.md",
         "docs/system/workspace/three-loop-capability-lifecycle.md",
         "docs/system/workspace/scan-lifecycle-design.md",

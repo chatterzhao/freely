@@ -87,7 +87,7 @@ def main():
         elif not arg.startswith("--"):
             project = Path(arg)
 
-    svg_file = project / "docs" / "epics-map.svg"
+    svg_file = project / "docs" / "B2-map.svg"
     if not svg_file.exists():
         print(f"[epics-map] ERROR: {svg_file} not found")
         sys.exit(1)
