@@ -2813,3 +2813,27 @@
 - milestone: M-20260705T024320Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T024320Z-A`
+
+## M-20260705T042057Z-A
+- title: fix — base_tool validation + slot naming
+- status: active
+### candidate_issues
+1. `C-20260705T042057Z-A`
+- milestone: M-20260705T042057Z-A; status: absorbed
+- absorbed_into: `I-20260705T042057Z-A`
+### committed_issues
+1. `I-20260705T042057Z-A`
+- title: fix — base_tool validation + slot naming
+- milestone: M-20260705T042057Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
+### completed_issues
+1. `I-20260705T042057Z-A`
+- title: fix — base_tool validation + slot naming
+- milestone: M-20260705T042057Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
+2. `C-20260705T042057Z-A`
+- milestone: M-20260705T042057Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T042057Z-A`
