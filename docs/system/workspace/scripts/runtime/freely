@@ -60,6 +60,43 @@ _tool_registry_tools() {
   python3 "$TOOL_REGISTRY_QUERY" "$TOOL_REGISTRY" --list 2>/dev/null
 }
 
+# ── Validate base_tool extracted from slot against tool-registry ──
+_validate_base_tool_from_slot() {
+  local _v_slot="${1:-}" _v_caller="${2:-unknown}"
+  [[ -n "$_v_slot" ]] || return 0
+
+  # Check slot naming convention: {base_tool}-apikey|account-{name}
+  if ! echo "$_v_slot" | grep -qE '^[a-z]+-(apikey|account)-'; then
+    log_error "Slot naming convention violation: $_v_slot (caller=$_v_caller)"
+    log_error ""
+    log_error "Expected format: {base_tool}-apikey|account-{name}"
+    log_error "  Examples: claude-apikey-ds-pro-auto, opencode-apikey-ds-flash-auto, cline-account-ds-flash-free-auto"
+    log_error ""
+    log_error "Fix:"
+    log_error "  1. Check agent-table.toml slot field spelling"
+    log_error "  2. The ~/.ai-auth/ directory name must follow this convention"
+    exit 1
+  fi
+
+  local _v_bt="${_v_slot%%-*}"
+  if ! _tool_is_registered "$_v_bt" 2>/dev/null; then
+    local _v_supported
+    _v_supported="$(_tool_registry_tools 2>/dev/null | tr '\n' ', ' | sed 's/, $//')"
+    log_error "Unsupported base_tool: $_v_bt (from slot $_v_slot, caller=$_v_caller)"
+    log_error ""
+    log_error "Supported base_tools: $_v_supported"
+    log_error ""
+    log_error "Possible causes:"
+    log_error "  1. agent-table.toml has a typo in the slot field"
+    log_error "  2. The ~/.ai-auth/ directory name does not start with a supported base_tool"
+    log_error "  3. This base_tool is genuinely not supported by freely"
+    log_error ""
+    log_error "  Check: bin/agent-table-query --get-slot <agent_id>"
+    log_error "  Check: ls ~/.ai-auth/"
+    exit 1
+  fi
+}
+
 _tool_is_registered() {
   local tool="$1"
   _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
@@ -13181,6 +13218,7 @@ SESSIONEOF
   local _worker_slot _worker_base
   _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || true)
   _worker_base="${_worker_slot%%-*}"
+  _validate_base_tool_from_slot "$_worker_slot" "worker_launch"
   [[ -z "$_worker_base" ]] && _worker_base="opencode"
 
   _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
@@ -22229,6 +22267,7 @@ start_project_runtime() {
         _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
         [[ -n "$_slot" ]] || continue
         _bt="${_slot%%-*}"
+        _validate_base_tool_from_slot "$_slot" "bridge_init"
         [[ " ${_unique_tools[*]:-} " == *" $_bt "* ]] && continue
         _unique_tools+=("$_bt")
       done
@@ -22365,6 +22404,7 @@ print(result.get('status','error'))
           _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
           [[ -n "$_slot" ]] || continue
           _bt="${_slot%%-*}"
+          _validate_base_tool_from_slot "$_slot" "cycle_check"
           [[ " ${_cycle_tools[*]:-} " == *" $_bt "* ]] && continue
           _cycle_tools+=("$_bt")
         done
