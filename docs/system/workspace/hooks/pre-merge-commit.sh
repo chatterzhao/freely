@@ -120,7 +120,7 @@ require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded so hooks can verify the canonical handshake.
+develop 是受保护分支。修改内容是临时的就丢弃，不是就通过 freely feedback 命令创建 raw issue，freely wt-create 命令创建工位，详情阅读 skill freely-workflow-guarded-execution。
 MSG
     exit 1
   }
@@ -128,7 +128,7 @@ MSG
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded.
+develop 是受保护分支。修改内容是临时的就丢弃，不是就通过 freely feedback 命令创建 raw issue，freely wt-create 命令创建工位，详情阅读 skill freely-workflow-guarded-execution。
 MSG
     exit 1
   fi

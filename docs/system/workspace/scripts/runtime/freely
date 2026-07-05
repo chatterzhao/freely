@@ -21931,30 +21931,21 @@ start_project_runtime() {
       git diff --name-only 2>/dev/null | while read -r _f; do echo "  (unstaged) $_f"; done
       git diff --cached --name-only 2>/dev/null | while read -r _f; do echo "  (staged)   $_f"; done
       log_error ""
-      log_error "请检查以上 dirty 内容并选择合适的处理方式:"
+      log_error "请检查以上 dirty 内容:"
       log_error ""
-      log_error "  如果内容已在其他工位存在 → 丢弃:"
+      log_error "  修改内容是临时的 → 丢弃:"
       log_error "    git checkout -- <file>"
       log_error ""
-      log_error "  如果是无用的临时文件 → 丢弃:"
-      log_error "    git checkout -- <file>"
-      log_error ""
-      log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error "    git stash  # 先暂存变更"
+      log_error "  修改内容不是临时的 → 按工作流:"
       log_error "    用 \`freely feedback\` 命令创建 raw issue"
       log_error "    用 \`freely wt-create\` 命令创建工位"
       log_error "    cd 到工位目录修复"
-      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
+      log_error "    详情阅读 skill \`freely-workflow-guarded-execution\`"
       log_error ""
       log_error "Then retry: freely daemon start --project $project"
 
 	      log_error ""
 	      log_error "  如果是有用的修改 → 按工作流修复:"
-	      log_error "    git stash  # 先暂存变更"
-	      log_error "    用 \`freely feedback\` 命令创建 raw issue"
-	      log_error "    用 \`freely wt-create\` 命令创建工位"
-	      log_error "    cd 到工位目录修复"
-	      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
 	      log_error ""
       log_error ""
       log_error "  如果内容已在其他工位存在 → 丢弃:"
@@ -21964,7 +21955,6 @@ start_project_runtime() {
       log_error "    git checkout -- <file>"
       log_error ""
       log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error "    git stash  # 先暂存变更"
       log_error "    freely feedback --kind fix --title '...' --body '...'  # 创建 raw issue"
       log_error "    freely wt-create --raw-key <key> --source local --kind fix --slug <slug>  # 创建工位"
       log_error "    cd ../<project>-worktrees/<dir>  # 进入工位修复"
@@ -22380,10 +22370,11 @@ ${_msg}" >/dev/null 2>&1 || true
     log_info "agent_working: writing __manager__ record for project=$project"
     _aw_result=$(python3 -c "
 import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_assign
-result = agent_assign('${project}', '__manager__', 'manager', 'manager_01',
-                       worktree='${project}', branch='develop')
-print(result.get('status','error'))
+from agent_working import acp_session_register
+acp_session_register('${project}', '__manager__', 'manager', 'manager_01',
+                     slot='${AGENT_AI_TOOL:-}',
+                     worktree='${project}', branch='develop')
+print('ok')
 " 2>&1)
     log_info "agent_working __manager__ write: status=${_aw_result:-empty}"
   fi
