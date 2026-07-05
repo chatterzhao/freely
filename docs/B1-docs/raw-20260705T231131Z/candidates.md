@@ -25,6 +25,6 @@ milestone: M-20260705T231131Z-A
 - open_questions: []
 - acceptance_reviews: []
 - promoted_issue_id: I-20260705T231131Z-A
-- promoted_issue_path: pending://B2-materialization
+- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
 - milestone: M-20260705T231131Z-A
 - session_refs: []
