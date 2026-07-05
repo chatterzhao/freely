@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260705T010030Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260705T010030Z
 created_at: 2026-07-05
 milestone: M-20260705T010030Z-A
@@ -10,7 +10,7 @@ milestone: M-20260705T010030Z-A
 
 - candidate_format_version: v2
 - title: wt-close 重构 — --raw-key 唯一必填参数，自动发现双工位
-- status: promoted
+- status: absorbed
 - decision_reason: |
   消除 --branch 入口和 test-pre-merge disposable 路径，
   统一为 --raw-key 唯一入口，命令自动发现两个工位。

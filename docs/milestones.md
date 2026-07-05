@@ -267,7 +267,7 @@
 ### candidate_issues
 1. `C-20260701T081450Z-A`
 - milestone: M-20260701T081450Z-A
-- status: promoted
+- status: absorbed
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T081450Z-A`
 ### committed_issues
 1. `I-20260703T051533Z-A`
@@ -2745,13 +2745,23 @@
 ## M-20260705T010030Z-A
 - title: fix — wt-close --raw-key 唯一入口重构
 - status: active
+### candidate_issues
+1. `C-20260705T010030Z-A`
+- milestone: M-20260705T010030Z-A; status: absorbed
+- absorbed_into: `I-20260705T010030Z-A`
 ### committed_issues
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
-### candidate_issues
-1. `C-20260705T010030Z-A`
-- milestone: M-20260705T010030Z-A; status: promoted
-- promoted_issue_id: `I-20260705T010030Z-A`
+### completed_issues
+1. `I-20260705T010030Z-A`
+- title: fix — wt-close --raw-key 唯一入口重构
+- milestone: M-20260705T010030Z-A
+- phase_state: completed
+- path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
+2. `C-20260705T010030Z-A`
+- milestone: M-20260705T010030Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T010030Z-A`
