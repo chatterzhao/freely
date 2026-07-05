@@ -25,7 +25,7 @@ session_refs: []
 Rewrite task-lifecycle-scan.py with three-category classification:
 
 ### Category 1 — 未开始
-- 1a: Platform OPEN + no worktree + no `docs/issues/raw-{key}/` → wt-create
+- 1a: Platform OPEN + no worktree + no `docs/B1-docs/raw-{key}/` → wt-create
 - 1b: Platform OPEN + raw dir exists + phase=completed → reopen
 - 1c: Chat inbox unconsumed + no worktree + no raw dir → AI 判断价值
 

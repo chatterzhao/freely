@@ -39,7 +39,7 @@ This inconsistency means:
 
 ### Option A: Align gate to LAWS.md (strict)
 - Restrict governance-only paths to: AGENTS.md, CONSTITUTION.md, LAWS.md,
-  PROJECT_INTENT.md, milestones.md, docs/pre-brainstorms/, docs/epics/,
+  PROJECT_INTENT.md, milestones.md, docs/B1-docs/, docs/epics/,
   docs/progress/, docs/issues/
 - All workspace scripts REQUIRE IBM lifecycle
 - FREELY_SKIP_IBM_GATE=1 only works for pure doc changes

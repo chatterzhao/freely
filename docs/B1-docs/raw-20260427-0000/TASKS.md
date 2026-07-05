@@ -46,7 +46,7 @@
 
 ### [CHANGE] 2.3 `write_intake_item()` 函数
 - **当前**：创建 `.freely/intake/<id>/` 目录 + `message.txt` + `meta.env`
-- **改为**：创建 `docs/issues/raw-{key}/` 目录 + `issue.md`，或追加评论到已有 issue.md
+- **改为**：创建 `docs/B1-docs/raw-{key}/` 目录 + `issue.md`，或追加评论到已有 issue.md
 
 ### [KEEP] 2.4 `submit_human_frontdoor_message()` 函数
 - 不做实质改动。内部的 `cmd_intake_chat` 调用会被 CHG 2.2 覆盖。
@@ -57,7 +57,7 @@
 
 ### [CHANGE] 3.1 `task-source-scan.py: scan_intake()`
 - **当前**：扫描 `.freely/intake/` 目录
-- **改为**：扫描 `docs/issues/raw-*/issue.md`（未关联 candidate 的 raw issue）
+- **改为**：扫描 `docs/B1-docs/raw-*/issue.md`（未关联 candidate 的 raw issue）
 - 输出：restart_point=pre_brainstorm，source_family="raw_issue"
 
 ### [NEW] 3.2 `task-source-scan.py: scan_linked_issues()`
@@ -71,7 +71,7 @@
 
 ### [CHANGE] 3.4 `task-source-scan.py: scan_external_github/gitee()`
 - **当前**：下载平台 issue 后直接在 scan 结果中返回
-- **改为**：下载后先写入 `docs/issues/raw-{key}/issue.md`（如果本地还没有），再返回 scan 结果
+- **改为**：下载后先写入 `docs/B1-docs/raw-{key}/issue.md`（如果本地还没有），再返回 scan 结果
 - 平台 raw issue → 本地 raw issue 的一一对应
 
 ### [KEEP] 3.5 `scan_pre_brainstorms()`, `scan_milestones()`, `scan_progress()`
@@ -176,7 +176,7 @@
 - issue phase_state: in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed（不变）
 
 ### [KEEP] 9.2 现有目录
-- docs/pre-brainstorms/（不变）
+- docs/B1-docs/（不变）
 - docs/epics/（不变）
 - docs/progress/（不变）
 - docs/system/workspace/（不变）

@@ -8,7 +8,7 @@
 - route_kind: `pre_brainstorm`
 - target_skill_or_loop: `doc-pre-brainstorm-execution`
 - status: `needs_research`
-- prioritized_pool: `docs/pre-brainstorms/** + docs/milestones.md#candidate_issues`
+- prioritized_pool: `docs/B1-docs/** + docs/milestones.md#candidate_issues`
 - why_this_pool_first:
   - delegated continuation handoff 已直接命中 `C-20260323-1705-A`
   - `docs/milestones.md` 仍将该条目标记为 `candidate` / `in_pre_brainstorm`
@@ -18,8 +18,8 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
-  - `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`
+  - `docs/B1-docs/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
+  - `docs/B1-docs/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`
   - `docs/milestones.md`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
 - canonical_writeback_decision: `keep-and-commit`

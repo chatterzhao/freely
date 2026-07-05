@@ -32,7 +32,7 @@ platform_state:
 | 层 | 存储 | 字段 | 取值 |
 |----|------|------|------|
 | chat-inbox | .freely/freely.db | consumed | -1/0/1 |
-| raw issue | docs/issues/raw-*/ | status | proposed→absorbed/dropped |
+| raw issue | docs/B1-docs/raw-*/ | status | proposed→absorbed/dropped |
 | I-* issue | docs/issues/I-*/ | phase_state | in_b2_ibm→…→completed |
 | 平台 issue | GitHub/Gitee API | state | open/closed |
 

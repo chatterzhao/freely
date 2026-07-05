@@ -38,7 +38,7 @@ session_refs: []
   ├─ 1. 查 worktree 是否存在（已有）
   │
   ├─ 2. [NEW] 查 raw issue 是否存在且 open
-  │   raw_file="docs/issues/raw-${raw_key}/issue.md"
+  │   raw_file="docs/B1-docs/raw-${raw_key}/issue.md"
   │   phase=$(grep "phase_state:" "$raw_file")
   │
   ├─ raw issue 不存在:
@@ -62,7 +62,7 @@ session_refs: []
 ```
 [GATE] Worker launch blocked: raw-20260621T123324Z
 
-  raw issue 不存在: docs/issues/raw-20260621T123324Z/issue.md
+  raw issue 不存在: docs/B1-docs/raw-20260621T123324Z/issue.md
   请仔细检查该任务是否有对应的 raw issue。
   按 raw_key 查找: gh issue list --search "raw-20260621T123324Z in:title"
   或语义搜索: gh issue list --search "关键词 in:title" --state open

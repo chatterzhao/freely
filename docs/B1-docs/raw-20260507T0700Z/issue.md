@@ -20,7 +20,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/unified-platform/verification/pre-tests.md
 verification_artifact_dir: docs/epics/unified-platform/code-reviews
-source_candidate: docs/pre-brainstorms/20260507-unified-platform/candidates.md
+source_candidate: docs/B1-docs/20260507-unified-platform/candidates.md
 platform_state: closed
 ---
 

@@ -37,7 +37,7 @@ candidates.md 的候选条目用 `## C-xxx`（h2），子节（`### 改动`、`#
 
 ### Bug 2: `_all_base_keys` 无 I-* 来源
 
-key 发现只有两个来源：chat_inbox + `docs/issues/raw-*` 目录。当 raw dir 不存在（完整生命周期走完后清理）但 I-* children 仍存在时，整条链不可见。需要增加 `docs/issues/I-*` 作为 key 来源。
+key 发现只有两个来源：chat_inbox + `docs/B1-docs/raw-*` 目录。当 raw dir 不存在（完整生命周期走完后清理）但 I-* children 仍存在时，整条链不可见。需要增加 `docs/issues/I-*` 作为 key 来源。
 
 ## scan 职责边界（不修的部分）
 

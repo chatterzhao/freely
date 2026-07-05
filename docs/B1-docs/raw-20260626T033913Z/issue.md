@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260626T033913Z-A
-source_candidate: docs/pre-brainstorms/20260626T033913Z--freely-review/candidates.md#C-20260626T033913Z-A
+source_candidate: docs/B1-docs/20260626T033913Z--freely-review/candidates.md#C-20260626T033913Z-A
 promoted_issue_path: docs/issues/I-20260626T033913Z-A/issue.md
 pre_tests_path: docs/epics/freely-review/verification/pre-tests.md
 platform_state: closed

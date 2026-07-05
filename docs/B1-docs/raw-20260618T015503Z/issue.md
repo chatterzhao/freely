@@ -41,13 +41,13 @@ Freely 的多个命令在操作 `docs/issues/`、milestones、epics 等治理文
 
 ## 受影响的全量路径
 
-### docs/issues/raw-{key}/issue.md
+### docs/B1-docs/raw-{key}/issue.md
 
 | 命令 | 行号 | 当前路径 | 应该用 |
 |---|---|---|---|
-| wt-create `_pull_raw_issue` | 307 | `$ROOT_DIR/docs/issues/raw-${key}` | worktree 路径 |
-| wt-create `_pull_raw_issue` | 330 | `$ROOT_DIR/docs/issues/raw-${key}/issue.md` | worktree 路径 |
-| wt-create `_mark_raw_issue_absorbed` | 357 | `$ROOT_DIR/docs/issues/raw-${key}/issue.md` | worktree 路径 |
+| wt-create `_pull_raw_issue` | 307 | `$ROOT_DIR/docs/B1-docs/raw-${key}` | worktree 路径 |
+| wt-create `_pull_raw_issue` | 330 | `$ROOT_DIR/docs/B1-docs/raw-${key}/issue.md` | worktree 路径 |
+| wt-create `_mark_raw_issue_absorbed` | 357 | `$ROOT_DIR/docs/B1-docs/raw-${key}/issue.md` | worktree 路径 |
 | wt-create `_ensure_scan_index` | 439,455,467,505,513,522 | `$ROOT_DIR/docs/issues/$key` | worktree 路径 |
 | wt-create `_materialize_chat_if_needed` | 561 | `$target_path/docs/issues/$key` | ✅ 这个是 worktree 路径！ |
 | pr-merge-guarded `_absorb_close_frontmatter` | 274 | `docs/issues/${raw_key}/issue.md` | **不需要了（见下文）** |
@@ -81,12 +81,12 @@ Freely 强制 worktrees 目录与项目主目录的相对位置：
 ```
 wt-create（在 develop 执行）
   ├─ 从平台/chat-inbox 拉取 raw issue
-  └─ 物化到 worktree 的 docs/issues/raw-{key}/  ← 不是 develop！
+  └─ 物化到 worktree 的 docs/B1-docs/raw-{key}/  ← 不是 develop！
 
 fix worktree（可写工位）
-  ├─ docs/issues/raw-{key}/issue.md  ← phase_state 在这里
+  ├─ docs/B1-docs/raw-{key}/issue.md  ← phase_state 在这里
   ├─ docs/epics/{name}/              ← code-review 等在这里
-  ├─ docs/pre-brainstorms/{key}/     ← brainstorms/candidates 在这里
+  ├─ docs/B1-docs/{key}/     ← brainstorms/candidates 在这里
   ├─ 代码修改
   └─ git commit（phase_state 变更作为普通 commit 提交）
 

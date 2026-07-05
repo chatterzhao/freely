@@ -32,7 +32,7 @@ wt-close --platform-only <branch> --reason "..."
 
 只做:
   1. 从 branch 提取 raw key
-  2. 读 $PROJECT_ROOT/docs/issues/raw-xxx/issue.md（只读，不动 develop）
+  2. 读 $PROJECT_ROOT/docs/B1-docs/raw-xxx/issue.md（只读，不动 develop）
   3. 获取 raw issue 的 GitHub issue number → API close
   4. 读 absorbed_into → 获取 I-* issue
   5. 如果 I-* phase=completed 且 platform_state!=closed → 同样 API close

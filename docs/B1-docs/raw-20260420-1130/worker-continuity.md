@@ -7,15 +7,15 @@
 - source_class: `continuation`
 - route_kind: `pre_brainstorm`
 - target_skill_or_loop: `doc-pre-brainstorm-execution`
-- prioritized_pool: `docs/pre-brainstorms/** + docs/milestones.md#candidate_issues`
+- prioritized_pool: `docs/B1-docs/** + docs/milestones.md#candidate_issues`
 - restart_point: `continuation`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
 - workspace_action: `reuse-current-feature-worktree`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
-  - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+  - `docs/B1-docs/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+  - `docs/B1-docs/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
   - `docs/milestones.md`
 - route_verdict: `still_pre_brainstorm`
 - why:
@@ -24,7 +24,7 @@
   - the older `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md` owner is already `completed` and only freezes patrol-completeness semantics; it does not absorb this newer idle/replan scan-trigger contract
   - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabfa-babb-7a22-bca4-63ce4693ea81` `fresh_with_handoff` restart after `context compacted` only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign
 - hygiene_judgement:
-  - current `git status --short` on entry showed exactly two dirty candidate-owned files: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md` and `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/worker-continuity.md`
+  - current `git status --short` on entry showed exactly two dirty candidate-owned files: `docs/B1-docs/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md` and `docs/B1-docs/20260420-1130--manager-task-source-scan-replan-boundary/worker-continuity.md`
   - current `git diff --stat` on entry stayed bounded to the same scope with `2 files changed`, so the worktree entered this round as a narrow candidate-doc hygiene batch rather than a mixed implementation tree
   - this round started as `fresh_with_handoff` from Codex session `019dabfa-babb-7a22-bca4-63ce4693ea81` after `context compacted`, so continuity refresh was required before any scope expansion
   - `./bin/checkpoint-guard` reports `checkpoint_required: no`

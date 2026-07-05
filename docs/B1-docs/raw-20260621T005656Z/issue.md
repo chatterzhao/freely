@@ -50,7 +50,7 @@ def build_issue_index():
             output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/issues/")
             for line in output.splitlines():
                 line = line.strip()
-                if line and (line.startswith("docs/issues/raw-") or line.startswith("docs/issues/I-")):
+                if line and (line.startswith("docs/B1-docs/raw-") or line.startswith("docs/issues/I-")):
                     if line.endswith("/issue.md"):
                         paths.append(line)
         except Exception:

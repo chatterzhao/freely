@@ -74,4 +74,4 @@ ALTER TABLE chats ADD COLUMN conversation_id INTEGER DEFAULT 0;
 
 ## 参考
 
-B1 文档：`docs/pre-brainstorms/issue-state-lifecycle.md` §6, §7.3
+B1 文档：`docs/B1-docs/issue-state-lifecycle.md` §6, §7.3

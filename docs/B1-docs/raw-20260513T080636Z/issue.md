@@ -4,7 +4,7 @@ kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-source_candidate: docs/pre-brainstorms/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
+source_candidate: docs/B1-docs/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
 priority: P2
 source: platform
 created_at: '2026-05-13T09:49:13Z'

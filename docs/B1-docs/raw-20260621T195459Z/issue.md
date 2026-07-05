@@ -45,7 +45,7 @@ if [[ -n "$existing_wt" ]]; then
 fi
 
 # 3. raw issue 已关闭?
-phase=$(grep "phase_state:" "docs/issues/raw-${raw_key}/issue.md" 2>/dev/null)
+phase=$(grep "phase_state:" "docs/B1-docs/raw-${raw_key}/issue.md" 2>/dev/null)
 if [[ "$phase" =~ (absorbed|completed|dropped) ]]; then
     echo "拒绝: raw-${raw_key} 已关闭 (phase_state=$phase)"
     exit 1

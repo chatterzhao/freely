@@ -21,7 +21,7 @@
 - Priority: P1
 
 ### 2. Root Cause Analysis Complete ✓
-- Created `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/root-cause-analysis.md`
+- Created `docs/B1-docs/20260330-2318--live-status-already-running-attach-regression/root-cause-analysis.md`
 - Confirmed the optimistic attach write path in `start_project_runtime()`
 - Confirmed `live-status` only reconciles upward and does not downgrade stale optimistic state
 - Reframed earlier "PID reuse / stale pid file" claims as unproven hypotheses

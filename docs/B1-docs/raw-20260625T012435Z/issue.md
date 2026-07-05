@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T012435Z-A
-source_candidate: docs/pre-brainstorms/20260625T012435Z--test-pre-merge-allow/candidates.md#C-20260625T012435Z-A
+source_candidate: docs/B1-docs/20260625T012435Z--test-pre-merge-allow/candidates.md#C-20260625T012435Z-A
 ---
 
 ## 问题

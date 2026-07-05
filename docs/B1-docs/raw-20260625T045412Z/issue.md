@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T045412Z-A
-source_candidate: docs/pre-brainstorms/20260625T045412Z--migrate-to-adapter/candidates.md#C-20260625T045412Z-A
+source_candidate: docs/B1-docs/20260625T045412Z--migrate-to-adapter/candidates.md#C-20260625T045412Z-A
 ---
 
 ## 问题

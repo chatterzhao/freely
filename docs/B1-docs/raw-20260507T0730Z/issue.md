@@ -20,7 +20,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/source-param/verification/pre-tests.md
 verification_artifact_dir: docs/epics/source-param/code-reviews
-source_candidate: docs/pre-brainstorms/20260507-source-param/candidates.md
+source_candidate: docs/B1-docs/20260507-source-param/candidates.md
 platform_state: closed
 ---
 
@@ -68,7 +68,7 @@ wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>
   │       └─ 仍没有 → 拒绝：
   │           "raw-{key} 在 chat-inbox 和所有平台都未找到，请先创建 raw issue"
   │
-  ├─ 5. 调 pull(raw-key, source) 物化到 docs/issues/raw-{key}/
+  ├─ 5. 调 pull(raw-key, source) 物化到 docs/B1-docs/raw-{key}/
   │   ├─ source=chat-inbox → chat-inbox.py materialize + consume
   │   └─ source=platform   → raw-issue-pull（platform-adapter.py pull）
   │
@@ -124,7 +124,7 @@ _pull_raw_issue() {
 - `--source` 缺失 → clear error，提示 AI 先确定来源
 - scan source_family 与 --source 不一致 → 报错，不建工位
 - scan 没有 → 自动跑 scan → 再查 → 仍没有 → 拒绝
-- pull 完成后 → docs/issues/raw-{key}/issue.md 存在且 platform_ids 完整（所有已配置平台都有）
+- pull 完成后 → docs/B1-docs/raw-{key}/issue.md 存在且 platform_ids 完整（所有已配置平台都有）
 - chat-inbox 来源的 raw issue → platform_ids 不再为空
 - 旧接口 `freely wt-create <branch>` 不受影响
 

@@ -25,7 +25,7 @@ platform_state: closed
 task-source-scan reports 74 items as incomplete (dev_worktree_missing, b1_brainstorm_missing, etc.) but all have phase_state=absorbed/dropped/completed in their frontmatter.
 
 ## Root Cause
-Scan checks file/directory existence (e.g., does docs/pre-brainstorms/{key}--{slug}/brainstorms.md exist?) instead of reading phase_state from issue frontmatter.
+Scan checks file/directory existence (e.g., does docs/B1-docs/{key}--{slug}/brainstorms.md exist?) instead of reading phase_state from issue frontmatter.
 
 ## Fix
 In the lifecycle scan logic, before reporting an item as incomplete with dev_worktree_missing or b1_brainstorm_missing, check:

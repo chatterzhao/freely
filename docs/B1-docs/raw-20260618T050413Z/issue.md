@@ -39,8 +39,8 @@ Step 0a 用两个命令检查：
 ## 真正要防止的
 
 **commit 遗漏**——应该提交但忘记 git add 的文件。最常见场景：
-- wt-create 拉取的 `docs/issues/raw-*/issue.md` 忘记 add
-- B1_IBM/B2_IBM 产出的 `docs/pre-brainstorms/`, `docs/epics/` 文件忘记 add
+- wt-create 拉取的 `docs/B1-docs/raw-*/issue.md` 忘记 add
+- B1_IBM/B2_IBM 产出的 `docs/B1-docs/`, `docs/epics/` 文件忘记 add
 - 修改的源码忘记 add
 
 ## 修复方向

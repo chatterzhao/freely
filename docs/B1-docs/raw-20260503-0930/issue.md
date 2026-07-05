@@ -17,7 +17,7 @@ title: "feat: webhook receiver for realtime platform issue sync"
 platform_state: closed
 ---
 ## 问题
-平台 issue 变化 → webhook POST → freely receiver → issue-sync → docs/issues/raw-*
+平台 issue 变化 → webhook POST → freely receiver → issue-sync → docs/B1-docs/raw-*
 
 支持 GitHub issues/issue_comment 和 Gitee issue_hooks/note_hooks。
 

@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260624T235907Z-A
-source_candidate: docs/pre-brainstorms/20260624T235907Z--anti-cheating-gate/candidates.md#C-20260624T235907Z-A
+source_candidate: docs/B1-docs/20260624T235907Z--anti-cheating-gate/candidates.md#C-20260624T235907Z-A
 ---
 
 ## 问题

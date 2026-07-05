@@ -1,7 +1,7 @@
 # I-20260503T0915Z-enforce-test-pre-merge: Enforce Test-Pre-Merge Gate
 
 - issue_id: I-20260503T0915Z-enforce-test-pre-merge
-- source_candidate: docs/B1-docs/raw-NEEDS-KEY/candidates.md
+- source_candidate: docs/B1-docs/raw-MIGRATED/candidates.md
 - phase_state: in_dev
 - verification_artifact_dir: docs/epics/test-pre-merge-enforcement/code-reviews
 - pre_tests_path: `docs/epics/test-pre-merge-enforcement/pre-tests.md`

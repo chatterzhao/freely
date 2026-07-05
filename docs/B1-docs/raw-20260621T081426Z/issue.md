@@ -26,7 +26,7 @@ session_refs: []
 
 ### 断裂点 1: `handle_interruption_intake_once` 对 raw-* 直接 return 0
 
-`freely` L18692-18697: 遇到 `docs/issues/raw-*` 的 intake 项时直接 early return，注释说 "deferred to handler migration"。但迁移从未完成，导致所有 chat 消息被静默丢弃。
+`freely` L18692-18697: 遇到 `docs/B1-docs/raw-*` 的 intake 项时直接 early return，注释说 "deferred to handler migration"。但迁移从未完成，导致所有 chat 消息被静默丢弃。
 
 ### 断裂点 2: `append_human_chat_intake_if_needed` 仍从旧位置读取
 
@@ -49,7 +49,7 @@ session_refs: []
 - 调 `interruption-manager-handler` triage
 - 根据 DECISION 分发
 
-同时修复 `intake_snapshot_for_project` 从 `docs/issues/raw-*` 读取（status=proposed 的项）。
+同时修复 `intake_snapshot_for_project` 从 `docs/B1-docs/raw-*` 读取（status=proposed 的项）。
 
 ### 2. 实现 steer dispatch
 
@@ -64,7 +64,7 @@ Manager patrol Step 1.5: 拉取 `status=proposed` 的 raw-* intake，分拣为 s
 
 ## 不改的部分
 
-- chat → intake 存储路径：`docs/issues/raw-*` ✓（已完成）
+- chat → intake 存储路径：`docs/B1-docs/raw-*` ✓（已完成）
 - interruption-manager-handler 的快速路径 + AI triage：✓（已实现，只需重新接通）
 - a2a_task.py prompt 的 ACP session/prompt 机制：✓（已实现，只需 wiring）
 - 人类的旁路注入角色：✓（设计正确）

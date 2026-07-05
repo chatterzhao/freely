@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260626T133842Z-A
-source_candidate: docs/pre-brainstorms/20260626T133842Z--feedback-exit-on-error/candidates.md#C-20260626T133842Z-A
+source_candidate: docs/B1-docs/20260626T133842Z--feedback-exit-on-error/candidates.md#C-20260626T133842Z-A
 ---
 
 ## 问题

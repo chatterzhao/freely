@@ -45,12 +45,12 @@ title: "governance-merge-gate GATE 1 时间戳不一致时应给出可操作的�
 
 ## 背景
 
-governance-merge-gate GATE 1 在做时间戳一致性检查时（branch key vs `docs/issues/raw-*/issue.md` 的时间戳），当前报错信息只描述了"不一致"，但没有指导开发者/AI 如何诊断和修复。
+governance-merge-gate GATE 1 在做时间戳一致性检查时（branch key vs `docs/B1-docs/raw-*/issue.md` 的时间戳），当前报错信息只描述了"不一致"，但没有指导开发者/AI 如何诊断和修复。
 
 当前报错示例：
 ```
 GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z' (20260514T1035)
-vs issue raw-20260515T125610Z (20260515T1256) in docs/issues/raw-20260515T125610Z/issue.md.
+vs issue raw-20260515T125610Z (20260515T1256) in docs/B1-docs/raw-20260515T125610Z/issue.md.
 The raw/C/I lifecycle must share the same date-time key.
 ```
 
@@ -75,7 +75,7 @@ GATE 1 时间戳不一致时，报错信息应包含结构化的诊断路径：
 改进后的报错示例格式：
 ```
 GATE 1: timestamp mismatch — branch key 'raw-20260514T103532Z' (20260514T1035)
-vs issue raw-20260515T125610Z (20260515T1256) in docs/issues/raw-20260515T125610Z/issue.md.
+vs issue raw-20260515T125610Z (20260515T1256) in docs/B1-docs/raw-20260515T125610Z/issue.md.
 
 诊断步骤：
   1. 检查 issue 文件名和 frontmatter local_id 格式是否正确（raw-YYYYMMDDTHHMM[SS]Z）

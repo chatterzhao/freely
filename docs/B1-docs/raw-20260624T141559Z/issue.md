@@ -19,7 +19,7 @@ channel: github
 session_refs: []
 platform_state: open
 absorbed_into: I-20260624T141559Z-A
-source_candidate: docs/pre-brainstorms/20260624T141559Z--feedback-issue-sync/candidates.md#C-20260624T141559Z-A
+source_candidate: docs/B1-docs/20260624T141559Z--feedback-issue-sync/candidates.md#C-20260624T141559Z-A
 ---
 
 ## 问题
@@ -47,6 +47,6 @@ source_candidate: docs/pre-brainstorms/20260624T141559Z--feedback-issue-sync/can
 `cmd_feedback` 应该对齐为 issue-sync 的薄封装：
 
 1. 从 `git remote` 自动获取 repo，去掉 `--repo` 参数
-2. 生成本地 `docs/issues/raw-{key}/issue.md`
+2. 生成本地 `docs/B1-docs/raw-{key}/issue.md`
 3. 调用 `issue-sync create` 推送到所有配置的平台
 4. 加平台只需在 adapter 层新增，feedback 零改动
