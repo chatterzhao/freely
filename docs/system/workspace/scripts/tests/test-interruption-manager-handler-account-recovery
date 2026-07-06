@@ -22,7 +22,7 @@ mkdir -p \
 git init -q -b develop "$PROJECT"
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_REASONING_EFFORT="medium"
 EOF

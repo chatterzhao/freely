@@ -25,7 +25,7 @@ PY
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
 PROJECT_ROOT=""
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 EOF
 
 cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'

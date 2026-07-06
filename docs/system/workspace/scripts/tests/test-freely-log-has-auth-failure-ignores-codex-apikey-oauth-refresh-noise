@@ -22,7 +22,7 @@ HOME="$HOME_DIR" \
 bash -lc '
   set -euo pipefail
   source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
-  AI_TOOL="codex"
+  AGENT_AI_TOOL="codex"
   if log_has_auth_failure "'"$LOG_FILE"'"; then
     echo "[FAIL] apikey OAuth refresh 401 noise should not count as auth_failure" >&2
     exit 1

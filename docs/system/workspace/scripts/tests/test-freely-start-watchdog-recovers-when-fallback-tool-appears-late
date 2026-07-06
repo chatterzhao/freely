@@ -69,7 +69,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="kiro-cli"
+AGENT_AI_TOOL="kiro-cli"
 AI_MODEL="auto"
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
@@ -135,7 +135,7 @@ sleep 30
 EOF
 chmod +x "$MOCK_BIN/claude"
 
-wait_for_grep '^AI_TOOL="cc"$' "$PROJECT/.freely/config.env" 80 || {
+wait_for_grep '^AGENT_AI_TOOL="cc"$' "$PROJECT/.freely/config.env" 80 || {
   echo "[FAIL] expected manager watchdog to switch to fallback tool once claude became available" >&2
   cat "$PROJECT/.freely/config.env" >&2
   [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && cat "$PROJECT/.freely/logs/runtime-events.log" >&2

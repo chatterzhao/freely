@@ -10,7 +10,7 @@ mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
 PROJECT_ROOT="__PROJECT__"
-AI_TOOL="cc"
+AGENT_AI_TOOL="cc"
 AI_MODEL=""
 AI_MODE="auto"
 AUTO_SWITCH_SLOT="true"
@@ -47,7 +47,7 @@ attempt_runtime_auto_recovery_after_failure "$PROJECT" "cc" "tool_runtime_failur
   echo "[FAIL] tool_runtime_failure should fall through the unified cross-tool recovery path" >&2
   exit 1
 }
-grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] unified recovery path should persist the fallback tool selection" >&2
   exit 1
 }

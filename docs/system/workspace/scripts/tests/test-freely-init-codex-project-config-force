@@ -84,7 +84,7 @@ test -x "$WRAPPER_DIR/codex"
 test -x "$WRAPPER_DIR/claude"
 test -x "$WRAPPER_DIR/iflow"
 test -x "$WRAPPER_DIR/kiro-cli"
-grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
 grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE"
@@ -100,7 +100,7 @@ grep -Fq -- "--add-dir \"$PROJECT_WORKTREES_ROOT\"" "$WRAPPER_DIR/iflow"
 grep -Fq "\`$PROJECT_WORKTREES_ROOT\`" "$TOOL_BOOTSTRAP_FILE"
 
 cat >"$CONFIG_FILE" <<'EOF'
-AI_TOOL="sentinel"
+AGENT_AI_TOOL="sentinel"
 EOF
 
 cat >"$CODEX_CONFIG_FILE" <<'EOF'
@@ -124,7 +124,7 @@ REINIT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 
 printf '%s\n' "$REINIT_OUTPUT" | grep -Fq "skip: $CONFIG_FILE already exists"
 printf '%s\n' "$REINIT_OUTPUT" | grep -Fq "skip: $CODEX_CONFIG_FILE already exists"
-grep -q '^AI_TOOL="sentinel"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="sentinel"$' "$CONFIG_FILE"
 grep -q '^model_context_window = 111111$' "$CODEX_CONFIG_FILE"
 grep -Fq 'writable_roots = ["/tmp/sentinel"]' "$CODEX_CONFIG_FILE"
 
@@ -137,7 +137,7 @@ FORCE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --force \
   2>&1)"
 
-grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
 grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE"

@@ -54,7 +54,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 EOF
@@ -62,7 +62,7 @@ cat >"$WORKER_WT/.freely/config.env" <<EOF
 PROJECT_ROOT="$WORKER_WT"
 INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
-AI_TOOL="cc"
+AGENT_AI_TOOL="cc"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
@@ -116,7 +116,7 @@ LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
 }
 grep -q "^$RESOLVED_WORKER_WT$" "$START_LOG"
 
-grep -q '^AI_TOOL="codex"$' "$RESOLVED_WORKER_WT/.freely/config.env"
+grep -q '^AGENT_AI_TOOL="codex"$' "$RESOLVED_WORKER_WT/.freely/config.env"
 grep -q '^AI_MODEL="gpt-5.4"$' "$RESOLVED_WORKER_WT/.freely/config.env"
 
 echo "[PASS] manager worker launch applies selected_tool from prompt before startup"

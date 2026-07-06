@@ -67,7 +67,7 @@ EOF
 PROJECT_ROOT="$project"
 INTENT_FILE="$project/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
-AI_TOOL="kiro-cli"
+AGENT_AI_TOOL="kiro-cli"
 AI_MODEL="auto"
 AI_MODE="auto"
 AI_REASONING_EFFORT=""

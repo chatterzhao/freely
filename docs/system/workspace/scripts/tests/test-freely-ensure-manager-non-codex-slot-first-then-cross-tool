@@ -50,7 +50,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="kiro-cli"
+AGENT_AI_TOOL="kiro-cli"
 AI_MODEL="auto"
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
@@ -90,7 +90,7 @@ log_error() { :; }
 
 HOME="$HOME" ensure_manager_once "$PROJECT" >/dev/null
 
-grep -q '^AI_TOOL="kiro-cli"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="kiro-cli"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected same-tool slot recovery to stay on kiro-cli before cross-tool fallback" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

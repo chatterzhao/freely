@@ -76,7 +76,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" set-tool \
   --tool-adapter-policy acp \
   >/dev/null
 
-grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
@@ -102,7 +102,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" set-tool \
   --tool-adapter-policy prefer_acp_fallback_direct \
   >/dev/null
 
-grep -q '^AI_TOOL="iflow"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="iflow"$' "$CONFIG_FILE"
 grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE"
 grep -q '^AI_TOOL_ADAPTER_POLICY="prefer_acp_fallback_direct"$' "$CONFIG_FILE"
 

@@ -48,7 +48,7 @@ cat >.freely/config.env <<EOF
 PROJECT_ROOT="$REPO"
 INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"

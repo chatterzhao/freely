@@ -85,7 +85,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 EOF
@@ -93,7 +93,7 @@ cat >"$FEATURE_WT/.freely/config.env" <<EOF
 PROJECT_ROOT="$FEATURE_WT"
 INTENT_FILE="$FEATURE_WT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$FEATURE_WT/docs/CONSTITUTION.md"
-AI_TOOL="cc-use-codex-cli"
+AGENT_AI_TOOL="cc-use-codex-cli"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
@@ -106,7 +106,7 @@ cat >"$PREMERGE_WT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PREMERGE_WT"
 INTENT_FILE="$PREMERGE_WT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PREMERGE_WT/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 EOF
@@ -207,7 +207,7 @@ PROMPT_FILE="$(find "$PROJECT/.freely/run/worker-prompts" -type f | head -n 1)"
 }
 
 grep -Fq -- '- selected_tool: `codex`' "$PROMPT_FILE"
-grep -q '^AI_TOOL="codex"$' "$FEATURE_WT/.freely/config.env"
+grep -q '^AGENT_AI_TOOL="codex"$' "$FEATURE_WT/.freely/config.env"
 grep -q '^AI_MODEL="gpt-5.4"$' "$FEATURE_WT/.freely/config.env"
 grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$FEATURE_WT/.freely/run/worker-verification-contract.env"
 grep -q '^OWNER_ISSUE="'"$FEATURE_WT"'/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md"$' "$FEATURE_WT/.freely/run/worker-verification-contract.env"

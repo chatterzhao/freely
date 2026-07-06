@@ -11,7 +11,7 @@ mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$MOCK_BIN"
 
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT=""

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # monitor-ai-acp.sh: ACP-native AI lifecycle monitor.
 #
-# Replaces PID-based monitor-ai-cli.sh when AI_TOOL_ADAPTER=acp.
+# Replaces PID-based monitor-ai-cli.sh when AGENT_AI_TOOL_ADAPTER=acp.
 # Delegates to tool-launchers.sh for per-tool ACP syntax.
 #
 # Architecture:
@@ -76,7 +76,7 @@ _bridge_ensure_running() {
       # Same base tool? Keep bridge alive.
       # Compare base_tool (%%-*) because .tool stores full slot name
       # (e.g. opencode-apikey-ds-flash-auto) but --tool passes base name
-      # (e.g. opencode from AI_TOOL=${AGENT_AI_TOOL%%-*}).
+      # (e.g. opencode from AGENT_AI_TOOL tool family).
       last_tool=$(cat "$tool_file" 2>/dev/null || true)
       local last_base="${last_tool%%-*}"
       local cur_base="${tool%%-*}"

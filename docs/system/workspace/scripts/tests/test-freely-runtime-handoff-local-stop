@@ -113,7 +113,7 @@ from pathlib import Path
 import sys
 cfg = Path(sys.argv[1])
 text = cfg.read_text()
-text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+text = text.replace('AGENT_AI_TOOL="codex"', 'AGENT_AI_TOOL="test-sleep"', 1)
 cfg.write_text(text)
 PY
 

@@ -243,7 +243,7 @@ for wt in "$PROJECT" "$TASK_A_WT" "$TASK_B_WT"; do
 PROJECT_ROOT="$wt"
 INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
-AI_TOOL="test-scripted"
+AGENT_AI_TOOL="test-scripted"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT=""

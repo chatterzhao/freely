@@ -62,7 +62,7 @@ EOF
 PROJECT_ROOT="$project"
 INTENT_FILE="$project/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"

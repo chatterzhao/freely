@@ -17,7 +17,7 @@ make_project() {
   mkdir -p "$project/.freely/run" "$project/.freely/logs"
   cat >"$project/.freely/config.env" <<EOF
 PROJECT_ROOT="$project"
-AI_TOOL="$tool"
+AGENT_AI_TOOL="$tool"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"

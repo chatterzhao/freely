@@ -47,7 +47,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="iflow"
+AGENT_AI_TOOL="iflow"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
@@ -93,7 +93,7 @@ log_error() { :; }
 
 ensure_manager_once "$PROJECT" >/dev/null
 
-grep -q '^AI_TOOL="cc"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="cc"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected cross-tool fallback to restart from the leftmost configured priority and select cc" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

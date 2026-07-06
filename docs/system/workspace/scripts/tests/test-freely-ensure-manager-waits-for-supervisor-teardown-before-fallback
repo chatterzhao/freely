@@ -47,7 +47,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="kiro-cli"
+AGENT_AI_TOOL="kiro-cli"
 AI_MODEL="auto"
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
@@ -101,7 +101,7 @@ if ! ensure_manager_once "$PROJECT" >/dev/null; then
   exit 1
 fi
 
-grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected config to switch to codex after teardown race cleared" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

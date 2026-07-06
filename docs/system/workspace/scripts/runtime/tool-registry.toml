@@ -3,7 +3,7 @@
 # =============================================================================
 # Each [tool] section defines an AI CLI tool's complete capability description.
 # Users can add new tools in ~/.freely/tool-registry.toml (takes priority).
-# After adding a tool, set AI_TOOL = "toolname-apikey-slotname" in config.toml.
+# After adding a tool, set AGENT_AI_TOOL via agent-table.toml slot = "toolname-apikey-slotname" in config.toml.
 #
 # ── [tool.slot] 字段说明 ──────────────────────────────────────────────────
 #

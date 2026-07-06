@@ -86,7 +86,7 @@ for wt in "$PROJECT" "$FEATURE_WT" "$PREMERGE_WT"; do
 PROJECT_ROOT="$wt"
 INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 EOF

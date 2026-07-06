@@ -1251,14 +1251,14 @@ cmd_login() {
           log_info "Alias already exists: $_alias_name"
         fi
 
-        # Auto-detect project from PWD and update AI_TOOL in config
+        # Auto-detect project from PWD and update AGENT_AI_TOOL in agent-table
         local _project_dir="$PWD"
         while [[ "$_project_dir" != "/" ]]; do
           if [[ -f "$_project_dir/.freely/config.toml" ]]; then
             local _ai_tool_val="$slot"
             "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
-              --project "$_project_dir" --key "AI_TOOL" --value "$_ai_tool_val"
-            log_info "Updated AI_TOOL in config: $_ai_tool_val"
+              --project "$_project_dir" --key "AGENT_AI_TOOL" --value "$_ai_tool_val"
+            log_info "Updated slot in agent-table: $_ai_tool_val"
             break
           fi
           _project_dir="$(dirname "$_project_dir")"
@@ -1684,10 +1684,10 @@ cmd_switch() {
           local _ai_tool_val="$slot"
           if [[ -f "$_cfg" ]]; then
             local _old_tool
-            _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
+            _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AGENT_AI_TOOL=" | sed 's/^export AGENT_AI_TOOL=//; s/^"//; s/"$//') || true
             "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
-              --project "${SWITCH_PROJECT}" --key "AI_TOOL" --value "$_ai_tool_val"
-            log_info "Updated AI_TOOL in config: $_ai_tool_val"
+              --project "${SWITCH_PROJECT}" --key "AGENT_AI_TOOL" --value "$_ai_tool_val"
+            log_info "Updated slot in agent-table: $_ai_tool_val"
             # Record switch in tool_switch_events table
             local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
             python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
@@ -1704,10 +1704,10 @@ cmd_switch() {
         local cfg="${SWITCH_PROJECT}/.freely/config.toml"
         if [[ -f "$cfg" ]]; then
           local _old_tool
-          _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
+          _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AGENT_AI_TOOL=" | sed 's/^export AGENT_AI_TOOL=//; s/^"//; s/"$//') || true
           "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
-            --project "${SWITCH_PROJECT}" --key "AI_TOOL" --value "$slot"
-          log_info "Updated AI_TOOL in config: $slot"
+            --project "${SWITCH_PROJECT}" --key "AGENT_AI_TOOL" --value "$slot"
+          log_info "Updated slot in agent-table: $slot"
           local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
           python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
             --trigger_error switch_command --old_tool "$_old_tool" \
@@ -1732,8 +1732,8 @@ _cmd_switch_auto() {
 
   # Build tool priority: current tool first, then fallback list
   local current_tool priority_list
-  current_tool="$(_extract_tool_from_slot "$(read_tool_active_slot "${AI_TOOL%%-*}")" 2>/dev/null || true)"
-  [[ -z "$current_tool" ]] && current_tool="${AI_TOOL%%-*}"
+  current_tool="$(_extract_tool_from_slot "$(read_tool_active_slot "${AGENT_AI_TOOL%%-*}")" 2>/dev/null || true)"
+  [[ -z "$current_tool" ]] && current_tool="${AGENT_AI_TOOL%%-*}"
   [[ -z "$current_tool" || "$current_tool" == "oc" ]] && current_tool="codex"
 
   local fallback="${AI_FALLBACK_TOOLS:-codex,claude,opencode,kiro-cli,cc-use-codex-cli}"

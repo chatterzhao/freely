@@ -11,7 +11,7 @@ This directory contains example slot configurations for Freely's `~/.ai-auth/` a
   name = your custom slot name (e.g., personal, work, EXAMPLE)
 ```
 
-The slot directory name, `.zshrc` alias, and `config.toml` `AI_TOOL` value **must all match**.
+The slot directory name, `.zshrc` alias, and `config.toml` agent-table slot name **must all match**.
 
 ## Quick Start
 

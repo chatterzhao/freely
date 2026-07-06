@@ -71,7 +71,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 CONFIG_FILE="$PROJECT_CC/.freely/config.env"
 test -f "$PROJECT_CC/AGENTS.md"
 grep -q '^# Project Agent Entry$' "$PROJECT_CC/AGENTS.md"
-grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE"
+grep -q '^AGENT_AI_TOOL="cc"$' "$CONFIG_FILE"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
 grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE"
@@ -113,7 +113,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   >/dev/null
 
 CONFIG_FILE_ACP="$PROJECT_CC_ACP/.freely/config.env"
-grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE_ACP"
+grep -q '^AGENT_AI_TOOL="cc"$' "$CONFIG_FILE_ACP"
 grep -q '^AI_TOOL_ADAPTER="acp"$' "$CONFIG_FILE_ACP"
 grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$CONFIG_FILE_ACP"
 
@@ -138,7 +138,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 
 CONFIG_FILE_CODEX="$PROJECT_CC_CODEX/.freely/config.env"
 CODEX_CONFIG_FILE="$PROJECT_CC_CODEX/.codex/config.toml"
-grep -q '^AI_TOOL="cc-use-codex-cli"$' "$CONFIG_FILE_CODEX"
+grep -q '^AGENT_AI_TOOL="cc-use-codex-cli"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE_CODEX"

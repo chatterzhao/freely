@@ -11,7 +11,7 @@ mkdir -p "$PROJECT/.freely" "$PROJECT/.ai-auth/codex" "$HOME_DIR/.codex"
 
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 EOF
 
 cat >"$HOME_DIR/.codex/auth.json" <<'EOF'

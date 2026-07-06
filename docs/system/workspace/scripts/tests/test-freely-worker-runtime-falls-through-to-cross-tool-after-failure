@@ -48,7 +48,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="kiro-cli"
+AGENT_AI_TOOL="kiro-cli"
 AI_MODEL="auto"
 AI_MODE="auto"
 AUTO_SWITCH_TOOL="true"
@@ -98,7 +98,7 @@ attempt_runtime_auto_recovery_after_failure "$PROJECT" "kiro-cli" "unexpected_ru
   echo "[FAIL] worker runtime should preserve the fallback tool slot selection" >&2
   exit 1
 }
-grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] worker runtime should persist the selected fallback tool" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

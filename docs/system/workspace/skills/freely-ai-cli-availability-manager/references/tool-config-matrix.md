@@ -6,7 +6,7 @@
 > 三种工具的 slot 配置 `.example` 模板，含完整注释。新用户按
 > `templates/ai-auth/README.md` 操作即可在 10 分钟内建好第一个可用 slot。
 >
-> ★ **命名约定**：slot 目录名 = `.zshrc` alias 名 = `config.toml` `AI_TOOL` 值，
+> ★ **命名约定**：slot 目录名 = `.zshrc` alias 名 = `config.toml` agent-table slot 值，
 > 三者必须一致。格式：`{tool}-{type}-{name}`，Freely 靠 `-apikey-` / `-account-`
 > 前缀识别工具族。
 
