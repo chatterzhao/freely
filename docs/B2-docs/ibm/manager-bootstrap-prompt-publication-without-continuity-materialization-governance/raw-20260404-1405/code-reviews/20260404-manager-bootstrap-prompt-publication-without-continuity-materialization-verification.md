@@ -19,7 +19,7 @@
 
 ## Implementation Decision Note
 
-- see `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
+- see `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/raw-20260404-1405/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
 
 ## Evidence Read
 

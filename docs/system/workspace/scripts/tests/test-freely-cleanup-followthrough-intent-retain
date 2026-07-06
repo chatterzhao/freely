@@ -60,8 +60,8 @@ cat >"$PROJECT/docs/B2-docs/sample/story/issues/owned-fixture.md" <<'EOF'
 - issue_id: `I-TEST-OWNED-FIXTURE`
 - title: `Owned fixture`
 - phase_state: `in_verification`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat >"$PROJECT/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-Tests: owned fixture
@@ -145,8 +145,8 @@ Dispatch metadata:
 - write_scope: $OWNED_WT
 - intent_kind: cleanup
 - owner_issue: docs/B2-docs/sample/story/issues/owned-fixture.md
-- pre_tests_path: docs/B2-docs/sample/story/pre-tests.md
-- verification_artifact_dir: docs/B2-docs/sample/story/code-reviews
+- pre_tests_path: docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews
 - required_test_lanes: feature-local
 - required_acceptance_item_ids: cleanup-followthrough
 - minimum_evidence_level: artifact-plus-human-observation

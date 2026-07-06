@@ -51,7 +51,7 @@ Freely 现有的 `prd.md` 普遍偏短，能表达“这轮要做什么”，但
 - `docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md`
 - `docs/B2-docs/ibm/doc-loop/brainstorms/b-agent-ready-prd-for-freely-flow.md`
 - `docs/B2-docs/ibm/doc-loop/prd.md`
-- `docs/B2-docs/ibm/doc-loop/pre-tests.md`
+- `docs/B2-docs/ibm/doc-loop/raw-20260321-1530/verification/pre-tests.md`
 - `docs/B2-docs/ibm/doc-loop/tasks.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`

@@ -20,9 +20,9 @@ Verify that the new owner:
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/prd.md`
-- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/raw-20260413-0420/verification/pre-tests.md`
 - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/tasks.md`
-- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/raw-20260413-0420/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
 - `docs/B1-docs/raw-20260413T020800Z/candidates.md`
 - `docs/B1-docs/raw-20260413T020800Z/brainstorms.md`

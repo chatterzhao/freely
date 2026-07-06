@@ -19,7 +19,7 @@
 
 ## Implementation Decision Note
 
-- see `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
+- see `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
 
 ## Verification
 

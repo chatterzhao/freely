@@ -74,7 +74,7 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/brainstorms/b-deep-refactor-fleet-sequencing-governance.md`
 - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/prd.md`
-- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/pre-tests.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/raw-20260326-1915/verification/pre-tests.md`
 - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-deep-refactor-fleet-sequencing-governance.md`
 - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`

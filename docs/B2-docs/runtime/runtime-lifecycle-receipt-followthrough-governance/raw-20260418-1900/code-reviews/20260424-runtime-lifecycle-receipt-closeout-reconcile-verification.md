@@ -24,7 +24,7 @@
 3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 4. `git diff --check`
 5. `./bin/governance-check`
-6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
+6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/raw-20260418-1900/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
 
 ## Command Results
 
@@ -43,7 +43,7 @@
 5. `./bin/governance-check`
    - Exit `0`
    - Output: `Governance check passed.`
-6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
+6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/raw-20260418-1900/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
    - The stale replay batch is explicitly blocked because the source owner truth was still dirty and uncommitted while the stale batch already carried the committed source ancestor.
 
 ## Implementation Decision Note

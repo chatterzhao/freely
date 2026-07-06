@@ -70,7 +70,7 @@ Freely 现在已经有：
 
 - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/brainstorms/b-token-efficient-session-continuity-and-rotation-governance.md`
 - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/prd.md`
-- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/pre-tests.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/raw-20260319-0018/verification/pre-tests.md`
 - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/tasks.md`
 - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`

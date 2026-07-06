@@ -94,18 +94,18 @@ cat >"$PROJECT/docs/B2-docs/demo/task-a/issues/task-a.md" <<'EOF'
 
 - issue_id: `I-TASK-A`
 - phase_state: `in_progress`
-- pre_tests_path: `docs/B2-docs/demo/task-a/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/task-a/raw-TESTFIXTURE/verification/pre-tests.md`
 - progress_path: `docs/progress/demo/p-task-a.md`
-- verification_artifact_dir: `docs/B2-docs/demo/task-a/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/task-a/raw-TESTFIXTURE/code-reviews`
 EOF
 cat >"$PROJECT/docs/B2-docs/demo/task-b/issues/task-b.md" <<'EOF'
 # Issue: task-b
 
 - issue_id: `I-TASK-B`
 - phase_state: `in_progress`
-- pre_tests_path: `docs/B2-docs/demo/task-b/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/task-b/raw-TESTFIXTURE/verification/pre-tests.md`
 - progress_path: `docs/progress/demo/p-task-b.md`
-- verification_artifact_dir: `docs/B2-docs/demo/task-b/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/task-b/raw-TESTFIXTURE/code-reviews`
 EOF
 
 cat >"$PROJECT/docs/B2-docs/demo/task-a/pre-tests.md" <<'EOF'

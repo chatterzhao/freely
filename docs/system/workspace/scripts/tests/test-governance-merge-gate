@@ -62,8 +62,8 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 mkdir -p "$REPO/docs/B2-docs/sample/story"
 cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
@@ -346,7 +346,7 @@ cat > "$REPO/docs/B2-docs/absorbed/story/issues/owner.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/absorbed/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/absorbed/story/raw-TESTFIXTURE/code-reviews`
 EOF
 git add docs/B1-docs/absorbed/candidates.md
 
@@ -393,7 +393,7 @@ cat > "$REPO/docs/B2-docs/promoted/story/issues/promoted.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/promoted/candidates.md#c-20260327-2401-a`
-- verification_artifact_dir: `docs/B2-docs/promoted/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/promoted/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-promoted.md" <<'EOF'
 # Progress: promoted
@@ -439,7 +439,7 @@ cat > "$REPO/docs/B2-docs/absorbed/story/issues/owner.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/absorbed/candidates.md#c-20260327-2301-a`
-- verification_artifact_dir: `docs/B2-docs/absorbed/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/absorbed/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-owner.md" <<'EOF'
 # Progress: owner
@@ -564,7 +564,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_ibm`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 echo "console.log('ibm');" > "$REPO/src/sample.js"
 git add src/sample.js docs/B1-docs/sample/candidates.md docs/B2-docs/sample/story/issues/sample.md
@@ -594,7 +594,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 
 ## note
 
@@ -667,7 +667,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample-a.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/B2-docs/sample/story/issues/sample-b.md" <<'EOF'
 # Issue: sample-b
@@ -676,7 +676,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample-b.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-b`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 mkdir -p "$REPO/docs/progress/sample"
 mkdir -p "$REPO/docs/B2-docs/sample/story/code-reviews"
@@ -731,7 +731,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 echo "console.log('verification without evidence');" > "$REPO/src/sample.js"
 git add src/sample.js docs/B1-docs/sample/candidates.md docs/B2-docs/sample/story/issues/sample.md
@@ -762,7 +762,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample
@@ -816,7 +816,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/B2-docs/sample/story/code-reviews/r-sample.md" <<'EOF'
 # Review: sample
@@ -851,7 +851,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/B2-docs/sample/story/code-reviews/r-sample.md" <<'EOF'
 # Review: sample
@@ -1001,7 +1001,7 @@ cat > "$REPO/docs/B2-docs/completed/story/issues/owner.md" <<'EOF'
 - phase_state: `completed`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/completed-provenance/candidates.md#c-20260327-2235-a`
-- verification_artifact_dir: `docs/B2-docs/completed/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/completed/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/milestones.md" <<'EOF'
 # Milestones
@@ -1054,7 +1054,7 @@ cat > "$REPO/docs/B2-docs/completed/story/issues/owner.md" <<'EOF'
 - phase_state: `completed`
 - milestone: `M-completed`
 - source_candidate: `docs/B1-docs/completed-provenance/candidates.md#c-20260327-2235-a`
-- verification_artifact_dir: `docs/B2-docs/completed/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/completed/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample
@@ -1158,7 +1158,7 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/statusscope.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/statusscope/candidates.md#c-20260327-2225-a`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/statusscope/p-statusscope.md" <<'EOF'
 # Progress: statusscope
@@ -1218,7 +1218,7 @@ cat > "$REPO/docs/B2-docs/staged/view/issues/staged-view.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/staged-view/candidates.md#c-20260402-1400-a`
-- verification_artifact_dir: `docs/B2-docs/staged/view/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/staged/view/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/progress/staged/p-staged-view.md" <<'EOF'
 # Progress: staged-view
@@ -1305,8 +1305,8 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 mkdir -p "$REPO/docs/progress/sample" "$REPO/docs/B2-docs/sample/story/code-reviews"
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'

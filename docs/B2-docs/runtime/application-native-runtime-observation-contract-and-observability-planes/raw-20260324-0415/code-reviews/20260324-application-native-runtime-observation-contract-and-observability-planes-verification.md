@@ -17,7 +17,7 @@
 
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/prd.md`
-- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260324-0415/verification/pre-tests.md`
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-application-native-runtime-observation-contract-and-observability-planes.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`

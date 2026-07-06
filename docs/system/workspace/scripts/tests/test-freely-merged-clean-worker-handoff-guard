@@ -39,8 +39,8 @@ cat >"$WORKER/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 
 - issue_id: `I-sample`
 - phase_state: `in_verification`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 - tasks_path: `docs/B2-docs/sample/story/tasks.md`
 - progress_path: `docs/progress/sample.md`
 EOF

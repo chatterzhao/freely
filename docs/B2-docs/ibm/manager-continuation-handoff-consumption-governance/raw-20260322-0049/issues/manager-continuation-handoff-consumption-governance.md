@@ -68,7 +68,7 @@ Freely 当前已经具备：
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-manager-continuation-handoff-consumption-governance.md`
-- `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`
+- `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/raw-20260322-0049/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`
 
 ## Verification
 

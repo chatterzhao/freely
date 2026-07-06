@@ -18,11 +18,11 @@
 
 ## Implementation Decision Note
 
-- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/raw-20260404-1545/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
 
 ## Prior Verification Note
 
-- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/raw-20260404-1545/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
 ## Verification
 

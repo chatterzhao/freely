@@ -65,7 +65,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/raw-20260405-1615/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
 ## Unit
 - acceptance_target: 历史 issue，已完成验证
 - testing_layer: unit

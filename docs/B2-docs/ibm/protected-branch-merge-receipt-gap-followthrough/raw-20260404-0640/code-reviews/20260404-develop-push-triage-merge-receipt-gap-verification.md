@@ -20,7 +20,7 @@
 2. `./bin/governance-check`
 3. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 4. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
-5. `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
+5. `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/raw-20260404-0640/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
 
 ## Findings
 

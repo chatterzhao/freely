@@ -10,7 +10,7 @@
 |--------|--------|------|
 | `docs/issues/raw-{key}/issue.md` | `docs/B1-docs/raw-{key}/issue.md` | sed |
 | `docs/issues/I-{key}/issue.md` | `find docs/B2-docs -path "*/issues/I-{key}*.md"` | find 搜索 |
-| `docs/epics/` | `docs/B2-docs/` | sed |
+| `docs/B2-docs/` | `docs/B2-docs/` | sed |
 | `docs/progress/` | `docs/B2-docs/` | sed |
 | `.freely/intake/` | `docs/B1-docs/` | sed |
 

@@ -9,7 +9,7 @@
 
 - `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 - `docs/B2-docs/runtime/control-surface/prd.md`
-- `docs/B2-docs/runtime/control-surface/pre-tests.md`
+- `docs/B2-docs/runtime/control-surface/raw-20260312-0011/verification/pre-tests.md`
 - `docs/B2-docs/runtime/control-surface/tasks.md`
 
 ## Findings

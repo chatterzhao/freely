@@ -45,7 +45,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429-1745/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -59,7 +59,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429-1745/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -73,7 +73,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429-1745/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

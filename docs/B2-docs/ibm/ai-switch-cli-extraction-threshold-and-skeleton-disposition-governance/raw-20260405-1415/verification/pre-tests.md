@@ -52,7 +52,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/raw-20260405-1415/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
 ### AT-002
 - id: `AT-002`
@@ -61,7 +61,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/raw-20260405-1415/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
 ### AT-003
 - id: `AT-003`
@@ -70,4 +70,4 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/raw-20260405-1415/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`

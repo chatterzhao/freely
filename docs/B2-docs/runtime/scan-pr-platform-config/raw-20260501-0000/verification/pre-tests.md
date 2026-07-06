@@ -50,7 +50,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501-0000/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -63,7 +63,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501-0000/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -76,7 +76,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501-0000/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `unit`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -89,7 +89,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501-0000/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

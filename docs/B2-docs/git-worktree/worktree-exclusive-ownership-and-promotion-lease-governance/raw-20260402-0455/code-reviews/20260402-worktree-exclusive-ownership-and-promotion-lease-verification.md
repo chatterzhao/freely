@@ -40,7 +40,7 @@
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455/verification/pre-tests.md`
 
 ## Develop Absorption
 

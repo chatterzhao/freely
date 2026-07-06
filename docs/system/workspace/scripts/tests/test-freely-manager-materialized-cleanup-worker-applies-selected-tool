@@ -56,9 +56,9 @@ cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md
 # Issue: cleanup-governance
 
 - issue_id: `I-20260421-1330-A`
-- pre_tests_path: `docs/B2-docs/demo/cleanup-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/cleanup-governance/raw-TESTFIXTURE/verification/pre-tests.md`
 - progress_path: `docs/progress/demo/p-cleanup-governance.md`
-- verification_artifact_dir: `docs/B2-docs/demo/cleanup-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/cleanup-governance/raw-TESTFIXTURE/code-reviews`
 EOF
 cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/pre-tests.md" <<'EOF'
 # Pre-tests

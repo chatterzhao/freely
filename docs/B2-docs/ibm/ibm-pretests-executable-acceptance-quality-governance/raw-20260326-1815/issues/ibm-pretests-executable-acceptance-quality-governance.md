@@ -73,7 +73,7 @@ Freely 已经把 `pre-tests.md` 定义成 issue-level acceptance 控制面，也
 - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
 - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/brainstorms/b-ibm-pretests-executable-acceptance-quality-governance.md`
 - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/prd.md`
-- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/pre-tests.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/raw-20260326-1815/verification/pre-tests.md`
 - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/tasks.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`

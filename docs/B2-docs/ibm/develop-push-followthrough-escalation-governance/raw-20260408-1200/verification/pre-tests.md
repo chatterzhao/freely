@@ -52,7 +52,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/raw-20260408-1200/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-002
 - id: `AT-002`
@@ -61,7 +61,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/raw-20260408-1200/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-003
 - id: `AT-003`
@@ -70,7 +70,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/raw-20260408-1200/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-004
 - id: `AT-004`
@@ -79,4 +79,4 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/raw-20260408-1200/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`

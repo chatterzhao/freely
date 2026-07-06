@@ -10,7 +10,7 @@
 
 - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 - `docs/B2-docs/human/tui/prd.md`
-- `docs/B2-docs/human/tui/pre-tests.md`
+- `docs/B2-docs/human/tui/raw-20260317-1001/verification/pre-tests.md`
 - `docs/B2-docs/human/tui/tasks.md`
 - `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
 - `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`

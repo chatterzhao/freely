@@ -10,7 +10,7 @@
 
 - `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 - `docs/B2-docs/runtime/control-surface/prd.md`
-- `docs/B2-docs/runtime/control-surface/pre-tests.md`
+- `docs/B2-docs/runtime/control-surface/raw-20260312-0011/verification/pre-tests.md`
 - `docs/B2-docs/runtime/control-surface/tasks.md`
 - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
 - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`

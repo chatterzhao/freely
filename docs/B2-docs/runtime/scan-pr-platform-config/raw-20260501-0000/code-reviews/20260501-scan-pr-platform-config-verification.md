@@ -8,7 +8,7 @@
 - decision: `approve`
 - artifacts_reviewed:
   - docs/system/workspace/scripts/runtime/freely
-  - docs/B2-docs/runtime/scan-pr-platform-config/pre-tests.md
+  - docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501-0000/verification/pre-tests.md
   - docs/B1-docs/raw-20260501/candidates.md
 
 ## Implementation Decision Note

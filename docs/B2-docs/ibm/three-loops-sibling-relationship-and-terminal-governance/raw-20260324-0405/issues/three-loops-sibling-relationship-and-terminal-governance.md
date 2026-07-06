@@ -78,7 +78,7 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
 - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
 - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/brainstorms/b-three-loops-sibling-relationship-and-terminal-governance.md`
 - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/prd.md`
-- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/pre-tests.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/raw-20260324-0405/verification/pre-tests.md`
 - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-three-loops-sibling-relationship-and-terminal-governance.md`
 - `docs/CONSTITUTION.md`

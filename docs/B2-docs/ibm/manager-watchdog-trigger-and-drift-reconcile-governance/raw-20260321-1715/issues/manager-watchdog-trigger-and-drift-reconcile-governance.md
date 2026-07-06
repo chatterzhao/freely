@@ -77,7 +77,7 @@ Freely 当前已经分别定义了：
 - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/brainstorms/b-manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/prd.md`
-- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/raw-20260321-1715/verification/pre-tests.md`
 - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/tasks.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/agents/manager-agent.md`

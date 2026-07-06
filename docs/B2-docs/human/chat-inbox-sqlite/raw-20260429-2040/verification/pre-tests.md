@@ -45,7 +45,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/raw-20260429-2040/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -59,7 +59,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/raw-20260429-2040/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -73,7 +73,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/raw-20260429-2040/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

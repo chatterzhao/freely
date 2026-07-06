@@ -52,7 +52,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -66,7 +66,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -80,7 +80,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -94,7 +94,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `real_environment`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -108,7 +108,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

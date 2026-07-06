@@ -60,8 +60,8 @@ cat >"$PROJECT/docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-recei
 # Issue
 - issue_id: `I-20260418-1900-A`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
-- pre_tests_path: `docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/raw-TESTFIXTURE/code-reviews`
 EOF
 cat >"$PROJECT/docs/B2-docs/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md" <<'EOF'
 # Pre-tests

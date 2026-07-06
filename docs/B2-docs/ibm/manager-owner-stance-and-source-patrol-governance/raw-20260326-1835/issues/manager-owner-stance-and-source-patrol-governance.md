@@ -72,7 +72,7 @@ Freely 在自举开发中已经形成了两层真源：
 - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
 - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/brainstorms/b-manager-owner-stance-and-source-patrol-governance.md`
 - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/prd.md`
-- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/raw-20260326-1835/verification/pre-tests.md`
 - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/tasks.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`

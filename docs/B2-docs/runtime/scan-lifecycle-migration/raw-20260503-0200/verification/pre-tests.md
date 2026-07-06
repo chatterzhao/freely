@@ -47,7 +47,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/raw-20260503-0200/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -61,7 +61,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/raw-20260503-0200/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -75,7 +75,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/raw-20260503-0200/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -89,7 +89,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/raw-20260503-0200/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -103,7 +103,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/raw-20260503-0200/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `develop_merge`

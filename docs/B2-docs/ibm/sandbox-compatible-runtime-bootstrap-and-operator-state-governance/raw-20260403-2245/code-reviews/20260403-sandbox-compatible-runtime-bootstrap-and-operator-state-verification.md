@@ -30,7 +30,7 @@
 - `docs/B1-docs/raw-20260403T110000Z/candidates.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
-- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/raw-20260403-2245/verification/pre-tests.md`
 - `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`

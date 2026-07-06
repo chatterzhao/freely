@@ -136,7 +136,7 @@
   - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
   - `docs/B2-docs/human/tui/brainstorms/b-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
   - `docs/B2-docs/human/tui/prd.md`
-  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/raw-20260317-1001/verification/pre-tests.md`
   - `docs/B2-docs/human/tui/tasks.md`
 
 ## Verification

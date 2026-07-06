@@ -84,7 +84,7 @@
 
 - `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/brainstorms/b-watchdog-restart-storm-and-process-churn-governance.md`
 - `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/prd.md`
-- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/pre-tests.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260324-0405/verification/pre-tests.md`
 - `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/tasks.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`

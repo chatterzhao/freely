@@ -33,8 +33,8 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 
 cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
@@ -202,8 +202,8 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample-duplicate.md" <<'EOF'
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"

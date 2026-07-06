@@ -25,7 +25,7 @@ created_at: 2026-07-06
 - `bin/freely-watchdog:18` — `docs/pre-brainstorms/` → `docs/B1-docs/`
 - `quality/governance-check` — 10 处 `docs/pre-brainstorms/` → `docs/B1-docs/`
 - `quality/checkpoint-guard:60` — `docs/pre-brainstorms/` → `docs/B1-docs/`
-- `governance-merge-gate:826` — `docs/epics/` → `docs/B2-docs/` (已在 PR #3760 修)
+- `governance-merge-gate:826` — `docs/B2-docs/` → `docs/B2-docs/` (已在 PR #3760 修)
 
 #### B. verification_artifact_dir 缺 raw-{key} 层 — Phase 2 修复
 门禁 regex: `docs/B2-docs/{epic}/{story}/raw-{key}/code-reviews`（4 层）

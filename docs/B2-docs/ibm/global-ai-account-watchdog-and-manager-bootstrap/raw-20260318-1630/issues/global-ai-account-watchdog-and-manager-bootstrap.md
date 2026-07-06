@@ -78,7 +78,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - `docs/B1-docs/raw-20260318T163000Z/*`
 - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/pre-tests.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/raw-20260318-1630/verification/pre-tests.md`
 - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`

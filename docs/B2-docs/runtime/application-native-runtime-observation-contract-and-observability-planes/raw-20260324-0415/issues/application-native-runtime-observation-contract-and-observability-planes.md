@@ -76,7 +76,7 @@ Freely 已经具备多种观察面：
 
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/brainstorms/b-application-native-runtime-observation-contract-and-observability-planes.md`
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/prd.md`
-- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260324-0415/verification/pre-tests.md`
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
 - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`

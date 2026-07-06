@@ -112,7 +112,7 @@ Freely 现在对不同工具的会话续接模型不一致：
 
 - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/brainstorms/b-explicit-session-addressed-resume-governance.md`
 - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/prd.md`
-- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/pre-tests.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/raw-20260321-2010/verification/pre-tests.md`
 - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`

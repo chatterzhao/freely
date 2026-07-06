@@ -69,7 +69,7 @@
 ## Completion
 
 - `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
-- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/pre-tests.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/raw-20260327-1115/verification/pre-tests.md`
 - `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/tasks.md`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 - `docs/system/workspace/scripts/runtime/ai-cli`

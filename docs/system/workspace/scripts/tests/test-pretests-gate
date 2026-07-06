@@ -34,8 +34,8 @@ cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 
 cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
@@ -560,8 +560,8 @@ cat > "$REPO/docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 - title: `Follow-on auth switch startup recovery verification tightening`
 - issue-name: `auth-switch-startup-recovery-follow-on`
 - follow_on_to: `I-auth-switch-parent`
-- pre_tests_path: `docs/B2-docs/auth/switch/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/auth/switch/code-reviews`
+- pre_tests_path: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/code-reviews`
 EOF
 
 cat > "$REPO/docs/B2-docs/auth/switch/code-reviews/integration.md" <<'EOF'
@@ -687,8 +687,8 @@ cat > "$REPO/docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 - title: `Follow-on real bin/ai and codex exec verification tightening`
 - issue-name: `auth-switch-startup-recovery-follow-on`
 - follow_on_to: `I-auth-switch-parent`
-- pre_tests_path: `docs/B2-docs/auth/switch/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/auth/switch/code-reviews`
+- pre_tests_path: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/code-reviews`
 EOF
 
 cat > "$REPO/docs/B2-docs/auth/switch/pre-tests.md" <<'EOF'
@@ -752,8 +752,8 @@ cat > "$REPO/docs/B2-docs/staged/story/issues/staged.md" <<'EOF'
 
 - issue_id: `I-staged`
 - phase_state: `completed`
-- pre_tests_path: `docs/B2-docs/staged/story/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/staged/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/staged/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/staged/story/raw-TESTFIXTURE/code-reviews`
 EOF
 cat > "$REPO/docs/B2-docs/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged

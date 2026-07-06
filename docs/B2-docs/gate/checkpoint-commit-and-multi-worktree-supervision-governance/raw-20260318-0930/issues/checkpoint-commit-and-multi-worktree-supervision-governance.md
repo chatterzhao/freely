@@ -66,8 +66,8 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
   - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - 已写入 review 证据：
-  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
-  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
+  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930/code-reviews/20260318-checkpoint-and-fleet-verification.md`
+  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 - 本轮补充验证：
   - `./bin/checkpoint-guard` -> `checkpoint_required: no`
