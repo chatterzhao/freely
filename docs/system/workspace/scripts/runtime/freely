@@ -13,7 +13,7 @@
 #   - Issue lifecycle: scan, promote, finalize, platform sync
 #   - Rate limit + circuit breaker: slot switching, restart storm detection
 #
-# Adapter dispatch (AI_TOOL_ADAPTER):
+# Adapter dispatch (AGENT_AI_TOOL_ADAPTER):
 #   direct → monitor-ai-cli.sh (DEPRECATED: PID-based, to be removed)
 #   acp    → monitor-ai-acp.sh (primary: stopReason-based, persistent sessions)
 set -euo pipefail
@@ -823,7 +823,7 @@ ensure_codex_slot_switch_startup_ready_or_fail() {
   local timeout_secs="${FREELY_ACCOUNT_SWITCH_WAIT_SECS:-60}"
   local interval_secs="${FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS:-1}"
   local start_ts now waiting_logged="0"
-  [[ "${AI_TOOL:-}" == "codex" || "${AI_TOOL:-}" == codex-* ]] || return 0
+  [[ "${AGENT_AI_TOOL:-}" == "codex" || "${AGENT_AI_TOOL:-}" == codex-* ]] || return 0
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
   [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
   start_ts="$(date +%s)"
@@ -897,7 +897,7 @@ ensure_codex_slot_switch_startup_ready_or_fail() {
 preflight_codex_slot_recovery_before_start_or_fail() {
   local project="$1"
   local entry_slot=""
-  [[ "${AI_TOOL:-}" == "codex" || "${AI_TOOL:-}" == codex-* ]] || return 0
+  [[ "${AGENT_AI_TOOL:-}" == "codex" || "${AGENT_AI_TOOL:-}" == codex-* ]] || return 0
   config_bool_enabled "${AUTO_SWITCH_SLOT:-true}" || return 0
   if [[ -f "$(codex_active_auth_file)" ]] && [[ -n "$(codex_current_identity_hint "$project" || true)" ]]; then
     return 0
@@ -2174,7 +2174,7 @@ wake_registered_projects_for_auth_change() {
       skipped_count=$((skipped_count + 1))
       continue
     fi
-    if [[ "${AI_TOOL:-}" != "${tool:-}" ]]; then
+    if [[ "${AGENT_AI_TOOL:-}" != "${tool:-}" ]]; then
       skipped_count=$((skipped_count + 1))
       continue
     fi
@@ -2211,7 +2211,7 @@ resolve_ai_spec_for_project_or_global() {
   if [[ -f "$cfg" ]]; then
     unset AI_TOOL AI_MODEL AI_MODE
     source_config "$project"
-    tool="${AI_TOOL:-}"
+    tool="${AGENT_AI_TOOL:-}"
     model="${AI_MODEL:-}"
     mode="${AI_MODE:-auto}"
     if [[ -n "$tool" ]]; then
@@ -2221,7 +2221,7 @@ resolve_ai_spec_for_project_or_global() {
   fi
 
   if source_global_config; then
-    tool="${AI_TOOL:-}"
+    tool="${AGENT_AI_TOOL:-}"
     model="${AI_MODEL:-}"
     mode="${AI_MODE:-auto}"
     if [[ -n "$tool" ]]; then
@@ -2261,23 +2261,23 @@ resolve_tool_adapter_policy_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AI_TOOL:-}"
+        printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_policy="$(
       (
-        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+        printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AI_TOOL_ADAPTER:-}"
+        printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
     )"
     if [[ "$current_tool" == "$tool" ]]; then
@@ -2313,16 +2313,16 @@ resolve_tool_adapter_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AI_TOOL:-}"
+        printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AI_TOOL_ADAPTER:-}"
+        printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
     )"
     if [[ -n "$current_adapter" && "$current_tool" == "$tool" ]]; then
@@ -2872,7 +2872,7 @@ materialize_missing_required_manager_continuity_fallback() {
 - role: \`manager\`
 - branch: \`${branch:-unknown}\`
 - worktree: \`${project}\`
-- tool: \`${AI_TOOL:-unknown}\`
+- tool: \`${AGENT_AI_TOOL:-unknown}\`
 - model: \`${AI_MODEL:-unknown}\`
 - reasoning_effort: \`${AI_REASONING_EFFORT:-unknown}\`
 - manager_mode: \`true\`
@@ -2950,7 +2950,7 @@ materialize_required_manager_continuity_startup_stub() {
 - role: \`manager\`
 - branch: \`${branch:-unknown}\`
 - worktree: \`${project}\`
-- tool: \`${AI_TOOL:-unknown}\`
+- tool: \`${AGENT_AI_TOOL:-unknown}\`
 - model: \`${AI_MODEL:-unknown}\`
 - reasoning_effort: \`${AI_REASONING_EFFORT:-unknown}\`
 - manager_mode: \`true\`
@@ -3758,12 +3758,12 @@ valid_ai_pid_for_project() {
   tool="codex"
   if [[ -f "$cfg" ]]; then
     source_config "$project"
-    tool="${AI_TOOL:-codex}"
+    tool="${AGENT_AI_TOOL:-codex}"
   fi
 
   # ACP mode: the AI PID is the bridge PID (acp-bridge.py).
   # Bridge has --project in its command line, matches via project path.
-  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     pid_matches_project "$pid" "$project" "" && return 0
   fi
 
@@ -3910,7 +3910,7 @@ tool_runtime_resume_target_before_launch() {
 
   # ACP mode: sessions are persisted in-memory by the bridge.
   # Resume target is the session ID from session state (no JSONL needed).
-  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     local sid="${TOOL_SESSION_ID_CURRENT:-${LAST_TOOL_SESSION_ID:-}}"
     if [[ -n "$sid" ]]; then
       printf '%s\n' "$sid"
@@ -3998,7 +3998,7 @@ tool_persisted_session_id_after_cycle() {
 }
 
 current_workcell_session_refs() {
-  local tool="${AI_TOOL:-}" resume_target
+  local tool="${AGENT_AI_TOOL:-}" resume_target
   resume_target="$(tool_runtime_resume_target_before_launch "$tool" "${PROJECT_ROOT:-}")"
   if [[ -z "$tool" || -z "$resume_target" ]]; then
     printf '[]\n'
@@ -4145,7 +4145,7 @@ ensure_runtime_tool_session_anchor() {
     # ACP mode: use session-store (SQLite), NOT tool directory scan.
     # Non-ACP mode: scan the tool's session dir for JSONL files.
     if [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
-      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         local _acp_sid
         _acp_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
           --project "$project" session.get-active \
@@ -4165,7 +4165,7 @@ ensure_runtime_tool_session_anchor() {
       fi
     fi
     # Resume evidence: ACP mode checks session-store (SQLite); non-ACP checks JSONL.
-    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
       local _acp_evidence_sid
       _acp_evidence_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
         --project "$project" session.get-active \
@@ -4192,7 +4192,7 @@ ensure_runtime_tool_session_anchor() {
         exit 1
       fi
       if [[ "$current_verified" != "1" ]]; then
-        if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+        if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
           log_error "AI_RESUME_ON_START/RESTART=true but session ${TOOL_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
         else
           log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${TOOL_SESSION_ID_CURRENT}. Cannot resume."
@@ -4379,8 +4379,8 @@ write_config() {
     --value "AI_MODEL=$model" \
     --value "AI_MODE=$mode" \
     --value "AI_REASONING_EFFORT=$reasoning_effort" \
-    --value "AI_TOOL_ADAPTER=$tool_adapter" \
-    --value "AI_TOOL_ADAPTER_POLICY=$tool_adapter_policy" \
+    --value "AGENT_AI_TOOL_ADAPTER=$tool_adapter" \
+    --value "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY=$tool_adapter_policy" \
     --value "AI_TOOL_CAPABILITIES=$tool_capabilities" \
     --value "AI_TOOL_POLICY=$tool_policy" \
     --value "AI_CAPABILITY_CODEX_MODEL=$codex_capability_model" \
@@ -4574,7 +4574,7 @@ freely_execution_boundary_audit_summary_for_loaded_config() {
     failures+=("activation_consent_status=${consent_status}")
   fi
 
-  if tool_requires_project_codex_config "${AI_TOOL:-}" "${AI_TOOL_CAPABILITIES:-}"; then
+  if tool_requires_project_codex_config "${AGENT_AI_TOOL:-}" "${AI_TOOL_CAPABILITIES:-}"; then
     codex_cfg="$(project_codex_config_file "$project")"
     if [[ ! -f "$codex_cfg" ]]; then
       failures+=("missing_project_codex_config")
@@ -4719,7 +4719,7 @@ print_autonomy_posture_summary() {
   echo "minimal_risk_posture: last-resort-safe-stop"
   echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
   echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
-  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AGENT_AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
   echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
   echo "recommended_safeguards: sandbox,container-or-vm,dedicated-device-or-account,restricted-network"
@@ -4843,8 +4843,8 @@ runtime_cross_tool_fallback_order_for_current_tool() {
 
 runtime_tool_auth_dir() {
   local default_dir project_dir
-  if [[ -n "${AI_TOOL_AUTH_DIR:-}" ]]; then
-    printf '%s\n' "$AI_TOOL_AUTH_DIR"
+  if [[ -n "${AGENT_AI_TOOL_AUTH_DIR:-}" ]]; then
+    printf '%s\n' "$AGENT_AI_TOOL_AUTH_DIR"
     return 0
   fi
   default_dir="$HOME/.ai-auth"
@@ -5369,8 +5369,8 @@ persist_project_tool_selection() {
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
-  upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
-  upsert_config_key "$project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
+  upsert_config_key "$project" "AGENT_AI_TOOL_ADAPTER" "$tool_adapter"
+  upsert_config_key "$project" "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
   upsert_config_key "$project" "AI_TOOL_CAPABILITIES" "$tool_capabilities"
   upsert_config_key "$project" "AI_TOOL_POLICY" "$tool_policy"
 }
@@ -5385,23 +5385,23 @@ project_tool_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL:-}"
+      printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL_ADAPTER:-}"
+      printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+      printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
   printf '%s|%s|%s\n' "$current_tool" "$current_adapter" "$current_adapter_policy"
@@ -5463,37 +5463,37 @@ project_tool_runtime_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL:-}"
+      printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_model="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_MODEL:-}"
     )
   )"
   current_reasoning="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_REASONING_EFFORT:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL_ADAPTER:-}"
+      printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+      printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
   printf '%s|%s|%s|%s|%s\n' "$current_tool" "$current_model" "$current_reasoning" "$current_adapter" "$current_adapter_policy"
@@ -5595,7 +5595,7 @@ _tool_switch_launch_kind() {
   [[ -n "$record" ]] || { printf 'fresh\n'; return 0; }
 
   IFS='|' read -r _trig _old_tool _old_sid _old_jsonl _old_clog _new_tool _new_sid _cross_tool <<<"$record"
-  local current_tool="${AI_TOOL:-}"
+  local current_tool="${AGENT_AI_TOOL:-}"
   if [[ -z "$current_tool" ]]; then
     printf 'fresh\n'; return 0
   fi
@@ -5646,7 +5646,7 @@ prepare_manager_same_tool_slot_recovery_if_needed() {
     last_exit_reason="${LAST_EXIT_REASON:-}"
   fi
   manager_bootstrap_runtime_expected "$project" || return 1
-  current_tool="${AI_TOOL:-}"
+  current_tool="${AGENT_AI_TOOL:-}"
   [[ -n "$current_tool" ]] || return 1
   tool_supports_auto_same_tool_slot_recovery "$current_tool" || return 1
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
@@ -5684,7 +5684,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
   fi
   manager_bootstrap_runtime_expected "$project" || return 1
   config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
-  current_tool="${AI_TOOL:-}"
+  current_tool="${AGENT_AI_TOOL:-}"
   [[ -n "$current_tool" ]] || return 1
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(manager_ai_pid_for_project "$project")"
@@ -5882,7 +5882,7 @@ EOF
 
 materialize_project_tooling_for_loaded_config() {
   local project="$1" force="${2:-false}"
-  local tool="${AI_TOOL:-}"
+  local tool="${AGENT_AI_TOOL:-}"
   local tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
   local mode="${AI_MODE:-auto}"
 
@@ -6099,7 +6099,7 @@ EOF
 )"
   template="${template/__FREELY_APPROVAL_POLICY__/$approval_policy}"
   template="${template/__FREELY_WORKTREES_ROOT__/$root}"
-  local slot_dir="$HOME/.ai-auth/${AI_TOOL:-codex}"
+  local slot_dir="$HOME/.ai-auth/${AGENT_AI_TOOL:-codex}"
   template="${template/__FREELY_SLOT_DIR__/$slot_dir}"
   printf '%s\n' "$template" >"$cfg"
 
@@ -6241,7 +6241,7 @@ manager_cycle_has_effective_output_evidence() {
   local project="$1" session_file jsonl_path tool_name launch_kind prompt_file
   session_file="$(session_state_file "$project")"
   [[ -f "$session_file" ]] || return 1
-  tool_name="${AI_TOOL:-}"
+  tool_name="${AGENT_AI_TOOL:-}"
   [[ -n "$tool_name" ]] || tool_name="$(meta_env_value "$(config_file "$project")" "AI_TOOL")"
   launch_kind="$(meta_env_value "$session_file" "LAST_LAUNCH_KIND")"
   prompt_file="$(meta_env_value "$session_file" "LAST_PROMPT_FILE")"
@@ -7903,7 +7903,7 @@ log_has_auth_failure() {
   local excerpt=""
   [[ -f "$log_file" ]] || return 1
   excerpt="$(runtime_error_signal_excerpt "$log_file")"
-  if [[ "${AI_TOOL:-}" == "codex" || "${AI_TOOL:-}" == codex-* ]] && [[ "$(codex_live_auth_kind)" == "apikey" ]]; then
+  if [[ "${AGENT_AI_TOOL:-}" == "codex" || "${AGENT_AI_TOOL:-}" == codex-* ]] && [[ "$(codex_live_auth_kind)" == "apikey" ]]; then
     excerpt="$(printf '%s\n' "$excerpt" | sed '/codex_login::auth::manager: Failed to refresh token: 401 Unauthorized/d')"
   fi
   printf '%s\n' "$excerpt" | rg -qi '402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|auth failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
@@ -10347,7 +10347,7 @@ worker_runtime_reconcile_selected_tool_from_contract_if_needed() {
   [[ -n "$selected_tool" ]] || return 1
   current_truth="$(project_tool_runtime_selection_truth "$project")"
   IFS='|' read -r current_tool _ <<<"$current_truth"
-  [[ -n "$current_tool" ]] || current_tool="${AI_TOOL:-}"
+  [[ -n "$current_tool" ]] || current_tool="${AGENT_AI_TOOL:-}"
   [[ "$selected_tool" == "$current_tool" ]] && return 0
   persist_project_tool_selection "$project" "$selected_tool"
   runtime_clear_session_state_for_fresh_launch "$project"
@@ -10399,7 +10399,7 @@ worker_worktree_needs_managed_tooling_repair() {
   [[ -f "$(project_tool_boundary_bootstrap_file "$project")" ]] || return 0
   wrapper_dir="$(project_tool_wrapper_dir "$project")"
   [[ -x "$wrapper_dir/codex" ]] || return 0
-  tool="${AI_TOOL:-codex}"
+  tool="${AGENT_AI_TOOL:-codex}"
   tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     [[ -f "$(project_codex_config_file "$project")" ]] || return 0
@@ -10885,7 +10885,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   if [[ -z "$cleanup_selected_tool" ]]; then
     current_truth="$(project_tool_runtime_selection_truth "$project")"
     IFS='|' read -r current_tool _ <<<"$current_truth"
-    cleanup_selected_tool="${current_tool:-${AI_TOOL:-}}"
+    cleanup_selected_tool="${current_tool:-${AGENT_AI_TOOL:-}}"
   fi
 
   prompt_file="$(manager_cleanup_prompt_file_for_continuity "$project" "$continuity_file")"
@@ -13031,19 +13031,19 @@ ensure_runtime_workcell_initialized_for_launch() {
     fi
     return 0
   fi
-  tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-codex}")}"
-  tool_adapter_policy="${AI_TOOL_ADAPTER_POLICY:-${tool_adapter:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-codex}")}}"
+  tool_adapter="${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-codex}")}"
+  tool_adapter_policy="${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-${tool_adapter:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-codex}")}}"
   freely_bin="$(freely_bin_for_project "$target_project")"
   bash "$freely_bin" init \
     --project "$target_project" \
     --intent "$target_project/docs/PROJECT_INTENT.md" \
     --constitution "$target_project/docs/CONSTITUTION.md" \
-    --ai "${AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" \
+    --ai "${AGENT_AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" \
     --accept-default-autonomy >/dev/null
   init_rc=$?
   (( init_rc == 0 )) || return "$init_rc"
-  upsert_config_key "$target_project" "AI_TOOL_ADAPTER" "$tool_adapter"
-  upsert_config_key "$target_project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
+  upsert_config_key "$target_project" "AGENT_AI_TOOL_ADAPTER" "$tool_adapter"
+  upsert_config_key "$target_project" "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
 }
 
 manager_record_worker_pid_for_launch() {
@@ -13824,7 +13824,7 @@ EOF
 # Returns 0 (active) if any signal shows recent work; 1 (inactive) otherwise.
 _ai_shows_liveness() {
   local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
-  local adapter="${AI_TOOL_ADAPTER:-direct}"
+  local adapter="${AGENT_AI_TOOL_ADAPTER:-direct}"
 
   case "$adapter" in
     acp)
@@ -13964,7 +13964,7 @@ _ai_shows_liveness_pid_signals() {
 
 # ── ACP Bridge lifecycle ─────────────────────────────────────────
 # The ACP bridge (acp-bridge.py) keeps claude-agent-acp alive across AI cycles.
-# Managed only when AI_TOOL_ADAPTER=acp.
+# Managed only when AGENT_AI_TOOL_ADAPTER=acp.
 
 _acp_bridge_short_hash() {
   local project="$1"
@@ -14300,7 +14300,7 @@ _ensure_acp_bridge_running() {
   if [[ -n "$_ts_record" ]]; then
     _ts_old_tool="$(echo "$_ts_record" | cut -d'|' -f6)"  # new_tool from last record
   fi
-  _tool_switch_atomic_write "$project" "startup" "$_ts_old_tool" "" "" "" "${AI_TOOL:-}" ""
+  _tool_switch_atomic_write "$project" "startup" "$_ts_old_tool" "" "" "" "${AGENT_AI_TOOL:-}" ""
 }
 
 # _acp_session_close: gracefully close an ACP session via bridge socket.
@@ -14625,7 +14625,7 @@ recover_stalled_manager_ai_if_needed() {
   stall_reason="$(manager_ai_runtime_recovery_reason "$project" "${MANAGER_AI_STALL_THRESHOLD_SECS:-90}")" || return 1
   ai_pid="$(manager_ai_pid_for_project "$project")"
   current_slot=""
-  if [[ "${AI_TOOL:-}" == "codex" || "${AI_TOOL:-}" == codex-* ]]; then
+  if [[ "${AGENT_AI_TOOL:-}" == "codex" || "${AGENT_AI_TOOL:-}" == codex-* ]]; then
     current_slot="$(codex_current_slot "$project")"
   fi
   append_runtime_event "$project" "runtime_stalled_ai_recovery_triggered" \
@@ -14858,7 +14858,7 @@ write_session_handoff() {
         CROSS_TOOL_EVIDENCE_PATH="${LAST_CYCLE_LOG:-none}"
       fi
       local _ctx_old_tool; _ctx_old_tool=$(echo "$_ctx_record" | cut -d'|' -f2)
-      CROSS_TOOL_HINT="Previous tool was $_ctx_old_tool, switched to ${AI_TOOL:-unknown}. Reference the previous session evidence (${CROSS_TOOL_EVIDENCE_PATH}) to continue work."
+      CROSS_TOOL_HINT="Previous tool was $_ctx_old_tool, switched to ${AGENT_AI_TOOL:-unknown}. Reference the previous session evidence (${CROSS_TOOL_EVIDENCE_PATH}) to continue work."
     fi
   fi
 
@@ -17835,13 +17835,13 @@ select_launch_kind() {
   local handoff_rotation_reason=""
   local resume_target_before_launch=""
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
-  resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
+  resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")"
 
   # ACP mode: session identity stored in session-store (SQLite).
   # tool_switch_events is the unified truth source for session continuity —
   # consulted FIRST, before session-store, to detect cross-tool switches and
   # bridge restarts that invalidated old sessions.
-  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     # Fork: worker inherits parent session context.
     if [[ -n "${SESSION_PARENT_ID:-}" && -z "${TOOL_SESSION_ID_CURRENT:-}" \
           && "${LAST_LAUNCH_KIND:-}" != "fork" && -z "${LAST_LAUNCH_KIND:-}" ]]; then
@@ -17937,7 +17937,7 @@ select_launch_kind() {
 
   case "$handoff_rotation_reason" in
     manager_exit_contract_repair|worker_exit_contract_repair)
-      if [[ "$_ts_launch" == "resume" && -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT" && [[ -z "${AUTO_RECOVERY_ORIGIN_TOOL:-}" || "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "$AI_TOOL" ]]; then
+      if [[ "$_ts_launch" == "resume" && -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AGENT_AI_TOOL" "$PROJECT_ROOT" && [[ -z "${AUTO_RECOVERY_ORIGIN_TOOL:-}" || "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "$AGENT_AI_TOOL" ]]; then
         LAUNCH_KIND_SELECTED="resume"
         LAUNCH_ROTATION_REASON=""
       else
@@ -17987,7 +17987,7 @@ select_launch_kind() {
 
     if [[ "$resume_required" == "true" || "$resume_required" == "check" ]]; then
       local session_dir has_jsonl fallback_id
-      session_dir="$(_tool_session_dir "$(_resolve_tool_family "$AI_TOOL")" "$PROJECT_ROOT" 2>/dev/null || true)"
+      session_dir="$(_tool_session_dir "$(_resolve_tool_family "$AGENT_AI_TOOL")" "$PROJECT_ROOT" 2>/dev/null || true)"
       if [[ -n "$session_dir" && -d "$session_dir" ]]; then
         has_jsonl=$(find "$session_dir" -name "*.jsonl" -type f 2>/dev/null | head -1)
       fi
@@ -17999,7 +17999,7 @@ select_launch_kind() {
       if [[ -n "$has_jsonl" ]]; then
         if [[ "$state_file_exists" == "true" || "$resume_required" == "true" ]]; then
           # State file exists or restart required → MUST resume from JSONL.
-          fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AI_TOOL" || true)"
+          fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AGENT_AI_TOOL" || true)"
           if [[ -n "$fallback_id" ]]; then
             log_info "resume: found JSONL session $fallback_id in $session_dir"
             TOOL_SESSION_ID_CURRENT="$fallback_id"
@@ -18073,7 +18073,7 @@ select_launch_kind() {
     return 0
   fi
 
-  if tool_prefers_resume_evidence "$AI_TOOL" && ! tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT"; then
+  if tool_prefers_resume_evidence "$AGENT_AI_TOOL" && ! tool_has_resume_evidence "$AGENT_AI_TOOL" "$PROJECT_ROOT"; then
     # AI_RESUME_ON_RESTART: prefer resume even without verified evidence (e.g. stall-killed)
     if [[ "${AI_RESUME_ON_RESTART:-true}" == "true" ]]; then
       LAUNCH_KIND_SELECTED="resume"
@@ -19069,21 +19069,21 @@ ensure_manager_once() {
       current_ai_pid=""
     fi
   fi
-  if tool_supports_auto_same_tool_slot_recovery "${AI_TOOL:-}"; then
+  if tool_supports_auto_same_tool_slot_recovery "${AGENT_AI_TOOL:-}"; then
     if ! prepare_manager_same_tool_slot_recovery_if_needed "$project"; then
       if [[ "${TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED:-0}" == "1" ]]; then
         same_tool_blocked="1"
-        log_warn "no ${AI_TOOL:-unknown} slot is ready for manager bootstrap; checking cross-tool fallback policy"
+        log_warn "no ${AGENT_AI_TOOL:-unknown} slot is ready for manager bootstrap; checking cross-tool fallback policy"
         append_lifecycle_trace "$project" "L211" "manager_same_tool_recovery_blocked" \
           "trigger=same_tool_slots_exhausted" \
-          "tool=${AI_TOOL:-unknown}" \
+          "tool=${AGENT_AI_TOOL:-unknown}" \
           "next=cross_tool_fallback_selection"
       elif [[ "${TOOL_AUTO_RECOVERY_ENTRY_BLOCKED:-0}" == "1" ]]; then
         same_tool_blocked="1"
-        log_warn "current ${AI_TOOL:-unknown} slot entry is unavailable; holding manager bootstrap until recovery path is ready"
+        log_warn "current ${AGENT_AI_TOOL:-unknown} slot entry is unavailable; holding manager bootstrap until recovery path is ready"
         append_lifecycle_trace "$project" "L212" "manager_same_tool_recovery_blocked" \
           "trigger=entry_slot_unavailable" \
-          "tool=${AI_TOOL:-unknown}" \
+          "tool=${AGENT_AI_TOOL:-unknown}" \
           "next=wait_or_cross_tool_fallback"
       fi
     fi
@@ -19128,7 +19128,7 @@ ensure_manager_once() {
     log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
     append_lifecycle_trace "$project" "L230" "manager_recovery_waiting" \
       "trigger=all_recovery_paths_unavailable" \
-      "tool=${AI_TOOL:-unknown}" \
+      "tool=${AGENT_AI_TOOL:-unknown}" \
       "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
       "next=wait"
     return 0
@@ -19139,7 +19139,7 @@ ensure_manager_once() {
     current_pid=""
     append_lifecycle_trace "$project" "L231" "manager_bootstrap_skipped" \
       "trigger=no_recovery_capable_tool_ready" \
-      "tool=${AI_TOOL:-unknown}" \
+      "tool=${AGENT_AI_TOOL:-unknown}" \
       "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
       "next=wait"
     return 0
@@ -19163,7 +19163,7 @@ ensure_manager_once() {
   fi
   append_lifecycle_trace "$project" "L240" "manager_launch_requested" \
     "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
-    "tool=${AI_TOOL:-unknown}" \
+    "tool=${AGENT_AI_TOOL:-unknown}" \
     "next=launch_manager_supervisor"
   launch_manager_supervisor "$project"
   log_info "manager bootstrap requested"
@@ -20185,8 +20185,8 @@ PROMPT_AGENT
     build_manager_exit_contract_repair_fresh_with_handoff_prompt "$PROJECT_ROOT"
     append_task_source_patrol_seed_if_needed
   else
-    AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
-    AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
+    AGENT_AI_TOOL_ADAPTER="${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-}")}" \
+    AGENT_AGENT_AI_TOOL_ADAPTER_POLICY="${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}" \
     AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
     AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
     AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
@@ -20197,7 +20197,7 @@ PROMPT_AGENT
       --project "$PROJECT_ROOT" \
       --intent "$INTENT_FILE" \
       --constitution "$CONSTITUTION_FILE" \
-      --ai "${AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
+      --ai "${AGENT_AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
       --workspace-root "$workspace_root" \
       --reasoning-effort "${AI_REASONING_EFFORT:-}" \
 	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
@@ -20880,7 +20880,7 @@ cmd_set_tool() {
   load_config "$project"
   materialize_project_tooling_for_loaded_config "$project" "true"
   load_config "$project"
-  log_info "updated tool selection: ${AI_TOOL:-$tool} via ${AI_TOOL_ADAPTER:-unknown} (policy=${AI_TOOL_ADAPTER_POLICY:-unknown})"
+  log_info "updated tool selection: ${AGENT_AI_TOOL:-$tool} via ${AGENT_AI_TOOL_ADAPTER:-unknown} (policy=${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-unknown})"
 }
 
 cmd_sync_tooling() {
@@ -21584,7 +21584,7 @@ print(f'/tmp/freely-db-{h}.pid')
       ;;
     *)
       rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
-      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         _stop_acp_bridge "$project" "${_cross_base_tool:-}"
       fi
       # Aggressively kill ALL project-related AI processes.
@@ -22264,7 +22264,7 @@ start_project_runtime() {
   load_session_state_or_defaults "$project"
 
   # ACP bridge lifecycle: start one bridge per unique base_tool in agent-table
-  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
     local _aq="${PROJECT_ROOT}/bin/agent-table-query"
     local -a _unique_tools=()
@@ -22348,8 +22348,8 @@ start_project_runtime() {
     if [[ -x "$SELF_ROOT/bin/freely" ]]; then
       _msg="supervisor crash: ${_err_cmd} at ${BASH_SOURCE##*/}:${_err_line} (rc=${_err_rc})
 last_exit_reason_before_crash: ${LAST_WORKCELL_EXIT_REASON:-none}
-tool: ${AI_TOOL:-unknown}
-adapter: ${AI_TOOL_ADAPTER:-unknown}
+tool: ${AGENT_AI_TOOL:-unknown}
+adapter: ${AGENT_AI_TOOL_ADAPTER:-unknown}
 launch_kind: ${mode_name:-unknown}"
       if [[ -n "${FREELY_REPO_URL:-}" ]]; then
         local _crash_title _existing_issue _ts
@@ -22418,7 +22418,7 @@ print('ok')
     load_session_state_or_defaults "$project"
 
     # Ensure all ACP bridges are alive (tool may have been switched by auto-recovery)
-    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
       local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
       local _aq="${PROJECT_ROOT}/bin/agent-table-query"
       local -a _cycle_tools=()
@@ -22511,9 +22511,9 @@ print(ready)
     # On first cycle, skip continuity-based recovery — fleet cache not populated yet.
     # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
     manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" || true
-    ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
+    ensure_runtime_tool_session_anchor "$AGENT_AI_TOOL" "$mode_name" "$PROJECT_ROOT"
     # Persist session anchor immediately so SIGTERM-killed sessions can resume
-    _persist_session_anchor_early "$PROJECT_ROOT" "$AI_TOOL"
+    _persist_session_anchor_early "$PROJECT_ROOT" "$AGENT_AI_TOOL"
     delegated_pending_ids="$(delegated_continuation_ids_for_project "$PROJECT_ROOT")"
     delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
     delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
@@ -22598,16 +22598,16 @@ print(ready)
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AGENT_AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(exit_contract_file "$PROJECT_ROOT")"
     fi
 
     local tool_adapter failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
-    tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
-    # Ensure AI_TOOL_ADAPTER is available for child processes (monitor script selection)
+    tool_adapter="${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AGENT_AI_TOOL")}"
+    # Ensure AGENT_AI_TOOL_ADAPTER is available for child processes (monitor script selection)
     # and for subsequent cycles via session state
-    export AI_TOOL_ADAPTER="$tool_adapter"
+    export AGENT_AI_TOOL_ADAPTER="$tool_adapter"
     failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/tool-runtime-failure.marker"
     network_failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/network-failure.marker"
     bridge_lost_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/bridge-lost.marker"
@@ -22615,10 +22615,10 @@ print(ready)
     rm -f "$network_failure_marker_file"
     rm -f "$bridge_lost_marker_file"
     exit_if_stop_requested_before_launch
-    log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
+    log_info "launching $AGENT_AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
       "supervisor_pid=$$" \
-      "tool=$AI_TOOL" \
+      "tool=$AGENT_AI_TOOL" \
       "tool_adapter=${tool_adapter:-unknown}" \
       "launch_kind=$mode_name" \
       "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
@@ -22626,7 +22626,7 @@ print(ready)
       "cycle_log=$cycle_log"
     append_lifecycle_trace "$project" "L040" "ai_launch_begin" \
       "supervisor_pid=$$" \
-      "tool=$AI_TOOL" \
+      "tool=$AGENT_AI_TOOL" \
       "tool_adapter=${tool_adapter:-unknown}" \
       "launch_kind=$mode_name" \
       "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
@@ -22637,10 +22637,10 @@ print(ready)
       "expected_next=L041"
     set +e
     {
-      echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
+      echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AGENT_AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
-      case "${AI_TOOL_ADAPTER:-direct}" in
+      case "${AGENT_AI_TOOL_ADAPTER:-direct}" in
         acp)
           monitor_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/monitor-ai-acp.sh"
           [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/runtime/monitor-ai-acp.sh"
@@ -22652,12 +22652,12 @@ print(ready)
       esac
       # Per-adapter extra args (ACP-only args must not be passed to non-ACP monitors).
       local -a _adapter_extra_args=()
-      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         _adapter_extra_args=(--bridge-lost-marker-file "$bridge_lost_marker_file")
       fi
       bash "$monitor_script" \
         --project "$PROJECT_ROOT" \
-        --tool "$AI_TOOL" \
+        --tool "$AGENT_AI_TOOL" \
         --tool-adapter "${tool_adapter:-}" \
         --model "${AI_MODEL:-}" \
         --reasoning-effort "${AI_REASONING_EFFORT:-}" \
@@ -22669,7 +22669,7 @@ print(ready)
         --codex-capability-cwd-mode "${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
         --debug-log-file "$cycle_debug_log" \
         --claude-session-id "${TOOL_SESSION_ID_CURRENT:-}" \
-        --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")" \
+        --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")" \
         --mode "$AI_MODE" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
@@ -22690,9 +22690,9 @@ print(ready)
     local dirty_entries worktree_total worktree_dirty summary
     local launch_resume_target
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-    tool_session_id="$(runtime_capture_or_empty extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
+    tool_session_id="$(runtime_capture_or_empty extract_tool_session_id_from_log "$AGENT_AI_TOOL" "$cycle_log")"
     # ACP mode: extract clean UUID from cycle log (search all lines, line 1 may be blank)
-    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" && ( -z "$tool_session_id" || "$tool_session_id" == "unavailable" ) ]]; then
+    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" && ( -z "$tool_session_id" || "$tool_session_id" == "unavailable" ) ]]; then
       if [[ -f "$cycle_log" ]]; then
         local _line1_uuid
         _line1_uuid=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$cycle_log" 2>/dev/null | head -1) || true
@@ -22713,10 +22713,10 @@ print(ready)
     worktree_total="0"
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
-    launch_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
+    launch_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")"
     append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
       "supervisor_pid=$$" \
-      "tool=$AI_TOOL" \
+      "tool=$AGENT_AI_TOOL" \
       "launch_kind=$mode_name" \
       "child_pid=${child_pid:-unknown}" \
       "prompt_file=$prompt_file" \
@@ -22724,7 +22724,7 @@ print(ready)
       "from_checkpoint=L040" \
       "expected_from_previous=L041" \
       "expected_next=L042"
-    if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]] && [[ -n "$tool_session_id" ]]; then
+    if [[ "$AGENT_AI_TOOL" == "codex" || "$AGENT_AI_TOOL" == codex-* ]] && [[ -n "$tool_session_id" ]]; then
       tool_jsonl_path="$(runtime_capture_or_empty find_codex_jsonl_path_for_session "$tool_session_id")"
       context_ratio="$(runtime_capture_or_empty extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
       primary_rate_limit_used_percent="$(runtime_capture_or_empty extract_latest_codex_primary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
@@ -22741,8 +22741,8 @@ print(ready)
         context_ratio="$(cat "$_bridge_ratio_file" 2>/dev/null || true)"
       fi
     fi
-    active_slot="$(runtime_capture_or_empty runtime_read_tool_current_slot "$PROJECT_ROOT" "$AI_TOOL")"
-    if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]]; then
+    active_slot="$(runtime_capture_or_empty runtime_read_tool_current_slot "$PROJECT_ROOT" "$AGENT_AI_TOOL")"
+    if [[ "$AGENT_AI_TOOL" == "codex" || "$AGENT_AI_TOOL" == codex-* ]]; then
       [[ -n "$active_slot" ]] || active_slot="$(runtime_capture_or_empty codex_current_slot "$PROJECT_ROOT")"
       active_cooldown_identity="$(runtime_capture_or_empty codex_current_cooldown_identity "$PROJECT_ROOT")"
     fi
@@ -22759,10 +22759,10 @@ print(ready)
     codex_mcp_used="0"
     codex_mcp_thread_id=""
     codex_mcp_jsonl_path=""
-    if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
+    if log_has_same_tool_route_only_handoff "$cycle_log" "$AGENT_AI_TOOL"; then
       route_only_handoff="1"
     fi
-    if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
+    if tool_uses_claude_session_id "$AGENT_AI_TOOL" && [[ -n "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence
       resolved_cc_evidence="$(runtime_capture_or_empty resolve_cc_session_evidence "$PROJECT_ROOT" "${TOOL_SESSION_ID_CURRENT:-}")"
       if [[ -n "$resolved_cc_evidence" ]]; then
@@ -22770,7 +22770,7 @@ print(ready)
         # shellcheck disable=SC1090
         source /dev/stdin <<<"$resolved_cc_evidence"
         claude_jsonl_path="${CLAUDE_JSONL_PATH:-}"
-        if [[ "$AI_TOOL" == "cc-use-codex-cli" ]]; then
+        if [[ "$AGENT_AI_TOOL" == "cc-use-codex-cli" ]]; then
           codex_mcp_used="${CODEX_MCP_USED:-0}"
           codex_mcp_thread_id="${CODEX_MCP_THREAD_ID:-}"
           codex_mcp_jsonl_path="${CODEX_MCP_JSONL_PATH:-}"
@@ -22780,9 +22780,9 @@ print(ready)
         TOOL_SESSION_ID_CURRENT=""
       fi
     fi
-    tool_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
-    tool_session_id="$(runtime_capture_or_empty tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
-    if [[ "$AI_TOOL" == "cc-use-codex-cli" && "$codex_mcp_used" != "1" ]] && cc_debug_log_has_codex_tool_call "$cycle_debug_log"; then
+    tool_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_after_cycle "$AGENT_AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
+    tool_session_id="$(runtime_capture_or_empty tool_persisted_session_id_after_cycle "$AGENT_AI_TOOL" "$tool_session_id" "$tool_resume_target")"
+    if [[ "$AGENT_AI_TOOL" == "cc-use-codex-cli" && "$codex_mcp_used" != "1" ]] && cc_debug_log_has_codex_tool_call "$cycle_debug_log"; then
       codex_mcp_used="1"
       [[ -n "$codex_mcp_thread_id" ]] || codex_mcp_thread_id="unavailable://claude-jsonl-did-not-yet-expose-codex-thread-id"
       [[ -n "$codex_mcp_jsonl_path" ]] || codex_mcp_jsonl_path="unavailable://codex-thread-id-not-yet-resolved"
@@ -22882,7 +22882,7 @@ print(ready)
 	    # ── Layer 2: Tool-specific failure detection ──
 
     # No slot switch needed — the tool itself is healthy, just the session is gone.
-    if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]]; then
+    if [[ "$AGENT_AI_TOOL" == "codex" || "$AGENT_AI_TOOL" == codex-* ]]; then
       rate_limit_reason="$(runtime_capture_or_empty codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
       rate_limit_reset_at="$(runtime_capture_or_empty codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
       if [[ -n "$slot_switch_reason" ]]; then
@@ -22901,7 +22901,7 @@ print(ready)
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
         LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
       fi
-    elif [[ "$AI_TOOL" == "kiro-cli" && -z "$slot_switch_reason" ]]; then
+    elif [[ "$AGENT_AI_TOOL" == "kiro-cli" && -z "$slot_switch_reason" ]]; then
       slot_switch_reason="$(kiro_availability_reason_from_log "$cycle_log" || true)"
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
@@ -22935,13 +22935,13 @@ print(ready)
       clear_execution_network_state "$PROJECT_ROOT"
     fi
     if [[ -n "$slot_switch_reason" ]]; then
-      record_tool_unavailability_from_failure "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason" "$cycle_log"
+      record_tool_unavailability_from_failure "$PROJECT_ROOT" "$AGENT_AI_TOOL" "$slot_switch_reason" "$cycle_log"
     fi
     if [[ -z "$slot_switch_reason" && -z "$network_failure_reason" ]]; then
       runtime_auto_recovery_reset_attempted_tools
     fi
     if [[ -n "$slot_switch_reason" || -n "$network_failure_reason" ]]; then
-      emit_runtime_failure_guidance "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason" "$network_failure_reason" "$cycle_log"
+      emit_runtime_failure_guidance "$PROJECT_ROOT" "$AGENT_AI_TOOL" "$slot_switch_reason" "$network_failure_reason" "$cycle_log"
     fi
 
     local restart_signal_reason active_process_count now_epoch observe_delay restart_window_stats restart_window_count restart_window_peak
@@ -22961,7 +22961,7 @@ print(ready)
     # Persisted via write_session_state below so it survives across loop iterations.
     FREELY_ACP_FIRST_LAUNCH_DONE=1
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AGENT_AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     # Normalize rc=1 to 0 when the debug log shows a clean SessionEnd completion.
     # Claude Code -p mode may exit 1 even when the session ended gracefully (SessionEnd:other).
     if [[ "${rc:-0}" != "0" && -f "$cycle_debug_log" ]]; then
@@ -22984,7 +22984,7 @@ print(ready)
     materialize_blocked_supervision_truth_if_needed "$PROJECT_ROOT" "$prompt_file" "$LAST_WORKCELL_EXIT_REASON" "$cycle_log"
     append_runtime_event "$project" "ai_cycle_finished" \
       "supervisor_pid=$$" \
-      "tool=$AI_TOOL" \
+      "tool=$AGENT_AI_TOOL" \
       "launch_kind=$mode_name" \
       "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
       "rc=$rc" \
@@ -23020,7 +23020,7 @@ print(ready)
       "active_session_count=${_cache_active_sessions}"
     append_lifecycle_trace "$project" "L042" "ai_cycle_finished" \
       "supervisor_pid=$$" \
-      "tool=$AI_TOOL" \
+      "tool=$AGENT_AI_TOOL" \
       "launch_kind=$mode_name" \
       "rc=$rc" \
       "child_pid=${child_pid:-unknown}" \
@@ -23037,15 +23037,15 @@ print(ready)
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     # Preserve crash evidence: save debug log when AI exits non-zero.
-    # Uses $AI_TOOL (registry-derived, not hardcoded) — works for any tool.
+    # Uses $AGENT_AI_TOOL (registry-derived, not hardcoded) — works for any tool.
     if [[ "$rc" != "0" && -f "${cycle_debug_log:-}" ]]; then
-      local _crash_log; _crash_log="$(logs_dir_for_project "$PROJECT_ROOT")/crash-${AI_TOOL:-unknown}-$(date +%Y%m%d-%H%M%S).log"
+      local _crash_log; _crash_log="$(logs_dir_for_project "$PROJECT_ROOT")/crash-${AGENT_AI_TOOL:-unknown}-$(date +%Y%m%d-%H%M%S).log"
       cp "$cycle_debug_log" "$_crash_log" 2>/dev/null || true
       [[ -f "$cycle_log" ]] && cp "$cycle_log" "${_crash_log}.stdout" 2>/dev/null || true
       log_info "crash evidence saved: $_crash_log"
     fi
     # ACP mode: bridge persists across cycles — keep child_pid_file so watchdog knows AI is alive
-    if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
       rm -f "$child_pid_file"
     fi
 
@@ -23155,23 +23155,23 @@ print(ready)
       auto_recovery_reason=""
     fi
     if [[ -n "$auto_recovery_reason" ]]; then
-      if attempt_runtime_proxy_self_heal_after_network_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
+      if attempt_runtime_proxy_self_heal_after_network_failure "$PROJECT_ROOT" "$AGENT_AI_TOOL" "$auto_recovery_reason"; then
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
         continue
       fi
-      if attempt_runtime_auto_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
+      if attempt_runtime_auto_recovery_after_failure "$PROJECT_ROOT" "$AGENT_AI_TOOL" "$auto_recovery_reason"; then
         # attempt_runtime_auto_recovery_after_failure already handles cooldown
         # state (CROSS_TOOL_SWITCH_AT, CROSS_TOOL_SWITCH_INDEX).  Do NOT apply a
         # second cooldown here — the double sleep of 120s causes the ensure-manager
         # to kill the supervisor as stalled before it can restart the bridge.
-        if [[ "${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" == "$AI_TOOL" ]]; then
+        if [[ "${RUNTIME_AUTO_RECOVERY_TOOL:-$AGENT_AI_TOOL}" == "$AGENT_AI_TOOL" ]]; then
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched locally to slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown} and will continue"
         else
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched to tool=${RUNTIME_AUTO_RECOVERY_TOOL:-unknown} slot=${RUNTIME_AUTO_RECOVERY_SLOT:-none} and will continue"
         fi
         append_runtime_event "$project" "supervisor_local_slot_recovery" \
           "supervisor_pid=$$" \
-          "tool=${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" \
+          "tool=${RUNTIME_AUTO_RECOVERY_TOOL:-$AGENT_AI_TOOL}" \
           "reason=$auto_recovery_reason" \
           "active_slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown}"
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
@@ -24914,10 +24914,10 @@ cmd_baseline_status() {
   echo "project: $PROJECT_ROOT"
   echo "intent: $INTENT_FILE"
   echo "constitution: $CONSTITUTION_FILE"
-  echo "ai: ${AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
-  echo "tool_adapter: ${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}"
-  echo "tool_adapter_policy: ${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}"
-  echo "tool_supported_adapters: $(tool_supported_adapters_for_runtime "${AI_TOOL:-}" | paste -sd ',' -)"
+  echo "ai: ${AGENT_AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
+  echo "tool_adapter: ${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-}")}"
+  echo "tool_adapter_policy: ${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}"
+  echo "tool_supported_adapters: $(tool_supported_adapters_for_runtime "${AGENT_AI_TOOL:-}" | paste -sd ',' -)"
   echo "reasoning_effort: ${AI_REASONING_EFFORT:-default}"
   echo "tool_capabilities: ${AI_TOOL_CAPABILITIES:-none}"
   echo "tool_policy: ${AI_TOOL_POLICY:-none}"
@@ -24933,7 +24933,7 @@ cmd_baseline_status() {
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
   echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
   echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
-  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AGENT_AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   local execution_boundary_audit_summary
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
@@ -25167,7 +25167,7 @@ cmd_security_review_brief() {
   IFS='|' read -r review_mode reviewer_count review_scope decision continuation_guidance minimal_risk_state _ <<<"$review_fields"
 
   echo "project: $project"
-  echo "current_tool: ${AI_TOOL:-none}"
+  echo "current_tool: ${AGENT_AI_TOOL:-none}"
   echo "current_slot: ${CURRENT_TOOL_SLOT:-${LAST_ACTIVE_SLOT:-unavailable}}"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
@@ -25461,7 +25461,7 @@ cmd_live_status() {
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
   echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
   echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
-  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AGENT_AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   local execution_boundary_audit_summary
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
@@ -25700,7 +25700,7 @@ sleep_with_rate_limit_recheck() {
     if [[ -f "$stop_file" ]]; then
       return 0
     fi
-    if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]] && [[ "$active_probe_mode" == "1" ]]; then
+    if [[ "$AGENT_AI_TOOL" == "codex" || "$AGENT_AI_TOOL" == codex-* ]] && [[ "$active_probe_mode" == "1" ]]; then
       workable_slot="$(probe_any_usable_codex_slot_now "$project" || true)"
       if [[ -n "$workable_slot" ]]; then
         return 0
