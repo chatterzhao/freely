@@ -30,7 +30,7 @@ description: >- 管理 Freely 风格开发的完整分支生命周期。支持 `
 - 对于规范文档变更，在专用 feature/worktree 中工作，并要求关联实现或门禁变更证据。
 - 对于依赖未合并父分支的子任务，不把 `develop` 伪装成执行基线；必须记录依赖并在提升前完成 restack / rebase / merge 上游。
 - `develop` / `main` / `test-pre-merge-*` 可以存在 canonical worktree，但它们只承担受保护分支的管理/集成/验收环境，不承担真实 feature 开发。
-- 跑测试前先选对 lane，并显式使用 `./bin/test-lane <lane> -- <command...>`：
+- 跑测试前先选对 lane，并显式使用 `freely test-lane <lane> -- <command...>`：
   - writable dedicated worktree -> `feature-local`
   - `test-pre-merge-*` 批次 -> `premerge-integration`
   - 目标 protected branch 的 merge 后验收 -> `post-merge-followthrough`

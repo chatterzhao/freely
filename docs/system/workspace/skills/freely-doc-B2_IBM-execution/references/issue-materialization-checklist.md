@@ -89,7 +89,7 @@ Epic `ai-session-continuity` 下：
    - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw key}` 目录
    - 是 epic 下的新子问题 → 新建 story
 5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
-6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/B2-docs/` 目录结构是否对齐——不对齐则拦截
+6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`freely check-epics-map`）会检查 SVG 与 `docs/B2-docs/` 目录结构是否对齐——不对齐则拦截
 
 #### 层级模型
 
@@ -114,7 +114,7 @@ B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写
 1. **新建 epic 时**：在 `docs/epics-map.svg` 中添加 `<rect id="epic-{name}">`，放在合适的垂直位置（按字母序或能力关联）
 2. **新建 story 时**：在对应 epic 的 `<rect>` 下方添加 `<rect id="story-{name}">`
 3. **复用已有 epic/story 时**：如果 SVG 中没有对应条目（epic/story 在文件系统存在但 SVG 未记录），补上
-4. **写完后验证**：运行 `./bin/check-epics-map --project .` 确认对齐。不对齐 → 门禁拦截，必须修正后再继续
+4. **写完后验证**：运行 `freely check-epics-map --project .` 确认对齐。不对齐 → 门禁拦截，必须修正后再继续
 5. **更新 milestones.md**：`promoted_issue_id` 必须指向物化后的实际路径
 
 #### 一个 raw → 一个 story 还是多个？

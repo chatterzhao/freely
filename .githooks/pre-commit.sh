@@ -233,7 +233,7 @@ REASON_GATE
       echo "[HOOK] FREELY_SKIP_IBM_GATE — validating governance-only paths"
       if [[ -x "./bin/governance-merge-gate" ]]; then
         set +e
-        gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --skip-ibm-gate 2>&1)"
+        gate_output="$(freely governance-merge-gate --staged --target-branch "$branch" --skip-ibm-gate 2>&1)"
         gate_rc=$?
         set -e
         if [[ "$gate_rc" -ne 0 ]]; then
@@ -296,7 +296,7 @@ esac
 if ! freely_wt_is_primary_worktree; then
   if [[ -x "./bin/governance-merge-gate" ]]; then
     set +e
-    checkpoint_output="$(./bin/checkpoint-guard --staged-only  2>&1)"
+    checkpoint_output="$(freely checkpoint-guard --staged-only  2>&1)"
     checkpoint_rc=$?
     set -e
     if [[ "$checkpoint_rc" -eq 2 ]]; then
@@ -313,7 +313,7 @@ MSG
   fi
   if [[ -x "./bin/governance-merge-gate" ]]; then
     set +e
-    pretests_output="$(./bin/pretests-gate --staged-only 2>&1)"
+    pretests_output="$(freely pretests-gate --staged-only 2>&1)"
     pretests_rc=$?
     set -e
     if [[ "$pretests_rc" -ne 0 ]]; then

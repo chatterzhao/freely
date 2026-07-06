@@ -5,7 +5,7 @@ set -euo pipefail
 # 从 develop（或指定源）复制 config、session-store、continuity 等
 # 使 pre 工位具备完整的 Manager 运行能力
 #
-# 用法: ./bin/pre-init-runtime --pre-project <path> [--source-project <path>]
+# 用法: freely pre-init-runtime --pre-project <path> [--source-project <path>]
 # 默认 --source-project 为 develop 分支对应的项目根目录
 
 PRE_PROJECT=""

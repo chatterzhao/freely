@@ -43,9 +43,9 @@ description: >-
    - 依赖父分支 -> 基于 `execution_base`
 5. 在当前 dedicated worktree 中实现变更。
 6. 持续补齐测试、verification evidence 与 code-review 证据。
-   - 默认先在当前 dedicated worktree 跑 `./bin/test-lane feature-local -- <command...>`
-   - 若需要主线前真实集成面，切到对应 `test-pre-merge-*` worktree 跑 `./bin/test-lane premerge-integration -- <command...>`
-   - 若变更已 merge 到目标 protected branch 且需要真实 followthrough，在该 canonical worktree 跑 `./bin/test-lane post-merge-followthrough -- <command...>`
+   - 默认先在当前 dedicated worktree 跑 `freely test-lane feature-local -- <command...>`
+   - 若需要主线前真实集成面，切到对应 `test-pre-merge-*` worktree 跑 `freely test-lane premerge-integration -- <command...>`
+   - 若变更已 merge 到目标 protected branch 且需要真实 followthrough，在该 canonical worktree 跑 `freely test-lane post-merge-followthrough -- <command...>`
 7. 若本轮是 develop-bound implementation-bearing 变更，在当前 owner issue 的 `verification_artifact_dir` 下写 implementation decision note。
    - 最小字段见 [implementation-decision-note.md](references/implementation-decision-note.md)
    - 不要把这份 note 改写到 `progress`、`prd.md` 或新目录里当成平行真源

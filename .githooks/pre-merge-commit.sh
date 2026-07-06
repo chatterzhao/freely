@@ -45,7 +45,7 @@ REASON_GATE
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Re-run the merge through ./bin/pr-merge-guarded.
+Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   }
@@ -73,14 +73,14 @@ GATE_WARN
   # work for both Freely and non-Freely projects via env var configuration.
   if [[ ! -x "./bin/governance-merge-gate" ]]; then
     cat <<MSG
-[HOOK] FREELY_SKIP_IBM_GATE=1 but governance-merge-gate not found at ./bin/governance-merge-gate.
+[HOOK] FREELY_SKIP_IBM_GATE=1 but governance-merge-gate not found at freely governance-merge-gate.
 Install the gate or remove FREELY_SKIP_IBM_GATE=1 to use the full governance path.
 MSG
     exit 1
   fi
 
   set +e
-  gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" --skip-ibm-gate 2>&1)"
+  gate_output="$(freely governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" --skip-ibm-gate 2>&1)"
   gate_rc=$?
   set -e
 
@@ -120,7 +120,7 @@ require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded so hooks can verify the canonical handshake.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded so hooks can verify the canonical handshake.
 MSG
     exit 1
   }
@@ -128,7 +128,7 @@ MSG
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   fi
@@ -168,7 +168,7 @@ if [[ ! -x "./bin/governance-merge-gate" ]]; then
 fi
 
 set +e
-gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" 2>&1)"
+gate_output="$(freely governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" 2>&1)"
 gate_rc=$?
 set -e
 
@@ -190,7 +190,7 @@ if [[ ! -x "./bin/governance-promotion-gate" ]]; then
 fi
 
 set +e
-promotion_output="$(./bin/governance-promotion-gate --project "$project_root" --target-branch "$branch" 2>&1)"
+promotion_output="$(freely governance-promotion-gate --project "$project_root" --target-branch "$branch" 2>&1)"
 promotion_rc=$?
 set -e
 

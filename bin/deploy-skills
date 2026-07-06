@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   cat <<USAGE
-Usage: ./bin/deploy-skills [--tools <name,...>] [--force] [--dry-run]
+Usage: freely deploy-skills [--tools <name,...>] [--force] [--dry-run]
 
 Deploy all skills from docs/system/workspace/skills/ to AI tool skill directories
 so tools can invoke them via skill:<name>.
@@ -28,9 +28,9 @@ Project-local override: if tool directory exists under <project-root>/.opencode/
 skills are deployed there instead of global config.
 
 Examples:
-  ./bin/deploy-skills --tools claude,codex
-  ./bin/deploy-skills --tools opencode-apikey-ds-flash-auto --force
-  ./bin/deploy-skills --dry-run
+  freely deploy-skills --tools claude,codex
+  freely deploy-skills --tools opencode-apikey-ds-flash-auto --force
+  freely deploy-skills --dry-run
 USAGE
 }
 

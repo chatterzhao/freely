@@ -10,7 +10,7 @@ source "$ROOT_DIR/bin/worktree-common.sh" 2>/dev/null || true
 # Loop until pass, or escalate to Manager after 3 rounds.
 #
 # Usage:
-#   ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
+#   freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
 #
 # --reason gate: when --verdict pass overrides failing review, --reason is required.
 
@@ -81,7 +81,7 @@ while [[ $# -gt 0 ]]; do
     --slot) REVIEWER_SLOT="${2:-}"; shift 2 ;;
     --help|-h)
       cat >&2 <<'HELPMSG'
-Usage: ./bin/pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail] [--reason <text>]
+Usage: freely pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail] [--reason <text>]
 
 Launches TDD Reviewer via ACP for independent four-question review.
 Loops until pass (with Worker fixes between rounds) or escalates after 3 rounds.
@@ -99,7 +99,7 @@ done
 
 if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
-  echo "Usage: ./bin/pr-review-guarded <branch>" >&2
+  echo "Usage: freely pr-review-guarded <branch>" >&2
   exit 1
 fi
 
@@ -545,7 +545,7 @@ _platform_remote_name() {
 
   echo ""
   echo "Next steps:"
-  echo "  ./bin/pr-merge-guarded $base $review_branch"
+  echo "  freely pr-merge-guarded $base $review_branch"
   exit 0
 
 elif [[ "$_review_verdict" == "manual_required" ]]; then
@@ -560,7 +560,7 @@ elif [[ "$_review_verdict" == "manual_required" ]]; then
   echo "    3. 每级检查：下层是否忠实消化了上层？"
   echo "    4. 审查结论写入 $review_file"
   echo "    5. git add $review_file && git commit -m 'review: manual review verdict=pass'"
-  echo "    6. 重新运行 ./bin/pr-merge-guarded $base $review_branch"
+  echo "    6. 重新运行 freely pr-merge-guarded $base $review_branch"
   exit 1
 else
   echo "❌ TDD Review FAILED (round $_review_round)"
@@ -586,7 +586,7 @@ if fixes:
 
   echo ""
   echo "Fix the issues above, commit changes, and re-run:"
-  echo "  ./bin/pr-review-guarded $review_branch"
+  echo "  freely pr-review-guarded $review_branch"
   echo ""
   echo "Rounds remaining: $((MAX_ROUNDS - _review_round))"
 

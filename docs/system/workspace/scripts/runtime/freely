@@ -4188,7 +4188,7 @@ ensure_runtime_tool_session_anchor() {
     if [[ "$resume_required" == "true" && "$launch_kind" == "resume" ]]; then
       if [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
         log_error "AI_RESUME_ON_START/RESTART=true but no valid session ID found. Cannot resume."
-        log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
+        log_error "To force a fresh session: freely new-session --project $project && freely daemon start --project $project"
         exit 1
       fi
       if [[ "$current_verified" != "1" ]]; then
@@ -4197,7 +4197,7 @@ ensure_runtime_tool_session_anchor() {
         else
           log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${TOOL_SESSION_ID_CURRENT}. Cannot resume."
         fi
-        log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
+        log_error "To force a fresh session: freely new-session --project $project && freely daemon start --project $project"
         exit 1
       fi
     fi
@@ -6671,7 +6671,7 @@ _write_chat_to_issue() {
   if [[ "$chat_type" == "new-issue" ]]; then
     log_info "[chat] raw issue created: $issue_id"
     log_info "[chat] Next: create raw issue on configured platform, then worktree:"
-    log_info "[chat]   1. ./bin/freely feedback --help   (review usage, then create the raw issue)"
+    log_info "[chat]   1. freely feedback --help   (review usage, then create the raw issue)"
     log_info "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feature-execution (Govern first)"
   fi
@@ -10485,7 +10485,7 @@ materialize_worker_prompt_worktree_if_needed() {
     if ! bash "$manager_project/bin/wt-create" "$target_branch" --base develop 2>&1; then
       log_warn "worker worktree auto-materialize blocked: wt-create failed for branch=$target_branch"
       log_warn "  Manager must create the worktree before delegating:"
-      log_warn "  ./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+      log_warn "  freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
       return 1
     fi
   else
@@ -10875,7 +10875,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   [[ -n "$minimum_evidence_level" ]] || minimum_evidence_level="cleanup followthrough evidence plus worktree retirement disposition"
   [[ -n "$target_environment" ]] || target_environment="$(printf '%s cleanup_governance retirement followthrough' "$issue_id")"
   [[ -n "$closeout_gate" ]] || closeout_gate="Only claim closeout after the retained merged cleanup targets are retired or explicitly left with bounded followthrough evidence"
-  [[ -n "$closeout_gate_command" ]] || closeout_gate_command="./bin/freely daemon start --project $project"
+  [[ -n "$closeout_gate_command" ]] || closeout_gate_command="freely daemon start --project $project"
   [[ -n "$closeout_target_lane" ]] || closeout_target_lane="develop"
   [[ -n "$closeout_promotion_gate" ]] || closeout_promotion_gate="Retire retained merged worktrees for $issue_id without reopening replay"
   [[ -n "$closeout_requires_adequacy" ]] || closeout_requires_adequacy="true"
@@ -13145,7 +13145,7 @@ launch_worker_from_manager_prompt_if_needed() {
   if [[ -z "$target_project" || ! -d "$target_project" ]]; then
     log_warn "worker launch BLOCKED: worktree does not exist (target=$target_project)"
     log_warn "  Manager must create the worktree before delegating workers."
-    log_warn "  Use: ./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+    log_warn "  Use: freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
     append_runtime_event "$manager_project" "worker_launch_blocked_worktree_missing" \
       "prompt_file=$prompt_file" \
       "target=$target_project"
@@ -15033,7 +15033,7 @@ build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
   expected_continuity=”$(manager_exit_contract_repair_prompt_expected_continuity_file “$project”)”
   manager_agent_def="$(cat "$(workspace_root_for_project "$project")/agents/manager-agent.md" 2>/dev/null || true)"
   contract_path=”$(exit_contract_file “$project”)”
-  live_status_cmd=”./bin/freely live-status --project $project”
+  live_status_cmd=”freely live-status --project $project”
   scan_json_path=”$(task_source_scan_json_path_for_project “$project”)”
   latest_continuity=”$(latest_generated_manager_continuity_file_for_project “$project”)”
   [[ -n “$latest_continuity” && -f “$latest_continuity” ]] || latest_continuity=”none”
@@ -18020,7 +18020,7 @@ select_launch_kind() {
         # Restart: JSONL MUST exist. Hard error.
         log_error "AI_RESUME_ON_RESTART=true but no JSONL files found in $session_dir."
         log_error "A previous launch should have created sessions. Something is wrong."
-        log_error "To force a fresh start: ./bin/freely new-session --project $PROJECT_ROOT"
+        log_error "To force a fresh start: freely new-session --project $PROJECT_ROOT"
         exit 1
       else
         # Start: no JSONL → first-ever launch. Allow one fresh.
@@ -18780,7 +18780,7 @@ bootstrap_interruption_entry_runtime_or_fail() {
     launch_interruption_dispatcher "$project"
     ensure_interruption_dispatcher_ready_or_fail "$project" && return 0
     log_error "freely interruption control plane did not become ready for project: $project"
-    log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
+    log_error "try: freely ensure-interruption-dispatch --project \"$project\" --watch"
     exit 1
   fi
 
@@ -18788,8 +18788,8 @@ bootstrap_interruption_entry_runtime_or_fail() {
   ensure_interruption_dispatcher_ready_or_fail "$project" && return 0
 
   log_error "freely could not auto-prepare interruption handling for project: $project"
-  log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
-  log_error "or:  ./bin/freely start --project \"$project\""
+  log_error "try: freely ensure-interruption-dispatch --project \"$project\" --watch"
+  log_error "or:  freely start --project \"$project\""
   exit 1
 }
 
@@ -21688,8 +21688,8 @@ reject_repeated_user_start_if_running() {
     append_runtime_event "$project" "user_start_rejected_already_running" \
       "command_name=$command_name"
     log_error "$command_name refused: project runtime is already running for $project"
-    log_error "run: ./bin/freely stop --project \"$project\""
-    log_error "or:  ./bin/freely $command_name --project \"$project\" --force"
+    log_error "run: freely stop --project \"$project\""
+    log_error "or:  freely $command_name --project \"$project\" --force"
     exit 2
   fi
 }
@@ -22010,8 +22010,8 @@ start_project_runtime() {
       log_error ""
       log_error "This means pr-merge-guarded did not push to all platforms."
       log_error "Resolve by running:"
-      log_error "  ./bin/freely develop-push status --project $project"
-      log_error "  ./bin/freely develop-push attempt --project $project"
+      log_error "  freely develop-push status --project $project"
+      log_error "  freely develop-push attempt --project $project"
       log_error ""
       log_error "If a platform is permanently unavailable, remove it from git remote:"
       log_error "  git remote remove <name>"
@@ -22238,7 +22238,7 @@ start_project_runtime() {
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
     exit_if_stop_requested_before_launch
     log_error "freely interruption dispatcher did not become ready for project: $project"
-    log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
+    log_error "try: freely ensure-interruption-dispatch --project \"$project\" --watch"
     exit 1
   }
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
@@ -22248,7 +22248,7 @@ start_project_runtime() {
     ensure_manager_watchdog_ready_or_fail "$project" || {
       exit_if_stop_requested_before_launch
       log_error "freely manager watchdog did not become ready for project: $project"
-      log_error "try: ./bin/freely ensure-manager --project \"$project\" --watch"
+      log_error "try: freely ensure-manager --project \"$project\" --watch"
       exit 1
     }
   fi
@@ -23322,7 +23322,7 @@ REASON_GATE
 }
 
 # cmd_new_session: clear all session state to force a completely fresh launch.
-# Usage: ./bin/freely new-session [--project <path>]
+# Usage: freely new-session [--project <path>]
 cmd_new_session() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -24158,7 +24158,7 @@ HELP
   if [[ "$_platform_state" == "closed" ]]; then
     log_error "raw issue $issue_id is closed on platform"
     echo >&2 "  Reopen the issue first, then comment."
-    echo >&2 "  Use the platform UI or: ./bin/freely issue-reopen $issue_id"
+    echo >&2 "  Use the platform UI or: freely issue-reopen $issue_id"
     return 1
   fi
 
@@ -24687,7 +24687,7 @@ cmd_intake_chat() {
   if [[ "$new_issue" == "true" ]]; then
     echo ""
     echo "[chat] To create a raw issue from this intake:"
-    echo "[chat]   1. ./bin/freely feedback --help   (review usage, then create the raw issue)"
+    echo "[chat]   1. freely feedback --help   (review usage, then create the raw issue)"
     echo "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     echo "[chat]"
     echo "[chat] Then follow the skill to complete the work:"

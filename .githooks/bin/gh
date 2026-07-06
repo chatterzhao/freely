@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# gh wrapper: gh pr create → use ./bin/pr-create-guarded
+# gh wrapper: gh pr create → use freely pr-create-guarded
 case "$*" in
   *"pr create"*|*"pr new"*)
     cat >&2 <<'MSG'
 [BLOCKED] gh pr create is not allowed directly.
-  Use the canonical command: ./bin/pr-create-guarded
+  Use the canonical command: freely pr-create-guarded
   This ensures: pull develop → dry-run gate → push → create PR.
 MSG
     exit 1

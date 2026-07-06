@@ -18,7 +18,7 @@
 ## 输入
 
 - `git worktree list --porcelain`
-- `./bin/wt-status-all`
+- `freely wt-status-all`
 - 每个 active worktree 的：
   - branch / execution base / integration target
   - clean / dirty

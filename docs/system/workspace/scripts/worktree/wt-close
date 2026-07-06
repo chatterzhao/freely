@@ -27,7 +27,7 @@ DRY_RUN=false
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-close --raw-key <key> [options]
+  freely wt-close --raw-key <key> [options]
 
 Close both the fix|feature worktree and its companion test-pre-merge worktree.
 --raw-key 是唯一必填参数。命令从 raw key 自动发现两个工位，按先测试后开发的顺序关闭。
@@ -57,14 +57,14 @@ Options (按场景选择):
 
 Scenarios:
     # PR 已 merge，正常收口
-  ./bin/wt-close --raw-key 20260627T021849Z
+  freely wt-close --raw-key 20260627T021849Z
   # 确定放弃此 issue
     # PR 已 merge，正常收口
-  ./bin/wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
+  freely wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
 
   # 无工位，只关闭平台 issue
     # PR 已 merge，正常收口
-  ./bin/wt-close --raw-key 20260627T021849Z --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
+  freely wt-close --raw-key 20260627T021849Z --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
 
 USAGE
 }
@@ -256,8 +256,8 @@ if true; then  # --raw-key always passes through reason check
     - 平台 issue 已通过其他渠道手动关闭，无需同步
 
   示例:
-    ./bin/wt-close --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue" fix/raw-xxx
-    ./bin/wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃" fix/raw-xxx
+    freely wt-close --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue" fix/raw-xxx
+    freely wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃" fix/raw-xxx
 GATE
     fi
   }
@@ -362,7 +362,7 @@ if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
 
   3. 该功能已确定放弃，工位需要强制收口
      → 使用 --force 并给出准确的业务理由:
-       ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+       freely wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：<业务理由>"
 
      有效业务理由示例:
        ✅ "该功能确定放弃，不再继续实现此 raw issue"
@@ -407,7 +407,7 @@ TEST_MISSING
   请在测试工位完成测试验证:
 
   1. cd $_test_wt
-  2. ./bin/freely daemon start --task-mode auto
+  2. freely daemon start --task-mode auto
   3. 按 pre-tests.md 的测试用例逐条验证
   4. daemon 停止后 test-gate.env 会记录测试完成的 commit
 
@@ -590,9 +590,9 @@ if [[ "$FORCE" == true ]]; then
   如果确定要彻底丢弃这些提交:
   1. Review the unmerged commits listed above
   2. If useful: create a new raw issue to extract and preserve the work
-     ./bin/freely chat --new-issue "extract: <what to preserve from $branch>"
+     freely chat --new-issue "extract: <what to preserve from $branch>"
   3. Then re-run with --discard-unmerged to confirm:
-     ./bin/wt-close --force --discard-unmerged --reason "..." $branch
+     freely wt-close --force --discard-unmerged --reason "..." $branch
 UNMERGED_BLOCK
       exit 1
     fi
@@ -640,9 +640,9 @@ if [[ "$PLATFORM_ONLY" == true ]]; then
 ║                                                              ║
 ║  正确做法:                                                    ║
 ║    - 如果要彻底丢弃此 raw issue 的所有修改:                    ║
-║      ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：..."    ║
+║      freely wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：..."    ║
 ║    - 如果 PR 已 merge，正常收口:                              ║
-║      ./bin/wt-close $branch                                  ║
+║      freely wt-close $branch                                  ║
 ╚══════════════════════════════════════════════════════════════╝
 PLATFORM_BLOCK
     exit 1
@@ -722,7 +722,7 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     :  # skip platform close for orphaned branches
   elif [[ "$SKIP_PLATFORM" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
   if [[ "$DRY_RUN" == true ]]; then
-    _dry "./bin/issue-sync close $issue_id completed"
+    _dry "freely issue-sync close $issue_id completed"
   else
     echo "wt-close: closing platform issue for $issue_id..."
     if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then

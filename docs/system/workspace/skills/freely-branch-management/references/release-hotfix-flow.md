@@ -2,7 +2,7 @@
 
 ## Release
 
-1. 发布/打标签前执行 `./bin/wt-status-all`，结果必须全 `CLEAN`
+1. 发布/打标签前执行 `freely wt-status-all`，结果必须全 `CLEAN`
 2. 从 `develop` 创建 `release/*`
 3. 在 `release/*` dedicated worktree 中完成冻结与验证
 4. 合并到 `main`

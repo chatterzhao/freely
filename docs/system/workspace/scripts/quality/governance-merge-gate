@@ -1004,7 +1004,7 @@ def main() -> int:
                 f"GATE 1: source branch '{source_branch}' does not contain a valid issue key. "
                 f"Feature and hotfix branches must include a raw-YYYYMMDDTHHMM[SS]Z or I-YYYYMMDDTHHMM[SS]Z-X key (legacy raw-YYYYMMDD-HHMM also accepted). "
                 f"Examples: {branch_type}/raw-20260505T121030Z-scan-b1-fix, {branch_type}/I-20260505T121030Z-A-issue-state-refactor. "
-                f"Use './bin/wt-create {branch_type}/raw-YYYYMMDDTHHMM[SS]Z-slug' to create the worktree with correct naming."
+                f"Use 'freely wt-create {branch_type}/raw-YYYYMMDDTHHMM[SS]Z-slug' to create the worktree with correct naming."
             )
 
     # ── GATE 2: raw issue must be materialized from SQLite and on platform ──
@@ -1166,7 +1166,7 @@ def main() -> int:
                             if not has_github and not has_gitee:
                                 warnings.append(
                                     f"GATE 2: raw issue {branch_issue_key} has no platform_ids on GitHub or Gitee. "
-                                    f"Run './bin/issue-sync batch' to create it on the platform before merging."
+                                    f"Run 'freely issue-sync batch' to create it on the platform before merging."
                                 )
                         except json.JSONDecodeError:
                             pass

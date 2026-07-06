@@ -239,7 +239,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - required_evidence: <测试通过的证据要求>
 - evidence_level: mock | integration | real_env | post_merge_dogfood
 - artifact_ref: <指向测试产物文件，如 docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/test-evidence/acceptance-1.log>
-- test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
+- test_command: <实际执行的 shell 命令，如：freely test-lane feature-local -- echo ok>
 - expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
 - actual_RED_output: (RED 阶段执行后填写)
@@ -311,7 +311,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
-- [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
+- [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `freely check-epics-map` 验证）
 - [ ] 下一跳明确：进入 skill `freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
@@ -351,7 +351,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | 文件 | 路径 | 更新什么 |
 |------|------|---------|
 | milestones.md | `docs/milestones.md` | I-* issue 写入 `committed_issues`（含 `path:` 字段指向 epics 下真实路径） |
-| epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
+| epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `freely check-epics-map`） |
 | test-gate.env | `{test-worktree}/.freely/run/test-gate.env` | 测试证据（wt-create 创建，daemon 启停更新，门禁检查） |
 | worker-verification-contract.env | `{worker-worktree}/.freely/run/worker-verification-contract.env` | Worker closeout 上下文（manager 委派 worker 时写入） |
 
@@ -434,7 +434,7 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 | section 'X' has no concrete test tasks | section 下需有编号列表测试任务(如 `1. task`)或 lawful not_applicable_reason | 添加 `- not_applicable_reason:` + `- not_applicable_explanation:` + `- replacement_evidence:` |
 | Real-Environment missing / unsupported status | real_environment_status 只能是 pass 或 fail | `- real_environment_status: pass` + `- real_environment_reason: <理由>` |
 | section missing blocker_taxonomy | Unit/Integration/End-to-End 必须声明 blocker_taxonomy | `- blocker_taxonomy: execution_pending_or_failed` |
-| test gate missing / not tested | test-gate.env 缺失或 TEST_STATUS=not_tested | 在 test-pre-merge 工位启动 daemon：`./bin/freely daemon start --task-mode auto` |
+| test gate missing / not tested | test-gate.env 缺失或 TEST_STATUS=not_tested | 在 test-pre-merge 工位启动 daemon：`freely daemon start --task-mode auto` |
 | surface_kind unsupported | 合法值仅 5 个 | `unit` / `integration` / `end_to_end` / `real_environment` / `post_merge_followthrough` |
 | target_lane unsupported | 合法值仅 3 个 | `feature-local` / `premerge-integration` / `post-merge-followthrough` |
 | promotion_gate unsupported | 合法值仅 3 个 | `completion` / `develop_merge` / `retirement` |
