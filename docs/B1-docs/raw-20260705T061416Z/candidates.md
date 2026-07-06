@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260705T061416Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260705T061416Z
 created_at: 2026-07-05
 milestone: M-20260705T061416Z-A
@@ -10,9 +10,9 @@ milestone: M-20260705T061416Z-A
 
 - candidate_format_version: v2
 - title: fix dirty 提示 backtick 命令替换
-- status: promoted
+- status: absorbed
 - decision_reason: Bug 1 已被 M-20260703T080443Z-A 修复，本 candidate 收窄为仅 Bug 2。去掉反引号是最简单最安全的方案，避免 bash 双引号中的转义链脆弱性。
-- next_action: B2 → dev → fix line 21982
+- next_action: absorbed by I-20260705T061416Z-A
 - revisit_trigger: N/A（backtick 去掉后不回退）
 - acceptance_criteria:
   - `docs/system/workspace/scripts/runtime/freely:21982` 中 `\\\`freely-workflow-guarded-execution\\\`` 改为 `freely-workflow-guarded-execution`（纯文本，无反引号）
