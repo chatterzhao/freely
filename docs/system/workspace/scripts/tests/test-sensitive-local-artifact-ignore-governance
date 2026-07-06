@@ -37,7 +37,7 @@ assert_ignored "local/root.der"
 assert_ignored "local/root.csr"
 
 assert_not_ignored "docs/system/workspace/scripts/runtime/ai-cli"
-assert_not_ignored "docs/pre-brainstorms/INDEX.md"
+assert_not_ignored "docs/B1-docs/INDEX.md"
 assert_not_ignored "README.md"
 
 echo "[PASS] common local sensitive artifacts are ignored without hiding normal repo paths"

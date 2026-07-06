@@ -9,7 +9,7 @@ trap 'rm -rf "$TMP_DIR_REAL"' EXIT
 PROJECT="$TMP_DIR_REAL/project"
 WT="$TMP_DIR_REAL/cleanup-wt"
 
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260323-0000"
 
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name "Freely Test"
@@ -36,20 +36,20 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260323-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260323-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260323-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -61,16 +61,16 @@ git -C "$PROJECT" commit -q -m "init"
 
 bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
 
-mkdir -p "$PROJECT/docs/epics/sample/story/issues" "$PROJECT/docs/epics/sample/story"
-cat >"$PROJECT/docs/epics/sample/story/issues/sample.md" <<'EOF'
+mkdir -p "$PROJECT/docs/B2-docs/sample/story/issues" "$PROJECT/docs/B2-docs/sample/story"
+cat >"$PROJECT/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
-cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -115,7 +115,7 @@ cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `pending://sample`
 EOF
 
-git -C "$PROJECT" add docs/epics/sample/story/issues/sample.md docs/epics/sample/story/pre-tests.md
+git -C "$PROJECT" add docs/B2-docs/sample/story/issues/sample.md docs/B2-docs/sample/story/pre-tests.md
 git -C "$PROJECT" commit -q -m "owner issue fixtures"
 
 git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$WT" develop
@@ -129,7 +129,7 @@ git -C "$PROJECT" merge --no-ff feature/cleanup-fixture -m "merge clean fixture"
 
 cat >"$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
@@ -154,11 +154,11 @@ RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolut
 grep -q 'blocked_reason: pretests_retirement_blocked' "$RESOLUTION_FILE"
 grep -q 'pretests-retirement-blocked:.*PT-1' "$RESOLUTION_FILE"
 
-mkdir -p "$PROJECT/docs/epics/sample/story/code-reviews"
-cat >"$PROJECT/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+mkdir -p "$PROJECT/docs/B2-docs/sample/story/code-reviews"
+cat >"$PROJECT/docs/B2-docs/sample/story/code-reviews/pt-1.md" <<'EOF'
 # Verification artifact
 EOF
-cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -200,7 +200,7 @@ cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
 GATE_WT="$TMP_DIR_REAL/gate-unavailable-wt"
@@ -214,7 +214,7 @@ git -C "$GATE_WT" commit -q -m "gate unavailable fixture"
 git -C "$PROJECT" merge --no-ff feature/cleanup-gate-unavailable -m "merge gate unavailable fixture" >/dev/null
 cat >"$GATE_WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"

@@ -7,7 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 WORKER_WT="$TMP_DIR/worker-wt"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260322-0000"
 
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name "Freely Test"
@@ -25,20 +25,20 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260322-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260322-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260322-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -72,13 +72,13 @@ cat >"$PROMPT_FILE" <<EOF
 dispatch_priority: P0
 parallel_safe: false
 write_scope:
-- docs/pre-brainstorms/20260322-0000--sample/**
+- docs/B1-docs/raw-20260322-0000/**
 Owner-Issue:
 - \`I-20260322-0000-A\`
 Pre-Tests-Path:
-- \`docs/epics/sample/story/pre-tests.md\`
+- \`docs/B2-docs/sample/story/pre-tests.md\`
 Verification-Artifact-Dir:
-- \`docs/epics/sample/story/code-reviews\`
+- \`docs/B2-docs/sample/story/code-reviews\`
 Required-Test-Lanes:
 - \`feature-local\`
 - \`premerge-integration\`
@@ -157,8 +157,8 @@ grep -q '^DESIRED_RUNTIME_STATE="running"$' "$WORKER_WT/.freely/run/workcell-sta
 grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "$(worker_prompt_owner_issue "$PROMPT_FILE")" == "I-20260322-0000-A" ]]
-[[ "$(worker_prompt_pre_tests_path "$PROMPT_FILE")" == "docs/epics/sample/story/pre-tests.md" ]]
-[[ "$(worker_prompt_verification_artifact_dir "$PROMPT_FILE")" == "docs/epics/sample/story/code-reviews" ]]
+[[ "$(worker_prompt_pre_tests_path "$PROMPT_FILE")" == "docs/B2-docs/sample/story/pre-tests.md" ]]
+[[ "$(worker_prompt_verification_artifact_dir "$PROMPT_FILE")" == "docs/B2-docs/sample/story/code-reviews" ]]
 [[ "$(worker_prompt_required_test_lanes_csv "$PROMPT_FILE")" == "feature-local,premerge-integration" ]]
 [[ "$(worker_prompt_required_acceptance_item_ids_csv "$PROMPT_FILE")" == "integration-cli-smoke,realenv-dogfood" ]]
 [[ "$(worker_prompt_minimum_evidence_level "$PROMPT_FILE")" == "command-plus-artifact" ]]
@@ -171,7 +171,7 @@ grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.fre
 [[ "$(worker_prompt_closeout_review_artifact_policy "$PROMPT_FILE")" == "fresh-staged-owner-review-artifact" ]]
 grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$INTAKE_CONTRACT"
 grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$INTAKE_CONTRACT"
-grep -q '^PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$INTAKE_CONTRACT"
+grep -q '^PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"$' "$INTAKE_CONTRACT"
 grep -q '^REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$INTAKE_CONTRACT"
 grep -q '^REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$INTAKE_CONTRACT"
 grep -q '^CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$INTAKE_CONTRACT"
@@ -185,7 +185,7 @@ grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$RUNTIME_CONTRACT"
 grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$RUNTIME_CONTRACT"
 grep -q '^LAST_WORKER_VERIFICATION_METADATA_PRESENT="true"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_OWNER_ISSUE="I-20260322-0000-A"$' "$WORKER_WT/.freely/run/workcell-state.env"
-grep -q '^LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$WORKER_WT/.freely/run/workcell-state.env"

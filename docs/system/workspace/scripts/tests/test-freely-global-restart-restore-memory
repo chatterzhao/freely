@@ -29,7 +29,7 @@ setup_project() {
   mkdir -p \
     "$project/.freely/run" \
     "$project/.freely/logs" \
-    "$project/docs/pre-brainstorms/20260309-0000--sample"
+    "$project/docs/B1-docs/raw-20260309-0000"
 
   cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -43,19 +43,19 @@ EOF
   cat >"$project/AGENTS.md" <<'EOF'
 # Agents
 EOF
-  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+  cat >"$project/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat >"$project/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 EOF
-  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat >"$project/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-  cat >"$project/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260309-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-  cat >"$project/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260309-0000/candidates.md" <<'EOF'
 # Candidates
 EOF
   cat >"$project/.freely/config.env" <<EOF

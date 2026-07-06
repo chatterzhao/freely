@@ -79,15 +79,15 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 
 ### committed_issues
 1. `I-20260327-2205-A`
-   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - issue_path: `docs/B2-docs/sample/story/issues/sample.md`
    - source_candidates:
-     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+     - `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
 
 ### completed_issues
 EOF
 
-mkdir -p "$REPO/docs/pre-brainstorms/sample"
-cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+mkdir -p "$REPO/docs/B1-docs/sample"
+cat > "$REPO/docs/B1-docs/sample/candidates.md" <<'EOF'
 # Candidates
 
 ### C-20260327-2205-A
@@ -97,19 +97,19 @@ cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
 - revisit_trigger: new evidence arrives
 EOF
 
-mkdir -p "$REPO/docs/epics/sample/story/issues"
-cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+mkdir -p "$REPO/docs/B2-docs/sample/story/issues"
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260327-2205-A`
 - phase_state: `in_dev`
 - milestone: `M-sample`
-- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
-mkdir -p "$REPO/docs/epics/sample/story"
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+mkdir -p "$REPO/docs/B2-docs/sample/story"
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-Tests: sample
 
 ## Unit
@@ -165,9 +165,9 @@ git add \
   bin/pretests-gate \
   bin/governance-promotion-gate \
   docs/milestones.md \
-  docs/pre-brainstorms/sample/candidates.md \
-  docs/epics/sample/story/issues/sample.md \
-  docs/epics/sample/story/pre-tests.md \
+  docs/B1-docs/sample/candidates.md \
+  docs/B2-docs/sample/story/issues/sample.md \
+  docs/B2-docs/sample/story/pre-tests.md \
   docs/system/workspace/hooks/pre-merge-commit.sh \
   docs/system/workspace/scripts/quality/governance-merge-gate \
   docs/system/workspace/scripts/quality/pretests-gate \
@@ -213,26 +213,26 @@ git merge --abort >/dev/null 2>&1
 rm -f "$REPO/.git/freely-guarded-merge-state"
 
 git checkout -q -b feature/promotion-owner
-mkdir -p docs/epics/sample/story/code-reviews src
-cat > docs/pre-brainstorms/sample/candidates.md <<'EOF'
+mkdir -p docs/B2-docs/sample/story/code-reviews src
+cat > docs/B1-docs/sample/candidates.md <<'EOF'
 # Candidates
 
 ### C-20260327-2205-A
 - status: promoted
 - milestone: `M-sample`
 - promoted_issue_id: `I-20260327-2205-A`
-- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- promoted_issue_path: `docs/B2-docs/sample/story/issues/sample.md`
 EOF
-cat > docs/epics/sample/story/issues/sample.md <<'EOF'
+cat > docs/B2-docs/sample/story/issues/sample.md <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260327-2205-A`
 - phase_state: `in_verification`
 - milestone: `M-sample`
-- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
-cat > docs/epics/sample/story/code-reviews/r-sample.md <<'EOF'
+cat > docs/B2-docs/sample/story/code-reviews/r-sample.md <<'EOF'
 # Review: sample
 
 - issue_id: `I-20260327-2205-A`
@@ -246,7 +246,7 @@ cat > docs/epics/sample/story/code-reviews/r-sample.md <<'EOF'
 - residual_risk: `Dormant prompts can still exist, but only active workers block phase-1 promotion replay.`
 EOF
 echo "console.log('promotion owner');" > src/sample.js
-git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md src/sample.js
+git add docs/B1-docs/sample/candidates.md docs/B2-docs/sample/story/issues/sample.md docs/B2-docs/sample/story/code-reviews/r-sample.md src/sample.js
 git commit -q -m "promotion owner payload"
 
 git checkout -q develop
@@ -327,40 +327,40 @@ git merge-base --is-ancestor feature/promotion-owner develop
 rm -f "$REPO/.git/freely-guarded-merge-state"
 
 git checkout -q -b test-pre-merge-verification-batch develop
-mkdir -p docs/epics/sample/story/code-reviews docs/progress/sample src
-cat > docs/pre-brainstorms/sample/candidates.md <<'EOF'
+mkdir -p docs/B2-docs/sample/story/code-reviews docs/progress/sample src
+cat > docs/B1-docs/sample/candidates.md <<'EOF'
 # Candidates
 
 ### C-20260327-2205-A
 - status: promoted
 - milestone: `M-sample`
 - promoted_issue_id: `I-20260327-2205-A`
-- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- promoted_issue_path: `docs/B2-docs/sample/story/issues/sample.md`
 EOF
-cat > docs/epics/sample/story/issues/sample.md <<'EOF'
+cat > docs/B2-docs/sample/story/issues/sample.md <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260327-2205-A`
 - phase_state: `in_verification`
 - milestone: `M-sample`
-- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- source_candidate: `docs/B1-docs/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
 cat > docs/progress/sample/p-sample.md <<'EOF'
 # Progress: sample
 
 - issue_id: `I-20260327-2205-A`
-- issue_path: `docs/epics/sample/story/issues/sample.md`
+- issue_path: `docs/B2-docs/sample/story/issues/sample.md`
 - phase_state: `in_verification`
 EOF
-cat > docs/epics/sample/story/tasks.md <<'EOF'
+cat > docs/B2-docs/sample/story/tasks.md <<'EOF'
 # Tasks: sample
 
 - [x] Keep the owner lifecycle binding visible during guarded promote.
 - [x] Record the guarded premerge closeout artifact and adequacy evidence.
 EOF
-cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
+cat > docs/B2-docs/sample/story/code-reviews/r-premerge.md <<'EOF'
 # Review: sample
 
 - issue_id: `I-20260327-2205-A`
@@ -373,7 +373,7 @@ cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
 - boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
 - residual_risk: `Post-merge followthrough still needs its own closeout lane.`
 EOF
-git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/tasks.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md
+git add docs/B1-docs/sample/candidates.md docs/B2-docs/sample/story/issues/sample.md docs/B2-docs/sample/story/tasks.md docs/progress/sample/p-sample.md docs/B2-docs/sample/story/code-reviews/r-premerge.md
 git commit -q -m "premerge governance closeout payload"
 
 git checkout -q develop
@@ -390,7 +390,7 @@ git merge --abort >/dev/null 2>&1
 rm -f "$REPO/.git/freely-guarded-merge-state"
 
 git checkout -q test-pre-merge-verification-batch
-cat > docs/epics/sample/story/pre-tests.md <<'EOF'
+cat > docs/B2-docs/sample/story/pre-tests.md <<'EOF'
 # Pre-Tests: sample
 
 ## Unit
@@ -435,9 +435,9 @@ cat > docs/epics/sample/story/pre-tests.md <<'EOF'
 - case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/r-premerge.md`
 EOF
-git add docs/epics/sample/story/pre-tests.md
+git add docs/B2-docs/sample/story/pre-tests.md
 git commit -q -m "complete premerge evidence"
 
 git checkout -q develop
@@ -449,7 +449,7 @@ git merge-base --is-ancestor test-pre-merge-verification-batch develop
 rm -f "$REPO/.git/freely-guarded-merge-state"
 
 git checkout -q test-pre-merge-verification-batch
-cat > docs/epics/sample/story/pre-tests.md <<'EOF'
+cat > docs/B2-docs/sample/story/pre-tests.md <<'EOF'
 # Pre-Tests: sample
 
 ## Unit
@@ -493,12 +493,12 @@ cat > docs/epics/sample/story/pre-tests.md <<'EOF'
 - case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/r-premerge.md`
 EOF
-git add docs/epics/sample/story/pre-tests.md
+git add docs/B2-docs/sample/story/pre-tests.md
 git commit -q -m "drop replacement evidence"
 set +e
-./bin/pretests-gate --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/pretests-standalone-stdout" 2>"$TMP_DIR/pretests-standalone-stderr"
+./bin/pretests-gate --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/pretests-standalone-stdout" 2>"$TMP_DIR/pretests-standalone-stderr"
 pretests_cmd_rc=$?
 set -e
 if [[ "$pretests_cmd_rc" -eq 0 ]]; then

@@ -7,8 +7,8 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 REPO="$TMP_DIR/repo"
 WT="$TMP_DIR/wt"
-mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/epics/sample/story/issues" "$REPO/docs/epics/sample/story/code-reviews" "$WT/.freely/run"
-mkdir -p "$REPO/docs/epics/sample/story"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/B2-docs/sample/story/issues" "$REPO/docs/B2-docs/sample/story/code-reviews" "$WT/.freely/run"
+mkdir -p "$REPO/docs/B2-docs/sample/story"
 
 git init -q -b develop "$REPO"
 git -C "$REPO" config user.name tester
@@ -28,16 +28,16 @@ run_gate() {
   "$REPO/bin/pretests-retirement-gate" --project "$REPO" --worktree-path "$WT"
 }
 
-cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -82,14 +82,14 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `pending://sample`
 EOF
 
-cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks
 1. Keep the sample owner visible for retirement gate validation.
 EOF
 
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
@@ -102,11 +102,11 @@ if run_gate >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
 fi
 grep -q 'PT-1' "$TMP_DIR/stderr1"
 
-cat > "$REPO/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/code-reviews/pt-1.md" <<'EOF'
 # Verification artifact
 EOF
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -148,14 +148,14 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
 run_gate
 
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
-LAST_WORKER_OWNER_ISSUE="docs/epics/sample/story/issues/sample.md"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_OWNER_ISSUE="docs/B2-docs/sample/story/issues/sample.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
@@ -172,7 +172,7 @@ fi
 grep -q 'pretests_retirement_state_missing' "$TMP_DIR/stderr-missing-state"
 
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
@@ -197,17 +197,17 @@ if run_gate >"$TMP_DIR/stdout-missing-pretests" 2>"$TMP_DIR/stderr-missing-prete
 fi
 grep -q 'pretests_retirement_binding_missing' "$TMP_DIR/stderr-missing-pretests"
 
-cat > "$REPO/docs/epics/sample/story/issues/sample-duplicate.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample-duplicate.md" <<'EOF'
 # Issue: sample duplicate
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
@@ -218,11 +218,11 @@ if run_gate >"$TMP_DIR/stdout-ambiguous-issue" 2>"$TMP_DIR/stderr-ambiguous-issu
   exit 1
 fi
 grep -q 'pretests_retirement_issue_ambiguous' "$TMP_DIR/stderr-ambiguous-issue"
-rm -f "$REPO/docs/epics/sample/story/issues/sample-duplicate.md"
+rm -f "$REPO/docs/B2-docs/sample/story/issues/sample-duplicate.md"
 
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
-LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/B2-docs/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"
 LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"
 LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="true"

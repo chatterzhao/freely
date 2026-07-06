@@ -11,7 +11,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-mkdir -p "$PROJECT/docs/progress/demo" "$PROJECT/docs/epics/demo/issues"
+mkdir -p "$PROJECT/docs/progress/demo" "$PROJECT/docs/B2-docs/demo/issues"
 
 git init -q "$PROJECT" -b develop
 git -C "$PROJECT" config user.name tester
@@ -50,7 +50,7 @@ cat >"$PROJECT/docs/milestones.md" <<'EOF'
 # Milestones
 EOF
 
-cat >"$PROJECT/docs/epics/demo/issues/absorbed-progress.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/issues/absorbed-progress.md" <<'EOF'
 # Issue: absorbed-progress
 
 - issue_id: `I-TEST-ABSORBED`
@@ -61,7 +61,7 @@ cat >"$PROJECT/docs/progress/demo/p-absorbed-progress.md" <<EOF
 # Progress: absorbed-progress
 
 - issue_id: \`I-TEST-ABSORBED\`
-- issue_path: \`docs/epics/demo/issues/absorbed-progress.md\`
+- issue_path: \`docs/B2-docs/demo/issues/absorbed-progress.md\`
 - phase_state: \`in_verification\`
 - runtime_state: \`stopped\`
 - closure_status: \`open\`

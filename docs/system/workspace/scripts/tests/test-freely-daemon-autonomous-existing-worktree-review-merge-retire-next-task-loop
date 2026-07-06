@@ -19,11 +19,11 @@ export FREELY_TEST_SCRIPT_TASK_B_WT="$TASK_B_WT"
 mkdir -p \
   "$PROJECT/.freely/run" \
   "$PROJECT/.freely/logs" \
-  "$PROJECT/docs/pre-brainstorms/20260425-0000--sample" \
-  "$PROJECT/docs/epics/demo/task-a/issues" \
-  "$PROJECT/docs/epics/demo/task-a/code-reviews" \
-  "$PROJECT/docs/epics/demo/task-b/issues" \
-  "$PROJECT/docs/epics/demo/task-b/code-reviews" \
+  "$PROJECT/docs/B1-docs/raw-20260425-0000" \
+  "$PROJECT/docs/B2-docs/demo/task-a/issues" \
+  "$PROJECT/docs/B2-docs/demo/task-a/code-reviews" \
+  "$PROJECT/docs/B2-docs/demo/task-b/issues" \
+  "$PROJECT/docs/B2-docs/demo/task-b/code-reviews" \
   "$PROJECT/docs/progress/demo" \
   "$WT_ROOT"
 
@@ -58,7 +58,7 @@ cat >"$PROJECT/docs/milestones.md" <<'EOF'
 - phase_state: `in_progress`
 - priority: `P0`
 - next_action: `review the existing feature/task-a worktree first`
-- issue_path: `docs/epics/demo/task-a/issues/task-a.md`
+- issue_path: `docs/B2-docs/demo/task-a/issues/task-a.md`
 - progress_path: `docs/progress/demo/p-task-a.md`
 
 2. `I-TASK-B`
@@ -66,49 +66,49 @@ cat >"$PROJECT/docs/milestones.md" <<'EOF'
 - phase_state: `in_progress`
 - priority: `P1`
 - next_action: `continue with the existing feature/task-b worktree after task-a closes`
-- issue_path: `docs/epics/demo/task-b/issues/task-b.md`
+- issue_path: `docs/B2-docs/demo/task-b/issues/task-b.md`
 - progress_path: `docs/progress/demo/p-task-b.md`
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260425-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260425-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260425-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
 EOF
 
-cat >"$PROJECT/docs/epics/demo/task-a/issues/task-a.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/task-a/issues/task-a.md" <<'EOF'
 # Issue: task-a
 
 - issue_id: `I-TASK-A`
 - phase_state: `in_progress`
-- pre_tests_path: `docs/epics/demo/task-a/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/task-a/pre-tests.md`
 - progress_path: `docs/progress/demo/p-task-a.md`
-- verification_artifact_dir: `docs/epics/demo/task-a/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/task-a/code-reviews`
 EOF
-cat >"$PROJECT/docs/epics/demo/task-b/issues/task-b.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/task-b/issues/task-b.md" <<'EOF'
 # Issue: task-b
 
 - issue_id: `I-TASK-B`
 - phase_state: `in_progress`
-- pre_tests_path: `docs/epics/demo/task-b/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/task-b/pre-tests.md`
 - progress_path: `docs/progress/demo/p-task-b.md`
-- verification_artifact_dir: `docs/epics/demo/task-b/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/task-b/code-reviews`
 EOF
 
-cat >"$PROJECT/docs/epics/demo/task-a/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/task-a/pre-tests.md" <<'EOF'
 # Pre-tests: task-a
 
 ## Unit
@@ -150,9 +150,9 @@ cat >"$PROJECT/docs/epics/demo/task-a/pre-tests.md" <<'EOF'
 - requirement: `task-a`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/demo/task-a/code-reviews/task-a.md`
+- artifact_ref: `docs/B2-docs/demo/task-a/code-reviews/task-a.md`
 EOF
-cat >"$PROJECT/docs/epics/demo/task-b/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/task-b/pre-tests.md" <<'EOF'
 # Pre-tests: task-b
 
 ## Unit
@@ -194,14 +194,14 @@ cat >"$PROJECT/docs/epics/demo/task-b/pre-tests.md" <<'EOF'
 - requirement: `task-b`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/demo/task-b/code-reviews/task-b.md`
+- artifact_ref: `docs/B2-docs/demo/task-b/code-reviews/task-b.md`
 EOF
 
 cat >"$PROJECT/docs/progress/demo/p-task-a.md" <<EOF
 # Progress: task-a
 
 - issue_id: \`I-TASK-A\`
-- issue_path: \`docs/epics/demo/task-a/issues/task-a.md\`
+- issue_path: \`docs/B2-docs/demo/task-a/issues/task-a.md\`
 - phase_state: \`in_progress\`
 - runtime_state: \`stopped\`
 - closure_status: \`open\`
@@ -213,7 +213,7 @@ cat >"$PROJECT/docs/progress/demo/p-task-b.md" <<EOF
 # Progress: task-b
 
 - issue_id: \`I-TASK-B\`
-- issue_path: \`docs/epics/demo/task-b/issues/task-b.md\`
+- issue_path: \`docs/B2-docs/demo/task-b/issues/task-b.md\`
 - phase_state: \`in_progress\`
 - runtime_state: \`stopped\`
 - closure_status: \`open\`
@@ -306,9 +306,9 @@ intent_target: \`$issue_id\`
 Owner-Issue:
 - \`$issue_id\`
 Pre-Tests-Path:
-- \`docs/epics/demo/${slug}/pre-tests.md\`
+- \`docs/B2-docs/demo/${slug}/pre-tests.md\`
 Verification-Artifact-Dir:
-- \`docs/epics/demo/${slug}/code-reviews\`
+- \`docs/B2-docs/demo/${slug}/code-reviews\`
 Required-Test-Lanes:
 - \`feature-local,post-merge-followthrough\`
 Required-Acceptance-Item-Ids:
@@ -409,7 +409,7 @@ CONTRACT
 worker_complete_task() {
   local worker_project="$1" slug="$2" issue_id="$3" task_label="$4"
   local review_file progress_file state_marker
-  review_file="$worker_project/docs/epics/demo/${slug}/code-reviews/${slug}.md"
+  review_file="$worker_project/docs/B2-docs/demo/${slug}/code-reviews/${slug}.md"
   progress_file="$worker_project/docs/progress/demo/p-${slug}.md"
   state_marker="$worker_project/.freely/run/${slug}-complete.marker"
   if [[ ! -f "$state_marker" ]]; then

@@ -25,7 +25,7 @@ cat >"$PROMPT" <<EOF
 dispatch_priority: P0
 parallel_safe: false
 write_scope:
-- docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/**
+- docs/B1-docs/raw-20260323-1705/**
 - docs/milestones.md
 
 You are the worker for \`feature/worker-prompt-natural-language-contract-compat-20260323\` in \`$WORKER\`.

@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-unresolved.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260322-0000"
 
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name "Freely Test"
@@ -24,20 +24,20 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260322-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260322-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260322-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -71,9 +71,9 @@ intent_target: `/tmp/nonexistent-worker-wt`
 Owner-Issue:
 - `I-20260322-0203-A`
 Pre-Tests-Path:
-- `docs/epics/sample/story/pre-tests.md`
+- `docs/B2-docs/sample/story/pre-tests.md`
 Verification-Artifact-Dir:
-- `docs/epics/sample/story/code-reviews`
+- `docs/B2-docs/sample/story/code-reviews`
 Required-Test-Lanes:
 - `feature-local`
 Required-Acceptance-Item-Ids:

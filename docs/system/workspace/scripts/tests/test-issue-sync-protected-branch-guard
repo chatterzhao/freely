@@ -13,12 +13,12 @@ git config user.name tester
 git config user.email tester@example.com
 
 # Copy issue-sync
-mkdir -p bin docs/issues/raw-20260522T000000Z
+mkdir -p bin docs/B1-docs/raw-20260522T000000Z
 cp "$ROOT_DIR/bin/issue-sync" bin/issue-sync
 chmod +x bin/issue-sync
 
 # Create a raw issue
-cat > docs/issues/raw-20260522T000000Z/issue.md <<'EOF'
+cat > docs/B1-docs/raw-20260522T000000Z/issue.md <<'EOF'
 ---
 local_id: raw-20260522T000000Z
 kind: raw

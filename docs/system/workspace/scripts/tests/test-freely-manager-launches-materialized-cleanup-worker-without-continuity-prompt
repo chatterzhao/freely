@@ -11,7 +11,7 @@ FEATURE_WT="$WT_ROOT/feature-cleanup"
 PREMERGE_WT="$WT_ROOT/test-pre-merge-cleanup"
 FEATURE_WT_REAL=""
 
-mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260421-0000--sample" "$WT_ROOT"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs/B1-docs/raw-20260421-0000" "$WT_ROOT"
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name tester
 git -C "$PROJECT" config user.email tester@example.com
@@ -31,36 +31,36 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260421-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260421-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260421-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
 EOF
 
-mkdir -p "$PROJECT/docs/epics/demo/cleanup-governance/issues" "$PROJECT/docs/epics/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
-cat >"$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
+mkdir -p "$PROJECT/docs/B2-docs/demo/cleanup-governance/issues" "$PROJECT/docs/B2-docs/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
+cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
 # Issue: cleanup-governance
 
 - issue_id: `I-20260421-1330-A`
-- pre_tests_path: `docs/epics/demo/cleanup-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/cleanup-governance/pre-tests.md`
 - progress_path: `docs/progress/demo/p-cleanup-governance.md`
-- verification_artifact_dir: `docs/epics/demo/cleanup-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/cleanup-governance/code-reviews`
 EOF
-cat >"$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/pre-tests.md" <<'EOF'
 # Pre-tests
 EOF
 cat >"$PROJECT/docs/progress/demo/p-cleanup-governance.md" <<'EOF'
@@ -127,7 +127,7 @@ cat >"$CONTINUITY" <<EOF
 
 ## Evidence
 
-- issue_truth: \`docs/epics/demo/cleanup-governance/issues/cleanup-governance.md\`
+- issue_truth: \`docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md\`
 - progress_truth: \`docs/progress/demo/p-cleanup-governance.md\`
 
 ## Fleet Inventory
@@ -188,7 +188,7 @@ PROMPT_FILE="$(find "$PROJECT/.freely/run/worker-prompts" -type f | head -n 1)"
 
 grep -Fq "$PROMPT_FILE" "$CONTINUITY"
 grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$FEATURE_WT/.freely/run/worker-verification-contract.env"
-grep -q '^OWNER_ISSUE="'"$FEATURE_WT"'/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md"$' "$FEATURE_WT/.freely/run/worker-verification-contract.env"
+grep -q '^OWNER_ISSUE="'"$FEATURE_WT"'/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md"$' "$FEATURE_WT/.freely/run/worker-verification-contract.env"
 grep -q '^'"$FEATURE_WT_REAL"'$' "$START_LOG"
 
 echo "[PASS] manager launch materializes and launches cleanup worker when continuity omitted a prompt"

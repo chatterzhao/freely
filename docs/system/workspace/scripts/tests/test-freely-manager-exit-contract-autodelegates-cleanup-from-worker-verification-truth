@@ -30,16 +30,16 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-mkdir -p "$PROJECT/docs/epics/demo/cleanup-governance/issues" "$PROJECT/docs/epics/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
-cat >"$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
+mkdir -p "$PROJECT/docs/B2-docs/demo/cleanup-governance/issues" "$PROJECT/docs/B2-docs/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
+cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
 # Issue: cleanup-governance
 
 - issue_id: `I-20260424-0315-A`
-- pre_tests_path: `docs/epics/demo/cleanup-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/demo/cleanup-governance/pre-tests.md`
 - progress_path: `docs/progress/demo/p-cleanup-governance.md`
-- verification_artifact_dir: `docs/epics/demo/cleanup-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/demo/cleanup-governance/code-reviews`
 EOF
-cat >"$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md" <<'EOF'
+cat >"$PROJECT/docs/B2-docs/demo/cleanup-governance/pre-tests.md" <<'EOF'
 # Pre-tests
 EOF
 cat >"$PROJECT/docs/progress/demo/p-cleanup-governance.md" <<'EOF'
@@ -98,11 +98,11 @@ write_scope: \`$FEATURE_WT/**\`
 intent_kind: \`cleanup\`
 intent_target: \`I-20260424-0315-A retained cleanup followthrough\`
 Owner-Issue:
-- \`$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md\`
+- \`$PROJECT/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md\`
 Pre-Tests-Path:
-- \`$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md\`
+- \`$PROJECT/docs/B2-docs/demo/cleanup-governance/pre-tests.md\`
 Verification-Artifact-Dir:
-- \`$PROJECT/docs/epics/demo/cleanup-governance/code-reviews\`
+- \`$PROJECT/docs/B2-docs/demo/cleanup-governance/code-reviews\`
 Required-Test-Lanes:
 - \`feature-local\`
 - \`premerge-integration\`
@@ -133,9 +133,9 @@ SOURCE_INTAKE_ID="intake-demo"
 TARGET_PROJECT="$FEATURE_WT"
 VERIFICATION_METADATA_PRESENT="true"
 VERIFICATION_METADATA_MISSING_FIELDS=""
-OWNER_ISSUE="$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md"
-PRE_TESTS_PATH="$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md"
-VERIFICATION_ARTIFACT_DIR="$PROJECT/docs/epics/demo/cleanup-governance/code-reviews"
+OWNER_ISSUE="$PROJECT/docs/B2-docs/demo/cleanup-governance/issues/cleanup-governance.md"
+PRE_TESTS_PATH="$PROJECT/docs/B2-docs/demo/cleanup-governance/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="$PROJECT/docs/B2-docs/demo/cleanup-governance/code-reviews"
 REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"
 REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="cleanup-followthrough-closeout,retirement-handoff-required"
 MINIMUM_EVIDENCE_LEVEL="bounded cleanup evidence"

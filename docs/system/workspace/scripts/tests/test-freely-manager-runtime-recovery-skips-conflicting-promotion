@@ -11,7 +11,7 @@ WT_ROOT="$TMP_DIR/freely-worktrees"
 WORKER_A="$WT_ROOT/feature-a"
 WORKER_B="$WT_ROOT/feature-b"
 
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260324-0000" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
 cd "$PROJECT"
 git init -q -b develop
 git config user.name tester
@@ -25,7 +25,7 @@ git worktree add "$WORKER_A" feature/a >/dev/null
 git worktree add "$WORKER_B" feature/b >/dev/null
 
 for wt in "$PROJECT" "$WORKER_A" "$WORKER_B"; do
-  mkdir -p "$wt/docs/pre-brainstorms/20260324-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
+  mkdir -p "$wt/docs/B1-docs/raw-20260324-0000" "$wt/.freely/run" "$wt/.freely/logs"
   cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
 EOF
@@ -38,20 +38,20 @@ EOF
   cat >"$wt/AGENTS.md" <<'EOF'
 # Agents
 EOF
-  cat >"$wt/docs/pre-brainstorms/README.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-  cat >"$wt/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260324-0000--sample
 EOF
-  cat >"$wt/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/raw-20260324-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/raw-20260324-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

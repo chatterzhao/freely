@@ -147,14 +147,14 @@ git add BREAKGLASS.txt
   --break-glass \
   --reason verified_false_negative \
   --blocked-gate pre-merge-commit \
-  --evidence-ref docs/epics/sample/story/code-reviews/r-breakglass.md \
+  --evidence-ref docs/B2-docs/sample/story/code-reviews/r-breakglass.md \
   --follow-on-issue I-20260402-0020-A >/dev/null
 git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-break-glass$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: break_glass$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Break-Glass-Reason: verified_false_negative$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Blocked-Gate: pre-merge-commit$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Operation-Scope: merge_completion_only$'
-git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-breakglass.md$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/B2-docs/sample/story/code-reviews/r-breakglass.md$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Follow-On-Issue: I-20260402-0020-A$'
 
 # hotfix -> develop break-glass completion (manual merge start, guarded complete)
@@ -168,11 +168,11 @@ git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 || {
   --break-glass \
   --reason tooling_unavailable \
   --blocked-gate governance-merge-gate \
-  --evidence-ref docs/epics/sample/story/code-reviews/r-hotfix.md \
+  --evidence-ref docs/B2-docs/sample/story/code-reviews/r-hotfix.md \
   --follow-on-issue I-20260402-0020-A >/dev/null
 git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-break-glass$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: break_glass$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Break-Glass-Reason: tooling_unavailable$'
-git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-hotfix.md$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/B2-docs/sample/story/code-reviews/r-hotfix.md$'
 
 echo "[PASS] merge-guarded enforces test-pre-merge family promotion into develop and controlled completion receipts"

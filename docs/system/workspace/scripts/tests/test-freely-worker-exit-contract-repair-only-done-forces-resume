@@ -87,9 +87,9 @@ intent_target: \`$WORKER\`
 Owner-Issue:
 - \`I-20260424-0310-A\`
 Pre-Tests-Path:
-- \`docs/epics/sample/story/pre-tests.md\`
+- \`docs/B2-docs/sample/story/pre-tests.md\`
 Verification-Artifact-Dir:
-- \`docs/epics/sample/story/code-reviews\`
+- \`docs/B2-docs/sample/story/code-reviews\`
 Required-Test-Lanes:
 - \`feature-local\`
 - \`premerge-integration\`

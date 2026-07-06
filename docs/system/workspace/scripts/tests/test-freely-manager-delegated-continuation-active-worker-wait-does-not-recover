@@ -15,7 +15,7 @@ git init -q -b develop
 git config user.name tester
 git config user.email tester@example.com
 echo base > README.md
-mkdir -p docs/pre-brainstorms/20260322-0000--sample
+mkdir -p docs/B1-docs/raw-20260322-0000
 cat >docs/PROJECT_INTENT.md <<'EOF'
 # Intent
 EOF
@@ -28,20 +28,20 @@ EOF
 cat >AGENTS.md <<'EOF'
 # Agents
 EOF
-cat >docs/pre-brainstorms/README.md <<'EOF'
+cat >docs/B1-docs/README.md <<'EOF'
 # README
 EOF
-cat >docs/pre-brainstorms/INDEX.md <<'EOF'
+cat >docs/B1-docs/INDEX.md <<'EOF'
 # INDEX
 - 20260322-0000--sample
 EOF
-cat >docs/pre-brainstorms/CONVERGENCE.md <<'EOF'
+cat >docs/B1-docs/CONVERGENCE.md <<'EOF'
 # CONVERGENCE
 EOF
-cat >docs/pre-brainstorms/20260322-0000--sample/brainstorms.md <<'EOF'
+cat >docs/B1-docs/raw-20260322-0000/brainstorms.md <<'EOF'
 # Brainstorms
 EOF
-cat >docs/pre-brainstorms/20260322-0000--sample/candidates.md <<'EOF'
+cat >docs/B1-docs/raw-20260322-0000/candidates.md <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

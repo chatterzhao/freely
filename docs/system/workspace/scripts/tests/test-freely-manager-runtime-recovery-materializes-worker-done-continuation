@@ -27,8 +27,8 @@ LAST_STATE_UPDATED_AT="2026-04-25T00:00:00Z"
 EOF
 
     cat >"$worker/.freely/run/worker-verification-contract.env" <<EOF
-OWNER_ISSUE="$worker/docs/epics/sample/issues/sample.md"
-VERIFICATION_ARTIFACT_DIR="$worker/docs/epics/sample/code-reviews"
+OWNER_ISSUE="$worker/docs/B2-docs/sample/issues/sample.md"
+VERIFICATION_ARTIFACT_DIR="$worker/docs/B2-docs/sample/code-reviews"
 CLOSEOUT_GATE_COMMAND="./bin/merge-guarded sample"
 CLOSEOUT_TARGET_LANE="develop"
 CLOSEOUT_PROMOTION_GATE="manager review"
@@ -37,7 +37,7 @@ EOF
     cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
 EXIT_KIND="worker_done"
 COMPLETION_SUMMARY="Replay passed and is promote-ready for manager review."
-EVIDENCE_PATHS_CSV="$worker/docs/epics/sample/code-reviews/20260425-sample.md"
+EVIDENCE_PATHS_CSV="$worker/docs/B2-docs/sample/code-reviews/20260425-sample.md"
 EOF
 
     git() {

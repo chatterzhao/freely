@@ -18,8 +18,8 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p \
-  "$PROJECT/docs/pre-brainstorms/README" \
-  "$PROJECT/docs/pre-brainstorms/20260420-0001--scan-demo" \
+  "$PROJECT/docs/B1-docs/README" \
+  "$PROJECT/docs/B1-docs/raw-20260420-0001" \
   "$PROJECT/docs/progress/demo" \
   "$PROJECT/.freely/intake/INTAKE-20260420-0001" \
   "$FAKE_BIN_DIR"
@@ -43,23 +43,23 @@ cat >"$PROJECT/docs/LAWS.md" <<'EOF'
 # laws
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # pre-brainstorms
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # index
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # convergence
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/20260420-0001--scan-demo/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260420-0001/brainstorms.md" <<'EOF'
 # Brainstorm
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/20260420-0001--scan-demo/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260420-0001/candidates.md" <<'EOF'
 # Candidates
 
 ### C-20260420-0001-A
@@ -79,7 +79,7 @@ cat >"$PROJECT/docs/pre-brainstorms/20260420-0001--scan-demo/candidates.md" <<'E
 ### C-20260420-0001-C
 - status: `absorbed`
 - milestone: `M-20260420-demo`
-- promoted_issue_path: `docs/epics/demo/issues/demo.md`
+- promoted_issue_path: `docs/B2-docs/demo/issues/demo.md`
 EOF
 
 cat >"$PROJECT/docs/milestones.md" <<'EOF'
@@ -89,7 +89,7 @@ cat >"$PROJECT/docs/milestones.md" <<'EOF'
 
 - milestone_id: `M-20260420-demo`
 - milestone_state: committed
-- issue_path: `docs/epics/demo/issues/demo.md`
+- issue_path: `docs/B2-docs/demo/issues/demo.md`
 - progress_path: `docs/progress/demo/p-demo.md`
 - next_action: Finish the in-flight demo owner.
 
@@ -97,7 +97,7 @@ cat >"$PROJECT/docs/milestones.md" <<'EOF'
 
 - milestone_id: `M-20260420-demo`
 - milestone_state: candidate
-- promoted_issue_path: `docs/epics/demo/issues/demo.md`
+- promoted_issue_path: `docs/B2-docs/demo/issues/demo.md`
 - next_action: Candidate mirror only. `I-20260420-0001-A` is now canonical.
 EOF
 
@@ -105,7 +105,7 @@ cat >"$PROJECT/docs/progress/demo/p-demo.md" <<'EOF'
 # Progress: demo
 
 - issue_id: `I-20260420-0001-A`
-- issue_path: `docs/epics/demo/issues/demo.md`
+- issue_path: `docs/B2-docs/demo/issues/demo.md`
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - closure_status: `issue_materialized`
@@ -122,7 +122,7 @@ cat >"$PROJECT/docs/progress/demo/p-contract-frozen.md" <<'EOF'
 # Progress: contract-frozen
 
 - issue_id: `I-20260420-0002-A`
-- issue_path: `docs/epics/demo/issues/contract-frozen.md`
+- issue_path: `docs/B2-docs/demo/issues/contract-frozen.md`
 - phase_state: `completed`
 - runtime_state: `stopped`
 - closure_status: `contract-frozen`
@@ -133,7 +133,7 @@ cat >"$PROJECT/docs/progress/demo/p-ready-followthrough.md" <<'EOF'
 # Progress: ready-followthrough
 
 - issue_id: `I-20260420-0003-A`
-- issue_path: `docs/epics/demo/issues/ready-followthrough.md`
+- issue_path: `docs/B2-docs/demo/issues/ready-followthrough.md`
 - phase_state: `completed`
 - runtime_state: `stopped`
 - closure_status: `ready_for_guarded_replay`

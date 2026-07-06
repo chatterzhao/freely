@@ -9,7 +9,7 @@ PROJECT="$TMP_DIR/freely"
 WT_ROOT="$TMP_DIR/freely-worktrees"
 WORKER="$WT_ROOT/feature-worker"
 
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$WT_ROOT"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260309-0000" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$WT_ROOT"
 cd "$PROJECT"
 git init -q -b develop
 git config user.name tester
@@ -22,7 +22,7 @@ git worktree add "$WORKER" feature/worker >/dev/null
 WORKER="$(cd "$WORKER" && pwd -P)"
 
 for wt in "$PROJECT" "$WORKER"; do
-  mkdir -p "$wt/docs/pre-brainstorms/20260309-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
+  mkdir -p "$wt/docs/B1-docs/raw-20260309-0000" "$wt/.freely/run" "$wt/.freely/logs"
   cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
 EOF
@@ -35,21 +35,21 @@ EOF
   cat >"$wt/AGENTS.md" <<'EOF'
 # Agents
 EOF
-  cat >"$wt/docs/pre-brainstorms/README.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/README.md" <<'EOF'
 # 预研头脑风暴工作区
 EOF
-  cat >"$wt/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260309-0000--sample
 EOF
-  cat >"$wt/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # 收敛
 EOF
-  cat >"$wt/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/raw-20260309-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
-  cat >"$wt/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+  cat >"$wt/docs/B1-docs/raw-20260309-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -119,9 +119,9 @@ SOURCE_INTAKE_ID="recovery-intake"
 TARGET_PROJECT="$WORKER"
 VERIFICATION_METADATA_PRESENT="true"
 VERIFICATION_METADATA_MISSING_FIELDS=""
-OWNER_ISSUE="docs/epics/sample/issues/sample.md"
-PRE_TESTS_PATH="docs/epics/sample/pre-tests.md"
-VERIFICATION_ARTIFACT_DIR="docs/epics/sample/artifacts"
+OWNER_ISSUE="docs/B2-docs/sample/issues/sample.md"
+PRE_TESTS_PATH="docs/B2-docs/sample/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="docs/B2-docs/sample/artifacts"
 REQUIRED_TEST_LANES_CSV="feature-local"
 REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="sample-acceptance"
 MINIMUM_EVIDENCE_LEVEL="sample"

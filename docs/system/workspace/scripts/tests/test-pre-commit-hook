@@ -98,18 +98,18 @@ echo "[PASS] pre-commit now sends guarded develop merge completion through downs
 git checkout -q develop
 git worktree add -q -b feature/pretests ../repo-worktrees/feature-pretests develop
 FEATURE_WT="$(cd ../repo-worktrees/feature-pretests && pwd -P)"
-mkdir -p "$FEATURE_WT/docs/epics/sample/story/issues" "$FEATURE_WT/docs/epics/sample/story"
+mkdir -p "$FEATURE_WT/docs/B2-docs/sample/story/issues" "$FEATURE_WT/docs/B2-docs/sample/story"
 
-cat > "$FEATURE_WT/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$FEATURE_WT/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `in_dev`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
 
-cat > "$FEATURE_WT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$FEATURE_WT/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Acceptance Items
@@ -122,18 +122,18 @@ cat > "$FEATURE_WT/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `pending://pt-1`
 EOF
 
-(cd "$FEATURE_WT" && git add docs/epics/sample/story/issues/sample.md docs/epics/sample/story/pre-tests.md && git commit -q -m "seed sample issue")
+(cd "$FEATURE_WT" && git add docs/B2-docs/sample/story/issues/sample.md docs/B2-docs/sample/story/pre-tests.md && git commit -q -m "seed sample issue")
 
-cat > "$FEATURE_WT/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$FEATURE_WT/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/code-reviews`
 EOF
 
-(cd "$FEATURE_WT" && git add docs/epics/sample/story/issues/sample.md)
+(cd "$FEATURE_WT" && git add docs/B2-docs/sample/story/issues/sample.md)
 if (cd "$FEATURE_WT" && "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"); then
   echo "[FAIL] pre-commit should block completed issue with pending acceptance items" >&2
   exit 1
@@ -143,7 +143,7 @@ cat "$TMP_DIR/stdout2" "$TMP_DIR/stderr2" | grep -q "staged issue completion doe
 cat > "$FEATURE_WT/feature-note.md" <<'EOF'
 note
 EOF
-(cd "$FEATURE_WT" && git restore --staged docs/epics/sample/story/issues/sample.md && git checkout -- docs/epics/sample/story/issues/sample.md && git add feature-note.md)
+(cd "$FEATURE_WT" && git restore --staged docs/B2-docs/sample/story/issues/sample.md && git checkout -- docs/B2-docs/sample/story/issues/sample.md && git add feature-note.md)
 (cd "$FEATURE_WT" && "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3")
 
 echo "[PASS] pre-commit enforces completed issue gate without blocking unrelated feature commits"

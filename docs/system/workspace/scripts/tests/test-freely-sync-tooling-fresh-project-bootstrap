@@ -7,7 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 make_project() {
   local project="$1"
-  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  mkdir -p "$project/docs/B1-docs/raw-20260320-0018"
   git init -q -b develop "$project"
   mkdir -p "$project/.githooks"
   cat >"$project/.githooks/pre-commit" <<'EOF'
@@ -32,25 +32,25 @@ EOF
 # Agents
 EOF
 
-  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+  cat >"$project/docs/B1-docs/README.md" <<'EOF'
 # 预研头脑风暴工作区
 EOF
 
-  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat >"$project/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260320-0018--sample
 EOF
 
-  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat >"$project/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # 收敛
 EOF
 
-  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260320-0018/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
 
-  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260320-0018/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -70,17 +70,17 @@ EOF
 
 copy_project_docs_only() {
   local source_project="$1" target_project="$2"
-  mkdir -p "$target_project/docs/pre-brainstorms/20260320-0018--sample"
+  mkdir -p "$target_project/docs/B1-docs/raw-20260320-0018"
   git init -q -b develop "$target_project"
   cp "$source_project/docs/PROJECT_INTENT.md" "$target_project/docs/PROJECT_INTENT.md"
   cp "$source_project/docs/CONSTITUTION.md" "$target_project/docs/CONSTITUTION.md"
   cp "$source_project/docs/LAWS.md" "$target_project/docs/LAWS.md"
   cp "$source_project/AGENTS.md" "$target_project/AGENTS.md"
-  cp "$source_project/docs/pre-brainstorms/README.md" "$target_project/docs/pre-brainstorms/README.md"
-  cp "$source_project/docs/pre-brainstorms/INDEX.md" "$target_project/docs/pre-brainstorms/INDEX.md"
-  cp "$source_project/docs/pre-brainstorms/CONVERGENCE.md" "$target_project/docs/pre-brainstorms/CONVERGENCE.md"
-  cp "$source_project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" "$target_project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md"
-  cp "$source_project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" "$target_project/docs/pre-brainstorms/20260320-0018--sample/candidates.md"
+  cp "$source_project/docs/B1-docs/README.md" "$target_project/docs/B1-docs/README.md"
+  cp "$source_project/docs/B1-docs/INDEX.md" "$target_project/docs/B1-docs/INDEX.md"
+  cp "$source_project/docs/B1-docs/CONVERGENCE.md" "$target_project/docs/B1-docs/CONVERGENCE.md"
+  cp "$source_project/docs/B1-docs/raw-20260320-0018/brainstorms.md" "$target_project/docs/B1-docs/raw-20260320-0018/brainstorms.md"
+  cp "$source_project/docs/B1-docs/raw-20260320-0018/candidates.md" "$target_project/docs/B1-docs/raw-20260320-0018/candidates.md"
 }
 
 FREELY_HOME="$TMP_DIR/freely-home"

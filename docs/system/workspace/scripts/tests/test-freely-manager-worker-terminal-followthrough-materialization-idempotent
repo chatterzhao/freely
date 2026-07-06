@@ -20,7 +20,7 @@ OUTPUT="$(
     cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
 EXIT_KIND="worker_done"
 COMPLETION_SUMMARY="Replay passed and is promote-ready for manager review."
-EVIDENCE_PATHS_CSV="$worker/docs/epics/sample/code-reviews/20260425-sample.md"
+EVIDENCE_PATHS_CSV="$worker/docs/B2-docs/sample/code-reviews/20260425-sample.md"
 EOF
 
     manager_operator_stop_boundary_epoch_for_project() { printf "1714055970\n"; }

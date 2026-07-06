@@ -21,8 +21,8 @@ make_repo() {
   mkdir -p "$repo/docs/system/workspace/skills/freely-auto-loop-orchestrator"
   mkdir -p "$repo/docs/system/workspace/skills"
   mkdir -p "$repo/docs/system/workspace/agents"
-  mkdir -p "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt"
-  mkdir -p "$repo/docs/epics/sample/issues"
+  mkdir -p "$repo/docs/B1-docs/raw-20260402-1111"
+  mkdir -p "$repo/docs/B2-docs/sample/issues"
 
   cat > "$repo/AGENTS.md" <<'EOF'
 # Agent entry
@@ -108,27 +108,27 @@ EOF
 # Issue Materialization Checklist
 prd-quality-bar.md
 EOF
-  cat > "$repo/docs/pre-brainstorms/README.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-  cat > "$repo/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # Convergence
 EOF
-  cat > "$repo/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260402-1111--sample-receipt
 
 - 20260402-1111--sample-receipt
-  - brainstorms: docs/pre-brainstorms/20260402-1111--sample-receipt/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md
+  - brainstorms: docs/B1-docs/raw-20260402-1111/brainstorms.md
+  - candidates: docs/B1-docs/raw-20260402-1111/candidates.md
 
 ## 收敛
 EOF
-  cat > "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt/brainstorms.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/raw-20260402-1111/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
-  cat > "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/raw-20260402-1111/candidates.md" <<'EOF'
 # Candidates
 - id: C-20260402-1111-A
 - candidate_format_version: v2
@@ -145,7 +145,7 @@ EOF
   - mode: subagent
   - summary: good enough
   - verdict: pass
-- promoted_issue_path: docs/epics/sample/issues/sample.md
+- promoted_issue_path: docs/B2-docs/sample/issues/sample.md
 - milestone: M-20260402-1111-sample
 - session_refs: []
 EOF
@@ -165,22 +165,22 @@ EOF
 - milestone_state: committed
 - phase_state: `in_dev`
 - priority: P1
-- issue_path: `docs/epics/sample/issues/sample.md`
+- issue_path: `docs/B2-docs/sample/issues/sample.md`
 - source_candidates:
-  - `docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md#c-20260402-1111-a`
+  - `docs/B1-docs/raw-20260402-1111/candidates.md#c-20260402-1111-a`
 - next_action: implement sample owner
 
 ### completed_issues
 
 - none currently
 EOF
-  cat > "$repo/docs/epics/sample/issues/sample.md" <<'EOF'
+  cat > "$repo/docs/B2-docs/sample/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260402-1111-A`
 - phase_state: `in_dev`
 - milestone: `M-20260402-1111-sample`
-- source_candidate: `docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md#c-20260402-1111-a`
+- source_candidate: `docs/B1-docs/raw-20260402-1111/candidates.md#c-20260402-1111-a`
 EOF
 }
 
@@ -259,7 +259,7 @@ Freely-Source-Branch: test-pre-merge-20260402-breakglass
 Freely-Break-Glass-Reason: verified_false_negative
 Freely-Blocked-Gate: pre-merge-commit
 Freely-Operation-Scope: merge_completion_only
-Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
+Freely-Evidence-Ref: docs/B2-docs/sample/code-reviews/r-breakglass.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
 )" test-pre-merge-20260402-breakglass >/dev/null
@@ -281,7 +281,7 @@ cat > "$REPO_BREAK/docs/system/workspace/hooks/protected-branch-breakglass-recei
 - operation_scope: \`merge_completion_only\`
 - follow_on_owner: \`I-20260402-0020-A\`
 - evidence_refs:
-  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
+  - \`docs/B2-docs/sample/code-reviews/r-breakglass.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/break.out" 2>&1; then
@@ -323,7 +323,7 @@ cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-rece
 - operation_scope: \`merge_completion_only\`
 - follow_on_owner: \`I-20260402-0020-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 git checkout -q -b test-pre-merge-20260402-legacy-head-receipt
@@ -369,7 +369,7 @@ Freely-Source-Branch: test-pre-merge-20260402-mismatch
 Freely-Break-Glass-Reason: verified_false_negative
 Freely-Blocked-Gate: pre-merge-commit
 Freely-Operation-Scope: merge_completion_only
-Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
+Freely-Evidence-Ref: docs/B2-docs/sample/code-reviews/r-breakglass.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
 )" test-pre-merge-20260402-mismatch >/dev/null
@@ -391,7 +391,7 @@ cat > "$REPO_MISMATCH/docs/system/workspace/hooks/protected-branch-breakglass-re
 - operation_scope: \`merge_completion_only\`
 - follow_on_owner: \`I-20260402-0020-A\`
 - evidence_refs:
-  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
+  - \`docs/B2-docs/sample/code-reviews/r-breakglass.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/mismatch.out" 2>&1; then
@@ -424,7 +424,7 @@ Freely-Source-Branch: test-pre-merge-20260402-backfill-misuse
 Freely-Break-Glass-Reason: tooling_unavailable
 Freely-Blocked-Gate: pre-commit
 Freely-Operation-Scope: merge_completion_only
-Freely-Evidence-Ref: docs/epics/sample/issues/sample.md
+Freely-Evidence-Ref: docs/B2-docs/sample/issues/sample.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
 )" test-pre-merge-20260402-backfill-misuse >/dev/null
@@ -446,7 +446,7 @@ cat > "$REPO_BACKFILL_MISUSE/docs/system/workspace/hooks/protected-branch-breakg
 - operation_scope: \`merge_completion_only\`
 - follow_on_owner: \`I-20260402-0020-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/backfill-misuse.out" 2>&1; then
