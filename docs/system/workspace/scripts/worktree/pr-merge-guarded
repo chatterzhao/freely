@@ -223,7 +223,7 @@ run_promotion_gate_if_needed() {
   local target="$1"
   local source_branch="$2"
   if [[ "$target" == "develop" && -x "./bin/governance-promotion-gate" ]]; then
-    freely governance-promotion-gate --project "$PWD" --target-branch "$target" --source-branch "$source_branch"
+    ./bin/governance-promotion-gate --project "$PWD" --target-branch "$target" --source-branch "$source_branch"
   fi
 }
 

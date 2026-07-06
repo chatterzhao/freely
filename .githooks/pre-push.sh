@@ -105,7 +105,7 @@ REASON_GATE
           fi
           echo "[HOOK] FREELY_SKIP_IBM_GATE — validating governance-only paths via governance-merge-gate --skip-ibm-gate"
           set +e
-          gate_output="$(freely governance-merge-gate --range "develop..HEAD" --skip-ibm-gate 2>&1)"
+          gate_output="$(./bin/governance-merge-gate --range "develop..HEAD" --skip-ibm-gate 2>&1)"
           gate_rc=$?
           set -e
           if [[ "$gate_rc" -ne 0 ]]; then
@@ -121,7 +121,7 @@ MSG
           echo "$gate_output"
         elif [[ -n "${remote_sha:-}" && "$remote_sha" != "0000000000000000000000000000000000000000" ]]; then
           set +e
-          gate_output="$(freely governance-merge-gate --range "${remote_sha}..${local_sha}" 2>&1)"
+          gate_output="$(./bin/governance-merge-gate --range "${remote_sha}..${local_sha}" 2>&1)"
           gate_rc=$?
           set -e
           if [[ "$gate_rc" -ne 0 ]]; then
