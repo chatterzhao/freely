@@ -26,7 +26,7 @@ _fleet_audit_orphans() {
       if [[ $issue_count -eq 0 ]]; then
         echo "[freely] WARNING: Orphaned managed branches detected (no active worktree):" >&2
       fi
-      echo "  - $branch (use wt-close or wt-close --force to clean up)" >&2
+      echo "  - $branch (工作收口: freely wt-close --raw-key <key> | 废弃丢弃: freely wt-close --raw-key <key> --force --reason "...". --force = 永久丢弃，不是废弃严禁使用)" >&2
       ((issue_count++))
     fi
   done < <(git branch --list 'fix/*' 'feature/*' 'hotfix/*' 'test-pre-merge-*' 2>/dev/null | sed 's/^[* ]*//')
