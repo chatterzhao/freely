@@ -2,7 +2,7 @@
 local_id: raw-20260705T061416Z
 kind: raw
 phase_state: absorbed
-absorbed_into: I-20260705T061416Z-A
+absorbed_into: docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Z/issues/I-20260705T061416Z-A.md
 platform_ids:
   github:
     issue_id: '3742'
