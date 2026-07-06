@@ -303,19 +303,21 @@ FUZZY_BLOCK
 fi
 
 # ── Raw issue state check ────────────────────────────────
+# If the raw issue was previously closed (absorbed/completed/dropped),
+# automatically reopen it by setting phase_state → proposed.
+# This avoids forcing the user to manually edit develop.
 _issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
 if [[ -f "$_issue_file" ]]; then
   _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
   case "$_phase" in
     absorbed|completed|dropped)
-      cat >&2 <<PHASE_BLOCK
-拒绝创建工位: raw-${raw_key} 已关闭 (phase_state=${_phase})
-
-  该 raw issue 已关闭，不需要新建工位。
-  如果确实需要重新打开: 将 phase_state 改为 proposed
-  如果有替代 issue: 使用新的 raw_key
-PHASE_BLOCK
-      exit 1
+      echo "[wt-create] raw-${raw_key} phase_state=${_phase} → proposed (auto-reopen)" >&2
+      # Change phase_state in-place on the worktree branch (never on develop)
+      if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"
+      else
+        sed -i "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"
+      fi
       ;;
   esac
 fi
