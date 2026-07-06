@@ -54,7 +54,7 @@ if [[ -x "$AGENT_QUERY" ]]; then
 fi
 # agent-table is the source of truth for reviewer_slot.
 # AGENT_AI_TOOL is resolved from agent-table at load_config time.
-# AI_TOOL fallback is deprecated — fail clearly if unresolved.
+# AGENT_AI_TOOL must be set by agent-table — no fallback.
 [[ -z "$reviewer_slot" ]] && reviewer_slot="${AGENT_AI_TOOL:-claude}"
 
 # ── Pre-checks ──

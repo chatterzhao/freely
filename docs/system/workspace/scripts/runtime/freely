@@ -2209,7 +2209,7 @@ resolve_ai_spec_for_project_or_global() {
 
   cfg="$(config_file "$project")"
   if [[ -f "$cfg" ]]; then
-    unset AI_TOOL AI_MODEL AI_MODE
+    unset AI_MODEL AI_MODE
     source_config "$project"
     tool="${AGENT_AI_TOOL:-}"
     model="${AI_MODEL:-}"
@@ -2261,21 +2261,21 @@ resolve_tool_adapter_policy_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_policy="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
-        printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
+        printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
@@ -2313,14 +2313,14 @@ resolve_tool_adapter_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
@@ -4345,12 +4345,6 @@ load_config() {
   fi
 
   # ── Derive AI_TOOL from AGENT_AI_TOOL ────────────────────
-  # AI_TOOL is no longer a config value — it is always derived
-  # from the agent-table slot.  "claude-apikey-ds-pro-auto" → "claude".
-  # This ensures tool-family checks (codex, opencode, etc.) use the
-  # correct tool, not a stale alias from old config.
-  AI_TOOL="${AGENT_AI_TOOL%%-*}"
-  export AI_TOOL
 }
 
 write_config() {
@@ -4380,9 +4374,9 @@ write_config() {
     --value "AI_MODE=$mode" \
     --value "AI_REASONING_EFFORT=$reasoning_effort" \
     --value "AGENT_AI_TOOL_ADAPTER=$tool_adapter" \
-    --value "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY=$tool_adapter_policy" \
-    --value "AI_TOOL_CAPABILITIES=$tool_capabilities" \
-    --value "AI_TOOL_POLICY=$tool_policy" \
+    --value "AGENT_AI_TOOL_ADAPTER_POLICY=$tool_adapter_policy" \
+    --value "AGENT_AI_TOOL_CAPABILITIES=$tool_capabilities" \
+    --value "AGENT_AI_TOOL_POLICY=$tool_policy" \
     --value "AI_CAPABILITY_CODEX_MODEL=$codex_capability_model" \
     --value "AI_CAPABILITY_CODEX_SANDBOX=$codex_capability_sandbox" \
     --value "AI_CAPABILITY_CODEX_APPROVAL_POLICY=$codex_capability_approval_policy" \
@@ -4574,7 +4568,7 @@ freely_execution_boundary_audit_summary_for_loaded_config() {
     failures+=("activation_consent_status=${consent_status}")
   fi
 
-  if tool_requires_project_codex_config "${AGENT_AI_TOOL:-}" "${AI_TOOL_CAPABILITIES:-}"; then
+  if tool_requires_project_codex_config "${AGENT_AI_TOOL:-}" "${AGENT_AI_TOOL_CAPABILITIES:-}"; then
     codex_cfg="$(project_codex_config_file "$project")"
     if [[ ! -f "$codex_cfg" ]]; then
       failures+=("missing_project_codex_config")
@@ -5370,9 +5364,9 @@ persist_project_tool_selection() {
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
   upsert_config_key "$project" "AGENT_AI_TOOL_ADAPTER" "$tool_adapter"
-  upsert_config_key "$project" "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
-  upsert_config_key "$project" "AI_TOOL_CAPABILITIES" "$tool_capabilities"
-  upsert_config_key "$project" "AI_TOOL_POLICY" "$tool_policy"
+  upsert_config_key "$project" "AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
+  upsert_config_key "$project" "AGENT_AI_TOOL_CAPABILITIES" "$tool_capabilities"
+  upsert_config_key "$project" "AGENT_AI_TOOL_POLICY" "$tool_policy"
 }
 
 project_tool_selection_truth() {
@@ -5385,23 +5379,23 @@ project_tool_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
+      printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
   printf '%s|%s|%s\n' "$current_tool" "$current_adapter" "$current_adapter_policy"
@@ -5463,37 +5457,37 @@ project_tool_runtime_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_model="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_MODEL:-}"
     )
   )"
   current_reasoning="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_REASONING_EFFORT:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
-      printf '%s' "${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-}"
+      printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
   printf '%s|%s|%s|%s|%s\n' "$current_tool" "$current_model" "$current_reasoning" "$current_adapter" "$current_adapter_policy"
@@ -5883,7 +5877,7 @@ EOF
 materialize_project_tooling_for_loaded_config() {
   local project="$1" force="${2:-false}"
   local tool="${AGENT_AI_TOOL:-}"
-  local tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
+  local tool_capabilities="${AGENT_AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
   local mode="${AI_MODE:-auto}"
 
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
@@ -10400,7 +10394,7 @@ worker_worktree_needs_managed_tooling_repair() {
   wrapper_dir="$(project_tool_wrapper_dir "$project")"
   [[ -x "$wrapper_dir/codex" ]] || return 0
   tool="${AGENT_AI_TOOL:-codex}"
-  tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
+  tool_capabilities="${AGENT_AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     [[ -f "$(project_codex_config_file "$project")" ]] || return 0
   fi
@@ -13032,7 +13026,7 @@ ensure_runtime_workcell_initialized_for_launch() {
     return 0
   fi
   tool_adapter="${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-codex}")}"
-  tool_adapter_policy="${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-${tool_adapter:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-codex}")}}"
+  tool_adapter_policy="${AGENT_AI_TOOL_ADAPTER_POLICY:-${tool_adapter:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-codex}")}}"
   freely_bin="$(freely_bin_for_project "$target_project")"
   bash "$freely_bin" init \
     --project "$target_project" \
@@ -13043,7 +13037,7 @@ ensure_runtime_workcell_initialized_for_launch() {
   init_rc=$?
   (( init_rc == 0 )) || return "$init_rc"
   upsert_config_key "$target_project" "AGENT_AI_TOOL_ADAPTER" "$tool_adapter"
-  upsert_config_key "$target_project" "AGENT_AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
+  upsert_config_key "$target_project" "AGENT_AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
 }
 
 manager_record_worker_pid_for_launch() {
@@ -20186,9 +20180,9 @@ PROMPT_AGENT
     append_task_source_patrol_seed_if_needed
   else
     AGENT_AI_TOOL_ADAPTER="${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-}")}" \
-    AGENT_AGENT_AI_TOOL_ADAPTER_POLICY="${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}" \
-    AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
-    AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
+    AGENT_AI_TOOL_ADAPTER_POLICY="${AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}" \
+    AGENT_AI_TOOL_CAPABILITIES="${AGENT_AI_TOOL_CAPABILITIES:-}" \
+    AGENT_AI_TOOL_POLICY="${AGENT_AI_TOOL_POLICY:-}" \
     AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
     AI_CAPABILITY_CODEX_SANDBOX="${AI_CAPABILITY_CODEX_SANDBOX:-}" \
     AI_CAPABILITY_CODEX_APPROVAL_POLICY="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
@@ -20752,7 +20746,7 @@ SDK_HELP
     cp -r "$_ai_auth_src" "$_ai_auth_dst"
     log_info "ai-auth slot templates released to .freely/ai-auth/"
     log_info "→ read .freely/ai-auth/README.md to configure AI CLI slots"
-    log_info "→ then set AI_TOOL in .freely/config.toml to match your alias name"
+    log_info "→ then set AGENT_AI_TOOL via agent-table.toml slot configuration"
   fi
 
   # ── Write project .gitignore with template ignore rule ──
@@ -20880,7 +20874,7 @@ cmd_set_tool() {
   load_config "$project"
   materialize_project_tooling_for_loaded_config "$project" "true"
   load_config "$project"
-  log_info "updated tool selection: ${AGENT_AI_TOOL:-$tool} via ${AGENT_AI_TOOL_ADAPTER:-unknown} (policy=${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-unknown})"
+  log_info "updated tool selection: ${AGENT_AI_TOOL:-$tool} via ${AGENT_AI_TOOL_ADAPTER:-unknown} (policy=${AGENT_AI_TOOL_ADAPTER_POLICY:-unknown})"
 }
 
 cmd_sync_tooling() {
@@ -22661,8 +22655,8 @@ print(ready)
         --tool-adapter "${tool_adapter:-}" \
         --model "${AI_MODEL:-}" \
         --reasoning-effort "${AI_REASONING_EFFORT:-}" \
-        --tool-capabilities "${AI_TOOL_CAPABILITIES:-}" \
-        --tool-policy "${AI_TOOL_POLICY:-}" \
+        --tool-capabilities "${AGENT_AI_TOOL_CAPABILITIES:-}" \
+        --tool-policy "${AGENT_AI_TOOL_POLICY:-}" \
         --codex-capability-model "${AI_CAPABILITY_CODEX_MODEL:-}" \
         --codex-capability-sandbox "${AI_CAPABILITY_CODEX_SANDBOX:-}" \
         --codex-capability-approval-policy "${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
@@ -24916,11 +24910,11 @@ cmd_baseline_status() {
   echo "constitution: $CONSTITUTION_FILE"
   echo "ai: ${AGENT_AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
   echo "tool_adapter: ${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-}")}"
-  echo "tool_adapter_policy: ${AGENT_AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}"
+  echo "tool_adapter_policy: ${AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}"
   echo "tool_supported_adapters: $(tool_supported_adapters_for_runtime "${AGENT_AI_TOOL:-}" | paste -sd ',' -)"
   echo "reasoning_effort: ${AI_REASONING_EFFORT:-default}"
-  echo "tool_capabilities: ${AI_TOOL_CAPABILITIES:-none}"
-  echo "tool_policy: ${AI_TOOL_POLICY:-none}"
+  echo "tool_capabilities: ${AGENT_AI_TOOL_CAPABILITIES:-none}"
+  echo "tool_policy: ${AGENT_AI_TOOL_POLICY:-none}"
   echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
   echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
   echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"

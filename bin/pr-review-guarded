@@ -25,7 +25,7 @@ REVIEW_SESSION_FILE="$REVIEW_STATE_DIR/review-session.env"
 REVIEW_PROMPT_FILE="$REVIEW_STATE_DIR/review-prompt.txt"
 MAX_ROUNDS=3
 REVIEWER_SKILL="freely-tdd-review"
-# Slot for Reviewer agent — uses same slot as main AI_TOOL for now.
+# Slot for Reviewer agent — reads from agent-table reviewer_slot.
 # When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
 # Try agent_working table for reviewer_slot if available (preferred over agent-id.env).
@@ -87,7 +87,7 @@ Launches TDD Reviewer via ACP for independent four-question review.
 Loops until pass (with Worker fixes between rounds) or escalates after 3 rounds.
 
 Options:
-  --slot <name>     Reviewer AI slot (default: same as AI_TOOL)
+  --slot <name>     Reviewer AI slot (default: from agent-table reviewer_slot)
   --verdict <value> Override verdict (pass|fail)
   --reason <text>   REQUIRED when overriding
 HELPMSG
@@ -304,7 +304,7 @@ fi
 
 # ── Manual fallback (ACP unavailable OR freely-review not found) ──
 if [[ -z "$REVIEWER_SLOT" ]]; then
-  REVIEWER_SLOT="${AI_TOOL:-claude-apikey-ds-pro-auto}"
+  REVIEWER_SLOT="$("$ROOT_DIR/bin/agent-table-query" --get-slot reviewer_01 2>/dev/null || echo "")"
 fi
 
 # Collect review context — search fix worktree first, then current
