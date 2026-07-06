@@ -78,9 +78,6 @@ __pycache__/
 .codex/
 .opencode/
 .claude/
-projects.tsv
-projects.tsv
-
 # Freely runtime artifacts (local only, not committed)
 /freely.db
 /projects.tsv
