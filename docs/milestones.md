@@ -1,6 +1,7 @@
 ## M-20260627T234054Z-A
 - title: wt-create assignee check
 - status: completed
+### candidate_issues
 ### committed_issues
 1. `I-20260627T234054Z-A`
 - milestone: M-20260627T234054Z-A
