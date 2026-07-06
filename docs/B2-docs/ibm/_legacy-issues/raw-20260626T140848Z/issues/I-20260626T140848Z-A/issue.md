@@ -1,0 +1,13 @@
+- issue_id: I-20260626T140848Z-A
+- kind: fix
+- phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260626T140848Z/code-reviews
+- source_candidate: docs/B1-docs/raw-20260626T140848Z48Z/candidates.md#C-20260626T140848Z-A
+- source_raw: raw-20260626T140848Z48Z
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T140848Z-A/issue.md
+- pre_tests_path: docs/B2-docs/runtime-dir-typo/verification/pre-tests.md
+- title: platform-adapter.py RUNTIME_DIR → _RUNTIME_DIR typo fix
+
+# I-20260626T140848Z-A: RUNTIME_DIR typo fix
+## 实现
+- 8 处 RUNTIME_DIR → _RUNTIME_DIR

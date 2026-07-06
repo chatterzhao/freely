@@ -1,0 +1,12 @@
+- issue_id: I-20260701T001514Z-A
+- kind: fix
+- phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260701T001514Z/code-reviews
+- milestone: M-20260701T001514Z-A
+- issue_id: I-20260701T001514Z-A
+- kind: fix
+- phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260701T001514Z/code-reviews
+- milestone: M-20260701T001514Z-A
+- source_candidate: docs/B1-docs/raw-20260701T001514Z14Z/candidates.md#C-20260701T001514Z-A
+- title: fix --reset timeout msg

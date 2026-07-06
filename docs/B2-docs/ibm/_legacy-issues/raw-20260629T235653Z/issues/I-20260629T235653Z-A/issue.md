@@ -1,0 +1,7 @@
+- issue_id: I-20260629T235653Z-A
+- kind: linked
+- phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260629T235653Z/code-reviews
+- source_raw: raw-20260629T235653Z53Z
+- source_candidate: docs/B1-docs/raw-20260629T235653Z53Z/candidates.md
+- title: docs: replace outdated handoff JSON with A2A tasks in AGENTS.md
