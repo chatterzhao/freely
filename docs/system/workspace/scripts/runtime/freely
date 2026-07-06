@@ -2261,21 +2261,21 @@ resolve_tool_adapter_policy_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_policy="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
@@ -2313,14 +2313,14 @@ resolve_tool_adapter_for_project_or_global() {
   if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL:-}"
       )
     )"
     current_adapter="$(
       (
-        unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+        unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
         source_global_config
         printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
       )
@@ -4299,7 +4299,7 @@ load_config() {
   migrate_project_auto_recovery_defaults_if_needed "$project"
 
   # ── Agent-table: resolve AGENT_AI_TOOL for ALL agents ──────
-  # AI_TOOL is deprecated.  AGENT_AI_TOOL is resolved from
+  # AGENT_AI_TOOL is resolved from agent-table.toml slot (no fallback).
   # .freely/agent-table.toml at startup.  No config writes needed.
   #
   # Resolution order:
@@ -4344,7 +4344,7 @@ load_config() {
     fi
   fi
 
-  # ── Derive AI_TOOL from AGENT_AI_TOOL ────────────────────
+  # ── AGENT_AI_TOOL already set by _init_agent_table_slot_pin ──
 }
 
 write_config() {
@@ -5348,7 +5348,7 @@ persist_project_tool_selection() {
   local project="$1" tool="$2" requested_adapter="${3:-}" requested_adapter_policy="${4:-}"
   local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy effective_tool
   effective_tool="$tool"
-  # If switching to an apikey slot, AI_TOOL must be the full slot directory name
+  # If switching to an apikey slot, the full slot directory name is used
   # (e.g. claude-apikey-ai98pro), not just the tool family (claude).
   # The runtime resolves it via alias → type → settings chain.
   local _slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
@@ -5379,21 +5379,21 @@ project_tool_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
@@ -5457,35 +5457,35 @@ project_tool_runtime_selection_truth() {
   fi
   current_tool="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL:-}"
     )
   )"
   current_model="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_MODEL:-}"
     )
   )"
   current_reasoning="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AI_REASONING_EFFORT:-}"
     )
   )"
   current_adapter="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
-      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
+      unset AGENT_AI_TOOL AI_MODEL AI_REASONING_EFFORT AGENT_AI_TOOL_ADAPTER AGENT_AI_TOOL_ADAPTER_POLICY
       source_config "$project"
       printf '%s' "${AGENT_AI_TOOL_ADAPTER_POLICY:-}"
     )
@@ -6236,7 +6236,7 @@ manager_cycle_has_effective_output_evidence() {
   session_file="$(session_state_file "$project")"
   [[ -f "$session_file" ]] || return 1
   tool_name="${AGENT_AI_TOOL:-}"
-  [[ -n "$tool_name" ]] || tool_name="$(meta_env_value "$(config_file "$project")" "AI_TOOL")"
+  [[ -n "$tool_name" ]] || { log_error "AGENT_AI_TOOL not set — agent-table.toml may be missing or misconfigured"; return 1; }
   launch_kind="$(meta_env_value "$session_file" "LAST_LAUNCH_KIND")"
   prompt_file="$(meta_env_value "$session_file" "LAST_PROMPT_FILE")"
   case "$tool_name" in
