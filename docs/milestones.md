@@ -2,6 +2,10 @@
 - title: 门禁硬拦截
 - status: completed
 ### candidate_issues
+1. `C-20260706T091733Z-A`
+- milestone: M-20260706T091733Z-A
+- status: promoted
+- promoted_issue_id: `I-20260706T091733Z-A`
 ### committed_issues
 1. `I-20260706T091733Z-A`
 - milestone: M-20260706T091733Z-A
