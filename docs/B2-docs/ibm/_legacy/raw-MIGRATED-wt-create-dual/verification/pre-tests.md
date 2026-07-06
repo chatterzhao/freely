@@ -50,6 +50,8 @@
 - case_design: `Run wt-create with valid args, verify two worktrees, check parent relationship.`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/wt-create-dual/code-reviews/review.md`
 
 ### AT-002 fast-forward merge
@@ -62,4 +64,6 @@
 - case_design: `Create commit on fix branch, verify merge-base(fix, tp) == tp HEAD.`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/wt-create-dual/code-reviews/review.md`

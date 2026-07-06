@@ -1,3 +1,18 @@
+## M-20260706T023422Z-A
+- title: docs-structure-refactor 遗漏补完
+- status: active
+### candidate_issues
+1. `C-20260706T023422Z-A`
+- milestone: M-20260706T023422Z-A
+- status: promoted
+- promoted_issue_id: `I-20260706T023422Z-A`
+### committed_issues
+1. `I-20260706T023422Z-A`
+- title: docs-structure-refactor 遗漏补完
+- milestone: M-20260706T023422Z-A
+- phase_state: done_b2_ibm
+- path: docs/B2-docs/ibm/b2-governance/raw-20260706T023422Z/issues/I-20260706T023422Z-A.md
+
 ## M-20260705T061416Z-A
 - title: fix dirty 提示 backtick 命令替换
 - status: completed

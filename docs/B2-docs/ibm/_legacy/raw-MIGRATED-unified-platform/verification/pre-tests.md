@@ -38,4 +38,6 @@
 - case_design: `issue-sync with Gitee fallback, raw-issue-pull auto-sync`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/unified-platform/code-reviews/review.md`

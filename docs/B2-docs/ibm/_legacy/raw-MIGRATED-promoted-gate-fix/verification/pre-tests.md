@@ -38,4 +38,6 @@
 - case_design: `gate validates promoted candidates have candidate_issues entries`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/promoted-gate-fix/code-reviews/review.md`

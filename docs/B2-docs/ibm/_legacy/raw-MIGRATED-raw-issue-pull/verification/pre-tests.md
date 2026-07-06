@@ -38,4 +38,6 @@
 - case_design: `raw-issue-pull --raw-key 20260506T1000Z returns github issue_id: "231"`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/raw-issue-pull/code-reviews/review.md`

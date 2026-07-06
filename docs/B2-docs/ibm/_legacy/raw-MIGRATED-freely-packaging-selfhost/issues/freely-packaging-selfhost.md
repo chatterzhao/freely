@@ -4,7 +4,7 @@
 - source_candidate: docs/B1-docs/raw-20260502T000000Z/candidates.md#c-20260502-0500-a
 - phase_state: completed
 - milestone: current
-- pre_tests_path: docs/B2-docs/freely-packaging-selfhost/pre-tests.md
+- pre_tests_path: docs/B2-docs/ibm/_legacy/raw-MIGRATED-freely-packaging-selfhost/verification/pre-tests.md
 - tasks_path: docs/B2-docs/freely-packaging-selfhost/tasks.md
 - verification_artifact_dir: docs/B2-docs/freely-packaging-selfhost/code-reviews
 

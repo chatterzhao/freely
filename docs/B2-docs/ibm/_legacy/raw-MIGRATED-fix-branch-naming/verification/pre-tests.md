@@ -43,4 +43,6 @@
 - case_design: `grep fix/ in fix-execution SKILL.md confirms 5 locations`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/fix-branch-naming/code-reviews/review.md`

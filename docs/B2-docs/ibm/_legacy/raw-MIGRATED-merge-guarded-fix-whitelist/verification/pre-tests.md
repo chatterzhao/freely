@@ -42,4 +42,6 @@
 - case_design: `Merge fix/* branch into test-pre-merge via merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/merge-guarded-fix-whitelist/code-reviews/review.md`
