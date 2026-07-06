@@ -672,8 +672,11 @@ def anchorless_source_candidate(source_candidate: Optional[str]) -> Optional[str
     return source_candidate.split("#", 1)[0]
 
 
-def build_issue_index() -> Dict[str, IssueRecord]:
-    # Canonical issue files in epics/
+def build_issue_index(changed_paths: Optional[Set[str]] = None) -> Dict[str, IssueRecord]:
+    """Build index of all issue files. When changed_paths is provided, scope the
+    filesystem fallback to only directories that appear in the changed set, so
+    historical unrelated files don't get swept into gate validation."""
+    # Canonical issue files in B2-docs/
     try:
         output = git("ls-files", "docs/B2-docs/**/issues/I-*.md")
         paths = [line.strip() for line in output.splitlines() if line.strip()]
@@ -685,8 +688,6 @@ def build_issue_index() -> Dict[str, IssueRecord]:
     # I-* and raw-* that only exist in the fix branch.
     if USE_RANGE_VIEW and RANGE_SOURCE_REF:
         try:
-            # ls-tree from docs/B1-docs/ subtree returns paths relative to that dir
-            # (e.g. "raw-20260620T142838Z/issue.md"). Prepend docs/B1-docs/ prefix.
             output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/B1-docs/")
             for line in output.splitlines():
                 line = line.strip()
@@ -698,8 +699,8 @@ def build_issue_index() -> Dict[str, IssueRecord]:
                         paths.append(full_path)
         except Exception:
             pass
-    # Fallback: filesystem scan at ROOT_DIR (works when running from the
-    # worktree that actually has the files on disk).
+    # Fallback: filesystem scan — scope to changed_paths when available
+    # so that historical unrelated raw-* directories don't trigger gate errors.
     if not USE_RANGE_VIEW or not RANGE_SOURCE_REF:
         issues_dir = os.path.join(ROOT_DIR, "docs", "B1-docs")
         if os.path.isdir(issues_dir):
@@ -708,6 +709,10 @@ def build_issue_index() -> Dict[str, IssueRecord]:
                     mf = os.path.join(issues_dir, d, "issue.md")
                     if os.path.isfile(mf):
                         rel = os.path.relpath(mf, ROOT_DIR)
+                        if changed_paths is not None:
+                            # Only include if this file or its directory is touched
+                            if rel not in (changed_paths or set()):
+                                continue
                         if rel not in paths:
                             paths.append(rel)
     result: Dict[str, IssueRecord] = {}
@@ -788,7 +793,7 @@ def candidate_has_canonical_owner_line(
 VALID_RAW_PHASES = {"proposed", "absorbed", "dropped"}
 
 
-def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[str]:
+def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None, issues_index: dict = None) -> list[str]:
     """Validate a raw-* issue meets B1 entry-point requirements.
 
     Checks:
@@ -825,7 +830,15 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
             target_id = match.group(1).strip("`").strip('"').strip("'")
             target_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", target_id)
             found = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "issue.md"))
-            if not found:
+            if not found and issues_index:
+                # Look up in the scoped index first (avoids full-repo os.walk)
+                for ipath, irec in issues_index.items():
+                    if irec.issue_id and irec.issue_id == target_id:
+                        found = True; break
+                    if ipath.endswith(f"/{target_id}.md") or f"/{target_id}/" in ipath:
+                        found = True; break
+            if not found and issues_index is None:
+                # Fallback full scan only when no scoped index available
                 for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "B2-docs")):
                     if "issues" in dirs:
                         for f in os.listdir(os.path.join(root, "issues")):
@@ -931,7 +944,7 @@ def main() -> int:
         for source_candidate_path in entry.source_candidates:
             milestone_entries_by_source_candidate.setdefault(source_candidate_path, []).append(entry)
 
-    issues_index = build_issue_index()
+    issues_index = build_issue_index(changed_paths=issue_paths)
     issues_by_id = build_issue_id_index(issues_index)
     candidate_records: List[CandidateRecord] = []
     progress_records: List[ProgressRecord] = [parse_progress_file(path) for path in sorted(progress_paths)]
@@ -1574,7 +1587,7 @@ def main() -> int:
         # Raw issues are B1 entry points — they don't have source_candidate.
         # Instead, validate raw-specific requirements.
         if issue.path.startswith("docs/B1-docs/raw-"):
-            raw_errors = _validate_raw_issue(issue, changed_paths)
+            raw_errors = _validate_raw_issue(issue, changed_paths, issues_index)
             errors.extend(raw_errors)
             continue
 
