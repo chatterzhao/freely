@@ -1,3 +1,12 @@
+## M-20260706T114314Z-A
+- title: hook 提示 + 命令速查
+- status: active
+### candidate_issues
+1. `C-20260706T114314Z-A`
+- milestone: M-20260706T114314Z-A
+- status: promoted
+- promoted_issue_id: `I-20260706T114314Z-A`
+
 ## M-20260706T091733Z-A
 - title: 门禁硬拦截
 - status: completed
