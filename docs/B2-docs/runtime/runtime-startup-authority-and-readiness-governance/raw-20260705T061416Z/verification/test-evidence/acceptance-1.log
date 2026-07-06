@@ -1,0 +1,3 @@
+PASS: no backtick command substitution
+Fixed line: log_error "    详细流程见 skill freely-workflow-guarded-execution"
+grep backtick check: CLEAN

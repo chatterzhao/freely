@@ -21979,7 +21979,7 @@ start_project_runtime() {
       log_error "    freely feedback --kind fix --title '...' --body '...'  # 创建 raw issue"
       log_error "    freely wt-create --raw-key <key> --source local --kind fix --slug <slug>  # 创建工位"
       log_error "    cd ../<project>-worktrees/<dir>  # 进入工位修复"
-      log_error "    详细流程见 skill \\`freely-workflow-guarded-execution\\`"
+      log_error "    详细流程见 skill freely-workflow-guarded-execution"
       log_error ""
       log_error "Then retry: freely daemon start --project $project"
       exit 1
