@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260627T084545Z45Z
+local_id: raw-20260627T084545Z
 kind: raw
 phase_state: absorbed
 platform_ids:
@@ -9,11 +9,10 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
-absorbed_into: I-20260627T084545Z-A
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-27T08:46:05Z'
-updated_at: '2026-06-27T08:46:05Z'
+updated_at: '2026-06-27T12:24:53Z'
 intake_id: ''
 author: platform
 channel: github

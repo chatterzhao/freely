@@ -852,7 +852,7 @@ def _main() -> int:
             print(json.dumps({"task_id": tid}))
         elif args.cmd == "insert":
             tid = create_task(
-                agent_id=getattr(args, 'role', 'manager') or "manager",
+                agent_id=getattr(args, 'agent_id', None) or getattr(args, 'role', 'manager') or "manager",
                 raw_key=getattr(args, 'raw_key', '') or "",
                 worktree=getattr(args, 'worktree', '') or "",
                 branch=getattr(args, 'branch', '') or "",
@@ -1087,7 +1087,7 @@ def _main() -> int:
                     task_id = existing_task_id
                 else:
                     r = c.create(
-                        agent_id=getattr(args, 'role', 'manager') or "manager",
+                        agent_id=getattr(args, 'agent_id', None) or getattr(args, 'role', 'manager') or "manager",
                         name=getattr(args, 'role', 'manager') or "manager",
                         raw_key=getattr(args, 'raw_key', '') or "",
                         worktree=getattr(args, 'worktree', '') or "",

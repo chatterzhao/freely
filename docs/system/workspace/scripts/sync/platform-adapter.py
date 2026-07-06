@@ -597,9 +597,13 @@ def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, st
     """Set assignee for an issue. Returns (ok, message)."""
     if platform == "github":
         try:
-            _gh("api", "--method", "POST",
-                f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
-                "--input", "-", _input=f'{{"assignees":["{login}"]}}')
+            import subprocess as _sp
+            _sp.run(
+                ["gh", "api", "--method", "POST",
+                 f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
+                 "--input", "-"],
+                input=f'{{"assignees":["{login}"]}}',
+                text=True, check=True, capture_output=True)
             return True, f"Assigned {login} to GitHub #{issue_number}"
         except Exception as e:
             return False, f"Failed to assign on GitHub: {e}"
