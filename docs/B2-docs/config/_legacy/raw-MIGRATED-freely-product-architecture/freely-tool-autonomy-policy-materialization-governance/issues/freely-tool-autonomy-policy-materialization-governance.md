@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
-- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews`
 - depends_on:
-  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -61,11 +61,11 @@ Freely 已经明确选择默认高自治方向，但“这份姿势如何被具�
 
 ## Completion
 
-- `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
-- `docs/B2-docs/config/packaging/brainstorms/b-freely-tool-autonomy-policy-materialization-governance.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
-- `docs/B2-docs/config/packaging/tasks.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403brainstorms/b-freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403prd.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403tasks.md`
 - `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/B1-docs/raw-20260323T204500Z/brainstorms.md`

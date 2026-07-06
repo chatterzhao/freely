@@ -1,0 +1,7 @@
+- issue_id: I-20260522T044515Z-A
+- kind: feat
+- phase_state: completed
+- milestone: M-20260522T044515Z-A
+- source_candidate: docs/B1-docs/raw-20260522T044515Z15Z/candidates.md#C-20260522T044515Z-A
+- verification_artifact_dir: docs/B2-docs/slot-probe-generic-hi/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T044515ZI-20260522T044515Z-A/issue.md

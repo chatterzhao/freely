@@ -18,7 +18,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
+  - `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/auto-loop-orchestrator-bootstrap.md`
   - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - session_refs: []
 

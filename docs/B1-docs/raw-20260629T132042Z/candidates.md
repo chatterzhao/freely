@@ -28,6 +28,6 @@ milestone: M-20260629T132042Z-A
   - mode: in-session
   - summary: 评审 6 个 .sh 文件中的 ./bin/ 引用，确认替换策略正确（区分 CLI 命令与库引用），与 #3622 规范化方向一致
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T132042Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260629T132042Z-A/issue.md
 - milestone: M-20260629T132042Z-A
 - session_refs: []

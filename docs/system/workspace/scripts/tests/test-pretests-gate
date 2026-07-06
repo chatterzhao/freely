@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-pretests-gate.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 REPO="$TMP_DIR/repo"
-mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/epics/sample/story/issues" "$REPO/docs/epics/sample/story"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/B2-docs/sample/story/issues" "$REPO/docs/B2-docs/sample/story"
 cd "$REPO"
 
 git init -q -b develop
@@ -16,29 +16,29 @@ cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
 cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
 chmod +x "$REPO/bin/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
 
-cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `in_dev`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
   echo "[FAIL] pretests-gate should reject an issue without binding" >&2
   exit 1
 fi
 grep -q 'missing pre_tests_path' "$TMP_DIR/stderr1"
 
-cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
 EOF
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -85,19 +85,19 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `pending://sample`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"; then
   echo "[FAIL] pretests-gate should reject pending acceptance items" >&2
   exit 1
 fi
 grep -q 'must be pass or not_applicable' "$TMP_DIR/stderr2"
 grep -q 'pending artifact_ref' "$TMP_DIR/stderr2"
 
-mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
-cat > "$REPO/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+mkdir -p "$REPO/docs/B2-docs/sample/story/code-reviews"
+cat > "$REPO/docs/B2-docs/sample/story/code-reviews/pt-1.md" <<'EOF'
 # Verification artifact
 EOF
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -141,31 +141,31 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
-cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks: sample
 
 - [ ] Task 1: This fixture still claims unfinished owner work.
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2tasks" 2>"$TMP_DIR/stderr2tasks"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout2tasks" 2>"$TMP_DIR/stderr2tasks"; then
   echo "[FAIL] pretests-gate should reject completed issues whose tasks.md still has unchecked boxes" >&2
   exit 1
 fi
 grep -q '\[task_closeout_incomplete\]' "$TMP_DIR/stderr2tasks"
 grep -q 'contains unchecked tasks' "$TMP_DIR/stderr2tasks"
 
-cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks: sample
 
 - [x] Task 1: This fixture completed its owner work.
 EOF
 
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -208,16 +208,16 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2re" 2>"$TMP_DIR/stderr2re"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout2re" 2>"$TMP_DIR/stderr2re"; then
   echo "[FAIL] pretests-gate should reject Real-Environment chapters that omit the review reason" >&2
   exit 1
 fi
 grep -q "section 'Real-Environment' missing 'real_environment_reason'" "$TMP_DIR/stderr2re"
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -261,16 +261,16 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2rf" 2>"$TMP_DIR/stderr2rf"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout2rf" 2>"$TMP_DIR/stderr2rf"; then
   echo "[FAIL] pretests-gate should reject Real-Environment chapters that explicitly fail review" >&2
   exit 1
 fi
 grep -q "section 'Real-Environment' is fail" "$TMP_DIR/stderr2rf"
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -314,23 +314,23 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `This task is intentionally not run in the sample fixture.`
 - evidence_level: `integration`
 - status: `not_applicable`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2na" 2>"$TMP_DIR/stderr2na"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout2na" 2>"$TMP_DIR/stderr2na"; then
   echo "[FAIL] pretests-gate should reject not_applicable acceptance items that lack explicit reason fields" >&2
   exit 1
 fi
 grep -q 'is marked not_applicable but is missing not_applicable_reason, not_applicable_explanation, replacement_evidence' "$TMP_DIR/stderr2na"
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -374,29 +374,29 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `This task is intentionally not run in the sample fixture.`
 - evidence_level: `integration`
 - status: `not_applicable`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 - not_applicable_reason: `covered_by_more_realistic_required_surface`
 - not_applicable_explanation: `The pass item already captures the only executable integration surface in this bounded sample fixture.`
 - replacement_evidence: `PT-1 remains the canonical artifact-backed integration proof for this fixture.`
 EOF
 
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2a" 2>"$TMP_DIR/stderr2a"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2a" 2>"$TMP_DIR/stderr2a"; then
   echo "[FAIL] pretests-gate should reject develop-merge adequacy when no Acceptance Item materializes adequacy v2 fields" >&2
   exit 1
 fi
 grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stderr2a"
 grep -q 'require at least one Acceptance Item with adequacy v2 fields' "$TMP_DIR/stderr2a"
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -440,7 +440,7 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -448,14 +448,14 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - case_design: `Given the sample fixture, run the integration replay and observe the verification artifact.`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2b" 2>"$TMP_DIR/stderr2b"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2b" 2>"$TMP_DIR/stderr2b"; then
   echo "[FAIL] pretests-gate should reject adequacy-v2 items that do not cover the requested lane/gate" >&2
   exit 1
 fi
 grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stderr2b"
 grep -q 'none target lane premerge-integration for promotion gate develop_merge' "$TMP_DIR/stderr2b"
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
@@ -499,7 +499,7 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -507,27 +507,27 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - case_design: `Given the sample fixture, run the guarded integration replay and capture the review artifact used for develop promote.`
 EOF
 
-cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks: sample
 
 - [ ] Task 1: The guarded promote closeout is still unfinished.
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2tasks2" 2>"$TMP_DIR/stderr2tasks2"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2tasks2" 2>"$TMP_DIR/stderr2tasks2"; then
   echo "[FAIL] pretests-gate should reject adequacy checks when tasks.md still shows unfinished owner work" >&2
   exit 1
 fi
 grep -q '\[task_closeout_incomplete\]' "$TMP_DIR/stderr2tasks2"
 
-cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks: sample
 
 - [x] Task 1: The guarded promote closeout is complete.
 EOF
 
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
 
-cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Integration
@@ -541,18 +541,18 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - requirement: `sample`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- artifact_ref: `docs/B2-docs/sample/story/code-reviews/pt-1.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/sample/story/issues/sample.md >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3"; then
   echo "[FAIL] pretests-gate should reject pre-tests missing required sections" >&2
   exit 1
 fi
 grep -q '\[pre_tests_missing\]' "$TMP_DIR/stderr3"
 grep -q "missing required section '## Unit'" "$TMP_DIR/stderr3"
 
-mkdir -p "$REPO/docs/epics/auth/switch/issues" "$REPO/docs/epics/auth/switch/code-reviews"
-cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
+mkdir -p "$REPO/docs/B2-docs/auth/switch/issues" "$REPO/docs/B2-docs/auth/switch/code-reviews"
+cat > "$REPO/docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 # Issue: auth switch startup recovery follow-on
 
 - issue_id: `I-auth-switch-follow-on`
@@ -560,21 +560,21 @@ cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 - title: `Follow-on auth switch startup recovery verification tightening`
 - issue-name: `auth-switch-startup-recovery-follow-on`
 - follow_on_to: `I-auth-switch-parent`
-- pre_tests_path: `docs/epics/auth/switch/pre-tests.md`
-- verification_artifact_dir: `docs/epics/auth/switch/code-reviews`
+- pre_tests_path: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/code-reviews`
 EOF
 
-cat > "$REPO/docs/epics/auth/switch/code-reviews/integration.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/code-reviews/integration.md" <<'EOF'
 # Integration artifact
 EOF
 
-cat > "$REPO/docs/epics/auth/switch/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/tasks.md" <<'EOF'
 # Tasks: auth switch follow-on
 
 - [x] Task 1: Keep the follow-on fixture fully closed out.
 EOF
 
-cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/pre-tests.md" <<'EOF'
 # Pre-tests: auth switch follow-on
 
 ## Unit
@@ -614,20 +614,20 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - requirement: `Integration replay ran for auth switch startup recovery.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+- artifact_ref: `docs/B2-docs/auth/switch/code-reviews/integration.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout4" 2>"$TMP_DIR/stderr4"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout4" 2>"$TMP_DIR/stderr4"; then
   echo "[FAIL] pretests-gate should reject auth/switch follow-on owners that dual-waive End-to-End and Real-Environment without live evidence" >&2
   exit 1
 fi
 grep -q "cannot mark 'Real-Environment' pass without at least one artifact-backed pass Acceptance Item" "$TMP_DIR/stderr4"
 
-cat > "$REPO/docs/epics/auth/switch/code-reviews/live.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/code-reviews/live.md" <<'EOF'
 # Live replay artifact
 EOF
 
-cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/pre-tests.md" <<'EOF'
 # Pre-tests: auth switch follow-on
 
 ## Unit
@@ -654,7 +654,7 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - blocker taxonomy: `evidence_plan_missing`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `This follow-on defers end-to-end replay to the protected lane.`
-- replacement_evidence: `See docs/epics/auth/switch/code-reviews/live.md for the bound live replay artifact.`
+- replacement_evidence: `See docs/B2-docs/auth/switch/code-reviews/live.md for the bound live replay artifact.`
 
 ## Real-Environment
 - real_environment_status: `pass`
@@ -667,19 +667,19 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - requirement: `Integration replay ran for auth switch startup recovery.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+- artifact_ref: `docs/B2-docs/auth/switch/code-reviews/integration.md`
 
 ### Live replay
 - id: `auth-switch-live`
 - requirement: `A real protected-lane replay observed the startup recovery behavior.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/auth/switch/code-reviews/live.md`
+- artifact_ref: `docs/B2-docs/auth/switch/code-reviews/live.md`
 EOF
 
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md
 
-cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 # Issue: auth switch startup recovery follow-on
 
 - issue_id: `I-auth-switch-follow-on`
@@ -687,11 +687,11 @@ cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
 - title: `Follow-on real bin/ai and codex exec verification tightening`
 - issue-name: `auth-switch-startup-recovery-follow-on`
 - follow_on_to: `I-auth-switch-parent`
-- pre_tests_path: `docs/epics/auth/switch/pre-tests.md`
-- verification_artifact_dir: `docs/epics/auth/switch/code-reviews`
+- pre_tests_path: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/auth/switch/raw-TESTFIXTURE/code-reviews`
 EOF
 
-cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/auth/switch/pre-tests.md" <<'EOF'
 # Pre-tests: auth switch follow-on
 
 ## Unit
@@ -731,10 +731,10 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - requirement: `Integration replay ran for auth switch startup recovery.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+- artifact_ref: `docs/B2-docs/auth/switch/code-reviews/integration.md`
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout5" 2>"$TMP_DIR/stderr5"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout5" 2>"$TMP_DIR/stderr5"; then
   echo "[FAIL] pretests-gate should also reject follow-on owners that only mention bin/ai or codex exec while dual-waiving End-to-End and Real-Environment" >&2
   exit 1
 fi
@@ -746,16 +746,16 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --target-lane premerge-integratio
 fi
 grep -q 'require --require-adequacy' "$TMP_DIR/stderr6"
 
-mkdir -p "$REPO/docs/epics/staged/story/issues" "$REPO/docs/epics/staged/story/code-reviews"
-cat > "$REPO/docs/epics/staged/story/issues/staged.md" <<'EOF'
+mkdir -p "$REPO/docs/B2-docs/staged/story/issues" "$REPO/docs/B2-docs/staged/story/code-reviews"
+cat > "$REPO/docs/B2-docs/staged/story/issues/staged.md" <<'EOF'
 # Issue: staged
 
 - issue_id: `I-staged`
 - phase_state: `completed`
-- pre_tests_path: `docs/epics/staged/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/staged/story/code-reviews`
+- pre_tests_path: `docs/B2-docs/staged/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/staged/story/raw-TESTFIXTURE/code-reviews`
 EOF
-cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged
 
 ## Unit
@@ -795,7 +795,7 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - requirement: `The staged guarded replay must be evidenced in the commit itself.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- artifact_ref: `docs/B2-docs/staged/story/code-reviews/r-staged.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -803,34 +803,34 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - case_design: `Run the staged replay and stage the review artifact in the same commit.`
 EOF
 
-cat > "$REPO/docs/epics/staged/story/tasks.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/tasks.md" <<'EOF'
 # Tasks: staged
 
 - [x] Task 1: Keep the staged completion fixture closed out.
 EOF
-git add docs/epics/staged/story/issues/staged.md docs/epics/staged/story/pre-tests.md docs/epics/staged/story/tasks.md
+git add docs/B2-docs/staged/story/issues/staged.md docs/B2-docs/staged/story/pre-tests.md docs/B2-docs/staged/story/tasks.md
 
-cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/code-reviews/r-staged.md" <<'EOF'
 # Staged review artifact
 EOF
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7a" 2>"$TMP_DIR/stderr7a"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7a" 2>"$TMP_DIR/stderr7a"; then
   echo "[FAIL] pretests-gate should reject ambiguous issue-bound worktree reads when staged changes overlap the same owner scope" >&2
   exit 1
 fi
 grep -q 'rerun with --staged-only or unstage those paths' "$TMP_DIR/stderr7a"
 
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7" 2>"$TMP_DIR/stderr7"; then
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7" 2>"$TMP_DIR/stderr7"; then
   echo "[FAIL] pretests-gate should reject staged-only adequacy when the referenced artifact is not staged" >&2
   exit 1
 fi
 grep -q 'require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level' "$TMP_DIR/stderr7"
 
-git add docs/epics/staged/story/code-reviews/r-staged.md
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+git add docs/B2-docs/staged/story/code-reviews/r-staged.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
 
 git commit -q -m "stage guarded artifact"
-cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged
 
 ## Unit
@@ -870,29 +870,29 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - requirement: `A previously committed artifact must not satisfy the guarded merge by itself.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- artifact_ref: `docs/B2-docs/staged/story/code-reviews/r-staged.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `task-staged-1b`
 - case_design: `Demonstrate that old committed review evidence must be restaged in the guarded merge.`
 EOF
-git add docs/epics/staged/story/pre-tests.md
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7b" 2>"$TMP_DIR/stderr7b"; then
+git add docs/B2-docs/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7b" 2>"$TMP_DIR/stderr7b"; then
   echo "[FAIL] pretests-gate should reject develop-merge adequacy that reuses an unchanged committed artifact" >&2
   exit 1
 fi
-grep -q 'artifact_ref is a fresh staged owner review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7b"
+grep -q 'artifact_ref is a fresh staged owner review artifact under docs/B2-docs/staged/story/code-reviews' "$TMP_DIR/stderr7b"
 
-cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/code-reviews/r-staged.md" <<'EOF'
 # Staged review artifact
 
 restaged refresh
 EOF
-git add docs/epics/staged/story/code-reviews/r-staged.md
-"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+git add docs/B2-docs/staged/story/code-reviews/r-staged.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
 
-cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged
 
 ## Unit
@@ -932,21 +932,21 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - requirement: `A staged artifact outside the bound verification dir must not satisfy guarded merge adequacy.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/staged/story/pre-tests.md`
+- artifact_ref: `docs/B2-docs/staged/story/pre-tests.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `task-staged-1c`
 - case_design: `Demonstrate that only staged review artifacts under the owner verification dir can justify develop merge.`
 EOF
-git add docs/epics/staged/story/pre-tests.md
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7c" 2>"$TMP_DIR/stderr7c"; then
+git add docs/B2-docs/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7c" 2>"$TMP_DIR/stderr7c"; then
   echo "[FAIL] pretests-gate should reject staged adequacy that points outside the bound verification dir" >&2
   exit 1
 fi
-grep -q 'artifact_ref is a fresh staged owner review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7c"
+grep -q 'artifact_ref is a fresh staged owner review artifact under docs/B2-docs/staged/story/code-reviews' "$TMP_DIR/stderr7c"
 
-cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged
 
 ## Unit
@@ -986,15 +986,15 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - requirement: `A mock artifact must not satisfy guarded premerge integration.`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- artifact_ref: `docs/B2-docs/staged/story/code-reviews/r-staged.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `task-staged-2`
 - case_design: `Demonstrate that mock evidence is insufficient for guarded premerge integration.`
 EOF
-git add docs/epics/staged/story/pre-tests.md
-if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout8" 2>"$TMP_DIR/stderr8"; then
+git add docs/B2-docs/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/B2-docs/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout8" 2>"$TMP_DIR/stderr8"; then
   echo "[FAIL] pretests-gate should reject mock-only evidence for premerge-integration develop_merge" >&2
   exit 1
 fi

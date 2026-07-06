@@ -31,6 +31,6 @@ milestone: M-20260630T002621Z-A
   - mode: in-session
   - summary: B1 预研覆盖现状分析、对标分析（Conveyor/CAO/Superharness）、四个方案对比、分 Phase 交付策略。Phase 1 范围明确（旁观不介入），留有 Phase 2/3 扩展空间
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T002621Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T002621Z-A/issue.md
 - milestone: M-20260630T002621Z-A
 - session_refs: []

@@ -8,5 +8,5 @@ milestone: M-20260630T151209Z-A
 - candidate_format_version: v2
 - title: unified _read_config_value() + --reset flag
 - status: promoted
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T151209Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T151209Z-A/issue.md
 - milestone: M-20260630T151209Z-A

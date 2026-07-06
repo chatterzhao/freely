@@ -1,7 +1,7 @@
 ---
 name: Pre-merge Gate Check Implementation Decision Note
 owner_issue: I-20260616T033325Z-A
-owner_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T033325Z-A/issue.md
+owner_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T033325Z-A/issue.md
 implementation_decision_note: true
 phase_state: completed
 review_id: premerge-gate-check-review
@@ -10,7 +10,7 @@ review_id: premerge-gate-check-review
 # Implementation Decision Note: Pre-merge Governance Gate
 
 - issue_id: I-20260616T033325Z-A
-- issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T033325Z-A/issue.md
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T033325Z-A/issue.md
 - source_candidate: docs/B1-docs/raw-20260616T033325Z25Z/candidates.md
 
 ## Implementation Decision Note

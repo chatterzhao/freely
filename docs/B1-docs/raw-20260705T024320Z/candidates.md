@@ -20,5 +20,5 @@ milestone: M-20260705T024320Z-A
   - sse-watchdog 传 base_tool
 - promotion_gate: 全部修复通过 bash -n + Python AST
 - promoted_issue_id: I-20260705T024320Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T024320Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260705T024320Z-A/issue.md
 - milestone: M-20260705T024320Z-A

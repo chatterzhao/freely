@@ -38,4 +38,6 @@
 - case_design: `gate detects timestamp drift in raw/C/I chain`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/gate1-timestamp/code-reviews/review.md`

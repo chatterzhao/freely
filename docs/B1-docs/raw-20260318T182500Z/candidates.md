@@ -6,7 +6,7 @@
 - Title: worktree hygiene supervision control plane
 - Problem: Freely 缺少针对 dirty-budget / checkpoint drift 的自治监督控制面，manager 只能观察，不能稳定推动 worker 收口。
 - Expected outcome: 明确 manager/worker/runtime/hook 的 hygiene 分工，并新增可执行能力与测试。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T182500Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T182500Z-A/issue.md
 - milestone: M-20260318T182500Z-A
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 

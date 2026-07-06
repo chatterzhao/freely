@@ -18,5 +18,5 @@ absorbed_into: I-20260703T114618Z-A
   - restart 后 agent_working 中有 manager session_id → 可 resume
   - worker/reviewer 的写入不受影响（已在 watchdog_sse.py 中正确实现）
 - absorbed_into: I-20260703T114618Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T114618Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260703T114618Z-A/issue.md
 - milestone: M-20260703T114618Z-A

@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-human-chat-intake.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260319-0000"
 mkdir -p "$PROJECT/.freely"
 
 git init -q -b develop "$PROJECT"
@@ -27,25 +27,25 @@ cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # 预研头脑风暴工作区
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260319-0000--sample
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # 收敛
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260319-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
 
-cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260319-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -123,14 +123,14 @@ cat >"$RESOLUTION_FILE" <<'EOF'
 - absorption_recommendation: discovery -> doc-pre-brainstorm-execution
 EOF
 
-RESOLVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake resolve --project "$PROJECT" --intake-id "$INTAKE_ID" --resolved-by interruption-worker --reaction followup --classification discovery --resolution-file "$RESOLUTION_FILE" --absorption-target 'docs/pre-brainstorms/20260319-0000--sample' --linked-artifact 'docs/pre-brainstorms/20260319-0000--sample/brainstorms.md')"
+RESOLVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake resolve --project "$PROJECT" --intake-id "$INTAKE_ID" --resolved-by interruption-worker --reaction followup --classification discovery --resolution-file "$RESOLUTION_FILE" --absorption-target 'docs/B1-docs/raw-20260319-0000' --linked-artifact 'docs/B1-docs/raw-20260319-0000/brainstorms.md')"
 RESOLUTION_ARTIFACT="$(printf '%s\n' "$RESOLVE_OUTPUT" | sed -n 's/^resolution_artifact: //p')"
 [[ -f "$RESOLUTION_ARTIFACT" ]] || {
   echo "[FAIL] missing interruption resolution artifact" >&2
   exit 1
 }
 grep -q 'STATUS="absorbed"' "$INTAKE_PATH/meta.env"
-grep -q 'ABSORPTION_TARGET="docs/pre-brainstorms/20260319-0000--sample"' "$INTAKE_PATH/meta.env"
+grep -q 'ABSORPTION_TARGET="docs/B1-docs/raw-20260319-0000"' "$INTAKE_PATH/meta.env"
 grep -q 'RESOLUTION_ARTIFACT="' "$INTAKE_PATH/meta.env"
 grep -q 'absorption_recommendation' "$RESOLUTION_ARTIFACT"
 

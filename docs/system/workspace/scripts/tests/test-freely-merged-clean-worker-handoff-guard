@@ -22,7 +22,7 @@ git -C "$PROJECT" commit -q -m "init"
 
 git -C "$PROJECT" branch feature/test-worker
 git -C "$PROJECT" worktree add "$WORKER" feature/test-worker >/dev/null
-mkdir -p "$WORKER/docs/epics/sample/story/issues" "$WORKER/docs/epics/sample/story/code-reviews" "$WORKER/docs/progress"
+mkdir -p "$WORKER/docs/B2-docs/sample/story/issues" "$WORKER/docs/B2-docs/sample/story/code-reviews" "$WORKER/docs/progress"
 cat >"$WORKER/feature.txt" <<'EOF'
 worker change
 EOF
@@ -34,20 +34,20 @@ AI_TOOL="codex"
 AI_MODEL=""
 AI_MODE="auto"
 EOF
-cat >"$WORKER/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat >"$WORKER/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-sample`
 - phase_state: `in_verification`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
-- tasks_path: `docs/epics/sample/story/tasks.md`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
+- tasks_path: `docs/B2-docs/sample/story/tasks.md`
 - progress_path: `docs/progress/sample.md`
 EOF
-cat >"$WORKER/docs/epics/sample/story/pre-tests.md" <<'EOF'
+cat >"$WORKER/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests
 EOF
-cat >"$WORKER/docs/epics/sample/story/tasks.md" <<'EOF'
+cat >"$WORKER/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks
 EOF
 cat >"$WORKER/docs/progress/sample.md" <<'EOF'
@@ -62,7 +62,7 @@ cat >"$WORKER/docs/progress/sample.md" <<'EOF'
 
 - merged followthrough evidence
 EOF
-cat >"$WORKER/docs/epics/sample/story/code-reviews/retirement.md" <<'EOF'
+cat >"$WORKER/docs/B2-docs/sample/story/code-reviews/retirement.md" <<'EOF'
 # Verification
 EOF
 
@@ -77,13 +77,13 @@ Branch:
 - \`feature/test-worker\`
 
 Owner-Issue:
-- \`docs/epics/sample/story/issues/sample.md\`
+- \`docs/B2-docs/sample/story/issues/sample.md\`
 
 Pre-Tests-Path:
-- \`docs/epics/sample/story/pre-tests.md\`
+- \`docs/B2-docs/sample/story/pre-tests.md\`
 
 Verification-Artifact-Dir:
-- \`docs/epics/sample/story/code-reviews\`
+- \`docs/B2-docs/sample/story/code-reviews\`
 EOF
 
 CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260323-170438.md"

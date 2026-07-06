@@ -10,15 +10,15 @@
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260401T224500Z/candidates.md#c-20260401-2316-a`
 - source_brainstorm: `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
-- reopen_of_issue: `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- reopen_of_issue: `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md`
 - reopen_reason: `canonical cc:auto ACP init now requires --accept-default-autonomy, but test-freely-init-cc-config still used the old invocation`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
-- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews`
 - depends_on:
-  - `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -54,12 +54,12 @@ Because the develop merge gate requires every develop-bound replay to remain can
 - `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/milestones.md`
-- `docs/B2-docs/config/packaging/brainstorms/b-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
-- `docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
-- `docs/B2-docs/config/packaging/tasks.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260401-cc-acp-init-autonomy-consent-test-followthrough-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403brainstorms/b-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403prd.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403tasks.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260401-cc-acp-init-autonomy-consent-test-followthrough-verification.md`
 - `docs/progress/freely-product-architecture/p-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
 - `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 

@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这次多轮 worktree 维护已经证明，该能力不再是抽象研究，而是 Freely 主管层的稳定日常动作；继续把它散落在 `branch-management`、聊天经验和 ad hoc 审计里，只会重复消耗轮次。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T141000Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T141000Z-A/issue.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

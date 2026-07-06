@@ -22,7 +22,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: 这条路径已经在本机通过 `CCR + Claude Code + codex mcp-server` 跑通，并最终收敛成 `cc` / `cc-use-codex-cli` 两个显式工具、`skill:tool-cc-codex-mcp-runtime`、以及双层 session evidence runtime。早期 capability-only 命名建议已被后续实现与用户交互方式取代。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T162800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T162800Z-A/issue.md
 - milestone: M-20260320T162800Z-A
 - session_refs:
   - tool: cc-use-codex-cli

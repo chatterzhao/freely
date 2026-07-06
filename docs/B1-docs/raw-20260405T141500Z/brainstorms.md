@@ -3,7 +3,7 @@
 ## Context
 
 - source: continuation from `I-20260405T002700Z-A` verification and the user request to decide when the switch backend should split into a standalone app
-- related owner: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- related owner: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - observed local skeleton: `/Users/zhaoyu/Downloads/code/my-codex-account-switch/codex-account-switch`
 
 ## Observations

@@ -35,7 +35,7 @@
 - milestone: `M-20260326-freely-product-architecture`
 - decision_reason: 本轮仍把产物限定为 `AGENTS.md` 中的开发入口回复风格实验，不把它升级成新的 Freely 能力；但讨论同时确认了一条既有能力真相：Freely 已会为项目生成最小 `AGENTS.md` 并优先读取它。为了合法 merge 到 `develop`，需要以一个 narrow issue owner 承接 `AGENTS.md`、pre-brainstorm、milestone writeback 与这条项目级入口事实的文档对齐。
 - promoted_issue_id: `I-20260405-cli-output-style-A`
-- promoted_issue_path: `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/agents-cli-output-style-experiment-governance.md`
 - next_action: 以 narrow owner `I-20260405-cli-output-style-A` 完成 `AGENTS.md` 实验与“项目级 AGENTS 先生成再读取”的现有能力事实的 issue/progress/review writeback，并 replay 到 `develop`。
 - revisit_trigger: 当这条实验被证明不足、需要进入更高优先级真源，或需要作为 Freely 对外能力长期消费时重新唤起
 - session_refs:

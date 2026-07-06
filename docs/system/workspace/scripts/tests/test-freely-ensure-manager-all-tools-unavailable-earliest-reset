@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-all-tools-unavailable.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260331-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260331-0000" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
 
 git init -q -b develop "$PROJECT"
 
@@ -22,21 +22,21 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # 预研头脑风暴工作区
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260331-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # 收敛
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260331-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260331-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

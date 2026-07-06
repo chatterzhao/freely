@@ -1,0 +1,7 @@
+- issue_id: I-20260522T042725Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260522T042725Z-A
+- source_candidate: docs/B1-docs/raw-20260522T042725Z25Z/candidates.md#C-20260522T042725Z-A
+- verification_artifact_dir: docs/B2-docs/apikey-full-slot-name-fixes/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T042725ZI-20260522T042725Z-A/issue.md

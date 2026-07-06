@@ -23,7 +23,7 @@
 - next_action: 在 `I-20260321T183500Z-A` 中收紧 develop merge gate，要求 merge 绑定具体 issue，并确保 touched candidate 与 touched owner issue 处在同一条 C/M/I 线上。
 - revisit_trigger: 若后续仍出现 candidate-only merge、borrowed owner issue、或 allowed status 误判放行，则在本 issue 线继续追加 regression。
 - promoted_issue_id: I-20260321T183500Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321T183500Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260321T183500Z-A/issue.md
 - milestone: M-20260321T183500Z-A
 - supporting_evidence: 2026-03-27 dogfood replay 确认 `pre-merge-commit` hook 虽已触发，但因为错误依赖 `MERGE_HEAD` 守卫而放过了 develop-bound runtime/test merge；修复方向应改为直接审查 staged merge 结果，并以真实 `git merge` 回归测试钉住该时序。
 - supporting_evidence: 同轮继续确认 `absorbed` 候选当前被判得过宽，只要 `promoted_issue_path` 指向某个现存 owner issue 就足以放行 develop merge；后续 gate 应先要求“本次 merge 基于一个具体 issue”，再验证该 issue 的 `C/M/I` 链与允许状态，而不是让 candidate-only supporting evidence 直接成为通行证。

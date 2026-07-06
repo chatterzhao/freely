@@ -44,6 +44,6 @@ milestone: M-20260703T003829Z-A
   - summary: 审查 unsafe source 替换为 meta_env_value 的正确性，确认无其他同类问题
   - verdict: pass
 - promoted_issue_id: I-20260703T003829Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T003829Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260703T003829Z-A/issue.md
 - milestone: M-20260703T003829Z-A
 - session_refs: []

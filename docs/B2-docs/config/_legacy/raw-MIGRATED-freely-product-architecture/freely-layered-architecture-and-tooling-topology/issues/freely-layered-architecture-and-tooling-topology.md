@@ -7,7 +7,7 @@
 - epic-name: `freely-product-architecture`
 - story-name: `freely-layered-architecture-and-tooling-topology`
 - issue-name: `freely-layered-architecture-and-tooling-topology`
-- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260326T181000Z/candidates.md#c-20260326-1810-a`
 - source_brainstorm: `docs/B1-docs/raw-20260326T181000Z/brainstorms.md`
@@ -66,11 +66,11 @@ Freely 已经在多个局部真源里分别写对了部分边界，例如 `three
 - `docs/milestones.md`
 - `docs/B1-docs/raw-20260326T181000Z/brainstorms.md`
 - `docs/B1-docs/raw-20260326T181000Z/candidates.md`
-- `docs/B2-docs/config/packaging/brainstorms/b-freely-layered-architecture-and-tooling-topology.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
-- `docs/B2-docs/config/packaging/tasks.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403brainstorms/b-freely-layered-architecture-and-tooling-topology.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403prd.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403tasks.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
 
 ## Verification
 

@@ -1,6 +1,6 @@
 ---
 name: a2a-replace-handoff
-raw_key: raw-20260612T000223Z23Z
+raw_key: raw-20260612T000223Z
 created: 2026-06-12T00:10:00Z
 status: proposed
 ---

@@ -1,7 +1,7 @@
 # Code Review: frontend-runtime-baseline-for-probe-absorption-verification
 
 - issue_id: `I-20260317-1004`
-- issue: `docs/B2-docs/human/tui/issues/frontend-runtime-baseline-for-probe.md`
+- issue: `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-runtime-baseline-for-probe.md`
 - reviewer: `codex`
 - phase: `completed`
 - date: `2026-04-02`
@@ -28,9 +28,9 @@
 4. downstream closeout and verification
    - result: present
    - evidence:
-     - `docs/B2-docs/human/tui/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
-     - `docs/B2-docs/human/tui/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
-     - `docs/B2-docs/human/tui/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
+     - `docs/B2-docs/human/tui/raw-20260308-1244code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
+     - `docs/B2-docs/human/tui/raw-20260308-1244code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
+     - `docs/B2-docs/human/tui/raw-20260308-1244code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
 
 ## Findings
 

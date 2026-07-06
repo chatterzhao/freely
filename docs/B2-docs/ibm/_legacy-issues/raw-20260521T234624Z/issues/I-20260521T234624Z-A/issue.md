@@ -1,0 +1,7 @@
+- issue_id: I-20260521T234624Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260521T234624Z-A
+- source_candidate: docs/B1-docs/raw-20260521T234624Z24Z/candidates.md#C-20260521T234624Z-A
+- verification_artifact_dir: docs/B2-docs/opencode-high-failure-rate/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260521T234624ZI-20260521T234624Z-A/issue.md

@@ -7,7 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 make_project() {
   local project="$1" branch="${2:-develop}"
-  mkdir -p "$project/.freely" "$project/docs/pre-brainstorms/20260320-0018--sample"
+  mkdir -p "$project/.freely" "$project/docs/B1-docs/raw-20260320-0018"
   git init -q -b "$branch" "$project"
 
   cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
@@ -22,20 +22,20 @@ EOF
   cat >"$project/AGENTS.md" <<'EOF'
 # Agents
 EOF
-  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+  cat >"$project/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat >"$project/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 EOF
-  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat >"$project/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260320-0018/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
-  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+  cat >"$project/docs/B1-docs/raw-20260320-0018/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

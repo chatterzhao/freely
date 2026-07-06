@@ -45,6 +45,8 @@
 - case_design: `grep for old names returns 0 in non-historical dirs.`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/ibm-skill-rename/code-reviews/review.md`
 
 ### AT-002 guarded merge
@@ -57,4 +59,6 @@
 - case_design: `Merge feature into test-pre-merge, then test-pre-merge into develop via pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/ibm-skill-rename/code-reviews/review.md`

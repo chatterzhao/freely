@@ -17,11 +17,11 @@
 
 ## Evidence
 
-- `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403prd.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
 - `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
-- `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md`
 
 ## Implementation Decision Note
 

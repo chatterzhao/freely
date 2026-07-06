@@ -11,7 +11,7 @@
 ## Current Repo Facts
 
 1. `1100` 曾在 `milestones` 与 candidate 中被当作 canonical umbrella owner 使用
-2. 当前树中缺失的 `docs/B2-docs/gate/governance-chain-legacy-repair/**` 与 `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md` 已在 2026-04-04 truth-repair 中恢复
+2. 当前树中缺失的 `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100**` 与 `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md` 已在 2026-04-04 truth-repair 中恢复
 3. `20260402-1912` 已明确写明不要再复用已删除且 stale 的 `1719`
 4. 当前需要修的不是 gate 放宽，而是 canonical truth 对齐、残留引用清理，以及把 `1100` 从活跃 owner 语义收口为历史完成态
 

@@ -18,6 +18,8 @@
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z15Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 
 ### acceptance-2: pr-review-guarded uses new glob patterns
 - id: AT-002
@@ -34,6 +36,8 @@
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z15Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 
 ### acceptance-3: task-lifecycle-scan scans new epics structure
 - id: AT-003
@@ -50,6 +54,8 @@
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z15Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 
 ### acceptance-4: gate scripts use new path patterns
 - id: AT-004
@@ -66,6 +72,8 @@
 - evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z15Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 
 ## Unit
 - acceptance_target: 所有6个文件路径已更新并通过grep检查验证

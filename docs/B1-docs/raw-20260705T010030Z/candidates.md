@@ -30,6 +30,6 @@ milestone: M-20260705T010030Z-A
   - summary: 审查 wt-close 重构是否符合设计意图
   - verdict: pass
 - promoted_issue_id: I-20260705T010030Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T010030Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260705T010030Z-A/issue.md
 - milestone: M-20260705T010030Z-A
 - session_refs: []

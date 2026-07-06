@@ -1,0 +1,7 @@
+- issue_id: I-20260522T030835Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260522T030835Z-A
+- source_candidate: docs/B1-docs/raw-20260522T030835Z35Z/candidates.md#C-20260522T030835Z-A
+- verification_artifact_dir: docs/B2-docs/ai-cli-apikey-alias-switch/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T030835ZI-20260522T030835Z-A/issue.md

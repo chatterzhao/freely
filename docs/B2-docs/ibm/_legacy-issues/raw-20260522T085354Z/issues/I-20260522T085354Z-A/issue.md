@@ -1,0 +1,11 @@
+---
+issue_id: I-20260522T085354Z-A
+kind: fix
+phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260522T085354Z/code-reviews
+milestone: M-20260522T085354Z-A
+source_candidate: docs/B1-docs/raw-20260522T085354Z54Z/candidates.md#C-20260522T085354Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T085354ZI-20260522T085354Z-A/issue.md
+updated_at: '2026-06-15T10:37:00Z'
+platform_state: closed
+---

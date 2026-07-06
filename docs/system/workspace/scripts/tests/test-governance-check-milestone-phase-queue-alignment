@@ -23,7 +23,7 @@ mkdir -p "$REPO/docs/system/workspace/skills"
 mkdir -p "$REPO/docs/system/workspace/agents"
 mkdir -p "$REPO/docs/system/workspace/hooks"
 mkdir -p "$REPO/docs/pre-brainstorms"
-mkdir -p "$REPO/docs/epics/sample/story/issues"
+mkdir -p "$REPO/docs/B2-docs/sample/story/issues"
 
 cat > "$REPO/AGENTS.md" <<'EOF'
 # Agent entry
@@ -128,27 +128,27 @@ cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/references/issue-mat
 prd-quality-bar.md
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/README.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # Convergence
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260320-9999--candidate-v2-sample
-  - brainstorms: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md
+  - brainstorms: docs/B1-docs/raw-20260320-9999/brainstorms.md
+  - candidates: docs/B1-docs/raw-20260320-9999/candidates.md
 EOF
 
-mkdir -p "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample"
-cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md" <<'EOF'
+mkdir -p "$REPO/docs/B1-docs/raw-20260320-9999"
+cat > "$REPO/docs/B1-docs/raw-20260320-9999/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/raw-20260320-9999/candidates.md" <<'EOF'
 # Candidates
 
 ### C-20260320-9999-A
@@ -156,7 +156,7 @@ cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.
 - title: sample
 - status: promoted
 - milestone: `M-20260320-9999-sample`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
 - acceptance_criteria:
   - queue truth is aligned
 - promotion_gate:
@@ -167,17 +167,17 @@ cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.
     verdict: supports
     note: boundary is stable
 - decision_reason: sample
-- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- promoted_issue_path: `docs/B2-docs/sample/story/issues/sample.md`
 - session_refs: []
 EOF
 
-cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260320-9999-A`
 - phase_state: `completed`
 - milestone: `M-20260320-9999-sample`
-- source_candidate: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+- source_candidate: `docs/B1-docs/raw-20260320-9999/candidates.md#c-20260320-9999-a`
 EOF
 
 cat > "$REPO/docs/milestones.md" <<'EOF'
@@ -194,9 +194,9 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md`
+- promoted_issue_path: `docs/B2-docs/sample/story/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260320-9999/candidates.md`
 - next_action: materialized already
 - revisit_trigger: drift appears
 
@@ -207,10 +207,10 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - milestone_state: committed
 - phase_state: `completed`
 - priority: P1
-- issue_path: `docs/epics/sample/story/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- issue_path: `docs/B2-docs/sample/story/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
 - source_candidates:
-  - `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+  - `docs/B1-docs/raw-20260320-9999/candidates.md#c-20260320-9999-a`
 - next_action: wrong queue on purpose
 - revisit_trigger: move it
 
@@ -238,9 +238,9 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md`
+- promoted_issue_path: `docs/B2-docs/sample/story/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260320-9999/candidates.md`
 - next_action: materialized already
 - revisit_trigger: drift appears
 
@@ -253,10 +253,10 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P1
-- issue_path: `docs/epics/sample/story/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- issue_path: `docs/B2-docs/sample/story/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
 - source_candidates:
-  - `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+  - `docs/B1-docs/raw-20260320-9999/candidates.md#c-20260320-9999-a`
 EOF
 
 ./bin/governance-check >/tmp/gov-queue-pass.out 2>&1

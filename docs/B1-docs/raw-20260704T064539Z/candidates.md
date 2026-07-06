@@ -38,6 +38,6 @@ milestone: M-20260704T064539Z-A
   - summary: 审查 session 统一 + bridge 解耦方案，确认三层架构合理
   - verdict: pass
 - promoted_issue_id: I-20260704T064539Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260704T064539Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260704T064539Z-A/issue.md
 - milestone: M-20260704T064539Z-A
 - session_refs: []

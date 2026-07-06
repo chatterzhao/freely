@@ -1,6 +1,6 @@
 # Verification: incremental-dogfooding-gate-for-backend-increments canonical closeout
 
-- issue_path: `docs/B2-docs/human/tui/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- issue_path: `docs/B2-docs/human/tui/raw-20260308-1244issues/incremental-dogfooding-gate-for-backend-increments.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`
@@ -15,7 +15,7 @@
 1. Canonical truth check
    - `PASS`: issue text already says no further gate-definition expansion is needed and future owners should consume this gate directly.
 2. Pre-tests gate
-   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-051451-feature-incremental-dogfooding-gate-parked-ibm-closeout --issue docs/B2-docs/human/tui/issues/incremental-dogfooding-gate-for-backend-increments.md`
+   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-051451-feature-incremental-dogfooding-gate-parked-ibm-closeout --issue docs/B2-docs/human/tui/raw-20260308-1244issues/incremental-dogfooding-gate-for-backend-increments.md`
 3. Governance
    - `PASS`: `./bin/governance-check`
 4. Diff hygiene

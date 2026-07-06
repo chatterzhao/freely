@@ -9,13 +9,13 @@
 - target_environment: fix worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-1.txt
 - test_command: grep -q 'Phase 3.6\|raw issue not in develop' docs/system/workspace/scripts/worktree/wt-close && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — Phase 3.6 present before fix
 - actual_output: PASS
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -28,13 +28,13 @@
 - target_environment: fix worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-2.txt
 - test_command: grep -q '永久丢弃.*本地.*远程.*平台' docs/system/workspace/scripts/worktree/wt-close || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — old text before fix
 - actual_output: PASS
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -47,13 +47,13 @@
 - target_environment: fix worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-3.txt
 - test_command: grep -q '不带.*force.*正常.*wt-close' docs/system/workspace/scripts/worktree/wt-close || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — old text before fix
 - actual_output: PASS
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Zverification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none

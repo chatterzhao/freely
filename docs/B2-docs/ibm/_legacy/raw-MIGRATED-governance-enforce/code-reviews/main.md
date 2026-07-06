@@ -1,7 +1,7 @@
 ---
 name: Governance Enforcement Implementation Decision Note
 owner_issue: I-20260616T083810Z-A
-owner_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T083810Z-A/issue.md
+owner_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T083810Z-A/issue.md
 implementation_decision_note: true
 phase_state: completed
 review_id: governance-enforce-review
@@ -10,7 +10,7 @@ review_id: governance-enforce-review
 # Implementation Decision Note: Governance Enforcement
 
 - issue_id: I-20260616T083810Z-A
-- issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T083810Z-A/issue.md
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T083810Z-A/issue.md
 - source_candidate: docs/B1-docs/raw-20260616T083810Z10Z/candidates.md
 
 ## Implementation Decision Note

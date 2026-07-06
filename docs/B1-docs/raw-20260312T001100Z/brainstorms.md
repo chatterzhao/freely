@@ -19,8 +19,8 @@
 - `docs/B1-docs/raw-20260303T000000Z/brainstorms.md`
 - `docs/B1-docs/raw-20260304T000000Z/brainstorms.md`
 - `docs/B1-docs/raw-20260308T124400Z/brainstorms.md`
-- `docs/B2-docs/human/tui/prd.md`
-- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244prd.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
 
 第三方生态与扩展研究：
 

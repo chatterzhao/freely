@@ -1,7 +1,7 @@
 ---
 name: Gate Scope Alignment Implementation Decision Note
 owner_issue: I-20260616T030213Z-A
-owner_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T030213Z-A/issue.md
+owner_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T030213Z-A/issue.md
 implementation_decision_note: true
 phase_state: completed
 review_id: gate-scope-alignment-review
@@ -10,7 +10,7 @@ review_id: gate-scope-alignment-review
 # Implementation Decision Note: Gate Scope Alignment
 
 - issue_id: I-20260616T030213Z-A
-- issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T030213Z-A/issue.md
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T030213Z-A/issue.md
 - source_candidate: docs/B1-docs/raw-20260616T030213Z13Z/candidates.md
 
 ## Implementation Decision Note

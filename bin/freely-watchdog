@@ -15,7 +15,7 @@ PRE_CHECK_MAP() {
       local b1_ok=0 b2_ok=0 red_ok=0 green_ok=0
       # Match both fix-raw-* and feature-raw-* worktree directories
       for _prefix in fix feature; do
-        ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/pre-brainstorms/${raw_key}--*/brainstorms.md 2>/dev/null && b1_ok=1
+        ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/B1-docs/raw-${raw_key}/brainstorms.md 2>/dev/null && b1_ok=1
         ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/B2-docs/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null && b2_ok=1
       done
       # RED check: pre-tests items should not be pending

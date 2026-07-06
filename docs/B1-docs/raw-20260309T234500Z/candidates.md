@@ -15,7 +15,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: `governance-check` 命名、candidate v2 门禁与脚本回归已由 `I-20260320T050000Z` 吸收；本候选只保留为 supporting provenance。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260309T234500Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260309T234500Z-A/issue.md
 - milestone: M-20260309T234500Z-A
 - session_refs:
   - tool: codex

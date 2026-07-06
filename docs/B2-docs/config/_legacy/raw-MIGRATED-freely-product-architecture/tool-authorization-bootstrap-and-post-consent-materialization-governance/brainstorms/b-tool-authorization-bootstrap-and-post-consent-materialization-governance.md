@@ -114,7 +114,7 @@ Freeze the first product-architecture contract for project authorization bootstr
 
 1. This brainstorm confirms that Codex API-key/provider mode is real product evidence that “project bootstrap completed” and “home-level tool auth/config is healthy” are different states.
 2. It does not retain the detailed bundle, naming, probe, or cross-kind switch mechanics here. Those are now delegated to:
-   - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+   - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
    - `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 3. The architecture-layer takeaway is narrower:
    - one cross-tool inventory/repair contract should exist

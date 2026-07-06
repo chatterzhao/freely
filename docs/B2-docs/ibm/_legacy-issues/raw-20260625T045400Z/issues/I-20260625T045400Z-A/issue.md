@@ -1,0 +1,8 @@
+- issue_id: I-20260625T045400Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260625T045400Z-A
+- source_candidate: docs/B1-docs/raw-20260625T045412Z00Z/candidates.md#C-20260625T045400Z-A
+- verification_artifact_dir: docs/B2-docs/adapter-add-cli/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T045400ZI-20260625T045400Z-A/issue.md
+- title: adapter CLI

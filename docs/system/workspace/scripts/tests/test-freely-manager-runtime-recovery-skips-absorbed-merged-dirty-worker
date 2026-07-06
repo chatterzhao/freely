@@ -9,7 +9,7 @@ PROJECT="$TMP_DIR/project"
 WT_ROOT="$TMP_DIR/worktrees"
 WORKER="$WT_ROOT/feature-a"
 
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+mkdir -p "$PROJECT/docs/B1-docs/raw-20260324-0000" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name tester
 git -C "$PROJECT" config user.email tester@example.com
@@ -29,20 +29,20 @@ EOF
 cat >"$PROJECT/AGENTS.md" <<'EOF'
 # Agents
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/INDEX.md" <<'EOF'
 # INDEX
 - 20260324-0000--sample
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260324-0000/brainstorms.md" <<'EOF'
 # Brainstorms
 EOF
-cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+cat >"$PROJECT/docs/B1-docs/raw-20260324-0000/candidates.md" <<'EOF'
 # Candidates
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -66,21 +66,21 @@ AI_MODE="auto"
 EOF
 done
 
-mkdir -p "$WORKER/docs/epics/sample/story/issues" "$WORKER/docs/epics/sample/story/code-reviews" "$WORKER/docs/progress"
+mkdir -p "$WORKER/docs/B2-docs/sample/story/issues" "$WORKER/docs/B2-docs/sample/story/code-reviews" "$WORKER/docs/progress"
 for wt in "$WORKER"; do
-  cat >"$wt/docs/epics/sample/story/issues/sample.md" <<'EOF'
+  cat >"$wt/docs/B2-docs/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 - issue_id: `I-sample`
 - phase_state: `in_verification`
-- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
-- tasks_path: `docs/epics/sample/story/tasks.md`
+- pre_tests_path: `docs/B2-docs/sample/story/raw-TESTFIXTURE/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/sample/story/raw-TESTFIXTURE/code-reviews`
+- tasks_path: `docs/B2-docs/sample/story/tasks.md`
 - progress_path: `docs/progress/sample.md`
 EOF
-  cat >"$wt/docs/epics/sample/story/pre-tests.md" <<'EOF'
+  cat >"$wt/docs/B2-docs/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests
 EOF
-  cat >"$wt/docs/epics/sample/story/tasks.md" <<'EOF'
+  cat >"$wt/docs/B2-docs/sample/story/tasks.md" <<'EOF'
 # Tasks
 EOF
   cat >"$wt/docs/progress/sample.md" <<'EOF'

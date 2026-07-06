@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
-- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews`
 - depends_on:
-  - `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403issues/agents-cli-output-style-experiment-governance.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/start-lead-agent.sh`
 - session_refs:
@@ -68,12 +68,12 @@ But that behavior has been scattered across runtime code, tests, and high-level 
 - `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/milestones.md`
-- `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
-- `docs/B2-docs/config/packaging/brainstorms/b-project-level-agents-bootstrap-and-management-contract-governance.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
-- `docs/B2-docs/config/packaging/tasks.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403brainstorms/b-project-level-agents-bootstrap-and-management-contract-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403prd.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403tasks.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
 - `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
 - `docs/system/workspace/README.md`
 - `docs/system/workspace/project-agents-contract.md`
@@ -88,5 +88,5 @@ But that behavior has been scattered across runtime code, tests, and high-level 
 
 ## Next
 
-- Completed on canonical `develop` with closeout verification recorded in `docs/B2-docs/config/packaging/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`.
+- Completed on canonical `develop` with closeout verification recorded in `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` regresses the project-level `AGENTS.md` preservation contract or stops treating the project root entrypoint as authoritative before reusable workspace capability docs.

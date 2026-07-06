@@ -18,7 +18,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - milestone: M-20260327T184500Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260327T184500Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260327T184500Z-A/issue.md
 - decision_reason: 当前缺口仍属于 latest manager continuity consumption / manager resume contract 的 same-family followthrough，不需要再新开独立 lifecycle；这条 pre-brainstorm 仅保留 discovery 边界与吸收理由，正式实现和验证回到 `I-20260322T044500Z`。
 - next_action: 在 `I-20260322T044500Z` 的 progress / verification 中补写 consumed-continuity resume drift addendum，并把当前 runtime prompt narrowing 修复和测试收口为 same-family followthrough。
 - revisit_trigger: 若后续发现它已经超出 latest manager continuity consumption contract，例如演变成独立 patrol planner / route engine redesign，再重新 materialize。

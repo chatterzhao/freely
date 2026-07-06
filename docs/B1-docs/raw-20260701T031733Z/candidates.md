@@ -29,6 +29,6 @@ milestone: M-20260701T031733Z-A
   - summary: 逐文件对比 gate 规则，确认模板字段完整
   - verdict: pass
 - promoted_issue_id: I-20260701T031733Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T031733Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260701T031733Z-A/issue.md
 - milestone: M-20260701T031733Z-A
 - session_refs: []

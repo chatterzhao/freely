@@ -38,4 +38,6 @@
 - case_design: `missing --source shows scan file path, --source mismatch blocked by gate`
 - evidence_level: `integration`
 - status: `pass`
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
 - artifact_ref: `docs/B2-docs/source-param/code-reviews/review.md`

@@ -1,0 +1,8 @@
+- issue_id: I-20260625T030147Z-A
+- kind: feat
+- phase_state: completed
+- milestone: M-20260625T030147Z-A
+- source_candidate: docs/B1-docs/raw-20260625T030147Z47Z/candidates.md#C-20260625T030147Z-A
+- verification_artifact_dir: docs/B2-docs/auto-detect-platforms/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T030147ZI-20260625T030147Z-A/issue.md
+- title: auto-detect platforms

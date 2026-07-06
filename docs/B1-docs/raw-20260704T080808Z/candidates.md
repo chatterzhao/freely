@@ -38,6 +38,6 @@ milestone: M-20260704T080808Z-A
   - summary: 审查多 bridge 架构设计，确认 per-tool bridge 与 session 路由正确
   - verdict: pass
 - promoted_issue_id: I-20260704T080808Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260704T080808Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260704T080808Z-A/issue.md
 - milestone: M-20260704T080808Z-A
 - session_refs: []

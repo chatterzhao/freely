@@ -1,0 +1,8 @@
+- issue_id: I-20260521T132714Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260521T132714Z-A
+- source_candidate: docs/B1-docs/raw-20260521T132714Z14Z/candidates.md#C-20260521T132714Z-A
+- verification_artifact_dir: docs/B2-docs/daemon-stop-kill-acp-bridge/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260521T132714ZI-20260521T132714Z-A/issue.md
+- title: stop_project_runtime kills ACP bridge by pid

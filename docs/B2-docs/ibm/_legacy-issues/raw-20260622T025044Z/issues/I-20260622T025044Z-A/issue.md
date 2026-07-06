@@ -1,0 +1,21 @@
+---
+local_id: I-20260622T025044Z-A
+kind: linked
+phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260622T025044Z/code-reviews
+milestone_state: committed
+milestone: M-20260622T025044Z-A
+platform_ids:
+  github:
+    issue_id: '3324'
+    url: https://github.com/chatterzhao/freely/issues/3324
+primary_platform: github
+source_candidate: docs/B1-docs/raw-20260622T025044Z44Z/candidates.md#C-20260622T025044Z-A
+created_at: '2026-06-22T02:50:44Z'
+updated_at: '2026-06-22T02:50:44Z'
+author: platform
+channel: github
+platform_state: open
+---
+
+# I-20260622T025044Z-A: Platform sync batch

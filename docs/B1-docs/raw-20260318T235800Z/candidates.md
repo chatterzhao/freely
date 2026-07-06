@@ -17,7 +17,7 @@
 - priority: P0
 - status: absorbed
 - decision_reason: `I-20260318T093000Z` 已以更早的 canonical owner `C-20260318-A` 承接 checkpoint / fleet / supervision 主线；当前候选只保留为同一 owner family 的后续 scope 输入，不再单独 materialize。
-- promoted_issue_path: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
 
@@ -32,6 +32,6 @@
 - priority: P0
 - status: absorbed
 - decision_reason: `I-20260318T093000Z` 已吸收主管工位协议与多工位监督语义；当前候选不再需要独立 IBM owner，只作为该 canonical issue family 的补充来源保留。
-- promoted_issue_path: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []

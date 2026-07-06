@@ -5,7 +5,7 @@
   status: promoted
   why_now:
     - 当前 `cc` 语义需要和 `cc-use-codex-cli` 固定 profile 拆开，避免 capability 参数泄漏到用户侧。
-  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T214500Z-A/issue.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T214500Z-A/issue.md
   legacy_id_mapping: I-20260321T021700Z  # 历史遗留的 issue id
   milestone: M-20260320T214500Z-A
   session_refs:
@@ -23,7 +23,7 @@
   status: absorbed
   why_now:
     - 多 worker / 多 worktree 并发必须立即稳定，不能阻塞在隐藏 `Codex threadId` 可见性上。
-  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T214500Z-A/issue.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T214500Z-A/issue.md
   decision_reason: 当前并发 continuity 语义已经由 `I-20260321T021700Z` 作为 canonical owner 吸收，并在该 issue 的 `additional_source_candidates` 中显式记录；不再单独 materialize 平行 issue。
   milestone: M-20260320T214500Z-A
   session_refs:

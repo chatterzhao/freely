@@ -73,17 +73,17 @@ cat > docs/LAWS.md <<'EOF'
 Minimal laws for testing.
 EOF
 
-mkdir -p docs/pre-brainstorms/20260309-0000--sample
-cat > docs/pre-brainstorms/README.md <<'EOF'
+mkdir -p docs/B1-docs/raw-20260309-0000
+cat > docs/B1-docs/README.md <<'EOF'
 # 预研头脑风暴工作区
 EOF
 
-cat > docs/pre-brainstorms/INDEX.md <<'EOF'
+cat > docs/B1-docs/INDEX.md <<'EOF'
 # 预研头脑风暴索引
 - 20260309-0000--sample
 EOF
 
-cat > docs/pre-brainstorms/CONVERGENCE.md <<'EOF'
+cat > docs/B1-docs/CONVERGENCE.md <<'EOF'
 # 收敛
 EOF
 

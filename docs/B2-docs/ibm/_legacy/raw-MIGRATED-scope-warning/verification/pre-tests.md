@@ -18,6 +18,8 @@
 - evidence_file: docs/B2-docs/scope-warning/test-evidence/acceptance-1.log
 - blocker:
 - status: not_applicable
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 - not_applicable_reason: human_observation_only
 - not_applicable_explanation: Text-only hook config change. Manual grep confirms --fail-on-required removed (result:0). Real verification when subsequent PRs pass through updated hook on develop.
 - replacement_evidence: manual grep result (0) + git diff review
@@ -37,6 +39,8 @@
 - evidence_file:
 - blocker:
 - status: not_applicable
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: Hook text + AGENTS.md only — no multi-module coordination. Verified post-merge via subsequent PR flow.
 - replacement_evidence: subsequent PR creation after merge

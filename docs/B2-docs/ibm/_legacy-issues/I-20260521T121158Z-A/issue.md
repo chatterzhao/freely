@@ -1,8 +1,0 @@
-- issue_id: I-20260521T121158Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260521T121158Z-A
-- source_candidate: docs/B1-docs/raw-20260521T121158Z58Z/candidates.md#C-20260521T121158Z-A
-- verification_artifact_dir: docs/B2-docs/package-version-timestamp-format/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260521T121158Z-A/issue.md
-- title: package version format add hour-minute to nightly

@@ -20,7 +20,7 @@ scan → 输出:
 | `B1_proposed` | raw issue 待预研 | `docs/B1-docs/raw-*/` | 发散收敛 → candidate |
 | `B1_brainstorming` | 预研进行中 | `docs/B1-docs/{id}/` | 产出 candidate |
 | `B1_candidate` | candidate 待决策 | `docs/milestones.md candidate_issues` | promote/absorb/drop |
-| `B2_active` | 正式 issue 执行中 | `docs/B2-docs/ibm/_legacy-issues/I-*/` , milestone committed | in_dev → in_verification |
+| `B2_active` | 正式 issue 执行中 | `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-*/` , milestone committed | in_dev → in_verification |
 | `B2_verifying` | 等待验证收口 | progress / code-review | 验证 → completed |
 | `completed` | 已完成 | 全部标记 completed | 从 scan 排除 |
 
@@ -30,7 +30,7 @@ scan → 输出:
 
 ```
 raw issues:    docs/B1-docs/raw-*/issue.md
-linked issues: docs/B2-docs/ibm/_legacy-issues/I-*/issue.md  
+linked issues: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-*/issue.md  
 pre_brainstorms: docs/B1-docs/*/
 milestones:    docs/milestones.md
 progress:      docs/B2-docs/**/*.md
@@ -94,7 +94,7 @@ for each item:
       "ready_for_worker": true,
       "owner_hint": "worker",
       "cross_refs": {
-        "linked_issue": "docs/B2-docs/ibm/_legacy-issues/I-20260419-1505-A/issue.md",
+        "linked_issue": "docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260419-1505-A/issue.md",
         "github_issue": "#156 (closed)",
         "gitee_issue": "IJFOxx (open)"
       }

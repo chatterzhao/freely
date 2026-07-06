@@ -24,6 +24,6 @@ milestone: M-20260701T085407Z-A
 - promotion_gate: N/A（已 absorb）
 - open_questions: []
 - absorbed_into: I-20260701T085407Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T085407Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260701T085407Z-A/issue.md
 - milestone: M-20260701T085407Z-A
 - session_refs: []

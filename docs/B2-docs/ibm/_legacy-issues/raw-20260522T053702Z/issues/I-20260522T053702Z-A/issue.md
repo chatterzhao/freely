@@ -1,0 +1,7 @@
+- issue_id: I-20260522T053702Z-A
+- kind: fix
+- phase_state: completed
+- verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260522T053702Z/code-reviews
+- milestone: M-20260522T053702Z-A
+- source_candidate: docs/B1-docs/raw-20260522T053702Z02Z/candidates.md#C-20260522T053702Z-A
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260522T053702Z-A/issue.md

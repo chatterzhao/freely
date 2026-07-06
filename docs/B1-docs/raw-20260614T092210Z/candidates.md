@@ -12,5 +12,5 @@ milestone: M-20260614T092210Z-A
 - status: absorbed
 - decision_reason: Issue created before IBM framework. Absorbed without formal B1 pre-research.
 - promoted_issue_id: I-20260614T092210Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260614T092210Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260614T092210Z-A/issue.md
 - milestone: M-20260614T092210Z-A

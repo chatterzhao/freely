@@ -9,5 +9,5 @@ milestone: M-20260701T003241Z-A
 - title: remove --ai, deprecate AI tool fields, block init on existing config
 - status: promoted
 - decision_reason: AI tool config belongs in agent-table.toml and slot config files
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T003241Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260701T003241Z-A/issue.md
 - milestone: M-20260701T003241Z-A

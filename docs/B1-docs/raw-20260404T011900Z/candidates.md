@@ -33,7 +33,7 @@
   - this is a residual parser bug in a completed merge-governance family, not a reason to mutate the prior completed owner
   - the develop merge gate correctly insists on a new same-line owner for this replay-bound fix, even though the implementation delta is small
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/raw-20260404-0119issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

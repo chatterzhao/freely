@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是通过狗粮开发直接发现的治理缺口。现在不收编成 skill，后续每次大批量 worktree 收口都会重复踩同一类问题。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321T025700Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260321T025700Z-A/issue.md
 - legacy_id_mapping: I-20260321T025700Z  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

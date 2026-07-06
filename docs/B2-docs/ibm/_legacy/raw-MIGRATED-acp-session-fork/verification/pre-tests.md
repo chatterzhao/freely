@@ -16,6 +16,8 @@
 - not_applicable_reason: pre-merge 阶段 ACP bridge 不可用
 - not_applicable_explanation: 需要启动 claude-agent-acp 并通过 bridge socket 发 session/fork RPC，只有 freely daemon 运行时才能执行。代码路径已通过 acceptance-2/3 验证
 - status: not_applicable
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue — completed before TDD RED-GREEN requirement
 
 ### acceptance-2
 - acceptance_target: fork code includes session/fork try/except

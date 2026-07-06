@@ -21,8 +21,8 @@ make_repo() {
   mkdir -p "$repo/docs/system/workspace/skills/freely-auto-loop-orchestrator"
   mkdir -p "$repo/docs/system/workspace/skills"
   mkdir -p "$repo/docs/system/workspace/agents"
-  mkdir -p "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap"
-  mkdir -p "$repo/docs/epics/sample/issues" "$repo/docs/epics/sample/code-reviews"
+  mkdir -p "$repo/docs/B1-docs/raw-20260404-0640"
+  mkdir -p "$repo/docs/B2-docs/sample/issues" "$repo/docs/B2-docs/sample/code-reviews"
 
   cat > "$repo/AGENTS.md" <<'EOF'
 # Agent entry
@@ -108,23 +108,23 @@ EOF
 # Issue Materialization Checklist
 prd-quality-bar.md
 EOF
-  cat > "$repo/docs/pre-brainstorms/README.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
-  cat > "$repo/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # Convergence
 EOF
-  cat > "$repo/docs/pre-brainstorms/INDEX.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260404-0640--sample-receipt-gap
-  - brainstorms: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md
+  - brainstorms: docs/B1-docs/raw-20260404-0640/brainstorms.md
+  - candidates: docs/B1-docs/raw-20260404-0640/candidates.md
 EOF
-  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/raw-20260404-0640/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
-  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md" <<'EOF'
+  cat > "$repo/docs/B1-docs/raw-20260404-0640/candidates.md" <<'EOF'
 # Candidates
 ## C-20260404-0640-A
 - candidate_format_version: `v2`
@@ -140,7 +140,7 @@ EOF
   - reviewer: `codex-mini`
     verdict: `supports`
     note: sample
-- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- promoted_issue_path: `docs/B2-docs/sample/issues/sample.md`
 - milestone: `M-20260404-0640-sample`
 - session_refs: []
 EOF
@@ -158,9 +158,9 @@ EOF
 - milestone_state: committed
 - phase_state: `in_dev`
 - priority: P1
-- issue_path: `docs/epics/sample/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- issue_path: `docs/B2-docs/sample/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260404-0640/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260404-0640/candidates.md`
 - next_action: implement sample owner
 
 ### candidate_issues
@@ -170,9 +170,9 @@ EOF
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `docs/epics/sample/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- promoted_issue_path: `docs/B2-docs/sample/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260404-0640/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260404-0640/candidates.md`
 - next_action: sample
 - revisit_trigger: sample
 
@@ -180,15 +180,15 @@ EOF
 
 - none currently
 EOF
-  cat > "$repo/docs/epics/sample/issues/sample.md" <<'EOF'
+  cat > "$repo/docs/B2-docs/sample/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260404-0640-A`
 - phase_state: `in_dev`
 - milestone: `M-20260404-0640-sample`
-- source_candidate: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md#c-20260404-0640-a`
+- source_candidate: `docs/B1-docs/raw-20260404-0640/candidates.md#c-20260404-0640-a`
 EOF
-  cat > "$repo/docs/epics/sample/code-reviews/sample-verification.md" <<'EOF'
+  cat > "$repo/docs/B2-docs/sample/code-reviews/sample-verification.md" <<'EOF'
 # Verification: sample
 EOF
 }
@@ -251,7 +251,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/good.out" 2>&1; then
@@ -306,7 +306,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/feature-target.out" 2>&1; then
@@ -354,7 +354,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/trailer.out" 2>&1; then
@@ -434,7 +434,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/invalid-backfill.out" 2>&1; then
@@ -496,11 +496,11 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
-- bounded_issue: \`docs/epics/sample/issues/sample.md\`
-- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- bounded_issue: \`docs/B2-docs/sample/issues/sample.md\`
+- verification_ref: \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
-  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/generic-good.out" 2>&1; then
@@ -575,11 +575,11 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
-- bounded_issue: \`docs/epics/sample/issues/sample.md\`
-- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- bounded_issue: \`docs/B2-docs/sample/issues/sample.md\`
+- verification_ref: \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
-  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/generic-retired-target.out" 2>&1; then
@@ -651,11 +651,11 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
-- bounded_issue: \`docs/epics/sample/issues/sample.md\`
-- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- bounded_issue: \`docs/B2-docs/sample/issues/sample.md\`
+- verification_ref: \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
-  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/generic-wrong-absorb.out" 2>&1; then
@@ -712,7 +712,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/generic-underevidenced.out" 2>&1; then
@@ -757,11 +757,11 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
-- bounded_issue: \`docs/epics/sample/issues/sample.md\`
-- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- bounded_issue: \`docs/B2-docs/sample/issues/sample.md\`
+- verification_ref: \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
-  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+  - \`docs/B2-docs/sample/issues/sample.md\`
+  - \`docs/B2-docs/sample/code-reviews/sample-verification.md\`
 EOF
 
 if ./bin/governance-check >"$TMP_DIR/generic-parseable-misuse.out" 2>&1; then

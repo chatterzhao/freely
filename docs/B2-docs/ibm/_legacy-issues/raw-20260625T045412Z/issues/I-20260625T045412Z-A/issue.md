@@ -1,0 +1,8 @@
+- issue_id: I-20260625T045412Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260625T045412Z-A
+- source_candidate: docs/B1-docs/raw-20260625T045412Z12Z/candidates.md#C-20260625T045412Z-A
+- verification_artifact_dir: docs/B2-docs/migrate-to-adapter/code-reviews
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T045412ZI-20260625T045412Z-A/issue.md
+- title: migrate to adapter

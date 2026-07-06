@@ -23,7 +23,7 @@ mkdir -p "$REPO/docs/system/workspace/skills"
 mkdir -p "$REPO/docs/system/workspace/agents"
 mkdir -p "$REPO/docs/system/workspace/hooks"
 mkdir -p "$REPO/docs/pre-brainstorms"
-mkdir -p "$REPO/docs/epics/sample/issues"
+mkdir -p "$REPO/docs/B2-docs/sample/issues"
 
 cat > "$REPO/AGENTS.md" <<'EOF'
 # Agent entry
@@ -128,21 +128,21 @@ cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/references/issue-mat
 prd-quality-bar.md
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/README.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/README.md" <<'EOF'
 # README
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/CONVERGENCE.md" <<'EOF'
 # Convergence
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/INDEX.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/INDEX.md" <<'EOF'
 # 预研头脑风暴索引
 - 20260320-9999--candidate-v2-sample
 
 - 20260320-9999--candidate-v2-sample
-  - brainstorms: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md
+  - brainstorms: docs/B1-docs/raw-20260320-9999/brainstorms.md
+  - candidates: docs/B1-docs/raw-20260320-9999/candidates.md
 
 ## 收敛
 EOF
@@ -162,8 +162,8 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - phase_state: `needs_research`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
+- source_candidates: `docs/B1-docs/raw-20260320-9999/candidates.md`
 - next_action: keep researching
 - revisit_trigger: more evidence
 
@@ -174,10 +174,10 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 - milestone_state: committed
 - phase_state: `in_ibm`
 - priority: P1
-- issue_path: `docs/epics/sample/issues/sample.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- issue_path: `docs/B2-docs/sample/issues/sample.md`
+- source_brainstorm: `docs/B1-docs/raw-20260320-9999/brainstorms.md`
 - source_candidates:
-  - `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+  - `docs/B1-docs/raw-20260320-9999/candidates.md#c-20260320-9999-a`
 - next_action: materialize owner issue
 
 ### completed_issues
@@ -186,14 +186,14 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 EOF
 
 ENTRY="20260320-9999--candidate-v2-sample"
-mkdir -p "$REPO/docs/pre-brainstorms/$ENTRY"
+mkdir -p "$REPO/docs/B1-docs/$ENTRY"
 
-cat > "$REPO/docs/pre-brainstorms/$ENTRY/brainstorms.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/$ENTRY/brainstorms.md" <<'EOF'
 # Brainstorms
 - ok
 EOF
 
-cat > "$REPO/docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/$ENTRY/candidates.md" <<'EOF'
 # Candidates
 - id: C-20260320-9999-A
 - candidate_format_version: v2
@@ -205,13 +205,13 @@ cat > "$REPO/docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
-cat > "$REPO/docs/epics/sample/issues/sample.md" <<'EOF'
+cat > "$REPO/docs/B2-docs/sample/issues/sample.md" <<'EOF'
 # Issue: sample
 
 - issue_id: `I-20260320-9999-A`
 - phase_state: `in_ibm`
 - milestone: `M-20260320-9999-sample`
-- source_candidate: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+- source_candidate: `docs/B1-docs/raw-20260320-9999/candidates.md#c-20260320-9999-a`
 EOF
 
 if ./bin/governance-check >/tmp/gov.out 2>&1; then
@@ -221,7 +221,7 @@ if ./bin/governance-check >/tmp/gov.out 2>&1; then
 fi
 grep -q 'missing acceptance_criteria' /tmp/gov.out
 
-cat > "$REPO/docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
+cat > "$REPO/docs/B1-docs/$ENTRY/candidates.md" <<'EOF'
 # Candidates
 - id: C-20260320-9999-A
 - candidate_format_version: v2
@@ -238,7 +238,7 @@ cat > "$REPO/docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
   - mode: subagent
   - summary: boundary is stable enough for promotion
   - verdict: pass
-- promoted_issue_path: docs/epics/sample/issues/sample.md
+- promoted_issue_path: docs/B2-docs/sample/issues/sample.md
 - milestone: M-20260320-9999-sample
 - session_refs: []
 EOF

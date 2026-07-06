@@ -18,7 +18,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: 工具配置矩阵已作为 `ai-cli-availability-manager` 的 supporting evidence 被 `I-20260318T163000Z` 吸收，不再单独 materialize 平行 issue。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - session_refs: []
 - sequencing_rank: 1
@@ -42,7 +42,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: skill 与 references 已作为 `I-20260318T163000Z` 的 canonical completion surface 落盘，这条 pre-brainstorm 只保留 supporting provenance。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - session_refs: []
 - sequencing_rank: 2
@@ -66,7 +66,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: profile 配置格式已作为 `ai-cli-availability-manager` 的 supporting contract 被当前 canonical owner 吸收。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - session_refs: []
 - sequencing_rank: 2
@@ -91,7 +91,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: 限流检测、双限额归因与切换验证现已属于 `I-20260318T163000Z` 的 canonical verification surface，不再单开 follow-on issue。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - session_refs: []
 - sequencing_rank: 3
@@ -144,7 +144,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: `freely ai login codex` 已进入 `runtime/ai-cli` 与 `I-20260318T163000Z` 的 canonical completion，不再需要单独 owner。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - session_refs: []
 - sequencing_rank: 4
@@ -166,7 +166,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: 实现细节，但影响用户体验。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318T181800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260318T181800Z-A/issue.md
 - milestone: M-20260318T181800Z-A
 - resolution: |
     - 测试确认 macOS/Linux 支持 `@`
