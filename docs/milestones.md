@@ -11,7 +11,7 @@
 1. `C-20260705T061416Z-A`
 - milestone: M-20260705T061416Z-A
 - status: absorbed
-- absorbed_into: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Z/issues/I-20260705T061416Z-A.md`
+- absorbed_into: `I-20260705T061416Z-A`
 
 ## M-20260703T234313Z-A
 - title: fix: close IBM gate legacy loophole
