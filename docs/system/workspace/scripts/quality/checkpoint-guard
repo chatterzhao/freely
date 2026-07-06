@@ -57,7 +57,7 @@ scope_for_path() {
       # Matches docs/B2-docs/{epic}/{story}/raw-{key}/... (new) and docs/B2-docs/{epic}/{story}/... (old)
       awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
       ;;
-    docs/pre-brainstorms/*/*)
+    docs/B1-docs/*/*)
       awk -F/ '{print $1 "/" $2 "/" $3}' <<<"$path"
       ;;
     docs/system/workspace/*/*)

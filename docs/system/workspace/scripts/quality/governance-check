@@ -11,9 +11,9 @@ required_files=(
   "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
   "docs/system/workspace/three-loop-capability-lifecycle.md"
   "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
-  "docs/pre-brainstorms/README.md"
-  "docs/pre-brainstorms/INDEX.md"
-  "docs/pre-brainstorms/CONVERGENCE.md"
+  "docs/B1-docs/README.md"
+  "docs/B1-docs/INDEX.md"
+  "docs/B1-docs/CONVERGENCE.md"
 )
 
 three_loop_reference_targets=(
@@ -850,8 +850,8 @@ check_fixed_string \
 
 entries=()
 while IFS= read -r d; do
-  [[ -d "docs/pre-brainstorms/$d" ]] && entries+=("$d")
-done < <(ls -1 docs/pre-brainstorms/)
+  [[ -d "docs/B1-docs/$d" ]] && entries+=("$d")
+done < <(ls -1 docs/B1-docs/)
 
 if [[ "${#entries[@]}" -eq 0 ]]; then
   fail "no pre-brainstorm entries found under docs/pre-brainstorms"
@@ -860,14 +860,14 @@ fi
 for entry in "${entries[@]}"; do
   check_entry_naming "$entry"
   
-  brainstorm="docs/pre-brainstorms/${entry}/brainstorms.md"
-  candidates="docs/pre-brainstorms/${entry}/candidates.md"
+  brainstorm="docs/B1-docs/${entry}/brainstorms.md"
+  candidates="docs/B1-docs/${entry}/candidates.md"
   check_file_exists "$brainstorm"
   check_file_exists "$candidates"
   check_no_tbd "$brainstorm"
   check_no_tbd "$candidates"
 
-  rg -n --fixed-strings "$entry" docs/pre-brainstorms/INDEX.md >/dev/null 2>&1 || fail "INDEX missing entry: $entry"
+  rg -n --fixed-strings "$entry" docs/B1-docs/INDEX.md >/dev/null 2>&1 || fail "INDEX missing entry: $entry"
   rg -n "promoted_issue_path:" "$candidates" >/dev/null 2>&1 || fail "missing promoted_issue_path in $candidates"
   rg -n "milestone:" "$candidates" >/dev/null 2>&1 || fail "missing milestone in $candidates"
   rg -n "session_refs:" "$candidates" >/dev/null 2>&1 || fail "missing session_refs in $candidates"
