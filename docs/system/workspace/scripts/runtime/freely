@@ -4803,27 +4803,33 @@ runtime_default_reasoning_effort_for_tool() {
 # slot to ~/.ai-auth/.${tool}-current-slot.  This ensures slot switching prefers
 # the agent's assigned slot over alphabetically-first scan results.
 _init_agent_table_slot_pin() {
+  # At daemon startup, resolve current agent's slot from agent-table.toml
+  # and export AGENT_AI_TOOL.  Every agent (manager/worker/reviewer) gets
+  # its own base tool — no guard, no fallback, agent-table is the only source.
   local project="$1"
-  [[ -n "${AGENT_AI_TOOL:-}" ]] || return 0
   local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
   [[ -f "$_at" ]] || return 0
   local _aq="${PROJECT_ROOT}/bin/agent-table-query"
   [[ -x "$_aq" ]] || return 0
 
   # Resolve current agent identity from agent-id.env
-  # Anchor with = to avoid substring match (see load_config above).
   local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env" _my_id=""
   if [[ -f "$_agent_env" ]]; then
-    _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+    _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+|reviewer_[0-9]+)' | head -1 || true)
   fi
   [[ -z "$_my_id" ]] && _my_id="manager_01"
 
   local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
-  [[ -n "$_slot" ]] || return 0
+  if [[ -z "$_slot" ]]; then
+    log_error "agent-table: $_my_id has no slot configured in $_at"
+    log_error "  Run: bin/agent-table-query --get-slot $_my_id"
+    return 1
+  fi
 
   local _tool="${_slot%%-*}"
   runtime_write_tool_current_slot "$_tool" "$_slot"
-  log_info "agent-table: pinned $_my_id slot=$_slot → ~/.ai-auth/.${_tool}-current-slot"
+  export AGENT_AI_TOOL="$_slot"
+  log_info "agent-table: $_my_id slot=$_slot → AGENT_AI_TOOL=$AGENT_AI_TOOL (base=$_tool)"
 }
 
 runtime_cross_tool_fallback_order_for_current_tool() {
