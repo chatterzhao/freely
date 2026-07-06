@@ -562,10 +562,75 @@ def _update_issue_title(platform: str, issue_number: str, new_title: str) -> boo
     return False
 
 
+def get_assignees(platform: str, issue_number: str) -> list[str]:
+    """Get list of assignee logins for an issue."""
+    if platform == "github":
+        try:
+            r = _gh("api", f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
+                    "--jq", ".[].login")
+            return [line.strip() for line in r.stdout.splitlines() if line.strip()]
+        except Exception:
+            return []
+    elif platform == "gitee":
+        try:
+            r = _gitee_api("GET", f"repos/{_gitee_repo()}/issues/{issue_number}")
+            assignee = r.get("assignee", {}) or {}
+            login = assignee.get("login", "")
+            return [login] if login else []
+        except Exception:
+            return []
+    return []
+
+def check_and_claim_assignee(platform: str, issue_number: str, my_login: str) -> tuple[bool, str]:
+    """Check assignee and claim if unassigned. Returns (ok, message)."""
+    current = get_assignees(platform, issue_number)
+    if current:
+        others = [a for a in current if a != my_login]
+        if others:
+            return False, f"Issue #{issue_number} on {platform} already assigned to {', '.join(others)}"
+        return True, f"Already assigned to {my_login}"
+    # Unassigned — claim it
+    ok, msg = set_assignee(platform, issue_number, my_login)
+    return ok, msg
+
+def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, str]:
+    """Set assignee for an issue. Returns (ok, message)."""
+    if platform == "github":
+        try:
+            _gh("api", "--method", "POST",
+                f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
+                "--input", "-", _input=f'{{"assignees":["{login}"]}}')
+            return True, f"Assigned {login} to GitHub #{issue_number}"
+        except Exception as e:
+            return False, f"Failed to assign on GitHub: {e}"
+    elif platform == "gitee":
+        # Gitee uses PATCH to update issue assignee
+        try:
+            _gitee_api("PATCH", f"repos/{_gitee_repo()}/issues/{issue_number}",
+                       data={"assignee": login})
+            return True, f"Assigned {login} to Gitee #{issue_number}"
+        except Exception as e:
+            return False, f"Failed to assign on Gitee: {e}"
+    return False, f"Unknown platform: {platform}"
+
+
 def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     """Find raw issue on platform, fetch it, and materialize to target_dir/issue.md.
     Returns the materialized issue dict with path and platform_ids, or None if not found.
     """
+    # 0. Assignee gate — refuse if claimed by others, claim if free
+    my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
+    results_pre = search_raw_issue(raw_key)
+    if results_pre:
+        for plat, info in results_pre.items():
+            ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
+            print(f"[assignee] {plat}: {msg}", file=sys.stderr)
+            if not ok:
+                print(f"FATAL: {msg}", file=sys.stderr)
+                print(f"  The issue is already claimed by someone else.", file=sys.stderr)
+                print(f"  Coordinate with them or use a different raw key.", file=sys.stderr)
+                return None
+
     # 1. Search on all platforms
     results = search_raw_issue(raw_key)
     if not results:
