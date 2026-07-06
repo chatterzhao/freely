@@ -10,4 +10,5 @@ milestone: M-20260706T091733Z-A
 - status: promoted
 - decision_reason: gh wrapper 拦截 pr merge/issue close, git wrapper 剥离 --no-verify
 - promoted_issue_id: I-20260706T091733Z-A
+- promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260706T091733Z/issues/I-20260706T091733Z-A.md
 - milestone: M-20260706T091733Z-A

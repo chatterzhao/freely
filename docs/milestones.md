@@ -1,6 +1,6 @@
 ## M-20260706T091733Z-A
 - title: 门禁硬拦截
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20260706T091733Z-A`
 - milestone: M-20260706T091733Z-A
