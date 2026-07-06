@@ -441,9 +441,9 @@ def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
 
 def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
     try:
-            lines = read_repo_text(rel_path).splitlines(keepends=True)
-        except FileNotFoundError:
-            continue
+        lines = read_repo_text(rel_path).splitlines(keepends=True)
+    except FileNotFoundError:
+        return []
 
     starts = []
     for idx, line in enumerate(lines):
