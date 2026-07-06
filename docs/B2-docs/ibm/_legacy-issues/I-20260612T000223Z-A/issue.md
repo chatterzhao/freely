@@ -4,8 +4,8 @@ kind: linked
 status: in_dev
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-promoted_from: raw-20260612T000223Z23Z
-source_candidate: docs/B1-docs/raw-20260612T000223Z23Z/candidates.md
+promoted_from: raw-20260612T000223Z
+source_candidate: docs/B1-docs/raw-20260612T000223Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -28,7 +28,7 @@ platform_state: closed
 
 # I-20260612T000223Z-A: A2A 协议替换 Freely Handoff 架构重构
 
-- source_candidate: `docs/B1-docs/raw-20260612T000223Z23Z/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260612T000223Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/a2a/handoff/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/a2a/handoff/code-reviews`
 
