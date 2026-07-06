@@ -1,3 +1,18 @@
+## M-20260706T091733Z-A
+- title: 门禁硬拦截
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260706T091733Z-A`
+- milestone: M-20260706T091733Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260706T091733Z/issues/I-20260706T091733Z-A.md
+### completed_issues
+1. `C-20260706T091733Z-A`
+- milestone: M-20260706T091733Z-A
+- status: absorbed
+- absorbed_into: `I-20260706T091733Z-A`
+
 ## M-20260706T050919Z-A
 - title: 门禁 diff-scope 改造
 - status: completed
