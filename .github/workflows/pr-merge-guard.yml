@@ -16,7 +16,7 @@
 #         "strict": true,
 #         "contexts": ["governance/pr-merge-guard"]
 #       },
-#       "enforce_admins": false,
+#       "enforce_admins": true,
 #       "required_pull_request_reviews": null,
 #       "restrictions": null,
 #       "allow_force_pushes": false,
@@ -27,6 +27,8 @@
 #   Or via UI: Settings → Branches → Add rule → "develop"
 #     ☑ Require status checks → search "governance/pr-merge-guard"
 #     ☑ Require branches to be up to date before merging
+#     ☑ Include administrators (enforce_admins: true)
+#         ↑ THIS IS CRITICAL — prevents gh pr merge --admin bypass
 #
 # ── Correct merge workflow ──────────────────────────────────────
 #   ./bin/pr-merge-guarded develop <source-branch>

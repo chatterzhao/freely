@@ -1,3 +1,24 @@
+# ═══════════════════════════════════════════════════════════════
+# 铁律 ZERO — 任何变更必须走完整流程，禁止一切绕过
+# ═══════════════════════════════════════════════════════════════
+#
+# 改任意一个字符，必须完整执行:
+#   feedback → wt-create → B1 → B2 → RED → dev → GREEN
+#   → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
+#
+# 绝对禁止:
+#   - git push --no-verify        (跳过 pre-push hook)
+#   - git commit --no-verify      (跳过 pre-commit hook)
+#   - gh pr merge --admin         (跳过 CI gate)
+#   - gh pr create                (绕过 pr-create-guarded)
+#   - git update-ref develop      (直接改 develop ref)
+#   - 手工 git add/commit 在 develop 分支
+#   - git worktree remove --force (跳过 wt-close)
+#
+# 违规后果: CI 硬拦截 → 合并被阻止 → 必须 revert → 重新走流程
+# ═══════════════════════════════════════════════════════════════
+
+
 ---
 name: freely-workflow-guarded-execution
 description: >-
