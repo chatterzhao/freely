@@ -14,6 +14,6 @@ milestone: M-20260629T163137Z-A
   - ACP 不可用时显式报错并引导 skill:freely-tdd-review
   - freely-review 失败有 explicit error message
 - promotion_gate: all AT green + merge
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T163137Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260629T163137Z-A/issue.md
 - milestone: M-20260629T163137Z-A
 - session_refs: []

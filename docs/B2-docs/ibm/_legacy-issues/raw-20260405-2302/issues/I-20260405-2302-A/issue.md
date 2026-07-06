@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8U
     synced_at: '2026-04-27T13:16:33Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-helper-shell-source-compatibility-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:11Z'
 hash: ''
@@ -32,4 +32,4 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 
 这意味着实际 user-facing command path 已经偏离仓库真源：内部脚本仍可在 `bash` 测试里通过，但文档教给用户的正式命令在默认 shell 下坏掉。
 
-canonical: docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md
+canonical: docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-helper-shell-source-compatibility-governance.md

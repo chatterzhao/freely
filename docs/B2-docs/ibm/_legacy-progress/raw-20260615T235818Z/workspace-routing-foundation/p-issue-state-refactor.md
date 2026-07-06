@@ -1,5 +1,5 @@
 - issue_id: I-20260505T1210Z-A-C
-- issue_path: docs/B2-docs/ibm/issue-state-refactor/issues/I-20260505T1210Z-A-C.md
+- issue_path: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Zissues/I-20260505T1210Z-A-C.md
 - phase_state: in_dev
 - candidate_path: docs/B1-docs/raw-20260505T121000Z/candidates.md
 

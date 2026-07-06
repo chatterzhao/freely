@@ -1,7 +1,7 @@
 # ACP Bridge Crash Resilience
 
 - issue: `I-20260503-0000-A`
-- issue_path: `docs/B2-docs/acp/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
+- issue_path: `docs/B2-docs/acp/acp-bridge-crash-resilience/raw-20260503-0000issues/I-20260503-0000-A.md`
 - candidate: `C-20260503-0000-A`
 - candidate_path: `docs/B1-docs/raw-20260503/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`

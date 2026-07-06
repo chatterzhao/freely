@@ -50,6 +50,6 @@ milestone: M-20260704T004227Z-A
   - summary: 审查 ACP bridge 启动链路的三个 bug，确认修复方案覆盖全部根因
   - verdict: pass
 - promoted_issue_id: I-20260704T004227Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260704T004227Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260704T004227Z-A/issue.md
 - milestone: M-20260704T004227Z-A
 - session_refs: []

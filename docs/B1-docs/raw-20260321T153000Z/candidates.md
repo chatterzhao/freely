@@ -18,7 +18,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这轮研究已经从外部材料和 Freely 自身现状得出稳定结论：PRD 需要从“读物”变成“可执行包”。该判断已经 materialize 为正式 IBM issue，并完成最小质量门槛、governance-check 与回归测试的真源吸收，因此此 candidate 现在只保留历史 provenance。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321T153000Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260321T153000Z-A/issue.md
 - legacy_id_mapping: I-20260321T153000Z  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260321-ai-native-doc-loop
 - next_action: 保留为历史来源记录。若未来要继续扩展 PRD 模板生成器、lint 或更强 doc-loop 自动化，应从当前 canonical truth 新开 candidate/issue，而不是重新激活这条 candidate。

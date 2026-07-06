@@ -71,14 +71,14 @@
 
 ## Implementation References
 
-- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/prd.md`
-- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/pre-tests.md`
-- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/tasks.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045prd.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045pre-tests.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045tasks.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 
 ## Next
 
-- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commit `44bb13c`. The canonical closeout evidence is the focused regression set plus `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`.
+- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commit `44bb13c`. The canonical closeout evidence is the focused regression set plus `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`.
 - Future auth UX or helper-process expansion must open a new lifecycle rather than reopening this completed owner.

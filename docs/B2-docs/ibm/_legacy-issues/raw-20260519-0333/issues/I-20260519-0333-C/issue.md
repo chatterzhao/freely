@@ -7,10 +7,10 @@ completed_at: '2026-06-16T04:14:56Z'
 promoted_from: pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates
 source_candidate: docs/B1-docs/raw-20260325T033300Z/candidates.md#C-20260325-0333-A
 milestone: M-20260306-workspace-routing-foundation
-canonical_issue_path: docs/B2-docs/ibm/red-green/issues/testing-evidence-ladder-and-gate-mapping.md
-pre_tests_path: docs/B2-docs/ibm/red-green/pre-tests.md
-tasks_path: docs/B2-docs/ibm/red-green/tasks.md
-verification_artifact_dir: docs/B2-docs/ibm/red-green/code-reviews
+canonical_issue_path: docs/B2-docs/ibm/red-green/raw-20260325T033300Zissues/testing-evidence-ladder-and-gate-mapping.md
+pre_tests_path: docs/B2-docs/ibm/red-green/raw-20260325T033300Zpre-tests.md
+tasks_path: docs/B2-docs/ibm/red-green/raw-20260325T033300Ztasks.md
+verification_artifact_dir: docs/B2-docs/ibm/red-green/raw-20260325T033300Zcode-reviews
 platform_ids:
   github:
     issue_id: '2601'
@@ -32,8 +32,8 @@ Materialize Slice 2 of C-20260325-0333-A umbrella: freeze the testing evidence l
 
 - source_candidate: `docs/B1-docs/raw-20260325T033300Z/candidates.md#C-20260325-0333-A`
 - milestone: `M-20260306-workspace-routing-foundation`
-- pre_tests_path: `docs/B2-docs/ibm/red-green/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/ibm/red-green/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/red-green/raw-20260325T033300Zpre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/red-green/raw-20260325T033300Zcode-reviews`
 
 ## Ladder Levels
 

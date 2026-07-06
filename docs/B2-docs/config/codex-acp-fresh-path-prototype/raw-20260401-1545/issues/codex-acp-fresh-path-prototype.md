@@ -15,9 +15,9 @@
 - pre_tests_path: docs/B2-docs/config/codex-acp-fresh-path-prototype/raw-20260401-1545/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/config/codex-acp-fresh-path-prototype/raw-20260401-1545/code-reviews
 - depends_on:
-  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`
   - `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
-  - `docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
+  - `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105issues/codex-verified-resume-evidence-governance.md`
   - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -95,7 +95,7 @@ ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config
 
 ## Implementation References
 
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`
 - `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
 - `docs/B2-docs/config/codex-acp-fresh-path-prototype/brainstorms/b-codex-acp-fresh-path-prototype.md`
 - `docs/system/workspace/tools.md`

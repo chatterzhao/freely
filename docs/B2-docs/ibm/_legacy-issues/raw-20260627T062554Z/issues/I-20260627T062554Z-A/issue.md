@@ -5,7 +5,7 @@
 - source_candidate: docs/B1-docs/raw-20260627T062554Z54Z/candidates.md#C-20260627T062554Z-A
 - source_raw: raw-20260627T062554Z54Z
 - verification_artifact_dir: docs/B2-docs/scan-v3-refactor/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T062554Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260627T062554ZI-20260627T062554Z-A/issue.md
 - pre_tests_path: docs/B2-docs/scan-v3-refactor/verification/pre-tests.md
 - title: task-lifecycle-scan v3 — 三分类重构
 

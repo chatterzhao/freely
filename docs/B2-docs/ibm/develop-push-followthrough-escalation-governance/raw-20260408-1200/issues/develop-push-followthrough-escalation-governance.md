@@ -17,7 +17,7 @@
 - verification_artifact_dir: docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/raw-20260408-1200/code-reviews
 - depends_on:
   - `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
-  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`
   - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

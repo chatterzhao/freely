@@ -10,5 +10,5 @@ milestone: M-20260705T111413Z-A
 - status: absorbed
 - decision_reason: machine-specific global state
 - promoted_issue_id: I-20260705T111413Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T111413Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260705T111413Z-A/issue.md
 - milestone: M-20260705T111413Z-A

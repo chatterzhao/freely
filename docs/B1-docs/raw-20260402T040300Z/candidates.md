@@ -23,7 +23,7 @@
 - priority: `P1`
 - status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/B2-docs/config/packaging/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

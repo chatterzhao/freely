@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/raw-20260405-1415/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -86,7 +86,7 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
   - `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`
   - `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/pre-tests.md`
   - `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/tasks.md`
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 
 ## Closeout
 
@@ -98,5 +98,5 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
 
 - `./bin/governance-check`
 - review `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
-- review `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`
+- review `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027prd.md`
 - confirm the resulting docs do not claim standalone extraction has already started

@@ -1,7 +1,7 @@
 # Code Review: frontend-probe-v0-terminal-attach-validation
 
 - issue_id: `I-20260308-1244-03`
-- issue: `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+- issue: `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-probe-v0.md`
 - reviewer: `codex`
 - phase: `in_verification`
 - date: `2026-04-01`

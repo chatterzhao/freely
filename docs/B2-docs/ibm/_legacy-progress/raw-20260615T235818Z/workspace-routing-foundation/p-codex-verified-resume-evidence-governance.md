@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `develop`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely`
-- issue_path: `docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
+- issue_path: `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105issues/codex-verified-resume-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "verification-writeback"}
 
@@ -31,7 +31,7 @@
 1. `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 2. `bash -n docs/system/workspace/scripts/runtime/freely`
 3. `./bin/governance-check`
-4. verification artifact written to `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
+4. verification artifact written to `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
 
 ## Closure Evidence
 
@@ -40,7 +40,7 @@
   - `develop` commit `20574fa`
   - `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
   - `./bin/governance-check`
-  - `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
+  - `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
 
 ## Next Action
 

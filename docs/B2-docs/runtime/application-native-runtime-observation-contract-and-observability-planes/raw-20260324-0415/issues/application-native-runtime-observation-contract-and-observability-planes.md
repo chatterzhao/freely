@@ -15,7 +15,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/raw-20260322-0115issues/cli-first-entrypoint-and-observability-surface-unification.md`
   - `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

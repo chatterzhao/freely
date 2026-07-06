@@ -53,7 +53,7 @@ That left the runtime able to mis-handle the failed current slot, over-probe in 
 
 ## Verification
 
-- `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/raw-20260410-1835code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
 
 ## Completion
 

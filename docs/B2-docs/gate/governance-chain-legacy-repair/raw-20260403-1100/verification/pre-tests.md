@@ -52,7 +52,7 @@
 - status: `pass`
 - red-green-status: not_applicable
 - red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
-- artifact_ref: `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
+- artifact_ref: `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100child-slice-status.md`
 
 ### AT-003
 - id: `AT-003`

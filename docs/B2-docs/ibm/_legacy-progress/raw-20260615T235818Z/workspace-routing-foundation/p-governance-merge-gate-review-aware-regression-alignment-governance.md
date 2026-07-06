@@ -1,7 +1,7 @@
 # Progress: governance-merge-gate-review-aware-regression-alignment-governance
 
 - issue_id: `I-20260404-0232-A`
-- issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
 - title: `Governance merge gate review-aware regression alignment governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -24,7 +24,7 @@
 1. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 2. `git diff --check`
 3. `./bin/governance-check`
-4. `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+4. `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
 ## Current Batch Risks
 
@@ -34,7 +34,7 @@
 ## Closure Evidence
 
 1. develop merge `0bb78ce`
-2. `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+2. `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
 ## Next Action
 

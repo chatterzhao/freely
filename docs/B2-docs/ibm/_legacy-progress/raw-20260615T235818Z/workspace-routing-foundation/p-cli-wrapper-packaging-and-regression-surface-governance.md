@@ -1,7 +1,7 @@
 # Progress: cli-wrapper-packaging-and-regression-surface-governance
 
 - issue_id: `I-20260405-2358-C`
-- issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - title: `CLI wrapper packaging and regression-surface governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -30,16 +30,16 @@
 - `./bin/check-tauri-probe-host`
 - `./bin/tauri-probe-dev`
 - `git diff --check`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0035-test-pre-merge-cli-wrapper-regression-closeout --issue docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0035-test-pre-merge-cli-wrapper-regression-closeout --issue docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 
 ## Closure Evidence
 
 - feature commits `f2c0ad1` and `3a5aff2`
 - premerge merge `ab7a9b8`
 - develop merge `8e0985b`
-- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-implementation-decision.md`
-- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
-- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-canonical-closeout-verification.md`
+- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-implementation-decision.md`
+- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
+- `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-canonical-closeout-verification.md`
 
 ## Next Action
 

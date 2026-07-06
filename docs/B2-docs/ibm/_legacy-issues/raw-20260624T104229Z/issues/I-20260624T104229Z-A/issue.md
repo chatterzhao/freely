@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T104229Z29Z
 source_candidate: docs/B1-docs/raw-20260624T104229Z29Z/candidates.md#C-20260624T104229Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T104229Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T104229ZI-20260624T104229Z-A/issue.md
 milestone: M-20260624T104229Z-A
 title: 'fix: wt-create success message → read skill'
 platform_ids: {}

@@ -18,7 +18,7 @@ The future extraction owner must consume this package before opening any standal
 2. `prd.md`
 3. `pre-tests.md`
 4. `tasks.md`
-5. `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+5. `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 
 ## Start Checklist
 

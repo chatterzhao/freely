@@ -786,7 +786,7 @@ Freely 后续吸收外部理论时，应坚持一个更强的判定：
 
 来源：
 - `I-20260318T093000Z`
-- `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 
 issue 类型：
 - runtime / governance / CLI control plane
@@ -814,7 +814,7 @@ acceptance 特征：
 
 来源：
 - `I-20260318T190800Z`
-- `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/raw-20260318-1246issues/url-content-intake-skill-and-wechat-fetch-governance.md`
 
 issue 类型：
 - skill materialization / platform routing
@@ -843,7 +843,7 @@ acceptance 特征：
 
 来源：
 - `I-20260317T100500Z`
-- `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/rust-tauri-probe-bridge-v1.md`
 
 issue 类型：
 - contract / bridge / app-facing runtime seam

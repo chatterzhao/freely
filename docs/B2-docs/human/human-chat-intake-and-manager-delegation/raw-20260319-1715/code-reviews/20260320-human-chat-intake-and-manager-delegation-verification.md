@@ -11,7 +11,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
 - `docs/system/workspace/skills/human-interruption-handling/SKILL.md`
 - `docs/system/workspace/agents/manager-agent.md`
-- `docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- `docs/B2-docs/human/human-chat-intake-and-manager-delegation/raw-20260319-1715issues/human-chat-intake-and-manager-delegation.md`
 
 ## Findings
 

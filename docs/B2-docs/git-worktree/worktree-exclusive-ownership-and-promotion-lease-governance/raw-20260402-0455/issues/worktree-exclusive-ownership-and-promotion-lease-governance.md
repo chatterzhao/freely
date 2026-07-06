@@ -16,8 +16,8 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - verification_artifact_dir: docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455/code-reviews
 - depends_on:
-  - `docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
-  - `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
+  - `docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/raw-20260318-1825issues/worktree-hygiene-supervision-control-plane.md`
+  - `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/raw-20260321-0257issues/worktree-fleet-governance-closure.md`
   - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - session_refs:
@@ -77,11 +77,11 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 
 - `docs/B1-docs/raw-20260402T191200Z/brainstorms.md`
 - `docs/B1-docs/raw-20260402T191200Z/candidates.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
-- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/tasks.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455prd.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455pre-tests.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455tasks.md`
 - `docs/milestones.md`
 
 ## Current Evidence

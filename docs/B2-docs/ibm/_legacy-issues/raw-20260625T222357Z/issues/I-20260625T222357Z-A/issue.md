@@ -4,7 +4,7 @@
 - milestone: M-20260625T222357Z-A
 - source_candidate: docs/B1-docs/raw-20260625T222357Z57Z/candidates.md#C-20260625T222357Z-A
 - verification_artifact_dir: docs/B2-docs/review-test-worktree/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T222357Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T222357ZI-20260625T222357Z-A/issue.md
 - source_raw: raw-20260625T222357Z57Z
 - pre_tests_path: docs/B2-docs/review-test-worktree/verification/pre-tests.md
 - title: Review in test-pre-merge, three-layer review

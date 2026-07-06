@@ -5,7 +5,7 @@
 - source_raw: raw-20260626T155612Z12Z
 - source_candidate: docs/B1-docs/raw-20260626T155612Z12Z/candidates.md#C-20260626T155612Z-A
 - verification_artifact_dir: docs/B2-docs/issue-sync-before-merge/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T155612Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260626T155612ZI-20260626T155612Z-A/issue.md
 - title: pr-merge-guarded issue-sync before merge + auto-commit
 - pre_tests_path: docs/B2-docs/issue-sync-before-merge/verification/pre-tests.md
 

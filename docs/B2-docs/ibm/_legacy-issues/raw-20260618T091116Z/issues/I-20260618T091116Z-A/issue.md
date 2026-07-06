@@ -5,7 +5,7 @@ phase_state: completed
 - verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260618T091116Z/code-reviews
 milestone: M-20260618T091116Z-A
 source_candidate: docs/B1-docs/raw-20260618T091116Z16Z-write-task-mode-ordering/candidates.md#C-20260618T091116Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260618T091116Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260618T091116Z-A/issue.md
 title: Fix write_task_mode ordering — ensure DB daemon running first
 ---
 

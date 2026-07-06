@@ -1,7 +1,7 @@
 # Progress: worktree-tool-boundary-bootstrap-governance
 
 - issue_id: `I-20260403-2041-A`
-- issue_path: `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-tool-boundary-bootstrap-governance.md`
 - title: `Worktree tool boundary bootstrap governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -37,8 +37,8 @@
 - `bash docs/system/workspace/scripts/tests/test-worktree-entry-flow`
 - `git diff --check`
 - `./bin/governance-check`
-- `docs/B2-docs/config/packaging/code-reviews/20260403-worktree-tool-boundary-bootstrap-verification.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260403-worktree-tool-boundary-bootstrap-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
 
 ## Next Action
 

@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8H
     synced_at: '2026-04-27T13:16:16Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md
+canonical_issue_path: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:58Z'
 hash: ''
@@ -36,4 +36,4 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 - `switch` 会把旧 provider residue 留在 live config
 - w
 
-canonical: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md
+canonical: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md

@@ -6,7 +6,7 @@
 - runtime_state: `closed_for_this_batch`
 - branch: `feature/codex-session-reentry-and-pty-input-20260321`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260321-feature-codex-session-reentry-and-pty-input`
-- issue_path: `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
+- issue_path: `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/raw-20260321-1706issues/chat-triggered-worker-runtime-reactivation-governance.md`
 
 ## Summary
 

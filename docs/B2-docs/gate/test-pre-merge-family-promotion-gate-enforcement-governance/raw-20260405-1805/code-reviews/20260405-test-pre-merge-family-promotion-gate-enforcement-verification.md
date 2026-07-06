@@ -1,7 +1,7 @@
 # Verification: test-pre-merge-family-promotion-gate-enforcement-governance
 
 - issue_id: `I-20260405-1805-A`
-- issue_path: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+- issue_path: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - branch: `feature/testing-lane-guidance-20260405-1545`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1545-feature-testing-lane-guidance`
 - verification_date: `2026-04-05`

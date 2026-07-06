@@ -37,7 +37,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是两层 auto-loop 机制的中枢；本轮纠偏后已明确它是“首跳接管与委托者”，而不是需求池扫描器。
-- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/lead-agent-bootstrap.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
@@ -49,7 +49,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是 `lead-agent` 的核心依赖文件，也是两层模型里真正承载“找活、解释上下文、决定下一跳”的一层。
-- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/context-source-skill-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/context-source-skill-bootstrap.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
@@ -61,7 +61,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: `pre-brainstorm` 本身是独立执行环；用“没 issue”来命名 skill 会把路由条件和工作能力混在一起。
-- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/doc-pre-brainstorm-execution-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/doc-pre-brainstorm-execution-bootstrap.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
@@ -74,7 +74,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 真正稳定的执行能力应该直接是 `doc-ibm-execution` 和 `dev-loop-execution`；“有 usable issue”只是路由判定，不该长期存在为独立 skill。
-- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/doc-loop-dev-loop-handoff-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/doc-loop-dev-loop-handoff-bootstrap.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
@@ -87,6 +87,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是把本次预研结论真正接回现有 orchestrator skill 与项目意图的收口项。
-- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/raw-20260306-1101issues/auto-loop-orchestrator-bootstrap.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []

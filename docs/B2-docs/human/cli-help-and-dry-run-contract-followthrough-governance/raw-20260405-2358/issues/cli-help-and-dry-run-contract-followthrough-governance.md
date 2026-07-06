@@ -16,9 +16,9 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-cli-help-and-dry-run-contract-followthrough-governance.md`
 - verification_artifact_dir: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260405-2358/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-  - `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
+  - `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-helper-shell-source-compatibility-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5O
     synced_at: '2026-04-27T13:14:19Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md
+canonical_issue_path: docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:31Z'
 hash: ''
@@ -37,4 +37,4 @@ Freely 现有技能已经覆盖：
 
 这会让主管在 worktree 积累后反复用 milestone、issue、review、tests、git ancestry 和聊天上下文临时拼判断。
 
-canonical: docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md
+canonical: docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md

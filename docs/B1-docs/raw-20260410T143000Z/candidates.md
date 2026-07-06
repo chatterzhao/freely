@@ -22,7 +22,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260410T143000Z-A`
-- promoted_issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/preferred-auth-method-account-switch-fix.md`
 - source_brainstorm: `docs/B1-docs/raw-20260410T143000Z/brainstorms.md`
 - session_refs: []
 - next_action: Merge this narrow fix to `develop` as a follow-on to `I-20260405T002700Z-A`.

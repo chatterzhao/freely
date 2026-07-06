@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/pretests-adequacy-item-schema-materialization-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-pretests-adequacy-item-schema-materialization`
-- issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415issues/pretests-adequacy-item-schema-materialization-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-closeout"}
 
@@ -29,7 +29,7 @@
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/test-lane premerge-integration -- ./bin/governance-check`
-- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ## Next Action
 

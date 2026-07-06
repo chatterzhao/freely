@@ -1,7 +1,7 @@
 # Verification: governance-merge-gate-review-aware-regression-alignment-governance
 
 - issue_id: `I-20260404-0232-A`
-- issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
 - branch: `feature/governance-merge-gate-diagnostic-alignment-20260404-023234`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-023234-feature-governance-merge-gate-diagnostic-alignment`
 - verification_date: `2026-04-04`

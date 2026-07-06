@@ -117,11 +117,11 @@
   - 继续承接 `I-20260317-1001` 已冻结的 boundary contract，把 Probe 的最小产品面收敛成可实现 issue。
   - 当前阶段仍是 issue-bound IBM 收敛，不进入前端实现代码。
 - required_doc_refs:
-  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-  - `docs/B2-docs/human/tui/brainstorms/b-frontend-probe-v0.md`
-  - `docs/B2-docs/human/tui/prd.md`
-  - `docs/B2-docs/human/tui/pre-tests.md`
-  - `docs/B2-docs/human/tui/tasks.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244brainstorms/b-frontend-probe-v0.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244prd.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244pre-tests.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244tasks.md`
 
 ## Next
 

@@ -6,7 +6,7 @@
 - title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
 - status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - promoted_issue_id: `I-20260405T235800Z-A`
 - session_refs:
   - tool: `codex`
@@ -63,7 +63,7 @@
 - title: CLI wrapper packaging and regression-surface audit
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - promoted_issue_id: `I-20260405T235800Z-C`
 - session_refs:
   - tool: `codex`

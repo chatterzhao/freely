@@ -4,7 +4,7 @@
 - verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260626T121349Z/code-reviews
 - source_candidate: docs/B1-docs/raw-20260626T121349Z49Z/candidates.md#C-20260626T121349Z-A
 - source_raw: raw-20260626T121349Z49Z
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T121349Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260626T121349ZI-20260626T121349Z-A/issue.md
 - pre_tests_path: docs/B2-docs/consistency-cleanup/verification/pre-tests.md
 - title: agent-table help text + test-pre-merge docs + cherry-pick transfer consistency
 

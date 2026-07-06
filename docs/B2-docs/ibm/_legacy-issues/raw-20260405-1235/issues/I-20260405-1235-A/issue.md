@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8M
     synced_at: '2026-04-27T13:16:22Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:22Z'
 hash: ''
@@ -33,4 +33,4 @@ Freely 已经冻结了 activation consent、默认自治 posture、以及一部�
 
 当前这层缺口已经不是 wording 问题，而是产品 contract 缺口。现有 runtim
 
-canonical: docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md
+canonical: docs/B2-docs/config/packaging/raw-20260402-0403issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md

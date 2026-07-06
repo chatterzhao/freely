@@ -1,7 +1,7 @@
 # Verification: worktree-tool-boundary-bootstrap-governance canonical closeout
 
 - issue_id: `I-20260403-2041-A`
-- issue_path: `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-tool-boundary-bootstrap-governance.md`
 - branch: `feature/worktree-tool-boundary-bootstrap-closeout-20260405-1700`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1700-feature-worktree-tool-boundary-bootstrap-closeout`
 - verification_date: `2026-04-05`

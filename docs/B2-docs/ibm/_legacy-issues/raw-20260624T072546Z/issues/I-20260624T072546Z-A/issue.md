@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T072546Z46Z
 source_candidate: docs/B1-docs/raw-20260624T072546Z46Z/candidates.md#C-20260624T072546Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T072546Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T072546ZI-20260624T072546Z-A/issue.md
 milestone: M-20260624T072546Z-A
 title: 'fix: wt-create/hook/freely feedback 平台硬编码报错修复'
 platform_ids: {github: {issue_id: '3410'}}

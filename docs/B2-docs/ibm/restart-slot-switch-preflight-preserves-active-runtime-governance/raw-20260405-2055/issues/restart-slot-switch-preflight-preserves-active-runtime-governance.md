@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/raw-20260405-2055/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
   - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

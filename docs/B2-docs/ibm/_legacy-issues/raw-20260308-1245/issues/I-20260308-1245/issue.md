@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4H
     synced_at: '2026-04-27T13:13:14Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md
+canonical_issue_path: docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:11Z'
 hash: ''
@@ -31,7 +31,7 @@ platform_state: closed
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `internal-frontend-backend-architecture-review`
 - issue-name: `internal-frontend-backend-architecture-review`
-- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/tui/raw-20260308-1244code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260308T163000Z/candidates.md#c-20260308-1244-01`
 - source_brainstorm: `docs/B1-docs/raw-20260308T163000Z/brainstorms.md`
 - execution_base: `develop`

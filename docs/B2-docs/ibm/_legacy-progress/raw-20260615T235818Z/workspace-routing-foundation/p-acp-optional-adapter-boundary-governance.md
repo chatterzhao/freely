@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/acp-client-agent-protocol-research-20260401`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-feature-acp-client-agent-protocol-research`
-- issue_path: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- issue_path: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-author"}
 
@@ -16,4 +16,4 @@
   - `merge_commit: a0f9a48`
   - `governance: ./bin/governance-check`
   - `milestone: docs/milestones.md`
-  - `issue: docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+  - `issue: docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`

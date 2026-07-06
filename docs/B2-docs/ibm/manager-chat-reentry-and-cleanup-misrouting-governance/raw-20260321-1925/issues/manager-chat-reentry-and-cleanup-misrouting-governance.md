@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/B2-docs/ibm/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
+- depends_on: `docs/B2-docs/human/human-chat-intake-and-manager-delegation/raw-20260319-1715issues/human-chat-intake-and-manager-delegation.md`, `docs/B2-docs/ibm/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

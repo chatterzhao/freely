@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T081419Z19Z
 source_candidate: docs/B1-docs/raw-20260624T081419Z19Z/candidates.md#C-20260624T081419Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T081419Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T081419ZI-20260624T081419Z-A/issue.md
 milestone: M-20260624T081419Z-A
 title: 'fix: fix-execution 修改转移从 cp 改为 git stash push/apply'
 platform_ids:

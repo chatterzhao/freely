@@ -4,4 +4,4 @@
 - milestone: M-20260522T035043Z-A
 - source_candidate: docs/B1-docs/raw-20260522T035043Z43Z/candidates.md#C-20260522T035043Z-A
 - verification_artifact_dir: docs/B2-docs/ai-cli-codex-apikey/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260522T035043Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T035043ZI-20260522T035043Z-A/issue.md

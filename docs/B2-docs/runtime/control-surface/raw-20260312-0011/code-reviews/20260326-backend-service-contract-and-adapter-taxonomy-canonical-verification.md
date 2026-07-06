@@ -12,8 +12,8 @@
 - `docs/B2-docs/runtime/control-surface/prd.md`
 - `docs/B2-docs/runtime/control-surface/raw-20260312-0011/verification/pre-tests.md`
 - `docs/B2-docs/runtime/control-surface/tasks.md`
-- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
-- `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 
 ## Findings
 

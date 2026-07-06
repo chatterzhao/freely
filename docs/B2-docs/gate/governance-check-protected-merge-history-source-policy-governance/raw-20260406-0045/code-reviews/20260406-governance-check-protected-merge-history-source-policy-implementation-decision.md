@@ -1,7 +1,7 @@
 # Implementation Decision: governance-check-protected-merge-history-source-policy-governance
 
 - issue_id: `I-20260406-0045-A`
-- issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md`
 
 ## Implementation Decision Note
 

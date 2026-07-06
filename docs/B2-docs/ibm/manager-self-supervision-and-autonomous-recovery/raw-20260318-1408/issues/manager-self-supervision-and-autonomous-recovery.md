@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260318T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- depends_on: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/raw-20260318-0930issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why

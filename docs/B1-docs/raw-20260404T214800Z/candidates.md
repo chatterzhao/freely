@@ -36,7 +36,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - decision_reason: The boundary is now narrow enough to materialize cleanly. This owner stays separate from blocked-intake websocket supervision and from completed shared-slot owners, and it converts the startup/doctor/status contract into a dedicated runtime lifecycle.
 - promoted_issue_id: `I-20260404T214800Z-A`
-- promoted_issue_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - next_action: Implement the startup preflight plus minimal doctor/status lock truth on the dedicated `2148` feature lane and verify with focused runtime regressions.
 - revisit_trigger: Re-open only if future evidence proves this startup/status lock contract was fully absorbed elsewhere or if a broader shared-slot redesign is explicitly opened.
 - session_refs:

@@ -1,7 +1,7 @@
 # Progress: freely-tool-autonomy-policy-materialization-governance
 
 - issue_id: `I-20260401-1303-A-2`
-- issue_path: `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md`
 - title: `Freely tool autonomy policy materialization governance`
 - phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
@@ -17,8 +17,8 @@
   - `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
   - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
   - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
-  - `docs/B2-docs/config/packaging/pre-tests.md`
-  - `docs/B2-docs/config/packaging/code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403pre-tests.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
 - next:
   - further tool-surface or ACP adapter expansion should materialize as a narrower follow-on instead of reopening this bounded owner.
 
@@ -27,7 +27,7 @@
 - closure_status: `merged-and-verified`
 - closure_evidence:
   - `merge_commit: 641cb55`
-  - `docs/B2-docs/config/packaging/code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
   - `docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
   - `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
   - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`

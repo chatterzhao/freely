@@ -14,7 +14,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/acp/acp-bridge-path-sync/issues/I-20260503-0115-A.md
+canonical_issue_path: docs/B2-docs/acp/acp-bridge-path-sync/raw-20260503-0115issues/I-20260503-0115-A.md
 hash: ''
 created_at: '2026-05-03T01:15:00Z'
 updated_at: '2026-06-13T10:51:49Z'

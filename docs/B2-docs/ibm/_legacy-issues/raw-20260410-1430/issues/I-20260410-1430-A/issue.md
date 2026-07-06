@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9F
     synced_at: '2026-04-27T13:16:56Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md
+canonical_issue_path: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260410-1430issues/preferred-auth-method-account-switch-fix.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:25Z'
 hash: ''
@@ -26,4 +26,4 @@ platform_state: closed
 
 When switching from an apikey slot to an account slot, the `preferred_auth_method` field is deleted from live `~/.codex/config.toml` but not restored. This happens because account slots have empty `config-auth.toml` fragments.
 
-canonical: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md
+canonical: docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260410-1430issues/preferred-auth-method-account-switch-fix.md

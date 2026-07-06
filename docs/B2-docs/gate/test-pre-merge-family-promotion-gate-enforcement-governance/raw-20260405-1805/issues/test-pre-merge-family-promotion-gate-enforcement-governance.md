@@ -73,11 +73,11 @@
   - 这条 owner 内允许同时修改 truth sources 与 gate scripts，因为两者需要同轮收敛。
   - stale automation、manifest generation、paired create、runtime surfaces 仍由后续 owner 承接。
 - required_doc_refs:
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/brainstorms/b-test-pre-merge-family-promotion-gate-enforcement-governance.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/prd.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/tasks.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805brainstorms/b-test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805prd.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805pre-tests.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805tasks.md`
   - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 
 ## Verification
@@ -109,8 +109,8 @@
 - `docs/system/workspace/skills/branch-management/references/semantic-regression-checklist.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-implementation-decision.md`
-- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
+- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-implementation-decision.md`
+- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
 
 ## Next
 

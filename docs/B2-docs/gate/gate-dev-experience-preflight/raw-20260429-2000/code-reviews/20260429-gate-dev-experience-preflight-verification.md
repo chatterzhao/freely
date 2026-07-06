@@ -1,7 +1,7 @@
 # Verification: gate-dev-experience-preflight
 
 - issue_id: `I-20260429-2000-A`
-- issue_path: `docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
+- issue_path: `docs/B2-docs/gate/gate-dev-experience-preflight/raw-20260429-2000issues/I-20260429-2000-A.md`
 - verification_date: `2026-04-29`
 - verifier: `human`
 

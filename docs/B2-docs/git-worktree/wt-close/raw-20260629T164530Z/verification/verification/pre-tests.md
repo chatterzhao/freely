@@ -12,7 +12,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 _extract_raw_key 函数存在且使用 grep -oE 精确提取
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-1.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -q '_extract_raw_key\|grep -oE.*raw-' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL"; exit 1; }
@@ -21,7 +21,7 @@
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: "PASS: _extract_raw_key with grep -oE found"
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -35,7 +35,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 --platform-only 路径不调 _resolve_branch_from_raw_key
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-2.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -A3 'PLATFORM_ONLY.*true' docs/system/workspace/scripts/worktree/wt-close | grep -q 'raw_key=' || { echo "FAIL"; exit 1; }
@@ -44,7 +44,7 @@
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: "PASS: platform-only sets raw_key from _raw_key"
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -58,7 +58,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 sed 's/^[*+ ]*//'
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-3.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T164530Z30Z-wt-close-raw-key-flag
   grep -q 's/\^\[\*+ \]\*//' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL"; exit 1; }
@@ -67,7 +67,7 @@
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: "PASS: + prefix stripped"
-- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Zverification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none

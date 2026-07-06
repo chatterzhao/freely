@@ -55,7 +55,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/B1-docs/raw-20260411T141400Z/brainstorms.md`
 - session_refs: []
-- promoted_issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415issues/pretests-adequacy-item-schema-materialization-governance.md`
 - promoted_issue_id: `I-20260411T141500Z-A`
 - decision_reason: `Adequacy schema materialization was intentionally split out after launch-time contract hardening and is now canonically owned by I-20260411T141500Z-A, so this candidate remains only as provenance for why the two owners were separated.`
 - next_action: treat this candidate as absorbed provenance; any further adequacy evolution should continue from the completed canonical owner instead of reopening this launch-time lane.

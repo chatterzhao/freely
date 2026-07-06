@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260312T001100Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+- depends_on: `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
 
@@ -56,8 +56,8 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
 - required_doc_refs:
   - `docs/B1-docs/raw-20260312T001100Z/brainstorms.md`
   - `docs/B1-docs/raw-20260312T001100Z/candidates.md`
-  - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
-  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 
 ## Verification
 

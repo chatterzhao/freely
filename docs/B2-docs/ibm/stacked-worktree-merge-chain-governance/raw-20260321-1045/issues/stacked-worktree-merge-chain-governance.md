@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`
 - session_refs:
   - {tool: cc-use-codex-cli, session_id: "11111111-2222-4333-8444-555555555555", jsonl_path: "/Users/zhaoyu/.claude/projects/-private-tmp-freely-cc-codex-real-ed64yw-project/11111111-2222-4333-8444-555555555555.jsonl", role: "integration-smoke"}
   - {tool: codex-cli, session_id: "019d0f86-7c2e-7f50-999f-10cf4935e7ba", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/21/rollout-2026-03-21T01-27-02-019d0f86-7c2e-7f50-999f-10cf4935e7ba.jsonl", role: "integration-smoke"}

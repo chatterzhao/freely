@@ -1427,6 +1427,6 @@ Freely 需要在 `openclaw` 的 reaction plane 之上，再增加：
 
 ## Materialization Update
 
-- `I-20260319T171500Z` 已物化为正式 issue：`docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- `I-20260319T171500Z` 已物化为正式 issue：`docs/B2-docs/human/human-chat-intake-and-manager-delegation/raw-20260319-1715issues/human-chat-intake-and-manager-delegation.md`
 - canonical 文档工位挂起说明：`feature/prebrainstorm-human-chat-canonical-20260320-0023` 只重复物化了 human-chat issue 包，独立 verification/review 不足，且祖先历史混入 `CLI TUI` / `project-resolution` 能力线；后续只允许人工摘取真正独有的 human-chat 文档差异到 `feature/human-chat-intake-supervision-20260319-1030`，不得把本工位作为独立 promote 来源。
 - 后续对这条能力的收口应从 issue / verification 继续，不应再回退到 pre-brainstorm 作为主执行入口。

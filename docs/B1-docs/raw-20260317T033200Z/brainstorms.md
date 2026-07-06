@@ -2,7 +2,7 @@
 
 - id: `20260317-0332--rust-tauri-probe-bridge-v1`
 - status: `active`
-- related_issue: `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+- related_issue: `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-probe-v0.md`
 - trigger: `Frontend Probe v0` 已把前端侧的 bridge contract、transport diagnostics、manifest 暴露面基本补齐，但仓库里没有任何 Rust / Tauri backend bridge 实现。
 
 ## 问题

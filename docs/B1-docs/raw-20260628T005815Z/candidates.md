@@ -31,6 +31,6 @@ milestone: M-20260628T005815Z-A
   - mode: plan-subagent
   - summary: 审查 chat 拆分设计，验证 comment/discuss/export 三模块边界清晰，平台兼容策略合理
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260628T005815Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260628T005815Z-A/issue.md
 - milestone: M-20260628T005815Z-A
 - session_refs: []

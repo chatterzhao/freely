@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8W
     synced_at: '2026-04-27T13:16:35Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:15Z'
 hash: ''
@@ -30,4 +30,4 @@ Upgraded `memark 0.1.1` replay showed canonical Freely root still missed one nar
 2. Canonical Freely root previously did not ignore those paths, so the new guidance correctly rejected root init there.
 3. Linked Freely worktrees were already using MemArk successfully, which means the remaining defect is bootstrap metadata at the protected root, not th
 
-canonical: docs/B2-docs/config/packaging/issues/memark-protected-root-bootstrap-followthrough-governance.md
+canonical: docs/B2-docs/config/packaging/raw-20260402-0403issues/memark-protected-root-bootstrap-followthrough-governance.md

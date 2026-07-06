@@ -10,7 +10,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `chat_intake`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429T174500Z-A.md`
+- promoted_issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429T174500Zissues/I-20260429T174500Z-A.md`
 - session_refs:
   - {tool: ccds, session_id: "20260429-bash32-fix", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:

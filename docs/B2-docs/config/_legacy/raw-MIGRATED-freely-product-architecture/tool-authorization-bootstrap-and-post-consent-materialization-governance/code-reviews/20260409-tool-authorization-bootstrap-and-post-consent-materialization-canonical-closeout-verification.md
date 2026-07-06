@@ -1,6 +1,6 @@
 # Verification: tool-authorization-bootstrap-and-post-consent-materialization-governance canonical closeout
 
-- issue_path: `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`
@@ -15,7 +15,7 @@
 1. Verification baseline
    - Existing verification artifact already records this owner as the lawful active architecture package and rejects widening back into tool-specific implementation work.
 2. Pre-tests gate
-   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/B2-docs/config/packaging/raw-20260402-0403issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 3. Governance
    - `PASS`: `./bin/governance-check`
 4. Diff hygiene

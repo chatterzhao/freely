@@ -4,5 +4,5 @@
 - milestone: M-20260624T235907Z-A
 - source_candidate: docs/B1-docs/raw-20260624T235907Z07Z/candidates.md#C-20260624T235907Z-A
 - verification_artifact_dir: docs/B2-docs/red-green-separation/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T235907Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T235907ZI-20260624T235907Z-A/issue.md
 - title: RED/GREEN separation

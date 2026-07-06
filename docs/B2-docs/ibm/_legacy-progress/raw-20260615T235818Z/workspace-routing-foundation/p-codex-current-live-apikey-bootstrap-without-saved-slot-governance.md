@@ -1,7 +1,7 @@
 # Progress: codex-current-live-apikey-bootstrap-without-saved-slot-governance
 
 - issue_id: `I-20260406-1829-A`
-- issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - title: `Codex current-live apikey bootstrap without saved-slot inventory governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -21,12 +21,12 @@
 
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-current-live-apikey-without-saved-slot`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-current-live-apikey-without-saved-slot`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1904-feature-codex-current-live-apikey-bootstrap-dev --issue docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1904-feature-codex-current-live-apikey-bootstrap-dev --issue docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-feature-fix-codex-apikey-availability-lock-retirement-handoff.md`
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-feature-fix-codex-apikey-availability-lock-retirement-handoff.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
 
 ## Closure Evidence
 

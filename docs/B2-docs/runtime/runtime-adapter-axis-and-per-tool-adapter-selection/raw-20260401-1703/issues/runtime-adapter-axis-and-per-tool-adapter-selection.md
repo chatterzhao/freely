@@ -15,7 +15,7 @@
 - pre_tests_path: docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/raw-20260401-1703/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/raw-20260401-1703/code-reviews
 - depends_on:
-  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`
   - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
   - `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - session_refs:
@@ -84,7 +84,7 @@ ACP boundary 已经收口，但 runtime 现在还没有 first-class `adapter axi
 
 ## Implementation References
 
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/scripts/runtime/freely`

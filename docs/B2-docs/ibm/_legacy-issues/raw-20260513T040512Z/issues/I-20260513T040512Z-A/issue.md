@@ -21,7 +21,7 @@ intake_id: ''
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
-pre_tests_path: docs/B2-docs/ibm/_legacy-issues/I-20260513T040512Z-A/pre-tests.md
+pre_tests_path: docs/B2-docs/ibm/_legacy-issues/raw-20260513T040512ZI-20260513T040512Z-A/pre-tests.md
 verification_artifact_dir: docs/B2-docs/task-lifecycle-scan-batch/code-reviews/
 platform_state: closed
 ---
@@ -30,7 +30,7 @@ platform_state: closed
 
 - source_candidate: `docs/B1-docs/raw-20260513T040512Z12Z/candidates.md`
 - milestone: `M-20260513T040512Z-A`
-- pre_tests_path: `docs/B2-docs/ibm/_legacy-issues/I-20260513T040512Z-A/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260513T040512ZI-20260513T040512Z-A/pre-tests.md`
 
 ## 目标
 

@@ -19,7 +19,7 @@ intake_id: ''
 author: zhaoquan
 channel: manager-promotion
 session_refs: []
-pre_tests_path: docs/B2-docs/ibm/_legacy-issues/I-20260519T004246Z-A/pre-tests.md
+pre_tests_path: docs/B2-docs/ibm/_legacy-issues/raw-20260519T004246ZI-20260519T004246Z-A/pre-tests.md
 verification_artifact_dir: ''
 platform_state: closed
 ---

@@ -30,7 +30,7 @@
   - 现有边界已经足够冻结第一轮 capability contract：读取优先级、默认模板层级、preserve-existing 语义与 self-hosting 关系
 - next_action: 以 `I-20260405T113000Z-A` materialize 第一轮 capability owner，补 capability doc 与 preserve-existing-AGENTS 回归测试，并 replay 到 `develop`。
 - revisit_trigger: 当需要把项目级 `AGENTS.md` 的模板注入、升级/merge 策略或更复杂的项目定制行为继续升级为长期能力时。
-- promoted_issue_path: `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - milestone: `M-20260326-freely-product-architecture`
 - session_refs:
   - tool: `codex`

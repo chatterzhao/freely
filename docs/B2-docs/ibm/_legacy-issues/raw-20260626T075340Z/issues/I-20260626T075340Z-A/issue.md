@@ -3,7 +3,7 @@
 - phase_state: completed
 - source_candidate: docs/B1-docs/raw-20260626T075340Z40Z/candidates.md#C-20260626T075340Z-A
 - source_raw: raw-20260626T075340Z40Z
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T075340Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260626T075340ZI-20260626T075340Z-A/issue.md
 - verification_artifact_dir: docs/B2-docs/cline-registry-fix/verification
 - pre_tests_path: docs/B2-docs/cline-registry-fix/verification/pre-tests.md
 - title: cline tool-registry.toml slot/session fix + bridge_config_env CLI flag mode

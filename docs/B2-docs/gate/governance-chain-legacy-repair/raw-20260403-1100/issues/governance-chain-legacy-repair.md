@@ -65,18 +65,18 @@
 
 - `docs/B1-docs/raw-20260403T110000Z/brainstorms.md`
 - `docs/B1-docs/raw-20260403T110000Z/candidates.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/brainstorms/b-governance-chain-legacy-repair.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/prd.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/pre-tests.md`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/tasks.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100issues/governance-chain-legacy-repair.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100brainstorms/b-governance-chain-legacy-repair.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100child-slice-status.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100prd.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100pre-tests.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100tasks.md`
 - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 
 ## Current Evidence
 
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
-- `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/raw-20260403-1100child-slice-status.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 

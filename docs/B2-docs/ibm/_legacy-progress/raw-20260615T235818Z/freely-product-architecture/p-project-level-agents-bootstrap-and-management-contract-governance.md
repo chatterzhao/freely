@@ -1,7 +1,7 @@
 # Progress: project-level-agents-bootstrap-and-management-contract-governance
 
 - issue_id: `I-20260405-1130-A`
-- issue_path: `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - title: `Project-level AGENTS bootstrap and management contract governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -27,8 +27,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
 - `git diff --check`
 - `./bin/governance-check`
-- `docs/B2-docs/config/packaging/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
 
 ## Next Action
 

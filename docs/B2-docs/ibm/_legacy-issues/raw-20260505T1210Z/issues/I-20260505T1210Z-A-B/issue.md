@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '214'
     url: https://github.com/chatterzhao/freely/issues/214
 primary_platform: github
-canonical_issue_path: docs/B2-docs/ibm/issue-state-refactor/issues/I-20260505T1210Z-A-B.md
+canonical_issue_path: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Zissues/I-20260505T1210Z-A-B.md
 created_at: '2026-05-05T12:10:02Z'
 updated_at: '2026-05-17T08:02:22Z'
 session_refs: []

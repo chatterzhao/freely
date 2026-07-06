@@ -23,6 +23,6 @@ milestone: M-20260629T165403Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T165403Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260629T165403Z-A/issue.md
 - milestone: M-20260629T165403Z-A
 - session_refs: []

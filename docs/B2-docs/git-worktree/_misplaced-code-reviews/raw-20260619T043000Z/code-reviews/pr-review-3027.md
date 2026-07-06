@@ -6,7 +6,7 @@
 - review_date: 2026-06-19T04:42:35Z
 - verdict: pass
 - issue_id: I-20260619T043000Z-A
-- issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260619T043000Z-A/issue.md
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260619T043000Z-A/issue.md
 
 ## 1. Worktree Check
 ^- status: passed

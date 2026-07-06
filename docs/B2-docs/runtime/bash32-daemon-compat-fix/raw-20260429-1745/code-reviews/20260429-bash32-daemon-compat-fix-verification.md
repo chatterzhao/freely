@@ -1,7 +1,7 @@
 # Verification: bash32-daemon-compat-fix
 
 - issue_id: `I-20260429-1745-A`
-- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429T174500Zissues/I-20260429-1745-A.md`
 - verification_date: `2026-04-29`
 - verifier: `human`
 

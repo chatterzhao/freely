@@ -12,7 +12,7 @@
 - target_environment: feature worktree
 - required_evidence: 命令输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-1.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   bin/freely cycle --help 2>&1 | grep -q 'raw-key\|Usage' && echo PASS || echo FAIL
@@ -20,7 +20,7 @@
 - expected_RED_output: FAIL (命令不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -34,7 +34,7 @@
 - target_environment: feature worktree
 - required_evidence: JSON 解析成功
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-2.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   output=$(bin/freely cycle --raw-key 20260630T002621Z --json 2>&1)
@@ -43,7 +43,7 @@
 - expected_RED_output: FAIL (命令不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -57,7 +57,7 @@
 - target_environment: feature worktree
 - required_evidence: cycle 输出确认
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-3.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   # 创建测试 task
@@ -70,7 +70,7 @@
 - expected_RED_output: FAIL (cycle 不存在或无 task)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -84,7 +84,7 @@
 - target_environment: feature worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-4.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-4.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -q '\[CMD\].*called.*raw-key' bin/pr-create-guarded 2>/dev/null && echo PASS || echo FAIL
@@ -92,7 +92,7 @@
 - expected_RED_output: FAIL ([CMD] 日志不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-4.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-4.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -106,7 +106,7 @@
 - target_environment: feature worktree
 - required_evidence: grep 确认 PRE_CHECK_MAP 存在
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-5.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-5.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -r 'PRE_CHECK_MAP\|check_b1_artifacts\|check_b2_artifacts' docs/system/workspace/scripts/ --include='*.sh' --include='*.py' -l | head -1 | xargs grep -q 'pr-create-guarded' && echo PASS || echo FAIL
@@ -114,7 +114,7 @@
 - expected_RED_output: FAIL (PRE_CHECK_MAP 不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-5.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-5.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -128,7 +128,7 @@
 - target_environment: feature worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-6.txt
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-6.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260630T002621Z21Z-supervisor-cycle-monitor
   grep -r 'review_assigned\|防重复\|duplicate.*dispatch' docs/system/workspace/scripts/ --include='*.sh' --include='*.py' -l | head -1 | xargs grep -q 'review_assigned' && echo PASS || echo FAIL
@@ -136,7 +136,7 @@
 - expected_RED_output: FAIL (守卫逻辑不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/B2-docs/runtime/daemon/verification/test-evidence/acceptance-6.txt
+- evidence_file: docs/B2-docs/runtime/daemon/raw-20260630T002621Zverification/test-evidence/acceptance-6.txt
 - red-green-status: green
 - status: passed
 - blocker: none

@@ -6,14 +6,14 @@
 ### acceptance-1
 - id: AT-001
 - requirement: 生产代码零旧路径引用
-- acceptance_target: bin/ + .githooks/ + quality/ + runtime/ + skills/ 中零 docs/pre-brainstorms/ + docs/issues/ + docs/epics/ 旧路径
+- acceptance_target: bin/ + .githooks/ + quality/ + runtime/ + skills/ 中零 docs/pre-brainstorms/ + docs/issues/ + docs/B2-docs/ 旧路径
 - testing_layer: unit
 - target_environment: test-pre-merge-20260706T023422Z-fix-refactor-leftovers
 - required_evidence: grep -r 全量搜索零结果
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/ibm/b2-governance/raw-20260706T023422Z/verification/test-evidence/acceptance-1.log
 - test_command: |
-  grep -rn 'docs/pre-brainstorms/\|docs/issues/raw-\|docs/epics/' \
+  grep -rn 'docs/pre-brainstorms/\|docs/issues/raw-\|docs/B2-docs/' \
     bin/ .githooks/ docs/system/workspace/scripts/quality/ \
     docs/system/workspace/scripts/runtime/ docs/system/workspace/scripts/worktree/ \
     docs/system/workspace/skills/ 2>/dev/null | grep -v 'B1-docs\|B2-docs\|\.bak\|_legacy' | wc -l

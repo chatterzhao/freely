@@ -1,7 +1,7 @@
 # Pre-tests — scan-pr-platform-config
 
 - issue_id: `I-20260501-0000-A`
-- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501T000000Zissues/I-20260501-0000-A.md`
 
 ## Unit
 

@@ -1,7 +1,7 @@
 # Verification: codex-apikey-slot-bundle-and-provider-aware-probe-governance
 
 - issue_id: `I-20260405-0027-A`
-- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - branch: `feature/tool-authorization-bootstrap-research-20260405-0335`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-0335-feature-tool-authorization-bootstrap-research`
 - verification_date: `2026-04-05`

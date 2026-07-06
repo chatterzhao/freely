@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-milestone-completed-queue-closeout-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/raw-20260406-1105/code-reviews
 - depends_on:
-  - `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/raw-20260404-0119issues/governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/system/workspace/scripts/quality/governance-check`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

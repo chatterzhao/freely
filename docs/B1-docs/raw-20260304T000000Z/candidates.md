@@ -96,7 +96,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`
   - `docs/system/workspace/skills/branch-management/SKILL.md`
 - session_refs: []
 
@@ -109,6 +109,6 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: issue-level acceptance、pre-tests executable contract 与相关 checklist/gate 已被后续 IBM acceptance 真源吸收，这条旧候选不再需要独立 materialization。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260304T000000Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260304T000000Z-A/issue.md
 - milestone: M-20260304T000000Z-A
 - session_refs: []

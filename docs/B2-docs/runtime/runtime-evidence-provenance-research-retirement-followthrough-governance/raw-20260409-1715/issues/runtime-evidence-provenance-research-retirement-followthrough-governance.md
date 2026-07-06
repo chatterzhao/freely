@@ -10,7 +10,7 @@
 - priority: `P0`
 - source_candidate: `docs/B1-docs/raw-20260409T171500Z/candidates.md#c-20260409-1715-a`
 - source_brainstorm: `docs/B1-docs/raw-20260409T171500Z/brainstorms.md`
-- reopen_of_issue: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- reopen_of_issue: `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`
 - reopen_reason: `real develop-bound retirement of dropped candidate C-20260407-0603-A surfaced that candidate-only cleanup evidence still fails protected push and needs a narrow same-line followthrough owner`
 - execution_base: `develop`
 - integration_target: `develop`
@@ -18,7 +18,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - verification_artifact_dir: docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/raw-20260409-1715/code-reviews
 - depends_on:
-  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`
   - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
   - `docs/B1-docs/raw-20260407T103600Z/candidates.md`
 - session_refs:

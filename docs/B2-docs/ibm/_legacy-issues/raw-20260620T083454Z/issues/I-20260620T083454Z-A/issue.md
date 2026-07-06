@@ -5,7 +5,7 @@ phase_state: completed
 verification_artifact_dir: docs/B2-docs/runtime/verify
 milestone: ""
 source_candidate: docs/B1-docs/raw-20260620T083454Z54Z/candidates.md#C-20260620T083454Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T083454Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260620T083454ZI-20260620T083454Z-A/issue.md
 title: "fix: task-source-scan check phase_state before reporting incomplete"
 created_at: "2026-06-20T09:50:00Z"
 author: manager

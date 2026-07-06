@@ -24,7 +24,7 @@
   - `in_dev` issue 必须声明 commit boundary
   - 验证通过后触发 checkpoint policy
   - dirty-tree 超阈值时 runtime 不再继续扩展实现
-  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260317T073500Z-A/issue.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260317T073500Z-A/issue.md
   milestone: M-20260317T073500Z-A
   session_refs: []
 
@@ -37,6 +37,6 @@
   Acceptance Hint:
   - supervisor/status 能展示 worktree phase、dirty budget、checkpoint readiness
   - promotion 必须绑定集成测试与依赖关系
-  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260317T073500Z-A/issue.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260317T073500Z-A/issue.md
   milestone: M-20260317T073500Z-A
   session_refs: []

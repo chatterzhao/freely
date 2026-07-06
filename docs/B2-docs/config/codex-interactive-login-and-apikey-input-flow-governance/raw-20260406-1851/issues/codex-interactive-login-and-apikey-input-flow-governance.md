@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-interactive-login-and-apikey-input-flow-governance.md`
 - verification_artifact_dir: docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -56,9 +56,9 @@ Freely 还缺一个受治理约束的 Codex-first interactive login contract。�
 
 ## Verification
 
-- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-verification.md`
-- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
-- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-verification.md`
+- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
+- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
 
 ## Boundary Reminder
 

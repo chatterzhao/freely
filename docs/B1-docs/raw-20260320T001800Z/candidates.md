@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: runtime 已具备统一 resolver；本轮补齐 cwd 自动解析和单一已授权项目回退的脚本回归后，已可以 materialize 为 issue。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T001800Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T001800Z-A/issue.md
 - legacy_id_mapping: I-20260320T001800Z  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

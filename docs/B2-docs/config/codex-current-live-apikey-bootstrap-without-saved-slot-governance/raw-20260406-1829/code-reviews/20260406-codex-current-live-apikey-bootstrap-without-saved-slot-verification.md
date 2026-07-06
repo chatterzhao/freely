@@ -1,7 +1,7 @@
 # Verification: codex-current-live-apikey-bootstrap-without-saved-slot-governance
 
 - issue_id: `I-20260406-1829-A`
-- issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - verified_in_branch: `feature/codex-current-live-apikey-bootstrap-dev-20260406-1904`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1904-feature-codex-current-live-apikey-bootstrap-dev`
 - verified_at: `2026-04-06`
@@ -18,7 +18,7 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-current-live-apikey-without-saved-slot`
 2. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-current-live-apikey-without-saved-slot`
-3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1904-feature-codex-current-live-apikey-bootstrap-dev --issue docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1904-feature-codex-current-live-apikey-bootstrap-dev --issue docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 4. `./bin/governance-check`
 5. `git diff --check`
 

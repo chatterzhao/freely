@@ -4,7 +4,7 @@
 - milestone: M-20260624T154500Z-A
 - source_candidate: docs/B1-docs/raw-20260624T154500Z00Z/candidates.md#C-20260624T154500Z-A
 - verification_artifact_dir: docs/B2-docs/runtime-py-chmod/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T154500Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T154500ZI-20260624T154500Z-A/issue.md
 - title: chmod +x for runtime Python scripts
 
 # I-20260624T154500Z-A: runtime Python scripts +x

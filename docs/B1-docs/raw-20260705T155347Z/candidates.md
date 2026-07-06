@@ -29,6 +29,6 @@ milestone: M-20260705T155347Z-A
 - open_questions: []
 - acceptance_reviews: []
 - promoted_issue_id: I-20260705T155347Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T155347Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260705T155347Z-A/issue.md
 - milestone: M-20260705T155347Z-A
 - session_refs: []

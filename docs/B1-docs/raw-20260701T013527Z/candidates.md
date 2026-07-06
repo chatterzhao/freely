@@ -26,6 +26,6 @@ milestone: M-20260701T013527Z-A
   - summary: 确认 get_config 无其他调用者，修复方案正确
   - verdict: pass
 - promoted_issue_id: I-20260701T013527Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T013527Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260701T013527Z-A/issue.md
 - milestone: M-20260701T013527Z-A
 - session_refs: []

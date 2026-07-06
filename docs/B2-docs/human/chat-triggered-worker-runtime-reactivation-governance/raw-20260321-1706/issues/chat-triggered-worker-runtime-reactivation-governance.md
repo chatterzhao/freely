@@ -70,4 +70,4 @@
 - `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 - `docs/progress/workspace-routing-foundation/p-chat-triggered-worker-runtime-reactivation-governance.md`
-- `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`
+- `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/raw-20260321-1706code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`

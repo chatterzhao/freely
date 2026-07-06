@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T092822Z22Z
 source_candidate: docs/B1-docs/raw-20260624T092822Z22Z/candidates.md#C-20260624T092822Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T092822Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T092822ZI-20260624T092822Z-A/issue.md
 milestone: M-20260624T092822Z-A
 title: 'feat: tool-registry.toml 添加 Cline CLI 配置'
 platform_ids: {}

@@ -25,4 +25,4 @@ Add fix/* to pr-merge-guarded validate_merge_direction + help text + pre-flight 
 - pre_tests_path: `docs/B2-docs/merge-guarded-fix-whitelist/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/merge-guarded-fix-whitelist/code-reviews`
 - issue_id: `I-20260506T1400Z-A`
-- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260506T1400Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260506T1400ZI-20260506T1400Z-A/issue.md`

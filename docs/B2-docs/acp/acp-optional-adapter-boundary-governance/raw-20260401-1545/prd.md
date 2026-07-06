@@ -21,7 +21,7 @@ Freely 的 runtime/governance 已经足够成熟，真正开始暴露出 adapter
 - `docs/B1-docs/raw-20260401T224500Z/candidates.md`
 - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545/issues/acp-optional-adapter-boundary-governance.md`
 - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545/verification/pre-tests.md`
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/tasks.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 

@@ -18,7 +18,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - verification_artifact_dir: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260417-0445/code-reviews
 - depends_on:
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
   - `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
   - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - created_at: `2026-04-18`

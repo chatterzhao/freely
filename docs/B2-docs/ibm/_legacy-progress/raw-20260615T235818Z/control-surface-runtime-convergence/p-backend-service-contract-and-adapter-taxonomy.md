@@ -11,7 +11,7 @@
 - evidence:
   - `docs/B2-docs/runtime/control-surface/code-reviews/20260320-backend-service-contract-and-adapter-taxonomy-ibm-completion.md`
   - `docs/B2-docs/runtime/control-surface/code-reviews/20260326-backend-service-contract-and-adapter-taxonomy-canonical-verification.md`
-  - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
-  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 - next:
   - 后续 control surface、standalone runtime、human intervention transport 继续复用该 contract 真源；若要引入新的系统拓扑总图或 adapter family，另开 lifecycle

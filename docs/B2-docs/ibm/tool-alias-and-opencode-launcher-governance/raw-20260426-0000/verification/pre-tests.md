@@ -734,7 +734,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-50`
-- case_design: `Verify phase_state=completed in docs/B2-docs/ibm/_legacy-issues/I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
+- case_design: `Verify phase_state=completed in docs/B2-docs/ibm/_legacy-issues/raw-20260426-0000I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
 - artifact_ref: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/raw-20260426-0000/code-reviews/20260428-fix-phase-state.md`
 
 

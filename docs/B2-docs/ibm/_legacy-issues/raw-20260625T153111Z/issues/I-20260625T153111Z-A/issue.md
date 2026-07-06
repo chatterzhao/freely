@@ -4,7 +4,7 @@
 - milestone: M-20260625T153111Z-A
 - source_candidate: docs/B1-docs/raw-20260625T153111Z11Z/candidates.md#C-20260625T153111Z-A
 - verification_artifact_dir: docs/B2-docs/agent-table/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T153111Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T153111ZI-20260625T153111Z-A/issue.md
 - source_raw: raw-20260625T153111Z11Z
 - pre_tests_path: docs/B2-docs/agent-table/verification/pre-tests.md
 - title: agent-table.toml 多 agent 分身注册

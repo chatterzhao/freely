@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO85
     synced_at: '2026-04-27T13:16:04Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/worktree-tool-boundary-bootstrap-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:15Z'
 hash: ''

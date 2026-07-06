@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8B
     synced_at: '2026-04-27T13:16:08Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md
+canonical_issue_path: docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232issues/governance-merge-gate-review-aware-regression-alignment-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:32Z'
 hash: ''
@@ -28,4 +28,4 @@ platform_state: closed
 
 Reproducing the current path shows the canonical contract is different from the old expectation: unresolved `needs_research` candidate metadata repairs are allowed to travel inside the same governance owner line when the merge already carries same-l
 
-canonical: docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md
+canonical: docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232issues/governance-merge-gate-review-aware-regression-alignment-governance.md

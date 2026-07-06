@@ -13,7 +13,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md
+canonical_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20260429-2000issues/I-20260429-2000-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-29T20:00:00Z'
@@ -36,4 +36,4 @@ governance-merge-gate --range, pr-merge-guarded pre-flight, pre-commit FP fix.
 ## References
 
 - B1: docs/B1-docs/raw-20260429T122700Z/
-- Issue: docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md
+- Issue: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20260429-2000issues/I-20260429-2000-A.md

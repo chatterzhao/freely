@@ -113,10 +113,10 @@ ACP 预研现在已经有稳定边界：
 
 - `docs/B1-docs/raw-20260401T224500Z/brainstorms.md`
 - `docs/B1-docs/raw-20260401T224500Z/candidates.md`
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/brainstorms/b-acp-optional-adapter-boundary-governance.md`
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/prd.md`
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`
-- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/tasks.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545brainstorms/b-acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545prd.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545pre-tests.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`

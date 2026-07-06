@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5I
     synced_at: '2026-04-27T13:14:09Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/human/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md
+canonical_issue_path: docs/B2-docs/human/cli-tui-human-interruption-input/raw-20260319-2315issues/cli-tui-human-interruption-input.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:12Z'
 hash: ''
@@ -31,4 +31,4 @@ Freely 需要一个真正可用的 CLI 前台插话入口，但这个入口必�
 - 中文输入与展示必须可用
 - 输入框应支持多行内容，而不是只接受单行脚本式输入
 
-canonical: docs/B2-docs/human/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md
+canonical: docs/B2-docs/human/cli-tui-human-interruption-input/raw-20260319-2315issues/cli-tui-human-interruption-input.md

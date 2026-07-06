@@ -1,7 +1,7 @@
 # Implementation Decision Note: test-lane-routing-and-enforcement-governance
 
 - issue_id: `I-20260405-1914-A`
-- issue_path: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- issue_path: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914issues/test-lane-routing-and-enforcement-governance.md`
 - decision_date: `2026-04-05`
 - author: `codex`
 

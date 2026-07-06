@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - verification_artifact_dir: docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
   - `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -62,18 +62,18 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
   - 只吸收与 `network_failure` fast-fail / classification 直接相关的 residual changes；旧的 live-auth identity reconciliation 残差不在本 owner scope。
 - required_doc_refs:
   - `docs/B1-docs/raw-20260406T110500Z/brainstorms.md`
-  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/prd.md`
-  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/pre-tests.md`
-  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/tasks.md`
+  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901prd.md`
+  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901pre-tests.md`
+  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901tasks.md`
   - `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 
 ## Completion
 
-- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
-- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/brainstorms/b-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
-- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/prd.md`
-- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/pre-tests.md`
-- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/tasks.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901brainstorms/b-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901prd.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901pre-tests.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901tasks.md`
 - `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - milestone / candidate writeback showing `I-20260406-0901-A` is the canonical owner
 
@@ -95,8 +95,8 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
 - review `docs/system/workspace/scripts/runtime/ai-cli`
 - review `docs/system/workspace/scripts/runtime/freely`
 - pass the issue-bound reconnect/status/runtime regression set from `pre-tests.md`
-- record verification evidence in `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
-- record canonical closeout evidence in `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
+- record verification evidence in `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
+- record canonical closeout evidence in `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/raw-20260406-0901code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
 
 ## Next
 

@@ -1,7 +1,7 @@
 # Verification: codex-auto-switch-probe-apikey-fallback-governance
 
 - issue_id: `I-20260407-0023-A`
-- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 - verified_in_branch: `feature/codex-auto-switch-probe-apikey-fallback-20260406-2138`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback`
 - verified_at: `2026-04-07`
@@ -23,7 +23,7 @@
 4. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
 5. `git diff --check`
 6. `./bin/governance-check`
-7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 8. `./bin/ai list`
 9. `./bin/ai --quiet --format json switch apikey-codex-a1007-1`
 10. `codex exec "hi"`

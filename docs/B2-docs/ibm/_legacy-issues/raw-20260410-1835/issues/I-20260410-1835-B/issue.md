@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9H
     synced_at: '2026-04-27T13:16:59Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md
+canonical_issue_path: docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/raw-20260410-1835issues/codex-real-exec-switch-and-after-failure-recovery-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:33Z'
 hash: ''
@@ -30,4 +30,4 @@ Real dogfooding on 2026-04-12 exposed a narrower follow-on regression in the alr
 
 This is not a new generic network-taxonomy owner. It is a bounded closeout of the specific mismatch between real `hi`
 
-canonical: docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md
+canonical: docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md

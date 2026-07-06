@@ -14,7 +14,7 @@ platform_ids:
   gitee:
     issue_id: ""
 primary_platform: github
-canonical_issue_path: "docs/B2-docs/ibm/_legacy-issues/I-20260503T1235Z-A/issue.md"
+canonical_issue_path: "docs/B2-docs/ibm/_legacy-issues/raw-20260503T1235ZI-20260503T1235Z-A/issue.md"
 hash: ""
 created_at: "2026-05-03T12:39:03Z"
 updated_at: "2026-05-14T07:30:00Z"

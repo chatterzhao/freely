@@ -19,6 +19,6 @@
   - mode: subagent
   - summary: 审查 8 个文件的字符串替换，确认无逻辑变更
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T030408Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260629T030408Z-A/issue.md
 - milestone: M-20260629T030408Z-A
 - session_refs: []

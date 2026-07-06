@@ -8,11 +8,11 @@
 
 ## Scope
 
-- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
-- `docs/B2-docs/human/tui/prd.md`
-- `docs/B2-docs/human/tui/pre-tests.md`
-- `docs/B2-docs/human/tui/tasks.md`
-- `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244prd.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244pre-tests.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244tasks.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 - `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 
 ## Findings

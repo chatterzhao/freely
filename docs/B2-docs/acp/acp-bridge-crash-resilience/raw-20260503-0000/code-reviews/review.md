@@ -1,7 +1,7 @@
 # Code Review: ACP bridge crash resilience
 
 - issue_id: `I-20260503-0000-A`
-- issue_path: `docs/B2-docs/acp/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
+- issue_path: `docs/B2-docs/acp/acp-bridge-crash-resilience/raw-20260503-0000issues/I-20260503-0000-A.md`
 - review_date: `2026-05-03`
 - reviewer: `human`
 - status: `approved`

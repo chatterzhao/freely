@@ -5,7 +5,7 @@
 - source_candidate: docs/B1-docs/raw-20260628T054513Z13Z/candidates.md#C-20260628T054513Z-A
 - source_raw: raw-20260628T054513Z13Z
 - verification_artifact_dir: docs/B2-docs/scope-warning/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260628T054513Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260628T054513ZI-20260628T054513Z-A/issue.md
 - pre_tests_path: docs/B2-docs/scope-warning/verification/pre-tests.md
 - title: checkpoint-guard scope 硬阻塞 → 建议警告
 

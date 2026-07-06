@@ -5,7 +5,7 @@
 - source_raw: raw-20260626T173930Z30Z
 - source_candidate: docs/B1-docs/raw-20260626T173930Z30Z/candidates.md#C-20260626T173930Z-A
 - verification_artifact_dir: docs/B2-docs/slot-assemble-unify/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T173930Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260626T173930ZI-20260626T173930Z-A/issue.md
 - title: ai_cli_tool_with_auth_assemble + slot recovery
 - pre_tests_path: docs/B2-docs/slot-assemble-unify/verification/pre-tests.md
 

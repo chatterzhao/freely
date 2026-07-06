@@ -16,7 +16,7 @@
 - pre_tests_path: docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/raw-20260413-0420/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/raw-20260413-0420/code-reviews
 - depends_on:
-  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415issues/pretests-adequacy-item-schema-materialization-governance.md`
   - `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

@@ -74,12 +74,12 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 
 ## Completion
 
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/tasks.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027prd.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027pre-tests.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027tasks.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
 - milestone / candidate writeback showing this is now the canonical owner
 - issue-owned IBM contract freezing the future `ai-switch-cli` / `ai-switch-skill` boundary
 
@@ -100,5 +100,5 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 ## Next
 
 - Completed on canonical `develop` via guarded merge `c5e0b85`.
-- Post-merge closeout verification is recorded in `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`.
+- Post-merge closeout verification is recorded in `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`.
 - Reopen only if Codex auth/config bundle materialization, slot-kind-aware probe routing, or provider residue cleanup regresses on canonical `develop`.

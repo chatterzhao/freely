@@ -30,7 +30,7 @@
   - the fix boundary is narrow and entirely within protected merge receipt auditing
   - changing audit traversal is safer than rewriting receipt trailers for valid batch merges
 - promoted_issue_id: `I-20260406T004500Z-A`
-- promoted_issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

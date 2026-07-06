@@ -1,7 +1,7 @@
 # Progress: codex-auto-switch-probe-apikey-fallback-governance
 
 - issue_id: `I-20260407-0023-A`
-- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 - title: `Codex auto switch probe apikey fallback governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,13 +25,13 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
 
 ## Closure Evidence
 

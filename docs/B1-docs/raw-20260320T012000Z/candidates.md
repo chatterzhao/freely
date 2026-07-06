@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: manager answer-vs-delegation triage 已进入 interruption handler、manager route 与 `I-20260321T192500Z` 的 canonical owner surface，不再单开平行 issue。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T012000Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T012000Z-A/issue.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

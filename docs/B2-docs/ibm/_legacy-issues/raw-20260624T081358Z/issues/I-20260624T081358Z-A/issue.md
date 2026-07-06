@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T081358Z58Z
 source_candidate: docs/B1-docs/raw-20260624T081358Z58Z/candidates.md#C-20260624T081358Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T081358Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T081358ZI-20260624T081358Z-A/issue.md
 milestone: M-20260624T081358Z-A
 title: 'fix: skills/AGENTS 测试文档 daemon 假设改为 pre-tests.md 委托'
 platform_ids:

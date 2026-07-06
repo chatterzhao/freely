@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7L
     synced_at: '2026-04-27T13:15:39Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md
+canonical_issue_path: docs/B2-docs/acp/acp-optional-adapter-boundary-governance/raw-20260401-1545issues/acp-optional-adapter-boundary-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:59Z'
 hash: ''

@@ -10,7 +10,7 @@ milestone: M-20260703T121233Z-A
 
 - status: absorbed
 absorbed_into: I-20260703T121233Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T121233Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260703T121233Z-A/issue.md
 - decision_reason: |
   三个修复属同一边界——进程生命周期管理：
   1. stop 用进程组杀代替逐 PID 杀

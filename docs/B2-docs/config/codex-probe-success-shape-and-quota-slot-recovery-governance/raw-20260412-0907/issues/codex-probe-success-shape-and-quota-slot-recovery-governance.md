@@ -51,7 +51,7 @@ This is not a new generic network-taxonomy owner. It is a bounded closeout of th
 
 ## Verification
 
-- `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 
 ## Completion
 

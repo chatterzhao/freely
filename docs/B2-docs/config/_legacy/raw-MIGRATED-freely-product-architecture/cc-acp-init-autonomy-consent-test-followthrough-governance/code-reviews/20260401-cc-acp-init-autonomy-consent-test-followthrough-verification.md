@@ -1,7 +1,7 @@
 # Verification: cc-acp-init-autonomy-consent-test-followthrough-governance
 
 - issue_id: `I-20260401-2316-A`
-- issue_path: `docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
 - branch: `feature/security-verification-closeout-followthrough-20260401`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-feature-security-verification-closeout-followthrough`
 - verification_date: `2026-04-01`

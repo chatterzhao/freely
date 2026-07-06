@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T004510Z10Z
 source_candidate: docs/B1-docs/raw-20260624T004510Z10Z/candidates.md#C-20260624T004510Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T004510Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T004510ZI-20260624T004510Z-A/issue.md
 milestone: "M-20260624T004510Z-A"
 title: "fix: deploy-skills opencode wildcard fix + registry-driven default tool detection"
 platform_ids:

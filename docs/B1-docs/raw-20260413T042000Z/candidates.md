@@ -22,7 +22,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
   - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
   - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - problem: Canonical `develop` now has authoritative startup identity and a frozen startup-handoff contract, but the normal startup path still does not materialize the first manager continuity artifact until stop fallback or later manager behavior. That leaves Freely's startup chain bootstrapped but not handoff-materialized on the success path.
@@ -71,7 +71,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415issues/pretests-adequacy-item-schema-materialization-governance.md`
   - `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - problem: The root-cause review is now strong enough to split into a promote-ready startup-authority lane and a still-research manager-handoff lane, but canonical `develop` cannot absorb candidate-only truth without a concrete owner package that records the split and its boundaries.
 - why_now:
@@ -114,7 +114,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260413T042000Z-A`
-- promoted_issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -168,7 +168,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
   - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
   - `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - problem: The real self-hosting startup path still treats "AI process spawned" as sufficient startup success even when the first manager continuity is absent until stop fallback. That weakens Freely's outer loop, restart point, and runtime artifact chain.

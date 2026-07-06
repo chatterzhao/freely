@@ -20,7 +20,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
   - `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
   - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - problem: `freely` currently mixes user-facing CLI semantics with internal runtime attach/repair semantics. In the field this shows up as repeated `start` / `daemon start` reusing or rebuilding partial runtime state instead of clearly refusing, while `stop` can leave same-project watchdog / dispatcher / AI descendants alive. The result is a restart storm pattern: users believe they stopped the runtime, but surviving watchers relaunch it.

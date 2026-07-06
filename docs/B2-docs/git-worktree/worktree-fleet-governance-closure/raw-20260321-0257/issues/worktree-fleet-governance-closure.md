@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260321T170600Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
+- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/raw-20260320-1405issues/worktree-maintenance-governance.md`, `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -64,8 +64,8 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
-- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
+- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/raw-20260321-0257code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
+- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/raw-20260321-0257code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
 
 ## Verification
 

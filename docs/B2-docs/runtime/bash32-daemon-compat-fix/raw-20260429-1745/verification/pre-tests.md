@@ -1,7 +1,7 @@
 # Pre-tests — bash 3.2 daemon 兼容性修复
 
 - issue_id: `I-20260429-1745-A`
-- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/raw-20260429T174500Zissues/I-20260429-1745-A.md`
 
 ## Unit
 - acceptance target: `The freely runtime script passes shell syntax check on macOS bash 3.2.`

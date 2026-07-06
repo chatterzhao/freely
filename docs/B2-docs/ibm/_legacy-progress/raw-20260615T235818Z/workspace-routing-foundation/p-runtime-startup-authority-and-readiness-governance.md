@@ -1,7 +1,7 @@
 # Progress: runtime-startup-authority-and-readiness-governance
 
 - issue_id: `I-20260413-0420-A`
-- issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
 - title: `Runtime startup authority and readiness governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -38,7 +38,7 @@ This owner replaces PID/argv startup authority with runtime-published supervisor
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 
 ## Next Action
 

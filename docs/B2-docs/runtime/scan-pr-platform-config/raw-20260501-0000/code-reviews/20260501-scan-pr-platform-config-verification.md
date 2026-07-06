@@ -1,7 +1,7 @@
 # Code Review: PR scan surface + FREELY_REPO_PLATFORMS config
 
 - issue_id: `I-20260501-0000-A`
-- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501T000000Zissues/I-20260501-0000-A.md`
 - review_date: `2026-05-03`
 - reviewer: `human`
 - status: `approved`

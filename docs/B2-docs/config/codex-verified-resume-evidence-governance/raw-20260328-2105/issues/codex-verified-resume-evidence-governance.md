@@ -77,9 +77,9 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 
 ## Implementation References
 
-- `docs/B2-docs/config/codex-verified-resume-evidence-governance/prd.md`
-- `docs/B2-docs/config/codex-verified-resume-evidence-governance/pre-tests.md`
-- `docs/B2-docs/config/codex-verified-resume-evidence-governance/tasks.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105prd.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105pre-tests.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105tasks.md`
 - `docs/system/workspace/scripts/runtime/freely`
 
 ## Next
@@ -87,4 +87,4 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 - IBM, dev-loop, and verification are complete; this owner is closed.
 - Current implementation stays deliberately narrow: verified rollout/jsonl evidence is now required before the `codex` path can reuse explicit `resume`.
 - Develop already contains the repair in commit `20574fa`; the earlier merge-prep lane is provenance only, not an active owner.
-- Verification truth remains in `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`.
+- Verification truth remains in `docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`.

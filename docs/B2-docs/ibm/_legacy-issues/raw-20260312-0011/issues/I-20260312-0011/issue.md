@@ -36,7 +36,7 @@ platform_state: closed
 - source_brainstorm: `docs/B1-docs/raw-20260312T001100Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+- depends_on: `docs/B2-docs/human/tui/raw-20260308-1244issues/internal-frontend-backend-architecture-review.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
 

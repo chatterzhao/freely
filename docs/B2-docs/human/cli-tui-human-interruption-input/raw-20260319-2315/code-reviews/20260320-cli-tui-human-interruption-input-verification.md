@@ -9,7 +9,7 @@
 
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
-- `docs/B2-docs/human/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- `docs/B2-docs/human/cli-tui-human-interruption-input/raw-20260319-2315issues/cli-tui-human-interruption-input.md`
 
 ## Findings
 

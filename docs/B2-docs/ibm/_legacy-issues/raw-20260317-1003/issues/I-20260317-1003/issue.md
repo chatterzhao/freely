@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO50
     synced_at: '2026-04-27T13:13:53Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/human/tui/issues/incremental-dogfooding-gate-for-backend-increments.md
+canonical_issue_path: docs/B2-docs/human/tui/raw-20260308-1244issues/incremental-dogfooding-gate-for-backend-increments.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:42Z'
 hash: ''
@@ -35,9 +35,9 @@ platform_state: closed
 - source_brainstorm: `docs/B1-docs/raw-20260308T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/human/tui/raw-20260308-1244pre-tests.md`
 - progress_path: `docs/progress/frontend-probe-dogfooding-loop/p-incremental-dogfooding-gate-for-backend-increments.md`
-- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/tui/raw-20260308-1244code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}

@@ -5,7 +5,7 @@
 - source_candidate: docs/B1-docs/raw-20260627T084545Z23Z/candidates.md#C-20260627T084523Z-A
 - source_raw: raw-20260627T084545Z23Z
 - verification_artifact_dir: docs/B2-docs/agent-lifecycle/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T084523Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260627T084523ZI-20260627T084523Z-A/issue.md
 - pre_tests_path: docs/B2-docs/agent-lifecycle/verification/pre-tests.md
 - title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
 

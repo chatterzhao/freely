@@ -62,14 +62,14 @@ That combination means the immediate operator diagnosis is currently too implici
 
 - `docs/B1-docs/raw-20260404T214800Z/brainstorms.md`
 - `docs/B1-docs/raw-20260404T214800Z/candidates.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/prd.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
-- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/tasks.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148prd.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148pre-tests.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/raw-20260404-2148tasks.md`
 - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`

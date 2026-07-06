@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8A
     synced_at: '2026-04-27T13:16:07Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/raw-20260404-0119issues/governance-merge-gate-milestone-status-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:27Z'
 hash: ''

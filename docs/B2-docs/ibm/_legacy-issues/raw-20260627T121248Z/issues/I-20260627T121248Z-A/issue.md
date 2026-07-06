@@ -6,7 +6,7 @@
 - source_raw: raw-20260627T121248Z48Z
 - verification_artifact_dir: docs/B2-docs/a2a-worker-pid-fix/code-reviews
 - pre_tests_path: docs/B2-docs/a2a-worker-pid-fix/verification/pre-tests.md
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T121248Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260627T121248ZI-20260627T121248Z-A/issue.md
 - title: a2a worker_pid + manager check 修复
 
 # I-20260627T121248Z-A: a2a worker_pid + manager check

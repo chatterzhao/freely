@@ -1,7 +1,7 @@
 # Progress: governance-check-protected-merge-history-source-policy-governance
 
 - issue_id: `I-20260406-0045-A`
-- issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md`
 - title: `Governance-check protected-merge history source policy governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -23,16 +23,16 @@
 
 - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `./bin/governance-check`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0045-test-pre-merge-governance-check-history-source-policy --issue docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0045-test-pre-merge-governance-check-history-source-policy --issue docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md`
 
 ## Closure Evidence
 
 - feature commits `ef79bda`, `bc2be26`, and `c0d6bb4`
 - premerge merge `9d72147`
 - develop merge `f58cf65`
-- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-implementation-decision.md`
-- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-verification.md`
-- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-canonical-closeout-verification.md`
+- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045code-reviews/20260406-governance-check-protected-merge-history-source-policy-implementation-decision.md`
+- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045code-reviews/20260406-governance-check-protected-merge-history-source-policy-verification.md`
+- `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045code-reviews/20260406-governance-check-protected-merge-history-source-policy-canonical-closeout-verification.md`
 
 ## Next Action
 

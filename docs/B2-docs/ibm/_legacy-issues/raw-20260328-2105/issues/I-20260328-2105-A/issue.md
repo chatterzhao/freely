@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO75
     synced_at: '2026-04-27T13:15:14Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md
+canonical_issue_path: docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105issues/codex-verified-resume-evidence-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:13Z'
 hash: ''
@@ -38,4 +38,4 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 
 这说明当前缺口不是“resume 不可用”，而是 runtime 把弱观
 
-canonical: docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md
+canonical: docs/B2-docs/config/codex-verified-resume-evidence-governance/raw-20260328-2105issues/codex-verified-resume-evidence-governance.md

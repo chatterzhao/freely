@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '203'
     url: https://github.com/chatterzhao/freely/issues/203
 primary_platform: github
-canonical_issue_path: docs/B2-docs/ibm/raw-key-format-unify/issues/I-20260504T1132Z-A.md
+canonical_issue_path: docs/B2-docs/ibm/raw-key-format-unify/raw-20260504T113200Zissues/I-20260504T1132Z-A.md
 created_at: '2026-05-05T00:00:00Z'
 updated_at: '2026-05-05T09:54:48Z'
 session_refs:
@@ -31,4 +31,4 @@ platform_state:
 
 ## Code Review
 
-docs/B2-docs/ibm/raw-key-format-unify/code-reviews/review.md
+docs/B2-docs/ibm/raw-key-format-unify/raw-20260504T113200Zcode-reviews/review.md

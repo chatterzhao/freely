@@ -5,7 +5,7 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260624T061532Z32Z
 source_candidate: docs/B1-docs/raw-20260624T061532Z32Z/candidates.md#C-20260624T061532Z-A
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T061532Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260624T061532ZI-20260624T061532Z-A/issue.md
 milestone: "M-20260624T061532Z-A"
 title: "fix: remove JSON5 dead code from tool-registry-query.py"
 platform_ids:

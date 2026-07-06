@@ -45,8 +45,8 @@
 - The six failing commits form an ancestry chain under the trailer-bearing protected merge `aeca22048b2b63e2a5a3a4318e912dd0f71ee368` (`Merge branch 'test-pre-merge-20260410-preferred-auth-fix' into develop`), but the individual trailerless commits only expose parent hashes plus generic subjects.
 - Existing owner docs already prove the batch and feature lane existed:
   - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md` records the feature branch and explicitly says the next merge route is `test-pre-merge-20260410-preferred-auth-fix`.
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md` records that same test-pre-merge batch as the integration target.
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md` proves the bounded owner and verification artifact exist.
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027pre-tests.md` records that same test-pre-merge batch as the integration target.
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md` proves the bounded owner and verification artifact exist.
 - Those artifacts are sufficient to justify a new explicit evidence schema, but not sufficient for the current subject-matched contract because none of them recover per-commit source/target semantics from Git history alone.
 
 ## Rejected Directions

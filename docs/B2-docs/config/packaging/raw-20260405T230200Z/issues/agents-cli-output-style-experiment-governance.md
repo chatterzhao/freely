@@ -64,12 +64,12 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 - `docs/B1-docs/raw-20260405T230200Z/brainstorms.md`
 - `docs/B1-docs/raw-20260405T230200Z/candidates.md`
 - `docs/milestones.md`
-- `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
-- `docs/B2-docs/config/packaging/brainstorms/b-agents-cli-output-style-experiment-governance.md`
-- `docs/B2-docs/config/packaging/prd.md`
-- `docs/B2-docs/config/packaging/pre-tests.md`
-- `docs/B2-docs/config/packaging/tasks.md`
-- `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Zissues/agents-cli-output-style-experiment-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Zbrainstorms/b-agents-cli-output-style-experiment-governance.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Zprd.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Zpre-tests.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Ztasks.md`
+- `docs/B2-docs/config/packaging/raw-20260405T230200Zcode-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
 - `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
 
 ## Verification
@@ -79,5 +79,5 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 
 ## Next
 
-- Completed on canonical `develop` with closeout verification recorded in `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`.
+- Completed on canonical `develop` with closeout verification recorded in `docs/B2-docs/config/packaging/raw-20260405T230200Zcode-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` stops treating this as an `AGENTS.md`-only experiment or if project-level `AGENTS.md` entrypoint truth needs stronger capability-level materialization.

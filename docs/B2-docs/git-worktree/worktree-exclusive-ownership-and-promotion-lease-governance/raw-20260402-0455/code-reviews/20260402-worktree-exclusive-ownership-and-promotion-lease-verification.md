@@ -1,7 +1,7 @@
 # Verification: worktree-exclusive-ownership-and-promotion-lease-governance
 
 - issue_id: `I-20260402-0455-A`
-- issue_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- issue_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - branch: `feature/worktree-exclusive-ownership-governance-20260402-0455`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0455-feature-worktree-exclusive-ownership-governance`
 - verification_date: `2026-04-02`

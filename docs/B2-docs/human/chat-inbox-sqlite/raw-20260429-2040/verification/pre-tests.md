@@ -1,7 +1,7 @@
 # Pre-tests — chat-inbox SQLite
 
 - issue_id: `I-20260429-2040-A`
-- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/raw-20260429-2040issues/I-20260429-2040-A.md`
 
 ## Unit
 - acceptance target: `chat-inbox.py module loads and core functions are callable.`

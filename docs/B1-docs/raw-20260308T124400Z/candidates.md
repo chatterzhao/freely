@@ -14,7 +14,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条架构总入口已经 materialize 为正式 owner，并由 `I-20260308T124500Z` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260308T124400Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260308T124400Z-A/issue.md
 - legacy_id_mapping: I-20260308T124500Z  # 历史遗留的 issue id
 - milestone: M-20260308T124400Z-A
 - next_action: 保留为历史来源记录。若未来前后端边界或可插拔协议层需要重新总论收敛，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
@@ -29,7 +29,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条最小 boundary contract 候选已经 materialize 为正式 owner，并由 `I-20260317T100100Z` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260308T124400Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260308T124400Z-A/issue.md
 - legacy_id_mapping: I-20260317T100100Z  # 历史遗留的 issue id
 - milestone: M-20260308T124400Z-A
 - next_action: 保留为历史来源记录。若未来 Probe 边界契约需要新的对象族、transport 兼容层或错误面扩展，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
@@ -44,7 +44,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条 probe 候选已经 materialize 为正式 owner，并由 `I-20260308T124400Z-03` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260308T124400Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260308T124400Z-A/issue.md
 - milestone: M-20260308T124400Z-A
 - next_action: 保留为历史来源记录。若未来要继续扩展 frontend UX、multi-project shell 或更宽的交互闭环，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
 - completion_note: `I-20260308T124400Z-03` 已完成 canonical closeout；day-1 probe surface 与真实 `Transport=tauri` 闭环已经吸收到 `develop`，因此该 candidate 不再构成活跃 queue。
@@ -58,7 +58,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条门禁候选已经 materialize 为正式 owner，并由 `I-20260317T100300Z` 的 canonical closeout 写回 completed。当前 candidate 只保留为历史 provenance，不再代表待执行 owner。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260308T124400Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260308T124400Z-A/issue.md
 - legacy_id_mapping: I-20260317T100300Z  # 历史遗留的 issue id
 - milestone: M-20260308T124400Z-A
 - next_action: 保留为历史来源记录。后续若 backend increment review gate 需要扩展到更强 enforcement 或新的 probe 能力，应从当前 canonical truth 新开 candidate/issue。

@@ -16,7 +16,7 @@
 - verification_artifact_dir: docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/raw-20260402-0020/code-reviews
 - depends_on:
   - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
-  - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/raw-20260402-0455issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
   - `docs/system/workspace/hooks/README.md`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`

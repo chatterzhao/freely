@@ -1,7 +1,7 @@
 # Verification: codex-interactive-login-and-apikey-input-flow-governance
 
 - issue_id: `I-20260406-1851-A`
-- issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - verified_in_branch: `feature/codex-apikey-login-interactive`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive`
 - verified_at: `2026-04-06`
@@ -22,7 +22,7 @@
 2. `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-interactive`
 3. `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-direct-args`
 4. `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-empty-input-fails`
-5. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive --issue docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+5. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive --issue docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 6. `./bin/governance-check`
 7. `git diff --check`
 

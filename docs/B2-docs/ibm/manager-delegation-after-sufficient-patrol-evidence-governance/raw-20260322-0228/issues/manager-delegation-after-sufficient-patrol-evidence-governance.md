@@ -16,7 +16,7 @@
 - depends_on:
   - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
   - `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
-  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/raw-20260322-0115issues/cli-first-entrypoint-and-observability-surface-unification.md`
 
 ## Why
 

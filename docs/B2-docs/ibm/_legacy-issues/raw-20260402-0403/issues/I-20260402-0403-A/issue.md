@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7X
     synced_at: '2026-04-27T13:15:53Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/canonical-product-posture-bootstrap-reconciliation-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/canonical-product-posture-bootstrap-reconciliation-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:47Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely already completed the product contract and the first tool-materialization
 2. Canonical local bootstrap state still lacks activation-consent truth, so the canonical repo reports `activation_consent_status: unknown-legacy`.
 3. `freely live-status` and `freely doctor` therefore still show execution-b
 
-canonical: docs/B2-docs/config/packaging/issues/canonical-product-posture-bootstrap-reconciliation-governance.md
+canonical: docs/B2-docs/config/packaging/raw-20260402-0403issues/canonical-product-posture-bootstrap-reconciliation-governance.md

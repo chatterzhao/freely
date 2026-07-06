@@ -5,7 +5,7 @@
 - source_candidate: docs/B1-docs/raw-20260624T141559Z59Z/candidates.md#C-20260624T141559Z-A
 - source_raw: raw-20260624T141559Z59Z
 - verification_artifact_dir: docs/B2-docs/feedback-issue-sync/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T141559Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260624T141559Z-A/issue.md
 - title: cmd_feedback 改为 issue-sync 薄封装
 
 # I-20260624T141559Z-A: cmd_feedback 对齐 issue-sync 多平台架构

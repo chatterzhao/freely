@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/raw-20260401-1831/code-reviews
 - depends_on:
-  - `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
+  - `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/raw-20260321-1706issues/chat-triggered-worker-runtime-reactivation-governance.md`
   - `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
   - `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
 - session_refs:

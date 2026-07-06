@@ -61,11 +61,11 @@ The root-cause packet is already canonically split. This owner is the bounded ex
   - Introduce a runtime-owned supervisor identity surface, route readiness through that surface, and tighten stop/cleanup to the same authority model.
   - Keep the launch model bounded to startup identity and readiness. Leave manager continuity and wider phase modeling to the follow-on owner.
 - required_doc_refs:
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/brainstorms/b-runtime-startup-authority-and-readiness-governance.md`
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/prd.md`
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/pre-tests.md`
-  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/tasks.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zbrainstorms/b-runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zprd.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zpre-tests.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Ztasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
   - `docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
@@ -75,9 +75,9 @@ The root-cause packet is already canonically split. This owner is the bounded ex
 
 ## Verification
 
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-serializes-same-project-concurrent-starts`
@@ -90,14 +90,14 @@ The root-cause packet is already canonically split. This owner is the bounded ex
 ## Completion
 
 - `docs/B1-docs/raw-20260413T020800Z/candidates.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/brainstorms/b-runtime-startup-authority-and-readiness-governance.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/prd.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/pre-tests.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/tasks.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
-- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zbrainstorms/b-runtime-startup-authority-and-readiness-governance.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zprd.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zpre-tests.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Ztasks.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zcode-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-startup-authority-and-readiness-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`

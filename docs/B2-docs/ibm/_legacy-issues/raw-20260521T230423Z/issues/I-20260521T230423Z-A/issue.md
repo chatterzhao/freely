@@ -4,4 +4,4 @@
 - milestone: M-20260521T230423Z-A
 - source_candidate: docs/B1-docs/raw-20260521T230423Z23Z/candidates.md#C-20260521T230423Z-A
 - verification_artifact_dir: docs/B2-docs/scan-active-worker-guard-fix/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260521T230423Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260521T230423ZI-20260521T230423Z-A/issue.md

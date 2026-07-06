@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8X
     synced_at: '2026-04-27T13:16:36Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md
+canonical_issue_path: docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:22Z'
 hash: ''
@@ -31,4 +31,4 @@ platform_state: closed
 
 这类问题如果不先收束，会直接污染后续所有 CLI-first 验证，因为“命令存在”并不等于“命令入口契约稳定”。
 
-canonical: docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md
+canonical: docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/raw-20260405-2358issues/cli-wrapper-packaging-and-regression-surface-governance.md

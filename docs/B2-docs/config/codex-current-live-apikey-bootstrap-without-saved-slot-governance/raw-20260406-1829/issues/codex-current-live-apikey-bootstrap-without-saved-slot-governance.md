@@ -35,9 +35,9 @@ Freely still needs a bounded owner for the case where current live Codex auth is
 
 ## Verification
 
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
-- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/raw-20260406-1829code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
 
 ## Retirement Handoff
 

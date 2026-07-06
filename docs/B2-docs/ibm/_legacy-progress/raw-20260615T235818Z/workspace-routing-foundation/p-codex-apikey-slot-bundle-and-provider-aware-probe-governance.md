@@ -1,7 +1,7 @@
 # Progress: codex-apikey-slot-bundle-and-provider-aware-probe-governance
 
 - issue_id: `I-20260405-0027-A`
-- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - title: `Codex API-key slot bundle and provider-aware probe governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,9 +25,9 @@
 - `develop` merge `c5e0b85`
 - `git diff --check`
 - `./bin/governance-check`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/tasks.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027prd.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027pre-tests.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027tasks.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/file-backup.sh`
 - `docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh`
@@ -36,9 +36,9 @@
 - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
 - `docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
-- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
+- `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`
 
 ## Next Action
 

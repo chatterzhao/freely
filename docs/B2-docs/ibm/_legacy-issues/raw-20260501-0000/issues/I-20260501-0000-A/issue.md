@@ -14,7 +14,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md
+canonical_issue_path: docs/B2-docs/runtime/scan-pr-platform-config/raw-20260501T000000Zissues/I-20260501-0000-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-01T00:00:00Z'

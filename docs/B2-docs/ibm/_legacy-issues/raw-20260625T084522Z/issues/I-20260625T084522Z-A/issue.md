@@ -5,7 +5,7 @@
 - milestone: M-20260625T084522Z-A
 - source_candidate: docs/B1-docs/raw-20260625T084522Z22Z/candidates.md#C-20260625T084522Z-A
 - verification_artifact_dir: docs/B2-docs/test-exec-anti-ghost-pass/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T084522Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T084522ZI-20260625T084522Z-A/issue.md
 - source_raw: raw-20260625T084522Z22Z
 - pre_tests_path: docs/B2-docs/test-exec-anti-ghost-pass/verification/pre-tests.md
 - title: test-execution skill 反 ghost pass

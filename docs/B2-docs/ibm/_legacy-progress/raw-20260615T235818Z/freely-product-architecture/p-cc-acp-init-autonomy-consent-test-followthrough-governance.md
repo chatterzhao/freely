@@ -1,7 +1,7 @@
 # Progress: cc-acp-init-autonomy-consent-test-followthrough-governance
 
 - issue_id: `I-20260401-2316-A`
-- issue_path: `docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/raw-20260402-0403issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
 - title: `CC ACP init autonomy consent test followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -22,7 +22,7 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 2. `./bin/governance-check`
-3. `docs/B2-docs/config/packaging/code-reviews/20260401-cc-acp-init-autonomy-consent-test-followthrough-verification.md`
+3. `docs/B2-docs/config/packaging/raw-20260402-0403code-reviews/20260401-cc-acp-init-autonomy-consent-test-followthrough-verification.md`
 4. canonical `develop` merge commit `d5b7080`
 
 ## Next Action

@@ -17,7 +17,7 @@
 - verification_artifact_dir: docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914/code-reviews
 - depends_on:
   - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -64,12 +64,12 @@
   - 这条 owner 允许同步更新 `AGENTS.md`、skills、references、`test-lane` 脚本和其 focused tests。
   - auto-routing、batch create、lifecycle automation 仍由后续 owner 承接。
 - required_doc_refs:
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/brainstorms/b-test-lane-routing-and-enforcement-governance.md`
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/prd.md`
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/pre-tests.md`
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/tasks.md`
-  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914issues/test-lane-routing-and-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914brainstorms/b-test-lane-routing-and-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914prd.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914pre-tests.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914tasks.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/raw-20260405-1805issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 
 ## Verification
 
@@ -95,8 +95,8 @@
 - `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 - `docs/system/workspace/hooks/README.md`
-- `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-implementation-decision.md`
-- `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-verification.md`
+- `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914code-reviews/20260405-test-lane-routing-and-enforcement-implementation-decision.md`
+- `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914code-reviews/20260405-test-lane-routing-and-enforcement-verification.md`
 
 ## Next
 

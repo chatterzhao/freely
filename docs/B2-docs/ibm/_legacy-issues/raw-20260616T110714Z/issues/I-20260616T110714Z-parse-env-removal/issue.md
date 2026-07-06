@@ -4,7 +4,7 @@ kind: linked
 phase_state: completed
 promoted_from: raw-20260616T110714Z14Z
 source_candidate: docs/B1-docs/raw-20260616T110714Z14Z/candidates.md
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T110714Z-parse-env-removal/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260616T110714ZI-20260616T110714Z-parse-env-removal/issue.md
 verification_artifact_dir: docs/B2-docs/config-toml-complete/code-reviews
 primary_platform: github
 platform_ids:

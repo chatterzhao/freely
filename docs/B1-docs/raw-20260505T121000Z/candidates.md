@@ -9,7 +9,7 @@
 - priority: P0
 - status: promoted
 - milestone: M-20260505T121000Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260505T121000Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260505T121000Z-A/issue.md
 
 ### 改动
 

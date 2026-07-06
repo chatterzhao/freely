@@ -26,4 +26,4 @@ doc-ibm-execution → doc-B2_IBM-execution. Add I→B→M skeleton.
 - pre_tests_path: `docs/B2-docs/ibm-skill-rename/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/ibm-skill-rename/code-reviews`
 - issue_id: `I-20260506T1200Z-A`
-- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260506T1200Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260506T1200ZI-20260506T1200Z-A/issue.md`

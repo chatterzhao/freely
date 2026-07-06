@@ -45,7 +45,7 @@ session_refs: []
 这些文件应更新 `verification_artifact_dir` 字段。
 
 ### C. Skill 模板路径过时
-- `freely-doc-B2_IBM-execution` — 示例路径仍用 `docs/epics/`，无 `raw-{key}` 层
+- `freely-doc-B2_IBM-execution` — 示例路径仍用 `docs/B2-docs/`，无 `raw-{key}` 层
 - `freely-doc-B1_IBM-execution` — `source_candidate` 格式用 `docs/pre-brainstorms/`
 
 ### D. pr-review-guarded sed 格式

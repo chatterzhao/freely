@@ -28,4 +28,4 @@ B1 materialization candidate `C-20260506T1230Z-A` absorbed — `docs/B1-docs/raw
 - pre_tests_path: `docs/B2-docs/wt-create-dual/verification/pre-tests.md`
 - verification_artifact_dir: `docs/B2-docs/wt-create-dual/code-reviews`
 - issue_id: `I-20260506T1230Z-A`
-- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260506T1230Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260506T1230ZI-20260506T1230Z-A/issue.md`

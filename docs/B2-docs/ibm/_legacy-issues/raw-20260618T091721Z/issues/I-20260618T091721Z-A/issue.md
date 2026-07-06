@@ -4,7 +4,7 @@
 - milestone: M-20260618T091721Z-A
 - source_candidate: docs/B1-docs/raw-20260618T091721Z21Z-add-claude-md/candidates.md#C-20260618T091721Z-A
 - verification_artifact_dir: docs/B2-docs/add-claude-md-governance/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260618T091721Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260618T091721ZI-20260618T091721Z-A/issue.md
 - title: Add CLAUDE.md — automatic AI governance rule loading
 
 # I-20260618T091721Z-A: CLAUDE.md project governance auto-loading

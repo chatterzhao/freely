@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO76
     synced_at: '2026-04-27T13:15:16Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md
+canonical_issue_path: docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045issues/ai-auth-change-wake-command-lifecycle-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:17Z'
 hash: ''
@@ -35,4 +35,4 @@ platform_state: closed
 
 `ai login codex` 当前只作为同族 follow-on 风险记录。第一阶段 IBM 和修复以 `switch` 的硬复现为准，不要求执行真实登录。
 
-canonical: docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md
+canonical: docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/raw-20260329-2045issues/ai-auth-change-wake-command-lifecycle-governance.md

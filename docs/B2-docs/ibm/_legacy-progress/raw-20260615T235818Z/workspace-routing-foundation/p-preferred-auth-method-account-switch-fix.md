@@ -1,7 +1,7 @@
 # Progress: preferred-auth-method-account-switch-fix
 
 - issue_id: `I-20260410-1430-A`
-- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
+- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/preferred-auth-method-account-switch-fix.md`
 - title: `Fix preferred_auth_method lost when switching to account slot`
 - phase_state: `done_ibm`
 - runtime_state: `stopped`

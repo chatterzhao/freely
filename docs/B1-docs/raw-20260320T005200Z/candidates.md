@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: direct-answer runtime path、resolution artifact 与 writeback 行为已被 `I-20260321T192500Z` 的 interruption governance 吸收；该候选不再需要独立 materialization。
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320T005200Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260320T005200Z-A/issue.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

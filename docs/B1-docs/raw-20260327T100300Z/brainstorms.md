@@ -56,7 +56,7 @@
 3. `docs/B1-docs/raw-20260326T181000Z/candidates.md`
 - candidate: `C-20260326T181000Z-A`
 - current state: `status=promoted`
-- promoted issue: `docs/B2-docs/config/packaging/issues/freely-layered-architecture-and-tooling-topology.md`
+- promoted issue: `docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-layered-architecture-and-tooling-topology.md`
 - expected: `docs/milestones.md` 至少存在 `M-20260326-freely-product-architecture`，并收录该 issue
 - anomaly: `docs/milestones.md` 中连 milestone section 都不存在，导致 candidate 与 issue 都没有正式编排入口
 

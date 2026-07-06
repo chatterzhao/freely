@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
 - verification_artifact_dir: docs/B2-docs/runtime/runtime-human-readable-time-display-governance/raw-20260402-0308/code-reviews
 - depends_on:
-  - `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+  - `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-probe-v0.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -83,7 +83,7 @@ After the status-tail closeout landed, a runtime follow-up found one more consis
 - `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/tasks.md`
 - `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
-- `docs/B2-docs/human/tui/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
+- `docs/B2-docs/human/tui/raw-20260308-1244code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
 - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-probe-v0.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`

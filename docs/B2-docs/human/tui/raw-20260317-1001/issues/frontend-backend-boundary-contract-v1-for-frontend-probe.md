@@ -133,11 +133,11 @@
   - 基于 `I-20260308-1245` 已完成的总体边界收敛，把 Probe 真正依赖的 sessions / stream / history / status contract 冻结到 v1。
   - 当前 issue 已具备进入 `Frontend Probe v0` 所需的最小文档包，不进入实现代码。
 - required_doc_refs:
-  - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
-  - `docs/B2-docs/human/tui/brainstorms/b-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/raw-20260317-1001issues/internal-frontend-backend-architecture-review.md`
+  - `docs/B2-docs/human/tui/raw-20260317-1001brainstorms/b-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/raw-20260317-1001prd.md`
   - `docs/B2-docs/human/tui/raw-20260317-1001/verification/pre-tests.md`
-  - `docs/B2-docs/human/tui/tasks.md`
+  - `docs/B2-docs/human/tui/raw-20260317-1001tasks.md`
 
 ## Verification
 

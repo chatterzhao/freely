@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO90
     synced_at: '2026-04-27T13:16:39Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md
+canonical_issue_path: docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:33Z'
 hash: ''
@@ -30,4 +30,4 @@ platform_state: closed
 2. 因此 `Freely-Source-Branch: feature/*` 在 batch 内是合法的，却被拿到 `develop` 的规则下重新校验。
 3. 结果是有效的 guarded merge 刚完成，post-merge followthrough 反而立即失败。
 
-canonical: docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md
+canonical: docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/raw-20260406-0045issues/governance-check-protected-merge-history-source-policy-governance.md

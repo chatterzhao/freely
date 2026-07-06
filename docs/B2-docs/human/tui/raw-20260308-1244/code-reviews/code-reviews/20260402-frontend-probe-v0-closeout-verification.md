@@ -1,7 +1,7 @@
 # Code Review: frontend-probe-v0-closeout-verification
 
 - issue_id: `I-20260308-1244-03`
-- issue: `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+- issue: `docs/B2-docs/human/tui/raw-20260308-1244issues/frontend-probe-v0.md`
 - reviewer: `codex`
 - phase: `completed`
 - date: `2026-04-02`
@@ -25,7 +25,7 @@
 3. `I-20260317-0332`
    - result: completed_on_develop
    - evidence:
-     - `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
+     - `docs/B2-docs/human/tui/raw-20260308-1244issues/rust-tauri-probe-bridge-v1.md`
      - real Tauri host bring-up and bridge interaction blocker are closed
 4. `I-20260317-1004`
    - result: absorbed_dependency

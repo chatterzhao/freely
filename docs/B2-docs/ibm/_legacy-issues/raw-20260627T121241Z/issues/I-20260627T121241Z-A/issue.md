@@ -5,7 +5,7 @@
 - source_candidate: docs/B1-docs/raw-20260627T121248Z41Z/candidates.md#C-20260627T121241Z-A
 - source_raw: raw-20260627T121248Z41Z
 - verification_artifact_dir: docs/B2-docs/scan-agent-id-fix/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T121241Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260627T121241ZI-20260627T121241Z-A/issue.md
 - pre_tests_path: docs/B2-docs/scan-agent-id-fix/verification/pre-tests.md
 - title: scan Cat 3 agent-id.env 路径修复
 

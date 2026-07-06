@@ -5,7 +5,7 @@
   status: promoted
   why_now:
     - 当前 `cc-use-codex-cli` 已可用，但恢复与多并发证据仍偏弱，应该升级为精确 jsonl 解析。
-  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321T014800Z-A/issue.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260321T014800Z-A/issue.md
   milestone: M-20260321T014800Z-A
   session_refs:
     - tool: cc-use-codex-cli

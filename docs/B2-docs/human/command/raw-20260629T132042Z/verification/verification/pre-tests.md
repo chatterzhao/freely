@@ -12,7 +12,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 扫描确认全部 6 个文件无残留
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-1.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/hooks/pre-merge-commit.sh docs/system/workspace/hooks/pre-push.sh docs/system/workspace/hooks/reference-transaction.sh docs/system/workspace/scripts/start-lead-agent.sh; do
@@ -24,7 +24,7 @@
 - expected_RED_output: "FAIL:" with matching lines
 - actual_RED_output: "FAIL: .githooks/pre-commit.sh — ./bin/pr-merge-guarded, ./bin/wt-create, ./bin/wt-close, ./bin/freely sync-tooling. FAIL: pre-commit.sh, pre-push.sh, reference-transaction.sh. RED confirmed — 4 of 6 files have CLI references"
 - actual_output: "PASS: all 6 files clean"
-- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -38,7 +38,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 source 和 [[ -f ]] 引用仍在
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-2.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh; do
@@ -49,7 +49,7 @@
 - expected_RED_output: N/A — verification of preservation
 - actual_RED_output: "PASS (expected): worktree-common.sh references already preserved"
 - actual_output: "PASS: worktree-common.sh preserved"
-- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -63,7 +63,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 governance/checkpoint/pretests [[ -x 检查保留
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-3.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh; do
@@ -74,7 +74,7 @@
 - expected_RED_output: N/A — verification of preservation
 - actual_RED_output: "PASS (expected): checks preserved"
 - actual_output: "PASS: governance/checkpoint [[ -x checks preserved"
-- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -88,7 +88,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认全 6 个文件无残留引用
 - evidence_level: integration
-- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-4.txt
+- artifact_ref: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-4.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T132042Z42Z-hook-scripts-bin-to-freely
   for f in .githooks/pre-commit.sh docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/hooks/pre-merge-commit.sh docs/system/workspace/hooks/pre-push.sh docs/system/workspace/hooks/reference-transaction.sh docs/system/workspace/scripts/start-lead-agent.sh; do
@@ -100,7 +100,7 @@
 - expected_RED_output: "FAIL:" with matching lines
 - actual_RED_output: "FAIL: all 6 files — ./bin/pr-merge-guarded, ./bin/wt-create, ./bin/freely feedback/live-status/task-source-scan. RED confirmed"
 - actual_output: "PASS: all references removed"
-- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-4.txt
+- evidence_file: docs/B2-docs/human/command/raw-20260629T132042Zverification/test-evidence/acceptance-4.txt
 - red-green-status: green
 - status: passed
 - blocker: none

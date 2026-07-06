@@ -17,7 +17,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/raw-20260414-0255/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+  - `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/raw-20260412-0907issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
   - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

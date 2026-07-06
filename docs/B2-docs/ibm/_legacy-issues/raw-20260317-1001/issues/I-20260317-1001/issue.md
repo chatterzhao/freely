@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4Y
     synced_at: '2026-04-27T13:13:51Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
+canonical_issue_path: docs/B2-docs/human/tui/raw-20260317-1001issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:36Z'
 hash: ''
@@ -35,8 +35,8 @@ platform_state: closed
 - source_brainstorm: `docs/B1-docs/raw-20260308T163000Z/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
-- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
+- pre_tests_path: `docs/B2-docs/human/tui/raw-20260317-1001pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/human/tui/raw-20260317-1001code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}

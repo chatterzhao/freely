@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9V
     synced_at: '2026-04-27T13:17:14Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:13Z'
 hash: ''

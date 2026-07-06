@@ -6,7 +6,7 @@
 - title: `Codex interactive login and API-key input flow`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/raw-20260406-1851issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - promoted_issue_id: `I-20260406T185100Z-A`
 - source_brainstorm: `docs/B1-docs/raw-20260406T185100Z/brainstorms.md`
 - session_refs:

@@ -1,7 +1,7 @@
 # ACP Bridge Path Sync
 
 - issue: `I-20260503-0115-A`
-- issue_path: `docs/B2-docs/acp/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
+- issue_path: `docs/B2-docs/acp/acp-bridge-path-sync/raw-20260503-0115issues/I-20260503-0115-A.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `in_dev`
 - runtime_state: `verified_on_develop`

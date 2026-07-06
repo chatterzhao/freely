@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-auto-switch-probe-apikey-fallback-governance.md`
 - verification_artifact_dir: docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/raw-20260405-0027issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
   - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -46,9 +46,9 @@ Codex account/apikey bundle truth is already owned, but dogfooding exposed one r
 
 ## Verification
 
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
-- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
+- `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/raw-20260407-0023code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
 
 ## Retirement Handoff
 

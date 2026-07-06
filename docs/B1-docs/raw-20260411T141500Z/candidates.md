@@ -38,7 +38,7 @@
 - next_action:
   - candidate mirror only. `I-20260411T141500Z-A` is now the canonical owner for schema v2 + phased gate enforcement.
   - keep launch-time hard-gate and retirement-gate expansion as separate follow-on owners
-- promoted_issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/raw-20260411-1415issues/pretests-adequacy-item-schema-materialization-governance.md`
 - revisit_trigger:
   - another issue passes minimal acceptance-item structure but still escapes due to missing adequacy semantics
   - team pressure to add a second test truth file (`tests.md`) reappears due to schema underfit

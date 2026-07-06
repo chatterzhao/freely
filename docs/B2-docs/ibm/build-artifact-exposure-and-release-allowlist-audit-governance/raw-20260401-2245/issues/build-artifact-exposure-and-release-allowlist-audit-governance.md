@@ -16,7 +16,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-build-artifact-exposure-and-release-allowlist-audit-governance.md`
 - verification_artifact_dir: docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/raw-20260401-2245/code-reviews
 - depends_on:
-  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/raw-20260402-0403issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

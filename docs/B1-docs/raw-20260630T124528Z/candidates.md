@@ -30,6 +30,6 @@ milestone: M-20260630T124528Z-A
   - mode: inline
   - summary: 全面审查 freely init ACP 流程、tool-registry 字段设计、ensure-codex-acp 通用化方案、config.toml schema 扩展
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T124528Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T124528Z-A/issue.md
 - milestone: M-20260630T124528Z-A
 - session_refs: []

@@ -1,7 +1,7 @@
 # Verification: governance-merge-gate-milestone-status-followthrough-governance
 
 - issue_id: `I-20260404-0119-A`
-- issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/raw-20260404-0119issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - branch: `feature/governance-merge-gate-milestone-status-followthrough-20260404-011904`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-011904-feature-governance-merge-gate-milestone-status-followthrough`
 - verification_date: `2026-04-04`

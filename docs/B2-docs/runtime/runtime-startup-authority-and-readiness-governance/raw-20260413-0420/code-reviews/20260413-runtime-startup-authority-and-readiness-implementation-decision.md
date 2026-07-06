@@ -1,7 +1,7 @@
 # Implementation Decision: runtime-startup-authority-and-readiness-governance
 
 - issue_id: `I-20260413-0420-A`
-- issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/raw-20260705T061416Zissues/runtime-startup-authority-and-readiness-governance.md`
 - branch: `feature/runtime-startup-authority-and-readiness-governance-20260413`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-runtime-startup-authority-and-readiness-governance`
 - decision_date: `2026-04-13`

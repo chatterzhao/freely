@@ -1,7 +1,7 @@
 # Verification: chat-inbox-sqlite
 
 - issue_id: `I-20260429-2040-A`
-- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/raw-20260429-2040issues/I-20260429-2040-A.md`
 - verification_date: `2026-04-29`
 - verifier: `human`
 

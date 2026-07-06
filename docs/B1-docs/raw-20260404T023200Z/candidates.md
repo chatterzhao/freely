@@ -42,7 +42,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260404T023200Z-A`
-- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/raw-20260404-0232issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

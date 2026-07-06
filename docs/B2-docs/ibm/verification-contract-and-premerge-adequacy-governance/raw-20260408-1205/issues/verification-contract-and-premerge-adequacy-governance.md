@@ -15,7 +15,7 @@
 - pre_tests_path: docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/raw-20260408-1205/verification/pre-tests.md
 - verification_artifact_dir: docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/raw-20260408-1205/code-reviews
 - depends_on:
-  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/raw-20260405-1914issues/test-lane-routing-and-enforcement-governance.md`
   - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
   - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
 - session_refs:

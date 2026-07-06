@@ -4,4 +4,4 @@
 - verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260522T095721Z/code-reviews
 - milestone: M-20260522T095721Z-A
 - source_candidate: docs/B1-docs/raw-20260522T095721Z21Z/candidates.md#C-20260522T095721Z-A
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260522T095721Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260522T095721ZI-20260522T095721Z-A/issue.md

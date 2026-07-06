@@ -4,5 +4,5 @@
 - milestone: M-20260625T003331Z-A
 - source_candidate: docs/B1-docs/raw-20260625T003331Z31Z/candidates.md#C-20260625T003331Z-A
 - verification_artifact_dir: docs/B2-docs/feedback-platform-only/code-reviews
-- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T003331Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260625T003331ZI-20260625T003331Z-A/issue.md
 - title: feedback platform-only

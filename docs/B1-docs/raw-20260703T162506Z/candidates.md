@@ -10,6 +10,6 @@ milestone: M-20260703T162506Z-A
 
 - status: absorbed
 - absorbed_into: I-20260703T162506Z-A
-- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T162506Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260703T162506Z-A/issue.md
 - decision_reason: pattern match fix, one-line change
 - milestone: M-20260703T162506Z-A

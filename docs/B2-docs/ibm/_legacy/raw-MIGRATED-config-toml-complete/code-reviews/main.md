@@ -7,7 +7,7 @@ review_id: config-toml-complete-review
 ---
 
 - issue_id: I-20260616T044030Z-A
-- issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T044030Z-A/issue.md
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260616T044030Z-A/issue.md
 - source_candidate: docs/B1-docs/raw-20260616T044030Z30Z/candidates.md
 
 ## Implementation Decision Note

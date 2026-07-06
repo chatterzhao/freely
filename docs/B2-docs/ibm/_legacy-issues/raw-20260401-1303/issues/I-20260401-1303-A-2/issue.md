@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7J
     synced_at: '2026-04-27T13:15:36Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/freely-tool-autonomy-policy-materialization-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:52Z'
 hash: ''

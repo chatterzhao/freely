@@ -15,7 +15,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8K
     synced_at: '2026-04-27T13:16:19Z'
 primary_platform: github
-canonical_issue_path: docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/raw-20260402-0403issues/project-level-agents-bootstrap-and-management-contract-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:10Z'
 hash: ''
@@ -34,4 +34,4 @@ But that behavior has been scattered across runtime code, tests, and high-level 
 
 1. ex
 
-canonical: docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md
+canonical: docs/B2-docs/config/packaging/raw-20260402-0403issues/project-level-agents-bootstrap-and-management-contract-governance.md

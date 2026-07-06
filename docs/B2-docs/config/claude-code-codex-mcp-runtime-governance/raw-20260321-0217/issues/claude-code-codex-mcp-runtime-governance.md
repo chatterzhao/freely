@@ -87,7 +87,7 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
 - `bash docs/system/workspace/scripts/tests/test-session-evidence-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-cc-codex-evidence-status`
-- `docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
+- `docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/raw-20260321-0217code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
 - live smoke:
   - `freely init --ai cc-use-codex-cli:auto`
   - `freely start`

@@ -5,7 +5,7 @@ phase_state: completed
 verification_artifact_dir: docs/B1-docs/raw-20260619T061441Z41Z/
 platform_ids: {}
 primary_platform: local
-canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260619T061441Z-A/issue.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260619T061441ZI-20260619T061441Z-A/issue.md
 source_candidate: docs/B1-docs/raw-20260619T061441Z41Z/candidates.md
 last_synced_comment_at: {}
 hash: ''
