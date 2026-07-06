@@ -80,3 +80,7 @@ __pycache__/
 .claude/
 projects.tsv
 projects.tsv
+
+# Freely runtime artifacts (local only, not committed)
+/freely.db
+/projects.tsv
