@@ -261,6 +261,23 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 - 预存错误（非本分支引入）：报告但不阻塞
 - gate 失败 ≥3 次：回传 `worker_blocked` + 具体的 gate 输出
 
+
+## 铁律: 禁止绕过门禁
+
+以下行为违反工作流纪律，任何情况下不得使用:
+
+| 禁止 | 原因 |
+|------|------|
+| `git push --no-verify` | 跳过 pre-push hook，门禁不执行 |
+| `git commit --no-verify` | 跳过 pre-commit hook，pretests-gate 不执行 |
+| `gh pr merge --admin` | 跳过 CI PR Merge Guard，即使 red X 也能合并 |
+| `git push --force` | 强制覆盖远程历史，丢失他人提交 |
+| 手工在 develop 上 git add/commit | 违反 protected branch 原则 |
+
+**唯一的 bypass**: `freely develop-push attempt` — 受控的平台同步，有审计日志。
+
+违反上述铁律的提交，即使在本地通过，CI 硬拦截也会阻止合并。
+
 ## 硬性规则
 
 - **流程顺序不可变**。`freely-doc-B1_IBM-execution` → `freely-doc-B2_IBM-execution` → `freely-test-RED-execution` → `freely-dev-loop-execution` → `freely-test-execution` → `freely pr-create-guarded`，fix 和 feature 一致。
