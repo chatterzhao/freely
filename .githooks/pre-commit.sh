@@ -274,21 +274,26 @@ Do not finish protected-branch merges with bare 'git commit' or equivalent bypas
 MSG
     fi
     cat <<MSG
-[HOOK] Commit blocked: direct development on '$branch' is forbidden.
+[HOOK] Commit blocked: develop 分支禁止直接提交。
 
-Read AGENTS.md §核心开发流程, then invoke the correct skill:
+所有变更必须通过完整流程,一步不能跳:
 
-  Fix|Feature  → skill:freely-workflow-guarded-execution  (Govern first, code later)
+  ┌─ 完整流程 ───────────────────────────────────────────┐
+  │ 1. freely feedback --title "..." --kind fix --body "..." │
+  │ 2. freely wt-create --raw-key <key> --source platform   │
+  │ 3. cd <worktree> && 按 B1→B2→RED→dev→GREEN 开发       │
+  │ 4. freely pr-create-guarded                             │
+  │ 5. freely pr-review-guarded <branch>                    │
+  │ 6. freely pr-merge-guarded develop <branch>             │
+  │ 7. freely wt-close --raw-key <key>                      │
+  └──────────────────────────────────────────────────────┘
 
-Quick start:
-  cd <project-root>
-  freely wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
-  cd ../<project>-worktrees/<branch-dir>
-
-Do NOT work around this hook. Bypass attempts (skip-worktree, --no-verify,
-removing remotes, etc.) violate CONSTITUTION.md §5.
-The skills enforce the full IBM lifecycle:
-  feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create → pr-merge → wt-close
+严禁绕过:
+  ❌ git commit --no-verify
+  ❌ git push --no-verify (改用 freely pr-create-guarded)
+  ❌ gh pr merge --admin (改用 freely pr-merge-guarded)
+  ❌ git worktree remove --force (改用 freely wt-close)
+  ❌ gh issue close (改用 freely wt-close --platform-only)
 MSG
     ;;
 esac
