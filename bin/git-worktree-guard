@@ -65,10 +65,12 @@ _worktree_remove_guard() {
 [freely] git worktree remove BLOCKED for managed worktree.
 
   Managed worktrees must be closed through wt-close:
-    freely wt-close <branch>
+    freely wt-close <branch>              (工作完成收口)
 
   For emergency cleanup (corrupted/abandoned worktree):
-    freely wt-close --force <branch> --reason "why force close"
+    freely wt-close --force <branch> --reason "..."
+    --force = 永久丢弃该 raw issue 的全部实现。不是废弃严禁使用。
+    有任何门禁报错都是去解决问题，不是用 --force 绕过。
 
   If you absolutely must use raw git:
     FREELY_WT_BYPASS_GUARD=1 git worktree remove "$@"
