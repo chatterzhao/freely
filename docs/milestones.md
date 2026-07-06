@@ -1,3 +1,18 @@
+## M-20260706T050919Z-A
+- title: 门禁 diff-scope 改造
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260706T050919Z-A`
+- milestone: M-20260706T050919Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260706T050919Z/issues/I-20260706T050919Z-A.md
+### completed_issues
+1. `C-20260706T050919Z-A`
+- milestone: M-20260706T050919Z-A
+- status: absorbed
+- absorbed_into: `I-20260706T050919Z-A`
+
 ## M-20260705T231534Z-A
 - title: ./bin/xxx → freely xxx 统一引用
 - status: active
