@@ -3,7 +3,7 @@
 > **Slot 配置模板**：`templates/ai-auth/codex-account-EXAMPLE/config.toml.example`
 > 提供了完整的 Codex slot 配置模板。按 `templates/ai-auth/README.md` 操作。
 >
-> ★ **命名约定**：slot 目录名 = `.zshrc` alias 名 = `config.toml` `AI_TOOL` 值，
+> ★ **命名约定**：slot 目录名 = `.zshrc` alias 名 = `config.toml` `AGENT_AI_TOOL` 值，
 > 三者必须一致。Codex slot 格式为 `codex-account-{your-name}`。
 
 ## codex 授权文件

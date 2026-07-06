@@ -326,7 +326,7 @@ from pathlib import Path
 import sys
 cfg = Path(sys.argv[1])
 text = cfg.read_text()
-text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+text = text.replace('AGENT_AI_TOOL="codex"', 'AGENT_AI_TOOL="test-sleep"', 1)
 cfg.write_text(text)
 PY
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$DIRTY_WT" --watch >/dev/null 2>&1 &

@@ -13,7 +13,7 @@
 - `tools.md` 继续只定义任务路由与工具选择参考，不直接充当 runtime availability fallback 顺序真源。
 - 当前 runtime-owned availability manager 使用 project config 中的 `AI_FALLBACK_TOOLS` 作为 ordered recovery list，而不是复用本文件的 routing priority。
 - canonical recovery order 是：
-  - `AGENT_AI_TOOL`（来自 `.freely/agent-table.toml`）是 current tool+slot 真相；`AI_TOOL` 已废弃，由 load_config 自动从 AGENT_AI_TOOL 派生
+  - `AGENT_AI_TOOL`（来自 `.freely/agent-table.toml`）是 current tool+slot 真相；AI_TOOL 已移除，由 load_config 自动从 AGENT_AI_TOOL 派生
   - 同工具 slot / profile recovery first
   - same-tool exhausted 后再从 `AI_FALLBACK_TOOLS` 最左侧开始重新扫描其他工具，而不是把 current tool 隐式插到最前
   - 每进入一个 fallback tool，先继续扫该工具自己的 slot family，再决定是否进入下一个工具
@@ -31,9 +31,9 @@
 
 - Freely runtime 已把“工具选择”和“adapter 选择”拆成两个独立轴，当前工作模式以 ACP 为准。
 - 当前 canonical truth 是：
-  - `AGENT_AI_TOOL`（agent-table.toml）表示选中的外部工具+slot；`AI_TOOL` 已废弃，由 load_config 自动派生工具族名
-  - `AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略；当前正常运行值为 `acp`
-  - `AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
+  - `AGENT_AI_TOOL`（agent-table.toml）表示选中的外部工具+slot；AI_TOOL 已移除，由 load_config 自动派生工具族名
+  - `AGENT_AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略；当前正常运行值为 `acp`
+  - `AGENT_AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
   - status / introspection 还会暴露当前工具的 `tool_supported_adapters`，作为当前 runtime 支持矩阵
 - 当前 runtime 默认 adapter 是 `acp`；`direct` 属于遗留兼容/历史测试路径，不再作为 Freely 的产品工作模式描述。
 - 当前 canonical ACP family 来自 `tool-registry.toml`：
@@ -41,7 +41,7 @@
   - `codex` 通过 `codex-acp` 接入
   - `opencode` 通过 `opencode acp` 接入
 - 当前 runtime 已冻结一条选择语义：
-  - 同工具重选时，继续保留当前 `AI_TOOL_ADAPTER_POLICY` 和 `AI_TOOL_ADAPTER` truth，不因重写 config 或恢复写回而静默回到默认值
+  - 同工具重选时，继续保留当前 `AGENT_AI_TOOL_ADAPTER_POLICY` 和 `AGENT_AI_TOOL_ADAPTER` truth，不因重写 config 或恢复写回而静默回到默认值
   - 同工具 mutation 时，继续保留该工具当前 `AI_MODEL` / `AI_REASONING_EFFORT` truth，不因只换 adapter 或重写选择而回到工具默认值
   - 只有跨工具切换时，才回落到目标工具自己的 default adapter policy，除非显式给出 adapter / policy override
 - 当前显式配置入口包括：

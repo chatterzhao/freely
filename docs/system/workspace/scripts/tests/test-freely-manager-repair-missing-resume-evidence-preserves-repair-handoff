@@ -122,7 +122,7 @@ EOF
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 PROJECT_ROOT="$PROJECT"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"

@@ -10,7 +10,7 @@ mkdir -p "$PROJECT/.freely"
 
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_TOOL_ADAPTER="acp"
@@ -35,7 +35,7 @@ grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT/.freely/config.env" || {
 }
 
 persist_project_tool_selection "$PROJECT" "iflow"
-grep -q '^AI_TOOL="iflow"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="iflow"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected tool selection to switch to iflow" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1
@@ -52,7 +52,7 @@ grep -q '^AI_TOOL_ADAPTER_POLICY="direct"$' "$PROJECT/.freely/config.env" || {
 }
 
 persist_project_tool_selection "$PROJECT" "codex" "direct" "prefer_acp_fallback_direct"
-grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected explicit tool reselection to switch back to codex" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

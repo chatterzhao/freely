@@ -46,7 +46,7 @@ cat >"$PROMPT" <<EOF
 19. 至少创建一个 manager continuity 文件：\`$EXPECTED_CONTINUITY\`。
 EOF
 
-export AI_TOOL="codex"
+export AGENT_AI_TOOL="codex"
 export AI_MODEL="gpt-5.4"
 export AI_REASONING_EFFORT="medium"
 export LAST_CYCLE_LOG="$CYCLE_LOG"

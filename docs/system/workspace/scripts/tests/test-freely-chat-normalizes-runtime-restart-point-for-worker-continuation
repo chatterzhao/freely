@@ -82,7 +82,7 @@ python3 - <<'PY'
 from pathlib import Path
 cfg = Path(".freely/config.env")
 text = cfg.read_text()
-text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+text = text.replace('AGENT_AI_TOOL="codex"', 'AGENT_AI_TOOL="test-sleep"', 1)
 cfg.write_text(text)
 PY
 

@@ -80,7 +80,7 @@ EOF
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
 PROJECT_ROOT=""
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 EOF
 
 cat >"$PROJECT/.freely/run/manager-continuity-20260425-201013.md" <<'EOF'

@@ -46,7 +46,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="cc-use-codex-cli"
+AGENT_AI_TOOL="cc-use-codex-cli"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"

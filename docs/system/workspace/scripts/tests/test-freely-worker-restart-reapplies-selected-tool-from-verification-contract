@@ -54,7 +54,7 @@ cat >"$WORKER_WT/.freely/config.env" <<EOF
 PROJECT_ROOT="$WORKER_WT"
 INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
-AI_TOOL="cc-use-codex-cli"
+AGENT_AI_TOOL="cc-use-codex-cli"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
@@ -87,11 +87,11 @@ write_worker_verification_contract_file \
   "intake-123" \
   "$WORKER_WT"
 
-grep -q '^AI_TOOL="cc-use-codex-cli"$' "$WORKER_WT/.freely/config.env"
+grep -q '^AGENT_AI_TOOL="cc-use-codex-cli"$' "$WORKER_WT/.freely/config.env"
 
 worker_runtime_reconcile_selected_tool_from_contract_if_needed "$WORKER_WT"
 
-grep -q '^AI_TOOL="codex"$' "$WORKER_WT/.freely/config.env"
+grep -q '^AGENT_AI_TOOL="codex"$' "$WORKER_WT/.freely/config.env"
 grep -q '^AI_MODEL="gpt-5.4"$' "$WORKER_WT/.freely/config.env"
 
 echo "[PASS] worker restart reapplies selected_tool from verification contract"

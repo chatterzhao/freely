@@ -30,7 +30,7 @@ git -C "$WORKER" add feature.txt
 git -C "$WORKER" commit -q -m "feature change"
 mkdir -p "$WORKER/.freely"
 cat >"$WORKER/.freely/config.env" <<'EOF'
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL=""
 AI_MODE="auto"
 EOF

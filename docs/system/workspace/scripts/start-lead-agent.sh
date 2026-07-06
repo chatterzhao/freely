@@ -456,7 +456,7 @@ ${manager_artifact_rule_escaped}
 - WORKSPACE_ROOT=$workspace_root
 - CURRENT_BRANCH=${current_branch:-unknown}
 - MANAGER_MODE=${manager_mode}
-- AI_TOOL=$ai_tool
+- AGENT_AI_TOOL=$ai_tool
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
 - AI_REASONING_EFFORT=${reasoning_effort:-}

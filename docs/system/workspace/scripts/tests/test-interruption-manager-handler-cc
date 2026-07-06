@@ -23,7 +23,7 @@ run_case() {
   local worktrees_root="${project}-worktrees"
 
   cat >"$project/.freely/config.env" <<EOF
-AI_TOOL="$tool"
+AGENT_AI_TOOL="$tool"
 AI_MODEL="sonnet"
 AI_REASONING_EFFORT="medium"
 AI_TOOL_CAPABILITIES="$capabilities"

@@ -48,7 +48,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AUTO_SWITCH_TOOL="true"
@@ -110,7 +110,7 @@ if attempt_runtime_auto_recovery_after_failure "$PROJECT" "kiro-cli" "tool_runti
   exit 1
 fi
 
-grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+grep -q '^AGENT_AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] once every fallback fails, the runtime should restore the episode origin tool for the next retry" >&2
   cat "$PROJECT/.freely/config.env" >&2
   exit 1

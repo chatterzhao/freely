@@ -74,7 +74,7 @@ EOF
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 PROJECT_ROOT="$PROJECT"
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 FIRST_ROUND=true
 load_session_state_or_defaults "$PROJECT"
 

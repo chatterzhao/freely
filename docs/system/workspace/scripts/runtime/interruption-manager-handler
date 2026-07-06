@@ -249,7 +249,7 @@ config_toml="$project/.freely/config.toml"
 [[ -f "$config_toml" ]] || exit 1
 source_config "$project" || exit 1
 
-tool="${AI_TOOL:-codex}"
+tool="${AGENT_AI_TOOL:-}"
 model="${AI_MODEL:-gpt-5.4}"
 reasoning_effort="${AI_REASONING_EFFORT:-medium}"
 tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities "$tool")}"

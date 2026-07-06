@@ -747,7 +747,7 @@ SAME_PROJECT_UNRELATED_OUTPUT="$(
     printf "%s\n" "'"$SAME_PROJECT_SHELL_PID"'" >"$run_dir/supervisor.pid"
 
     cat >"$project/.freely/config.env" <<EOF
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 EOF
 
     resolve_project_or_fail() { printf "%s\n" "$1"; }
@@ -813,7 +813,7 @@ RUNTIME_AI_HINT_OUTPUT="$(
     printf "%s\n" "'"$FOREIGN_HINT_PID"'" >"$run_dir/ai.pid"
 
     cat >"$project/.freely/config.env" <<EOF
-AI_TOOL="codex"
+AGENT_AI_TOOL="codex"
 EOF
 
     resolve_project_or_fail() { printf "%s\n" "$1"; }
@@ -886,7 +886,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="test-once"
+AGENT_AI_TOOL="test-once"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
