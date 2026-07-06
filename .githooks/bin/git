@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# git wrapper: strip --no-verify from push/commit to prevent hook bypass.
+# All protected operations must go through freely commands.
+args=()
+skip_next=false
+for arg in "$@"; do
+  if $skip_next; then
+    skip_next=false
+    continue
+  fi
+  case "$arg" in
+    --no-verify)
+      # Swallow --no-verify — hooks are NOT optional
+      echo "[git-wrapper] --no-verify stripped — hooks are mandatory" >&2
+      ;;
+    --no-gpg-sign|--no-gpg-sign=*)
+      # Allow these — not hook-related
+      args+=("$arg")
+      ;;
+    *)
+      args+=("$arg")
+      ;;
+  esac
+done
+exec /usr/bin/git "${args[@]}"
