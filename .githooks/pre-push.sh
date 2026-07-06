@@ -154,14 +154,14 @@ MSG
       if [[ -z "${FREELY_SKIP_CREATE_GATE:-}" ]]; then
         if [[ ! -f ".freely/run/pr-create-gate-passed" ]]; then
           cat >&2 <<MSG
-[HOOK] Push blocked: pr-create-gate has not been run on branch '$local_branch'.
+[HOOK] Push blocked: freely pr-create-guarded 尚未在此分支执行。
 
-  All fix/feature/hotfix branches must pass pr-create-guarded before pushing.
-  Run pr-create-guarded in your worktree:
+  推送不是用 git push,而是通过 freely pr-create-guarded:
+    cd <fix-or-feature-worktree>
     freely pr-create-guarded
 
-  The ONLY valid way to push is:
-    freely pr-create-guarded
+  这会自动完成: dry-run gate → push → create PR。
+  git push --no-verify 跳过门禁,禁止使用。
 MSG
           exit 1
         fi

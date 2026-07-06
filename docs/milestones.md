@@ -1,3 +1,17 @@
+## M-20260706T114314Z-A
+- title: hook 提示 + 命令速查
+- status: completed
+### committed_issues
+1. `I-20260706T114314Z-A`
+- milestone: M-20260706T114314Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260706T114314Z/issues/I-20260706T114314Z-A.md
+### completed_issues
+1. `C-20260706T114314Z-A`
+- milestone: M-20260706T114314Z-A
+- status: absorbed
+- absorbed_into: `I-20260706T114314Z-A`
+
 ## M-20260706T091733Z-A
 - title: 门禁硬拦截
 - status: completed

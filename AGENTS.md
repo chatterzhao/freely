@@ -1,5 +1,23 @@
 # Agent 上下文入口
 
+## Freely 命令速查 — 禁止使用原始 git/gh 命令
+
+所有操作必须通过 freely 封装命令。下表列出每个场景的正确命令:
+
+| 场景 | ✅ 正确命令 | ❌ 禁止 |
+|------|-----------|--------|
+| 创建 raw issue | `freely feedback --title "..." --kind fix\|feature --body "..."` | gh issue create |
+| 创建开发工位 | `freely wt-create --raw-key <key> --source platform --kind fix\|feature --slug <slug>` | git worktree add, git checkout -b |
+| 提 PR | `freely pr-create-guarded` | gh pr create, git push |
+| Review PR | `freely pr-review-guarded <branch>` | — |
+| 合并 PR | `freely pr-merge-guarded develop <branch>` | gh pr merge, git merge |
+| 收口工位 | `freely wt-close --raw-key <key>` | git worktree remove, git branch -D |
+| 关 issue (双平台) | `freely wt-close --raw-key <key> --platform-only` | gh issue close |
+| 平台同步 | `freely develop-push attempt` | git push --no-verify |
+| 查看状态 | `freely live-status`, `freely fleet-status` | — |
+
+任何绕过上述封装命令的行为（--no-verify, --force, --admin）都会被门禁拦截。
+
 ## 强制 
 MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这个 skill。
 
