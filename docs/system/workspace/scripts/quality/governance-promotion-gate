@@ -8,7 +8,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 usage() {
   cat <<'USAGE'
 Usage:
-  ./bin/governance-promotion-gate [--project <abs-project>] [--target-branch <branch>] [--source-branch <branch>]
+  freely governance-promotion-gate [--project <abs-project>] [--target-branch <branch>] [--source-branch <branch>]
 
 Behavior:
   - only enforces duplicate promotion ownership for develop-bound merges

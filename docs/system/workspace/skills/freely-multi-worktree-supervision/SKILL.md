@@ -23,13 +23,13 @@ description: >- 同时监督多个 Freely worktree 的进度和状态。安排�
    - 它负责回答“现在谁在干活、在干什么”
 
 2. 再看项目级工位总览。
-   - `./bin/wt-fleet-status`
+   - `freely wt-fleet-status`
    - 或 `freely fleet-status --project <任一该仓库 worktree>`
    - 这里承接 day-1 `fleet plane`，只镜像最小 acceptance 摘要；若要判断 issue 是否真的完成或工位是否可删，必须继续顺着 `acceptance_ref` 回 artifact evidence
 
 3. 看单个工位 checkpoint 压力。
-   - `./bin/checkpoint-guard`
-   - commit 前用 `./bin/checkpoint-guard --staged-only`
+   - `freely checkpoint-guard`
+   - commit 前用 `freely checkpoint-guard --staged-only`
 
 4. 看单个工位 baseline snapshot。
    - `freely baseline-status --project <worktree>`
@@ -65,4 +65,4 @@ description: >- 同时监督多个 Freely worktree 的进度和状态。安排�
 
 - 本 skill 负责监督和调度，不代替具体 issue 的 doc/dev skill
 - `live-status` / `fleet-status` 只承担 day-1 `current-state plane` / `fleet plane`；completion / delete judgement 仍以 artifact plane 上的 acceptance evidence 为准
-- 最终 promote / cleanup 前仍必须过 `./bin/wt-status-all`
+- 最终 promote / cleanup 前仍必须过 `freely wt-status-all`

@@ -2,7 +2,7 @@
 """Validate docs/epics-map.svg against docs/B2-docs/ directory tree.
 
 Exit 0: aligned. Exit 1: mismatch with diff details.
-Usage: ./bin/check-epics-map [--project <path>]
+Usage: freely check-epics-map [--project <path>]
 """
 import os, re, sys
 from pathlib import Path
@@ -131,7 +131,7 @@ def main():
         print()
         print("── 修复方式 ──")
         print("  编辑 docs/epics-map.svg，添加缺失的 epic/story 条目。")
-        print("  参考已有条目格式，完成后: ./bin/check-epics-map 验证对齐")
+        print("  参考已有条目格式，完成后: freely check-epics-map 验证对齐")
         print(f"  请更新 docs/epics-map.svg 使其与 docs/B2-docs/ 目录树一致")
         sys.exit(1)
 

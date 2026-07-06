@@ -5,7 +5,7 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/raw-issue-pull --raw-key <key> [--target <dir>]
+  freely raw-issue-pull --raw-key <key> [--target <dir>]
 
 Pull a raw issue from platform by matching raw-{key} in OPEN issue titles.
 Materializes to docs/B1-docs/raw-{key}/issue.md with proper platform_ids.
@@ -15,7 +15,7 @@ Options:
   --target  <dir>   Target directory (default: docs/B1-docs/raw-{key}/)
 
 Example:
-  ./bin/raw-issue-pull --raw-key 20260506T100035Z
+  freely raw-issue-pull --raw-key 20260506T100035Z
 USAGE
 }
 

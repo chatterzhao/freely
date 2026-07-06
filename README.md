@@ -41,7 +41,7 @@ freely stop --project <项目绝对路径>
 
 ```bash
 chmod +x ./bin/governance-check
-./bin/governance-check
+freely governance-check
 ```
 
 ## Hook 回归门禁
@@ -50,7 +50,7 @@ chmod +x ./bin/governance-check
 
 ```bash
 chmod +x ./bin/test-pre-push-hook
-./bin/test-pre-push-hook
+freely test-pre-push-hook
 ```
 
 功能交付分支策略：

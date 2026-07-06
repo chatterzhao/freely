@@ -69,7 +69,7 @@ MSG
   echo "[HOOK] To continue in that worktree:"
   echo "  cd \"$existing_for_branch\""
   echo "[HOOK] Standard cleanup after merge:"
-  echo "  ./bin/wt-close \"$branch\""
+  echo "  freely wt-close \"$branch\""
   exit 0
 fi
 
@@ -84,7 +84,7 @@ mkdir -p "$(freely_wt_root_dir)"
 FREELY_WT_AUTOCREATE_INTERNAL=1 git checkout "$parking_branch" >/dev/null 2>&1
 FREELY_WT_AUTOCREATE_INTERNAL=1 git worktree add "$target_path" "$branch" >/dev/null
 if [[ -x "./bin/freely" ]]; then
-  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "./bin/freely" sync-tooling --source-project "$(freely_wt_primary_worktree)" --project "$target_path" >/dev/null 2>&1 || true
+  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "freely freely" sync-tooling --source-project "$(freely_wt_primary_worktree)" --project "$target_path" >/dev/null 2>&1 || true
 fi
 
 cat <<MSG
@@ -94,5 +94,5 @@ Primary worktree switched back to '$parking_branch'.
 [HOOK] Worktree mode is required for this branch. Continue there with:
   cd "$target_path"
 [HOOK] Standard cleanup after merge:
-  ./bin/wt-close "$branch"
+  freely wt-close "$branch"
 MSG

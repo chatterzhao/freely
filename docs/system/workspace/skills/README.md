@@ -13,7 +13,7 @@
 - 当冲突发生时，优先语义意图而非提交时间顺序。
 - 不要在多个文档中重复完整执行过程。
 - 流程标识词典与状态联动矩阵以 `docs/LAWS.md` 第 2C 章为唯一事实源。
-- Worktree 卫生门禁命令：`./bin/wt-status-all`（合并/提升/发布前必须全部 `CLEAN`；cleanup 需保证 target 自身安全，并显式跳过 unrelated dirty / busy worktree）。
+- Worktree 卫生门禁命令：`freely wt-status-all`（合并/提升/发布前必须全部 `CLEAN`；cleanup 需保证 target 自身安全，并显式跳过 unrelated dirty / busy worktree）。
 - 交叉引用顺序应遵循宪法/法律章节顺序 `1..16` 以减少阅读摩擦。
 
 ## 技能角色归属

@@ -18,7 +18,7 @@
    - `integration_target`
    - `depends_on`
 6. 暂存与提交：
-   - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
+   - `source freely wt-add feature/<topic> -- <paths or -A>`
    - 若暂存内容混合多个关注点，先拆分
 7. 提升前，先在当前 dedicated worktree 中把真正上游合进自己分支再处理冲突。
 

@@ -75,16 +75,16 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
   	     - 未经 test-pre-merge 验证的代码不得 merge 到 develop
   	   - **test-pre-merge 运行环境初始化**：
   	     - pre 工位从 develop 创建后是裸分支，无 config、无 session-store、无 continuity
-  	     - 必须运行 `./bin/pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
+  	     - 必须运行 `freely pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
   	     - 这会复制 config.toml（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
   	     - 初始化后 pre 工位具备完整的 Manager 运行能力
   	   - **test-pre-merge 的验证**：验证方式由 pre-tests.md 中的测试用例决定（pre-tests.md 由 B2_IBM 编写，test-execution 执行）。feature 合并到 test-pre-merge 后必须通过验证才能合并到 develop。具体测试步骤由项目对应的 pre-tests.md 定义。
 
-  	     Freely 自举端到端门禁（daemon 型项目参考）的 pre-tests.md 应定义自举验证所需步骤，通过预置脚本 `./bin/test-pre-merge-selfhost <project>` 执行。成功标准：打包版本能开发 Freely 自己。这个测试落地了"编译器自举"——用上一个版本开发下一个版本。通过 → pr-merge-guarded develop <feature-branch> 合并；失败 → 丢弃 test-pre-merge，修 feature。
+  	     Freely 自举端到端门禁（daemon 型项目参考）的 pre-tests.md 应定义自举验证所需步骤，通过预置脚本 `freely test-pre-merge-selfhost <project>` 执行。成功标准：打包版本能开发 Freely 自己。这个测试落地了"编译器自举"——用上一个版本开发下一个版本。通过 → pr-merge-guarded develop <feature-branch> 合并；失败 → 丢弃 test-pre-merge，修 feature。
    - 跑测试先判 lane：dedicated `feature/*`、`feature/premerge-*`、`release/*`、`hotfix/*` writable worktree 跑 `feature-local`；`test-pre-merge-*` 跑 `premerge-integration`；受保护分支 merge 后 followthrough 跑 `post-merge-followthrough`。不要把 `develop` 当成主线前预测试环境。
    - 测 worker/feature lane 示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile`
    - 测未 merge 的主管态示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`freely live-status --project <project-root>`、`freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
+2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`freely wt-fleet-status`、`freely live-status --project <project-root>`、`freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
    - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 B1_IBM（`docs/B1-docs/`）
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
@@ -228,21 +228,21 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 ## 基本命令
 - `freely init|doctor|start|status|baseline-status|live-status|fleet-status|stop`
 - `freely sync-tooling --source-project <project-root> --project <worktree>`
-- `./bin/governance-check`
-- `./bin/test-pre-push-hook`
+- `freely governance-check`
+- `freely test-pre-push-hook`
 - `cd <your-project-path>`
 - `freely wt-create <branch> [--base <base-branch>]`
 - `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base> && freely sync-tooling --source-project <project-root> --project ../<your-project-worktrees>/<branch-dir>`
 - `git worktree remove ../<your-project-worktrees>/<branch-dir> && git branch -d <branch>`
-- `source ./bin/wt-enter <branch>`
-- `source ./bin/wt-add <branch> -- <git-add-args>`
+- `source freely wt-enter <branch>`
+- `source freely wt-add <branch> -- <git-add-args>`
 
 ## 常用工具路径
 
 - `freely issue-sync` — 平台 issue 同步（create/close/comment/batch）
 - `freely pr-merge-guarded` — 门禁合并
-- `./bin/governance-check` — 治理门禁检查
+- `freely governance-check` — 治理门禁检查
 - `freely wt-create` — 创建 fix|feature worktree
 - `freely-package` — 打包版本
-- `./bin/issue-index` — Issue 索引管理
-- 这些是独立脚本，直接 `./bin/<name>` 调用，**不是** `./bin/freely <name>` 子命令
+- `freely issue-index` — Issue 索引管理
+- 这些命令通过 `freely <name>` 调用，底层脚本位于 `bin/` 目录

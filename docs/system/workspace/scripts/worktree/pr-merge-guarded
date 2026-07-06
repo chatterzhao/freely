@@ -16,8 +16,8 @@ cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&
 usage() {
   cat <<'USAGE'
 Usage:
-  ./bin/pr-merge-guarded <target-branch> <source-branch> [--dry-run]
-  ./bin/pr-merge-guarded complete <target-branch> <source-branch>
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
 
 Behavior:
   - non-interactive policy gate before merge
@@ -379,7 +379,7 @@ attempt_develop_push_followthrough_if_needed() {
 
 ┌─ 下一步 ──────────────────────────────────────────────┐
 │  运行 wt-close 收口工位（删远程+删工位+删本地分支）      │
-│  cd <project-root> && ./bin/wt-close <branch>         │
+│  cd <project-root> && freely wt-close <branch>         │
 │  完整链路最后一步，不可跳过                             │
 └──────────────────────────────────────────────────────┘
 NEXTSTEP
@@ -404,15 +404,15 @@ NEXTSTEP
 ║  3. 如果只是 metadata 未更新 (fix-execution 路径):            ║
 ║     更新 phase_state 为 absorbed，指向吸收它的 canonical issue║
 ║  4. 修复完成后重新执行:                                       ║
-║     ./bin/pr-merge-guarded develop <source-branch>            ║
+║     freely pr-merge-guarded develop <source-branch>            ║
 ║                                                              ║
 ║  查询当前阻塞状态:                                            ║
-║     ./bin/freely develop-push status --project <path>         ║
+║     freely develop-push status --project <path>         ║
 ╚══════════════════════════════════════════════════════════════╝
 
 GATE_BLOCKED
     # Record state for develop-push attempt tracking
-    ./bin/freely develop-push attempt --project "$PWD" || true
+    freely develop-push attempt --project "$PWD" || true
     exit 1
   fi
 

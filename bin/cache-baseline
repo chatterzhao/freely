@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # cache-baseline: 采集 token 花费基线数据
-# 用法: ./bin/cache-baseline --project <path> [--duration <minutes>] [--output <file>]
+# 用法: freely cache-baseline --project <path> [--duration <minutes>] [--output <file>]
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 PROJECT=""

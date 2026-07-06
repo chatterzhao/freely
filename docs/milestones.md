@@ -1,3 +1,12 @@
+## M-20260705T231534Z-A
+- title: ./bin/xxx → freely xxx 统一引用
+- status: active
+### candidate_issues
+1. `C-20260705T231534Z-A`
+- milestone: M-20260705T231534Z-A
+- status: promoted
+- promoted_issue_id: `I-20260705T231534Z-A`
+
 ## M-20260706T023422Z-A
 - title: docs-structure-refactor 遗漏补完
 - status: active

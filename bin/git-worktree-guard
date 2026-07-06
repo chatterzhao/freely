@@ -65,10 +65,10 @@ _worktree_remove_guard() {
 [freely] git worktree remove BLOCKED for managed worktree.
 
   Managed worktrees must be closed through wt-close:
-    ./bin/wt-close <branch>
+    freely wt-close <branch>
 
   For emergency cleanup (corrupted/abandoned worktree):
-    ./bin/wt-close --force <branch> --reason "why force close"
+    freely wt-close --force <branch> --reason "why force close"
 
   If you absolutely must use raw git:
     FREELY_WT_BYPASS_GUARD=1 git worktree remove "$@"

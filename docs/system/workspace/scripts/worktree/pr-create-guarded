@@ -5,7 +5,7 @@ set -euo pipefail
 source "$(dirname "$0")/worktree-common.sh" 2>/dev/null || true
 #
 # Usage:
-#   ./bin/pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+#   freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
 #
 # Must be run inside a fix/raw-* or feature/raw-* worktree.
 
@@ -329,12 +329,12 @@ $(if [[ -n "$conflicted_files" ]]; then echo "$conflicted_files" | sed 's/^/  /'
     git add <resolved-files>
     git add <resolved-files> && git merge --continue  # 继续 merge
     # 如果还有冲突，重复上述步骤直到 merge 完成
-    ./bin/pr-create-guarded  # 重新运行
+    freely pr-create-guarded  # 重新运行
 
   方案B: 放弃本次 merge
     git merge --abort          # 回到 merge 前状态
     # 修复冲突根源后重新运行
-    ./bin/pr-create-guarded
+    freely pr-create-guarded
 
 ========================================
 CONFLICT
@@ -449,7 +449,7 @@ fi
 
 if [[ "$pr_created_any" == "1" ]]; then
   echo ""
-  echo "Next: ./bin/pr-review-guarded $current_branch"
+  echo "Next: freely pr-review-guarded $current_branch"
   echo ""
 else
   echo "WARNING: PR not created on any platform (manual PR may be needed)" >&2

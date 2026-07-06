@@ -4,15 +4,15 @@ set -euo pipefail
 # freely-package: 从当前项目打包 Freely 版本
 #
 # 用法:
-#   ./bin/freely-package --version <ver> [--output <dir>]
+#   freely freely-package --version <ver> [--output <dir>]
 #
 # 版本号:
 #   nightly:  YYYYMMDDTHHMMZ-nightly
 #   stable:   YYYY.MM.DD-stable
 #
 # 示例:
-#   ./bin/freely-package --version 20260501T1207Z-nightly
-#   ./bin/freely-package --version 2026.05.01-stable --output ~/.freely/versions/2026.05.01-stable
+#   freely freely-package --version 20260501T1207Z-nightly
+#   freely freely-package --version 2026.05.01-stable --output ~/.freely/versions/2026.05.01-stable
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 ALLOWLIST="$ROOT_DIR/docs/system/workspace/package-allowlist.txt"

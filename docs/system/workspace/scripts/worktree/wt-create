@@ -4,8 +4,8 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>]
-  ./bin/wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
+  freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>]
+  freely wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
@@ -48,15 +48,15 @@ Optional:
   2. test-pre-merge-{raw key}-{slug}  ← based on ①, discardable testing sandbox
 
 Before wt-create, create the raw issue on a configured platform first:
-  ./bin/freely feedback --help    (review usage, then create the raw issue)
+  freely feedback --help    (review usage, then create the raw issue)
 
 Example:
   freely feedback --repo chatterzhao/freely --title "描述" --body "..."
-  ./bin/wt-create --raw-key <returned-key> --source platform \
+  freely wt-create --raw-key <returned-key> --source platform \
     --kind fix --slug task-mode-wait-prelaunch-gate
 
 Legacy:
-  ./bin/wt-create feature/my-task-20260307 --base develop
+  freely wt-create feature/my-task-20260307 --base develop
 USAGE
 }
 
@@ -144,14 +144,14 @@ if [[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]; th
 Missing required: --source
 
   --source must be 'platform'. Raw issues must exist on a configured platform.
-  Create one first: ./bin/freely feedback --help
+  Create one first: freely feedback --help
 
   AI: search for this raw-key in the scan file to find its source_family:
     .freely/run/manager-task-source-scan-latest.json
 
   If the scan file doesn't have this key, wt-create will auto-run scan once.
 
-Usage: ./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
+Usage: freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
 MSG
     exit 1
   fi
@@ -483,8 +483,8 @@ _require_issue_exists() {
             else
               echo "拒绝创建工位: raw-$raw_key not found on platform or local" >&2
               echo "  如果出错是因为还没有创建 raw issue：" >&2
-              echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
-              echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
+              echo "    请使用 freely feedback 命令创建 raw issue" >&2
+              echo "    如果不清楚用法，请运行 freely feedback --help" >&2
               echo "  创建后重试: wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
               return 1
             fi
@@ -497,8 +497,8 @@ _require_issue_exists() {
             else
               echo "拒绝创建工位: raw-$raw_key 不存在" >&2
               echo "  如果出错是因为还没有创建 raw issue：" >&2
-              echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
-              echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
+              echo "    请使用 freely feedback 命令创建 raw issue" >&2
+              echo "    如果不清楚用法，请运行 freely feedback --help" >&2
               echo "  创建后重试: wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
             fi
             return 1
@@ -676,7 +676,7 @@ if [[ -n "$_github_head" ]] && [[ -n "$_origin_head" ]] && [[ "$_github_head" !=
   echo "ERROR: Platform divergence detected" >&2
   echo "  github: $_github_head" >&2
   echo "  origin: $_origin_head" >&2
-  echo "  Cannot create worktree. Run: ./bin/freely develop-push attempt" >&2
+  echo "  Cannot create worktree. Run: freely develop-push attempt" >&2
   exit 1
 fi
 _sync_head="${_github_head:-$_origin_head}"
