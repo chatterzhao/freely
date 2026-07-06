@@ -1,3 +1,17 @@
+## M-20260627T084545Z-A
+- title: a2a agent_id + set_assignee fix
+- status: completed
+### committed_issues
+1. `I-20260627T084545Z-A`
+- milestone: M-20260627T084545Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260627T084545Z/issues/I-20260627T084545Z-A.md
+### completed_issues
+1. `C-20260627T084545Z-A`
+- milestone: M-20260627T084545Z-A
+- status: absorbed
+- absorbed_into: `I-20260627T084545Z-A`
+
 ## M-20260627T234054Z-A
 - title: wt-create assignee check
 - status: completed
