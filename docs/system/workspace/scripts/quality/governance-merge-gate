@@ -823,7 +823,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
             target_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", target_id)
             found = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "issue.md"))
             if not found:
-                for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "epics")):
+                for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "B2-docs")):
                     if "issues" in dirs:
                         for f in os.listdir(os.path.join(root, "issues")):
                             if f.startswith(target_id) and f.endswith(".md"):
