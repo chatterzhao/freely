@@ -293,6 +293,7 @@ MSG
   ❌ git push --no-verify (改用 freely pr-create-guarded)
   ❌ gh pr merge --admin (改用 freely pr-merge-guarded)
   ❌ git worktree remove --force (改用 freely wt-close)
+  ❌ git update-ref develop (plumbing 绕过,严禁)
   ❌ gh issue close (改用 freely wt-close --platform-only)
 
 [freely] 💡 你刚才想做的是 git commit → 对应封装命令是 freely pr-create-guarded
