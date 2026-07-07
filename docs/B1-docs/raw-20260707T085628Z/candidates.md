@@ -1,0 +1,12 @@
+---
+candidate_id: C-20260707T085628Z-A
+status: absorbed
+source_raw: raw-20260707T085628Z
+milestone: M-20260707T085628Z-A
+---
+## C-20260707T085628Z-A: cd 路径表述
+- status: absorbed
+- decision_reason: 统一用 cd 路径（与 wt-create 输出一致）
+- promoted_issue_id: I-20260707T085628Z-A
+- promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T085628Z/issues/I-20260707T085628Z-A.md
+- acceptance_criteria: 10 个命令执行位置改为 cd 路径
