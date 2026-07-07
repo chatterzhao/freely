@@ -257,6 +257,72 @@ def agent_stats(project: str) -> dict:
     """返回各角色占用/空闲统计。"""
     return _db_rpc(project, "agent_working.stats", {})
 
+
+# ── Review verdict tracking ──────────────────────────────────────────
+
+REVIEW_PHASES = ["b1", "b2", "red", "dev", "green"]
+
+
+def agent_record_review(project: str, raw_key: str, review_stage: str,
+                        verdict: str, reviewed_by: str,
+                        findings: list = None) -> dict:
+    """记录审查结果。Reviewer UPDATE ONLY — 行必须已存在。
+
+    Args:
+        review_stage: b1 | b2 | red | dev | green
+        verdict: PASS | FAIL
+        reviewed_by: "reviewer_07:codex" (agent_id:tool)
+        findings: [{"item": "...", "status": "pass"|"fail", "detail": "..."}]
+    """
+    if review_stage not in REVIEW_PHASES:
+        return {"error": f"unknown review_stage: {review_stage}"}
+    if verdict not in ("PASS", "FAIL"):
+        return {"error": f"verdict must be PASS or FAIL, got: {verdict}"}
+
+    return _db_rpc(project, "agent_working.record_review", {
+        "raw_key": raw_key,
+        "review_stage": review_stage,
+        "verdict": verdict,
+        "reviewed_by": reviewed_by,
+        "reviewed_at": "",  # filled by DB daemon
+        "findings": json.dumps(findings or []),
+    })
+
+
+def agent_get_reviews(project: str, raw_key: str) -> dict:
+    """获取某个 raw_key 的所有审查记录。
+
+    Returns:
+        {"b1": {"verdict": "PASS", "reviewed_by": "reviewer_07:codex", ...}, ...}
+    """
+    result = _db_rpc(project, "agent_working.get_reviews", {"raw_key": raw_key})
+    return result.get("reviews", {})
+
+
+def agent_find_first_missing_review(project: str, raw_key: str) -> tuple:
+    """找到第一个缺少审查签名的阶段。
+
+    阶段依赖链: b1 → b2 → red → dev → green
+    上游改动 → 下游全废。返回最先缺失的阶段，以及从该阶段起需要重做的所有阶段。
+
+    Returns:
+        (first_missing_phase, phases_to_redo)
+        或 (None, []) 表示全部通过
+
+    Example:
+        B1 PASS, B2 缺失 → ("b2", ["b2", "red", "dev", "green"])
+        B1 PASS, B2 PASS, RED FAIL → ("red", ["red", "dev", "green"])
+        全部 PASS → (None, [])
+    """
+    reviews = agent_get_reviews(project, raw_key)
+
+    for i, phase in enumerate(REVIEW_PHASES):
+        r = reviews.get(phase, {})
+        if not r or r.get("verdict") != "PASS":
+            return phase, REVIEW_PHASES[i:]
+
+    return None, []
+
 # ── CLI entry point ──────────────────────────────────────────────
 if __name__ == "__main__":
     import sys

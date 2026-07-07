@@ -197,6 +197,64 @@ else
 fi
 echo ""
 
+# ── Step 2c2: Review signature check ──
+# Ensures every completed phase (B1/B2/RED/dev/GREEN) has a Reviewer PASS verdict.
+# Missing review → block. Upstream phase change invalidates downstream → all must redo.
+_raw_key=$(echo "$current_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+echo "Step 2c2/4: review signature check..."
+if [[ -n "$_raw_key" ]]; then
+  _review_check=$(python3 -c "
+import sys
+sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from agent_working import agent_find_first_missing_review
+first, rest = agent_find_first_missing_review('$ROOT_DIR', '$_raw_key')
+if first:
+    print(f'MISSING:{first}:{",".join(rest)}')
+else:
+    print('ALL_PASS')
+" 2>/dev/null || echo "ERROR")
+  
+  case "$_review_check" in
+    ALL_PASS)
+      echo "[REVIEW-GATE] all phase reviews: PASS ✓"
+      ;;
+    MISSING:*)
+      _first="${_review_check#MISSING:}"
+      _missing_phase="${_first%%:*}"
+      _redo_phases="${_first#*:}"
+      cat >&2 <<REVIEW_BLOCKED
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [REVIEW-GATE] 缺少独立的阶段审查签名                      ║
+╠══════════════════════════════════════════════════════════════╣
+║  最先缺失审查的阶段: $_missing_phase
+║  需要重新走的阶段: $_redo_phases
+║                                                              ║
+║  上游改动会使下游全部作废——必须从 $_missing_phase 重新开始。     ║
+║                                                              ║
+║  正确流程（每个阶段做完后请求审查）:                             ║
+║    B1 → needs-review:b1 → Reviewer PASS                      ║
+║    B2 → needs-review:b2 → Reviewer PASS                      ║
+║    RED → needs-review:red → Reviewer PASS                    ║
+║    dev → needs-review:dev → Reviewer PASS                    ║
+║    GREEN → needs-review:test → Reviewer PASS                  ║
+║                                                              ║
+║  当前缺少 $_missing_phase 及之后的审查——请从 $_missing_phase 重新开始，  ║
+║  每完成一个阶段后通过 A2A state=input-required 请求审查。        ║
+║                                                              ║
+║  审查指南见: docs/system/workspace/review-guidelines/          ║
+╚══════════════════════════════════════════════════════════════╝
+REVIEW_BLOCKED
+      exit 1
+      ;;
+    *)
+      echo "[REVIEW-GATE] review check skipped (no review data available)"
+      ;;
+  esac
+else
+  echo "[REVIEW-GATE] no raw key found in branch, skipping review check"
+fi
+echo ""
+
 # ── Step 2c: Pretests execution evidence check ──
 # Checks that pretests execution evidence exists before allowing PR creation.
 # Mirrors the check in wt-close to catch untested code before PR creation.
