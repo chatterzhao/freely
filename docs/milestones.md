@@ -3239,3 +3239,12 @@
 - milestone: M-20260707T141251Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T141251Z-A`
+
+## M-20260707T145323Z-A
+- title: fix — issue-sync 幂等性 + adapter bug + review 强化
+- status: active
+### candidate_issues
+1. `C-20260707T145323Z-A`
+- milestone: M-20260707T145323Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T145323Z-A`
