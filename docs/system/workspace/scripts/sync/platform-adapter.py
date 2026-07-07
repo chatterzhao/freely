@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 """Unified platform adapter — Handler registry pattern.
 
-New platforms: write a PlatformHandler subclass + call register(). Done.
-No changes needed to any public function or existing caller.
+How to add a new platform (e.g. GitLab):
+
+  1. Subclass PlatformHandler:
+     class GitLabHandler(PlatformHandler):
+         name = "gitlab"
+         def detect(self) -> bool: ...                    # mandatory
+         def detect_repo(self) -> str: ...                # optional, for repo detection
+         def create_issue(self, title, body) -> dict: ... # mandatory
+         def close_issue(self, issue_number) -> dict: ... # mandatory
+         # Override other methods as needed. Default: {"status":"error","error":"not implemented"}
+
+  2. Register it:
+     register(GitLabHandler())
+
+  3. That's it. Every public function (create_issue, close_issue, search_raw_issue,
+     create_pr, ...) automatically iterates all registered handlers via the registry.
+     No if/elif chains to modify. No caller changes needed.
+
+  Mandatory methods (abstract — must implement):
+    name, detect, create_issue, close_issue
+
+  Optional methods (override if platform supports it):
+    add_comment, update_issue, get_issue_state, search_raw_issue, fetch_issue,
+    create_pr, merge_pr, close_pr, get_assignees, set_assignee, list_open_issues
 
 Usage:
   from platform_adapter import create_issue, close_issue, create_pr, ...
@@ -339,11 +361,12 @@ class GiteeHandler(PlatformHandler):
         return {}
 
 # ══════════════════════════════════════════════
-# Register built-in handlers
+# REGISTRATION — new platform? add ONE line here.
 # ══════════════════════════════════════════════
 
 register(GitHubHandler())
 register(GiteeHandler())
+# register(GitLabHandler())   ← example: new platform goes here
 
 # ══════════════════════════════════════════════
 # Public API — iterates registry, zero platform hardcoding
