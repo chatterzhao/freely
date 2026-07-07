@@ -1,39 +1,35 @@
 # B2 阶段审查指南
 
 ## 定位
-
-B2 是设计到交付的阶段。Reviewer 检查：I-* issue 是否物化完整，设计产物（prd/pre-tests/tasks/code-review）是否覆盖了全部改动面，pre-tests 是否真实可执行。
+B2 是设计到交付的阶段。Reviewer 检查：**pre-tests 是否设计了真正可验证行为正确性的测试**。
 
 ## 检查项
 
-### 1. I-* issue 物化完整性
-- [ ] I-* issue 文件是否存在？
-- [ ] 字段是否齐全（issue_id/phase_state/source_candidate/verification_artifact_dir/pre_tests_path）？
-- [ ] milestones.md committed_issues 条目是否存在且路径正确？
+### 1. I-* issue + PRD 完整性（快速过）
+- [ ] I-* issue 文件存在，字段齐全
+- [ ] 实现方案基于 brainstorms 分析结论
 
-### 2. PRD 质量
-- [ ] prd.md 是否包含 Goal → 实现方案 → Dev-Loop Handoff？
-- [ ] 实现方案是否基于 brainstorms 的分析结论？
-- [ ] 改动范围是否清晰（列出具体文件）？
+### 2. Pre-tests 行为验证质量（★ 重点）
 
-### 3. Pre-tests 覆盖度（重点）
-- [ ] 是否覆盖全部改动面（不是挂一漏万）？
-- [ ] 每条 acceptance item 的 test_command 是否真实可执行（不是占位符）？
-- [ ] 测试层级是否合理（端到端优先，集成第二，单元第三）？
-- [ ] Unit/Integration/End-to-End/Real-Environment 四个 section 是否完整？
-- [ ] 每个 acceptance item 的 expected_output 是否具体可验证？
+**核心原则：test_command 必须验证"改动的行为是否正确"，不是验证"代码有没有这行"。**
 
-### 4. 文档完整性
-- [ ] tasks.md 是否存在且任务分解合理？
-- [ ] code-reviews/ 目录是否存在？
-- [ ] Implementation Decision Note 的 5 字段是否完整（decision/why_this/alternatives/boundary/residual_risk）？
+| 测试类型 | 示例 | 判定 |
+|---------|------|------|
+| 行为测试 ✅ | "执行两次 close → git status 无变化" | PASS |
+| 行为测试 ✅ | "制造 dirty → 运行命令 → 确认被阻塞" | PASS |
+| 代码存在测试 ❌ | `grep -c "feature" file` → 1 | FAIL |
+| 语法测试 ❌（仅此不够） | `bash -n file` | 仅作补充 |
+
+- [ ] 每条 test_command 是否**可执行**（不是占位符）？
+- [ ] 每条 test_command 是否验证了**行为正确性**？
+- [ ] 如果 test_command 是 grep / bash -n / py_compile → **FAIL**
+
+### 3. 文档完整性
+- [ ] tasks.md + code-reviews/ + IDN 5 字段
 
 ## 通过标准
-
-全部检查项通过 → `PASS`。
-pre-tests 有占位符 test_command → `FAIL, reason=AT-00X 的 test_command 是占位符，需要真实可执行的测试命令`。
-pre-tests 未覆盖主要改动面 → `FAIL, reason=pre-tests 遗漏了 {改动面}，需要补充对应的 acceptance item`。
+- 全部通过 → PASS
+- test_command 全是 grep/bash -n → FAIL：测试只验证代码存在性，不验证行为
 
 ## 失败处理
-
-输出具体失败原因 + 缺失文件/字段列表 → Worker 回到 B2 补充 → 重新提交审查。
+输出具体失败项 → Worker 回到 B2 重新设计 pre-tests

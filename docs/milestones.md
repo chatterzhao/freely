@@ -3248,3 +3248,12 @@
 - milestone: M-20260707T145323Z-A
 - status: promoted
 - promoted_issue_id: `I-20260707T145323Z-A`
+
+## M-20260707T155021Z-A
+- title: fix — review-guidelines 行为测试强化
+- status: active
+### candidate_issues
+1. `C-20260707T155021Z-A`
+- milestone: M-20260707T155021Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T155021Z-A`
