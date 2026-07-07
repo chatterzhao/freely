@@ -216,8 +216,11 @@ class GitHubHandler(PlatformHandler):
 
     def get_assignees(self, issue_number):
         try:
-            r = subprocess.run(["gh", "api", f"repos/{self._repo()}/issues/{issue_number}/assignees", "--jq", ".[].login"],
+            r = subprocess.run(["gh", "issue", "view", issue_number, "--repo", self._repo(),
+                               "--json", "assignees", "--jq", ".[].login"],
                               capture_output=True, text=True)
+            if r.returncode != 0:
+                return []
             return [line.strip() for line in r.stdout.splitlines() if line.strip()]
         except Exception:
             return []
@@ -414,7 +417,7 @@ def search_raw_issue(raw_key: str) -> dict[str, dict]:
     results = {}
     for h in _handlers():
         info = _safe(h.search_raw_issue, raw_key)
-        if info and not isinstance(info, dict) and "error" not in str(info):
+        if info and isinstance(info, dict):
             results[h.name] = info
     return results
 

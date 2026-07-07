@@ -522,7 +522,6 @@ cmd_update() {
     _gitee_call "update" "{\"issue_id\":\"$gitee_id\",\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}"
   fi
 
-  _fm_set_str "$file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   echo "[issue-sync] update complete: $local_id"
 }
 
@@ -650,7 +649,6 @@ cmd_close() {
   fi
 
   _fm_set_str "$file" "platform_state" "closed"
-  _fm_set_str "$file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   echo "[issue-sync] close complete: $local_id"
 }
 
