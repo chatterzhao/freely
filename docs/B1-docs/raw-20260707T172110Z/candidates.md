@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260707T172110Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T172110Z
 milestone: M-20260707T172110Z-A
 ---
 ## C-20260707T172110Z-A: scan 修复
-- status: promoted
+- status: absorbed
 - decision_reason: argparse + 复用 platform-adapter + 修复 7 缺陷
 - promoted_issue_id: I-20260707T172110Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T172110Z/issues/I-20260707T172110Z-A.md

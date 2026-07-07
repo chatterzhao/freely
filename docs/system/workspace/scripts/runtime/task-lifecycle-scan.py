@@ -166,19 +166,13 @@ def list_all_worktrees(project: Path) -> list[dict]:
 
 
 def _detect_platforms(project: Path) -> list[str]:
-    """Detect configured platforms from git remotes (no hardcoded API calls)."""
-    platforms = []
+    """Detect configured platforms via platform-adapter."""
     try:
-        r = subprocess.run(["git", "-C", str(project), "remote", "-v"],
-                          capture_output=True, text=True, timeout=5)
-        remotes = r.stdout
-        if re.search(r'github', remotes):
-            platforms.append("github")
-        if re.search(r'gitee', remotes):
-            platforms.append("gitee")
+        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
+        from platform_adapter import configured_platforms
+        return configured_platforms()
     except Exception:
-        pass
-    return platforms or ["github"]  # fallback
+        return ["github"]
 
 def _gh_repo(project: Path) -> str:
     """Detect GitHub repo from gh CLI."""
@@ -200,53 +194,12 @@ def _gitee_repo(project: Path) -> str:
         return ""
 
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
-    """Return {issue_number: {state, title, body, platform}} for all OPEN issues.
-    Queries all detected platforms. Cached (5min TTL)."""
-    cache_file = project / ".freely" / "run" / "platform-open-cache.json"
-    cached = cache_get(cache_file, ttl=300)
-    if cached is not None:
-        return cached.get("B1-docs", {})
-
-    issues: dict[str, dict] = {}
-    platforms = _detect_platforms(project)
-
-    for p in platforms:
-        try:
-            if p == "github":
-                repo = _gh_repo(project)
-                if not repo:
-                    continue
-                r = subprocess.run(
-                    ["gh", "issue", "list", "--repo", repo, "--state", "open",
-                     "--limit", "200", "--json", "number,state,title,body"],
-                    capture_output=True, text=True, timeout=15, cwd=str(project))
-                if r.returncode == 0 and r.stdout.strip():
-                    for item in json.loads(r.stdout):
-                        num = str(item.get("number", ""))
-                        if num:
-                            issues[num] = {
-                                "state": "OPEN", "title": item.get("title", ""),
-                                "body": item.get("body", ""), "platform": p}
-            elif p == "gitee":
-                repo = _gitee_repo(project)
-                if not repo:
-                    continue
-                r = subprocess.run(
-                    [sys.executable, str(project / "docs" / "system" / "workspace" / "scripts" / "runtime" / "gitee-issue.py"),
-                     "--repo", repo, "list", "--state", "open", "--per-page", "100"],
-                    capture_output=True, text=True, timeout=20)
-                if r.returncode == 0 and r.stdout.strip():
-                    for item in json.loads(r.stdout):
-                        num = str(item.get("number", item.get("id", "")))
-                        if num:
-                            issues[num] = {
-                                "state": "OPEN", "title": item.get("title", ""),
-                                "body": item.get("body", ""), "platform": p}
-        except Exception:
-            continue
-
-    cache_put(cache_file, {"B1-docs": issues})
-    return issues
+    try:
+        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
+        from platform_adapter import list_open_issues
+        return list_open_issues()
+    except Exception:
+        return {}
 
 def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -> dict[str, str]:
     """Batch-fetch CLOSED states, merging with already-fetched OPEN.
@@ -442,11 +395,8 @@ def scan(project: Path) -> dict:
     all_platform_states = get_all_platform_issue_states(project, platform_issues)
     timer.mark("platform_all_states")
 
-    # File scan: skip if HEAD unchanged
-    if head_changed:
-        local_issues = read_issues_dir(project)
-    else:
-        local_issues = []
+    # File scan: always scan for accurate detection
+    local_issues = read_issues_dir(project)
     timer.mark("file_scan")
 
     worktrees = list_all_worktrees(project)
@@ -512,6 +462,7 @@ def scan(project: Path) -> dict:
             # Query agent_working table first (preferred), fallback to agent-id.env
             agent_id = ""
             try:
+                sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "runtime"))
                 from agent_working import agent_list_by_raw_key
                 row = agent_list_by_raw_key(str(project), f"raw-{raw_key}")
                 if row:
@@ -696,6 +647,8 @@ def scan(project: Path) -> dict:
 
     # ── Check chat inbox for unconsumed messages (1c/2d) ────────────
 
+    # ── 1c: Platform-only issues without raw-{key} (TODO: restore after adapter returns per-platform dict) ──
+
     # ── Summary ─────────────────────────────────────────────────────
     by_cat = {}
     ready_count = 0
@@ -737,10 +690,15 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="{current_head}"
 # ── CLI ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    project = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--project", required=True)
+    ap.add_argument("--json", action="store_true")
+    args = ap.parse_args()
+    project = Path(args.project)
     result = scan(project)
 
-    output_flags = sys.argv[2:] if len(sys.argv) > 2 else []
+    output_flags = ["--json"] if args.json else []
     if "--json" in output_flags or "-j" in output_flags:
         # Write to stdout and also to the scan file
         print(json.dumps(result, indent=2, ensure_ascii=False))
