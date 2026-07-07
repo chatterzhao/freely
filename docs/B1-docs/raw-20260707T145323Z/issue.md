@@ -2,7 +2,7 @@
 local_id: raw-20260707T145323Z
 kind: raw
 phase_state: absorbed
-absorbed_into: 'I-20260707T145323Z-A'
+absorbed_into: I-20260707T145323Z-A
 platform_ids:
   github:
     issue_id: '3809'
@@ -17,11 +17,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-07-07T14:53:46Z'
-updated_at: '2026-07-07T14:53:46Z'
+updated_at: '2026-07-07T15:21:46Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 根因
