@@ -3194,10 +3194,6 @@
 - title: feat — 多阶段强制 Review 门禁
 - status: active
 ### candidate_issues
-1. `C-20260707T113841Z-A`
-- milestone: M-20260707T113841Z-A
-- status: promoted
-- promoted_issue_id: `I-20260707T113841Z-A`
 ### committed_issues
 1. `I-20260707T113841Z-A`
 - milestone: M-20260707T113841Z-A
