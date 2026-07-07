@@ -3061,3 +3061,22 @@
 2. `C-20260705T231131Z-A`
 - milestone: M-20260705T231131Z-A; status: absorbed
 - absorbed_into: `I-20260705T231131Z-A`
+
+## M-20260706T232728Z-A
+- title: feat — 封装命令文档系统化，意图→命令映射 + 集中参考
+- status: active
+### candidate_issues
+1. `C-20260706T232728Z-A`
+- milestone: M-20260706T232728Z-A
+- status: promoted
+- promoted_issue_id: `I-20260706T232728Z-A`
+### committed_issues
+1. `I-20260706T232728Z-A`
+- milestone: M-20260706T232728Z-A
+- phase_state: done_b2_ibm
+- path: docs/B2-docs/ibm/b2-governance/raw-20260706T232728Z/issues/I-20260706T232728Z-A.md
+### completed_issues
+1. `C-20260706T232728Z-A`
+- milestone: M-20260706T232728Z-A
+- status: absorbed
+- absorbed_into: `I-20260706T232728Z-A`
