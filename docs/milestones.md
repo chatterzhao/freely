@@ -3159,3 +3159,18 @@
 - milestone: M-20260707T064609Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T064609Z-A`
+
+## M-20260707T065926Z-A
+- title: fix — commands.md 增加执行位置
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T065926Z-A`
+- milestone: M-20260707T065926Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T065926Z/issues/I-20260707T065926Z-A.md
+### completed_issues
+1. `C-20260707T065926Z-A`
+- milestone: M-20260707T065926Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T065926Z-A`
