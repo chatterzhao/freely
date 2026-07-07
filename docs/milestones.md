@@ -3129,3 +3129,18 @@
 - milestone: M-20260707T040104Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T040104Z-A`
+
+## M-20260707T043833Z-A
+- title: fix — 彻底移除本地 raw issue 创建路径
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T043833Z-A`
+- milestone: M-20260707T043833Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T043833Z/issues/I-20260707T043833Z-A.md
+### completed_issues
+1. `C-20260707T043833Z-A`
+- milestone: M-20260707T043833Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T043833Z-A`

@@ -1093,75 +1093,30 @@ def main() -> int:
                                 ))
 
     if args.target_branch == "develop" and branch_issue_key:
-        # 2a: SQLite chat-inbox catch-all — ensure matching chat is consumed
+        # 2a: SQLite chat-inbox — local raw issues are no longer supported.
+        # All raw issues must be created via 'freely feedback' on a configured platform.
         db_path = os.path.join(ROOT_DIR, ".freely", "freely.db")
         if os.path.isfile(db_path) and branch_issue_key.startswith("raw-"):
             try:
                 conn = sqlite3.connect(db_path)
-                # Branch key raw-YYYYMMDD-HHMM → chat id is YYYYMMDDHHMMSS
-                # Use LIKE to find chats with matching date+time prefix (ignore seconds)
-                # Accept old (YYYYMMDD-HHMM) and new (YYYYMMDDTHHMM[SS]Z) formats
                 raw_ts_match = re.match(r"raw-(\d{8}[-T]\d{4}Z?)", branch_issue_key)
                 if raw_ts_match:
                     ts_prefix = raw_ts_match.group(1).replace("-", "").replace("T", "").replace("Z", "")
-                    rows = conn.execute(
-                        "SELECT id, issue_id, consumed, materialized_as FROM chats "
-                        "WHERE CAST(id AS TEXT) LIKE ? AND chat_type = 'new-issue' AND consumed = 0 "
-                        "ORDER BY id ASC",
+                    row = conn.execute(
+                        "SELECT COUNT(*) FROM chats "
+                        "WHERE CAST(id AS TEXT) LIKE ? AND chat_type = 'new-issue' AND consumed = 0",
                         (f"{ts_prefix}%",),
-                    ).fetchall()
-                    if rows:
-                        for row in rows:
-                            chat_id, chat_issue_id, consumed_val, materialized_as = row
-                            # Only consume the chat whose issue_id matches the branch key
-                            if chat_issue_id == branch_issue_key or chat_issue_id.startswith(branch_issue_key):
-                                raw_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", branch_issue_key)
-                                # Auto-materialize to docs/B1-docs/ if missing
-                                if not os.path.isdir(raw_dir) or not os.path.isfile(os.path.join(raw_dir, "issue.md")):
-                                    os.makedirs(raw_dir, exist_ok=True)
-                                    chat_row = conn.execute(
-                                        "SELECT issue_id, author, channel, created_at, session_refs, intake_id, message FROM chats WHERE id = ?",
-                                        (chat_id,),
-                                    ).fetchone()
-                                    if chat_row:
-                                        issue_id, author, channel, created_at, session_refs, intake_id, message = chat_row
-                                        raw_issue_file = os.path.join(raw_dir, "issue.md")
-                                        with open(raw_issue_file, "w", encoding="utf-8") as f:
-                                            f.write(
-                                                f"---\n"
-                                                f"local_id: {issue_id}\n"
-                                                f"kind: raw\n"
-                                                f"status: proposed\n"
-                                                f"platform_ids: {{}}\n"
-                                                f"primary_platform: \"\"\n"
-                                                f"canonical_issue_path: \"\"\n"
-                                                f"last_synced_comment_at: {{}}\n"
-                                                f"hash: \"\"\n"
-                                                f"created_at: {created_at}\n"
-                                                f"updated_at: {created_at}\n"
-                                                f"intake_id: {intake_id}\n"
-                                                f"author: {author}\n"
-                                                f"channel: {channel}\n"
-                                                f"session_refs: {session_refs}\n"
-                                                f"---\n\n"
-                                                f"{message}\n"
-                                            )
-                                        warnings.append(
-                                            f"GATE 2a: auto-materialized raw issue {branch_issue_key} from chat-inbox entry {chat_id}."
-                                        )
-                                # Mark this specific chat as consumed
-                                conn.execute(
-                                    "UPDATE chats SET consumed = 1, materialized_as = ? WHERE id = ?",
-                                    (branch_issue_key, chat_id),
-                                )
-                                conn.commit()
-                                warnings.append(
-                                    f"GATE 2a: consumed chat-inbox entry {chat_id} → {branch_issue_key} (catch-all)."
-                                )
-                                break  # Only consume one matching chat
+                    ).fetchone()
+                    if row and row[0] > 0:
+                        errors.append(
+                            f"GATE 2a: found {row[0]} unconsumed local chat-inbox new-issue(s) matching {branch_issue_key}. "
+                            f"Local raw issues are no longer supported. "
+                            f"Create the issue via 'freely feedback --title ... --kind fix --body ...' on a configured platform instead."
+                        )
                 conn.close()
             except Exception:
                 pass  # SQLite check is best-effort; don't block the merge on DB errors
+
 
         # 2b: Platform raw issue check — ensure raw-* has platform_ids or clear waiver
         if branch_issue_key.startswith("raw-"):
