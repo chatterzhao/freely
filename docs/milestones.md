@@ -3257,3 +3257,12 @@
 - milestone: M-20260707T155021Z-A
 - status: promoted
 - promoted_issue_id: `I-20260707T155021Z-A`
+
+## M-20260707T162123Z-A
+- title: fix — per-platform ID close + scan Gitee
+- status: active
+### candidate_issues
+1. `C-20260707T162123Z-A`
+- milestone: M-20260707T162123Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T162123Z-A`
