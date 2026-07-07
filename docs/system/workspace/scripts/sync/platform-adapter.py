@@ -386,18 +386,31 @@ def configured_platforms() -> list[str]:
 def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
     return {h.name: _safe(h.create_issue, title, body) for h in _handlers()}
 
-def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
-    return {h.name: _safe(h.close_issue, platform_issue_id) for h in _handlers()}
-
-def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dict[str, dict]:
+def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
     results = {}
     for h in _handlers():
+        pid = (platform_ids or {}).get(h.name, {})
+        issue_id = pid.get('issue_id', '') if isinstance(pid, dict) else str(pid or '')
+        if not issue_id:
+            results[h.name] = {'status': 'skipped', 'error': f'no issue_id for {h.name}'}
+            continue
+        results[h.name] = _safe(h.close_issue, issue_id)
+    return results
+
+def add_comment(local_id: str, platform_ids: dict = None, comment_body: str = "") -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        pid = (platform_ids or {}).get(h.name, {})
+        issue_id = pid.get('issue_id', '') if isinstance(pid, dict) else str(pid or '')
+        if not issue_id:
+            results[h.name] = {'status': 'skipped', 'error': f'no issue_id for {h.name}'}
+            continue
         try:
-            state = h.get_issue_state(platform_issue_id)
+            state = h.get_issue_state(issue_id)
             if state and state.lower() == "closed":
-                results[h.name] = {"status": "blocked", "error": f"Issue #{platform_issue_id} is CLOSED on {h.name}."}
+                results[h.name] = {"status": "blocked", "error": f"Issue #{issue_id} is CLOSED on {h.name}."}
                 continue
-            results[h.name] = _safe(h.add_comment, platform_issue_id, comment_body)
+            results[h.name] = _safe(h.add_comment, issue_id, comment_body)
         except Exception as e:
             results[h.name] = {"status": "error", "error": str(e)[:200]}
     return results
@@ -634,6 +647,9 @@ if __name__ == "__main__":
         print(json.dumps(search_raw_issue(a[2]) if len(a) > 2 else {}, indent=2))
     elif len(a) > 1 and a[1] == "fetch":
         print(json.dumps(fetch_issue(a[2], a[3]), indent=2))
+    elif len(a) > 1 and a[1] == "close-multi":
+        platform_ids = json.loads(a[2]) if len(a) > 2 else {}
+        print(json.dumps(close_issue("", platform_ids), indent=2))
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":

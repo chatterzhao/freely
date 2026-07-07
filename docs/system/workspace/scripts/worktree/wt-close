@@ -673,13 +673,18 @@ for p, info in fm.get('platform_ids', {}).items():
       _po_raw_gh=$(gitee issue list --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
     fi
   fi
-  if [[ -n "$_po_raw_gh" ]]; then
-    echo "wt-close: closing raw issue #$_po_raw_gh via platform-adapter..."
-    if python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close github "$_po_raw_gh" 2>&1; then
-      echo "wt-close: raw issue #$_po_raw_gh closed ✓ (local files unchanged)"
+  # Read platform_ids from issue file for per-platform close
+  _po_platform_ids=$(_fm_get "$_po_issue_file" "platform_ids")
+  if [[ -n "$_po_platform_ids" && "$_po_platform_ids" != "None" ]]; then
+    echo "wt-close: closing raw issue via platform-adapter (all platforms)..."
+    if python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close-multi "$_po_platform_ids" 2>&1; then
+      echo "wt-close: raw issue closed (all platforms, local files unchanged)"
     else
-      echo "Warning: platform-adapter close failed for #$_po_raw_gh" >&2
+      echo "Warning: platform-adapter close failed" >&2
     fi
+  elif [[ -n "$_po_raw_gh" ]]; then
+    echo "wt-close: closing raw issue #$_po_raw_gh via platform-adapter..."
+    python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close-multi "{\"github\":{\"issue_id\":\"$_po_raw_gh\"}}" 2>&1 && echo "wt-close: raw issue closed" || echo "Warning: close failed" >&2
   fi
   
   # Also close absorbed I-* issue via API
