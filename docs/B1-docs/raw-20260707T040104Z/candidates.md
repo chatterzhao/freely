@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260707T040104Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T040104Z
 milestone: M-20260707T040104Z-A
 ---
 ## C-20260707T040104Z-A: pre-commit.sh 增加禁止项
-- status: promoted
+- status: absorbed
 - promoted_issue_id: I-20260707T040104Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T040104Z/issues/I-20260707T040104Z-A.md
 - acceptance_criteria:
