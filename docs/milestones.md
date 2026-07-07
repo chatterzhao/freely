@@ -3110,3 +3110,18 @@
 - milestone: M-20260707T003943Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T003943Z-A`
+
+## M-20260707T040104Z-A
+- title: fix — pre-commit.sh 增加 git update-ref 禁止项
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T040104Z-A`
+- milestone: M-20260707T040104Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T040104Z/issues/I-20260707T040104Z-A.md
+### completed_issues
+1. `C-20260707T040104Z-A`
+- milestone: M-20260707T040104Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T040104Z-A`
