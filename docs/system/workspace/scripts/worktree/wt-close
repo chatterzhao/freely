@@ -960,6 +960,45 @@ if [[ -n "$wt_path" ]]; then
   if [[ "$DRY_RUN" == true ]]; then
     _dry "git worktree remove $wt_path"
   else
+	    # ── Worktree cleanliness check (删工位前; --force 跳过) ──
+	    if [[ "$FORCE" != true ]]; then
+	      _dirty_files=$(git -C "$wt_path" status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
+	      _untracked=$(git -C "$wt_path" ls-files --others --exclude-standard 2>/dev/null | head -20 || true)
+	      if [[ -n "$_dirty_files" ]] || [[ -n "$_untracked" ]]; then
+	        cat >&2 <<WTCLOSE_DIRTY
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [WT-CLOSE] 工位有未提交的文件 — 删工位前请先处理          ║
+╠══════════════════════════════════════════════════════════════╣
+║  工位: $wt_path
+║  以下文件尚未提交——删除工位后这些修改将永久丢失。              ║
+║                                                              ║
+║  未提交的修改 (tracked):                                       ║
+$(printf "%s\n" "$_dirty_files" | sed 's/^/║    /')
+║                                                              ║
+║  未跟踪的文件 (untracked):                                     ║
+$(printf "%s\n" "$_untracked" | sed 's/^/║    /')
+║                                                              ║
+║  两条路，根据实际情况选:                                         ║
+║                                                              ║
+║  ① 这些修改没用 → 带 --force 直接丢弃:                          ║
+║      freely wt-close --raw-key $_raw_key --force             ║
+║      --reason "违规绕过门禁中，理由充分，是：<写清为什么丢弃>"    ║
+║                                                              ║
+║  ② 这些修改有用 → stash 暂存，开 raw issue 正规化:              ║
+║      cd $wt_path && git stash                                ║
+║      cd <project-root>                                       ║
+║      freely feedback --title "fix: ..." --kind fix \         ║
+║        --body "从 wt-close 拦截中恢复的修改: ..."               ║
+║      然后重新运行 freely wt-close --raw-key $_raw_key          ║
+║                                                              ║
+║  --force 什么都不检查直接删——确定没用就用它。                    ║
+╚══════════════════════════════════════════════════════════════╝
+WTCLOSE_DIRTY
+	        exit 1
+	      fi
+	    fi
+
+
     echo "wt-close: removing worktree $wt_path..."
     if FREELY_WT_BYPASS_GUARD=1 command git worktree remove "$wt_path" 2>/dev/null; then
       echo "wt-close: worktree removed ✓"

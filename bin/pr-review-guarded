@@ -108,6 +108,34 @@ pr_number=""
 echo "=== pr-review-guarded: $review_branch → $base ==="
 echo ""
 
+# ── Step 0: Worktree cleanliness check (入口闸门) ──
+_dirty_files=$(git -C "$ROOT_DIR" status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
+_untracked=$(git -C "$ROOT_DIR" ls-files --others --exclude-standard 2>/dev/null | head -20 || true)
+if [[ -n "$_dirty_files" ]] || [[ -n "$_untracked" ]]; then
+  cat >&2 <<DIRTY
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [PR-REVIEW] 工位有未提交的文件 — 审查前请先处理          ║
+╠══════════════════════════════════════════════════════════════╣
+║  带着未提交的修改做审查，审查的代码可能和最终合并的不一致。     ║
+║                                                              ║
+║  未提交的修改 (tracked):                                       ║
+$(printf "%s\n" "$_dirty_files" | sed 's/^/║    /')
+║                                                              ║
+║  未跟踪的文件 (untracked):                                     ║
+$(printf "%s\n" "$_untracked" | sed 's/^/║    /')
+║                                                              ║
+║  请检查以上文件，判断是遗漏提交还是无需提交:                     ║
+║    遗漏了 → git add <files> && git commit -m "..."           ║
+║    暂不用 → git stash                (保存稍后恢复)           ║
+║    不追踪 → echo <pattern> >> .gitignore  (明确忽略)          ║
+║                                                              ║
+║  ❌ 不要用 git reset --hard 或 git clean -f 直接丢弃          ║
+╚══════════════════════════════════════════════════════════════╝
+DIRTY
+  exit 1
+fi
+echo "Step 0/5: worktree clean ✓"
+
 # ── Step 1: Find PR number ──
 if command -v gh &>/dev/null; then
   pr_number=$(gh pr list --repo chatterzhao/freely --head "$review_branch" --state open --json number -q '.[0].number' 2>/dev/null || true)
@@ -546,6 +574,37 @@ _platform_remote_name() {
   echo ""
   echo "Next steps:"
   echo "  freely pr-merge-guarded $base $review_branch"
+
+  # ── Step 5: Post-commit cleanliness check (出口闸门) ──
+  _dirty_files=$(git -C "$ROOT_DIR" status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
+  _untracked=$(git -C "$ROOT_DIR" ls-files --others --exclude-standard 2>/dev/null | head -20 || true)
+  if [[ -n "$_dirty_files" ]] || [[ -n "$_untracked" ]]; then
+    cat >&2 <<DIRTY
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [PR-REVIEW] Review 完成后仍有未提交的文件                ║
+╠══════════════════════════════════════════════════════════════╣
+║  Review 文档已自动提交，但工位仍有其他未提交的修改。            ║
+║  这些文件可能是 review 过程中产生的，不提交会在合并时丢失。     ║
+║                                                              ║
+║  未提交的修改 (tracked):                                       ║
+$(printf "%s\n" "$_dirty_files" | sed 's/^/║    /')
+║                                                              ║
+║  未跟踪的文件 (untracked):                                     ║
+$(printf "%s\n" "$_untracked" | sed 's/^/║    /')
+║                                                              ║
+║  请检查以上文件，判断是遗漏提交还是无需提交:                     ║
+║    遗漏了 → git add <files> && git commit -m "review: ..."   ║
+║    暂不用 → git stash                                         ║
+║    不追踪 → echo <pattern> >> .gitignore                       ║
+║                                                              ║
+║  提交后重新运行:                                               ║
+║    freely pr-merge-guarded $base $review_branch              ║
+╚══════════════════════════════════════════════════════════════╝
+DIRTY
+    exit 1
+  fi
+  echo "Step 5/5: post-review worktree clean ✓"
+
   exit 0
 
 elif [[ "$_review_verdict" == "manual_required" ]]; then

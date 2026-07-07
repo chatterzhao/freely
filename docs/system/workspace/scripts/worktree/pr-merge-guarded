@@ -651,6 +651,35 @@ LOCAL_REMOTE_SYNC
   # Mirrors pr-review-guarded: review → commit → push → merge.
   echo "[MERGE-GUARD] issue-sync before merge..."
   _sync_issues_changed_in_merge "$source_branch" "$target" || true
+  # ── Worktree cleanliness check (最后防线) ──
+  _dirty_files=$(git status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
+  _untracked=$(git ls-files --others --exclude-standard 2>/dev/null | head -20 || true)
+  if [[ -n "$_dirty_files" ]] || [[ -n "$_untracked" ]]; then
+    cat >&2 <<MERGE_DIRTY
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [MERGE-GUARD] 工位有未提交的文件 — 合并前请先处理        ║
+╠══════════════════════════════════════════════════════════════╣
+║  可能是之前 review 阶段产生了未提交的修改。                     ║
+║  带着未提交的文件合并会导致这些修改丢失。                       ║
+║                                                              ║
+║  未提交的修改 (tracked):                                       ║
+$(printf "%s\n" "$_dirty_files" | sed 's/^/║    /')
+║                                                              ║
+║  未跟踪的文件 (untracked):                                     ║
+$(printf "%s\n" "$_untracked" | sed 's/^/║    /')
+║                                                              ║
+║  请检查以上文件，判断是遗漏提交还是无需提交:                     ║
+║    遗漏了 → git add <files> && git commit -m "review: ..."   ║
+║    暂不用 → git stash                                         ║
+║    不追踪 → echo <pattern> >> .gitignore                       ║
+║                                                              ║
+║  处理完成后重新运行:                                            ║
+║    freely pr-merge-guarded $target $source_branch            ║
+╚══════════════════════════════════════════════════════════════╝
+MERGE_DIRTY
+    return 1
+  fi
+
 
   echo "[MERGE-GUARD] performing local merge: $source_branch → $target"
   set +e; git merge --no-commit --no-ff "$source_branch"; local merge_rc=$?; set -e
