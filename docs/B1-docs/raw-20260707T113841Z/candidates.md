@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260707T113841Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T113841Z
 milestone: M-20260707T113841Z-A
 ---
@@ -9,7 +9,7 @@ milestone: M-20260707T113841Z-A
 
 - candidate_format_version: v2
 - title: feat — 三层审查保障：阶段指南 + 命令门禁 + 自动委派
-- status: promoted
+- status: absorbed
 - decision_reason: 在现有 A2A/SSE/ACP 架构上补三层：提示词层（phase-definitions）→ 指南层（review-guidelines）→ 命令层（pr-create-guarded + 签名检查 + 自动委派）
 - next_action: B2_IBM 物化 I-* issue → 实现 review-guidelines + phase-definitions + agent_working 改造 + pr-create-guarded gate 增强
 - revisit_trigger: 新增 workflow phase 时需要同步新增对应的 review-guidelines 和 phase-definitions
