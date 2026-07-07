@@ -294,6 +294,10 @@ MSG
   ❌ gh pr merge --admin (改用 freely pr-merge-guarded)
   ❌ git worktree remove --force (改用 freely wt-close)
   ❌ gh issue close (改用 freely wt-close --platform-only)
+
+[freely] 💡 你刚才想做的是 git commit → 对应封装命令是 freely pr-create-guarded
+[freely] 完整流程: feedback → wt-create → B1 → B2 → RED → dev → GREEN → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
+[freely] 被拦截了？从你当前阶段对应的命令重新开始。不要绕过门禁。
 MSG
     ;;
 esac

@@ -299,6 +299,23 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
 违反上述铁律的提交，即使在本地通过，CI 硬拦截也会阻止合并。
 
+## 意图→命令速查
+
+开发 Freely 时，从你的意图出发选择命令，不要直接操作 git/gh：
+
+| 你的意图 | ✅ 正确做法 | ❌ 错误做法 | 原因 |
+|---------|------------|-----------|------|
+| 报告 bug / 提需求 | `freely feedback --title "..." --kind fix --body "..."` | 直接 git commit 修 | 必须先有 raw issue，才能创建工位 |
+| 开始修 bug / 做功能 | `freely wt-create --raw-key <key> --source platform --kind fix\|feature --slug <slug>` | `git worktree add`, `git checkout -b` | wt-create 自动创建 dev + test 工位、同步 tooling |
+| 代码写完了提 PR | `freely pr-create-guarded` | `gh pr create`, `git push` | pr-create-guarded 先 pull develop、跑 dry-run gate、双平台同步 |
+| 请人 review | `freely pr-review-guarded <branch>` | — | 6 维独立 review + verdict 文档 |
+| review 通过想合并 | `freely pr-merge-guarded develop <branch>` | `gh pr merge`, `git merge` | pr-merge-guarded 跑全部门禁 + 双平台同步 |
+| 合并完了收工 | `freely wt-close --raw-key <key>` | `git worktree remove`, `git branch -D` | wt-close 同时关 test + dev 工位 + 双平台 close issue |
+| 同步 develop 到远程 | `freely develop-push attempt` | `git push --no-verify`, `git push --force` | 受控 push + 审计日志 |
+| 查看当前状态 | `freely live-status`, `freely fleet-status` | — | 工位/分支/运行时一览 |
+
+**每条封装命令都封装了多个步骤**。直接用 git/gh 命令 = 跳过流程 = 门禁拦截。被 hook 拦截了？上表告诉你应该用什么命令。完整封装说明见 `docs/system/workspace/commands.md`。
+
 ## 硬性规则
 
 - **流程顺序不可变**。`freely-doc-B1_IBM-execution` → `freely-doc-B2_IBM-execution` → `freely-test-RED-execution` → `freely-dev-loop-execution` → `freely-test-execution` → `freely pr-create-guarded`，fix 和 feature 一致。

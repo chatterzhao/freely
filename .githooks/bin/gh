@@ -3,25 +3,31 @@
 case "$*" in
   *"pr create"*|*"pr new"*)
     cat >&2 <<'MSG'
-[BLOCKED] gh pr create is not allowed directly.
-  Use the canonical command: freely pr-create-guarded
-  This ensures: pull develop → dry-run gate → push → create PR.
+[BLOCKED] gh pr create 不允许直接使用。
+  直接用 gh pr create = 跳过 pull develop、dry-run gate、push 门禁。
+
+  ✅ 使用封装命令: freely pr-create-guarded
+     它封装了: pull develop → 冲突处理 → dry-run gate → 双平台 push → 双平台创建 PR
 MSG
     exit 1
     ;;
   *"pr merge"*)
     cat >&2 <<'MSG'
-[BLOCKED] gh pr merge is not allowed.  Even --admin.
-  Use the canonical command: freely pr-merge-guarded develop <branch>
-  This runs all governance gates, merges, and pushes to develop.
+[BLOCKED] gh pr merge 不允许直接使用。即使 --admin 也不行。
+  直接用 gh pr merge = 跳过 PR gate、promotion gate、双平台同步。
+
+  ✅ 使用封装命令: freely pr-merge-guarded develop <branch>
+     它封装了: PR gate → promotion gate → merge → develop-push → 双平台同步
 MSG
     exit 1
     ;;
   *"issue close"*|*"issue reopen"*)
     cat >&2 <<'MSG'
-[BLOCKED] gh issue close/reopen is not allowed directly.
-  Use the canonical command: freely wt-close --raw-key <key> --platform-only
-  This ensures BOTH platforms (GitHub + Gitee) are synced.
+[BLOCKED] gh issue close/reopen 不允许直接使用。
+  直接用 gh issue close = 只关了一个平台，另一个平台 issue 会残留在 open 状态。
+
+  ✅ 使用封装命令: freely wt-close --raw-key <key> --platform-only
+     它封装了: 双平台 close issue（GitHub + Gitee）
 MSG
     exit 1
     ;;

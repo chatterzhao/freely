@@ -2,19 +2,21 @@
 
 ## Freely 命令速查 — 禁止使用原始 git/gh 命令
 
-所有操作必须通过 freely 封装命令。下表列出每个场景的正确命令:
+所有操作必须通过 freely 封装命令。下表从"你想做什么"出发，列出每个场景的正确命令及其封装了什么:
 
-| 场景 | ✅ 正确命令 | ❌ 禁止 |
-|------|-----------|--------|
-| 创建 raw issue | `freely feedback --title "..." --kind fix\|feature --body "..."` | gh issue create |
-| 创建开发工位 | `freely wt-create --raw-key <key> --source platform --kind fix\|feature --slug <slug>` | git worktree add, git checkout -b |
-| 提 PR | `freely pr-create-guarded` | gh pr create, git push |
-| Review PR | `freely pr-review-guarded <branch>` | — |
-| 合并 PR | `freely pr-merge-guarded develop <branch>` | gh pr merge, git merge |
-| 收口工位 | `freely wt-close --raw-key <key>` | git worktree remove, git branch -D |
-| 关 issue (双平台) | `freely wt-close --raw-key <key> --platform-only` | gh issue close |
-| 平台同步 | `freely develop-push attempt` | git push --no-verify |
-| 查看状态 | `freely live-status`, `freely fleet-status` | — |
+| 你想做什么 | ✅ 正确命令 | 它封装了什么 | ❌ 禁止 |
+|-----------|-----------|-------------|--------|
+| 报告 bug / 提需求 | `freely feedback --title "..." --kind fix\|feature --body "..."` | 创建 raw issue → 双平台同步（GitHub + Gitee）→ 纳入扫描发现 | gh issue create |
+| 开始修 bug / 做功能 | `freely wt-create --raw-key <key> --source platform --kind fix\|feature --slug <slug>` | 创建 dev worktree + test-pre-merge 工位 → sync-tooling → cd 到工位 | git worktree add, git checkout -b |
+| 代码写完了准备提 PR | `freely pr-create-guarded` | pull develop → 冲突处理 → dry-run gate → 双平台 push → 双平台创建 PR | gh pr create, git push |
+| 请人 review PR | `freely pr-review-guarded <branch>` | 6 维独立 review → verdict 文档 | — |
+| review 通过想合并 | `freely pr-merge-guarded develop <branch>` | PR gate → promotion gate → merge → develop-push → 双平台同步 | gh pr merge, git merge |
+| 合并完了收工 | `freely wt-close --raw-key <key>` | 关闭 test + dev worktree → 双平台 close issue → 清理分支 | git worktree remove, git branch -D |
+| 只关双平台 issue | `freely wt-close --raw-key <key> --platform-only` | 双平台 close issue（GitHub + Gitee） | gh issue close |
+| 同步 develop 到远程 | `freely develop-push attempt` | 受控 develop push → 审计日志 | git push --no-verify, git push --force |
+| 查看当前状态 | `freely live-status`, `freely fleet-status` | 工位/分支/运行时状态一览 | — |
+
+**每条封装命令都封装了多个步骤**。直接用 git/gh 命令 = 跳过这些步骤 = 门禁拦截。
 
 任何绕过上述封装命令的行为（--no-verify, --force, --admin）都会被门禁拦截。
 
