@@ -3189,3 +3189,12 @@
 - milestone: M-20260707T085628Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T085628Z-A`
+
+## M-20260707T113841Z-A
+- title: feat — 多阶段强制 Review 门禁
+- status: active
+### candidate_issues
+1. `C-20260707T113841Z-A`
+- milestone: M-20260707T113841Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T113841Z-A`
