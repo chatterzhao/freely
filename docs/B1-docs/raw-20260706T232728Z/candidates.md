@@ -10,7 +10,7 @@ milestone: M-20260706T232728Z-A
 
 - candidate_format_version: v2
 - title: 封装命令文档系统化 — 意图→命令映射 + 为什么用封装
-- status: promoted
+- status: absorbed
 - decision_reason: Option B — 集中 commands.md 作为权威参考 + 各触点嵌入场景化引导，覆盖所有用户触点
 - next_action: B2_IBM 物化 I-* issue + prd/pre-tests/tasks/code-reviews →
   实现 6 个文件的文档修改
