@@ -667,10 +667,10 @@ for p, info in fm.get('platform_ids', {}).items():
   else
     echo "wt-close: no local issue file, searching platform by raw key..."
     # Search GitHub for open issue containing the raw key in title
-    _po_raw_gh=$(gh issue list --repo chatterzhao/freely --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
+    _po_raw_gh=$(gh issue list --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
     if [[ -z "$_po_raw_gh" ]]; then
       # Try Gitee as fallback
-      _po_raw_gh=$(gitee issue list --repo zhaoquan/freely --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
+      _po_raw_gh=$(gitee issue list --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
     fi
   fi
   if [[ -n "$_po_raw_gh" ]]; then

@@ -138,7 +138,7 @@ echo "Step 0/5: worktree clean ✓"
 
 # ── Step 1: Find PR number ──
 if command -v gh &>/dev/null; then
-  pr_number=$(gh pr list --repo chatterzhao/freely --head "$review_branch" --state open --json number -q '.[0].number' 2>/dev/null || true)
+  pr_number=$(gh pr list --head "$review_branch" --state open --json number -q '.[0].number' 2>/dev/null || true)
 fi
 if [[ -z "$pr_number" ]]; then
   pr_number="local"

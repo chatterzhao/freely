@@ -3204,3 +3204,18 @@
 - milestone: M-20260707T113841Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T113841Z-A`
+
+## M-20260707T134101Z-A
+- title: fix — 平台硬编码清理 + issue-sync 顺序修复
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T134101Z-A`
+- milestone: M-20260707T134101Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T134101Z/issues/I-20260707T134101Z-A.md
+### completed_issues
+1. `C-20260707T134101Z-A`
+- milestone: M-20260707T134101Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T134101Z-A`

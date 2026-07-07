@@ -430,27 +430,18 @@ _sync_prs_across_platforms() {
   local source_branch="$1"
   [[ -n "$source_branch" ]] || return 0
 
-  for platform in gitee; do
-    local cli=""
-    case "$platform" in
-      gitee) command -v gitee >/dev/null 2>&1 && cli="gitee" ;;
+  # Use platform-adapter to close PRs on all non-GitHub platforms.
+  # GitHub PRs are auto-closed by the merge commit push.
+  local _adapter="$PWD/docs/system/workspace/scripts/sync/platform-adapter.py"
+  for platform in $(git remote | grep -v "^all$"); do
+    case "$(git remote get-url "$platform" 2>/dev/null || true)" in
+      *github.com*|*github-*|*github*) continue ;;
     esac
-    [[ -n "$cli" ]] || continue
-
-    local pr_number
-    pr_number="$("$cli" pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
-    if [[ -z "$pr_number" ]]; then
-      continue
+    echo "[MERGE-GUARD] closing $platform PRs via platform-adapter..."
+    if [[ -f "$_adapter" ]]; then
+      python3 "$_adapter" close-pr "$platform" "$source_branch" 2>/dev/null || true
     fi
-
-    echo "[MERGE-GUARD] closing $platform PR #$pr_number (merged via GitHub)..."
-    "$cli" pr close "$pr_number" --comment "Merged via pr-merge-guarded; develop synced from GitHub." 2>/dev/null || true
-
-    local remote=""
-    git remote | grep -q '^gitee$' && remote="gitee" || remote="origin"
-    if [[ -n "$remote" ]]; then
-	      echo "[MERGE-GUARD] remote branch cleanup deferred to wt-close for $source_branch on $platform"
-    fi
+    echo "[MERGE-GUARD] remote branch cleanup deferred to wt-close for $source_branch on $platform"
   done
 }
 
@@ -521,11 +512,29 @@ _sync_issues_changed_in_merge() {
     if [[ -d "$_wt_path" ]]; then
       git -C "$_wt_path" add docs/B1-docs/ 2>/dev/null || true
       if ! git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
-        git -C "$_wt_path" commit -m "chore: issue-sync before merge
+	        git -C "$_wt_path" commit -m "chore: issue-sync before merge
 
 Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
-        git -C "$_wt_path" push origin "$_src_branch" 2>/dev/null || true
-        echo "[MERGE-GUARD] issue-sync committed + pushed to $_src_branch"
+	        # ── Auto-sync test worktree ──
+	        # After committing in fix worktree, merge to test so dev↔test stays consistent.
+	        _raw_key=$(echo "$_src_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+	        if [[ -n "$_raw_key" ]]; then
+	          _test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-$_raw_key" '
+	            $1=="worktree" { wt=$2 }
+	            $1=="branch" && $2 ~ k { print wt; exit }
+	          ')
+	          if [[ -n "$_test_wt" && -d "$_test_wt" ]]; then
+	            git -C "$_test_wt" merge "$_src_branch" 2>/dev/null && \
+	              echo "[MERGE-GUARD] test worktree synced with issue-sync commit" || true
+	          fi
+	        fi
+	        # ── Push to all remotes ──
+	        if git -C "$_wt_path" remote | grep -q "^all$"; then
+	          git -C "$_wt_path" push all "$_src_branch" 2>/dev/null || true
+	        else
+	          git -C "$_wt_path" push origin "$_src_branch" 2>/dev/null || true
+	        fi
+	        echo "[MERGE-GUARD] issue-sync committed + pushed to $_src_branch"
         # Refresh source branch ref after push
         git fetch origin "$_src_branch" 2>/dev/null || true
       fi
