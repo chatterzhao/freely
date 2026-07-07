@@ -3095,3 +3095,18 @@
 - milestone: M-20260707T025106Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T025106Z-A`
+
+## M-20260707T003943Z-A
+- title: fix — Gitee assignee API 修复
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T003943Z-A`
+- milestone: M-20260707T003943Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T003943Z/issues/I-20260707T003943Z-A.md
+### completed_issues
+1. `C-20260707T003943Z-A`
+- milestone: M-20260707T003943Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T003943Z-A`

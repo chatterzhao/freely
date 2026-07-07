@@ -573,9 +573,16 @@ def get_assignees(platform: str, issue_number: str) -> list[str]:
             return []
     elif platform == "gitee":
         try:
-            r = _gitee_api("GET", f"repos/{_gitee_repo()}/issues/{issue_number}")
-            assignee = r.get("assignee", {}) or {}
-            login = assignee.get("login", "")
+            result = subprocess.run(
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "get", str(issue_number)],
+                capture_output=True, text=True
+            )
+            if result.returncode != 0:
+                return []
+            issue = json.loads(result.stdout)
+            assignee = (issue or {}).get("assignee") or {}
+            login = (assignee or {}).get("login", "")
             return [login] if login else []
         except Exception:
             return []
@@ -608,10 +615,15 @@ def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, st
         except Exception as e:
             return False, f"Failed to assign on GitHub: {e}"
     elif platform == "gitee":
-        # Gitee uses PATCH to update issue assignee
         try:
-            _gitee_api("PATCH", f"repos/{_gitee_repo()}/issues/{issue_number}",
-                       data={"assignee": login})
+            result = subprocess.run(
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "update", str(issue_number),
+                 "--assignee", login],
+                capture_output=True, text=True
+            )
+            if result.returncode != 0:
+                return False, f"Failed to assign on Gitee: {result.stderr.strip()}"
             return True, f"Assigned {login} to Gitee #{issue_number}"
         except Exception as e:
             return False, f"Failed to assign on Gitee: {e}"
@@ -630,10 +642,14 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
             ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
             print(f"[assignee] {plat}: {msg}", file=sys.stderr)
             if not ok:
-                print(f"FATAL: {msg}", file=sys.stderr)
-                print(f"  The issue is already claimed by someone else.", file=sys.stderr)
-                print(f"  Coordinate with them or use a different raw key.", file=sys.stderr)
-                return None
+                # Distinguish: "claimed by others" → fatal; "claim failed" → warning
+                if "already assigned to" in msg.lower():
+                    print(f"FATAL: {msg}", file=sys.stderr)
+                    print(f"  The issue is already claimed by someone else.", file=sys.stderr)
+                    print(f"  Coordinate with them or use a different raw key.", file=sys.stderr)
+                    return None
+                else:
+                    print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
 
     # 1. Search on all platforms
     results = search_raw_issue(raw_key)
