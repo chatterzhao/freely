@@ -3100,10 +3100,6 @@
 - title: fix — Gitee assignee API 修复
 - status: active
 ### candidate_issues
-1. `C-20260707T003943Z-A`
-- milestone: M-20260707T003943Z-A
-- status: promoted
-- promoted_issue_id: `I-20260707T003943Z-A`
 ### committed_issues
 1. `I-20260707T003943Z-A`
 - milestone: M-20260707T003943Z-A

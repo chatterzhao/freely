@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260707T003943Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T003943Z
 created_at: 2026-07-07
 milestone: M-20260707T003943Z-A
@@ -10,7 +10,7 @@ milestone: M-20260707T003943Z-A
 
 - candidate_format_version: v2
 - title: fix — platform-adapter.py Gitee assignee API 调用兼容
-- status: promoted
+- status: absorbed
 - decision_reason: Option B — Gitee 路径改用 subprocess.run 直接调用 gitee-issue.py CLI 子命令
 - next_action: B2_IBM 物化 I-* issue → dev 完成实现 → pr → merge
 - revisit_trigger: gitee-issue.py CLI 接口变更时需要检查
