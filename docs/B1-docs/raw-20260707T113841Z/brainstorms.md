@@ -134,6 +134,26 @@ Option B: 自动 ACP 委派 ✅
 
 **Decision: Option B** — 优先自动委派，ACP 不可用降级为人工提示。
 
+**★ 关键约束：上游改动 → 下游全部作废**
+
+阶段间有依赖链。上游重做会 invalidate 下游所有 review signature：
+
+```
+B1 修了 → B2/RED/dev/GREEN review 签名全部作废
+B2 修了 → RED/dev/GREEN review 签名全部作废
+RED 修了 → dev/GREEN review 签名全部作废
+dev 修了 → GREEN review 签名作废
+```
+
+命令兜底不是"缺哪个审哪个"——是"从最先缺失的阶段开始，后面全部重来"。
+
+gate 检查逻辑：
+1. 找最先缺失 review 的 phase（如 B2）
+2. 阻塞 + 报告: "B2 及之后所有阶段 (B2→RED→dev→GREEN) 需要重新走"
+3. Worker 从 B2 重新开始 → B2→RED→dev→GREEN 全部重做
+4. 每个阶段完成后重新请求 review
+5. 全部 PASS 后重新 pr-create-guarded
+
 ### 子问题 4：Agent 提示词如何让 Worker 知道何时停止
 
 #### 当前问题
