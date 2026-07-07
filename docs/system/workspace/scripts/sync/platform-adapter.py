@@ -1,870 +1,640 @@
 #!/usr/bin/env python3
-"""Unified platform adapter for GitHub/Gitee issue sync.
-Usage:
-  from platform_adapter import sync_create, sync_comment, sync_close
+"""Unified platform adapter — Handler registry pattern.
 
-  # Each function takes identical params, dispatches to all configured platforms
-  result = sync_create(local_id="I-xxx", title="...", body="...")
-  # -> {"github": {"issue_id": "42", "url": "..."}, "gitee": {"issue_id": "17", "url": "..."}}
+New platforms: write a PlatformHandler subclass + call register(). Done.
+No changes needed to any public function or existing caller.
+
+Usage:
+  from platform_adapter import create_issue, close_issue, create_pr, ...
+  result = create_issue(local_id="I-xxx", title="...", body="...")
+  # -> {"github": {"issue_id": "42", ...}, "gitee": {"issue_id": "17", ...}}
 """
 from __future__ import annotations
-import json
-import os
-import re
-import subprocess
-import sys
+import json, os, re, subprocess, sys
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 
-_ADAPTER_DIR = Path(__file__).resolve().parent       # .../scripts/sync/
-_SCRIPTS_DIR = _ADAPTER_DIR.parent                    # .../scripts/
-_RUNTIME_DIR = _SCRIPTS_DIR / "runtime"              # .../scripts/runtime/
+_ADAPTER_DIR = Path(__file__).resolve().parent
+_SCRIPTS_DIR = _ADAPTER_DIR.parent
+_RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
 sys.path.insert(0, str(_RUNTIME_DIR))
-
 from freely_user_env import value as freely_env_value
 
+# ══════════════════════════════════════════════
+# Abstract PlatformHandler — new platform? subclass this.
+# ══════════════════════════════════════════════
 
-def _gh(*args: str, check: bool = True) -> subprocess.CompletedProcess:
-    """Run gh CLI command."""
-    return subprocess.run(["gh", *args], capture_output=True, text=True, check=check)
+class PlatformHandler(ABC):
+    @property
+    @abstractmethod
+    def name(self) -> str: ...
+    @abstractmethod
+    def detect(self) -> bool: ...
+    def detect_repo(self) -> str: return ""
+    @abstractmethod
+    def create_issue(self, title: str, body: str) -> dict: ...
+    @abstractmethod
+    def close_issue(self, issue_number: str) -> dict: ...
+    def add_comment(self, issue_number: str, comment_body: str) -> dict:
+        return {"status": "error", "error": "not implemented"}
+    def update_issue(self, issue_number: str, title: str = "", body: str = "") -> dict:
+        return {"status": "error", "error": "not implemented"}
+    def get_issue_state(self, issue_number: str) -> Optional[str]: return None
+    def search_raw_issue(self, raw_key: str) -> Optional[dict]: return None
+    def fetch_issue(self, issue_number: str) -> dict: return {}
+    def create_pr(self, branch: str, base: str, title: str, body: str) -> dict:
+        return {"status": "error", "error": "not implemented"}
+    def merge_pr(self, pr_number: str) -> dict:
+        return {"status": "error", "error": "not implemented"}
+    def close_pr(self, pr_number: str) -> dict:
+        return {"status": "error", "error": "not implemented"}
+    def get_assignees(self, issue_number: str) -> list[str]: return []
+    def set_assignee(self, issue_number: str, login: str) -> tuple[bool, str]:
+        return False, "not implemented"
+    def list_open_issues(self) -> dict[str, str]: return {}
 
+# ══════════════════════════════════════════════
+# Registry
+# ══════════════════════════════════════════════
 
-def _gitee_api(method: str, path: str, data: Optional[dict] = None) -> dict:
-    """Call Gitee API via the project's gitee-issue module."""
-    result = subprocess.run(
-        [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-         "--repo", _gitee_repo(),
-         method, *([json.dumps(data)] if data else [])],
-        capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"Gitee {method} failed: {result.stderr.strip()}")
-    return {"ok": True, "output": result.stdout.strip()}
+_registry: list[PlatformHandler] = []
 
+def register(handler: PlatformHandler):
+    _registry.append(handler)
 
-def _gh_repo() -> str:
-    """Detect GitHub repo from gh CLI."""
-    try:
-        return _gh("repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner").stdout.strip()
-    except Exception:
-        return ""
+def _handlers() -> list[PlatformHandler]:
+    return [h for h in _registry if h.detect()]
 
-
-def _gitee_repo() -> str:
-    """Detect Gitee repo from git remotes."""
-    try:
-        result = subprocess.run(
-            ["git", "remote", "-v"], capture_output=True, text=True
-        )
-        for line in result.stdout.splitlines():
-            m = re.search(r"gitee[^:/]*[:/]([^/\s]+/[^/\s]+)", line)
-            if m:
-                repo = m.group(1); return repo.replace('.git', '')
-    except Exception:
-        pass
-    return ""
-
-
-def available_platforms() -> list[str]:
-    """Return list of platforms that are configured and accessible."""
-    platforms = []
-    if _gh_repo():
-        platforms.append("github")
-    if _gitee_repo() and freely_env_value("GITEE_ACCESS_TOKEN", "GITEE_TOKEN"):
-        platforms.append("gitee")
-    return platforms
-
-
-def list_open_issues(platforms: list[str]) -> dict[str, str]:
-    """List OPEN issues across all configured platforms. Returns union {number: state}.
-    Used by scan's fetch_open_platform_issues to avoid hardcoding gh CLI.
-    """
-    result: dict[str, str] = {}
-    for p in platforms:
-        try:
-            if p == "github":
-                repo = _gh_repo()
-                if not repo:
-                    continue
-                proc = subprocess.run(
-                    ["gh", "issue", "list", "--repo", repo,
-                     "--state", "open", "--limit", "200",
-                     "--json", "number,state"],
-                    capture_output=True, text=True, timeout=30)
-                if proc.returncode == 0:
-                    for issue in json.loads(proc.stdout):
-                        result[str(issue["number"])] = issue.get("state", "OPEN")
-            elif p == "gitee":
-                proc = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "list",
-                     "--state", "open", "--per-page", "50"],
-                    capture_output=True, text=True, timeout=30)
-                if proc.returncode == 0:
-                    for issue in json.loads(proc.stdout):
-                        num = str(issue.get("number", issue.get("id", "")))
-                        if num:
-                            result[num] = issue.get("state", "OPEN")
-        except Exception:
-            continue
-    return result
-
-
-def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
-    """Fetch issue state from a single platform. Returns 'OPEN'/'CLOSED' or None."""
-    try:
-        if platform == "github":
-            proc = subprocess.run(
-                ["gh", "issue", "view", str(issue_number), "--json", "state"],
-                capture_output=True, text=True, timeout=10)
-            if proc.returncode == 0:
-                return json.loads(proc.stdout).get("state", "")
-        elif platform == "gitee":
-            proc = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "get", str(issue_number)],
-                capture_output=True, text=True, timeout=10)
-            if proc.returncode == 0:
-                data = json.loads(proc.stdout)
-                return data.get("state", "").upper()
-    except Exception:
-        pass
+def _handler_for(platform: str) -> Optional[PlatformHandler]:
+    for h in _registry:
+        if h.name == platform and h.detect():
+            return h
     return None
 
+# ══════════════════════════════════════════════
+# GitHub Handler
+# ══════════════════════════════════════════════
 
-def configured_platforms() -> list[str]:
-    """Read FREELY_REPO_PLATFORMS from config/env. Falls back to auto-detection."""
-    csv = os.environ.get("FREELY_REPO_PLATFORMS", "")
-    platforms = [p.strip() for p in csv.split(",") if p.strip()]
-    if not platforms:
-        platforms = available_platforms()
-    return platforms
+class GitHubHandler(PlatformHandler):
+    name = "github"
 
-
-# ---- Unified public API ----
-
-def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
-    """Create an issue on all configured platforms. Returns per-platform results."""
-    results = {}
-    for platform in available_platforms():
+    def detect(self) -> bool:
         try:
-            if platform == "github":
-                result = _gh("issue", "create", "--repo", _gh_repo(),
-                            "--title", title, "--body", body)
-                url = result.stdout.strip()
-                num = url.split("/")[-1]
-                results[platform] = {"issue_id": num, "url": url, "status": "created"}
-            elif platform == "gitee":
-                # Use gitee-issue.py CLI
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "create",
-                     "--title", title, "--body", body],
-                    capture_output=True, text=True
-                )
-                if result.returncode != 0:
-                    results[platform] = {"status": "error", "error": result.stderr.strip()[:200]}
-                else:
-                    # Parse issue number from response
-                    output = result.stdout.strip()
-                    m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', output)
-                    num = m.group(1) if m else "?"
-                    results[platform] = {"issue_id": num, "status": "created"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dict[str, dict]:
-    """Add a comment to an issue on all configured platforms.
-
-    Blocks new comments on closed issues (#3302). Comment sync (issue-sync)
-    is exempt — it pushes locally-recorded comments made while the issue was open.
-    """
-    results = {}
-    for platform in available_platforms():
-        try:
-            # Check if platform issue is closed before commenting (#3302)
-            issue_state = _get_issue_state(platform, platform_issue_id)
-            if issue_state and issue_state.lower() == "closed":
-                results[platform] = {
-                    "status": "blocked",
-                    "error": (
-                        f"Issue #{platform_issue_id} is CLOSED on {platform}. "
-                        "Cannot create new comments on closed issues. "
-                        "Re-open the issue first, or create a new raw issue via 'freely feedback'."
-                    ),
-                }
-                continue
-
-            if platform == "github":
-                _gh("issue", "comment", "--repo", _gh_repo(),
-                    platform_issue_id, "--body", comment_body)
-                results[platform] = {"status": "created"}
-            elif platform == "gitee":
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "comment", platform_issue_id, "--body", comment_body],
-                    capture_output=True, text=True
-                )
-                results[platform] = {"status": "created" if result.returncode == 0 else "error"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def create_discussion(session_id: str, title: str, body: str = "") -> dict[str, dict]:
-    """Create a discussion on platforms that support it. Returns per-platform results.
-    Gitee is excluded — no Discussions feature."""
-    results = {}
-    for platform in available_platforms():
-        if platform == "gitee":
-            results[platform] = {"status": "skipped", "reason": "平台不支持 Discussions"}
-            continue
-        try:
-            if platform == "github":
-                result = _gh("api", "graphql", "-f", f"query={{repository(owner:\"{_gh_repo().split('/')[0]}\",name:\"{_gh_repo().split('/')[1]}\"){{createDiscussion(input:{{repositoryId:\"$(_gh_repo_id)\",categoryId:\"$(_gh_discussion_category_id)\",title:\"{title}\",body:\"{body}\"}}){{discussion{{id number}}}}}}}}")
-                results[platform] = {"status": "created", "discussion_id": "?", "url": ""}
-            elif platform == "gitcode":
-                # GitCode Discussions API via REST
-                results[platform] = {"status": "pending", "reason": "GitCode discussion API待实现"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
-    """Close a discussion on all platforms that have an ID."""
-    results = {}
-    for platform, info in platform_ids.items():
-        if platform == "gitee":
-            continue
-        disc_id = info.get("discussion_id", "") if isinstance(info, dict) else info
-        if not disc_id:
-            continue
-        try:
-            if platform == "github":
-                # Close via GraphQL mutation
-                results[platform] = {"status": "closed"}
-            elif platform == "gitcode":
-                results[platform] = {"status": "pending", "reason": "GitCode close API待实现"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict]:
-    """Add comment to ALL configured platforms. Uses local issue.md platform_ids first,
-    falls back to searching platform by raw-key if a platform's issue_id is missing."""
-    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
-    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
-    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
-    # 1. Read known platform_ids from local issue.md
-    platform_ids = {}
-    if issue_file.exists():
-        text = issue_file.read_text(encoding="utf-8")
-        for plat in ("github", "gitee"):
-            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
-            if m:
-                platform_ids[plat] = m.group(1)
-    # 2. For configured platforms missing from local file, search by raw-key
-    for plat in available_platforms():
-        if plat not in platform_ids or not platform_ids[plat]:
-            results = search_raw_issue(raw_key)
-            if plat in results:
-                platform_ids[plat] = results[plat].get("issue_number", "")
-    if not platform_ids:
-        return {"error": "no platform issue found for " + local_id}
-    # 3. Post comment to each platform with its correct issue_id
-    all_results = {}
-    for plat, num in platform_ids.items():
-        if not num or num == "?":
-            all_results[plat] = {"status": "error", "error": f"no issue_id for platform {plat}"}
-            continue
-        try:
-            if plat == "github":
-                _gh("issue", "comment", "--repo", _gh_repo(), str(num), "--body", comment_body)
-                all_results[plat] = {"status": "created"}
-            elif plat == "gitee":
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "comment", str(num), "--body", comment_body],
-                    capture_output=True, text=True
-                )
-                all_results[plat] = {"status": "created" if result.returncode == 0 else "error"}
-        except Exception as e:
-            all_results[plat] = {"status": "error", "error": str(e)[:200]}
-    return all_results
-
-
-def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
-    """Get the state (open/closed) of a platform issue. Returns None if unknown."""
-    try:
-        if platform == "github":
-            result = subprocess.run(
-                ["gh", "issue", "view", issue_id, "--repo", _gh_repo(),
-                 "--json", "state", "--jq", ".state"],
-                capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                return result.stdout.strip()
-        elif platform == "gitee":
-            # Gitee: use 'get' subcommand and parse JSON state field
-            result = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "get", issue_id],
-                capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                data = json.loads(result.stdout)
-                return str(data.get("state", "")).lower()
-    except Exception:
-        pass
-    return None
-
-
-def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
-    """Close an issue on all configured platforms."""
-    results = {}
-    for platform in available_platforms():
-        try:
-            if platform == "github":
-                _gh("issue", "close", "--repo", _gh_repo(), platform_issue_id)
-                results[platform] = {"status": "closed"}
-            elif platform == "gitee":
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "close", platform_issue_id],
-                    capture_output=True, text=True
-                )
-                results[platform] = {"status": "closed" if result.returncode == 0 else "error"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str = "") -> dict[str, dict]:
-    """Update an issue on all configured platforms.
-
-    platform_ids is a dict mapping platform -> {issue_id, url, ...}, e.g.:
-      {"github": {"issue_id": "42", "url": "..."}, "gitee": {"issue_id": "17", ...}}
-    """
-    results = {}
-    if not isinstance(platform_ids, dict):
-        platform_ids = {}
-    for platform in available_platforms():
-        piv = platform_ids.get(platform, {})
-        if piv is None:
-            piv = {}
-        issue_id = piv.get("issue_id", "") if isinstance(piv, dict) else str(piv)
-        if not issue_id:
-            results[platform] = {"status": "skipped", "error": f"no issue_id for {platform}"}
-            continue
-        try:
-            if platform == "github":
-                args = ["issue", "edit", "--repo", _gh_repo(), issue_id]
-                if title:
-                    args += ["--title", title]
-                if body:
-                    args += ["--body", body]
-                _gh(*args)
-                results[platform] = {"status": "updated"}
-            elif platform == "gitee":
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "update", issue_id,
-                     *(["--title", title] if title else []),
-                     *(["--body", body] if body else [])],
-                    capture_output=True, text=True
-                )
-                results[platform] = {"status": "updated" if result.returncode == 0 else "error"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-# ---- raw-issue-pull: find and materialize raw issues from platforms ----
-
-def search_raw_issue(raw_key: str) -> dict[str, dict]:
-    """Search all platforms for an OPEN issue matching raw-{key}.
-    Returns {platform: {issue_number, title, url}} or empty dict if not found.
-    """
-    results = {}
-    for platform in available_platforms():
-        try:
-            if platform == "github":
-                repo = _gh_repo()
-                if not repo:
-                    continue
-                result = _gh("issue", "list", "--repo", repo, "--state", "open",
-                           "--search", f"raw-{raw_key} in:title", "--limit", "5",
-                           "--json", "number,title,url", check=False)
-                if result.returncode == 0 and result.stdout.strip():
-                    issues = json.loads(result.stdout)
-                    for issue in issues:
-                        title = issue.get("title", "")
-                        if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                            results[platform] = {
-                                "issue_number": str(issue["number"]),
-                                "title": title,
-                                "url": issue.get("url", ""),
-                            }
-                            break
-                # Fallback: search raw_key in body
-                if platform not in results:
-                    result = _gh("issue", "list", "--repo", repo, "--state", "open",
-                               "--search", f"raw-{raw_key} in:body", "--limit", "5",
-                               "--json", "number,title,url", check=False)
-                    if result.returncode == 0 and result.stdout.strip():
-                        issues = json.loads(result.stdout)
-                        for issue in issues:
-                            results[platform] = {
-                                "issue_number": str(issue["number"]),
-                                "title": issue.get("title", ""),
-                                "url": issue.get("url", ""),
-                            }
-                            break
-            elif platform == "gitee":
-                result = subprocess.run(
-                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "list", "--state", "open", "--per-page", "50"],
-                    capture_output=True, text=True
-                )
-                if result.returncode == 0:
-                    try:
-                        issues = json.loads(result.stdout)
-                    except Exception:
-                        issues = []
-                    for issue in issues:
-                        title = issue.get("title", "")
-                        if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                            results[platform] = {
-                                "issue_number": str(issue.get("number", issue.get("id", ""))),
-                                "title": title,
-                                "url": issue.get("html_url", issue.get("url", "")),
-                            }
-                            break
-                    # Fallback: search raw_key in body
-                    if platform not in results:
-                        for issue in issues:
-                            body = issue.get("body", "") or ""
-                            if f"raw-{raw_key}" in body:
-                                results[platform] = {
-                                    "issue_number": str(issue.get("number", issue.get("id", ""))),
-                                    "title": issue.get("title", ""),
-                                    "url": issue.get("html_url", issue.get("url", "")),
-                                }
-                                break
+            subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner"],
+                          capture_output=True, timeout=10, check=True)
+            return True
         except Exception:
-            continue
-    return results
+            return False
 
+    def detect_repo(self) -> str:
+        try:
+            r = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner",
+                               "-q", ".nameWithOwner"], capture_output=True, text=True, timeout=10)
+            return r.stdout.strip()
+        except Exception:
+            return ""
 
-def fetch_issue(platform: str, issue_number: str) -> dict:
-    """Fetch full issue details from a platform.
-    Returns dict with title, body, created_at, updated_at, labels, state or empty dict on failure.
-    """
-    try:
-        if platform == "github":
-            repo = _gh_repo()
-            result = _gh("issue", "view", issue_number, "--repo", repo,
-                       "--json", "title,body,createdAt,updatedAt,labels,state",
-                       check=False)
-            if result.returncode == 0 and result.stdout.strip():
-                data = json.loads(result.stdout)
-                return {
-                    "title": data.get("title", ""),
-                    "body": data.get("body", ""),
-                    "created_at": data.get("createdAt", ""),
-                    "updated_at": data.get("updatedAt", ""),
-                    "labels": [l["name"] for l in data.get("labels", [])],
-                    "state": data.get("state", "").upper(),
-                }
-        elif platform == "gitee":
-            result = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "get", issue_number],
-                capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                data = json.loads(result.stdout)
-                return {
-                    "title": data.get("title", ""),
-                    "body": data.get("body", ""),
-                    "created_at": data.get("created_at", ""),
-                    "updated_at": data.get("updated_at", ""),
-                    "labels": [l.get("name", "") for l in data.get("labels", [])],
-                    "state": data.get("state", "").upper(),
-                }
-    except Exception:
-        pass
-    return {}
+    def _repo(self) -> str: return self.detect_repo()
 
+    def create_issue(self, title, body):
+        r = subprocess.run(["gh", "issue", "create", "--repo", self._repo(), "--title", title, "--body", body],
+                          capture_output=True, text=True)
+        if r.returncode != 0:
+            return {"status": "error", "error": r.stderr[:200]}
+        url = r.stdout.strip()
+        return {"issue_id": url.split("/")[-1], "url": url, "status": "created"}
 
-def _resolve_issue_state(local_id: str) -> str:
-    """Check if a raw issue is closed on all platforms. Returns 'closed' or 'open'."""
-    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
-    # Find platform issue IDs from local issue.md
-    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
-    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
-    platform_ids = {}
-    if issue_file.exists():
-        text = issue_file.read_text(encoding="utf-8")
-        for plat in ("github", "gitee"):
-            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
-            if m:
-                platform_ids[plat] = m.group(1)
-    if not platform_ids:
-        # Try platform search
-        results = search_raw_issue(raw_key)
-        for plat, info in results.items():
-            platform_ids[plat] = info.get("issue_number", "")
-    if not platform_ids:
-        return "unknown"
-    # Check each platform: if any is "open" or "unknown", return "open"
-    for plat, num in platform_ids.items():
-        if not num:
-            continue
-        state = _get_issue_state(plat, str(num))
-        if state and state.lower() not in ("closed",):
-            return "open"
-    return "closed"
+    def close_issue(self, issue_number):
+        r = subprocess.run(["gh", "issue", "close", "--repo", self._repo(), issue_number],
+                          capture_output=True, text=True)
+        return {"status": "closed" if r.returncode == 0 else "error",
+                "error": r.stderr[:200] if r.returncode != 0 else ""}
 
+    def add_comment(self, issue_number, comment_body):
+        r = subprocess.run(["gh", "issue", "comment", "--repo", self._repo(), issue_number, "--body", comment_body],
+                          capture_output=True, text=True)
+        return {"status": "created" if r.returncode == 0 else "error"}
 
-def _created_at_to_key(created_at: str) -> Optional[str]:
-    """Convert platform created_at to standard raw key.
-    "2026-05-06T10:00:35Z" → "20260506T100035Z"
-    """
-    try:
-        from datetime import datetime, timezone
-        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-        return dt.strftime("%Y%m%dT%H%M%SZ")
-    except Exception:
+    def update_issue(self, issue_number, title="", body=""):
+        args = ["gh", "issue", "edit", "--repo", self._repo(), issue_number]
+        if title: args += ["--title", title]
+        if body: args += ["--body", body]
+        r = subprocess.run(args, capture_output=True, text=True)
+        return {"status": "updated" if r.returncode == 0 else "error"}
+
+    def get_issue_state(self, issue_number):
+        try:
+            r = subprocess.run(["gh", "issue", "view", issue_number, "--repo", self._repo(),
+                               "--json", "state", "--jq", ".state"],
+                              capture_output=True, text=True, timeout=10)
+            return r.stdout.strip() if r.returncode == 0 else None
+        except Exception:
+            return None
+
+    def search_raw_issue(self, raw_key):
+        repo = self._repo()
+        if not repo: return None
+        try:
+            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
+                               "--search", f"raw-{raw_key} in:title", "--limit", "5",
+                               "--json", "number,title,url"],
+                              capture_output=True, text=True, timeout=15)
+            if r.returncode == 0 and r.stdout.strip():
+                for issue in json.loads(r.stdout):
+                    title = issue.get("title", "")
+                    if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
+                        return {"issue_number": str(issue["number"]), "title": title, "url": issue.get("url", "")}
+            r2 = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
+                                "--search", f"raw-{raw_key} in:body", "--limit", "5",
+                                "--json", "number,title,url"],
+                               capture_output=True, text=True, timeout=15)
+            if r2.returncode == 0 and r2.stdout.strip():
+                for issue in json.loads(r2.stdout):
+                    return {"issue_number": str(issue["number"]),
+                            "title": issue.get("title", ""), "url": issue.get("url", "")}
+        except Exception:
+            pass
         return None
 
-
-def _update_issue_title(platform: str, issue_number: str, new_title: str) -> bool:
-    """Update issue title on platform. Returns True on success."""
-    try:
-        if platform == "github":
-            _gh("issue", "edit", "--repo", _gh_repo(), issue_number, "--title", new_title)
-            return True
-        elif platform == "gitee":
-            result = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "update", issue_number,
-                 "--title", new_title],
-                capture_output=True, text=True
-            )
-            return result.returncode == 0
-    except Exception:
-        pass
-    return False
-
-
-def get_assignees(platform: str, issue_number: str) -> list[str]:
-    """Get list of assignee logins for an issue."""
-    if platform == "github":
+    def fetch_issue(self, issue_number):
         try:
-            r = _gh("api", f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
-                    "--jq", ".[].login")
+            r = subprocess.run(["gh", "issue", "view", issue_number, "--repo", self._repo(),
+                               "--json", "title,body,createdAt,updatedAt,labels,state"],
+                              capture_output=True, text=True, timeout=15)
+            if r.returncode == 0 and r.stdout.strip():
+                data = json.loads(r.stdout)
+                return {"title": data.get("title", ""), "body": data.get("body", ""),
+                        "created_at": data.get("createdAt", ""), "updated_at": data.get("updatedAt", ""),
+                        "labels": [l["name"] for l in data.get("labels", [])],
+                        "state": data.get("state", "").upper()}
+        except Exception:
+            pass
+        return {}
+
+    def create_pr(self, branch, base, title, body):
+        cmd = ["gh", "pr", "create", "--repo", self._repo(), "--head", branch, "--base", base]
+        if title: cmd.extend(["--title", title])
+        if body: cmd.extend(["--body", body])
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode == 0:
+            url = r.stdout.strip()
+            return {"url": url, "number": url.split("/")[-1] if url else "", "status": "created"}
+        return {"status": "error", "error": r.stderr[:200]}
+
+    def merge_pr(self, pr_number):
+        r = subprocess.run(["gh", "pr", "merge", pr_number, "--repo", self._repo(),
+                           "--squash", "--delete-branch"], capture_output=True, text=True)
+        return {"status": "merged", "platform": self.name, "number": pr_number} if r.returncode == 0 else {"status": "error", "error": r.stderr[:200]}
+
+    def close_pr(self, pr_number):
+        r = subprocess.run(["gh", "pr", "close", pr_number, "--repo", self._repo()],
+                          capture_output=True, text=True)
+        return {"status": "closed", "platform": self.name, "number": pr_number} if r.returncode == 0 else {"status": "error", "error": r.stderr[:200]}
+
+    def get_assignees(self, issue_number):
+        try:
+            r = subprocess.run(["gh", "api", f"repos/{self._repo()}/issues/{issue_number}/assignees", "--jq", ".[].login"],
+                              capture_output=True, text=True)
             return [line.strip() for line in r.stdout.splitlines() if line.strip()]
         except Exception:
             return []
-    elif platform == "gitee":
+
+    def set_assignee(self, issue_number, login):
         try:
-            result = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "get", str(issue_number)],
-                capture_output=True, text=True
-            )
-            if result.returncode != 0:
-                return []
-            issue = json.loads(result.stdout)
-            assignee = (issue or {}).get("assignee") or {}
-            login = (assignee or {}).get("login", "")
+            subprocess.run(["gh", "api", "--method", "POST",
+                           f"repos/{self._repo()}/issues/{issue_number}/assignees", "--input", "-"],
+                          input=f'{{"assignees":["{login}"]}}', text=True, check=True, capture_output=True)
+            return True, f"Assigned {login} to GitHub #{issue_number}"
+        except Exception as e:
+            return False, f"Failed to assign on GitHub: {e}"
+
+    def list_open_issues(self):
+        repo = self._repo()
+        if not repo: return {}
+        try:
+            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
+                               "--json", "number,state"], capture_output=True, text=True, timeout=30)
+            return {str(i["number"]): i.get("state", "OPEN") for i in json.loads(r.stdout)} if r.returncode == 0 and r.stdout.strip() else {}
+        except Exception:
+            return {}
+
+# ══════════════════════════════════════════════
+# Gitee Handler
+# ══════════════════════════════════════════════
+
+class GiteeHandler(PlatformHandler):
+    name = "gitee"
+
+    def detect(self) -> bool:
+        return bool(freely_env_value("GITEE_ACCESS_TOKEN", "GITEE_TOKEN")) and bool(self.detect_repo())
+
+    def detect_repo(self) -> str:
+        try:
+            r = subprocess.run(["git", "remote", "-v"], capture_output=True, text=True)
+            for line in r.stdout.splitlines():
+                m = re.search(r"gitee[^:/]*[:/]([^/\s]+/[^/\s]+)", line)
+                if m: return m.group(1).replace('.git', '')
+        except Exception:
+            pass
+        return ""
+
+    def _repo(self) -> str: return self.detect_repo()
+
+    def _run(self, *args):
+        return subprocess.run([sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                               "--repo", self._repo(), *args], capture_output=True, text=True)
+
+    def create_issue(self, title, body):
+        r = self._run("create", "--title", title, "--body", body)
+        if r.returncode != 0: return {"status": "error", "error": r.stderr.strip()[:200]}
+        m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', r.stdout.strip())
+        return {"issue_id": m.group(1) if m else "?", "status": "created"}
+
+    def close_issue(self, issue_number):
+        r = self._run("close", issue_number)
+        return {"status": "closed" if r.returncode == 0 else "error"}
+
+    def add_comment(self, issue_number, comment_body):
+        r = self._run("comment", issue_number, "--body", comment_body)
+        return {"status": "created" if r.returncode == 0 else "error"}
+
+    def update_issue(self, issue_number, title="", body=""):
+        args = ["update", issue_number]
+        if title: args += ["--title", title]
+        if body: args += ["--body", body]
+        r = self._run(*args)
+        return {"status": "updated" if r.returncode == 0 else "error"}
+
+    def get_issue_state(self, issue_number):
+        try:
+            r = self._run("get", issue_number)
+            if r.returncode == 0 and r.stdout.strip():
+                return str(json.loads(r.stdout).get("state", "")).lower()
+        except Exception:
+            pass
+        return None
+
+    def search_raw_issue(self, raw_key):
+        r = self._run("list", "--state", "open", "--per-page", "50")
+        if r.returncode != 0: return None
+        try:
+            issues = json.loads(r.stdout)
+        except Exception:
+            return None
+        for issue in issues:
+            title, body = issue.get("title", ""), issue.get("body", "") or ""
+            if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
+                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
+                        "title": title, "url": issue.get("html_url", issue.get("url", ""))}
+        for issue in issues:
+            if f"raw-{raw_key}" in (issue.get("body", "") or ""):
+                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
+                        "title": issue.get("title", ""), "url": issue.get("html_url", issue.get("url", ""))}
+        return None
+
+    def fetch_issue(self, issue_number):
+        r = self._run("get", issue_number)
+        if r.returncode == 0 and r.stdout.strip():
+            try:
+                data = json.loads(r.stdout)
+                return {"title": data.get("title", ""), "body": data.get("body", ""),
+                        "created_at": data.get("created_at", ""), "updated_at": data.get("updated_at", ""),
+                        "labels": [l.get("name", "") for l in data.get("labels", [])],
+                        "state": data.get("state", "").upper()}
+            except Exception: pass
+        return {}
+
+    def create_pr(self, branch, base, title, body):
+        return {"status": "skipped", "error": "gitee PR creation via API not yet implemented"}
+    def merge_pr(self, pr_number):
+        return {"status": "skipped", "error": "gitee PR merge via API not yet implemented"}
+    def close_pr(self, pr_number):
+        return {"status": "skipped", "error": "gitee PR close via API not yet implemented"}
+
+    def get_assignees(self, issue_number):
+        try:
+            r = self._run("get", str(issue_number))
+            if r.returncode != 0: return []
+            issue = json.loads(r.stdout)
+            a = (issue or {}).get("assignee") or {}
+            login = (a or {}).get("login", "")
             return [login] if login else []
         except Exception:
             return []
-    return []
+
+    def set_assignee(self, issue_number, login):
+        try:
+            r = self._run("update", str(issue_number), "--assignee", login)
+            return (r.returncode == 0, f"Failed on Gitee: {r.stderr.strip()}" if r.returncode else f"Assigned {login} to Gitee #{issue_number}")
+        except Exception as e:
+            return False, f"Failed on Gitee: {e}"
+
+    def list_open_issues(self):
+        try:
+            r = self._run("list", "--state", "open", "--per-page", "50")
+            if r.returncode == 0 and r.stdout.strip():
+                return {str(i.get("number", i.get("id", ""))): i.get("state", "OPEN") for i in json.loads(r.stdout)}
+        except Exception: pass
+        return {}
+
+# ══════════════════════════════════════════════
+# Register built-in handlers
+# ══════════════════════════════════════════════
+
+register(GitHubHandler())
+register(GiteeHandler())
+
+# ══════════════════════════════════════════════
+# Public API — iterates registry, zero platform hardcoding
+# ══════════════════════════════════════════════
+
+def available_platforms() -> list[str]:
+    return [h.name for h in _handlers()]
+
+def configured_platforms() -> list[str]:
+    csv = os.environ.get("FREELY_REPO_PLATFORMS", "")
+    configured = [p.strip() for p in csv.split(",") if p.strip()]
+    return [p for p in (configured or available_platforms()) if _handler_for(p)]
+
+def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
+    return {h.name: _safe(h.create_issue, title, body) for h in _handlers()}
+
+def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
+    return {h.name: _safe(h.close_issue, platform_issue_id) for h in _handlers()}
+
+def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        try:
+            state = h.get_issue_state(platform_issue_id)
+            if state and state.lower() == "closed":
+                results[h.name] = {"status": "blocked", "error": f"Issue #{platform_issue_id} is CLOSED on {h.name}."}
+                continue
+            results[h.name] = _safe(h.add_comment, platform_issue_id, comment_body)
+        except Exception as e:
+            results[h.name] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str = "") -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        piv = (platform_ids or {}).get(h.name, {})
+        issue_id = piv.get("issue_id", "") if isinstance(piv, dict) else str(piv or "")
+        if not issue_id:
+            results[h.name] = {"status": "skipped", "error": f"no issue_id for {h.name}"}
+            continue
+        results[h.name] = _safe(h.update_issue, issue_id, title, body)
+    return results
+
+def search_raw_issue(raw_key: str) -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        info = _safe(h.search_raw_issue, raw_key)
+        if info and not isinstance(info, dict) and "error" not in str(info):
+            results[h.name] = info
+    return results
+
+def fetch_issue(platform: str, issue_number: str) -> dict:
+    h = _handler_for(platform)
+    return h.fetch_issue(issue_number) if h else {}
+
+def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
+    h = _handler_for(platform)
+    return h.get_issue_state(issue_number) if h else None
+
+def list_open_issues(platforms: list[str] = None) -> dict[str, str]:
+    result = {}
+    targets = [h for h in _handlers() if platforms is None or h.name in platforms]
+    for h in targets:
+        result.update(_safe(h.list_open_issues) or {})
+    return result
+
+def get_assignees(platform: str, issue_number: str) -> list[str]:
+    h = _handler_for(platform)
+    return h.get_assignees(issue_number) if h else []
+
+def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, str]:
+    h = _handler_for(platform)
+    return h.set_assignee(issue_number, login) if h else (False, f"Unknown platform: {platform}")
 
 def check_and_claim_assignee(platform: str, issue_number: str, my_login: str) -> tuple[bool, str]:
-    """Check assignee and claim if unassigned. Returns (ok, message)."""
     current = get_assignees(platform, issue_number)
     if current:
         others = [a for a in current if a != my_login]
         if others:
             return False, f"Issue #{issue_number} on {platform} already assigned to {', '.join(others)}"
         return True, f"Already assigned to {my_login}"
-    # Unassigned — claim it
-    ok, msg = set_assignee(platform, issue_number, my_login)
-    return ok, msg
+    return set_assignee(platform, issue_number, my_login)
 
-def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, str]:
-    """Set assignee for an issue. Returns (ok, message)."""
-    if platform == "github":
-        try:
-            import subprocess as _sp
-            _sp.run(
-                ["gh", "api", "--method", "POST",
-                 f"repos/{_gh_repo()}/issues/{issue_number}/assignees",
-                 "--input", "-"],
-                input=f'{{"assignees":["{login}"]}}',
-                text=True, check=True, capture_output=True)
-            return True, f"Assigned {login} to GitHub #{issue_number}"
-        except Exception as e:
-            return False, f"Failed to assign on GitHub: {e}"
-    elif platform == "gitee":
-        try:
-            result = subprocess.run(
-                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "update", str(issue_number),
-                 "--assignee", login],
-                capture_output=True, text=True
-            )
-            if result.returncode != 0:
-                return False, f"Failed to assign on Gitee: {result.stderr.strip()}"
-            return True, f"Assigned {login} to Gitee #{issue_number}"
-        except Exception as e:
-            return False, f"Failed to assign on Gitee: {e}"
-    return False, f"Unknown platform: {platform}"
+# ── PR ──
 
+def create_pr(branch: str, base: str = "develop", title: str = "", body: str = "") -> dict:
+    return {h.name: _safe(h.create_pr, branch, base, title, body) for h in _handlers()}
+
+def merge_pr(platform: str, pr_number: str) -> dict:
+    h = _handler_for(platform)
+    return h.merge_pr(pr_number) if h else {"status": "error", "error": f"unknown: {platform}"}
+
+def close_pr(platform: str, pr_number: str) -> dict:
+    h = _handler_for(platform)
+    return h.close_pr(pr_number) if h else {"status": "error", "error": f"unknown: {platform}"}
+
+# ── Discussion ──
+
+def create_discussion(session_id: str, title: str, body: str = "") -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        if h.name != "github":
+            results[h.name] = {"status": "skipped", "reason": "平台不支持 Discussions"}
+            continue
+        try:
+            repo = h.detect_repo()
+            owner, name = repo.split("/") if "/" in repo else ("", "")
+            gh_id = subprocess.run(["gh", "api", f"repos/{repo}", "--jq", ".node_id"],
+                                   capture_output=True, text=True).stdout.strip()
+            subprocess.run(["gh", "api", "graphql", "-f",
+                f"query={{repository(owner:\"{owner}\",name:\"{name}\")"
+                f"{{createDiscussion(input:{{repositoryId:\"{gh_id}\","
+                f"categoryId:\"DIC_kwDOORxFVs4ClJqg\",title:\"{title}\","
+                f"body:\"{body}\"}}){{discussion{{id number}}}}}}}}"],
+                capture_output=True, text=True)
+            results[h.name] = {"status": "created"}
+        except Exception as e:
+            results[h.name] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
+    results = {}
+    for h in _handlers():
+        if h.name != "github": continue
+        info = platform_ids.get(h.name, {})
+        disc_id = info.get("discussion_id", "") if isinstance(info, dict) else info
+        if disc_id: results[h.name] = {"status": "closed"}
+    return results
+
+# ── Comment via local issue (multi-platform) ──
+
+def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict]:
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for h in _handlers():
+            m = re.search(rf"{h.name}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
+            if m: platform_ids[h.name] = m.group(1)
+    for h in _handlers():
+        if h.name not in platform_ids or not platform_ids.get(h.name):
+            r = search_raw_issue(raw_key)
+            if h.name in r: platform_ids[h.name] = r[h.name].get("issue_number", "")
+    if not platform_ids: return {"error": "no platform issue found for " + local_id}
+    results = {}
+    for h in _handlers():
+        num = platform_ids.get(h.name, "")
+        if not num or num == "?":
+            results[h.name] = {"status": "error", "error": f"no issue_id for {h.name}"}
+            continue
+        results[h.name] = _safe(h.add_comment, str(num), comment_body)
+    return results
+
+# ── Issue state resolution ──
+
+def _resolve_issue_state(local_id: str) -> str:
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for h in _handlers():
+            m = re.search(rf"{h.name}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
+            if m: platform_ids[h.name] = m.group(1)
+    if not platform_ids:
+        for plat, info in search_raw_issue(raw_key).items():
+            platform_ids[plat] = info.get("issue_number", "")
+    if not platform_ids: return "unknown"
+    for plat, num in platform_ids.items():
+        if num and (h := _handler_for(plat)):
+            state = h.get_issue_state(str(num))
+            if state and state.lower() not in ("closed",): return "open"
+    return "closed"
+
+# ── pull_raw_issue ──
 
 def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
-    """Find raw issue on platform, fetch it, and materialize to target_dir/issue.md.
-    Returns the materialized issue dict with path and platform_ids, or None if not found.
-    """
-    # 0. Assignee gate — refuse if claimed by others, claim if free
     my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
-    results_pre = search_raw_issue(raw_key)
-    if results_pre:
-        for plat, info in results_pre.items():
-            ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
-            print(f"[assignee] {plat}: {msg}", file=sys.stderr)
-            if not ok:
-                # Distinguish: "claimed by others" → fatal; "claim failed" → warning
-                if "already assigned to" in msg.lower():
-                    print(f"FATAL: {msg}", file=sys.stderr)
-                    print(f"  The issue is already claimed by someone else.", file=sys.stderr)
-                    print(f"  Coordinate with them or use a different raw key.", file=sys.stderr)
-                    return None
-                else:
-                    print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
+    for plat, info in search_raw_issue(raw_key).items():
+        ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
+        print(f"[assignee] {plat}: {msg}", file=sys.stderr)
+        if not ok and "already assigned to" in msg.lower():
+            print(f"FATAL: {msg}", file=sys.stderr); return None
+        if not ok:
+            print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
 
-    # 1. Search on all platforms
     results = search_raw_issue(raw_key)
-    if not results:
-        return None
-
-    # 2. Use primary platform first, fall back to any
+    if not results: return None
     platform = "github" if "github" in results else next(iter(results))
-    info = results[platform]
-    issue_number = info["issue_number"]
-
-    # 3. Fetch full issue details
+    info = results[platform]; issue_number = info["issue_number"]
     details = fetch_issue(platform, issue_number)
-    if not details:
-        return None
+    if not details: return None
 
-    # 3a. Standardize title only when it lacks the canonical raw-key.
-    # If title already has raw-{raw_key}, it is the truth source — skip.
     title = info.get("title", "")
-    title_has_key = f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title
-    if not title_has_key:
+    if not (f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title):
         created_at = details.get("created_at", "")
-        standard_key = _created_at_to_key(created_at) if created_at else None
-        if standard_key and standard_key != raw_key:
-            new_title = title.replace(f"raw-{raw_key}", f"raw-{standard_key}")
-            if new_title != title:
-                _update_issue_title(platform, issue_number, new_title)
-                raw_key = standard_key
-                target_dir = target_dir.parent / f"raw-{raw_key}"
+        if (sk := _created_at_to_key(created_at)) and sk != raw_key:
+            _update_issue_title(platform, issue_number, title.replace(f"raw-{raw_key}", f"raw-{sk}"))
+            raw_key = sk; target_dir = target_dir.parent / f"raw-{raw_key}"
 
-    # 4. Materialize to docs/B1-docs/raw-{key}/issue.md
     target_dir.mkdir(parents=True, exist_ok=True)
-    issue_file = target_dir / "issue.md"
-
-    # Build platform_ids
-    platform_ids = {}
-    for plat, plat_info in results.items():
-        platform_ids[plat] = {
-            "issue_id": plat_info["issue_number"],
-            "url": plat_info.get("url", ""),
-            "synced_at": "",
-        }
-
-    # Parse phase from labels
+    platform_ids = {p: {"issue_id": i["issue_number"], "url": i.get("url", ""), "synced_at": ""}
+                    for p, i in results.items()}
     phase = "proposed"
     for label in details.get("labels", []):
-        if label.startswith("phase/"):
-            phase = label.replace("phase/", "")
-            break
-
-    # Write issue.md with proper frontmatter
-    frontmatter = {
-        "local_id": f"raw-{raw_key}",
-        "kind": "raw",
-        "phase_state": phase,
-        "platform_ids": platform_ids,
-        "primary_platform": platform,
-        "canonical_issue_path": "",
-        "last_synced_comment_at": {},
-        "hash": "",
-        "created_at": details.get("created_at", ""),
-        "updated_at": details.get("updated_at", ""),
-        "intake_id": "",
-        "author": "platform",
-        "channel": platform,
-        "session_refs": [],
-    }
+        if label.startswith("phase/"): phase = label.replace("phase/", ""); break
 
     import yaml
     yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
-    fm_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    fm = {"local_id": f"raw-{raw_key}", "kind": "raw", "phase_state": phase,
+          "platform_ids": platform_ids, "primary_platform": platform,
+          "canonical_issue_path": "", "last_synced_comment_at": {}, "hash": "",
+          "created_at": details.get("created_at", ""), "updated_at": details.get("updated_at", ""),
+          "intake_id": "", "author": "platform", "channel": platform, "session_refs": []}
+    fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
     body = details.get("body", "")
-    # Remove frontmatter from body if present (GH issue body may contain old frontmatter)
     if body.startswith("---"):
-        parts = body.split("---", 2)
-        body = parts[2].strip() if len(parts) >= 3 else body
+        body = body.split("---", 2)[2].strip() if len(body.split("---", 2)) >= 3 else body
+    (target_dir / "issue.md").write_text(f"---\n{fm_str}\n---\n\n{body}\n", encoding="utf-8")
+    return {"path": str(target_dir / "issue.md"), "local_id": f"raw-{raw_key}",
+            "platform": platform, "issue_number": issue_number, "platform_ids": platform_ids}
 
-    issue_file.write_text(f"---\n{fm_str}\n---\n\n{body}\n", encoding="utf-8")
-
-    return {
-        "path": str(issue_file),
-        "local_id": f"raw-{raw_key}",
-        "platform": platform,
-        "issue_number": issue_number,
-        "platform_ids": platform_ids,
-    }
-
-
-# ── PR Operations (#3340) ────────────────────────────────────────────
-
-def create_pr(branch: str, base: str = "develop", title: str = "", body: str = "") -> dict:
-    """Create a PR on all configured platforms. Returns {platform: {url, number}}."""
-    results = {}
-    for platform in available_platforms():
-        try:
-            if platform == "github":
-                cmd = ["gh", "pr", "create", "--repo", _gh_repo(),
-                       "--head", branch, "--base", base]
-                if title:
-                    cmd.extend(["--title", title])
-                if body:
-                    cmd.extend(["--body", body])
-                result = subprocess.run(cmd, capture_output=True, text=True)
-                if result.returncode == 0:
-                    # Extract PR URL from stdout
-                    url = result.stdout.strip()
-                    number = url.split("/")[-1] if url else ""
-                    results[platform] = {"url": url, "number": number, "status": "created"}
-                else:
-                    results[platform] = {"status": "error", "error": result.stderr[:200]}
-            elif platform == "gitee":
-                # Gitee: push branch first, then API create PR
-                results[platform] = {"status": "skipped", "error": "gitee PR creation via API not yet implemented"}
-        except Exception as e:
-            results[platform] = {"status": "error", "error": str(e)[:200]}
-    return results
-
-
-def merge_pr(platform: str, pr_number: str) -> dict:
-    """Merge a PR on the specified platform."""
+def _created_at_to_key(created_at: str) -> Optional[str]:
     try:
-        if platform == "github":
-            result = subprocess.run(
-                ["gh", "pr", "merge", pr_number, "--repo", _gh_repo(),
-                 "--squash", "--delete-branch"],
-                capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                return {"status": "merged", "platform": platform, "number": pr_number}
-            return {"status": "error", "error": result.stderr[:200]}
-        elif platform == "gitee":
-            return {"status": "skipped", "error": "gitee PR merge via API not yet implemented"}
-    except Exception as e:
-        return {"status": "error", "error": str(e)[:200]}
+        from datetime import datetime, timezone
+        return datetime.fromisoformat(created_at.replace("Z", "+00:00")).strftime("%Y%m%dT%H%M%SZ")
+    except Exception: return None
 
+def _update_issue_title(platform: str, issue_number: str, new_title: str) -> bool:
+    if h := _handler_for(platform):
+        return h.update_issue(issue_number, title=new_title).get("status") == "updated"
+    return False
 
-def close_pr(platform: str, pr_number: str) -> dict:
-    """Close a PR without merging on the specified platform."""
-    try:
-        if platform == "github":
-            result = subprocess.run(
-                ["gh", "pr", "close", pr_number, "--repo", _gh_repo()],
-                capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                return {"status": "closed", "platform": platform, "number": pr_number}
-            return {"status": "error", "error": result.stderr[:200]}
-        elif platform == "gitee":
-            return {"status": "skipped", "error": "gitee PR close via API not yet implemented"}
-    except Exception as e:
-        return {"status": "error", "error": str(e)[:200]}
+def _safe(fn, *args):
+    try: return fn(*args)
+    except Exception as e: return {"status": "error", "error": str(e)[:200]}
 
+# Legacy helpers
+def _gh(*args, check=True):
+    return subprocess.run(["gh", *args], capture_output=True, text=True, check=check)
 
-# CLI entry point for testing
+def _gh_repo():
+    for h in _handlers():
+        if h.name == "github": return h.detect_repo()
+    return ""
+
+def _gitee_repo():
+    for h in _handlers():
+        if h.name == "gitee": return h.detect_repo()
+    return ""
+
+# ══════════════════════════════════════════════
+# CLI (unchanged interface)
+# ══════════════════════════════════════════════
+
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "search":
-        raw_key = sys.argv[2] if len(sys.argv) > 2 else ""
-        result = search_raw_issue(raw_key)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "fetch":
-        platform, num = sys.argv[2], sys.argv[3]
-        result = fetch_issue(platform, num)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "close":
-        platform, issue_number = sys.argv[2], sys.argv[3]
-        result = close_issue("", issue_number)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "pull":
-        raw_key = sys.argv[2]
-        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/B1-docs/raw-{raw_key}")
-        result = pull_raw_issue(raw_key, target)
-        print(json.dumps(result, indent=2, default=str))
-    elif len(sys.argv) > 1 and sys.argv[1] == "create-pr":
-        branch, base = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "develop"
-        title = sys.argv[4] if len(sys.argv) > 4 else ""
-        body = sys.argv[5] if len(sys.argv) > 5 else ""
-        result = create_pr(branch, base, title, body)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "merge-pr":
-        platform, pr_number = sys.argv[2], sys.argv[3]
-        result = merge_pr(platform, pr_number)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "close-pr":
-        platform, pr_number = sys.argv[2], sys.argv[3]
-    elif len(sys.argv) > 1 and sys.argv[1] == "create-issue":
-        local_id, title, body = sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else ""
-        result = create_issue(local_id, title, body)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "get-issue-state":
-        local_id = sys.argv[2] if len(sys.argv) > 2 else ""
-        state = _resolve_issue_state(local_id)
-        print(state)
-    elif len(sys.argv) > 1 and sys.argv[1] == "comment":
-        local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
-        # Look up platform_issue_id from local issue file
-        result = _comment_via_local_issue(local_id, comment_body)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "update-issue":
-        local_id = sys.argv[2] if len(sys.argv) > 2 else ""
-        platform_ids = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
-        title = sys.argv[4] if len(sys.argv) > 4 else ""
-        body = sys.argv[5] if len(sys.argv) > 5 else ""
-        result = update_issue(local_id, platform_ids, title, body)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "create-discussion":
-        session_id, title = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
-        body = sys.argv[4] if len(sys.argv) > 4 else ""
-        result = create_discussion(session_id, title, body)
-        print(json.dumps(result, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "close-discussion":
-        session_id = sys.argv[2]
-        platform_ids = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
-        result = close_discussion(session_id, platform_ids)
-        print(json.dumps(result, indent=2))
+    a = sys.argv
+    if len(a) > 1 and a[1] == "search":
+        print(json.dumps(search_raw_issue(a[2]) if len(a) > 2 else {}, indent=2))
+    elif len(a) > 1 and a[1] == "fetch":
+        print(json.dumps(fetch_issue(a[2], a[3]), indent=2))
+    elif len(a) > 1 and a[1] == "close":
+        print(json.dumps(close_issue("", a[3]), indent=2))
+    elif len(a) > 1 and a[1] == "pull":
+        raw_key = a[2]; target = Path(a[3]) if len(a) > 3 else Path(f"docs/B1-docs/raw-{raw_key}")
+        print(json.dumps(pull_raw_issue(raw_key, target), indent=2, default=str))
+    elif len(a) > 1 and a[1] == "create-pr":
+        print(json.dumps(create_pr(a[2], a[3] if len(a) > 3 else "develop",
+                                   a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "merge-pr":
+        print(json.dumps(merge_pr(a[2], a[3]), indent=2))
+    elif len(a) > 1 and a[1] == "close-pr":
+        print(json.dumps(close_pr(a[2], a[3]), indent=2))
+    elif len(a) > 1 and a[1] == "create-issue":
+        print(json.dumps(create_issue(a[2], a[3], a[4] if len(a) > 4 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "get-issue-state":
+        print(_resolve_issue_state(a[2]) if len(a) > 2 else "unknown")
+    elif len(a) > 1 and a[1] == "comment":
+        print(json.dumps(_comment_via_local_issue(a[2], a[3] if len(a) > 3 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "update-issue":
+        print(json.dumps(update_issue(a[2] if len(a) > 2 else "",
+                                      json.loads(a[3]) if len(a) > 3 else {},
+                                      a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "create-discussion":
+        print(json.dumps(create_discussion(a[2], a[3], a[4] if len(a) > 4 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "close-discussion":
+        print(json.dumps(close_discussion(a[2], json.loads(a[3]) if len(a) > 3 else {}), indent=2))
     else:
-        print(f"Available platforms: {available_platforms()}")
-        print(f"GitHub repo: {_gh_repo()}")
-        print(f"Gitee repo: {_gitee_repo()}")
+        print(f"Available: {available_platforms()}")
+        for h in _handlers():
+            print(f"  {h.name}: repo={h.detect_repo() or '(not detected)'}")

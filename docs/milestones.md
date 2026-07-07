@@ -3224,3 +3224,18 @@
 - milestone: M-20260707T134101Z-A
 - status: absorbed
 - absorbed_into: `I-20260707T134101Z-A`
+
+## M-20260707T141251Z-A
+- title: feat — platform-adapter Handler 注册表模式
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260707T141251Z-A`
+- milestone: M-20260707T141251Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260707T141251Z/issues/I-20260707T141251Z-A.md
+### completed_issues
+1. `C-20260707T141251Z-A`
+- milestone: M-20260707T141251Z-A
+- status: absorbed
+- absorbed_into: `I-20260707T141251Z-A`
