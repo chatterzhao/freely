@@ -2,6 +2,10 @@
 - title: wt-create assignee check
 - status: completed
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260627T234054Z-A`
 - milestone: M-20260627T234054Z-A
@@ -45,6 +49,10 @@
 - title: 门禁 diff-scope 改造
 - status: completed
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260706T050919Z-A`
 - milestone: M-20260706T050919Z-A
@@ -84,6 +92,10 @@
 - title: fix dirty 提示 backtick 命令替换
 - status: completed
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260705T061416Z-A`
 - milestone: M-20260705T061416Z-A
@@ -105,6 +117,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T234313Z-A`
 - milestone: M-20260703T234313Z-A
@@ -126,6 +142,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T170237Z-A`
 - milestone: M-20260703T170237Z-A
@@ -147,6 +167,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T162506Z-A`
 - milestone: M-20260703T162506Z-A
@@ -168,6 +192,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260701T001514Z-A`
 - milestone: M-20260701T001514Z-A
@@ -189,6 +217,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T080443Z-A`
 - milestone: M-20260703T080443Z-A
@@ -210,6 +242,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T141118Z-A`
 - milestone: M-20260703T141118Z-A
@@ -231,6 +267,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T121233Z-A`
 - milestone: M-20260703T121233Z-A
@@ -252,6 +292,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T114618Z-A`
 - milestone: M-20260703T114618Z-A
@@ -273,6 +317,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T054629Z-A`
 - milestone: M-20260703T054629Z-A
@@ -294,6 +342,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
@@ -315,6 +367,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260703T003829Z-A`
 - milestone: M-20260703T003829Z-A
@@ -340,6 +396,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260701T085407Z-A`
 - milestone: M-20260701T085407Z-A
@@ -1070,6 +1130,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
@@ -2752,6 +2816,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260704T004227Z-A`
@@ -2797,6 +2865,10 @@
 - phase_state: completed
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260704T080808Z-A`
 - title: feat — multi ACP bridge per-agent tool/slot
@@ -3066,6 +3138,10 @@
 - title: feat — 封装命令文档系统化，意图→命令映射 + 集中参考
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260706T232728Z-A`
 - milestone: M-20260706T232728Z-A
@@ -3100,6 +3176,10 @@
 - title: fix — Gitee assignee API 修复
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260707T003943Z-A`
 - milestone: M-20260707T003943Z-A
@@ -3134,6 +3214,10 @@
 - title: fix — 彻底移除本地 raw issue 创建路径
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260707T043833Z-A`
 - milestone: M-20260707T043833Z-A
@@ -3149,6 +3233,10 @@
 - title: fix — commands.md 源码对齐
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260707T064609Z-A`
 - milestone: M-20260707T064609Z-A
@@ -3164,6 +3252,10 @@
 - title: fix — commands.md 增加执行位置
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260707T065926Z-A`
 - milestone: M-20260707T065926Z-A
@@ -3179,6 +3271,10 @@
 - title: fix — commands.md cd 路径表述
 - status: active
 ### candidate_issues
+1. `C-20260707T085628Z-A`
+- milestone: M-20260707T085628Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T085628Z-A`
 ### committed_issues
 1. `I-20260707T085628Z-A`
 - milestone: M-20260707T085628Z-A
