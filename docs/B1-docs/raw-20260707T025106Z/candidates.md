@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260707T025106Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T025106Z
 created_at: 2026-07-07
 milestone: M-20260707T025106Z-A
@@ -10,7 +10,7 @@ milestone: M-20260707T025106Z-A
 
 - candidate_format_version: v2
 - title: fix — pr-review-guarded 增加审查前+后工位清洁检查，pr-merge-guarded 增加兜底检查
-- status: promoted
+- status: absorbed
 - decision_reason: Option B — pr-review-guarded 审查前入口闸门 + 审查后出口闸门 + pr-merge-guarded 最后防线，三个检查点形成完整覆盖
 - next_action: B2_IBM 物化 I-* issue → dev 实现 2 个文件的清洁检查逻辑
 - revisit_trigger: 未来新增流程阶段命令时也需考虑清洁检查
