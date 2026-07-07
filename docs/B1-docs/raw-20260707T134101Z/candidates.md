@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260707T134101Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T134101Z
 milestone: M-20260707T134101Z-A
 ---
 ## C-20260707T134101Z-A: 平台硬编码清理
-- status: promoted
+- status: absorbed
 - decision_reason: 消除所有硬编码平台调用 + issue-sync 自动同步 test worktree
 - promoted_issue_id: I-20260707T134101Z-A
 - acceptance_criteria:

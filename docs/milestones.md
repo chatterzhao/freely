@@ -3207,6 +3207,11 @@
 
 ## M-20260707T134101Z-A
 - title: fix — 平台硬编码清理 + issue-sync 顺序修复
+### candidate_issues
+1. `C-20260707T134101Z-A`
+- milestone: M-20260707T134101Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T134101Z-A`
 - status: active
 ### candidate_issues
 ### committed_issues
