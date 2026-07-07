@@ -165,8 +165,29 @@ PROMPT
     echo "freely-review: ACP verdict=$_verdict"
     [[ "$_verdict" == "pass" ]] && exit 0 || exit 1
   else
-    echo "[WARN] ACP bridge not available — skip review (not blocking)"
-    exit 0
+	    cat >&2 <<ACP_DOWN
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [REVIEW] ACP bridge 不可用 — 审查被阻塞                  ║
+╠══════════════════════════════════════════════════════════════╣
+║  ACP bridge 是 Reviewer agent 的通信通道。                    ║
+║  没有 ACP bridge，无法启动独立的 Reviewer session 进行审查。   ║
+║                                                              ║
+║  两种处理方式:                                                 ║
+║                                                              ║
+║  ① 启动 ACP bridge 后重试:                                    ║
+║     检查 daemon 是否在运行: freely live-status                ║
+║     启动 daemon: freely daemon start --task-mode auto         ║
+║     重试: freely pr-review-guarded <branch>                   ║
+║                                                              ║
+║  ② 人工审查（ACP 不可用时的降级方案）:                          ║
+║     skill:freely-tdd-review                                  ║
+║     审查结论写入 code-reviews/pr-review-raw-{key}.md           ║
+║     git add + git commit -m "review: manual review verdict=pass" ║
+║                                                              ║
+║  不推荐跳过审查直接合并——未审查的代码可能包含质量问题。         ║
+╚══════════════════════════════════════════════════════════════╝
+ACP_DOWN
+	    exit 1
   fi
 
 elif [[ "$caller" == "manager" ]]; then
