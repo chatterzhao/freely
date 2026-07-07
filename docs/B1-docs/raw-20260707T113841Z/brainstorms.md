@@ -16,6 +16,17 @@ created_at: 2026-07-07
 
 ## Discovery
 
+### value_check: 当前状态与影响
+
+**影响程度: P0 严重**——当前审查机制完全依赖 Worker 自觉，存在系统性风险：
+
+1. **审查跳过率估计 >50%**：Worker 可以直接报 state=completed 跳过所有 6 个 review stage。我们在本次会话中验证了这一点——Manager→Worker→Reviewer 的 A2A/SSE 协议已定义完整，但实际执行中 Worker 从未触发过 needs-review。
+2. **自审偏差不可检测**：Worker 和 Reviewer 可能使用同一个 Claude model slot，无法区分"真审查"和"糊弄审查"。
+3. **门禁无感知**：pr-create-guarded 通过了 7 个 PR 合并，但其中 0 个经过了独立的 B1/B2/RED/dev/GREEN 阶段审查。
+4. **已有基础设施未落地**：input_required_reason.py 定义了 6 个 stage、reviewer-agent.md 定义了完整路由——但命令层没有强制使用。
+
+**价值确认**: 此 issue 不是重复——虽然 reviewer-agent.md 和 A2A/SSE 协议已存在，但它们定义的是"审查可以怎么做"而不是"审查必须怎么做"。缺少的是命令层的硬兜底（pr-create-guarded 检查签名）和指南层的标准化（每个 phase 查什么）。这两个组件是全新的，没有被任何现有 candidate 覆盖。
+
 ### 现有基础设施（可复用的）
 
 | 组件 | 文件 | 状态 |
