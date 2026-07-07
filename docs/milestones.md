@@ -3227,11 +3227,6 @@
 
 ## M-20260707T141251Z-A
 - title: feat — platform-adapter Handler 注册表模式
-### candidate_issues
-1. `C-20260707T141251Z-A`
-- milestone: M-20260707T141251Z-A
-- status: promoted
-- promoted_issue_id: `I-20260707T141251Z-A`
 - status: active
 ### candidate_issues
 ### committed_issues
