@@ -160,7 +160,11 @@ MSG
     cd <fix-or-feature-worktree>
     freely pr-create-guarded
 
-  这会自动完成: dry-run gate → push → create PR。
+  这会自动完成: pull develop → 冲突处理 → dry-run gate → 双平台 push → 双平台创建 PR。
+
+  [freely] 💡 你刚才想做的是 git push → 对应封装命令是 freely pr-create-guarded
+  [freely] 完整流程: feedback → wt-create → B1 → B2 → RED → dev → GREEN → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
+  [freely] 被拦截了？从你当前阶段对应的命令重新开始。不要绕过门禁。
   git push --no-verify 跳过门禁,禁止使用。
 MSG
           exit 1
