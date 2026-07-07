@@ -43,26 +43,32 @@
 - blocker: execution_pending_or_failed
 - red_how: fix: 修改前无 review signature 检查
 ## Unit
-- acceptance_target: Python + bash 语法全部通过
+- acceptance_target: Python + bash syntax all pass
 - testing_layer: unit
+- target_environment: feature worktree
+- required_evidence: python3 -m py_compile + bash -n pass
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
-- not_applicable_explanation: 纯函数添加，python3 -m py_compile + bash -n 作为验证
-- replacement_evidence: 三个文件语法检查全部通过
+- not_applicable_explanation: 纯函数添加，无独立可测试单元
+- replacement_evidence: 三个文件语法检查全部通过 + AT-001~003 grep
 ## Integration
 - acceptance_target: review gate 与现有 gate chain 不冲突
 - testing_layer: integration
+- target_environment: test-pre-merge-20260707T113841Z-phase-review-gate
+- required_evidence: bash -n 语法通过 + gate chain 顺序正确
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 新增 gate step 是独立检查，不与现有 gate 交互
 - replacement_evidence: bash -n pr-create-guarded 通过
 ## End-to-End
-- acceptance_target: pr-create-guarded 门禁链通过
+- acceptance_target: pr-create-guarded 全部门禁通过 + review check 正确输出
 - testing_layer: end-to-end
+- target_environment: test-pre-merge-20260707T113841Z-phase-review-gate → develop merge chain
+- required_evidence: guarded merge receipts
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
-- not_applicable_explanation: 门禁链覆盖
-- replacement_evidence: pr-create-guarded gate chain
+- not_applicable_explanation: 门禁链自动覆盖端到端验证
+- replacement_evidence: pr-create-guarded gate chain 全部通过
 ## Real-Environment
 - real_environment_status: pass
-- real_environment_reason: 3 AT GREEN
+- real_environment_reason: 3 AT GREEN + 3 文件语法通过 + gate chain 集成正确
