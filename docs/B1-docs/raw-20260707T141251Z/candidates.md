@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260707T141251Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260707T141251Z
 milestone: M-20260707T141251Z-A
 ---
 ## C-20260707T141251Z-A: platform-adapter 改为 Handler 注册表模式
-- status: promoted
+- status: absorbed
 - decision_reason: 新平台只需写一个 Handler 子类 + register() 一行
 - promoted_issue_id: I-20260707T141251Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T141251Z/issues/I-20260707T141251Z-A.md
