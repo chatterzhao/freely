@@ -8,6 +8,7 @@ milestone: M-20260707T134101Z-A
 - status: absorbed
 - decision_reason: 消除所有硬编码平台调用 + issue-sync 自动同步 test worktree
 - promoted_issue_id: I-20260707T134101Z-A
+- promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T134101Z/issues/I-20260707T134101Z-A.md
 - acceptance_criteria:
   - pr-merge-guarded issue-sync 后自动 git merge 到 test worktree
   - pr-merge-guarded _sync_prs_across_platforms 遍历所有 remote 而非只 gitee
