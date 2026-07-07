@@ -3266,3 +3266,12 @@
 - milestone: M-20260707T162123Z-A
 - status: promoted
 - promoted_issue_id: `I-20260707T162123Z-A`
+
+## M-20260707T172110Z-A
+- title: fix — scan argparse + adapter 复用
+- status: active
+### candidate_issues
+1. `C-20260707T172110Z-A`
+- milestone: M-20260707T172110Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T172110Z-A`

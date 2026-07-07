@@ -6,14 +6,15 @@ milestone: M-20260707T172110Z-A
 ---
 ## C-20260707T172110Z-A: scan 修复
 - status: promoted
-- decision_reason: 修复 7 个缺陷，恢复 scan 检测能力
+- decision_reason: argparse + 复用 platform-adapter + 修复 7 缺陷
 - promoted_issue_id: I-20260707T172110Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260707T172110Z/issues/I-20260707T172110Z-A.md
+- promotion_gate: scan --project 正确返回 items + 平台检测走 adapter + 全部 7 缺陷修复
 - acceptance_criteria:
-  - scan --project 参数正确解析
-  - 平台检测复用 platform-adapter
-  - 平台查询复用 platform-adapter list_open_issues()
-  - 1b_reopen 逻辑可达
-  - extract_id 支持所有平台
-  - 无 raw-{key} 平台 issue 被报告
-  - agent_working import 正确
+  - A: scan --project 参数正确解析
+  - B: 文件扫描不依赖 head_changed（始终扫）
+  - C: 1b_reopen 集成到 Category 2
+  - D: 无 raw-{key} 平台 issue 被报告
+  - E: 平台检测/查询复用 platform-adapter
+  - F: agent_working import 正确
+  - G: extract_id 支持所有平台
