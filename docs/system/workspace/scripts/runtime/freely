@@ -918,11 +918,11 @@ Usage:
   freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
-  freely chat [--project <abs_path>] (--issue <id> | --new-issue) [--urgent] <message>
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
   freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
   freely comment --issue raw-{key} --file <path>      (write comment from file)
   freely tui [--project <abs_path>] [--once]
-  freely intake chat [--project <abs_path>] (--issue <id> | --new-issue) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
   freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
   freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
   freely intake status [--project <abs_path>]
@@ -6628,33 +6628,20 @@ _write_chat_to_issue() {
     issue_id="$target_issue"
     conversation_id=0
   else
-    chat_type="new-issue"
-    # issue_id will be set after INSERT returns the chat id
-    issue_id=""
-    conversation_id=0
+    log_error "[chat] Local raw issue creation is no longer supported."
+    log_error "[chat] All raw issues must be created on a configured platform via 'freely feedback':"
+    log_error "[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>""
+    log_error "[chat] Then create a worktree:"
+    log_error "[chat]   freely wt-create --raw-key <returned-key> --source platform --kind fix --slug <slug>"
+    return 1
   fi
 
   # Step 1: INSERT into freely.db chats table via daemon
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-  chat_id=$(python3 "$cli" --project "$project" chat.add \
-    --type "$chat_type" \
-    --issue-id "${issue_id:-pending}" \
-    --message "$message" \
-    --author "$author" \
-    --channel "$channel" \
-    --session-refs "$session_refs" \
-    --intake-id "$intake_id" \
-    --conversation-id "$conversation_id" 2>/dev/null) || {
+  chat_id=$(python3 "$cli" --project "$project" chat.add     --type "$chat_type"     --issue-id "${issue_id:-pending}"     --message "$message"     --author "$author"     --channel "$channel"     --session-refs "$session_refs"     --intake-id "$intake_id"     --conversation-id "$conversation_id" 2>/dev/null) || {
       log_error "failed to write chat to freely.db (daemon may be down, check db-daemon.log)"
       return 1
     }
-
-  # For new-issue: update issue_id now that we have the chat id
-  if [[ "$chat_type" == "new-issue" ]]; then
-    issue_id="raw-$chat_id"
-    python3 "$cli" --project "$project" chat.update-issue-id \
-      --id "$chat_id" --issue_id "$issue_id" >/dev/null 2>&1 || true
-  fi
 
   # For chat-message: if conversation_id was 0 (first message), the Python add_chat
   # already auto-updated conversation_id to the chat_id
@@ -6668,13 +6655,6 @@ _write_chat_to_issue() {
 
   log_info "chat recorded: freely.db id=$chat_id type=$chat_type issue_id=$issue_id${conversation:+ conversation_id=$conversation_id}"
 
-  if [[ "$chat_type" == "new-issue" ]]; then
-    log_info "[chat] raw issue created: $issue_id"
-    log_info "[chat] Next: create raw issue on configured platform, then worktree:"
-    log_info "[chat]   1. freely feedback --help   (review usage, then create the raw issue)"
-    log_info "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
-    log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feature-execution (Govern first)"
-  fi
 
   # Step 2: Try direct sync if a worktree exists for this issue
   # Skip for chat-message — conversation messages need AI judgment before materialization
@@ -6682,20 +6662,8 @@ _write_chat_to_issue() {
   if [[ "$chat_type" != "chat-message" && -d "$worktrees_root" ]]; then
     worktree_found=$(find "$worktrees_root" -maxdepth 1 -type d -name "*${issue_id}*" 2>/dev/null | head -1)
     if [[ -n "$worktree_found" && -d "$worktree_found/docs/B1-docs/$issue_id" ]]; then
-      if [[ "$chat_type" == "new-issue" ]]; then
-        local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-        python3 "$cli" --project "$project" chat.consume \
-          --id "$chat_id" --materialized_as "$issue_id" >/dev/null 2>&1 \
-          && log_info "chat materialized directly to worktree: $worktree_found"
-      else
-        local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-        python3 "$cli" --project "$project" chat.consume \
-          --id "$chat_id" >/dev/null 2>&1 \
-          && log_info "chat comment synced directly to worktree: $worktree_found"
-      fi
-      # Signal the daemon even for direct sync (worktree AI needs to notice)
-      update_intake_pending_signal "$project"
-      return 0
+      local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+      python3 "$cli" --project "$project" chat.consume         --id "$chat_id" >/dev/null 2>&1         && log_info "chat comment synced directly to worktree: $worktree_found"
     fi
   fi
 
@@ -23929,7 +23897,6 @@ cmd_chat() {
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --issue) target_issue="${2:-}"; shift 2 ;;
-      --new-issue) new_issue="true"; shift ;;
       --conversation) conversation="true"; shift ;;
       --new) new_conversation="true"; shift ;;
       --urgent) urgent="true"; shift ;;
@@ -24628,7 +24595,6 @@ cmd_intake_chat() {
       --author) author="${2:-}"; shift 2 ;;
       --channel) channel="${2:-}"; shift 2 ;;
       --issue) target_issue="${2:-}"; shift 2 ;;
-      --new-issue) new_issue="true"; shift ;;
       --conversation) conversation="true"; shift ;;
       --new) new_conversation="true"; shift ;;
       --urgent) urgent="true"; shift ;;

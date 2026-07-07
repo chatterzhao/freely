@@ -601,17 +601,6 @@ def h_chat_reset(daemon: DbDaemon, params: dict) -> dict:
     return {"changed": changed}
 
 
-@_h("chat.update-issue-id")
-def h_chat_update_issue_id(daemon: DbDaemon, params: dict) -> dict:
-    chat_id = params["chat_id"]
-    new_issue_id = params["issue_id"]
-    bare = _iso_to_bare(str(chat_id))
-    daemon.conn.execute(
-        "UPDATE chats SET issue_id = ? WHERE id = ?",
-        (new_issue_id, int(bare) if bare.isdigit() else bare),
-    )
-    changed = daemon.conn.total_changes > 0
-    daemon.conn.commit()
     return {"changed": changed}
 
 
@@ -664,31 +653,6 @@ def h_chat_consume_conversation(daemon: DbDaemon, params: dict) -> dict:
     count = 0
     now = _now_utc()
 
-    if action == "materialize" and target_dir:
-        combined = "\n---\n".join(m.get("message", "") for m in messages)
-        issue_id = f"raw-{messages[0]['id']}"
-        first = messages[0]
-        author = first.get("author", "human")
-        channel = first.get("channel", "chat")
-        created_at = first.get("created_at", now)
-        session_refs = first.get("session_refs", "[]")
-        intake_id = first.get("intake_id", "")
-
-        os.makedirs(target_dir, exist_ok=True)
-        issue_file = os.path.join(target_dir, "issue.md")
-        with open(issue_file, "w", encoding="utf-8") as f:
-            f.write(
-                f"---\nlocal_id: {issue_id}\nkind: raw\nphase_state: proposed\n"
-                f"platform_ids: {{}}\nprimary_platform: \"\"\ncanonical_issue_path: \"\"\n"
-                f"last_synced_comment_at: {{}}\nhash: \"\"\n"
-                f"created_at: {created_at}\nupdated_at: {created_at}\n"
-                f"intake_id: {intake_id}\nauthor: {author}\nchannel: {channel}\n"
-                f"session_refs: {session_refs}\n---\n\n{combined}\n"
-            )
-        for m in messages:
-            daemon.conn.execute("UPDATE chats SET consumed = 1, materialized_as = ? WHERE id = ?",
-                                (issue_id, m["id"]))
-            count += 1
 
     elif action == "materialize-all-as-comment" and target_dir:
         for m in messages:
@@ -777,13 +741,6 @@ def h_chat_count_comments(daemon: DbDaemon, params: dict) -> dict:
     ).fetchone()
     return {"count": row[0]}
 
-
-@_h("chat.base-keys")
-def h_chat_base_keys(daemon: DbDaemon, params: dict) -> dict:
-    rows = daemon.conn.execute(
-        "SELECT DISTINCT issue_id FROM chats WHERE consumed = 0 AND chat_type = 'new-issue'"
-    ).fetchall()
-    return {"keys": [r[0] for r in rows]}
 
 
 # ── session.* ─────────────────────────────────────────────────────────────

@@ -144,7 +144,7 @@ def _task_mode_read_scan_output(result):
 
 def _chat_add_params(args):
     return {
-        "chat_type": args.get("type", "new-issue"),
+        "chat_type": args.get("type", ""),
         "issue_id": args.get("issue_id", "pending"),
         "message": args["message"],
         "author": args.get("author", "human"),
