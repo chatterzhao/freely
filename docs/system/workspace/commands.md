@@ -50,6 +50,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | 创建新 raw issue | `freely feedback [create] --title "..." --kind <fix\|feature> --body "..." [--severity P0\|P1\|P2]` |
 | 编辑已有 raw issue | `freely feedback edit --raw-key <key> [--title "..."] [--body "..."]` |
 
+**执行位置**: 项目根目录（任意可写工位）。仅创建平台 issue，不操作本地文件。
 **选项**:
 
 | 选项 | 说明 |
@@ -73,6 +74,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**: `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>] [--skill <name>]`
 
+**执行位置**: 项目根目录（develop 分支）。在 develop 上创建 worktree。
 **选项**:
 
 | 选项 | 说明 |
@@ -98,6 +100,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**: `freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]`
 
+**执行位置**: **必须在 fix/raw-* 或 feature/raw-* 工位中**。拒绝在 develop 或 test-pre-merge-* 执行。
 **选项**:
 
 | 选项 | 说明 |
@@ -120,6 +123,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**: `freely pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail] [--reason <text>]`
 
+**执行位置**: 任意工位。审查指定分支的代码变更，不要求特定工位。
 **选项**:
 
 | 选项 | 说明 |
@@ -149,6 +153,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | 正常合并 | `freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]` |
 | 完成冲突解决 | `freely pr-merge-guarded complete <target-branch> <source-branch>` |
 
+**执行位置**: **必须在 develop 分支（项目根目录工位）**。在 develop 上执行合并操作。
 **选项**:
 
 | 选项 | 说明 |
@@ -178,6 +183,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | 跳过平台关闭 | `freely wt-close --raw-key <key> --skip-platform` |
 | 试运行 | `freely wt-close --raw-key <key> --dry-run` |
 
+**执行位置**: 项目根目录（develop 分支）。清理工位和分支。--platform-only 时可在任意工位执行。
 **选项**:
 
 | 选项 | 说明 |
@@ -215,6 +221,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | 推迟推送 | `freely develop-push defer --reason <post_merge_acceptance\|cleanup_followthrough\|remote_delivery_hold> [--note <text>]` |
 | 清除状态 | `freely develop-push clear` |
 
+**执行位置**: 项目根目录（develop 分支）。推送 develop 到远程。
 **选项**:
 
 | 选项 | 说明 |
@@ -231,6 +238,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**:
 
+**执行位置**: **禁止在保护分支执行**（main、develop、test-pre-merge-*）。通常在可写工位运行。
 | 子命令 | 说明 |
 |--------|------|
 | `create <local_id>` | 创建平台 issue（幂等） |
@@ -251,6 +259,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**: `freely deploy-skills [--tools <name,...>] [--force] [--dry-run]`
 
+**执行位置**: 项目根目录。读取 workspace skills 并部署到 AI 工具目录。
 **选项**:
 
 | 选项 | 说明 |
@@ -267,6 +276,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 **语法**: `freely live-status [--project <path>]` / `freely fleet-status [--project <path>]`
 
+**执行位置**: 任意工位。只读状态查询，不修改任何文件。
 **功能**:
 - **live-status**: 当前项目运行时状态（daemon、prompt、continuity、develop push 等）
 - **fleet-status**: 所有 worktree 表格视图（branch、CLEAN/DIRTY、supervisor/AI PID、intent 等）
