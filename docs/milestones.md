@@ -3076,3 +3076,12 @@
 - milestone: M-20260706T232728Z-A
 - status: absorbed
 - absorbed_into: `I-20260706T232728Z-A`
+
+## M-20260707T025106Z-A
+- title: fix — pr-review-guarded 工位清洁检查 + pr-merge-guarded 兜底
+- status: active
+### candidate_issues
+1. `C-20260707T025106Z-A`
+- milestone: M-20260707T025106Z-A
+- status: promoted
+- promoted_issue_id: `I-20260707T025106Z-A`
