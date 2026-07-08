@@ -22,8 +22,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: feature — 修改前 scan 不检测 platform-only issue
 
 ### acceptance-2: _sync_platform_direct 先 update 后 close
@@ -41,8 +41,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: fix — 修改前只 close_issue 不 update_issue
 
 ### acceptance-3: N=0 平台硬阻塞
@@ -61,8 +61,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: fix — 修改前 N=0 fallback 到 github
 
 ## Unit
