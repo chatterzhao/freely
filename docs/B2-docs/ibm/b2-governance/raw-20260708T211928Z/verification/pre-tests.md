@@ -16,8 +16,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前parse_frontmatter不读bullet, phase_state为空
 
@@ -36,8 +36,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前用--skill
 
@@ -56,8 +56,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前I-* terminal可能误分为raw_created
 
