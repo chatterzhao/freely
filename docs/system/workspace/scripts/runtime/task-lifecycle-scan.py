@@ -50,6 +50,34 @@ class Timer:
             prev = t
         return "\n".join(lines)
 
+# ── Stage classification ────────────────────────────────────────────
+
+def _classify_stage(subcategory: str, phase_state: str = "", platform_state: str = "") -> str:
+    """Map subcategory to lifecycle stage."""
+    if subcategory == "2a_state_mismatch":
+        return "close_platform"
+    if subcategory in ("2a_non_terminal", "2a_missing_platform_state"):
+        return "close_local"
+    if subcategory in ("1a_fresh", "1b_reopen"):
+        return "B1_proposed"
+    if subcategory == "2b_worktree_not_cleaned":
+        return "收口"
+    if subcategory in ("3a_never_bound", "3b_session_dead"):
+        return "恢复"
+    return "收口"
+
+
+def _stage_action(stage: str) -> str:
+    """Map stage to human-readable action description."""
+    return {
+        "close_platform": "issue-sync close — 关闭平台 issue",
+        "close_local": "更新本地 phase_state 为 absorbed/dropped",
+        "B1_proposed": "freely wt-create → B1 预研",
+        "收口": "检查并完成收口步骤",
+        "恢复": "恢复 worker session 或重新委派",
+    }.get(stage, "检查并完成")
+
+
 # ── Helpers ─────────────────────────────────────────────────────────
 
 def now_utc() -> str:
@@ -648,6 +676,15 @@ def scan(project: Path) -> dict:
     # ── Check chat inbox for unconsumed messages (1c/2d) ────────────
 
     # ── 1c: Platform-only issues without raw-{key} (TODO: restore after adapter returns per-platform dict) ──
+
+    # ── Post-processing: enrich items with stage and stage_action ───
+    for item in items:
+        sub = item.get("subcategory", "")
+        ps = item.get("phase_state", "")
+        # platform_state might be "platform_state" or "actual_platform_state"
+        pls = item.get("platform_state", "") or item.get("actual_platform_state", "")
+        item["stage"] = _classify_stage(sub, ps, pls)
+        item["stage_action"] = _stage_action(item["stage"])
 
     # ── Summary ─────────────────────────────────────────────────────
     by_cat = {}
