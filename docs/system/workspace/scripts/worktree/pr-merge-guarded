@@ -484,7 +484,7 @@ _sync_issues_changed_in_merge() {
 
   # Compare source branch against target (pre-merge), not HEAD vs HEAD^ (post-merge)
   local changed_issues synced=0
-  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/B1-docs/||' | sed 's|/issue\.md$||' | sort -u || true)
+  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "docs/B1-docs" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/B1-docs/||' | sed 's|/issue\.md$||' | sort -u || true)
   [[ -n "$changed_issues" ]] || return 0
 
   for local_id in $changed_issues; do
