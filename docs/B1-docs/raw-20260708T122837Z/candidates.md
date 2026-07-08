@@ -1,11 +1,12 @@
 ---
 candidate_id: C-20260708T122837Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T122837Z
 milestone: M-20260708T122837Z-A
 ---
 ## C-20260708T122837Z-A: scan stage + batch
-- status: promoted
+- status: absorbed
+- absorbed_into: `I-20260708T122837Z-A`
 - milestone: `M-20260708T122837Z-A`
 - decision_reason: 增量改造——保留新 scan 改进，恢复旧 scan 的 stage 分级 + batch 聚合 + derive_action
 - promoted_issue_id: I-20260708T122837Z-A
