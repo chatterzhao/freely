@@ -18,8 +18,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 当前 L459 为 $PWD/docs/B1-docs
 
@@ -38,8 +38,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 当前 worktree 解析不用 raw_key
 
@@ -58,8 +58,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 当前无条件执行 issue-sync close
 
@@ -78,8 +78,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 当前第 752 行写 updated_at
 
@@ -98,8 +98,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 当前 L743 用 PROJECT_ROOT
 
