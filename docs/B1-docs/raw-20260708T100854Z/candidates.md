@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260708T100854Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T100854Z
 milestone: M-20260708T100854Z-A
 ---
 ## C-20260708T100854Z-A: A2A socket 路径统一 + 日志时间戳
-- status: promoted
+- status: absorbed
 - decision_reason: 修复 freely shell `_a2a_socket_path` 加 .sock + watchdog 日志加时间戳
 - promoted_issue_id: I-20260708T100854Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260708T100854Z/issues/I-20260708T100854Z-A.md
