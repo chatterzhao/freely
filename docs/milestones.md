@@ -3452,9 +3452,13 @@
 - title: test — scan full coverage + batch visibility fix
 - status: active
 ### candidate_issues
+### committed_issues
+1. `I-20260708T225753Z-A`
+- milestone: M-20260708T225753Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T225753Z/issues/I-20260708T225753Z-A.md
+### completed_issues
 1. `C-20260708T225753Z-A`
 - milestone: M-20260708T225753Z-A
-- status: promoted
-- promoted_issue_id: `I-20260708T225753Z-A`
-### committed_issues
-### completed_issues
+- status: absorbed
+- absorbed_into: `I-20260708T225753Z-A`
