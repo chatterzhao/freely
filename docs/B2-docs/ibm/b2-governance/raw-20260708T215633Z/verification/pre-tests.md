@@ -16,8 +16,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: fix — 修改前13个platform=closed判为raw_not_started
 
 ### acceptance-2
@@ -35,8 +35,8 @@
 - actual_RED_output: (RED)
 - actual_output: (GREEN)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: fix — 修改前next_action含硬编码平台名
 ## Unit
 - acceptance_target: py_compile
