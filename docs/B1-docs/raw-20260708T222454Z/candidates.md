@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260708T222454Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T222454Z
 milestone: M-20260708T222454Z-A
 ---
 ## C-20260708T222454Z-A: scan platform detection fix
-- status: promoted
+- status: absorbed
 - milestone: `M-20260708T222454Z-A`
 - acceptance_criteria:
   - _sync_platform_direct: update content → check per-platform → close OPEN
