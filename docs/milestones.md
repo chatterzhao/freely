@@ -3402,3 +3402,14 @@
 - milestone: M-20260708T202402Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T202402Z-A`
+
+## M-20260708T211928Z-A
+- title: fix — scan classify + frontmatter + station precision
+- status: active
+### candidate_issues
+1. `C-20260708T211928Z-A`
+- milestone: M-20260708T211928Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T211928Z-A`
+### committed_issues
+### completed_issues

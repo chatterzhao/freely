@@ -119,6 +119,24 @@ STATION_ACTIONS = {
         "[manager] 检查 agent-working 表 → 恢复 session 或重新委派 worker\n"
         "[worker] cd <wt> && 继续之前的工作"
     ),
+    # ── I-* linked-issue stations ──
+    "i_non_terminal": (
+        "[manager] freely feedback → wt-create --raw-key {{new_key}} --source platform --skill freely-workflow-guided-execution --slug fix-i-state\n"
+        "[worker] cd <wt> && 更新 I-* issue 的 phase_state 为 completed/absorbed"
+    ),
+    "i_no_phase": (
+        "[manager] freely feedback → wt-create --raw-key {{new_key}} --source platform --skill freely-workflow-guided-execution --slug fix-i-state\n"
+        "[worker] cd <wt> && 调查 I-* issue 缺少 phase_state，补充并更新"
+    ),
+    # ── Raw-issue stations (no worktree yet) ──
+    "raw_not_started": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guided-execution --slug b1\n"
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → brainstorms.md → candidates.md"
+    ),
+    "raw_no_phase": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guided-execution --slug b1\n"
+        "[worker] cd <wt> && 先补充 issue.md 的 phase_state → B1 预研"
+    ),
 }
 
 # Terminal phases — issues in these states need no further lifecycle action.
@@ -136,7 +154,12 @@ def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
     raw_key = item.get("key", "")
     raw_issue = issues_by_raw.get(raw_key)
     wt = wt_by_raw.get(raw_key)
-    phase = raw_issue.get("phase_state", "") if raw_issue else ""
+    # For linked (I-*) items, phase_state is on the item itself from read_issues_dir
+    phase = item.get("phase_state", "")
+    if raw_issue and not phase:
+        phase = raw_issue.get("phase_state", "")
+    issue_kind = item.get("kind", "")
+    is_linked = raw_key.startswith("I-") or issue_kind == "linked"
 
     # ── Category 3: dead agent on existing worktree ──
     if subcategory in ("3a_never_bound", "3b_session_dead"):
@@ -151,20 +174,23 @@ def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
         return "B1_proposed"
 
     # ── Category 2: document misaligned ──
-    # State mismatch between local and platform → needs platform sync
     if subcategory == "2a_state_mismatch":
         return "platform_close"
 
     # Non-terminal phase or missing platform_state
     if subcategory in ("2a_non_terminal", "2a_missing_platform_state"):
+        if is_linked:
+            # I-* linked issue with non-terminal or empty phase_state
+            if not phase or phase == "":
+                return "i_no_phase"
+            return "i_non_terminal"
+        # Raw issue classification
         if not raw_issue:
-            return "raw_created"
+            return "raw_not_started"
         if phase in ("proposed", ""):
-            return "raw_created"
-        # Already terminal but platform state mismatch
+            return "raw_not_started"
         if phase in TERMINAL_PHASES:
             return "merged_develop"
-        # In progress → needs dev worktree
         return "close_local"
 
     return "收口"
@@ -319,14 +345,15 @@ def parse_frontmatter(text: str) -> dict:
         if in_fm and ":" in s:
             k, v = s.split(":", 1)
             fm[k.strip()] = v.strip().strip("'\"")
-    # Also try bullet format (- key: value)
-    if not fm:
-        for line in lines:
-            m = re.match(r"^-\s*(\w[\w_]*):\s*(.*)", line)
-            if m:
-                fm[m.group(1)] = m.group(2).strip().strip("`'\"")
+      # Also scan bullet format (- key: value). Many I-* issues
+    # use mixed format: YAML has kind/local_id, bullet has phase_state.
+    for line in lines:
+        m = re.match(r"^-\s*(\w[\w_]*):\s*(.*)", line)
+        if m:
+            k = m.group(1)
+            if k not in fm:  # bullet supplements YAML, does not overwrite
+                fm[k] = m.group(2).strip().strip("`'\"")
     return fm
-
 def extract_raw_key(text: str) -> str | None:
     """Extract raw-{timestamp} key from text (title + body)."""
     m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE)
