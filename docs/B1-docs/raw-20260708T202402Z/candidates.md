@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260708T202402Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T202402Z
 milestone: M-20260708T202402Z-A
 ---
 ## C-20260708T202402Z-A: scan station chain + two-level delegation + batch dedup
-- status: promoted
+- status: absorbed
 - milestone: `M-20260708T202402Z-A`
 - decision_reason: 恢复旧scan优秀设计，保留新scan改进
 - promoted_issue_id: I-20260708T202402Z-A
