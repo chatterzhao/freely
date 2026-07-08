@@ -50,6 +50,43 @@ class Timer:
             prev = t
         return "\n".join(lines)
 
+# ── Stage classification ────────────────────────────────────────────
+
+def _classify_stage(subcategory: str, phase_state: str = "", platform_state: str = "") -> str:
+    """Map subcategory to lifecycle stage."""
+    if subcategory == "2a_state_mismatch":
+        return "close_platform"
+    if subcategory in ("2a_non_terminal", "2a_missing_platform_state"):
+        return "close_local"
+    if subcategory in ("1a_fresh", "1b_reopen"):
+        return "B1_proposed"
+    if subcategory == "2b_worktree_not_cleaned":
+        return "收口"
+    if subcategory in ("3a_never_bound", "3b_session_dead"):
+        return "恢复"
+    return "收口"
+
+
+def _stage_action(stage: str) -> str:
+    """Map stage to human-readable action description."""
+    return {
+        "close_platform": "issue-sync close — 关闭平台 issue",
+        "close_local": "更新本地 phase_state 为 absorbed/dropped",
+        "B1_proposed": "freely wt-create → B1 预研",
+        "收口": "检查并完成收口步骤",
+        "恢复": "恢复 worker session 或重新委派",
+    }.get(stage, "检查并完成")
+
+
+def _batch_action(stage: str, count: int) -> str:
+    """Generate batch action description for Manager."""
+    if stage == "close_platform":
+        return f"[manager] 批量关闭 {count} 个平台 issue（本地已 terminal，平台未同步）→ issue-sync close --batch"
+    if stage == "close_local":
+        return f"[manager] 批量修正 {count} 个本地文档 phase_state（平台已关闭，本地未 terminal）→ 脚本批量更新 phase_state"
+    return f"[manager] 处理 {count} 个 {stage} 项"
+
+
 # ── Helpers ─────────────────────────────────────────────────────────
 
 def now_utc() -> str:
@@ -649,6 +686,55 @@ def scan(project: Path) -> dict:
 
     # ── 1c: Platform-only issues without raw-{key} (TODO: restore after adapter returns per-platform dict) ──
 
+    # ── Post-processing: enrich items with stage and stage_action ───
+    for item in items:
+        sub = item.get("subcategory", "")
+        ps = item.get("phase_state", "")
+        # platform_state might be "platform_state" or "actual_platform_state"
+        pls = item.get("platform_state", "") or item.get("actual_platform_state", "")
+        item["stage"] = _classify_stage(sub, ps, pls)
+        item["stage_action"] = _stage_action(item["stage"])
+
+    # ── Build batches: group items by stage for Manager ───────────
+    by_stage: dict[str, list[dict]] = {}
+    for item in items:
+        stage = item.get("stage", "收口")
+        by_stage.setdefault(stage, []).append(item)
+
+    batches: list[dict] = []
+    # Stages that should be batched (many similar items → one batch)
+    batchable_stages = {"close_platform", "close_local"}
+    # Stages that stay individual (need per-item Manager attention)
+    individual_stages = {"B1_proposed", "收口", "恢复"}
+
+    for stage, stage_items in sorted(by_stage.items()):
+        if stage in batchable_stages and len(stage_items) > 0:
+            sample_keys = [it["key"] for it in stage_items[:5]]
+            batches.append({
+                "type": "batch",
+                "stage": stage,
+                "stage_action": _stage_action(stage),
+                "count": len(stage_items),
+                "sample_keys": sample_keys,
+                "has_more": len(stage_items) > 5,
+                "ready": True,
+                "next_action": _batch_action(stage, len(stage_items)),
+                "_item_indices": list(range(
+                    next(i for i, it in enumerate(items) if it.get("stage") == stage),
+                    next(i for i, it in enumerate(items) if it.get("stage") == stage) + len(stage_items)
+                )) if stage_items else [],
+            })
+        elif stage in individual_stages:
+            for it in stage_items:
+                batches.append({
+                    "type": "individual",
+                    "stage": stage,
+                    "stage_action": it.get("stage_action", ""),
+                    "key": it["key"],
+                    "ready": it.get("ready", True),
+                    "next_action": it.get("next_action", ""),
+                })
+
     # ── Summary ─────────────────────────────────────────────────────
     by_cat = {}
     ready_count = 0
@@ -682,7 +768,10 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="{current_head}"
             "total": len(items),
             "ready": ready_count,
             "by_category": by_cat,
+            "by_stage": {stage: len(si) for stage, si in by_stage.items()},
+            "batch_count": len(batches),
         },
+        "batches": batches,
         "items": items,
     }
 
