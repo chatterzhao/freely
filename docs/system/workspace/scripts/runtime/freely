@@ -8725,7 +8725,7 @@ print(h)" 2>/dev/null || true).pid"
 _a2a_socket_path() {
   local project="$1" hash
   hash="$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('$project').encode()).hexdigest()[:16])" 2>/dev/null || true)"
-  echo "/tmp/freely-a2a-${hash}"
+  echo "/tmp/freely-a2a-${hash}.sock"
 }
 
 # ── task-mode gate (SQLite) ──────────────────────────────
