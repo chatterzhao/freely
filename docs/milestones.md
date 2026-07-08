@@ -3331,3 +3331,14 @@
 - milestone: M-20260708T122837Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T122837Z-A`
+
+## M-20260708T174039Z-A
+- title: fix — tool-launchers socket path missing base_tool
+- status: active
+### candidate_issues
+1. `C-20260708T174039Z-A`
+- milestone: M-20260708T174039Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T174039Z-A`
+### committed_issues
+### completed_issues
