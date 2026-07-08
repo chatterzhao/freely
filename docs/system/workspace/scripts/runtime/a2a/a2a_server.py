@@ -35,7 +35,7 @@ from google.protobuf.json_format import MessageToJson
 # ── Starlette + Uvicorn ─────────────────────────────────────────────────
 from starlette.applications import Starlette
 from starlette.routing import Route
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, Response, StreamingResponse
 from starlette.requests import Request
 import uvicorn
 
@@ -651,7 +651,7 @@ class A2AServer:
                 if global_key in self._sse_subscribers and queue in self._sse_subscribers[global_key]:
                     self._sse_subscribers[global_key].remove(queue)
 
-        return Response(
+        return StreamingResponse(
             event_generator(),
             media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
@@ -691,7 +691,7 @@ class A2AServer:
                 if task_id in self._sse_subscribers and queue in self._sse_subscribers[task_id]:
                     self._sse_subscribers[task_id].remove(queue)
 
-        return Response(
+        return StreamingResponse(
             event_generator(),
             media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},

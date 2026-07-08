@@ -3303,3 +3303,12 @@
 - milestone: M-20260708T100854Z-A
 - status: promoted
 - promoted_issue_id: `I-20260708T100854Z-A`
+
+## M-20260708T110621Z-A
+- title: fix — SSE 500 + pool + observability
+- status: active
+### candidate_issues
+1. `C-20260708T110621Z-A`
+- milestone: M-20260708T110621Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T110621Z-A`

@@ -4327,7 +4327,7 @@ load_config() {
         local _tool="${_slot%%-*}"
         if _tool_is_registered "$_tool" 2>/dev/null; then
           export AGENT_AI_TOOL="$_slot"
-          log_info "agent-table: $_my_id AGENT_AI_TOOL=$AGENT_AI_TOOL (pool=$(grep -c "worker_" "$_agent_env" 2>/dev/null || echo 0) workers)"
+          log_info "agent-table: $_my_id AGENT_AI_TOOL=$AGENT_AI_TOOL (pool=$("$SELF_ROOT/bin/agent-table-query" --pool-size worker 2>/dev/null || echo 10) workers)"
         else
           log_error "agent-table: $_my_id slot='$_slot' → tool='$_tool' not in registry"
           exit 1
