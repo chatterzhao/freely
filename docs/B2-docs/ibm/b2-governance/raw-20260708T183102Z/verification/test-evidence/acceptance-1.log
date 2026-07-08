@@ -1,0 +1,2 @@
+480:  local issues_dir="$_wt_path/docs/B1-docs"
+481:  [[ -d "$issues_dir" ]] || issues_dir="$PWD/docs/B1-docs"

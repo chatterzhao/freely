@@ -3348,3 +3348,18 @@
 - absorbed_into: `I-20260708T174039Z-A`
 ### committed_issues
 ### completed_issues
+
+## M-20260708T183102Z-A
+- title: fix — pr-merge path + wt-close issue-sync + worktree resolution
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260708T183102Z-A`
+- milestone: M-20260708T183102Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T183102Z/issues/I-20260708T183102Z-A.md
+### completed_issues
+1. `C-20260708T183102Z-A`
+- milestone: M-20260708T183102Z-A
+- status: absorbed
+- absorbed_into: `I-20260708T183102Z-A`

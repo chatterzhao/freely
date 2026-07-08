@@ -1,0 +1,2 @@
+782:      _wt_i_file="$wt_path/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
+783:      [[ -f "$_wt_i_file" ]] || _wt_i_file="$PROJECT_ROOT/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
