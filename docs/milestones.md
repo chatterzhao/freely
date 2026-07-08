@@ -3462,3 +3462,14 @@
 - milestone: M-20260708T225753Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T225753Z-A`
+
+## M-20260708T231255Z-A
+- title: fix — scan complete 9/9 test PASS
+- status: active
+### candidate_issues
+1. `C-20260708T231255Z-A`
+- milestone: M-20260708T231255Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T231255Z-A`
+### committed_issues
+### completed_issues

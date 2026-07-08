@@ -932,6 +932,20 @@ def scan(project: Path) -> dict:
                         "detail": "platform_state not set in frontmatter",
                         "next_action": "[manager] 创建 raw issue → 填上 platform_state",
                     })
+                else:
+                    # Terminal phase with local platform_state set but no
+                    # real platform data to verify against — flag for sync.
+                    items.append({
+                        "category": "2_document_misaligned",
+                        "subcategory": "2a_state_mismatch",
+                        "key": raw_key,
+                        "issue_path": raw_issue["path"],
+                        "phase_state": phase,
+                        "platform_state": plat_state,
+                        "ready": True,
+                        "detail": f"terminal phase={phase} but platform_state={plat_state} — needs alignment",
+                        "next_action": "[manager] 创建 raw issue → 工位 → 对齐 platform_state 与 phase_state",
+                    })
 
             continue  # raw on develop → done with this key
 
