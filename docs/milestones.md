@@ -3348,3 +3348,14 @@
 - absorbed_into: `I-20260708T174039Z-A`
 ### committed_issues
 ### completed_issues
+
+## M-20260708T183102Z-A
+- title: fix — pr-merge path + wt-close issue-sync + worktree resolution
+- status: active
+### candidate_issues
+1. `C-20260708T183102Z-A`
+- milestone: M-20260708T183102Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T183102Z-A`
+### committed_issues
+### completed_issues
