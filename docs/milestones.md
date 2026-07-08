@@ -3275,3 +3275,12 @@
 - milestone: M-20260707T172110Z-A
 - status: promoted
 - promoted_issue_id: `I-20260707T172110Z-A`
+
+## M-20260708T015105Z-A
+- title: fix — elif→if + updated_at
+- status: active
+### candidate_issues
+1. `C-20260708T015105Z-A`
+- milestone: M-20260708T015105Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T015105Z-A`

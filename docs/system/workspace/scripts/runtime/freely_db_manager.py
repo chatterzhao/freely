@@ -654,7 +654,7 @@ def h_chat_consume_conversation(daemon: DbDaemon, params: dict) -> dict:
     now = _now_utc()
 
 
-    elif action == "materialize-all-as-comment" and target_dir:
+    if action == "materialize-all-as-comment" and target_dir:
         for m in messages:
             author = m.get("author", "human")
             channel = m.get("channel", "chat")
