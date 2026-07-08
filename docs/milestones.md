@@ -3331,3 +3331,20 @@
 - milestone: M-20260708T122837Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T122837Z-A`
+
+## M-20260708T174039Z-A
+- title: fix — tool-launchers socket path missing base_tool
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260708T174039Z-A`
+- milestone: M-20260708T174039Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T174039Z/issues/I-20260708T174039Z-A.md
+### completed_issues
+1. `C-20260708T174039Z-A`
+- milestone: M-20260708T174039Z-A
+- status: absorbed
+- absorbed_into: `I-20260708T174039Z-A`
+### committed_issues
+### completed_issues

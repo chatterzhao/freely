@@ -820,7 +820,7 @@ tool_run_acp_from_prompt_file() {
   tool="$(_resolve_tool_family "$tool")"
 
   local bridge_socket
-  bridge_socket="$(_bridge_socket "$project")"
+  bridge_socket="$(_bridge_socket "$project" "$tool")"
 
   case "$tool" in
     codex)
