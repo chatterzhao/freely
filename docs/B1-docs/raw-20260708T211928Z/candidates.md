@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260708T211928Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T211928Z
 milestone: M-20260708T211928Z-A
 ---
 ## C-20260708T211928Z-A: scan classify fix
-- status: promoted
+- status: absorbed
 - milestone: `M-20260708T211928Z-A`
 - decision_reason: parse_frontmatter补充bullet解析 + _detect_station区分raw/linked
 - promoted_issue_id: I-20260708T211928Z-A
