@@ -3346,8 +3346,6 @@
 - milestone: M-20260708T174039Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T174039Z-A`
-### committed_issues
-### completed_issues
 
 ## M-20260708T183102Z-A
 - title: fix — pr-merge path + wt-close issue-sync + worktree resolution
@@ -3363,3 +3361,25 @@
 - milestone: M-20260708T183102Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T183102Z-A`
+
+## M-20260708T185138Z-A
+- title: fix — git diff relative path + state sync
+- status: active
+### candidate_issues
+1. `C-20260708T185138Z-A`
+- milestone: M-20260708T185138Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T185138Z-A`
+### committed_issues
+### completed_issues
+
+## M-20260708T185138Z-A
+- title: fix — git diff relative path
+- status: active
+### candidate_issues
+1. `C-20260708T185138Z-A`
+- milestone: M-20260708T185138Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T185138Z-A`
+### committed_issues
+### completed_issues
