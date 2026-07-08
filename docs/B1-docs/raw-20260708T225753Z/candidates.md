@@ -11,3 +11,4 @@ milestone: M-20260708T225753Z-A
 - promoted_issue_id: I-20260708T225753Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260708T225753Z/issues/I-20260708T225753Z-A.md
 - promoted_issue_id: I-20260708T225753Z-A
+- absorbed_into: I-20260708T225753Z-A
