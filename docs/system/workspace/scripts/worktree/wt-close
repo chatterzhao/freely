@@ -729,37 +729,73 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
   if [[ "$DRY_RUN" == true ]]; then
     _dry "freely issue-sync close $issue_id completed"
   else
-    echo "wt-close: closing platform issue for $issue_id..."
-    if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then
-      echo "wt-close: platform issue closed ✓"
+    # ── Check if pr-merge-guarded already synced ──
+    # pr-merge-guarded writes platform_state: closed to the worktree before merge.
+    # If that field is already present, issue-sync close is redundant — skip it.
+    _wt_existing_platform_state="$(_fm_get "$issue_file" "platform_state")"
+    if [[ "$_wt_existing_platform_state" == "closed" ]]; then
+      echo "wt-close: platform_state already closed (pr-merge-guarded synced), skipping issue-sync"
+    else
+      # platform_state is NOT closed.  In normal flow pr-merge-guarded should have
+      # handled this.  Reaching here means the sync was missed — tell the user to
+      # go through the formal workflow instead of force-discarding the diff.
+      if [[ "$FORCE" != true ]]; then
+        cat >&2 <<WTPLATFORM_MISSING
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  wt-close: platform_state 未同步，请走正规化流程           ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  pr-merge-guarded 未完成 issue-sync。                         ║
+║  issue.md 缺少 platform_state: closed。                       ║
+║                                                              ║
+║  正确处理（不要 --force 丢弃有价值的状态）:                     ║
+║    1. cd $wt_path && git stash          # 暂存修改            ║
+║    2. freely wt-close --raw-key $_raw_key # 正常关闭工位      ║
+║    3. cd <project-root>                                       ║
+║    4. freely feedback ...               # 创建 raw issue      ║
+║    5. freely wt-create ...              # 创建新工位           ║
+║    6. cd <新工位> && git stash pop       # 恢复修改            ║
+║    7. 按规范流程: B1 → B2 → dev → test → PR → merge           ║
+║                                                              ║
+║  --force 允许跳过（仅当确认要丢弃）:                            ║
+║    freely wt-close --raw-key $_raw_key --force                ║
+║    --reason "违规绕过门禁中，理由充分，是：<业务理由>"          ║
+╚══════════════════════════════════════════════════════════════╝
+WTPLATFORM_MISSING
+        exit 1
+      fi
+      echo "wt-close: --force, closing platform issue for $issue_id..."
+      if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then
+        echo "wt-close: platform issue closed ✓"
+      else
+        echo "Warning: issue-sync close failed for $issue_id, continuing..." >&2
+      fi
+    fi
 
-      # Also close the absorbed I-* issue if it has its own platform_ids.
-      # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
-      # may have been pushed to GitHub as a separate issue.  wt-close must close
-      # it too — otherwise completed I-* issues accumulate as open on GitHub.
-      # Note: no "local" here — this is script top-level, not a function.
-      _wt_i_absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
-      if [[ -n "$_wt_i_absorbed_i" ]]; then
-        _wt_i_file="$PROJECT_ROOT/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
-        if [[ -f "$_wt_i_file" ]]; then
-          _wt_i_phase="$(_fm_get "$_wt_i_file" "phase_state")"
-          _wt_i_platform_state="$(_fm_get "$_wt_i_file" "platform_state")"
-          if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
-            if [[ "$_wt_i_platform_state" != "closed" ]]; then
-              echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
-              if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_wt_i_absorbed_i" completed 2>&1; then
-                _fm_set_str "$_wt_i_file" "platform_state" "closed"
-                _fm_set_str "$_wt_i_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-                echo "wt-close: absorbed I-* closed ✓"
-              else
-                echo "Warning: issue-sync close failed for $_wt_i_absorbed_i, continuing..." >&2
-              fi
+    # Also close the absorbed I-* issue if it has its own platform_ids.
+    # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
+    # may have been pushed to GitHub as a separate issue.  wt-close must close
+    # it too — otherwise completed I-* issues accumulate as open on GitHub.
+    _wt_i_absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
+    if [[ -n "$_wt_i_absorbed_i" ]]; then
+      # Read from the worktree copy first, fall back to develop
+      _wt_i_file="$wt_path/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
+      [[ -f "$_wt_i_file" ]] || _wt_i_file="$PROJECT_ROOT/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
+      if [[ -f "$_wt_i_file" ]]; then
+        _wt_i_phase="$(_fm_get "$_wt_i_file" "phase_state")"
+        _wt_i_platform_state="$(_fm_get "$_wt_i_file" "platform_state")"
+        if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
+          if [[ "$_wt_i_platform_state" != "closed" ]]; then
+            echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
+            if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_wt_i_absorbed_i" completed 2>&1; then
+              _fm_set_str "$_wt_i_file" "platform_state" "closed"
+              echo "wt-close: absorbed I-* closed ✓"
+            else
+              echo "Warning: issue-sync close failed for $_wt_i_absorbed_i, continuing..." >&2
             fi
           fi
         fi
       fi
-    else
-      echo "Warning: issue-sync close failed for $issue_id, continuing..." >&2
     fi
   fi
 elif [[ "$SKIP_PLATFORM" == true ]]; then

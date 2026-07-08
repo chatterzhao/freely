@@ -450,13 +450,35 @@ _sync_prs_across_platforms() {
 # Mirrors pr-review-guarded: review → commit → push → merge.
 _sync_issues_changed_in_merge() {
   local _src_branch="${1:-}" _target="${2:-develop}"
-  local _wt_path
-  # Resolve worktree path from source branch so issue-sync --project points
-  # to a writable fix|feature/* worktree, not the protected develop branch.
-  _wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="$_src_branch" '$1=="worktree"{wt=$2} $1=="branch" && index($2,br){print wt}' | head -1)
+  local _wt_path _raw_key _dev_branch
+  # Resolve fix worktree by raw_key (same pattern as freely_wt_assert_dev_test_consistent).
+  # awk substring-match + head -1 is fragile — git worktree list order is not guaranteed.
+  _raw_key=$(echo "$_src_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  if [[ -n "$_raw_key" ]]; then
+    _wt_path=""
+    while IFS= read -r line; do
+      case "$line" in
+        worktree*) _wt_path="${line#worktree }" ;;
+        branch*)
+          local _br="${line#branch }"
+          case "$_br" in
+            *fix/raw-*$_raw_key*|*feature/raw-*$_raw_key*)
+              _dev_branch="${_br#refs/heads/}"
+              break
+              ;;
+          esac
+          _wt_path=""
+          ;;
+      esac
+    done < <(git worktree list --porcelain 2>/dev/null)
+  fi
   [[ -z "$_wt_path" ]] && _wt_path="$PWD"
 
-  local issues_dir="$PWD/docs/B1-docs"
+  # Read issue files from the fix worktree, not develop ($PWD).
+  # Before merge, issue.md only exists on the worktree branch — develop
+  # does not have it yet.  Fall back to $PWD for orphaned-branch scenarios.
+  local issues_dir="$_wt_path/docs/B1-docs"
+  [[ -d "$issues_dir" ]] || issues_dir="$PWD/docs/B1-docs"
   [[ -d "$issues_dir" ]] || return 0
   [[ -x "$PWD/bin/issue-sync" ]] || return 0
 
