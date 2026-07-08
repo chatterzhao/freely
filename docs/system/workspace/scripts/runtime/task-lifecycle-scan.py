@@ -362,7 +362,7 @@ def parse_frontmatter(text: str) -> dict:
     return fm
 def extract_raw_key(text: str) -> str | None:
     """Extract raw-{timestamp} key from text (title + body)."""
-    m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE)
+    m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE | re.IGNORECASE)
     return m.group(2) if m else None
 
 def find_worktree(project: Path, raw_key: str) -> Path | None:
@@ -464,17 +464,37 @@ def extract_platform_ids(text: str) -> dict[str, str]:
             current_platform = None  # reset after capturing
     return ids
 
-def _sync_platform_direct(raw_key: str, platform_ids: dict, project: Path) -> dict:
-    """Directly sync terminal state (closed/dropped/absorbed) to all platforms via API.
-    No worktree needed — this is a pure API operation.
-    Also syncs local platform_state field when all platforms agree on state.
-    Returns {platform: status} for successfully synced platforms."""
+def _sync_platform_direct(raw_key: str, platform_ids: dict, phase_state: str,
+                          project: Path) -> dict:
+    """Directly sync terminal state to all platforms via API. No worktree needed.
+    Flow: 1) update issue body to reflect phase_state (closed/dropped/absorbed)
+          2) check each platform → close any still-OPEN ones
+    Returns {platform: status} per platform."""
     results = {}
     local_id = f"raw-{raw_key}"
     try:
         sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import close_issue
-        results = close_issue(local_id, platform_ids)
+        from platform_adapter import close_issue, update_issue, fetch_issue_state
+
+        # Step 1: Update issue content to reflect terminal phase_state
+        update_body = f"phase_state: {phase_state}"
+        update_issue(local_id, platform_ids, body=update_body)
+
+        # Step 2: Check each platform and close OPEN ones
+        for pname, pid in platform_ids.items():
+            if not pid:
+                results[pname] = "skipped:no_id"
+                continue
+            try:
+                state = fetch_issue_state(pname, pid)
+                state = state.upper() if state else "UNKNOWN"
+                if state == "OPEN":
+                    close_issue(local_id, {pname: pid})
+                    results[pname] = "OPEN→CLOSED"
+                else:
+                    results[pname] = f"already {state}"
+            except Exception as e:
+                results[pname] = f"error:{e}"
     except Exception as e:
         results["error"] = str(e)
     return results
@@ -878,7 +898,7 @@ def scan(project: Path) -> dict:
                 # Terminal — if platforms disagree, sync them directly via API.
                 # No worktree needed for pure platform sync.
                 if platform_mismatches:
-                    synced = _sync_platform_direct(raw_key, pids, project)
+                    synced = _sync_platform_direct(raw_key, pids, phase, project)
                     if synced:
                         print(f"[scan] platform sync: {raw_key} → {synced}", file=sys.stderr)
                     else:
@@ -986,9 +1006,30 @@ def scan(project: Path) -> dict:
                 "next_action": f"wt-close {branch}",
             })
 
-    # ── Check chat inbox for unconsumed messages (1c/2d) ────────────
-
-    # ── 1c: Platform-only issues without raw-{key} (TODO: restore after adapter returns per-platform dict) ──
+    # ── 1c: Platform-only issues without local raw dir ──────────
+    # Scan all platform OPEN issues and flag those with no local file.
+    for num, pi in platform_issues.items():
+        rk = extract_raw_key(pi.get("title", "") + "\n" + pi.get("body", ""))
+        if not rk:
+            continue
+        if rk in seen_keys:
+            continue
+        seen_keys.add(rk)
+        # Build per-platform state view from all_platform_states
+        platform_states = {}
+        # platform_issues is keyed by issue number; check if this num has state
+        actual = all_platform_states.get(num, "")
+        if actual:
+            platform_states["detected"] = actual
+        items.append({
+            "category": "1_not_started",
+            "subcategory": "1c_platform_only",
+            "key": rk,
+            "ready": True,
+            "platform_states": platform_states,
+            "detail": f"Platform issue OPEN but no local docs/B1-docs/raw-{rk}/",
+            "next_action": f"[manager] raw-issue-pull --raw-key {rk} → 创建本地目录 → 评估状态",
+        })
 
     # ── Post-processing: enrich items with station and next_action ──
     for item in items:

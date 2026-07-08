@@ -3432,3 +3432,18 @@
 - milestone: M-20260708T215633Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T215633Z-A`
+
+## M-20260708T222454Z-A
+- title: fix — scan platform detection + per-platform state + direct sync
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260708T222454Z-A`
+- milestone: M-20260708T222454Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T222454Z/issues/I-20260708T222454Z-A.md
+### completed_issues
+1. `C-20260708T222454Z-A`
+- milestone: M-20260708T222454Z-A
+- status: absorbed
+- absorbed_into: `I-20260708T222454Z-A`
