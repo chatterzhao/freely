@@ -3387,3 +3387,14 @@
 - promoted_issue_id: `I-20260708T185138Z-A`
 ### committed_issues
 ### completed_issues
+
+## M-20260708T202402Z-A
+- title: feat — scan station chain + two-level delegation + batch dedup
+- status: active
+### candidate_issues
+1. `C-20260708T202402Z-A`
+- milestone: M-20260708T202402Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T202402Z-A`
+### committed_issues
+### completed_issues
