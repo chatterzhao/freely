@@ -3284,3 +3284,13 @@
 - milestone: M-20260708T015105Z-A
 - status: promoted
 - promoted_issue_id: `I-20260708T015105Z-A`
+### committed_issues
+1. `I-20260708T015105Z-A`
+- milestone: M-20260708T015105Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T015105Z/issues/I-20260708T015105Z-A.md
+### completed_issues
+1. `C-20260708T015105Z-A`
+- milestone: M-20260708T015105Z-A
+- status: absorbed
+- absorbed_into: `I-20260708T015105Z-A`

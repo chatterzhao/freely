@@ -1,11 +1,11 @@
 ---
 candidate_id: C-20260708T015105Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T015105Z
 milestone: M-20260708T015105Z-A
 ---
 ## C-20260708T015105Z-A: syntax + idempotent fix
-- status: promoted
+- status: absorbed
 - decision_reason: 1-char elif→if + 1-line updated_at removal
 - promoted_issue_id: I-20260708T015105Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260708T015105Z/issues/I-20260708T015105Z-A.md
