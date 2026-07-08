@@ -101,3 +101,24 @@ Manager AI session 的 Claude Code 输出没有被捕获到 cycle log 文件。�
 ## Decision: 最小改动——修复 socket 路径 + 日志时间戳
 
 ## Candidate: C-20260708T100854Z-A, promoted
+
+### 子问题 4: 可观测性增强
+
+**问题**: 
+- watchdog-sse.log 无时间戳，无法关联到运行周期
+- cycle log 未生成，AI session 输出丢失
+- socket 连接失败时错误信息不明确
+
+**Option A: 每行日志加 ISO8601 时间戳 ✅**
+- watchdog_sse.py: 所有 print → print(f"[{timestamp}] ...")
+- sse-watchdog.sh: Python 内嵌代码加时间戳
+
+**Option B: 结构化日志 (JSON)**
+- 优点: 可机器解析
+- 缺点: 改动大，人工阅读不便
+
+**Option C: 日志文件按启动时间命名**
+- 优点: 不丢历史
+- 缺点: 文件累积，需清理策略
+
+**Decision: Option A + C 组合** — 加时间戳 + 日志文件 rotation 保留最近 3 个历史。

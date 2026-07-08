@@ -3294,3 +3294,12 @@
 - milestone: M-20260708T015105Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T015105Z-A`
+
+## M-20260708T100854Z-A
+- title: fix — A2A socket path + log timestamps
+- status: active
+### candidate_issues
+1. `C-20260708T100854Z-A`
+- milestone: M-20260708T100854Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T100854Z-A`
