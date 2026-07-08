@@ -188,6 +188,12 @@ def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
         if not raw_issue:
             return "raw_not_started"
         if phase in ("proposed", ""):
+            # Platform state determines the right action:
+            # - platform closed → work was done externally, just fix local doc
+            # - platform open/unknown → truly not started, needs worktree
+            plat = item.get("platform_state", "")
+            if plat == "closed":
+                return "merged_develop"
             return "raw_not_started"
         if phase in TERMINAL_PHASES:
             return "merged_develop"
