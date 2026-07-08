@@ -14,3 +14,4 @@ milestone: M-20260708T222454Z-A
   - dropped/closed/absorbed 统一 terminal 同步
 - promoted_issue_id: I-20260708T222454Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260708T222454Z/issues/I-20260708T222454Z-A.md
+- decision_reason: _sync_platform_direct 先update后close + extract_raw_key 大小写 + platform-only 检测
