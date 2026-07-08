@@ -3417,3 +3417,14 @@
 - milestone: M-20260708T211928Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T211928Z-A`
+
+## M-20260708T215633Z-A
+- title: fix — scan de-hardcode platforms + per-platform state
+- status: active
+### candidate_issues
+1. `C-20260708T215633Z-A`
+- milestone: M-20260708T215633Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T215633Z-A`
+### committed_issues
+### completed_issues

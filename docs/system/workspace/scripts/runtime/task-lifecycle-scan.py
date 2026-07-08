@@ -241,7 +241,7 @@ def _stage_action(station: str) -> str:
     return actions.get(station, "检查并完成")
 
 
-def _build_sync_batch(items: list[dict], project_path, ts: str) -> list[dict]:
+def _build_sync_batch(items: list[dict], project_path, ts: str, platforms: list[str] = None) -> list[dict]:
     """Collect platform sync items into one deduplicated batch.
 
     Cross-scan dedup: if the same set of sync keys was already batched
@@ -293,7 +293,7 @@ def _build_sync_batch(items: list[dict], project_path, ts: str) -> list[dict]:
             "close_platform": close_platform_count,
             "close_local": close_local_count,
             "merged_develop": merged_count,
-            "platforms": ["github", "gitee"],
+            "platforms": platforms if platforms else _detect_platforms(project_path),
         },
     }
 
@@ -365,18 +365,6 @@ def extract_raw_key(text: str) -> str | None:
     m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE)
     return m.group(2) if m else None
 
-def extract_github_id(fm: dict, text: str) -> str:
-    """Extract github issue id from frontmatter (nested or flat)."""
-    # Nested: github:\n  issue_id: '123'
-    m = re.search(r"github:\s*\n\s*issue_id:\s*['\"]?(\d+)", text)
-    if m:
-        return m.group(1)
-    # Flat: github: '123'
-    m = re.search(r"github:\s*['\"]?(\d+)", text)
-    if m:
-        return m.group(1)
-    return ""
-
 def find_worktree(project: Path, raw_key: str) -> Path | None:
     """Find worktree path whose branch/dir name contains the raw key."""
     try:
@@ -425,34 +413,56 @@ def list_all_worktrees(project: Path) -> list[dict]:
 
 # ── Platform access (via platform-adapter, no hardcoding) ───────────
 
-
 def _detect_platforms(project: Path) -> list[str]:
-    """Detect configured platforms via platform-adapter."""
+    """Detect configured platforms from config.toml, fallback to git remotes."""
     try:
         sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
         from platform_adapter import configured_platforms
-        return configured_platforms()
+        platforms = configured_platforms()
+        if platforms:
+            return platforms
     except Exception:
-        return ["github"]
-
-def _gh_repo(project: Path) -> str:
-    """Detect GitHub repo from gh CLI."""
-    try:
-        r = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"],
-                          capture_output=True, text=True, timeout=5, cwd=str(project))
-        return r.stdout.strip()
-    except Exception:
-        return ""
-
-def _gitee_repo(project: Path) -> str:
-    """Detect Gitee repo from git remotes."""
+        pass
+    # Fallback: scan git remotes for known platform patterns
+    platforms = []
     try:
         r = subprocess.run(["git", "-C", str(project), "remote", "-v"],
                           capture_output=True, text=True, timeout=5)
-        m = re.search(r'gitee[^:/]*[:/]([^/\s]+/[^/\s]+)', r.stdout)
-        return m.group(1).replace('.git', '') if m else ""
+        remotes = r.stdout.lower()
+        if "github" in remotes:
+            platforms.append("github")
+        if "gitee" in remotes:
+            platforms.append("gitee")
     except Exception:
-        return ""
+        pass
+    if not platforms:
+        print("[SCAN] FATAL: no platforms configured.", file=sys.stderr)
+        print("[SCAN] Configure platforms in .freely/config.toml:", file=sys.stderr)
+        print("[SCAN]   FREELY_REPO_PLATFORMS = \"github,gitee\"", file=sys.stderr)
+        print("[SCAN] Or add remotes to .git/config.", file=sys.stderr)
+        sys.exit(1)
+    return platforms
+
+def extract_platform_ids(text: str) -> dict[str, str]:
+    """Extract per-platform issue IDs from frontmatter platform_ids block.
+    Returns dict like {'github': '3833', 'gitee': 'IJZS1G'}."""
+    ids = {}
+    # Parse YAML-like: platform_ids:\n  github:\n    issue_id: '123'\n  gitee:\n    issue_id: ABC
+    current_platform = None
+    for line in text.split("\n"):
+        s = line.strip()
+        # Match top-level platform key under platform_ids
+        if not s.startswith("-") and ":" in s and not s.startswith("issue_id") and not s.startswith("url") and not s.startswith("synced_at"):
+            # Check if this is a platform name (not indented, or indented once)
+            m = re.match(r"^\s*(\w+):\s*$", line)
+            if m and m.group(1) not in ("platform_ids",):
+                current_platform = m.group(1)
+        # Match issue_id under a platform
+        m = re.match(r"\s*issue_id:\s*['\"]?(\S+)['\"]?", line)
+        if m and current_platform:
+            ids[current_platform] = m.group(1)
+            current_platform = None  # reset after capturing
+    return ids
 
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
     try:
@@ -463,8 +473,9 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
         return {}
 
 def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -> dict[str, str]:
-    """Batch-fetch CLOSED states, merging with already-fetched OPEN.
-    Cached (5min TTL). Only queries GitHub CLOSED; Gitee too slow for batch."""
+    """Fetch CLOSED states for ALL configured platforms.
+    Uses platform-adapter for per-platform individual queries.
+    Cached (5min TTL). Returns {issue_id: state} keyed by platform issue ID."""
     cache_file = project / ".freely" / "run" / "platform-all-cache.json"
     cached = cache_get(cache_file, ttl=300)
     if cached is not None:
@@ -473,22 +484,21 @@ def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -
     states: dict[str, str] = {num: "OPEN" for num in open_issues}
 
     platforms = _detect_platforms(project)
-    if "github" in platforms:
-        try:
-            repo = _gh_repo(project)
-            if repo:
-                r = subprocess.run(
-                    ["gh", "issue", "list", "--repo", repo, "--state", "closed",
-                     "--limit", "500", "--json", "number,state"],
-                    capture_output=True, text=True, timeout=15, cwd=str(project))
-                if r.returncode == 0 and r.stdout.strip():
-                    for item in json.loads(r.stdout):
-                        num = str(item.get("number", ""))
-                        if num and num not in states:
-                            states[num] = "CLOSED"
-        except Exception:
-            pass
-    # Gitee: skip batch. Individual state queries too slow for 500+ issues.
+    sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
+    try:
+        from platform_adapter import _handlers, _safe
+        for h in _handlers():
+            if h.name not in platforms:
+                continue
+            try:
+                closed = _safe(h.list_closed_issues) or {}
+                for num in closed:
+                    if num not in states:
+                        states[num] = "CLOSED"
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     cache_put(cache_file, {"states": states})
     return states
@@ -589,7 +599,7 @@ def read_issues_dir(project: Path) -> list[dict]:
                 "phase_state": fm.get("phase_state", ""),
                 "platform_state": fm.get("platform_state", ""),
                 "absorbed_into": fm.get("absorbed_into", ""),
-                "github_id": extract_github_id(fm, text),
+                "platform_ids": extract_platform_ids(text),
                 "source_raw": fm.get("source_raw", ""),
                 "source_candidate": fm.get("source_candidate", ""),
                 "frontmatter": fm,
@@ -612,7 +622,7 @@ def read_issues_dir(project: Path) -> list[dict]:
                 "phase_state": fm.get("phase_state", ""),
                 "platform_state": fm.get("platform_state", ""),
                 "absorbed_into": fm.get("absorbed_into", ""),
-                "github_id": extract_github_id(fm, text),
+                "platform_ids": extract_platform_ids(text),
                 "source_raw": fm.get("source_raw", ""),
                 "source_candidate": fm.get("source_candidate", ""),
                 "frontmatter": fm,
@@ -650,6 +660,7 @@ def scan(project: Path) -> dict:
     head_changed = (current_head != last_head)
     timer.mark("head_check")
 
+    configured_platforms = _detect_platforms(project)
     platform_issues = get_platform_open_issues(project)
     timer.mark("platform_open")
 
@@ -784,8 +795,18 @@ def scan(project: Path) -> dict:
         # ── Category 2: raw on develop → check alignment ──────────
         if raw_on_develop:
             phase = raw_issue["phase_state"]
-            plat_state = raw_issue["platform_state"]
-            gh_id = raw_issue["github_id"]
+            plat_state = raw_issue.get("platform_state", "")
+            pids = raw_issue.get("platform_ids", {})
+
+            # Check per-platform state alignment
+            platform_mismatches = {}
+            for pname in configured_platforms:
+                pid = pids.get(pname, "")
+                if pid and pid in all_platform_states:
+                    actual = all_platform_states[pid]
+                    local_upper = plat_state.upper() if plat_state else ""
+                    if actual != local_upper:
+                        platform_mismatches[pname] = actual
 
             # Subcategory 2a: non-terminal phase
             if phase not in TERMINAL_PHASES:
@@ -801,27 +822,24 @@ def scan(project: Path) -> dict:
                     "next_action": "[manager] 创建 raw issue → 工位 → 修正本地文档状态为 terminal",
                 })
             else:
-                # Terminal — check platform_state alignment
-                actual_state = ""
-                if gh_id:
-                    actual_state = all_platform_states.get(gh_id, "")
-
-                if not plat_state:
-                    # Only flag if we actually have platform data to compare against
-                    if gh_id and all_platform_states and gh_id in all_platform_states:
-                        items.append({
-                            "category": "2_document_misaligned",
-                            "subcategory": "2a_missing_platform_state",
-                            "key": raw_key,
-                            "issue_path": raw_issue["path"],
-                            "phase_state": phase,
-                            "platform_state": "",
-                            "actual_platform_state": actual_state,
-                            "ready": True,
-                            "detail": "platform_state not set in frontmatter",
-                            "next_action": f"[manager] 创建 raw issue → 填上 platform_state (platform actual={actual_state})",
-                        })
-                elif actual_state and plat_state.upper() != actual_state.upper() and gh_id in all_platform_states:
+                # Terminal — check per-platform state alignment
+                if not plat_state and platform_mismatches:
+                    # platform_state not set but platforms have data
+                    items.append({
+                        "category": "2_document_misaligned",
+                        "subcategory": "2a_missing_platform_state",
+                        "key": raw_key,
+                        "issue_path": raw_issue["path"],
+                        "phase_state": phase,
+                        "platform_state": "",
+                        "ready": True,
+                        "platform_mismatches": platform_mismatches,
+                        "detail": "platform_state not set, platforms disagree or have data",
+                        "next_action": "[manager] 创建 raw issue → 填上 platform_state",
+                    })
+                elif platform_mismatches:
+                    mismatched_platforms = ", ".join(
+                        f"{p}={s}" for p, s in platform_mismatches.items())
                     items.append({
                         "category": "2_document_misaligned",
                         "subcategory": "2a_state_mismatch",
@@ -829,10 +847,10 @@ def scan(project: Path) -> dict:
                         "issue_path": raw_issue["path"],
                         "phase_state": phase,
                         "platform_state": plat_state,
-                        "actual_platform_state": actual_state,
+                        "platform_mismatches": platform_mismatches,
                         "ready": True,
-                        "detail": f"local platform_state='{plat_state}' != actual='{actual_state}'",
-                        "next_action": "[manager] 创建 raw issue → 工位 → 对齐 platform_state",
+                        "detail": f"local platform_state='{plat_state}' != actual: {mismatched_platforms}",
+                        "next_action": "[manager] platform-adapter sync → 对齐所有平台状态",
                     })
 
             continue  # raw on develop → done with this key
@@ -855,9 +873,15 @@ def scan(project: Path) -> dict:
         # But the user said reopen should be Category 1, not 2.
         # Let me add a separate check:
         if raw_on_develop and raw_issue["phase_state"] in TERMINAL_PHASES and platform_open:
-            gh_id = raw_issue["github_id"]
-            actual = all_platform_states.get(gh_id, "") if gh_id else ""
-            if actual == "OPEN":
+            pids = raw_issue.get("platform_ids", {})
+            any_platform_open = False
+            for pname in configured_platforms:
+                pid = pids.get(pname, "")
+                state = all_platform_states.get(pid, "") if pid else ""
+                if state == "OPEN":
+                    any_platform_open = True
+                    break
+            if any_platform_open:
                 items.append({
                     "category": "1_not_started",
                     "subcategory": "1b_reopen",
@@ -926,7 +950,7 @@ def scan(project: Path) -> dict:
 
     # ── Build sync batch with cross-scan dedup ──
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    batched_items = _build_sync_batch(items, project, ts)
+    batched_items = _build_sync_batch(items, project, ts, configured_platforms)
 
     # ── Build batches display for Manager ──
     by_station: dict[str, list[dict]] = {}
