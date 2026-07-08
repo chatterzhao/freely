@@ -50,41 +50,232 @@ class Timer:
             prev = t
         return "\n".join(lines)
 
-# ── Stage classification ────────────────────────────────────────────
+# ── Station-based action mapping ────────────────────────────────────
+# Two-level [manager]/[worker] delegation templates.
+# {key} replaced with actual raw key at render time.
+# {wt} replaced with worktree path (for items with existing worktree).
 
-def _classify_stage(subcategory: str, phase_state: str = "", platform_state: str = "") -> str:
-    """Map subcategory to lifecycle stage."""
-    if subcategory == "2a_state_mismatch":
-        return "close_platform"
-    if subcategory in ("2a_non_terminal", "2a_missing_platform_state"):
-        return "close_local"
-    if subcategory in ("1a_fresh", "1b_reopen"):
-        return "B1_proposed"
+STATION_ACTIONS = {
+    # ── B1 phase ──
+    "raw_created": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug b1\n"
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → brainstorms.md → candidates.md"
+    ),
+    "b1_dir": (
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → 工位已存在，写入 brainstorms.md"
+    ),
+    "b1_dir_no_wt": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug b1\n"
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → 写入 brainstorms.md"
+    ),
+    "b1_brainstorm": (
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → 工位已存在，产出 candidates.md"
+    ),
+    "b1_brainstorm_no_wt": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug b1\n"
+        "[worker] cd <wt> && skill:freely-doc-B1_IBM-execution → 产出 candidates.md"
+    ),
+    "b1_candidate": (
+        "[worker] cd <wt> && skill:freely-candidate-acceptance-review → 决策 promote/absorb/drop"
+    ),
+    # ── B2 / Implementation phase ──
+    "candidate_decision": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug impl\n"
+        "[worker] cd <wt> && skill:freely-doc-B2_IBM-execution → materialize I-* → dev-loop"
+    ),
+    "i_created": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug impl\n"
+        "[worker] cd <wt> && skill:freely-dev-loop-execution → 推进 phase_state"
+    ),
+    "dev_worktree": (
+        "[worker] cd <wt> && skill:freely-dev-loop-execution → 工位已存在，推进 phase_state"
+    ),
+    "dev_worktree_no_wt": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug work\n"
+        "[worker] cd <wt> && skill:freely-dev-loop-execution → 推进 phase_state"
+    ),
+    "dev_phase_done": (
+        "[worker] cd <wt> && skill:freely-dev-loop-execution → pr-create-guarded → git commit → wt-close"
+    ),
+    # ── Close / Sync phase ──
+    "platform_create": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug sync\n"
+        "[worker] cd <wt> && issue-sync create → git commit → wt-close"
+    ),
+    "merged_develop": (
+        "[manager] wt-create --raw-key {key} --source platform --skill freely-workflow-guarded-execution --slug close\n"
+        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+    ),
+    "platform_close": (
+        "[manager] freely feedback → wt-create --raw-key {{new_key}} --source platform --skill freely-workflow-guarded-execution --slug close\n"
+        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+    ),
+    "branch_deleted": (
+        "[manager] freely feedback → wt-create --raw-key {{new_key}} --source platform --skill freely-workflow-guarded-execution --slug sync\n"
+        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+    ),
+    # ── Dead agent recovery ──
+    "agent_dead": (
+        "[manager] 检查 agent-working 表 → 恢复 session 或重新委派 worker\n"
+        "[worker] cd <wt> && 继续之前的工作"
+    ),
+}
+
+# Terminal phases — issues in these states need no further lifecycle action.
+TERMINAL_PHASES = {"absorbed", "dropped", "completed"}
+
+
+def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
+    """Detect which lifecycle station an item is at.
+
+    Returns a station key from STATION_ACTIONS, or a raw stage name
+    (close_local, close_platform, B1_proposed, 收口, 恢复) for items
+    that don't fit the station pipeline.
+    """
+    subcategory = item.get("subcategory", "")
+    raw_key = item.get("key", "")
+    raw_issue = issues_by_raw.get(raw_key)
+    wt = wt_by_raw.get(raw_key)
+    phase = raw_issue.get("phase_state", "") if raw_issue else ""
+
+    # ── Category 3: dead agent on existing worktree ──
+    if subcategory in ("3a_never_bound", "3b_session_dead"):
+        return "agent_dead"
+
+    # ── Category 2b: worktree not cleaned ──
     if subcategory == "2b_worktree_not_cleaned":
         return "收口"
-    if subcategory in ("3a_never_bound", "3b_session_dead"):
-        return "恢复"
+
+    # ── Category 1: not started ──
+    if subcategory in ("1a_fresh", "1b_reopen"):
+        return "B1_proposed"
+
+    # ── Category 2: document misaligned ──
+    # State mismatch between local and platform → needs platform sync
+    if subcategory == "2a_state_mismatch":
+        return "platform_close"
+
+    # Non-terminal phase or missing platform_state
+    if subcategory in ("2a_non_terminal", "2a_missing_platform_state"):
+        if not raw_issue:
+            return "raw_created"
+        if phase in ("proposed", ""):
+            return "raw_created"
+        # Already terminal but platform state mismatch
+        if phase in TERMINAL_PHASES:
+            return "merged_develop"
+        # In progress → needs dev worktree
+        return "close_local"
+
     return "收口"
 
 
-def _stage_action(stage: str) -> str:
-    """Map stage to human-readable action description."""
-    return {
-        "close_platform": "issue-sync close — 关闭平台 issue",
-        "close_local": "更新本地 phase_state 为 absorbed/dropped",
-        "B1_proposed": "freely wt-create → B1 预研",
+def _render_next_action(station: str, key: str, worktree: str = "") -> str:
+    """Render two-level [manager]/[worker] next_action for a station."""
+    template = STATION_ACTIONS.get(station, STATION_ACTIONS.get("raw_created", ""))
+    if not template:
+        return f"[manager] 检查 {key} 状态并决定下一步"
+    result = template.replace("{key}", key)
+    if worktree:
+        result = result.replace("<wt>", worktree)
+    return result
+
+
+def _stage_action(station: str) -> str:
+    """Map station to human-readable stage description."""
+    actions = {
+        "raw_created": "创建工位 → B1 预研",
+        "b1_dir": "B1 预研（工位已存在）",
+        "b1_dir_no_wt": "创建工位 → B1 预研",
+        "b1_brainstorm": "B1 brainstorms（工位已存在）",
+        "b1_brainstorm_no_wt": "创建工位 → B1 brainstorms",
+        "b1_candidate": "B1 candidate 决策",
+        "candidate_decision": "创建工位 → B2 物化",
+        "i_created": "创建工位 → dev-loop",
+        "dev_worktree": "dev-loop（工位已存在）",
+        "dev_worktree_no_wt": "创建工位 → dev-loop",
+        "dev_phase_done": "pr-create → merge → close",
+        "platform_create": "创建工位 → issue-sync create",
+        "merged_develop": "创建工位 → issue-sync close",
+        "platform_close": "freely feedback → wt-create → issue-sync close",
+        "branch_deleted": "freely feedback → wt-create → issue-sync close",
+        "agent_dead": "恢复 worker session / 重新委派",
+        "B1_proposed": "创建工位 → B1 预研",
+        "close_local": "更新本地 phase_state",
+        "close_platform": "issue-sync close → 关闭平台 issue",
         "收口": "检查并完成收口步骤",
         "恢复": "恢复 worker session 或重新委派",
-    }.get(stage, "检查并完成")
+    }
+    return actions.get(station, "检查并完成")
 
 
-def _batch_action(stage: str, count: int) -> str:
-    """Generate batch action description for Manager."""
-    if stage == "close_platform":
-        return f"[manager] 批量关闭 {count} 个平台 issue（本地已 terminal，平台未同步）→ issue-sync close --batch"
-    if stage == "close_local":
-        return f"[manager] 批量修正 {count} 个本地文档 phase_state（平台已关闭，本地未 terminal）→ 脚本批量更新 phase_state"
-    return f"[manager] 处理 {count} 个 {stage} 项"
+def _build_sync_batch(items: list[dict], project_path, ts: str) -> list[dict]:
+    """Collect platform sync items into one deduplicated batch.
+
+    Cross-scan dedup: if the same set of sync keys was already batched
+    in a previous scan, produce a noop entry instead of a new actionable one.
+    """
+    sync_stages = {"platform_close", "close_platform", "close_local", "merged_develop"}
+    sync_items = [it for it in items if it.get("station") in sync_stages
+                  or it.get("stage") in sync_stages]
+    remaining = [it for it in items if it not in sync_items]
+
+    if not sync_items:
+        return items
+
+    close_platform_count = sum(1 for it in sync_items if it.get("station") == "platform_close"
+                               or it.get("stage") == "close_platform")
+    close_local_count = sum(1 for it in sync_items if it.get("station") == "close_local"
+                            or it.get("stage") == "close_local")
+    merged_count = sum(1 for it in sync_items if it.get("station") == "merged_develop")
+    total_sync = len(sync_items)
+
+    # Cross-scan dedup via fingerprint
+    sync_keys = sorted([it.get("key", "") for it in sync_items])
+    fingerprint = json.dumps({"keys": sync_keys, "total": total_sync}, sort_keys=True)
+    state_dir = project_path / ".freely" / "run"
+    state_file = state_dir / "platform-sync-batch-state.json"
+
+    noop = False
+    if state_file.exists():
+        try:
+            prev = json.loads(state_file.read_text())
+            if prev.get("fingerprint") == fingerprint:
+                noop = True
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    if not noop:
+        state_dir.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(json.dumps({"fingerprint": fingerprint, "last_ts": ts}, indent=2))
+
+    batch_item = {
+        "key": f"platform-sync-batch-{ts}",
+        "station": "platform_sync_batch",
+        "source_family": "platform_sync",
+        "ready": not noop,
+        "priority": "P0_highest",
+        "noop": noop,
+        "sync_summary": {
+            "total": total_sync,
+            "close_platform": close_platform_count,
+            "close_local": close_local_count,
+            "merged_develop": merged_count,
+            "platforms": ["github", "gitee"],
+        },
+    }
+
+    if not noop:
+        batch_item["next_action"] = (
+            f"[manager] freely feedback --title \"Platform sync batch: sync {total_sync} items\" "
+            f"--body \"Batch sync: close_platform={close_platform_count} close_local={close_local_count} merged={merged_count}\"\n"
+            f"  → wt-create --raw-key {{new_key}} --source platform --skill freely-workflow-guarded-execution --slug platform-sync\n"
+            f"[worker] cd <wt> && issue-sync close → git commit → wt-close"
+        )
+    else:
+        batch_item["next_action"] = "noop — same batch already processed in previous scan"
+
+    return [batch_item] + remaining
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
@@ -686,59 +877,66 @@ def scan(project: Path) -> dict:
 
     # ── 1c: Platform-only issues without raw-{key} (TODO: restore after adapter returns per-platform dict) ──
 
-    # ── Post-processing: enrich items with stage and stage_action ───
+    # ── Post-processing: enrich items with station and next_action ──
     for item in items:
         sub = item.get("subcategory", "")
-        ps = item.get("phase_state", "")
-        # platform_state might be "platform_state" or "actual_platform_state"
-        pls = item.get("platform_state", "") or item.get("actual_platform_state", "")
-        item["stage"] = _classify_stage(sub, ps, pls)
-        item["stage_action"] = _stage_action(item["stage"])
+        key = item.get("key", "")
+        wt_path = item.get("worktree", "")
+        item["station"] = _detect_station(item, issues_by_raw, wt_by_raw)
+        item["source_family"] = "chain_trace" if sub not in ("1a_fresh", "1b_reopen") else "platform_sync"
+        # Render two-level next_action
+        station = item["station"]
+        item["next_action"] = _render_next_action(station, key, wt_path)
+        item["stage_action"] = _stage_action(station)
+        # Preserve stage for backward compatibility
+        item["stage"] = station
 
-    # ── Build batches: group items by stage for Manager ───────────
-    by_stage: dict[str, list[dict]] = {}
-    for item in items:
-        stage = item.get("stage", "收口")
-        by_stage.setdefault(stage, []).append(item)
+    # ── Build sync batch with cross-scan dedup ──
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    batched_items = _build_sync_batch(items, project, ts)
+
+    # ── Build batches display for Manager ──
+    by_station: dict[str, list[dict]] = {}
+    for item in batched_items:
+        st = item.get("station", item.get("stage", "收口"))
+        by_station.setdefault(st, []).append(item)
 
     batches: list[dict] = []
-    # Stages that should be batched (many similar items → one batch)
-    batchable_stages = {"close_platform", "close_local"}
-    # Stages that stay individual (need per-item Manager attention)
-    individual_stages = {"B1_proposed", "收口", "恢复"}
+    individual_stations = {"B1_proposed", "agent_dead", "收口", "恢复"}
 
-    for stage, stage_items in sorted(by_stage.items()):
-        if stage in batchable_stages and len(stage_items) > 0:
-            sample_keys = [it["key"] for it in stage_items[:5]]
+    for st, st_items in sorted(by_station.items()):
+        if st == "platform_sync_batch":
+            # Sync batch is a singleton — keep as-is from _build_sync_batch
+            batches.append(st_items[0])
+        elif st not in individual_stations and len(st_items) > 1:
+            sample_keys = [it["key"] for it in st_items[:5]]
             batches.append({
                 "type": "batch",
-                "stage": stage,
-                "stage_action": _stage_action(stage),
-                "count": len(stage_items),
+                "station": st,
+                "stage_action": _stage_action(st),
+                "count": len(st_items),
                 "sample_keys": sample_keys,
-                "has_more": len(stage_items) > 5,
+                "has_more": len(st_items) > 5,
                 "ready": True,
-                "next_action": _batch_action(stage, len(stage_items)),
-                "_item_indices": list(range(
-                    next(i for i, it in enumerate(items) if it.get("stage") == stage),
-                    next(i for i, it in enumerate(items) if it.get("stage") == stage) + len(stage_items)
-                )) if stage_items else [],
+                "next_action": _render_next_action(st, sample_keys[0] if sample_keys else "", ""),
             })
-        elif stage in individual_stages:
-            for it in stage_items:
+        else:
+            for it in st_items:
                 batches.append({
                     "type": "individual",
-                    "stage": stage,
+                    "station": it.get("station", it.get("stage", "")),
                     "stage_action": it.get("stage_action", ""),
                     "key": it["key"],
                     "ready": it.get("ready", True),
                     "next_action": it.get("next_action", ""),
+                    "worktree": it.get("worktree", ""),
+                    "branch": it.get("branch", ""),
                 })
 
     # ── Summary ─────────────────────────────────────────────────────
     by_cat = {}
     ready_count = 0
-    for item in items:
+    for item in batched_items:
         cat = item.get("category", "unknown")
         by_cat[cat] = by_cat.get(cat, 0) + 1
         if item.get("ready"):
@@ -765,14 +963,14 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="{current_head}"
         "head_changed": head_changed,
         "_timing": {k: round(v, 3) for k, v in timer.marks.items()},
         "summary": {
-            "total": len(items),
+            "total": len(batched_items),
             "ready": ready_count,
             "by_category": by_cat,
-            "by_stage": {stage: len(si) for stage, si in by_stage.items()},
+            "by_station": {st: len(si) for st, si in by_station.items()},
             "batch_count": len(batches),
         },
         "batches": batches,
-        "items": items,
+        "items": batched_items,
     }
 
 
