@@ -1,0 +1,1 @@
+823:  bridge_socket="$(_bridge_socket "$project" "$tool")"

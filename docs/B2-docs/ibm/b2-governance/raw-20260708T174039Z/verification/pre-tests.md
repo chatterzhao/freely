@@ -18,8 +18,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前第 823 行只有 _bridge_socket "$project" 无 $tool
 
@@ -38,8 +38,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前路径为 /tmp/freely-acp-<hash>.sock，缺少 -claude
 
