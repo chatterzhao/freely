@@ -3364,14 +3364,18 @@
 
 ## M-20260708T185138Z-A
 - title: fix — git diff relative path + state sync
-- status: active
+- status: completed
 ### candidate_issues
+### committed_issues
+1. `I-20260708T185138Z-A`
+- milestone: M-20260708T185138Z-A
+- phase_state: completed
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T185138Z/issues/I-20260708T185138Z-A.md
+### completed_issues
 1. `C-20260708T185138Z-A`
 - milestone: M-20260708T185138Z-A
-- status: promoted
-- promoted_issue_id: `I-20260708T185138Z-A`
-### committed_issues
-### completed_issues
+- status: absorbed
+- absorbed_into: `I-20260708T185138Z-A`
 
 ## M-20260708T185138Z-A
 - title: fix — git diff relative path
