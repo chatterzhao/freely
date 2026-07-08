@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260708T183102Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T183102Z
 milestone: M-20260708T183102Z-A
 ---
@@ -8,7 +8,7 @@ milestone: M-20260708T183102Z-A
 
 - candidate_format_version: v2
 - title: 修复 pr-merge-guarded 路径、worktree 解析、wt-close 冗余 issue-sync
-- status: promoted
+- status: absorbed
 - milestone: `M-20260708T183102Z-A`
 - decision_reason: 6 处修复分布在 2 个文件，核心是修复 _sync_issues_changed_in_merge 的读写路径不一致 + wt-close 的冗余 close 和引导逻辑
 - next_action: 改 pr-merge-guarded 2 处 + wt-close 4 处
