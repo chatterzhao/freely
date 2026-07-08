@@ -16,10 +16,10 @@
 - expected_output: missing_stage=0
 - expected_RED_output: NameError or KeyError — stage field missing
 - actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- actual_output: OK — all assertions passed
+- evidence_file: test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: feature — 修改前 scan 返回 null 或 NameError
 
@@ -36,10 +36,10 @@
 - expected_output: batches 字段存在且非空
 - expected_RED_output: batches 字段缺失或为空
 - actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- actual_output: OK — all assertions passed
+- evidence_file: test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: feature — 修改前 scan 输出无 batches 字段
 
@@ -56,10 +56,10 @@
 - expected_output: OK
 - expected_RED_output: JSON parse error or null output
 - actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- actual_output: OK — all assertions passed
+- evidence_file: test-evidence/acceptance-3.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - red_how: fix — 修改前 scan 返回 null（NameError bug）
 
