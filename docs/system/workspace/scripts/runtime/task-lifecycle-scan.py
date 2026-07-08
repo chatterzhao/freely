@@ -458,11 +458,64 @@ def extract_platform_ids(text: str) -> dict[str, str]:
             if m and m.group(1) not in ("platform_ids",):
                 current_platform = m.group(1)
         # Match issue_id under a platform
-        m = re.match(r"\s*issue_id:\s*['\"]?(\S+)['\"]?", line)
+        m = re.match(r"\s*issue_id:\s*['\"]?([^'\"]+)['\"]?", line)
         if m and current_platform:
             ids[current_platform] = m.group(1)
             current_platform = None  # reset after capturing
     return ids
+
+def _sync_platform_direct(raw_key: str, platform_ids: dict, project: Path) -> dict:
+    """Directly sync terminal state (closed/dropped/absorbed) to all platforms via API.
+    No worktree needed — this is a pure API operation.
+    Also syncs local platform_state field when all platforms agree on state.
+    Returns {platform: status} for successfully synced platforms."""
+    results = {}
+    local_id = f"raw-{raw_key}"
+    try:
+        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
+        from platform_adapter import close_issue
+        results = close_issue(local_id, platform_ids)
+    except Exception as e:
+        results["error"] = str(e)
+    return results
+
+def _check_platform_state_consistency(raw_key: str, platform_ids: dict, local_phase: str,
+                                       local_platform_state: str, project: Path) -> tuple[bool, str]:
+    """Check if platform OPEN/CLOSED state is consistent with local phase_state.
+    Returns (needs_sync: bool, reason: str).
+    - Terminal phase → all platforms should be CLOSED
+    - Non-terminal phase → all platforms should be OPEN
+    - If platforms disagree among themselves → needs sync to majority/terminal state
+    """
+    platforms = _detect_platforms(project)
+    if not platforms:
+        return False, "no_platforms"
+
+    states = {}
+    try:
+        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
+        from platform_adapter import fetch_issue_state
+        for pname in platforms:
+            pid_info = platform_ids.get(pname, {})
+            issue_id = pid_info.get("issue_id", "") if isinstance(pid_info, dict) else str(pid_info or "")
+            if issue_id:
+                state = fetch_issue_state(pname, issue_id)
+                if state:
+                    states[pname] = state.upper()
+    except Exception as e:
+        return False, f"check_error: {e}"
+
+    if not states:
+        return False, "no_platform_data"
+
+    is_terminal = local_phase in TERMINAL_PHASES
+    expected_state = "CLOSED" if is_terminal else "OPEN"
+    mismatches = {p: s for p, s in states.items() if s != expected_state}
+
+    if mismatches:
+        mismatch_str = ", ".join(f"{p}={s}" for p, s in mismatches.items())
+        return True, f"expected={expected_state}, actual: {mismatch_str}"
+    return False, "consistent"
 
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
     try:
@@ -822,9 +875,28 @@ def scan(project: Path) -> dict:
                     "next_action": "[manager] 创建 raw issue → 工位 → 修正本地文档状态为 terminal",
                 })
             else:
-                # Terminal — check per-platform state alignment
-                if not plat_state and platform_mismatches:
-                    # platform_state not set but platforms have data
+                # Terminal — if platforms disagree, sync them directly via API.
+                # No worktree needed for pure platform sync.
+                if platform_mismatches:
+                    synced = _sync_platform_direct(raw_key, pids, project)
+                    if synced:
+                        print(f"[scan] platform sync: {raw_key} → {synced}", file=sys.stderr)
+                    else:
+                        # Sync failed — flag for Manager attention
+                        items.append({
+                            "category": "2_document_misaligned",
+                            "subcategory": "2a_state_mismatch",
+                            "key": raw_key,
+                            "issue_path": raw_issue["path"],
+                            "phase_state": phase,
+                            "platform_state": plat_state,
+                            "platform_mismatches": platform_mismatches,
+                            "ready": True,
+                            "detail": f"platform sync failed for {raw_key}",
+                            "next_action": "[manager] 手动 platform-adapter sync → 对齐平台状态",
+                        })
+                elif not plat_state:
+                    # platform_state missing in local frontmatter
                     items.append({
                         "category": "2_document_misaligned",
                         "subcategory": "2a_missing_platform_state",
@@ -833,24 +905,8 @@ def scan(project: Path) -> dict:
                         "phase_state": phase,
                         "platform_state": "",
                         "ready": True,
-                        "platform_mismatches": platform_mismatches,
-                        "detail": "platform_state not set, platforms disagree or have data",
+                        "detail": "platform_state not set in frontmatter",
                         "next_action": "[manager] 创建 raw issue → 填上 platform_state",
-                    })
-                elif platform_mismatches:
-                    mismatched_platforms = ", ".join(
-                        f"{p}={s}" for p, s in platform_mismatches.items())
-                    items.append({
-                        "category": "2_document_misaligned",
-                        "subcategory": "2a_state_mismatch",
-                        "key": raw_key,
-                        "issue_path": raw_issue["path"],
-                        "phase_state": phase,
-                        "platform_state": plat_state,
-                        "platform_mismatches": platform_mismatches,
-                        "ready": True,
-                        "detail": f"local platform_state='{plat_state}' != actual: {mismatched_platforms}",
-                        "next_action": "[manager] platform-adapter sync → 对齐所有平台状态",
                     })
 
             continue  # raw on develop → done with this key
