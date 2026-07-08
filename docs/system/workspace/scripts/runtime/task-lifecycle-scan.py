@@ -362,7 +362,7 @@ def parse_frontmatter(text: str) -> dict:
     return fm
 def extract_raw_key(text: str) -> str | None:
     """Extract raw-{timestamp} key from text (title + body)."""
-    m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE)
+    m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE | re.IGNORECASE)
     return m.group(2) if m else None
 
 def find_worktree(project: Path, raw_key: str) -> Path | None:
@@ -1008,25 +1008,26 @@ def scan(project: Path) -> dict:
 
     # ── 1c: Platform-only issues without local raw dir ──────────
     # Scan all platform OPEN issues and flag those with no local file.
-    # These need to be pulled locally before any work can begin.
     for num, pi in platform_issues.items():
         rk = extract_raw_key(pi.get("title", "") + "\n" + pi.get("body", ""))
         if not rk:
             continue
         if rk in seen_keys:
-            continue  # already handled above
+            continue
         seen_keys.add(rk)
-        # Check per-platform state consistency for terminal items
-        pids = {}
-        for pname in configured_platforms:
-            # platform_issues is keyed by issue number — resolve per-platform
-            pass
+        # Build per-platform state view from all_platform_states
+        platform_states = {}
+        # platform_issues is keyed by issue number; check if this num has state
+        actual = all_platform_states.get(num, "")
+        if actual:
+            platform_states["detected"] = actual
         items.append({
             "category": "1_not_started",
             "subcategory": "1c_platform_only",
             "key": rk,
             "ready": True,
-            "detail": f"Platform issue #{num} has raw key but no local docs/B1-docs/raw-{rk}/",
+            "platform_states": platform_states,
+            "detail": f"Platform issue OPEN but no local docs/B1-docs/raw-{rk}/",
             "next_action": f"[manager] raw-issue-pull --raw-key {rk} → 创建本地目录 → 评估状态",
         })
 
