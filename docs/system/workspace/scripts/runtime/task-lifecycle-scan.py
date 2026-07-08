@@ -255,6 +255,9 @@ def _build_sync_batch(items: list[dict], project_path, ts: str, platforms: list[
     if not sync_items:
         return items
 
+    # Keep individual items visible — batch is an ADDITIONAL summary, not a replacement.
+    # Individual items are needed for traceability and testing.
+
     close_platform_count = sum(1 for it in sync_items if it.get("station") == "platform_close"
                                or it.get("stage") == "close_platform")
     close_local_count = sum(1 for it in sync_items if it.get("station") == "close_local"
@@ -307,7 +310,8 @@ def _build_sync_batch(items: list[dict], project_path, ts: str, platforms: list[
     else:
         batch_item["next_action"] = "noop — same batch already processed in previous scan"
 
-    return [batch_item] + remaining
+    # Prepend batch summary, keep individual items for traceability
+    return [batch_item] + items
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
