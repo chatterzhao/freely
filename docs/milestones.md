@@ -3321,3 +3321,9 @@
 - milestone: M-20260708T122837Z-A
 - status: promoted
 - promoted_issue_id: `I-20260708T122837Z-A`
+### committed_issues
+1. `I-20260708T122837Z-A`
+- issue_id: `I-20260708T122837Z-A`
+- path: docs/B2-docs/ibm/b2-governance/raw-20260708T122837Z/issues/I-20260708T122837Z-A.md
+- phase_state: completed
+- status: completed

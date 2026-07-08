@@ -6,6 +6,7 @@ milestone: M-20260708T122837Z-A
 ---
 ## C-20260708T122837Z-A: scan stage + batch
 - status: promoted
+- milestone: `M-20260708T122837Z-A`
 - decision_reason: 增量改造——保留新 scan 改进，恢复旧 scan 的 stage 分级 + batch 聚合 + derive_action
 - promoted_issue_id: I-20260708T122837Z-A
 - promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260708T122837Z/issues/I-20260708T122837Z-A.md
