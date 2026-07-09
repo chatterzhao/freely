@@ -57,7 +57,10 @@ _bridge_socket() {
 }
 
 _bridge_log_file() {
-  echo "$1/.freely/run/acp-bridge.log"
+  local project="$1" base_tool="${2:-}"
+  local _suffix=""
+  [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
+  echo "$project/.freely/run/acp-bridge${_suffix}.log"
 }
 
 _bridge_ensure_running() {
@@ -174,7 +177,9 @@ _detect_acp_failure() {
   [[ -f "$log_file" ]] || return 0
 
   local _matched _bridge_log _net_err
-  _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
+  # Check all per-tool bridge logs (acp-bridge-*.log) — not just the default
+  _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"  # fallback for legacy
+  _bridge_log_glob="$(dirname "$log_file")/../run/acp-bridge-*.log"
 
   # ── Layer 0: Idle shutdown (intentional, not a failure) ──
   # Bridge idle timeout triggers a clean shutdown with a distinct log message.
@@ -366,7 +371,9 @@ main() {
   # Record bridge log byte offset at cycle start so failure detection only
   # scans NEW content — avoids matching stale errors from previous cycles.
   local bridge_log_path bridge_log_offset
-  bridge_log_path="$(_bridge_log_file "$project")"
+  # Use base_tool (tool name without slot suffix) for per-tool bridge log
+  local _base_tool="${tool%%-*}"
+  bridge_log_path="$(_bridge_log_file "$project" "$_base_tool")"
   bridge_log_offset=$(wc -c < "$bridge_log_path" 2>/dev/null || echo 0)
 
   # Write own PID as initial AI PID (freely uses this for liveness)

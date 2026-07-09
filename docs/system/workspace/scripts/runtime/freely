@@ -8300,16 +8300,22 @@ log_codex_rate_limit_reset_at() {
 # codex-acp stderr goes to bridge log, not cycle log.
 log_has_acp_usage_limit() {
   local project="$1"
-  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
-  [[ -f "$bridge_log" ]] || return 1
-  rg -qi 'UsageLimitExceeded|usage limit|rate_limit_exceeded|quota exceeded|billing.*limit|try again|insufficient.*(balance|credit|quota)|429.*Rate|Rate.*429' "$bridge_log" 2>/dev/null
+  local bridge_log
+  for bridge_log in "$(run_dir_for_project "$project")"/acp-bridge*.log; do
+    [[ -f "$bridge_log" ]] || continue
+    rg -qi 'UsageLimitExceeded|usage limit|rate_limit_exceeded|quota exceeded|billing.*limit|try again|insufficient.*(balance|credit|quota)|429.*Rate|Rate.*429' "$bridge_log" 2>/dev/null && return 0
+  done
+  return 1
 }
 
 log_acp_rate_limit_reset_at() {
   local project="$1" reset_at="" fallback_seconds bridge_log
-  bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
-  [[ -f "$bridge_log" ]] || return 1
-  reset_at="$(rg -i 'try again at' "$bridge_log" 2>/dev/null | grep -oE '[0-9]{1,2}:[0-9]{2}\s*(AM|PM)' | head -1 || true)"
+  for bridge_log in "$(run_dir_for_project "$project")"/acp-bridge*.log; do
+    [[ -f "$bridge_log" ]] || continue
+    reset_at="$(rg -i 'try again at' "$bridge_log" 2>/dev/null | grep -oE '[0-9]{1,2}:[0-9]{2}\s*(AM|PM)' | head -1 || true)"
+    [[ -n "$reset_at" ]] && break
+  done
+  [[ -n "$reset_at" ]] || return 1
   if [[ -n "$reset_at" ]]; then
     printf '%s\n' "$reset_at"
     return 0
@@ -13895,7 +13901,10 @@ except Exception:
 
 _acp_bridge_has_fatal_error() {
   local project="$1"
-  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  local bridge_log
+  for bridge_log in "$(run_dir_for_project "$project")"/acp-bridge*.log; do
+    [[ -f "$bridge_log" ]] && break
+  done
   [[ -f "$bridge_log" ]] || return 1
 
   # Usage / quota limit (account-level hard cap)
@@ -14253,7 +14262,7 @@ _ensure_acp_bridge_running() {
   [[ $_sanitized -gt 0 ]] && log_info "acp bridge env sanitized: $_sanitized inherited AI tool vars unset"
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
-  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge-${base_tool}.log"
   if [[ ${#_bridge_env[@]} -gt 0 ]]; then
     env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --base-tool "$base_tool" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
   else
@@ -14359,7 +14368,7 @@ _stop_acp_bridge() {
   done
   # Clean up state files
   # pid/socket files cleaned above (per-tool or all)
-  rm -f "$(run_dir_for_project "$project")/acp-bridge.log"
+  rm -f "$(run_dir_for_project "$project")/acp-bridge"*.log
 }
 
 manager_ai_stalled_with_pending_intake() {
