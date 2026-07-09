@@ -1,0 +1,7 @@
+=== AT-001: Lazy-Start Bridge ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: daemon startup (line 22299-22319) distinguishes manager vs other base_tools.
+Non-manager bridges print "deferring bridge start for base_tool=X (lazy-start, will start on first delegation)".
+Only manager_01 bridge is started at daemon startup.

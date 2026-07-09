@@ -1,0 +1,6 @@
+=== AT-003: Idle-Shutdown Detection in Monitor ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: monitor-ai-acp.sh contains "shutting down, restart on next task" pattern.
+Verified: Layer 0 correctly classifies idle-shutdown as non-failure (NOT a failure comment).

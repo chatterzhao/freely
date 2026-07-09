@@ -6014,22 +6014,40 @@ sync_project_tooling_from_source() {
 	      log_warn "agent-table: concurrency limit reached ($_active_count/$_max_workers), deferring worker assignment"
 	      return 0
 	    fi
-	    # Pick first idle worker — skip those already in agent-id.env
-	    _all_workers=$("$_agent_query" --project "$source_project" --list worker 2>/dev/null || true)
-	    _picked=""
-	    for _w in $_all_workers; do
-	      [[ -n "$_w" ]] || continue
-	      if ! grep -q "=$_w\$" "$_agent_env" 2>/dev/null; then
-	        _picked="$_w"; break
-	      fi
-	    done
-	    _next_worker="${_picked:-${_all_workers%% *}}"
+	    # Pick first idle worker — use agent_working table (authoritative source).
+	    # Falls back to legacy agent-id.env grep if DB RPC fails.
+	    _next_worker=$(python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_next_free
+print(agent_next_free('${PROJECT_ROOT}', 'worker', 10) or '')
+" 2>/dev/null || true)
+	    # Fallback: legacy agent-id.env grep
+	    if [[ -z "$_next_worker" ]]; then
+	      _all_workers=$("$_agent_query" --project "$source_project" --list worker 2>/dev/null || true)
+	      for _w in $_all_workers; do
+	        [[ -n "$_w" ]] || continue
+	        if ! grep -q "=$_w\$" "$_agent_env" 2>/dev/null; then
+	          _next_worker="$_w"; break
+	        fi
+	      done
+	      [[ -z "$_next_worker" ]] && _next_worker="${_all_workers%% *}"
+	    fi
 	    if [[ -n "$_next_worker" ]]; then
+	      # Auto-wake: ensure target bridge is alive before delegation.
+	      local _worker_slot _worker_bt
+	      _worker_slot=$("$_agent_query" --get-slot "$_next_worker" 2>/dev/null || true)
+	      _worker_bt="${_worker_slot%%-*}"
+	      if [[ -n "$_worker_bt" ]]; then
+	        _ensure_acp_bridge_running "$source_project" "$_worker_bt" || {
+	          log_warn "agent-table: failed to start worker bridge for $_worker_bt, deferring assignment"
+	          return 1
+	        }
+	      fi
 	      mkdir -p "$(dirname "$_agent_env")"
 	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
 		      # Phase 1: dual-write to agent_working table
 		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
-	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
+	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env + agent_working)"
 	    fi
 	  fi
 	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
@@ -22278,16 +22296,27 @@ start_project_runtime() {
       exit 1
     fi
 
+    # Determine manager's base_tool for lazy-start: only the manager bridge
+    # is started at daemon startup.  Worker/reviewer bridges are started
+    # on-demand at first delegation (_sync_project_tooling → _ensure_acp_bridge_running).
+    local _manager_slot _manager_bt
+    _manager_slot=$("$_aq" --get-slot "manager_01" 2>/dev/null || true)
+    _manager_bt="${_manager_slot%%-*}"
+
     for _bt in "${_unique_tools[@]}"; do
       if ! _tool_is_registered "$_bt" 2>/dev/null; then
         log_error "base_tool '$_bt' from agent-table not in tool-registry.toml"
         log_error "Check agent-table.toml {role}_slot fields — base_tool must be a registered tool"
         exit 1
       fi
-      _ensure_acp_bridge_running "$project" "$_bt" || {
-        log_error "failed to start ACP bridge for base_tool=$_bt"
-        exit 1
-      }
+      if [[ -n "$_manager_bt" && "$_bt" == "$_manager_bt" ]]; then
+        _ensure_acp_bridge_running "$project" "$_bt" || {
+          log_error "failed to start ACP bridge for base_tool=$_bt"
+          exit 1
+        }
+      else
+        log_info "deferring bridge start for base_tool=$_bt (lazy-start, will start on first delegation)"
+      fi
     done
   fi
 

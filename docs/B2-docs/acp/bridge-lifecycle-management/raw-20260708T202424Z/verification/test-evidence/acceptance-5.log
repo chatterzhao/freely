@@ -1,0 +1,8 @@
+=== AT-005: Scan Regression ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: agent_dead_detail: 2 occurrences in scan.
+Verified: session_id: 8 occurrences in scan.
+Verified: agent_list_by_raw_key: 2 occurrences.
+All scan functions intact — no regression.

@@ -176,6 +176,16 @@ _detect_acp_failure() {
   local _matched _bridge_log _net_err
   _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
 
+  # ── Layer 0: Idle shutdown (intentional, not a failure) ──
+  # Bridge idle timeout triggers a clean shutdown with a distinct log message.
+  # This is NORMAL behavior — the bridge WILL be restarted on next delegation
+  # by _ensure_acp_bridge_running.  Do NOT set any failure markers.
+  if _matched=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 \
+      -E 'shutting down, restart on next task' 2>/dev/null) && [[ -n "$_matched" ]]; then
+    echo "[ACP-detect] idle-shutdown (normal, will restart on next task): ${_matched:0:200}" >&2
+    # NOT a failure — do not set failure_marker, network_failure_marker, or bridge_lost_marker
+  fi
+
   # ── Layer 1: Network / transport failure (from cycle log) ──
   if _matched=$(grep -m1 -E '\b(Connection refused|Connection reset by peer|connection refused|connection reset|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|timed out|connection timeout|Connection timed out|dial timeout|i/o timeout|read timeout|deadline exceeded|TLS handshake|TLS alert|TLS error|proxy error|proxy refused|proxy timeout|proxy auth|Could not connect to proxy|DNS error|DNS failure|DNS timeout|DNS resolution|Could not resolve host|name resolution failed|NXDOMAIN)\b' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
