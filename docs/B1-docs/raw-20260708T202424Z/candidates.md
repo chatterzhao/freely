@@ -1,7 +1,8 @@
 ---
 candidate_id: C-20260708T202424Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260708T202424Z
+absorbed_into: I-20260708T202424Z-A
 created_at: 2026-07-08
 milestone: M-20260708T202424Z-A
 ---
@@ -10,7 +11,7 @@ milestone: M-20260708T202424Z-A
 
 - candidate_format_version: v2
 - title: Agent Lazy-Start + Idle-Sleep + Task Auto-Wake Lifecycle
-- status: promoted
+- status: absorbed
 - decision_reason: Option A 最小改动覆盖全部 4 个问题：P1(lazy-start) + P2(idle-log) + P3(auto-wake) + P4(pool)。改动面小（4 文件 ~60 行），风险低，快速验收。Option B 的增强可后续迭代。
 - next_action: 进入 B2 阶段设计具体实现方案（skill:freely-doc-B2_IBM-execution）
 - revisit_trigger: N/A（已 promote）
