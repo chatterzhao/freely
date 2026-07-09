@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260709T232630Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260709T232630Z
 absorbed_into: I-20260709T232630Z-A
 milestone: M-20260709T232630Z-A
@@ -10,7 +10,7 @@ milestone: M-20260709T232630Z-A
 
 - candidate_format_version: v2
 - title: acp-bridge.log 按 base_tool 分离
-- status: promoted
+- status: absorbed
 - decision_reason: 三个 bridge 共用同一个日志文件导致互相 truncate 覆盖，按 base_tool 分离最简单有效
 - acceptance_criteria:
   - 每个 bridge 写入独立的 `acp-bridge-{base_tool}.log`
