@@ -30,11 +30,13 @@
   FAIL (expected RED): daemon startup treats all bridges equally — 所有 _unique_tools 都调用 _ensure_acp_bridge_running
   代码位置: freely:22281-22291 — for _bt in "${_unique_tools[@]}"; do _ensure_acp_bridge_running "$project" "$_bt"
   当前行为: daemon 启动时为 claude/opencode/cline 三个 base_tool 各启动一个 bridge
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: (失败时填写)
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: feature RED — 在 feature worktree 检查 freely:22281-22291 源码，确认 daemon startup 对所有 _unique_tools 无差别调用 _ensure_acp_bridge_running。功能实现后应只对 manager_01 的 base_tool 启动 bridge，其他 tool 打印 lazy-start 日志。
 
 ### acceptance-2
@@ -83,11 +85,13 @@
 - actual_RED_output: |
   FAIL (expected RED): acp-bridge.py 中无 _idle_monitor_loop 方法，无 "shutting down, restart on next task" 日志
   当前行为: bridge 空闲 180s 后 _send_request 抛出 idle timeout，_read_stdout 只打印 "server stdout closed"
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: (失败时填写)
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: feature RED — 在 feature worktree 检查 acp-bridge.py 源码，确认无 idle monitor thread 且无明确 shutdown 日志。功能实现后需新增 _idle_monitor_loop daemon thread + 明确日志格式。
 
 ### acceptance-3
@@ -120,11 +124,13 @@
 - actual_RED_output: |
   FAIL (expected RED): monitor-ai-acp.sh 中无 "shutting down, restart on next task" 匹配模式
   _detect_acp_failure 只有 4 层检测 (network/auth/bridge_fatal/session_lost)，无 idle-shutdown 识别
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: (失败时填写)
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: feature RED — 在 feature worktree 检查 monitor-ai-acp.sh:_detect_acp_failure，确认无 idle-shutdown 识别逻辑。功能实现后需在函数开头新增 idle-shutdown 日志匹配，匹配时打印 info 不设置 failure marker。
 
 ### acceptance-4
@@ -158,11 +164,13 @@
 - actual_RED_output: |
   FAIL (expected RED): _sync_project_tooling (line 5995-6040) 中无 _ensure_acp_bridge_running 调用，无 agent_next_free 调用
   当前行为: 用 grep agent-id.env 简单轮询选第一个不在文件中的 worker
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: (失败时填写)
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: feature RED — 在 feature worktree 检查 freely:_sync_project_tooling 源码，确认只有 grep agent-id.env 轮询，无 bridge 检查和 agent_next_free。功能实现后需在委派前调用 agent_next_free + _ensure_acp_bridge_running。
 
 ### acceptance-5
@@ -204,7 +212,9 @@
   agent_dead_detail: 2 occurrences in scan
   session_id: 8 occurrences in scan
   agent_list_by_raw_key: 2 occurrences in scan
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
@@ -242,11 +252,13 @@
 - actual_RED_output: |
   FAIL (expected RED): daemon startup (line 22281-22291) treats all bridges equally — 无 manager vs other 区分
   与 AT-001 相同根因 — daemon startup 对所有 _unique_tools 无差别调用 _ensure_acp_bridge_running
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
+  All scan functions intact — no regression
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: (失败时填写)
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: feature RED — 与 AT-001 合并验证。daemon startup 对所有 tool 一视同仁。功能实现后 cycle check 保持不变（只维护已启动的 bridge）。
 
 ## Unit
