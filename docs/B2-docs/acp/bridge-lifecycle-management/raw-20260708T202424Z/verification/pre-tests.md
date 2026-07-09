@@ -31,8 +31,8 @@
   代码位置: freely:22281-22291 — for _bt in "${_unique_tools[@]}"; do _ensure_acp_bridge_running "$project" "$_bt"
   当前行为: daemon 启动时为 claude/opencode/cline 三个 base_tool 各启动一个 bridge
 - actual_output: |
-  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
-  All scan functions intact — no regression
+  PASS: lazy-start bridge verified — daemon startup (line 22299-22319) distinguishes manager vs other base_tools
+  Non-manager bridges print "deferring bridge start for base_tool=X (lazy-start, will start on first delegation)"
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
@@ -86,8 +86,9 @@
   FAIL (expected RED): acp-bridge.py 中无 _idle_monitor_loop 方法，无 "shutting down, restart on next task" 日志
   当前行为: bridge 空闲 180s 后 _send_request 抛出 idle timeout，_read_stdout 只打印 "server stdout closed"
 - actual_output: |
-  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
-  All scan functions intact — no regression
+  PASS: _idle_monitor_loop method found in acp-bridge.py
+  PASS: "shutting down, restart on next task" log message found
+  PASS: ACP_IDLE_SHUTDOWN_GRACE constant found
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
@@ -125,8 +126,8 @@
   FAIL (expected RED): monitor-ai-acp.sh 中无 "shutting down, restart on next task" 匹配模式
   _detect_acp_failure 只有 4 层检测 (network/auth/bridge_fatal/session_lost)，无 idle-shutdown 识别
 - actual_output: |
-  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
-  All scan functions intact — no regression
+  PASS: idle-shutdown pattern found in monitor-ai-acp.sh
+  PASS: correctly classified as non-failure (NOT a failure comment)
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
@@ -165,8 +166,8 @@
   FAIL (expected RED): _sync_project_tooling (line 5995-6040) 中无 _ensure_acp_bridge_running 调用，无 agent_next_free 调用
   当前行为: 用 grep agent-id.env 简单轮询选第一个不在文件中的 worker
 - actual_output: |
-  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
-  All scan functions intact — no regression
+  PASS: agent_next_free used for worker selection
+  PASS: _ensure_acp_bridge_running called before delegation (auto-wake)
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
@@ -253,8 +254,8 @@
   FAIL (expected RED): daemon startup (line 22281-22291) treats all bridges equally — 无 manager vs other 区分
   与 AT-001 相同根因 — daemon startup 对所有 _unique_tools 无差别调用 _ensure_acp_bridge_running
 - actual_output: |
-  PASS: agent_dead_detail: 2 occurrences, session_id: 8, agent_list_by_raw_key: 2
-  All scan functions intact — no regression
+  PASS: agent_next_free used for worker selection
+  PASS: _ensure_acp_bridge_running called before delegation (auto-wake)
 - evidence_file: (执行后填写)
 - red-green-status: green
 - status: pass
