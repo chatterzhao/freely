@@ -3497,6 +3497,10 @@
 - title: fix — doc gate 移除 3 个非 agent 注入文件检查
 - status: active
 ### candidate_issues
+1. `C-20260709T142056Z-A`
+- milestone: M-20260709T142056Z-A
+- status: promoted
+- promoted_issue_id: `I-20260709T142056Z-A`
 ### committed_issues
 1. `I-20260709T142056Z-A`
 - milestone: M-20260709T142056Z-A
