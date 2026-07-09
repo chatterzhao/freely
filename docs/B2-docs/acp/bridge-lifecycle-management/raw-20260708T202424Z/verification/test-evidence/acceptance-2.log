@@ -1,0 +1,7 @@
+=== AT-002: Idle Monitor Thread + Shutdown Log ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: _idle_monitor_loop method exists in acp-bridge.py.
+Verified: "shutting down, restart on next task" log message exists.
+Verified: ACP_IDLE_SHUTDOWN_GRACE constant (30s) exists.

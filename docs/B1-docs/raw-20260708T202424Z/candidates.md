@@ -29,7 +29,7 @@ milestone: M-20260708T202424Z-A
   - summary: 审查 agent lifecycle 4 项改造的架构合理性，确认改动面最小化且覆盖完整
   - verdict: pass
 - promoted_issue_id: I-20260708T202424Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260708T202424Z/issues/I-20260708T202424Z-A.md
+- promoted_issue_path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260708T202424Z/issues/I-20260708T202424Z-A.md
 - milestone: M-20260708T202424Z-A
 - session_refs: []
 

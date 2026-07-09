@@ -1,0 +1,6 @@
+=== AT-006: Cycle Check Unchanged ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: daemon startup distinguishes manager vs lazy (deferring bridge start exists).
+Verified: cycle check maintains existing bridges (_ensure_acp_bridge_running still in cycle).

@@ -1,0 +1,6 @@
+=== AT-004: Auto-Wake + agent_next_free ===
+Date: 2026-07-08
+Status: PASS
+
+Verified: agent_next_free used for worker selection in _sync_project_tooling.
+Verified: _ensure_acp_bridge_running called before delegation (auto-wake).

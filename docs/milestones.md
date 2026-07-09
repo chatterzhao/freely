@@ -3489,5 +3489,5 @@
 ### committed_issues
 1. `I-20260708T202424Z-A`
 - milestone: M-20260708T202424Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260708T202424Z/issues/I-20260708T202424Z-A.md

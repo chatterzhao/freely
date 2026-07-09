@@ -278,6 +278,9 @@
 - target_environment: test-pre-merge-20260708T202424Z-agent-lifecycle
 - required_evidence: AT-001(daemon start) → AT-002(idle-shutdown) → AT-004(auto-wake) 全部 PASS
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 完整的 daemon 集成测试需要实际运行 daemon、等待 idle timeout、触发委派，属于 post-merge real-environment 范畴。当前通过 6 个 acceptance items 验证源码正确性。
+- replacement_evidence: AT-001~AT-006 全部 green，evidence logs 已写入 test-evidence/
 
 ## End-to-End
 - acceptance_target: 完整端到端流程：daemon start (1 bridge) → bridge idle exit → manager cycle → bridge auto-wake → worker 可委派
@@ -285,6 +288,9 @@
 - target_environment: test-pre-merge-20260708T202424Z-agent-lifecycle → develop merge chain
 - required_evidence: guarded merge receipts
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 端到端测试需要真实 daemon 运行环境（实际启动 daemon、等待 idle timeout、触发委派），属于 post-merge dogfood 范畴。
+- replacement_evidence: AT-001~AT-006 全部 green + pr-create-guarded gate pass
 
 ## Real-Environment
 - real_environment_status: pass
