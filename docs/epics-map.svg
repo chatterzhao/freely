@@ -57,7 +57,7 @@
   <text x="65" y="603" fill="#333">packaging</text>
   <rect id="story-slot-switch-startup-preflight-and-lock-observability-governance" x="55" y="610" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
   <text x="65" y="623" fill="#333">slot-switch-startup-preflight-and-lock-observability-governance</text>
-  <rect id="epic-gate" x="35" y="641" width="730" height="245" fill="#fff8e1" stroke="#f9a825" stroke-width="2" rx="4"/>
+  <rect id="epic-gate" x="35" y="641" width="730" height="265" fill="#fff8e1" stroke="#f9a825" stroke-width="2" rx="4"/>
   <text x="50" y="657" font-size="14" font-weight="bold" fill="#f9a825">gate</text>
   <rect id="story-checkpoint-commit-and-multi-worktree-supervision-governance" x="55" y="667" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="680" fill="#333">checkpoint-commit-and-multi-worktree-supervision-governance</text>
@@ -81,7 +81,9 @@
   <text x="65" y="860" fill="#333">test-lane-routing-and-enforcement-governance</text>
   <rect id="story-test-pre-merge-family-promotion-gate-enforcement-governance" x="55" y="867" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="880" fill="#333">test-pre-merge-family-promotion-gate-enforcement-governance</text>
-  <rect id="epic-git-worktree" x="35" y="898" width="730" height="165" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
+  <rect id="story-doc-gate-governance" x="55" y="887" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
+  <text x="65" y="900" fill="#333">doc-gate-governance</text>
+  <rect id="epic-git-worktree" x="35" y="918" width="730" height="165" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
   <text x="50" y="914" font-size="14" font-weight="bold" fill="#e65100">git-worktree</text>
   <rect id="story-branch-pr" x="55" y="924" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="937" fill="#333">branch-pr</text>
