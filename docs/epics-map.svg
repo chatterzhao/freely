@@ -11,7 +11,7 @@
   <text x="65" y="129" fill="#333">reviewer-agent</text>
   <rect id="story-task-lifecycle" x="55" y="136" width="690" height="18" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="2"/>
   <text x="65" y="149" fill="#333">task-lifecycle</text>
-  <rect id="epic-acp" x="35" y="167" width="730" height="105" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
+  <rect id="epic-acp" x="35" y="167" width="730" height="125" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
   <text x="50" y="183" font-size="14" font-weight="bold" fill="#c62828">acp</text>
   <rect id="story-acp-bridge-crash-resilience" x="55" y="193" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
   <text x="65" y="206" fill="#333">acp-bridge-crash-resilience</text>
@@ -21,7 +21,9 @@
   <text x="65" y="246" fill="#333">acp-optional-adapter-boundary-governance</text>
   <rect id="story-multi-bridge" x="55" y="253" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
   <text x="65" y="266" fill="#333">multi-bridge</text>
-  <rect id="epic-config" x="35" y="284" width="730" height="345" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
+  <rect id="story-bridge-lifecycle-management" x="55" y="273" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
+  <text x="65" y="286" fill="#333">bridge-lifecycle-management</text>
+  <rect id="epic-config" x="35" y="304" width="730" height="345" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
   <text x="50" y="300" font-size="14" font-weight="bold" fill="#616161">config</text>
   <rect id="story-agent-table" x="55" y="310" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
   <text x="65" y="323" fill="#333">agent-table</text>

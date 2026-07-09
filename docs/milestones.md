@@ -3477,3 +3477,17 @@
 - milestone: M-20260708T231255Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T231255Z-A`
+
+## M-20260708T202424Z-A
+- title: feat — agent lazy-start + idle-sleep + task auto-wake lifecycle
+- status: active
+### candidate_issues
+1. `C-20260708T202424Z-A`
+- milestone: M-20260708T202424Z-A
+- status: promoted
+- promoted_issue_id: `I-20260708T202424Z-A`
+### committed_issues
+1. `I-20260708T202424Z-A`
+- milestone: M-20260708T202424Z-A
+- phase_state: done_b2_ibm
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260708T202424Z/issues/I-20260708T202424Z-A.md
