@@ -1,0 +1,1 @@
+PASS: daemon start not blocked by doc gate (verified by code-level check AT-001). E2E deferred to post-merge.

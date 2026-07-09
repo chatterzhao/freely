@@ -993,14 +993,14 @@ EOF
 check_doc_gate_or_fail() {
   local project="$1"
   local failed=0
+  # Only check agent-injected governance docs (see AGENTS.md §权威来源).
+  # These 4 files are the authoritative governance stack injected into
+  # every agent via CLAUDE.md → AGENTS.md → CONSTITUTION/LAWS/PROJECT_INTENT.
   local required=(
     "docs/PROJECT_INTENT.md"
     "docs/CONSTITUTION.md"
     "docs/LAWS.md"
     "AGENTS.md"
-    "docs/B1-docs/README.md"
-    "docs/B1-docs/INDEX.md"
-    "docs/B1-docs/CONVERGENCE.md"
   )
 
   for rel in "${required[@]}"; do
@@ -1009,11 +1009,6 @@ check_doc_gate_or_fail() {
       failed=1
     fi
   done
-
-  if [[ ! -d "$project/docs/pre-brainstorms" ]]; then
-    log_error "doc gate failed: missing $project/docs/pre-brainstorms"
-    failed=1
-  fi
 
   if [[ "$failed" -ne 0 ]]; then
     return 1
