@@ -31,6 +31,7 @@ import threading
 
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "180"))
+ACP_IDLE_SHUTDOWN_GRACE = int(os.environ.get("ACP_BRIDGE_IDLE_SHUTDOWN_GRACE", "30"))
 ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE") or "bypassPermissions"
 if not os.environ.get("CLAUDE_CODE_PERMISSION_MODE"):
     import sys as _sys
@@ -189,13 +190,15 @@ class AcpBridge:
         # --permission-mode CLI flag is claude-agent-acp-specific; codex-acp, opencode lack it.
         self.server_proc = self._popen_with_pty(env)
 
-        # Start reader threads
+        # Start reader threads + idle monitor
         self.running = True
         self.server_ready.clear()
         self.stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
         self.stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
+        self._idle_thread = threading.Thread(target=self._idle_monitor_loop, daemon=True)
         self.stdout_thread.start()
         self.stderr_thread.start()
+        self._idle_thread.start()
 
         # Initialize handshake
         try:
@@ -283,6 +286,32 @@ class AcpBridge:
         env = os.environ.copy()
         self.server_proc = self._popen_with_pty(env)
         self.log("server process restarted (initialize deferred to first request)")
+
+    def _idle_monitor_loop(self):
+        """Background thread: check idle time, gracefully shut down if exceeded.
+
+        Runs every 30s.  If the bridge has been idle for longer than
+        ACP_IDLE_TIMEOUT + ACP_IDLE_SHUTDOWN_GRACE seconds (no AI activity
+        on stdout), logs a clear message and triggers a clean shutdown.
+
+        Shutdown is intentional and recoverable — the bridge WILL be
+        restarted on the next delegation by _ensure_acp_bridge_running.
+        """
+        while self.running:
+            time.sleep(30)
+            if not self.running:
+                break
+            with self.activity_lock:
+                idle_secs = time.time() - self.last_activity_ts
+            if idle_secs > ACP_IDLE_TIMEOUT + ACP_IDLE_SHUTDOWN_GRACE:
+                self._idle_timeout_detected = True
+                self.log(
+                    f"idle {idle_secs:.0f}s (limit={ACP_IDLE_TIMEOUT}s) — "
+                    f"no task for base_tool={self.base_tool or '(default)'}, "
+                    f"shutting down, restart on next task"
+                )
+                self.running = False
+                break
 
     def _read_stdout(self):
         """Read newline-delimited JSON from server stdout (via PTY master fd)."""
