@@ -3483,12 +3483,12 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
 1. `I-20260708T202424Z-A`
 - milestone: M-20260708T202424Z-A
 - phase_state: completed
 - path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260708T202424Z/issues/I-20260708T202424Z-A.md
-### completed_issues
-1. `C-20260708T202424Z-A`
+2. `C-20260708T202424Z-A`
 - milestone: M-20260708T202424Z-A
 - status: absorbed
 - absorbed_into: `I-20260708T202424Z-A`
