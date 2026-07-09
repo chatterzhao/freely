@@ -60,8 +60,9 @@ def _socket_path(project, base_tool=""):
     return f"/tmp/freely-acp-{_short_hash(project)}{suffix}.sock"
 
 
-def _log_file(project):
-    return os.path.join(_runtime_dir(project), "acp-bridge.log")
+def _log_file(project, base_tool=""):
+    suffix = f"-{base_tool}" if base_tool else ""
+    return os.path.join(_runtime_dir(project), f"acp-bridge{suffix}.log")
 
 
 def _context_ratio_file(project):
@@ -113,7 +114,7 @@ class AcpBridge:
         self.acp_bin = acp_bin
         self.acp_args = acp_args or []  # tool-specific ACP server args (e.g. "acp" for opencode)
         self.base_tool = base_tool
-        self.log_file = log_file or _log_file(project)
+        self.log_file = log_file or _log_file(project, base_tool)
         self.server_proc = None
         self.server_lock = threading.Lock()
         self.pending = {}  # request_id -> {"event": Event, "response": dict, "method": str}
@@ -764,7 +765,7 @@ def cmd_start(args):
     project = args.project
     base_tool = getattr(args, 'base_tool', None) or ""
     acp_bin = args.acp_bin or os.environ.get("FREELY_CLAUDE_ACP_BIN", "claude-agent-acp")
-    log_file = args.log_file or _log_file(project)
+    log_file = args.log_file or _log_file(project, base_tool)
 
     # Check if already running
     pid_file = _pid_file(project, base_tool)
@@ -862,7 +863,7 @@ def cmd_status(args):
             os.kill(pid, 0)
             print(f"running (PID {pid}) base_tool={base_tool or '(default)'}")
             print(f"socket: {socket_path}")
-            print(f"log: {_log_file(project)}")
+            print(f"log: {_log_file(project, base_tool)}")
             return 0
         except (OSError, ValueError):
             print("stale (PID file exists but process dead)")
