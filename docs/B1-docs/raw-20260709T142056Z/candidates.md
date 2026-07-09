@@ -1,7 +1,8 @@
 ---
 candidate_id: C-20260709T142056Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260709T142056Z
+absorbed_into: I-20260709T142056Z-A
 created_at: 2026-07-09
 milestone: M-20260709T142056Z-A
 ---
@@ -10,7 +11,7 @@ milestone: M-20260709T142056Z-A
 
 - candidate_format_version: v2
 - title: doc gate 移除 3 个非 agent 注入文件检查
-- status: promoted
+- status: absorbed
 - decision_reason: README.md/INDEX.md/CONVERGENCE.md 不是 agent 注入治理文档，不应阻塞 daemon 启动。Agent 注入链路只有 CONSTITUTION/LAWS/PROJECT_INTENT/AGENTS.md 4 个文件。
 - next_action: 进入 B2 设计实现
 - revisit_trigger: N/A
