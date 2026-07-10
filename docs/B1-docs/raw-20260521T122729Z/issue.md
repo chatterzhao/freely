@@ -19,8 +19,7 @@ channel: github
 session_refs: []
 force_closed_at: '2026-05-21T15:26:59Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 oc-acp-ds-flash-auto alias 展开为 OPENCODE_CONFIG=... opencode，但新的 _resolve_tool_family 用 expansion%% * 取第一个词（OPENCODE_CONFIG=...），而非最后一个词（opencode）。导致 binary 识别错误，adapter 检查失败。

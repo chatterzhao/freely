@@ -12,8 +12,7 @@ platform_ids:
     synced_at: '2026-05-18T04:09:17Z'
 updated_at: '2026-06-17T00:19:57Z'
 primary_platform: github
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 根因
 

@@ -22,8 +22,7 @@ author: platform
 channel: github
 session_refs: []
 
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 \n\n## 根因
 agent-table.toml 已是多 agent 唯一真源（manager→claude, worker→opencode, reviewer→cline），但代码中 181 处 AI_TOOL 引用形成降级链，绕过 agent-table。

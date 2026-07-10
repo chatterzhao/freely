@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 _tool_switch_launch_kind 在同工具但记录中 new_session_id 为空时总是返回 fresh，

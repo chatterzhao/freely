@@ -7,6 +7,5 @@ platform_ids:
     issue_id: '297'
     url: https://github.com/chatterzhao/freely/issues/297
 primary_platform: github
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 同工位并发防护：worktree_has_active_worker 检查 PID，busy 则跳过分配。

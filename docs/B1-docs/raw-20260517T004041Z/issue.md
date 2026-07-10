@@ -19,8 +19,7 @@ channel: github
 session_refs: []
 platform_state: closed
 force_closed_at: '2026-05-17T00:44:09Z'
-force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-absorbed_into: raw-20260710T005219Z---
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'---
 
 ## raw-20260517T004041Z41Z
 

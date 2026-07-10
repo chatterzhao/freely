@@ -13,8 +13,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-11T13:34:33Z"
 title: "fix: .githooks/* wrappers bash 3.2 precedence bug blocks all ref updates"
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 

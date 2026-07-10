@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 _on_supervisor_err（freely:19092）每次崩溃无条件调用 `freely feedback` 新建 issue。

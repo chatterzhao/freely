@@ -6,8 +6,7 @@ platform_ids: {}
 primary_platform: ""
 canonical_issue_path: ""
 
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 # Migration placeholder
 

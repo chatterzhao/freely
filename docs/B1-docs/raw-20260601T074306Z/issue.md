@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 修复
 1. dead threshold 3→2：1小时窗口内 opencode 900s 周期只能累积 2 次失败，永达不到 3
