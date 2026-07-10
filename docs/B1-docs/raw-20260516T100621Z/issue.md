@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260516T100621Z21Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -21,7 +21,7 @@ session_refs: []
 platform_state: closed
 force_closed_at: '2026-05-16T10:12:49Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
----
+absorbed_into: raw-20260710T005219Z---
 
 ## consume_delegate_workers (13979-14033)
 

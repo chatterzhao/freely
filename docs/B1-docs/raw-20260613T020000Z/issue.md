@@ -11,7 +11,7 @@ canonical_issue_path: ''
 created_at: '2026-06-13T02:00:00Z'
 platform_state: closed
 updated_at: '2026-06-17T00:19:24Z'
----
+absorbed_into: raw-20260710T005219Z---
 
 pr-create-guarded 和 pr-merge-guarded 硬编码 GitHub，不支持多平台配置。
 多平台项目 merge 后 develop 只在单一 remote 同步，跨平台 PR 存在串平台风险。

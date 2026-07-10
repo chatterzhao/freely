@@ -21,6 +21,6 @@ platform_state: closed
 force_closed_at: '2026-06-03T11:48:40Z'
 force_closed_reason: platform-sync cycling — timestamp-only updates that will regenerate
   next batch
----
+absorbed_into: raw-20260710T005219Z---
 
 Batch sync task discovered by scan.\npull=0 push=353 reconcile=0 close=67\nplatforms: github, gitee

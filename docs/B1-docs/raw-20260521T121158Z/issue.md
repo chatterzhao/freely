@@ -20,7 +20,7 @@ session_refs: []
 force_closed_at: '2026-05-21T15:26:48Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 问题
 当前版本号格式为 YYYYMMDD-nightly（如 20260521-nightly），不含时分，同一天多次打包会覆盖。

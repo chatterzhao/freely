@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260511T135429Z29Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: medium
 source: platform
@@ -14,7 +14,7 @@ platform_ids:
 created_at: "2026-05-11T13:54:29Z"
 title: "feat: pre-push hook support FREELY_SKIP_IBM_GATE bypass"
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 问题
 

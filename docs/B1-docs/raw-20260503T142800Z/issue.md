@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260503T142800Z00Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: P1
 source: platform
@@ -14,7 +14,7 @@ platform_ids:
 created_at: "2026-05-03T21:29:35Z"
 title: "fix: run-acp-prompt.py disconnects before bridge finishes"
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## Root Cause
 

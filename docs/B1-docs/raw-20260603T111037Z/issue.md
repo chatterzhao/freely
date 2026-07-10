@@ -20,6 +20,6 @@ session_refs: []
 platform_state: closed
 force_closed_at: '2026-06-03T11:18:06Z'
 force_closed_reason: platform sync batch — changes pushed to remote
----
+absorbed_into: raw-20260710T005219Z---
 
 Batch sync task discovered by scan.\npull=0 push=352 reconcile=0 close=67\nplatforms: github, gitee

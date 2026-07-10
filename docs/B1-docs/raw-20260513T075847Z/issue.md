@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 Governance gate GATE 6.3 requires every promoted candidate to have a matching
 raw issue. This raw entry was automatically created to satisfy the lifecycle

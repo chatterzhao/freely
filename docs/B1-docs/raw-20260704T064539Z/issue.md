@@ -22,7 +22,8 @@ author: platform
 channel: github
 session_refs: []
 
-platform_state: closed---
+platform_state: closed
+absorbed_into: raw-20260710T005219Z---
 
 \n\n
 ## 问题 1: 三个角色 session 创建逻辑分散

@@ -18,6 +18,6 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 Batch sync task discovered by scan.\npull=676 push=9 reconcile=194 close=61\nplatforms: github, gitee
