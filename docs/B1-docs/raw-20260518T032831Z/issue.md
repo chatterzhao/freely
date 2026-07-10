@@ -12,8 +12,7 @@ platform_ids:
     synced_at: '2026-05-18T03:28:37Z'
 updated_at: '2026-06-17T00:23:42Z'
 primary_platform: github
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 现状
 

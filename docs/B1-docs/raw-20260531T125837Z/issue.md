@@ -18,8 +18,7 @@ author: platform
 channel: github
 session_refs: []
 
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 ensure-manager 通过 8 层 grace chain (L220-L240) + ai.pid 文件推断 supervisor 状态，存在竞态条件，导致 supervisor 被误杀、L240 死锁。

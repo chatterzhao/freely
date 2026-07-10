@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 目标
 消除双路径（a2a-exit + 文本JSON解析），只保留标准 A2A 协议路径。

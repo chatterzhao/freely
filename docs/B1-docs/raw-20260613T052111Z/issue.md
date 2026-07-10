@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 1. a2a_server.py --stop CLI 只 rm socket，不杀进程

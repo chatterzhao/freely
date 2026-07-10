@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 要改的
 

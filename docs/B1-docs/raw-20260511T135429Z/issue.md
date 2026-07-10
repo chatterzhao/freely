@@ -13,8 +13,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-11T13:54:29Z"
 title: "feat: pre-push hook support FREELY_SKIP_IBM_GATE bypass"
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## 问题
 

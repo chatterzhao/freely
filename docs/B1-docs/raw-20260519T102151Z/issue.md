@@ -12,8 +12,7 @@ platform_ids:
     synced_at: '2026-05-19T10:21:59Z'
 updated_at: '2026-06-21T20:14:31Z'
 primary_platform: github
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 supervisor crash: bash at freely:18923 (rc=0)
 last_exit_reason_before_crash: set_e_exit_cmd=bash@freely:18923_rc_0

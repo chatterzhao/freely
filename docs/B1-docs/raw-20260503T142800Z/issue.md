@@ -13,8 +13,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T21:29:35Z"
 title: "fix: run-acp-prompt.py disconnects before bridge finishes"
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## Root Cause
 

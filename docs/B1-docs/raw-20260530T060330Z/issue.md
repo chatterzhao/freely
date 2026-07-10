@@ -17,7 +17,6 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 Batch sync with multi-iteration convergence. push=337 platforms=github,gitee

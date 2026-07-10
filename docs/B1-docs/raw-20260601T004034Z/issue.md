@@ -17,8 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-absorbed_into: raw-20260710T005219Z---
+platform_state: closed---
 
 ## Changes
 1. Heartbeat-based supervisor liveness (replaces L220-L240 grace chain)
