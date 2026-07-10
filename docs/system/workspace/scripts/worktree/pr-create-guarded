@@ -136,10 +136,29 @@ fi
 echo ""
 echo "Step 2c/4: IBM governance gate..."
 if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
-  set +e
-  gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" 2>&1)"
-  gate_rc=$?
-  set -e
+  # FREELY_SKIP_IBM_GATE: skip IBM lifecycle validation for governance-only changes
+  # (per LAWS.md §304). Must match format "违规绕过门禁中，理由充分，是：<业务理由>".
+  # Only allowed when ALL changed paths are in docs/B1-docs/ or docs/B2-docs/.
+  if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+    if echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+      echo "[pr-create-guarded] FREELY_SKIP_IBM_GATE — validating governance-only paths"
+      set +e
+      gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" --skip-ibm-gate 2>&1)"
+      gate_rc=$?
+      set -e
+    else
+      echo "[pr-create-guarded] FREELY_SKIP_IBM_GATE format invalid — running full gate"
+      set +e
+      gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" 2>&1)"
+      gate_rc=$?
+      set -e
+    fi
+  else
+    set +e
+    gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" 2>&1)"
+    gate_rc=$?
+    set -e
+  fi
   if [[ "$gate_rc" -ne 0 ]]; then
 	    # Determine the authoritative skill from branch prefix.
 	    # wt-create derives prefix from --skill: freely-workflow-guarded-execution → fix/raw-*, freely-workflow-guarded-execution → feature/raw-*

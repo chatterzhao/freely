@@ -77,7 +77,7 @@
 1. `I-20260706T023422Z-A`
 - title: docs-structure-refactor 遗漏补完
 - milestone: M-20260706T023422Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/ibm/b2-governance/raw-20260706T023422Z/issues/I-20260706T023422Z-A.md
 
 ## M-20260705T061416Z-A
@@ -3552,3 +3552,9 @@
 - milestone: M-20260710T002224Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T002224Z-A`
+
+## M-20260710T011202Z-A
+- title: fix — pr-create-guarded FREELY_SKIP_IBM_GATE
+### completed_issues
+1. `I-20260710T011202Z-A` - phase_state: completed - path: docs/B2-docs/gate/doc-gate-governance/raw-20260710T011202Z/issues/I-20260710T011202Z-A.md
+2. `C-20260710T011202Z-A` - status: absorbed - absorbed_into: `I-20260710T011202Z-A`
