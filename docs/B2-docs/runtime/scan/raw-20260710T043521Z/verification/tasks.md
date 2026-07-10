@@ -1,0 +1,2 @@
+- [x] scan skip closed items
+- [x] fix 11 corrupt files

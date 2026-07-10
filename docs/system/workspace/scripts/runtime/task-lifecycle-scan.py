@@ -1005,18 +1005,23 @@ def scan(project: Path) -> dict:
                     })
                 else:
                     # Terminal phase with local platform_state set but no
-                    # real platform data to verify against — flag for sync.
-                    items.append({
-                        "category": "2_document_misaligned",
-                        "subcategory": "2a_state_mismatch",
-                        "key": raw_key,
-                        "issue_path": raw_issue["path"],
-                        "phase_state": phase,
-                        "platform_state": plat_state,
-                        "ready": True,
-                        "detail": f"terminal phase={phase} but platform_state={plat_state} — needs alignment",
-                        "next_action": "[manager] 创建 raw issue → 工位 → 对齐 platform_state 与 phase_state",
-                    })
+                    # real platform data to verify against.
+                    # If platform_state is already "closed", this item is
+                    # locally resolved — silently skip (nothing to sync).
+                    if plat_state.startswith("closed"):
+                        pass  # skip: already closed locally, no platform to sync
+                    else:
+                        items.append({
+                            "category": "2_document_misaligned",
+                            "subcategory": "2a_state_mismatch",
+                            "key": raw_key,
+                            "issue_path": raw_issue["path"],
+                            "phase_state": phase,
+                            "platform_state": plat_state,
+                            "ready": True,
+                            "detail": f"terminal phase={phase} but platform_state={plat_state} — needs alignment",
+                            "next_action": "[manager] 创建 raw issue → 工位 → 对齐 platform_state 与 phase_state",
+                        })
 
             continue  # raw on develop → done with this key
 
