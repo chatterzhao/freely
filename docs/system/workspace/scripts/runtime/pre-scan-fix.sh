@@ -11,8 +11,8 @@
 #   3. freely wt-create → 创建工位
 #   4. 在工位中批量修改 docs/B1-docs/raw-*/issue.md
 #   5. git commit
-#   6. FREELY_SKIP_IBM_GATE=1 freely pr-create-guarded
-#   7. FREELY_SKIP_IBM_GATE=1 freely pr-merge-guarded
+#   6. FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>" freely pr-create-guarded
+#   7. FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>" freely pr-merge-guarded
 #   8. freely wt-close
 #
 # Usage:
@@ -121,11 +121,16 @@ TS=$(date -u +%Y%m%dT%H%M%SZ)
 # Create batch raw issue via worktree workflow
 log "creating batch raw issue..."
 BATCH_TITLE="fix: pre-scan batch fix $needs_fix local docs (terminal phase, no platform_ids)"
-BATCH_BODY="Batch fix: align platform_state=closed for $needs_fix local raw issues with terminal phase_state and no platform_ids.
+BATCH_BODY="## 问题
+pre-scan batch: $needs_fix terminal-phase local raw issues lack platform_ids in frontmatter.
 
-This is a pure documentation fix — no code changes, no governance required.
+## 修复
+Align platform_state=closed for all terminal-phase (absorbed/completed/dropped) raw issues without platform_ids.
+Pure documentation fix — no code changes, no governance required.
 Uses FREELY_SKIP_IBM_GATE to bypass IBM governance gates (per LAWS.md §304).
 
+## 验收
+All affected issue.md files have platform_state=closed aligned with phase_state.
 Fixed items: $(head -5 "$NEEDS_FIX_FILE" | tr '\n' ' ')..."
 
 cd "$PROJECT"

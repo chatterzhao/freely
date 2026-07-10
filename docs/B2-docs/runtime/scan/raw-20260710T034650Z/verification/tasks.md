@@ -1,0 +1,3 @@
+- [x] Comment fix
+- [x] BATCH_BODY fix
+- [x] Daemon integration
