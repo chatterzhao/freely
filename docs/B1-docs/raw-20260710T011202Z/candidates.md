@@ -2,7 +2,8 @@
 candidate_id: C-20260710T011202Z-A
 status: absorbed
 source_raw: raw-20260710T011202Z
-absorbed_into: I-20260710T011202Z-A
+promoted_issue_path: docs/B2-docs/gate/doc-gate-governance/raw-20260710T011202Z/issues/I-20260710T011202Z-A.md
+- absorbed_into: I-20260710T011202Z-A
 milestone: M-20260710T011202Z-A
 ---
 ## C-20260710T011202Z-A
