@@ -3522,3 +3522,18 @@
 - milestone: M-20260709T232630Z-A
 - status: absorbed
 - absorbed_into: `I-20260709T232630Z-A`
+
+## M-20260710T000650Z-A
+- title: fix — pre-scan-fix + scan raw_key fallback
+- status: active
+### candidate_issues
+### committed_issues
+### completed_issues
+1. `I-20260710T000650Z-A`
+- milestone: M-20260710T000650Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/scan/raw-20260710T000650Z/issues/I-20260710T000650Z-A.md
+2. `C-20260710T000650Z-A`
+- milestone: M-20260710T000650Z-A
+- status: absorbed
+- absorbed_into: `I-20260710T000650Z-A`
