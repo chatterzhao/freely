@@ -22,7 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 \n\n## 改进
 1. _read_config_value() 统一函数：有 config 逐字段读，无 config 返回空不报错

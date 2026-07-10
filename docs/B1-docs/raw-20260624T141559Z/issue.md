@@ -17,7 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 absorbed_into: I-20260624T141559Z-A
 source_candidate: docs/B1-docs/raw-20260624T141559Z59Z/candidates.md#C-20260624T141559Z-A
 ---

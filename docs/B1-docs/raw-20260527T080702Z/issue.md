@@ -17,7 +17,7 @@ intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## Problem

@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 目标
 将 probe 命令、resume_target 判断、capabilities/policy 默认值迁移为注册表驱动。

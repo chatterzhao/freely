@@ -7,5 +7,6 @@ platform_ids:
   github:
     issue_id: '2112'
 primary_platform: github
----
+
+platform_state: closed---
 # slot 全名统一

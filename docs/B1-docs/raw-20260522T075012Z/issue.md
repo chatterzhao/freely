@@ -7,4 +7,5 @@ platform_ids:
   github:
     issue_id: '2119'
 primary_platform: github
----
+
+platform_state: closed---

@@ -15,7 +15,8 @@ author: ai-manager
 channel: internal
 session_refs: []
 source_candidate: docs/B1-docs/raw-20260625T020333Z33Z/candidates.md#C-20260625T020333Z-A
----
+
+platform_state: closed---
 
 ## 问题
 `wt-close --force` currently allows bypassing gate/pretests errors with misleading examples, making it easy for developers to mistakenly use `--force` to skip legitimate checks instead of fixing the underlying issue. The `--force` flag should be strictly for abandon-only scenarios where the raw issue is being discarded.

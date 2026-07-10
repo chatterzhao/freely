@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 task-lifecycle-scan.py line 19 uses `from platform_adapter import list_open_issues` but the file is named `platform-adapter.py` (hyphen, not underscore). Additionally, the _SYNC_DIR path on line 16 is `parent.parent / \"sync\"` but should be `parent.parent / \"scripts\" / \"sync\"`. Fix both issues so the scan can run again.

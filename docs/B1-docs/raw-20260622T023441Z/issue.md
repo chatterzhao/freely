@@ -13,7 +13,7 @@ created_at: '2026-06-22T02:34:41Z'
 updated_at: '2026-06-22T02:34:41Z'
 author: platform
 channel: github
-platform_state: open
+platform_state: closed
 ---
 
 Platform sync batch: sync 172 items (push=159, close=13) across github + gitee.

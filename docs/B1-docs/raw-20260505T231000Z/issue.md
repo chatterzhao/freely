@@ -15,7 +15,7 @@ intake_id: 20260505T2310Z-secret-detection-false-positive
 author: human
 channel: github
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 ## Problem

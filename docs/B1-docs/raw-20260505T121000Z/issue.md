@@ -15,7 +15,7 @@ intake_id: 20260505T1210Z-issue-state-refactor
 author: human
 channel: github
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 ## 问题

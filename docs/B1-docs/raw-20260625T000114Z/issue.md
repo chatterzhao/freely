@@ -18,7 +18,8 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T000114Z-A
----
+
+platform_state: closed---
 
 ## 现状混乱
 

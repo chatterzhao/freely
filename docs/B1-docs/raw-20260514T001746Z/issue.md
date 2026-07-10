@@ -12,7 +12,7 @@ platform_ids:
 updated_at: '2026-05-20T10:30:47Z'
 primary_platform: github
 created_at: '2026-05-20T10:30:47Z'
-platform_state: open
+platform_state: closed
 ---
 
 Governance gate GATE 6.3 requires every promoted candidate to have a matching

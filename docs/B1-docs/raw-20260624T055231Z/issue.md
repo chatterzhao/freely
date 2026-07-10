@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 现象
 #3399 (JSON5→TOML 重构) 合并后 deploy-skills 仍只检测到 claude，未检测到 codex/opencode。根因是重构不彻底，遗留了 JSON5 回退路径。

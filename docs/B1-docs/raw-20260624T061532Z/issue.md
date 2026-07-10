@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 现象
 #3403 删除 tool-registry.json5 后，tool-registry-query.py 仍保留 `_strip_json5()`、`_load_json5()`、`_load_registry()` 等 JSON5 兼容代码。
