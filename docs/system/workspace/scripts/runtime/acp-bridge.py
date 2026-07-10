@@ -291,9 +291,10 @@ class AcpBridge:
     def _idle_monitor_loop(self):
         """Background thread: check idle time, gracefully shut down if exceeded.
 
-        Runs every 30s.  If the bridge has been idle for longer than
-        ACP_IDLE_TIMEOUT + ACP_IDLE_SHUTDOWN_GRACE seconds (no AI activity
-        on stdout), logs a clear message and triggers a clean shutdown.
+        Runs every 30s.  Only triggers shutdown when the bridge is TRULY idle:
+        no active session/prompt in flight.  If an AI is mid-cycle (thinking
+        or waiting for API response), the bridge stays alive even if no stdout
+        output has been produced recently.
 
         Shutdown is intentional and recoverable — the bridge WILL be
         restarted on the next delegation by _ensure_acp_bridge_running.
@@ -305,6 +306,16 @@ class AcpBridge:
             with self.activity_lock:
                 idle_secs = time.time() - self.last_activity_ts
             if idle_secs > ACP_IDLE_TIMEOUT + ACP_IDLE_SHUTDOWN_GRACE:
+                # Only shutdown if NO active session/prompt is in flight.
+                # An AI may be "thinking" without producing stdout for minutes
+                # while processing large prompts or waiting for API responses.
+                with self.server_lock:
+                    has_active_prompt = any(
+                        slot.get("method") == "session/prompt"
+                        for slot in self.pending.values()
+                    )
+                if has_active_prompt:
+                    continue  # AI is working — do NOT shut down
                 self._idle_timeout_detected = True
                 self.log(
                     f"idle {idle_secs:.0f}s (limit={ACP_IDLE_TIMEOUT}s) — "
