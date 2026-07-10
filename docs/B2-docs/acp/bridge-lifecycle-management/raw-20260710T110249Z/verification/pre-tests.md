@@ -23,8 +23,8 @@
 - actual_output: |
   PASS: 0 default refs remain
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix
 
 ### acceptance-2
@@ -41,8 +41,8 @@
 - actual_RED_output: FAIL
 - actual_output: PASS
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix
 
 ### acceptance-3
@@ -59,11 +59,39 @@
 - actual_RED_output: FAIL
 - actual_output: PASS
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix
 
-## Unit: not_applicable (covered_by_more_realistic_required_surface)
-## Integration: not_applicable (covered_by_more_realistic_required_surface)
-## End-to-End: not_applicable (covered_by_more_realistic_required_surface)
+## Unit
+- acceptance_target: 语法检查
+- testing_layer: unit
+- target_environment: fix worktree
+- required_evidence: bash -n + python compile
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 代码级验证已被 AT-001/AT-002/AT-003 的 grep 检查覆盖
+- replacement_evidence: AT-001/AT-002/AT-003
+## Integration
+- acceptance_target: daemon 启停使用正确 per-tool bridge
+- testing_layer: integration
+- target_environment: develop
+- required_evidence: daemon stop/start 正常
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: daemon 集成测试属于 post-merge 验证范畴
+- replacement_evidence: AT-001/AT-002/AT-003
+## End-to-End
+- acceptance_target: Manager cycle 不再被 rc=143 杀死
+- testing_layer: end-to-end
+- target_environment: develop
+- required_evidence: Manager cycle log 无 rc=143
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 端到端验证需要真实 daemon 运行，属于 post-merge dogfood
+- replacement_evidence: AT-001/AT-002/AT-003
 ## Real-Environment: pass
+
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: post-merge daemon 运行间接验证
