@@ -3564,3 +3564,18 @@
 ### completed_issues
 1. `I-20260710T034650Z-A` - phase_state: completed - path: docs/B2-docs/runtime/scan/raw-20260710T034650Z/issues/I-20260710T034650Z-A.md
 2. `C-20260710T034650Z-A` - status: absorbed - absorbed_into: `I-20260710T034650Z-A`
+
+## M-20260710T043521Z-A
+- title: fix — scan skip closed items
+- status: active
+### candidate_issues
+### committed_issues
+### completed_issues
+1. `I-20260710T043521Z-A`
+- milestone: M-20260710T043521Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/scan/raw-20260710T043521Z/issues/I-20260710T043521Z-A.md
+2. `C-20260710T043521Z-A`
+- milestone: M-20260710T043521Z-A
+- status: absorbed
+- absorbed_into: `I-20260710T043521Z-A`
