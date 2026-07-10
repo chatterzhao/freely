@@ -3537,3 +3537,18 @@
 - milestone: M-20260710T000650Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T000650Z-A`
+
+## M-20260710T002224Z-A
+- title: fix — pre-scan-fix.sh FREELY_SKIP_IBM_GATE
+- status: active
+### candidate_issues
+### committed_issues
+### completed_issues
+1. `I-20260710T002224Z-A`
+- milestone: M-20260710T002224Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/scan/raw-20260710T002224Z/issues/I-20260710T002224Z-A.md
+2. `C-20260710T002224Z-A`
+- milestone: M-20260710T002224Z-A
+- status: absorbed
+- absorbed_into: `I-20260710T002224Z-A`

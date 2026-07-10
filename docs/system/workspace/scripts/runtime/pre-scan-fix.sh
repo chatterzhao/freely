@@ -3,16 +3,16 @@
 #
 # 处理 terminal phase + 无 platform_ids 的 raw issue 本地文档。
 # 这些文档不需要平台 API 同步，只需对齐本地 frontmatter。
-# 纯文档修改，跳过 IBM 治理 (--skip-ibm)。
+# 纯文档修改，使用 FREELY_SKIP_IBM_GATE 跳过 IBM 治理。
 #
 # 流程:
 #   1. 收集需要修复的 items
-#   2. freely feedback --skip-ibm → 创建 batch raw issue
+#   2. freely feedback → 创建 batch raw issue
 #   3. freely wt-create → 创建工位
 #   4. 在工位中批量修改 docs/B1-docs/raw-*/issue.md
 #   5. git commit
-#   6. freely pr-create-guarded --skip-ibm
-#   7. freely pr-merge-guarded --skip-ibm
+#   6. FREELY_SKIP_IBM_GATE=1 freely pr-create-guarded
+#   7. FREELY_SKIP_IBM_GATE=1 freely pr-merge-guarded
 #   8. freely wt-close
 #
 # Usage:
@@ -124,12 +124,12 @@ BATCH_TITLE="fix: pre-scan batch fix $needs_fix local docs (terminal phase, no p
 BATCH_BODY="Batch fix: align platform_state=closed for $needs_fix local raw issues with terminal phase_state and no platform_ids.
 
 This is a pure documentation fix — no code changes, no governance required.
-Uses --skip-ibm to bypass IBM governance gates.
+Uses FREELY_SKIP_IBM_GATE to bypass IBM governance gates (per LAWS.md §304).
 
 Fixed items: $(head -5 "$NEEDS_FIX_FILE" | tr '\n' ' ')..."
 
 cd "$PROJECT"
-RAW_KEY=$("$FREELY" feedback --skip-ibm --title "$BATCH_TITLE" --body "$BATCH_BODY" --kind fix 2>&1 | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+RAW_KEY=$("$FREELY" feedback --title "$BATCH_TITLE" --body "$BATCH_BODY" --kind fix 2>&1 | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 
 if [[ -z "$RAW_KEY" ]]; then
   log "ERROR: feedback failed, cannot create batch raw issue"
@@ -200,7 +200,7 @@ git commit -m "fix: pre-scan batch — align platform_state=closed for $fixed te
 Pure documentation fix. Terminal phase_state issues without platform_ids
 had their platform_state set to 'closed' to align local frontmatter.
 
---skip-ibm: no governance required for this batch doc fix.
+FREELY_SKIP_IBM_GATE: no governance required for this batch doc fix.
 
 Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || {
   log "nothing to commit (all already aligned)"
@@ -209,18 +209,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || {
   exit 0
 }
 
-# PR + merge with --skip-ibm
-log "pr-create-guarded --skip-ibm..."
+# PR + merge with FREELY_SKIP_IBM_GATE for pure doc changes
+log "pr-create-guarded (FREELY_SKIP_IBM_GATE)..."
 cd "$WT_DIR"
-"$FREELY" pr-create-guarded --skip-ibm 2>&1 || {
+FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：pre-scan batch fix 纯文档修改无需 IBM 治理" \
+  "$FREELY" pr-create-guarded 2>&1 || {
   log "ERROR: pr-create-guarded failed"
   exit 1
 }
 
-log "pr-merge-guarded --skip-ibm..."
+log "pr-merge-guarded (FREELY_SKIP_IBM_GATE)..."
 cd "$PROJECT"
 BRANCH=$(cd "$WT_DIR" && git rev-parse --abbrev-ref HEAD)
-"$FREELY" pr-merge-guarded --skip-ibm develop "$BRANCH" 2>&1 || {
+FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：pre-scan batch fix 纯文档修改无需 IBM 治理" \
+  "$FREELY" pr-merge-guarded develop "$BRANCH" 2>&1 || {
   log "ERROR: pr-merge-guarded failed"
   exit 1
 }
