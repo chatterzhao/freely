@@ -29,8 +29,19 @@ milestone: M-20260710T110249Z-A
 
 ## 改动计划
 
-### monitor-ai-acp.sh: 同步 per-tool 命名
-- `_detect_acp_failure`: 接受 base_tool 参数，使用 per-tool bridge log
-- `main()`: 提取 base_tool，传入 `_detect_acp_failure` 和 `_bridge_pid_file`
-- `_bridge_pid_file "$project"` → `_bridge_pid_file "$project" "$_base_tool"`
-- `_bridge_log_file "$project"` → `_bridge_log_file "$project" "$_base_tool"`
+全量审计发现 **11 处**仍使用默认路径（无 base_tool 后缀），分布在两个文件：
+
+### monitor-ai-acp.sh (4 处)
+- Line 181: `_bridge_log` 硬编码 → 使用 `_bridge_log_file "$project" "$_base_tool"`
+- Line 403: `_bridge_pid_file "$project"` → `"$project" "$_base_tool"`
+- Line 427: bridge-dead PID 检查 → 同上
+- Line 441: ping socket → `_bridge_socket "$project" "$_base_tool"`
+
+### freely (7 处)
+- Lines 18863/18904/18935/18965/18998: `_acp_bridge_socket "$project"` → `"$project" "$_base_tool"`
+- Line 21527: `_acp_bridge_pid_file "$project"` → 同上
+- Line 21535: cleanup socket → 同上
+
+### 额外修复
+- `_detect_acp_failure` 接受 base_tool 参数，传入 Layer 0/3 检测
+- `main()` 提取 base_tool from `--tool` 参数，传给所有 bridge 函数

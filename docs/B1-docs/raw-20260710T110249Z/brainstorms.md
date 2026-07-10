@@ -46,33 +46,39 @@ _bridge_pid_file "$project" → 检查默认 PID 文件（无 base_tool 后缀�
 ### 根因：per-tool 日志/PID 导致检测盲区
 
 PR #3842 (lazy-start bridge) 和 PR #3849 (per-tool logging) 引入 per-tool 命名：
-- PID: `/tmp/freely-acp-{hash}-claude.pid` (不再有默认无后缀版本)
-- Log: `.freely/run/acp-bridge-claude.log` (不再有默认无后缀版本)
+- PID: `/tmp/freely-acp-{hash}-{base_tool}.pid`
+- Log: `.freely/run/acp-bridge-{base_tool}.log`
+- Socket: `/tmp/freely-acp-{hash}-{base_tool}.sock`
 
-但 `monitor-ai-acp.sh` 中的检测代码**未同步更新**：
+但 `monitor-ai-acp.sh` 和 `freely` 中**大量调用仍使用默认路径（无 base_tool 后缀）**。
 
-| 检测点 | 代码 | 使用的路径 | 存在？ |
-|--------|------|-----------|:----:|
-| Layer 0 idle | `_bridge_log` (line 181) | `acp-bridge.log` | ❌ |
-| Layer 3 fatal | `_bridge_log` (line 217) | `acp-bridge.log` | ❌ |
-| Bridge-dead PID | `_bridge_pid_file "$project"` (line 427) | 无后缀 PID file | ❌ |
-| Bridge-dead PID (main) | `_bridge_pid_file "$project"` (line 386) | 无后缀 PID file | ❌ |
+**monitor-ai-acp.sh 中 4 处未更新：**
 
-**所有 bridge 级检测都在检查不存在的默认路径**——per-tool 路径的文件（`acp-bridge-claude.log`、`-claude.pid`）从未被检查。
+| 行号 | 代码 | 问题 |
+|------|------|------|
+| 181 | `_bridge_log=".../acp-bridge.log"` | 硬编码默认 log，Layer 0/3 检测盲区 |
+| 403 | `_bridge_pid_file "$project"` | 无 base_tool，读不存在的默认 PID |
+| 427 | `_bridge_pid_file "$project"` | bridge-dead 检查盲区 |
+| 441 | `_bridge_socket "$project"` | ping 使用错误 socket |
+
+**freely 中 7 处未更新：**
+
+| 行号 | 代码 | 问题 |
+|------|------|------|
+| 18863 | `_acp_bridge_socket "$PROJECT_ROOT"` | Supervisor 操作错误 socket |
+| 18904 | `_acp_bridge_socket "$project"` | 同上 |
+| 18935 | `_acp_bridge_socket "$project"` | 同上 |
+| 18965 | `_acp_bridge_socket "$project"` | 同上 |
+| 18998 | `_acp_bridge_socket "$project"` | 同上 |
+| 21527 | `_acp_bridge_pid_file "$project"` | 清理错误 PID 文件 |
+| 21535 | `_acp_bridge_socket "$project"` | 清理错误 socket |
+
+**总计 11 处仍使用默认路径，覆盖三大功能域：bridge 健康检测、Supervisor 启停管理、资源清理。**
 
 这意味着：
-- **Path A 失效**：4 层检测中，Layer 1/2 只检查 cycle log（不应触发），Layer 0/3 检查不存在的文件
-- **Path B 失效**：检查不存在的默认 PID 文件
-- **但 rc=143 仍然发生** → 存在第三个 kill 路径
-
-### 第三个 kill 路径（待确认）
-
-初步证据指向 pre-push hook 或 supervisor 层的 signal 传递。可能场景：
-1. cline/opencode bridge idle-shutdown 后，cycle check 重启它们
-2. 重启过程中某种 signal 传播到 claude bridge 的子进程
-3. Supervisor 检测到 bridge 变化 → 发送 SIGTERM
-
-需要更深入的运行时 tracing 才能确认第三个路径。
+- monitor 的所有 bridge 级检测（idle/fatal/PID/socket）全部盲区
+- Supervisor 启停 bridge 时操作不存在的默认 socket/PID
+- 资源清理删错文件，per-tool 文件残留
 
 ## Brainstorm
 
