@@ -4839,3 +4839,9 @@
 - milestone: M-20260710T061534Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T061534Z-A`
+
+## M-20260710T072314Z-A
+- title: fix — remove duplicate idle timeout
+### completed_issues
+1. `I-20260710T072314Z-A` - phase_state: completed - path: docs/B2-docs/runtime/scan/raw-20260710T072314Z/issues/I-20260710T072314Z-A.md
+2. `C-20260710T072314Z-A` - status: absorbed - absorbed_into: `I-20260710T072314Z-A`

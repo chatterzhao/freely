@@ -469,20 +469,15 @@ class AcpBridge:
                 raise RuntimeError(f"server stdin write failed: {e}")
 
         if method == "session/prompt":
-            poll_interval = min(ACP_IDLE_TIMEOUT // 2, 30)
-            while True:
-                if event.wait(timeout=poll_interval):
-                    break
-                with self.activity_lock:
-                    idle_secs = time.time() - self.last_activity_ts
-                if idle_secs > ACP_IDLE_TIMEOUT:
-                    self._idle_timeout_detected = True
-                    with self.server_lock:
-                        self.pending.pop(req_id, None)
-                    raise TimeoutError(
-                        f"idle timeout: no AI activity for {idle_secs:.0f}s "
-                        f"(limit={ACP_IDLE_TIMEOUT}s) waiting for {method}"
-                    )
+            # Idle detection is handled by _idle_monitor_loop at the bridge
+            # level (which checks self.pending for active prompts before
+            # shutting down).  Per-prompt idle checks here would race with
+            # the monitor and kill prompts that are mid-thinking.
+            # Use the absolute BRIDGE_TIMEOUT as the only safety net.
+            if not event.wait(timeout=timeout):
+                with self.server_lock:
+                    self.pending.pop(req_id, None)
+                raise TimeoutError(f"timeout waiting for {method} (absolute)")
         else:
             if not event.wait(timeout=timeout):
                 with self.server_lock:
