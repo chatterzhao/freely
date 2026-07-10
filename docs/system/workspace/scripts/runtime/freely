@@ -17150,6 +17150,13 @@ write_task_source_scan_json_for_project() {
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   project_head="$(task_source_scan_current_project_head_for_project "$project")"
 
+  # pre-scan-fix: auto-fix terminal-phase local docs before scan.
+  # Reduces scan noise by aligning frontmatter for issues that don't need AI attention.
+  local _pre_scan_fix="$SELF_ROOT/docs/system/workspace/scripts/runtime/pre-scan-fix.sh"
+  if [[ -x "$_pre_scan_fix" ]]; then
+    "$_pre_scan_fix" --project "$project" --dry-run >/dev/null 2>&1 || true
+  fi
+
   if [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]]; then
     local _scan_args=(--project "$project")
     [[ -n "$raw_key" ]] && _scan_args+=(--raw-key "$raw_key")
