@@ -23,7 +23,8 @@ author: zhaoquan
 channel: freely-feature-execution
 session_refs: []
 
-platform_state: closed---
+platform_state: closed
+---
 
 # refactor: 统一 fix skill 与 feature skill 的治理顺序 — B1→B2→dev→test
 

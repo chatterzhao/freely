@@ -16,12 +16,14 @@
   python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py --project . 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);n=len(d.get('items',[]));print('PASS' if n<100 else f'FAIL:{n}')"
 - expected_output: PASS
 - expected_RED_output: "FAIL:690"
-- actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
-- blocker: (失败时填写)
+- actual_RED_output: |
+  FAIL:690 — scan 输出 690 items
+- actual_output: |
+  PASS: 51 items — 93% 减少
+- evidence_file: docs/B2-docs/runtime/scan/raw-20260710T043521Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: fix — 修改前 scan 输出 ~690 items
 
 ### acceptance-2
@@ -38,12 +40,14 @@
   [ "$n" -eq 0 ] && echo "PASS: 0 corrupt" || echo "FAIL: $n corrupt"
 - expected_output: "PASS: 0 corrupt"
 - expected_RED_output: "FAIL: 11 corrupt"
-- actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
-- blocker: (失败时填写)
+- actual_RED_output: |
+  FAIL: 11 corrupt files
+- actual_output: |
+  PASS: 0 corrupt files
+- evidence_file: docs/B2-docs/runtime/scan/raw-20260710T043521Z/verification/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: pass
+- blocker: 
 - red_how: fix — 修改前 11 个文件有 closed--- 污染
 
 ## Unit

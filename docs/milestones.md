@@ -3569,12 +3569,13 @@
 - title: fix — scan skip closed items
 - status: active
 ### candidate_issues
-1. `C-20260710T043521Z-A`
-- milestone: M-20260710T043521Z-A
-- status: promoted
-- promoted_issue_id: `I-20260710T043521Z-A`
 ### committed_issues
+### completed_issues
 1. `I-20260710T043521Z-A`
 - milestone: M-20260710T043521Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/runtime/scan/raw-20260710T043521Z/issues/I-20260710T043521Z-A.md
+2. `C-20260710T043521Z-A`
+- milestone: M-20260710T043521Z-A
+- status: absorbed
+- absorbed_into: `I-20260710T043521Z-A`
