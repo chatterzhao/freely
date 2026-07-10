@@ -4,6 +4,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -22,6 +27,11 @@
 - title: hook 提示 + 命令速查
 - status: completed
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -42,6 +52,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -61,6 +76,11 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -95,6 +115,11 @@
 - promoted_issue_id: `I-20260706T023422Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -110,6 +135,11 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -130,6 +160,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -141,6 +176,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -161,6 +201,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -172,6 +217,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -192,6 +242,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -203,6 +258,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -223,6 +283,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -234,6 +299,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -254,6 +324,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -265,6 +340,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -285,6 +365,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -296,6 +381,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -316,6 +406,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -327,6 +422,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -347,6 +447,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -358,6 +463,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -378,6 +488,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -389,6 +504,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -409,6 +529,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -420,6 +545,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -440,6 +570,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -451,6 +586,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -475,6 +615,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -486,6 +631,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -507,6 +657,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -522,6 +677,11 @@
 - status: absorbed
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T081450Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -542,6 +702,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -558,6 +723,11 @@
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T045911Z-A`
 - promoted_issue_path: docs/B2-docs/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z11Z/issues/I-20260701T045911Z-A.md
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -578,6 +748,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -593,6 +768,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T061924Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -613,6 +793,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -628,6 +813,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T061531Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -648,6 +838,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -663,6 +858,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T054502Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -683,6 +883,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -698,6 +903,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T051138Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -718,6 +928,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -733,6 +948,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T040012Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -753,6 +973,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -768,6 +993,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T031733Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -788,6 +1018,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -803,6 +1038,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T024449Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -823,6 +1063,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -838,6 +1083,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T013527Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -858,6 +1108,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -874,6 +1129,11 @@
 - promoted_issue_path: `docs/B2-docs/config-toml-example/block-init/raw-20260701T003241Z41Z/issues/I-20260701T003241Z-A.md`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -888,6 +1148,11 @@
 - title: feat: config.toml.example overhaul + init create + merge lock
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -904,6 +1169,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260630T224941Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -924,6 +1194,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -939,6 +1214,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/acp-tool-setup/unified-config-reader/raw-20260630T151209Z09Z/issues/I-20260630T151209Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -959,6 +1239,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -974,6 +1259,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T134353Z-A/issue.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -995,6 +1285,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1010,6 +1305,11 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T051533Z-A` `I-20260630T124528Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1030,6 +1330,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1045,6 +1350,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T113839Z-A/issue.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1066,6 +1376,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1081,6 +1396,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T111641Z-A/issue.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1102,6 +1422,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1118,6 +1443,11 @@
 - promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260630T085809Z-A/issue.md`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1132,6 +1462,11 @@
 - title: feat: command standardization
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1149,6 +1484,11 @@
 - promoted_issue_path: `docs/B2-docs/cmd-standardize/subcommand-add/raw-20260629T122254Z54Z/issues/I-20260629T122254Z-A.md`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1163,6 +1503,11 @@
 - title: feat: supervisor cycle Phase 1 — freely cycle + watchdog
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1180,6 +1525,11 @@
 - promoted_issue_path: `docs/B2-docs/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z21Z/issues/I-20260630T002621Z-A.md`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1194,6 +1544,11 @@
 - title: fix: wt-close remove Phase 3.6 + force semantics
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1211,6 +1566,11 @@
 - promoted_issue_path: `docs/B2-docs/wt-close-raw-key/remove-phase36/raw-20260630T062010Z10Z/issues/I-20260630T062010Z-A.md`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1224,6 +1584,11 @@
 - title: fix: cleanup PENDING_INPUT residues
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1240,6 +1605,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/a2a-state-standard/cleanup-pending/raw-20260630T054652Z52Z/issues/I-20260630T054652Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1260,6 +1630,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1275,6 +1650,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/a2a-state-standard/state-rename/raw-20260630T021946Z46Z/issues/I-20260630T021946Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1295,6 +1675,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1310,6 +1695,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260629T235653Z-A/issue.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1330,6 +1720,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1345,6 +1740,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/pr-review-guarded/review-fixes/raw-20260629T163137Z37Z/issues/I-20260629T163137Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1365,6 +1765,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1380,6 +1785,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/wt-close-raw-key/args-d-fix/raw-20260629T165403Z03Z/issues/I-20260629T165403Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1400,6 +1810,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1415,6 +1830,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z30Z/issues/I-20260629T164530Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1435,6 +1855,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1450,6 +1875,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/wt-close-raw-key/raw-key-param/raw-20260629T160852Z52Z/issues/I-20260629T160852Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1470,6 +1900,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1485,6 +1920,11 @@
 - status: promoted
 - promoted_issue_path: `docs/B2-docs/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z42Z/issues/I-20260629T132042Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1505,6 +1945,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1516,6 +1961,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1536,6 +1986,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1550,6 +2005,11 @@
 - milestone: M-20260629T025659Z-A; status: promoted
 - promoted_issue_id: `docs/B2-docs/fix-flow-unify/skill-refactor/raw-20260629T025659Z59Z/issues/I-20260629T025659Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1570,6 +2030,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1584,6 +2049,11 @@
 - milestone: M-20260629T030408Z-A; status: promoted
 - promoted_issue_id: `docs/B2-docs/feat-to-feature/rename-completion/raw-20260629T030408Z08Z/issues/I-20260629T030408Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1604,6 +2074,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1618,6 +2093,11 @@
 - milestone: M-20260628T005815Z-A; status: promoted
 - promoted_issue_id: `docs/B2-docs/chat-refactor/comment-discuss-split/raw-20260628T005815Z15Z/issues/I-20260628T005815Z-A.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1637,6 +2117,11 @@
 - title: scope hard block → advisory warning
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1663,6 +2148,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1688,6 +2178,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1702,6 +2197,11 @@
 - milestone: M-20260510T1339Z-A; status: promoted
 - promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/raw-20260307-1201I-20260510T1339Z-A/issue.md`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1720,6 +2220,11 @@
 - title: C-20260522T045227Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1741,6 +2246,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1760,6 +2270,11 @@
 - title: C-20260522T053702Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1781,6 +2296,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1800,6 +2320,11 @@
 - title: C-20260522T075012Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1821,6 +2346,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1840,6 +2370,11 @@
 - title: C-20260522T081853Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1861,6 +2396,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1880,6 +2420,11 @@
 - title: C-20260616T030213Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1901,6 +2446,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1920,6 +2470,11 @@
 - title: C-20260616T143914Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1941,6 +2496,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -1960,6 +2520,11 @@
 - title: A2A Unified Data Flow
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -1981,6 +2546,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2000,6 +2570,11 @@
 - title: C-20260617T130029Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2021,6 +2596,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2040,6 +2620,11 @@
 - title: C-20260618T035220Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2061,6 +2646,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2080,6 +2670,11 @@
 - title: pr-merge local merge + wt-create consistency check
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2101,6 +2696,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2120,6 +2720,11 @@
 - title: C-20260618T091721Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2141,6 +2746,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2160,6 +2770,11 @@
 - title: IBM治理快速达标
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2181,6 +2796,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2200,6 +2820,11 @@
 - title: C-20260619T061448Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2221,6 +2846,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2240,6 +2870,11 @@
 - title: C-20260620T142847Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2261,6 +2896,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2280,6 +2920,11 @@
 - title: C-20260621T043842Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2301,6 +2946,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2320,6 +2970,11 @@
 - title: C-20260621T081426Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2341,6 +2996,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2360,6 +3020,11 @@
 - title: C-20260621T090002Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2381,6 +3046,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2400,6 +3070,11 @@
 - title: C-20260622T000649Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2421,6 +3096,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2440,6 +3120,11 @@
 - title: C-20260622T021126Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2461,6 +3146,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2480,6 +3170,11 @@
 - title: C-20260622T024321Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2501,6 +3196,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2520,6 +3220,11 @@
 - title: C-20260622T025736Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2541,6 +3246,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2560,6 +3270,11 @@
 - title: C-20260622T100348Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2581,6 +3296,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2600,6 +3320,11 @@
 - title: C-20260622T110050Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2621,6 +3346,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2640,6 +3370,11 @@
 - title: C-20260622T114625Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2661,6 +3396,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2680,6 +3420,11 @@
 - title: C-20260622T120046Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2701,6 +3446,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2720,6 +3470,11 @@
 - title: C-20260622T131109Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2741,6 +3496,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2760,6 +3520,11 @@
 - title: ACP usage workaround
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2781,6 +3546,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2800,6 +3570,11 @@
 - title: _restore_tasks 重启恢复——状态修正 + 环境恢复
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2821,6 +3596,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2840,6 +3620,11 @@
 - title: scan_state 输出到 Manager prompt
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2861,6 +3646,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2880,6 +3670,11 @@
 - title: A2A server _restore_tasks 异步化
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2901,6 +3696,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2920,6 +3720,11 @@
 - title: 彻底移除 JSON5 回退
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -2941,6 +3746,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2961,6 +3771,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -2980,6 +3795,11 @@
 - title: 平台硬编码报错修复
 - status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3005,6 +3825,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3024,6 +3849,11 @@
 - title: fix-execution cp→git stash 工作流优化
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3045,6 +3875,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3064,6 +3899,11 @@
 - title: adapter/ACP dispatch/launch_kind 注册表驱动化
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3085,6 +3925,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3104,6 +3949,11 @@
 - title: ai-cli generic
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3125,6 +3975,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3144,6 +3999,11 @@
 - title: wt-create success → read skill
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3165,6 +4025,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3184,6 +4049,11 @@
 - title: wt-close -d develop ref
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3205,6 +4075,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3224,6 +4099,11 @@
 - title: wt-close gate 传参修复
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3245,6 +4125,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3264,6 +4149,11 @@
 - title: runtime py chmod
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3285,6 +4175,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3304,6 +4199,11 @@
 - title: RED/GREEN separation
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3325,6 +4225,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3344,6 +4249,11 @@
 - title: feedback platform-only
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3365,6 +4275,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3384,6 +4299,11 @@
 - title: gate error skill guidance
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3405,6 +4325,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3424,6 +4349,11 @@
 - title: auto-detect platforms
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3445,6 +4375,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3464,6 +4399,11 @@
 - title: adapter CLI
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3485,6 +4425,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3504,6 +4449,11 @@
 - title: C-20260625T050000Z-A
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3525,6 +4475,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3544,6 +4499,11 @@
 - title: B2_IBM skill 反糊弄铁律
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3565,6 +4525,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3584,6 +4549,11 @@
 - title: pr-create-guarded rebase 替代 merge
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3605,6 +4575,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3624,6 +4599,11 @@
 - title: task-lifecycle-scan v3 — 三分类重构
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3645,6 +4625,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3664,6 +4649,11 @@
 - title: a2a_tasks agent_id 改具体编号 + 字段补全
 ^- status: active
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3685,6 +4675,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3705,6 +4700,11 @@
 ^- status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3724,6 +4724,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3738,6 +4743,11 @@
 - milestone: M-20260629T095905Z-A; status: promoted
 - promoted_issue_id: `I-20260629T095905Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3757,6 +4767,11 @@
 - status: completed
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3768,6 +4783,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3791,6 +4811,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3805,6 +4830,11 @@
 - milestone: M-20260704T064539Z-A; status: promoted
 - promoted_issue_id: `I-20260704T064539Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3822,6 +4852,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3833,6 +4868,11 @@
 - path: docs/B2-docs/worktree-close/rawkey-unify/raw-20260705T010030Z30Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3854,6 +4894,11 @@
 - status: active
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3868,6 +4913,11 @@
 - milestone: M-20260704T234812Z-A; status: absorbed
 - absorbed_into: `I-20260704T234812Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3898,6 +4948,11 @@
 - absorbed_into: `I-20260705T010030Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3926,6 +4981,11 @@
 - milestone: M-20260705T012851Z-A; status: absorbed
 - absorbed_into: `I-20260705T012851Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -3956,6 +5016,11 @@
 - absorbed_into: `I-20260705T024320Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -3984,6 +5049,11 @@
 - milestone: M-20260705T042057Z-A; status: absorbed
 - absorbed_into: `I-20260705T042057Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4014,6 +5084,11 @@
 - absorbed_into: `I-20260705T072052Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4042,6 +5117,11 @@
 - milestone: M-20260705T074631Z-A; status: absorbed
 - absorbed_into: `I-20260705T074631Z-A`
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4072,6 +5152,11 @@
 - absorbed_into: `I-20260705T084915Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4099,6 +5184,11 @@
 1. C-20260705T111413Z-A — absorbed → I-20260705T111413Z-A
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4112,6 +5202,11 @@
 ### candidate_issues
 1. C-20260705T122651Z-A — absorbed → I-20260705T122651Z-A
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4143,6 +5238,11 @@
 - absorbed_into: `I-20260705T231131Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4168,6 +5268,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4192,6 +5297,11 @@
 - promoted_issue_id: `I-20260707T025106Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4211,6 +5321,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4236,6 +5351,11 @@
 - promoted_issue_id: `I-20260707T040104Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4255,6 +5375,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4276,6 +5401,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4295,6 +5425,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4316,6 +5451,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4335,6 +5475,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4361,6 +5506,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4380,6 +5530,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4441,6 +5596,11 @@
 - promoted_issue_id: `I-20260708T015105Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4479,6 +5639,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4503,6 +5668,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4523,6 +5693,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4542,6 +5717,11 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4567,6 +5747,11 @@
 - promoted_issue_id: `I-20260708T185138Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4578,6 +5763,11 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4599,6 +5789,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4618,6 +5813,11 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4639,6 +5839,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4658,6 +5863,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4679,6 +5889,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4698,6 +5913,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4719,6 +5939,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4738,6 +5963,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4759,6 +5989,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4778,6 +6013,11 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
 ### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
@@ -4811,6 +6051,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4831,6 +6076,11 @@
 ### candidate_issues
 ### committed_issues
 ### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+### completed_issues
 1. `I-20260710T061534Z-A`
 - milestone: M-20260710T061534Z-A
 - phase_state: completed
@@ -4845,3 +6095,22 @@
 ### completed_issues
 1. `I-20260710T072314Z-A` - phase_state: completed - path: docs/B2-docs/runtime/scan/raw-20260710T072314Z/issues/I-20260710T072314Z-A.md
 2. `C-20260710T072314Z-A` - status: absorbed - absorbed_into: `I-20260710T072314Z-A`
+
+## M-20260710T110249Z-A
+- title: fix — monitor per-tool naming sync
+- status: active
+### candidate_issues
+1. \`C-20260710T110249Z-A\`
+- milestone: M-20260710T110249Z-A
+- status: promoted
+- promoted_issue_id: \`I-20260710T110249Z-A\`
+### committed_issues
+### completed_issues
+1. `I-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- phase_state: completed
+- path: docs/B2-docs/acp/bridge-lifecycle-management/raw-20260710T110249Z/issues/I-20260710T110249Z-A.md
+2. `C-20260710T110249Z-A`
+- milestone: M-20260710T110249Z-A
+- status: absorbed
+- absorbed_into: `I-20260710T110249Z-A`

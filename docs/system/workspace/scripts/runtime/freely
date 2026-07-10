@@ -13964,6 +13964,14 @@ _acp_bridge_short_hash() {
 _acp_bridge_pid_file() {
   local project="$1" base_tool="${2:-}"
   local _suffix=""
+  # Default to manager's base_tool when not specified (per-tool bridge naming)
+  if [[ -z "$base_tool" ]]; then
+    local _at="${PROJECT_ROOT}/.freely/agent-table.toml" _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    if [[ -f "$_at" && -x "$_aq" ]]; then
+      local _mgr_slot; _mgr_slot=$("$_aq" --get-slot "manager_01" 2>/dev/null || true)
+      [[ -n "$_mgr_slot" ]] && base_tool="${_mgr_slot%%-*}"
+    fi
+  fi
   [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
   echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")${_suffix}.pid"
 }
@@ -13971,6 +13979,14 @@ _acp_bridge_pid_file() {
 _acp_bridge_socket() {
   local project="$1" base_tool="${2:-}"
   local _suffix=""
+  # Default to manager's base_tool when not specified (per-tool bridge naming)
+  if [[ -z "$base_tool" ]]; then
+    local _at="${PROJECT_ROOT}/.freely/agent-table.toml" _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    if [[ -f "$_at" && -x "$_aq" ]]; then
+      local _mgr_slot; _mgr_slot=$("$_aq" --get-slot "manager_01" 2>/dev/null || true)
+      [[ -n "$_mgr_slot" ]] && base_tool="${_mgr_slot%%-*}"
+    fi
+  fi
   [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
   echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")${_suffix}.sock"
 }
@@ -21522,17 +21538,18 @@ stop_project_runtime() {
       terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
     done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
   fi
-  # Stop ACP bridge by tracked pid (belt-and-suspenders before the case below)
+  # Stop all ACP bridges by tracked pid (per-tool naming)
   local _bridge_pid_file _bridge_pid
-  _bridge_pid_file="$(_acp_bridge_pid_file "$project")"
-  if [[ -f "$_bridge_pid_file" ]]; then
+  for _bridge_pid_file in /tmp/freely-acp-$(_acp_bridge_short_hash "$project")-*.pid; do
+    [[ -f "$_bridge_pid_file" ]] || continue
     _bridge_pid="$(cat "$_bridge_pid_file" 2>/dev/null || true)"
     if [[ -n "$_bridge_pid" ]] && kill -0 "$_bridge_pid" 2>/dev/null; then
       terminate_pid_with_graceful_wait "$_bridge_pid" "project acp bridge during stop"
     fi
     rm -f "$_bridge_pid_file"
-  fi
-  rm -f "$(_acp_bridge_socket "$project")"
+  done
+  # Clean up all per-tool bridge sockets
+  rm -f /tmp/freely-acp-$(_acp_bridge_short_hash "$project")-*.sock
   # Stop A2A Server — multi-layer cleanup for zombie prevention
   local _a2a_socket _a2a_cached_pid _a2a_cached_pid_file
   _a2a_socket="$(_a2a_socket_path "$project")"
