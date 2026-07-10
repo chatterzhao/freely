@@ -3579,3 +3579,13 @@
 - milestone: M-20260710T043521Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T043521Z-A`
+
+## M-20260710T061534Z-A
+- title: fix — Manager agent collaboration fix
+- status: active
+### candidate_issues
+1. `C-20260710T061534Z-A`
+- milestone: M-20260710T061534Z-A
+- status: promoted
+- promoted_issue_id: `I-20260710T061534Z-A`
+### committed_issues
