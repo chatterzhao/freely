@@ -549,6 +549,62 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
     except Exception:
         return {}
 
+def _write_platform_ids(project: Path, issue_path: str, pids: dict[str, str]):
+    """Write discovered platform_ids back to issue.md frontmatter.
+
+    So the next scan can use platform_ids directly without the raw_key fallback.
+    """
+    issue_file = project / issue_path / "issue.md"
+    if not issue_file.is_file():
+        return
+    try:
+        text = issue_file.read_text(encoding="utf-8")
+        parts = text.split("---", 2)
+        if len(parts) < 3:
+            return
+        fm = parts[1]
+        if "platform_ids:" in fm:
+            return  # already has platform_ids section, don't overwrite
+        # Build platform_ids YAML block
+        pid_lines = ["platform_ids:"]
+        for pname, pid in sorted(pids.items()):
+            pid_lines.append(f"  {pname}:")
+            pid_lines.append(f"    issue_id: '{pid}'")
+            pid_lines.append(f"    url: ''")
+            pid_lines.append(f"    synced_at: ''")
+        pid_block = "\n".join(pid_lines)
+        # Insert before closing ---
+        new_fm = fm.rstrip() + "\n" + pid_block + "\n"
+        new_text = "---" + new_fm + "---" + parts[2]
+        issue_file.write_text(new_text, encoding="utf-8")
+    except Exception:
+        pass
+
+def _build_raw_key_index(platform_issues: dict[str, dict]) -> dict[str, dict[str, str]]:
+    """Build raw_key → {platform_name: issue_id} mapping from platform issues.
+
+    When local frontmatter lacks platform_ids, this index provides a fallback:
+    extract raw_key from platform issue title (e.g. [RAW-20260429T000000Z])
+    and match it to the local raw-{key} directory.
+
+    Returns {raw_key: {pname: issue_id}} — one raw_key can map to
+    multiple platforms (e.g. github: #123, gitee: ABC456).
+    """
+    index: dict[str, dict[str, str]] = {}
+    for issue_id, info in platform_issues.items():
+        title = info.get("title", "")
+        raw_key = extract_raw_key(title)
+        if raw_key:
+            if raw_key not in index:
+                index[raw_key] = {}
+            # Determine platform from issue_id format or info
+            pname = info.get("platform", "")
+            if not pname:
+                # Heuristic: numeric → github, alphanumeric-starting-with-letter → gitee
+                pname = "github" if issue_id.isdigit() else "gitee"
+            index[raw_key][pname] = issue_id
+    return index
+
 def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -> dict[str, str]:
     """Fetch CLOSED states for ALL configured platforms.
     Uses platform-adapter for per-platform individual queries.
@@ -742,6 +798,12 @@ def scan(project: Path) -> dict:
     timer.mark("platform_open")
 
     all_platform_states = get_all_platform_issue_states(project, platform_issues)
+
+    # Build raw_key → platform_ids fallback index.
+    # When local frontmatter lacks platform_ids but the raw_key appears
+    # in platform issue titles, this index fills the gap so
+    # _sync_platform_direct can still auto-close matching issues.
+    raw_key_pid_index = _build_raw_key_index(platform_issues)
     timer.mark("platform_all_states")
 
     # File scan: always scan for accurate detection
@@ -874,6 +936,15 @@ def scan(project: Path) -> dict:
             phase = raw_issue["phase_state"]
             plat_state = raw_issue.get("platform_state", "")
             pids = raw_issue.get("platform_ids", {})
+
+            # Fallback: if local frontmatter lacks platform_ids, use
+            # raw_key → platform_id index built from platform issue titles.
+            if not pids or not any(v for v in pids.values() if v):
+                fallback_pids = raw_key_pid_index.get(raw_key, {})
+                if fallback_pids:
+                    pids = fallback_pids
+                    # Write back to issue.md so next scan uses it directly
+                    _write_platform_ids(project, raw_issue["path"], fallback_pids)
 
             # Check per-platform state alignment
             platform_mismatches = {}
