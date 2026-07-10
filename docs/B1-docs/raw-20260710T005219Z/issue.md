@@ -21,7 +21,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+platform_state: closed
+absorbed_into: raw-20260710T005219Z---
 
 \n\n## 问题
 pre-scan batch: 642 terminal-phase local raw issues lack platform_ids in frontmatter.

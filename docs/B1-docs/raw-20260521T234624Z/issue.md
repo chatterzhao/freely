@@ -18,7 +18,7 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 supervisor crash: bash at freely:19074 (rc=1)
 last_exit_reason_before_crash: set_e_exit_cmd=bash@freely:19074_rc_1

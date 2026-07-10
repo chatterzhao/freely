@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260508T154706Z06Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -19,7 +19,7 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 改动
 

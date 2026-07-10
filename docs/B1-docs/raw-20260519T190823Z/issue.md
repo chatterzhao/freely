@@ -20,7 +20,7 @@ session_refs: []
 platform_state: closed
 force_closed_at: '2026-05-19T23:09:08Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
----
+absorbed_into: raw-20260710T005219Z---
 
 ## raw-20260519T190823Z23Z
 

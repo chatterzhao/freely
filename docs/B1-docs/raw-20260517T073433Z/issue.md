@@ -14,7 +14,7 @@ platform_ids:
 updated_at: '2026-06-17T00:26:31Z'
 primary_platform: github
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 问题
 

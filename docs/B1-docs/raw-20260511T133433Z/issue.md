@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260511T133433Z33Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: high
 source: platform
@@ -14,7 +14,7 @@ platform_ids:
 created_at: "2026-05-11T13:34:33Z"
 title: "fix: .githooks/* wrappers bash 3.2 precedence bug blocks all ref updates"
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 问题
 

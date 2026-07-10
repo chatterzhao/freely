@@ -6,7 +6,8 @@ platform_ids: {}
 primary_platform: ""
 canonical_issue_path: ""
 
-platform_state: closed---
+platform_state: closed
+absorbed_into: raw-20260710T005219Z---
 
 # Legacy issue raw-20260501
 

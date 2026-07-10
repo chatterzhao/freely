@@ -20,7 +20,7 @@ session_refs: []
 force_closed_at: '2026-05-21T15:27:10Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 platform_state: closed
----
+absorbed_into: raw-20260710T005219Z---
 
 ## 问题
 daemon stop 只杀 AI pid、manager watchdog、interruption dispatcher，不杀 acp-bridge.py。
