@@ -82,12 +82,14 @@ Manager→Worker 委派链路（a2a-exit → A2A → Runtime → Worker ACP sess
 
 **缺点**: 只改顺序不改架构。hygiene 仍是硬编码注入，下次加了别的硬编码步骤又会超时。
 
-## Decision: Option A
+## Decision: Option A（修正）
 
-1. ACP_IDLE_TIMEOUT: 180s → 600s（或环境变量可控）
+1. **Idle timeout 判定逻辑修正**（不是加长时间）：
+   `_idle_monitor_loop` 检查 `self.pending` 中是否有活跃的 `session/prompt`——有则说明 AI 正在工作中，不触发 shutdown。只在**真正空闲**（无 in-flight prompt）时关机。
 2. Worktree 卫生检测移入 task-lifecycle-scan.py，作为 scan items
 3. 移除 `append_manager_hygiene_alert_if_needed` 的硬编码注入
-4. 保留 Manager prompt 结构（巡逻流程、委派语法、行为契约）不变
+4. 所有委派 next_action 追加："严格按照 skill:freely-workflow-guarded-execution 指导开展工作"
+5. 保留 Manager prompt 结构不变
 
 ## Candidate
 

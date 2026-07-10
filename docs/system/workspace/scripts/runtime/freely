@@ -20220,7 +20220,6 @@ BACKLOG_NOTE
     append_checkpoint_governance_if_needed
     append_checkpoint_intervention_if_needed
     append_manager_supervision_alert_if_needed
-    append_manager_hygiene_alert_if_needed
     append_route_only_recovery_if_needed
   fi
   # ── AUTO-RETRY HINT: inject enrichment hint if present, then clean it up ──
