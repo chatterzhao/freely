@@ -6,7 +6,8 @@ platform_ids: {}
 primary_platform: ""
 canonical_issue_path: ""
 
-platform_state: closed---
+platform_state: closed
+---
 
 # Legacy issue raw-20260502T000000Z
 
