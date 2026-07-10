@@ -1,0 +1,2 @@
+- [x] Remove inline idle timeout in _send_request session/prompt branch
+- [x] Verify _idle_monitor_loop has_active_prompt check
