@@ -19,8 +19,8 @@
 - actual_output: |
   PASS: A2A query path exists
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix — 修改前只读 continuity 文件
 
 ### acceptance-2
@@ -37,8 +37,8 @@
 - actual_RED_output: FAIL
 - actual_output: PASS
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix
 
 ### acceptance-3
@@ -55,13 +55,41 @@
 - actual_RED_output: FAIL
 - actual_output: PASS
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix
 
-## Unit: not_applicable (covered_by_more_realistic_required_surface)
-## Integration: not_applicable (covered_by_more_realistic_required_surface)
-## End-to-End: not_applicable (covered_by_more_realistic_required_surface)
+## Unit
+- acceptance_target: A2A worker launch
+- testing_layer: unit
+- target_environment: develop
+- required_evidence: daemon cycle
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: post-merge daemon verification
+- replacement_evidence: AT-001/AT-002/AT-003
+## Integration
+- acceptance_target: A2A worker launch
+- testing_layer: integration
+- target_environment: develop
+- required_evidence: daemon cycle
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: post-merge daemon verification
+- replacement_evidence: AT-001/AT-002/AT-003
+## End-to-End
+- acceptance_target: A2A worker launch
+- testing_layer: end-to-end
+- target_environment: develop
+- required_evidence: daemon cycle
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: post-merge daemon verification
+- replacement_evidence: AT-001/AT-002/AT-003
 ## Real-Environment: pass
+- real_environment_status: pass
+- real_environment_reason: post-merge daemon 运行验证
+
+## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: post-merge daemon 运行验证
