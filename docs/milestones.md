@@ -77,7 +77,7 @@
 1. `I-20260706T023422Z-A`
 - title: docs-structure-refactor 遗漏补完
 - milestone: M-20260706T023422Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/ibm/b2-governance/raw-20260706T023422Z/issues/I-20260706T023422Z-A.md
 
 ## M-20260705T061416Z-A
