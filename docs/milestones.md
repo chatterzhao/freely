@@ -6114,3 +6114,13 @@
 - milestone: M-20260710T110249Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T110249Z-A`
+
+## M-20260710T142858Z-A
+- title: fix — Runtime Worker Launch 接入 A2A
+- status: active
+### candidate_issues
+1. `C-20260710T142858Z-A`
+- milestone: M-20260710T142858Z-A
+- status: promoted
+- promoted_issue_id: `I-20260710T142858Z-A`
+### committed_issues
