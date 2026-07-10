@@ -7,6 +7,5 @@ platform_ids: {}
 primary_platform: local
 created_at: '2026-06-17T13:17:46Z'
 
-platform_state: closed
----
+platform_state: closed---
 # Fix pr-merge-guarded pull || true

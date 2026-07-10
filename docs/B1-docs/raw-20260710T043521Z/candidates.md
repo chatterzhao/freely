@@ -1,15 +1,14 @@
 ---
 candidate_id: C-20260710T043521Z-A
-status: absorbed
+status: promoted
 source_raw: raw-20260710T043521Z
-absorbed_into: I-20260710T043521Z-A
 created_at: 2026-07-10
 milestone: M-20260710T043521Z-A
 ---
 ## C-20260710T043521Z-A: scan skip closed items
 - candidate_format_version: v2
 - title: scan skip closed items
-- status: absorbed
+- status: promoted
 - decision_reason: platform_state=closed + 无 platform_ids 的 items 已本地解决，不应进入 Manager AI cycle
 - next_action: B2 实现
 - acceptance_criteria:

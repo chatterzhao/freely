@@ -27,8 +27,7 @@ dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug
 =======
 >>>>>>> fix/raw-20260519T145435Z35Z-consumed-by-auto-consume
 
-platform_state: closed
----
+platform_state: closed---
 
 ## raw-20260519T145435Z35Z
 

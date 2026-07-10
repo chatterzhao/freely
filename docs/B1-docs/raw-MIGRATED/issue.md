@@ -6,8 +6,7 @@ platform_ids: {}
 primary_platform: ""
 canonical_issue_path: ""
 
-platform_state: closed
----
+platform_state: closed---
 
 # Migration placeholder
 
