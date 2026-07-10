@@ -4845,3 +4845,13 @@
 ### completed_issues
 1. `I-20260710T072314Z-A` - phase_state: completed - path: docs/B2-docs/runtime/scan/raw-20260710T072314Z/issues/I-20260710T072314Z-A.md
 2. `C-20260710T072314Z-A` - status: absorbed - absorbed_into: `I-20260710T072314Z-A`
+
+## M-20260710T110249Z-A
+- title: fix — monitor per-tool naming sync
+- status: active
+### candidate_issues
+1. \`C-20260710T110249Z-A\`
+- milestone: M-20260710T110249Z-A
+- status: promoted
+- promoted_issue_id: \`I-20260710T110249Z-A\`
+### committed_issues
