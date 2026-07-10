@@ -1,7 +1,8 @@
 ---
 candidate_id: C-20260710T110249Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260710T110249Z
+absorbed_into: I-20260710T110249Z-A
 created_at: 2026-07-10
 milestone: M-20260710T110249Z-A
 ---
@@ -10,7 +11,7 @@ milestone: M-20260710T110249Z-A
 
 - candidate_format_version: v2
 - title: monitor-ai-acp.sh 同步 per-tool bridge 命名
-- status: promoted
+- status: absorbed
 - decision_reason: PR #3842/3849 引入 per-tool bridge 后，monitor-ai-acp.sh 的检测代码未同步更新，所有 bridge 级检测（idle、fatal、PID）都在检查不存在的默认路径。需同步命名并在修复后确认 rc=143 是否解决。
 - next_action: B2 设计实现
 - revisit_trigger: 如果 Option A 修复后 rc=143 仍然发生 → 需要深入追踪第三个 kill 路径

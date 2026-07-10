@@ -178,7 +178,10 @@ _detect_acp_failure() {
 
   local _matched _bridge_log _net_err
   # Check all per-tool bridge logs (acp-bridge-*.log) — not just the default
-  _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"  # fallback for legacy
+  # Use per-tool bridge log (base_tool passed from main)
+  local _bt="${6:-}"
+  _bridge_log="$(_bridge_log_file "$(dirname "$log_file")/.." "$_bt")" 2>/dev/null || true
+  [[ -f "$_bridge_log" ]] || _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"  # legacy fallback
   _bridge_log_glob="$(dirname "$log_file")/../run/acp-bridge-*.log"
 
   # ── Layer 0: Idle shutdown (intentional, not a failure) ──
@@ -400,7 +403,7 @@ main() {
 
   # Write bridge PID as AI PID for liveness checks
   local bridge_pid
-  bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || echo "$child_pid")
+  bridge_pid=$(cat "$(_bridge_pid_file "$project" "$_base_tool")" 2>/dev/null || echo "$child_pid")
   if [[ -n "$pid_file" ]]; then
     echo "$bridge_pid" > "$pid_file"
   fi
@@ -438,7 +441,7 @@ main() {
     if (( _ping_counter > 0 && _ping_counter % 60 == 0 )); then
       local _sid _bridge_sock
       _sid=$(grep -oE 'ses_[A-Za-z0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
-      _bridge_sock=$(_bridge_socket "$project" 2>/dev/null || true)
+      _bridge_sock=$(_bridge_socket "$project" "$_base_tool" 2>/dev/null || true)
       if [[ -n "$_sid" && -n "$_bridge_sock" && -S "$_bridge_sock" ]]; then
         python3 -c "
 import json, socket
