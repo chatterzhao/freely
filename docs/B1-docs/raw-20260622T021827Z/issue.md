@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## pre-tests.md 完整模板（B2_IBM skill 内置）

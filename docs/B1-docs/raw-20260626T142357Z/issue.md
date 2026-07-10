@@ -19,6 +19,7 @@ channel: github
 session_refs: []
 absorbed_into: I-20260626T142357Z-A
 source_candidate: docs/B1-docs/raw-20260626T142357Z57Z/candidates.md#C-20260626T142357Z-A
+platform_state: closed
 ---
 
 ## 问题

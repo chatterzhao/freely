@@ -1,10 +1,10 @@
 ---
 local_id: raw-20260505T121000Z00Z
-issue_title: "issue 状态字段重构：分离 platform_state 和 phase_state，统一 raw/I-* 字段规范"
+issue_title: issue 状态字段重构：分离 platform_state 和 phase_state，统一 raw/I-* 字段规范
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
     issue_id: '214'
@@ -15,7 +15,7 @@ intake_id: 20260505T1210Z-issue-state-refactor
 author: human
 channel: github
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 ## 问题

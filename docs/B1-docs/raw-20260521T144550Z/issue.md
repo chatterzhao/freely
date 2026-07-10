@@ -17,7 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 force_closed_at: '2026-05-21T15:27:32Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---

@@ -13,6 +13,7 @@ platform_ids:
 updated_at: '2026-06-17T00:19:57Z'
 primary_platform: github
 platform_state: closed
+local_id: raw-20260518T040911Z
 ---
 
 ## 根因

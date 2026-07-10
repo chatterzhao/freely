@@ -22,6 +22,7 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260629T095905Z-A
+platform_state: closed
 ---
 \n\n## 问题
 

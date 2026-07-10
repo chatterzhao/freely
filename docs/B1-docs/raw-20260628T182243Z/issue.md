@@ -24,6 +24,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 - absorbed_into: I-20260628T005815Z-A

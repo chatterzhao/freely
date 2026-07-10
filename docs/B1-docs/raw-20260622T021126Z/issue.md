@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 Batch sync task discovered by scan.

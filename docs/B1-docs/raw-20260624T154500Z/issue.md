@@ -19,6 +19,7 @@ channel: github
 session_refs: []
 absorbed_into: I-20260624T154500Z-A
 source_candidate: docs/B1-docs/raw-20260624T154500Z00Z/candidates.md#C-20260624T154500Z-A
+platform_state: closed
 ---
 
 ## 根因

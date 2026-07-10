@@ -19,8 +19,8 @@ channel: github
 session_refs: []
 absorbed_into: I-20260625T235017Z-A
 pre_tests_path: docs/B2-docs/git-worktree/verification/pre-tests.md
-absorbed_into: I-20260625T235017Z-A
 source_candidate: docs/B1-docs/raw-20260625T235017Z17Z/candidates.md#C-20260625T235017Z-A
+platform_state: closed
 ---
 
 ## 问题

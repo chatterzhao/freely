@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 # feat: Manager prompt — persistent session note + A2A pre-check + three dispatch modes

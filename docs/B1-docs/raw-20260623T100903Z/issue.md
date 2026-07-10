@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 为什么这是唯一需要先做的

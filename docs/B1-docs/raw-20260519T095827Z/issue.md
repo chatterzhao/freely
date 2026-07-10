@@ -17,6 +17,7 @@ primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-19T10:04:37Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+local_id: raw-20260519T095827Z
 ---
 
 handoff是语义名，json是数据格式。正确写法:fence用json，内容为handoff数据。全文替换:agent文档中所有handoff fence改为json fence，handoff.py提取逻辑json优先，freely提示词同步。

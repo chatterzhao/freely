@@ -13,6 +13,7 @@ platform_ids:
 updated_at: '2026-06-17T00:22:37Z'
 primary_platform: github
 platform_state: closed
+local_id: raw-20260519T094157Z
 ---
 
 supervisor crash: bash at freely:18923 (rc=0)

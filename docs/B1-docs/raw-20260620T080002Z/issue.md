@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 PR #3147 changed manager_max_parallel_workers() from 'unbounded' to '10:7', but two callers (lines 8746 and 10849) still check for 'unbounded'. When they receive '10:7', the comparison fails, bash enters arithmetic code paths with string '10:7', crashes with set -e, and kills the entire daemon start process silently.

@@ -11,13 +11,14 @@ primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
-absorbed_into: 'I-20260623T022909Z-A'
+absorbed_into: I-20260623T022909Z-A
 created_at: '2026-06-23T02:29:26Z'
 updated_at: '2026-06-23T02:29:26Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 task-lifecycle-scan.py line 19 uses `from platform_adapter import list_open_issues` but the file is named `platform-adapter.py` (hyphen, not underscore). Additionally, the _SYNC_DIR path on line 16 is `parent.parent / \"sync\"` but should be `parent.parent / \"scripts\" / \"sync\"`. Fix both issues so the scan can run again.

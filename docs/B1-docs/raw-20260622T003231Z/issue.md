@@ -13,7 +13,7 @@ created_at: '2026-06-22T00:32:48Z'
 updated_at: '2026-06-22T00:32:48Z'
 author: platform
 channel: github
-platform_state: open
+platform_state: closed
 ---
 
 Fix pre-push.sh local keyword for macOS bash compat

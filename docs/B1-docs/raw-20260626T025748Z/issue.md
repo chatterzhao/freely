@@ -19,6 +19,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/B2-docs/a2a-review-states/verification/pre-tests.md
 absorbed_into: I-20260626T025748Z-A
+platform_state: closed
 ---
 
 ## 设计

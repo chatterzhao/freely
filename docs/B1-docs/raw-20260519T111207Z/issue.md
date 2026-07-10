@@ -17,6 +17,7 @@ primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-19T11:15:58Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+local_id: raw-20260519T111207Z
 ---
 
 AI写summary非completion_summary,artifacts非evidence_paths。修复:字段名alias+evidence_paths改为可选。

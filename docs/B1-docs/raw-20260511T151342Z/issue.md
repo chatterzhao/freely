@@ -1,18 +1,18 @@
 ---
 local_id: raw-20260511T151342Z42Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: medium
 source: platform
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
-    issue_id: "304"
+    issue_id: '304'
     owner: chatterzhao
     repo: freely
-created_at: "2026-05-11T15:13:42Z"
-title: "fix: pr-merge-guarded returns non-zero exit on successful merge"
+created_at: '2026-05-11T15:13:42Z'
+title: 'fix: pr-merge-guarded returns non-zero exit on successful merge'
 platform_state: closed
 ---
 ## 问题

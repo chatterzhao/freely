@@ -19,6 +19,7 @@ channel: github
 session_refs: []
 absorbed_into: I-20260625T031400Z-A
 source_candidate: docs/B1-docs/raw-20260625T031400Z00Z/candidates.md#C-20260625T031400Z-A
+platform_state: closed
 ---
 
 #3455 regression: platform-adapter.py has no create-issue CLI subcommand. Use gh issue create and gitee-issue.py create directly.

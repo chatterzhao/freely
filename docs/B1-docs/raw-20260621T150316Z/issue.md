@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 # [RAW-20260621T150316Z] feat: wt-create should clone develop .freely state to test-pre-merge worktree

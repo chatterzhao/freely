@@ -21,6 +21,7 @@ absorbed_into: I-20260625T044836Z-A
 source_candidate: docs/B1-docs/raw-20260625T044836Z36Z/candidates.md#C-20260625T044836Z-A
 promoted_issue_path: docs/issues/I-20260625T044836Z-A/issue.md
 pre_tests_path: docs/B2-docs/issue-sync-filter/verification/pre-tests.md
+platform_state: closed
 ---
 
 ## 问题

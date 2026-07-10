@@ -17,6 +17,7 @@ primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-19T09:24:45Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+local_id: raw-20260519T091633Z
 ---
 
 ## 设计
