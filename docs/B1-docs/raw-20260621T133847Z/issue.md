@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 # Fix: Inline Python -c quoting breaks manager_exit_contract_kind
 

@@ -7,5 +7,5 @@ platform_ids:
   github:
     issue_id: '2122'
 primary_platform: github
-
-platform_state: closed---
+platform_state: closed
+---

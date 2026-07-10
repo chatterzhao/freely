@@ -18,8 +18,8 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260618T015503Z-A
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题概述
 

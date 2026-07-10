@@ -18,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 pr-merge-guarded and wt-close call issue-sync close without --project, causing guard to reject develop. Fix: revert the close exemption and instead make callers pass --project <worktree-path>.

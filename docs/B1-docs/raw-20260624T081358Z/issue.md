@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题
 freely-fix-execution、freely-test-execution、freely-feat-execution 和 AGENTS.md 中，测试步骤写成了 "stop/start daemon → 验证"，假设所有项目都是 daemon 型应用。

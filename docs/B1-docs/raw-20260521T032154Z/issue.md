@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 supervisor crash: [[ at freely:18951 (rc=1)
 last_exit_reason_before_crash: set_e_exit_cmd=[[@freely:18951_rc_1

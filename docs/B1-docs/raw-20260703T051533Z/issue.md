@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## Bug
 .gitignore has __pycache__/ but .pyc files were force-added to git. Python recompiles them on import → git sees dirty tree → daemon refuses to start.

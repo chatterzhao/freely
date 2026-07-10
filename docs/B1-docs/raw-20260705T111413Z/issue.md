@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 问题
 projects.tsv 误入 repo 根目录（应位于 ~/.freely/）。该文件是机器相关的全局状态，记录已注册项目路径，不应提交。

@@ -19,7 +19,8 @@ channel: github
 session_refs: []
 platform_state: closed
 force_closed_at: '2026-06-15T04:36:07Z'
-force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'---
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+---
 
 ## 问题
 Supervisor loop 在 worktree_has_active_worker 中通过 tail+extract 从 cycle log 文本解析 Worker 状态。

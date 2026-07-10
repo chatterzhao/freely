@@ -20,8 +20,8 @@ channel: github
 session_refs: []
 force_closed_at: '2026-06-17T15:17:56Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题
 

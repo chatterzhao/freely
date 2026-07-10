@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 ## Phase 2b: 合并 a2a_task.py / a2a_client.py
 - 两个独立实现合并为一个标准 A2A 客户端

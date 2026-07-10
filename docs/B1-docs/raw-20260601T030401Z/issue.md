@@ -17,6 +17,7 @@ intake_id: ''
 author: platform
 channel: batch
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 Platform sync batch for fix branch: fix/raw-20260601T030401Z01Z-platform-sync.

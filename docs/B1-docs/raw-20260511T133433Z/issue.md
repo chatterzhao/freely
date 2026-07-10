@@ -5,15 +5,16 @@ phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: high
 source: platform
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
-    issue_id: "302"
+    issue_id: '302'
     owner: chatterzhao
     repo: freely
-created_at: "2026-05-11T13:34:33Z"
-title: "fix: .githooks/* wrappers bash 3.2 precedence bug blocks all ref updates"
-platform_state: closed---
+created_at: '2026-05-11T13:34:33Z'
+title: 'fix: .githooks/* wrappers bash 3.2 precedence bug blocks all ref updates'
+platform_state: closed
+---
 
 ## 问题
 

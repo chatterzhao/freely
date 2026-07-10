@@ -16,7 +16,8 @@ intake_id: 20260503-0200-scan-lifecycle
 author: ai
 channel: chat
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 将已废弃的 task-source-scan.py (147条噪声) 替换为 task-lifecycle-scan v2 (35条精准)，
 包含完整生命周期链条追踪、chat inbox 信号扫描、分支命名规范治理。

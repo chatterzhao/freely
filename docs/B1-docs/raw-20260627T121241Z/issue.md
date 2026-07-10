@@ -10,7 +10,6 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: ''
 absorbed_into: I-20260627T121241Z-A
-absorbed_into: I-20260627T121241Z-A
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-27T12:13:01Z'
@@ -19,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## Bug
 scan v3 Cat 3 reads `wt_path/.freely/run/agent-id.env` (per-worktree, never exists) instead of `develop/.freely/agent-id.env` (global binding table). Cat 3 always returns 3a_never_bound.

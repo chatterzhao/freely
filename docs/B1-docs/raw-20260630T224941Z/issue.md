@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 背景
 config.toml.example 多处注释不准确、字段缺失、缺少影响说明。init 不能从无到有创建 config.toml。

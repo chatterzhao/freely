@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 Batch sync task discovered by scan.
 pull=616 push=10 reconcile=186 close=57

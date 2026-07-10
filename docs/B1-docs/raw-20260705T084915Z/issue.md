@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 问题
 _ensure_acp_bridge_running 中 tool change 检测用全局 AGENT_AI_TOOL（永远=claude），导致 opencode/cline bridge 被误判为 tool changed，反复 kill+restart。

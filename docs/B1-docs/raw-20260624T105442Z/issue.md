@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 根因
 wt-close Phase 6 用 `git branch -d $branch` 删除分支。不加 ref 参数时，git 检查 upstream 或 HEAD。这些 fix/feature 分支无 upstream，fallback 到 HEAD——但在 worktree 中 HEAD 即分支自身，永远判定"not merged"，每次都退到 `-D`。

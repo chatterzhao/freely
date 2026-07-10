@@ -21,8 +21,8 @@ absorbed_into: I-20260625T211802Z-A
 source_candidate: docs/B1-docs/raw-20260625T211813Z02Z/candidates.md#C-20260625T211802Z-A
 promoted_issue_path: docs/issues/I-20260625T211802Z-A/issue.md
 pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 设计
 

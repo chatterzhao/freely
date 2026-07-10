@@ -22,8 +22,8 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260629T095905Z-A
-
-platform_state: closed---
+platform_state: closed
+---
 \n\n## 问题
 
 freely-workflow-guarded-execution 有三个缺口导致 AI 不自举：

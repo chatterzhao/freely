@@ -1,10 +1,10 @@
 ---
 local_id: raw-20260505T231000Z00Z
-issue_title: "fix: secret detection false positive on file paths with sk- prefix"
+issue_title: 'fix: secret detection false positive on file paths with sk- prefix'
 kind: raw
 phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
     issue_id: '228'
@@ -15,7 +15,8 @@ intake_id: 20260505T2310Z-secret-detection-false-positive
 author: human
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 ## Problem
 

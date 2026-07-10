@@ -3,7 +3,7 @@ local_id: raw-20260516T081651Z51Z
 kind: raw
 phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
     issue_id: '360'
@@ -20,7 +20,8 @@ channel: github
 session_refs: []
 platform_state: closed
 force_closed_at: '2026-05-16T08:19:52Z'
-force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'---
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+---
 
 ## raw-20260516T081651Z51Z
 

@@ -8,6 +8,6 @@ platform_ids:
     issue_id: '3304'
     url: https://github.com/chatterzhao/freely/issues/3304
 primary_platform: github
-
-platform_state: closed---
+platform_state: closed
+---
 # refine: --reason must match regex, not just non-empty

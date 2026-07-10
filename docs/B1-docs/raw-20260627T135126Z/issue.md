@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## Problem
 git merge develop into worktree pulls in already-merged files from other worktrees, exceeding MAX_SCOPE_COUNT=4. This blocks legitimate pre-PR conflict resolution.

@@ -19,9 +19,9 @@ channel: github
 session_refs: []
 force_closed_at: '2026-06-17T14:28:44Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-absorbed_into: 'I-20260617T110109Z-A'
-
-platform_state: closed---
+absorbed_into: I-20260617T110109Z-A
+platform_state: closed
+---
 
 ## 问题
 A2A 协议完全不使用文件。Message.parts[{text}] 就是内容载体。但 Freely 的 A2A Task 仍存储 prompt_file 字段——这是 ACP 层的实现细节泄漏到了 A2A 层。

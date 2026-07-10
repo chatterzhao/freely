@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题
 1. active slot 写部分名 apikey-test，应写全名 claude-apikey-test

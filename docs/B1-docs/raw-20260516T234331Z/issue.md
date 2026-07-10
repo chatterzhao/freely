@@ -16,7 +16,8 @@ phase_state: absorbed
 absorbed_into: I-20260413T042000Z-A
 platform_state: closed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-local_id: raw-20260516T234331Z---
+local_id: raw-20260516T234331Z
+---
 
 ## 设计
 

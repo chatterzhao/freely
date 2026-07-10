@@ -21,8 +21,8 @@ session_refs: []
 source_candidate: docs/B1-docs/raw-20260625T084522Z06Z/candidates.md#C-20260625T084506Z-A
 promoted_issue_path: docs/issues/I-20260625T084506Z-A/issue.md
 pre_tests_path: docs/B2-docs/b2-ibm-anti-cheating/verification/pre-tests.md
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题
 

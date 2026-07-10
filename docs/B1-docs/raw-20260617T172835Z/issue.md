@@ -20,8 +20,8 @@ session_refs: []
 force_closed_at: '2026-06-17T17:32:57Z'
 force_closed_reason: 'pr-merge-guarded: absorbed by merge'
 absorbed_into: ''
-
-platform_state: closed---
+platform_state: closed
+---
 
 Batch sync task discovered by scan.
 pull=50 push=7 reconcile=20 close=56

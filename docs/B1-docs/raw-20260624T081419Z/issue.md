@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 问题
 freely-fix-execution 中 test-pre-merge 到 fix 工位的修改转移方式用的是 cp 逐个文件路径。

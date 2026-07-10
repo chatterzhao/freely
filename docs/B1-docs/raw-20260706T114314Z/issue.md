@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 根因
 当前 hook 拦截时提示不够具体:

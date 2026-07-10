@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 codex apikey 需要：
 1. _login_apikey_alias 加 codex case：生成 auth.json + config.toml，alias='cd slot && codex'

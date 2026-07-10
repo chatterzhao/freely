@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## Problems
 1. wt-close line 917: local used outside function, breaks unmerged branch deletion

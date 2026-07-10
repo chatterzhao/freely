@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## Bugs
 1. ACP bridge binary changed every cycle: config.toml full path vs registry short name mismatch

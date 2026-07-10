@@ -2,7 +2,7 @@
 local_id: raw-20260708T100854Z
 kind: raw
 phase_state: absorbed
-absorbed_into: 'I-20260708T100854Z-A'
+absorbed_into: I-20260708T100854Z-A
 platform_ids:
   github:
     issue_id: '3818'
@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 根因
 

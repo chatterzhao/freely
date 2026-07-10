@@ -5,15 +5,16 @@ phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: P1
 source: platform
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
-    issue_id: "187"
+    issue_id: '187'
     owner: chatterzhao
     repo: freely
-created_at: "2026-05-03T21:29:35Z"
-title: "fix: run-acp-prompt.py disconnects before bridge finishes"
-platform_state: closed---
+created_at: '2026-05-03T21:29:35Z'
+title: 'fix: run-acp-prompt.py disconnects before bridge finishes'
+platform_state: closed
+---
 
 ## Root Cause
 

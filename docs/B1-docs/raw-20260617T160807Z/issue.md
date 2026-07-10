@@ -20,8 +20,8 @@ channel: github
 session_refs: []
 force_closed_at: '2026-06-17T16:11:12Z'
 force_closed_reason: 'pr-merge-guarded: absorbed by merge'
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## Bug
 

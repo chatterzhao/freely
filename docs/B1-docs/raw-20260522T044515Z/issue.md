@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed---
+platform_state: closed
+---
 
 ## 现状
 codex_probe_current_slot_now 只支持 codex exec。apikey slot 无法探测。

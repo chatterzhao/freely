@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 consume_delegate_workers already has _target_worktree from the A2A DB query. But it only passes _prompt_file to launch_worker_from_manager_prompt_if_needed, which then re-parses the worktree path from the prompt text using fragile awk patterns. The structured data is thrown away.
 

@@ -2,7 +2,6 @@
 local_id: raw-20260701T045911Z11Z
 kind: raw
 phase_state: absorbed
-absorbed_into: I-20260701T045911Z-A
 absorbed_into: M-20260701T045911Z-A
 platform_ids:
   github:
@@ -23,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n
 ## 现状

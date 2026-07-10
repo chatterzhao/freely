@@ -21,8 +21,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n
 ## 问题 1: 三个角色 session 创建逻辑分散

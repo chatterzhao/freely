@@ -18,8 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 ## 目标
 消除 tool-launchers.sh 中 adapter查询、launch_kind、ACP dispatch、tool family 解析的硬编码 case 分支，改为从 tool-registry.toml 读取。

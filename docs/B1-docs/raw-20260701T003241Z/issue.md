@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 问题
 已有 config.toml 时 init 会继续修改配置（ACP字段等），与用户预期不符。

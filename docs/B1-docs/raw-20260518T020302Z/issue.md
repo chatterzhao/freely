@@ -16,7 +16,8 @@ updated_at: '2026-06-17T00:23:34Z'
 primary_platform: github
 platform_state: closed
 absorbed_into: infra-githooks
-local_id: raw-20260518T020302Z---
+local_id: raw-20260518T020302Z
+---
 
 ## 依赖
 

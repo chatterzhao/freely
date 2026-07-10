@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## Bug
 _update_agent_table_slot searches for 'agent_id =' (e.g. 'worker_01 =') 

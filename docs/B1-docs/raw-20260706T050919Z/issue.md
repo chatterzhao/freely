@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 问题
 多个门禁做全仓扫描(os.walk/find/ls)，历史遗留问题误伤当前 PR，

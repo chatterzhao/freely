@@ -22,8 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-
-platform_state: closed---
+platform_state: closed
+---
 
 \n\n## 问题
 _rotate_log 只覆盖 a2a-server.log。db-daemon.log、watchdog-sse.log、lifecycle-trace.log、runtime-events.log 均无 rotation。
