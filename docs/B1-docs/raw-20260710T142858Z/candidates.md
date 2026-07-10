@@ -1,7 +1,8 @@
 ---
 candidate_id: C-20260710T142858Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260710T142858Z
+absorbed_into: I-20260710T142858Z-A
 created_at: 2026-07-10
 milestone: M-20260710T142858Z-A
 ---
@@ -10,7 +11,7 @@ milestone: M-20260710T142858Z-A
 
 - candidate_format_version: v2
 - title: Runtime Worker Launch 接入 A2A 协议
-- status: promoted
+- status: absorbed
 - decision_reason: A2A 集成完成 Phase 1 (Server) + Phase 2 (Manager 侧) 后，Phase 3 (Runtime 侧 Worker launch) 未完成。Manager 委派的 Worker 任务停留在 A2A submitted 状态，从未被启动。需要将 Runtime 的 Worker launch 从旧的 CSV/continuity 管道切换到 A2A tasks 查询。
 - next_action: B2 设计实现
 - revisit_trigger: 如果 Option A 接入后 Worker 仍不启动 → 检查 ACP session/fork 链路

@@ -13300,6 +13300,61 @@ manager_runtime_launch_workers_from_latest_task() {
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers terminal_kind
+
+  # ── A2A path (NEW): launch Workers from submitted A2A tasks ──
+  # Queries a2a_tasks for submitted worker tasks that haven't been launched yet.
+  # Each task carries the full Worker prompt in its message field, plus
+  # worktree/branch/raw_key metadata from the Manager's a2a-exit delegation.
+  local _a2a_task_py _a2a_tasks_json _a2a_launched
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+  _a2a_launched=0
+  if [[ -f "$_a2a_task_py" ]]; then
+    _a2a_tasks_json="$(python3 "$_a2a_task_py" list --state submitted --role worker 2>/dev/null || true)"
+    if [[ -n "$_a2a_tasks_json" && "$_a2a_tasks_json" != "[]" ]]; then
+      max_parallel_workers="$(manager_max_parallel_workers)"
+      active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
+      local _a2a_max_new=2
+      local _a2a_new_count=0
+      while IFS= read -r _a2a_row; do
+        [[ -n "$_a2a_row" ]] || continue
+        local _a2a_task_id _a2a_message _a2a_worktree _a2a_branch _a2a_raw_key _a2a_skill
+        _a2a_task_id="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('task_id',''))" 2>/dev/null || true)"
+        _a2a_message="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('message',''))" 2>/dev/null || true)"
+        _a2a_worktree="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('worktree',''))" 2>/dev/null || true)"
+        _a2a_branch="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('branch',''))" 2>/dev/null || true)"
+        _a2a_raw_key="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('raw_key',''))" 2>/dev/null || true)"
+        _a2a_skill="$(echo "$_a2a_row" | python3 -c "import sys,json;print(json.loads(sys.stdin.read()).get('skill','freely-workflow-guarded-execution'))" 2>/dev/null || true)"
+        [[ -n "$_a2a_task_id" && -n "$_a2a_message" ]] || continue
+        # Write message to temp prompt file
+        local _a2a_prompt_file
+        _a2a_prompt_file="$(mktemp "${TMPDIR:-/tmp}/freely-a2a-worker-prompt.XXXXXX")"
+        printf '%s\n' "$_a2a_message" > "$_a2a_prompt_file"
+        # Launch Worker ACP session
+        if launch_worker_from_manager_prompt_if_needed "$project" "$_a2a_prompt_file" "$_a2a_worktree" "$_a2a_task_id"; then
+          # Update task state: submitted → working
+          python3 "$_a2a_task_py" update --task-id "$_a2a_task_id" --state working 2>/dev/null || true
+          _a2a_launched=$((_a2a_launched + 1))
+          _a2a_new_count=$((_a2a_new_count + 1))
+          log_info "A2A worker launched: task=$_a2a_task_id worktree=$_a2a_worktree raw_key=$_a2a_raw_key"
+        else
+          log_warn "A2A worker launch failed: task=$_a2a_task_id"
+        fi
+        # Clean up temp file
+        rm -f "$_a2a_prompt_file"
+        [[ $_a2a_new_count -ge $_a2a_max_new ]] && break
+      done < <(echo "$_a2a_tasks_json" | python3 -c "
+import sys,json
+tasks=json.loads(sys.stdin.read()).get('rows',[])
+for t in tasks: print(json.dumps(t))
+" 2>/dev/null)
+    fi
+  fi
+  # If A2A tasks were launched, return the count (skip old continuity path)
+  if [[ $_a2a_launched -gt 0 ]]; then
+    printf '%s\n' "$_a2a_launched"
+    return 0
+  fi
+
   continuity_file="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
   if [[ -z "$continuity_file" || ! -f "$continuity_file" ]]; then
     continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
