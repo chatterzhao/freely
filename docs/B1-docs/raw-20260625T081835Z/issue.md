@@ -19,6 +19,7 @@ channel: github
 session_refs: []
 absorbed_into: I-20260625T081835Z-A
 source_candidate: docs/B1-docs/raw-20260625T081835Z35Z/candidates.md#C-20260625T081835Z-A
----
+
+platform_state: closed---
 
 #3464 simplified feedback to read env var but config.toml values are not auto-exported. Use freely_config.py print to read from config.toml.

@@ -22,7 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 \n\n## Bug
 agent_working records only written for worker/reviewer (watchdog_sse.py).

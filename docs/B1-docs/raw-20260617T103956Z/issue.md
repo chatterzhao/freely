@@ -20,7 +20,8 @@ session_refs: []
 force_closed_at: '2026-06-17T14:28:31Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 absorbed_into: 'I-20260617T103956Z-A'
----
+
+platform_state: closed---
 
 ## 目标
 彻底消除 worker_prompts_csv 和 prompt 文件路径的所有残留，改为 A2A 协议标准委派模式。

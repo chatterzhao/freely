@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 问题
 "Fix first, govern later" / "Govern first, code later" 容易被误解为"随便在哪改"或"随便什么时候写文档"。

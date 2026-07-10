@@ -21,7 +21,8 @@ pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
 absorbed_into: I-20260626T044954Z-A
 pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
 absorbed_into: I-20260626T033913Z-A
----
+
+platform_state: closed---
 - pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
 
 

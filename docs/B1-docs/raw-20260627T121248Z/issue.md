@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## Bug
 - --worker-pid infrastructure exists (a2a_task.py set_worker_pid) but manager never calls it on insert

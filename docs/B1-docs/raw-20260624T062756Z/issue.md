@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 现象
 docs/system/workspace/tools.md:39 仍引用旧名 tool-registry.json5，应改为 tool-registry.toml。

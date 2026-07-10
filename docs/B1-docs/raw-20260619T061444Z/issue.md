@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ACP bridge log shows repeated JSONDecodeError + BrokenPipeError across Thread-5/6/8. Clients send empty data then disconnect, causing unhandled exceptions. Fix: add empty-line filtering before json.loads and catch BrokenPipeError gracefully in handle_client.

@@ -22,7 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 \n\n## Bug
 wt-close passes fix worktree path to pretests-retirement-gate. test-gate.env only exists in test-pre-merge — fix worktrees never have it. Gate always fails.

@@ -24,7 +24,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 - absorbed_into: I-20260628T005815Z-A
 - pre_tests_path: docs/B2-docs/human/discuss/raw-20260628T005815Z15Z/verification/pre-tests.md

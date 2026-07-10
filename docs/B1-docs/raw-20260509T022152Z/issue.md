@@ -21,7 +21,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 - pre_tests_path: `docs/B2-docs/worker-launch-writable-redirect/pre-tests.md`

@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 Cline CLI ≥2.0.0 原生 ACP (cline --acp)，@agentclientprotocol/sdk over stdio/ndjson。已写好完整 registry 配置待 apply。

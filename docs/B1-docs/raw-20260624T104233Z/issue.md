@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 问题
 项目中多处仍写 "stop/start daemon" 作为测试方式，未指向 pre-tests.md。

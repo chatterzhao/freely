@@ -18,7 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 ## 问题
 wt-create 成功后的提示信息硬编码了步骤列表（如 "1. 在 test-pre-merge-* 改源码"），且文本陈旧（仍写 stop/start daemon、cp 修改）。

@@ -22,7 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 \n\n## 问题
 B2 SKILL.md copy-paste 示例中 docs/epics 路径缺层，共 10 处：

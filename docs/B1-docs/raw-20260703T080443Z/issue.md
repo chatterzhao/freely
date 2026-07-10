@@ -22,7 +22,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
----
+
+platform_state: closed---
 
 \n\n## Design Defect
 __manager__ record only written lazily by _handle_needs_manager (watchdog_sse.py).
