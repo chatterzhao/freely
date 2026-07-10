@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260710T043521Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: I-20260710T043521Z-A
 platform_ids:
   gitee:
     issue_id: IK04AI
