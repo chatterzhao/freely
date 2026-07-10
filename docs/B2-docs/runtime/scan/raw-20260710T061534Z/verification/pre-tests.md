@@ -19,8 +19,8 @@
 - actual_output: |
   PASS: has_active_prompt check exists in _idle_monitor_loop
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix — idle monitor 只看时间戳，误杀工作中的 AI
 
 ### acceptance-2
@@ -40,8 +40,8 @@
 - actual_output: |
   PASS: no append_manager_hygiene_alert_if_needed in build_prompt
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix — build_prompt 硬编码注入 hygiene alert
 
 ### acceptance-3
@@ -60,8 +60,8 @@
 - actual_output: |
   PASS: workflow skill referenced in scan templates
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: fix — 委派指令未引用 workflow skill
 
 ## Unit
