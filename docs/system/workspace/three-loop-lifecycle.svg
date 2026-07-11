@@ -53,7 +53,7 @@
   <!-- Manager: loaded Skills -->
   <rect x="50" y="155" width="1300" height="48" rx="6" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
   <text x="65" y="172" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">装载的 Skill（指令程序）：</text>
-  <text x="65" y="190" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">auto-loop-orchestrator（编排决策）| constitution-guard（硬约束检查）| laws-enforcer | context-source-skill | chat-issue-routing | milestone-planning | worktree-* | watchdog-*</text>
+  <text x="65" y="190" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">workflow-guarded-execution（全流程编排）| constitution-guard（硬约束检查）| laws-enforcer | branch-management | worktree-maintenance-governance</text>
 
   <!-- Manager: decision cycle (left) -->
   <rect x="50" y="215" width="600" height="95" rx="6" fill="white" stroke="#60a5fa" stroke-width="1.5"/>
@@ -62,7 +62,7 @@
   <text x="65" y="272" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ platform raw 或 chat new-issue → wt-create → A2A dispatch 给 Worker</text>
   <text x="65" y="289" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ chat comment → issue comment / re-activate；Worker done → closeout / merge</text>
   <text x="65" y="306" font-size="9" fill="#475569" font-family="system-ui, sans-serif">└─ 无事可做 → stop_ai → 等下一轮 scan</text>
-  <text x="480" y="295" font-size="8" fill="#a855f7" font-family="system-ui, sans-serif">🟣 Skill 行为模式 — auto-loop-orchestrator 注入 prompt 指导 Agent 决策</text>
+  <text x="480" y="295" font-size="8" fill="#a855f7" font-family="system-ui, sans-serif">🟣 Skill 行为模式 — workflow-guarded-execution 注入 prompt 指导 Agent 决策</text>
 
   <!-- Manager: gate chain (right) -->
   <rect x="670" y="215" width="680" height="95" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
@@ -101,7 +101,7 @@
   <!-- Worker: loaded Skills -->
   <rect x="50" y="440" width="1300" height="40" rx="6" fill="#faf5ff" stroke="#c084fc" stroke-width="1"/>
   <text x="65" y="457" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">装载的 Skill：</text>
-  <text x="65" y="473" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">doc-B1_IBM-execution（预研）| doc-B2_IBM-execution（设计）| dev-loop-execution（实现+测试）| fix-execution（修复）| branch-management（工位管理）</text>
+  <text x="65" y="473" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">doc-B1_IBM-execution（预研）| doc-B2_IBM-execution（设计）| test-RED-execution（RED）| dev-loop-execution（实现）| test-execution（GREEN）</text>
 
   <!-- Worker: doc-loop (left) -->
   <rect x="50" y="492" width="600" height="132" rx="6" fill="white" stroke="#4ade80" stroke-width="1.5"/>
@@ -157,9 +157,9 @@
   <rect x="40" y="723" width="280" height="20" rx="3" fill="#6366f1"/>
   <text x="180" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">ACP — 会话通道（Freely ↔ AI CLI Tool）</text>
   <text x="45" y="760" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">session/new|session/resume 只建/恢复 session；payload 总是通过 session/prompt 发送</text>
-  <text x="45" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">fresh/fork: session/new + full session/prompt（role+skills 在 prompt 文本里）；fork 不是 ACP 方法</text>
+  <text x="45" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">fresh: session/new + full prompt | fork: session/fork from Manager→Worker/Reviewer（继承 Manager 治理上下文，首轮缓存 ~80% 命中）</text>
   <text x="45" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">resume/prompt: existing/resumed session + delta session/prompt（scan/A2A/turn updates）</text>
-  <text x="45" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">空闲超时: 900s — 崩溃恢复: _ensure_server_alive + _restart_server</text>
+  <text x="45" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">空闲超时: 180s（仅无活跃 session/prompt 时触发）— 崩溃恢复: _ensure_server_alive + _restart_server | per-tool bridge: claude/opencode/cline 三桥独立管理</text>
   <text x="45" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">ACP 是 Freely Runtime 与 AI CLI Tool 之间的 session/prompt/control 通道，不是 Agent 间通信</text>
 
   <rect x="710" y="735" width="660" height="120" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8"/>
