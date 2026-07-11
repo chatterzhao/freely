@@ -1,0 +1,6 @@
+=== AT-004: Non-existent task validation ===
+Test: code review verification
+Result: h_a2a_task_update_message queries a2a_tasks table for task_id
+  - If row not found: returns {valid: False, error: "任务...不存在", fix_hint: "..."}
+  - SQL query: SELECT messages_json FROM a2a_tasks WHERE task_id = ?
+Gate 3 logic verified via code review.
