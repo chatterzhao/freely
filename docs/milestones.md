@@ -7417,3 +7417,7 @@
 - status: absorbed
 - absorbed_into: `I-20260711T083155Z-A`
 ### completed_issues
+1. `I-20260711T083155Z-A`
+- milestone: M-20260711T083155Z-A
+- phase_state: completed
+- path: docs/B2-docs/a2a/message-delivery/raw-20260711T083155Z/issues/I-20260711T083155Z-A.md
