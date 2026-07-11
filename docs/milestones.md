@@ -7407,9 +7407,13 @@
 - title: fix — A2A→SSE→ACP 消息投递链 + SQLite 友好校验
 - status: active
 ### candidate_issues
-1. `C-20260711T083155Z-A`
-- milestone: M-20260711T083155Z-A
-- status: promoted
-- promoted_issue_id: `I-20260711T083155Z-A`
 ### committed_issues
+1. `I-20260711T083155Z-A`
+- milestone: M-20260711T083155Z-A
+- phase_state: done_b2_ibm
+- path: docs/B2-docs/a2a/message-delivery/raw-20260711T083155Z/issues/I-20260711T083155Z-A.md
+2. `C-20260711T083155Z-A`
+- milestone: M-20260711T083155Z-A
+- status: absorbed
+- absorbed_into: `I-20260711T083155Z-A`
 ### completed_issues

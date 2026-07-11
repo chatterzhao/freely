@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260711T083155Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260711T083155Z
 created_at: 2026-07-11
 milestone: M-20260711T083155Z-A
@@ -10,10 +10,11 @@ milestone: M-20260711T083155Z-A
 
 - candidate_format_version: v2
 - title: A2A→SSE→ACP 消息投递链修复 + SQLite 友好校验层
-- status: promoted
+- status: absorbed
 - decision_reason: 消息投递是 agent 协作基础设施，断裂导致 Manager→Worker 单向通信全部丢失。SQLite 校验层让 AI 知道写错了什么、怎么改。
-- next_action: 进入 B2 → dev-loop → test → PR
-- revisit_trigger: N/A（已 promote）
+- next_action: 已吸收到 I-20260711T083155Z-A
+- revisit_trigger: N/A（已吸收）
+- absorbed_into: I-20260711T083155Z-A
 - acceptance_criteria:
   - Manager a2a_task.py prompt → Worker ACP session/prompt 收到消息
   - 空 content 写入 → 返回 422 + fix_hint + example
