@@ -755,9 +755,26 @@ class A2AServer:
         task_id = request.path_params["task_id"]
         if task_id.endswith("/messages") and request.method == "POST":
             tid = task_id[:-9]; body = await request.json()
-            self.task_store.raw_rpc("a2a_task.update-message", {
-                "task_id": tid, "role": body.get("role", body.get("agent_id", "worker")),
-                "type": body.get("type", "text"), "content": body.get("content", "")})
+            role = body.get("role", body.get("agent_id", "worker"))
+            msg_type = body.get("type", "text")
+            content = body.get("content", "")
+            # SQLite-level validation: blocks empty content, invalid roles, missing tasks
+            result = self.task_store.raw_rpc("a2a_task.update-message", {
+                "task_id": tid, "role": role, "type": msg_type, "content": content})
+            if not result.get("valid", True):
+                # Friendly validation failure — tell the caller how to fix their data
+                return JSONResponse({
+                    "ok": False,
+                    "error": result.get("error", "validation failed"),
+                    "fix_hint": result.get("fix_hint", ""),
+                    "example": result.get("example", {}),
+                }, status_code=422)
+            # SSE notification: Runtime watchdog picks this up and delivers
+            # the message to the target agent via ACP session/prompt.
+            import asyncio as _asyncio
+            _asyncio.ensure_future(self._notify_sse(tid, "message_added", {
+                "task_id": tid, "role": role, "type": msg_type,
+                "content": content[:512]}))
             return JSONResponse({"ok": True})
         if task_id.endswith("/worker-pid") and request.method == "PATCH":
             tid = task_id[:-12]; body = await request.json()

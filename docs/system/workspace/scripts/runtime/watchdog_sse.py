@@ -151,7 +151,7 @@ def _run_periodic_checks(project: str, timers: dict,
 
 
 def _handle_sse_event(project: str, event_text: str):
-    """Parse SSE event and route based on reason."""
+    """Parse SSE event and route based on event type."""
     data = {}
     for line in event_text.split("\n"):
         if line.startswith("data: "):
@@ -160,9 +160,13 @@ def _handle_sse_event(project: str, event_text: str):
             except json.JSONDecodeError:
                 pass
 
+    # ── message_added: agent-to-agent message via A2A → ACP delivery ──
+    event_type = data.get("event_type", "")
+    if event_type == "message_added":
+        _handle_message_delivery(project, data)
+        return
+
     # A2A _notify_sse sends: {"task_id":..., "state":..., "reason":..., ...}
-    # The event format is flat (not wrapped in statusUpdate), matching what
-    # _notify_sse in a2a_server.py constructs at PATCH time.
     state = data.get("state", "")
     if state != "input-required":
         return
@@ -310,6 +314,71 @@ def _build_worker_verdict_message(raw_key: str, from_agent: str,
         parts.append(f"消息: {message}")
     parts.append("请根据 Skill 指令处理，完成后调 a2a-exit 声明状态。")
     return "\n".join(parts)
+
+
+# ── message_added: A2A message delivery via ACP session/prompt ───────────────
+
+def _handle_message_delivery(project: str, data: dict):
+    """Deliver an A2A message to the target agent via ACP session/prompt.
+
+    Called when A2A Server emits a message_added SSE event.
+    Looks up the target agent's session_id from agent_working table,
+    then uses ACP bridge to forward the message via session/prompt.
+    """
+    task_id = data.get("task_id", "")
+    role = data.get("role", "")
+    content = data.get("content", "")
+    if not task_id or not content:
+        return
+
+    # Get the raw_key from a2a_tasks to look up agent session
+    import sqlite3
+    db_path = os.path.join(project, ".freely", "freely.db")
+    raw_key = ""
+    try:
+        db = sqlite3.connect(db_path)
+        row = db.execute("SELECT raw_key FROM a2a_tasks WHERE task_id=?", (task_id,)).fetchone()
+        if row:
+            raw_key = row[0] or ""
+        db.close()
+    except Exception:
+        pass
+
+    if not raw_key:
+        print(f"[watchdog] message_delivery: no raw_key for task {task_id[:16]}", file=sys.stderr)
+        return
+
+    # Look up the target agent's session from agent_working
+    row = agent_list_by_raw_key(project, raw_key)
+    if not row:
+        print(f"[watchdog] message_delivery: no agent_working row for {raw_key}", file=sys.stderr)
+        return
+
+    # Get session_id for the target role (manager/worker/reviewer)
+    session_val = row.get(f"{role}_id", "")
+    if not session_val or ":" not in str(session_val):
+        print(f"[watchdog] message_delivery: no session for {role} on {raw_key}", file=sys.stderr)
+        return
+    session_id = str(session_val).split(":")[-1]
+
+    # Determine base_tool from agent role
+    base_tool = ""
+    if role == "worker":
+        base_tool = "opencode"
+    elif role == "reviewer":
+        base_tool = "cline"
+    # manager uses default (claude bridge)
+
+    # Deliver via ACP session/prompt
+    result = _acp_rpc(project, "session/prompt",
+                      {"sessionId": session_id, "prompt": content},
+                      base_tool=base_tool)
+    if result:
+        print(f"[watchdog] message_delivery: {role} session={session_id[:16]} "
+              f"task={task_id[:16]} ok", file=sys.stderr)
+    else:
+        print(f"[watchdog] message_delivery: ACP failed for {role} "
+              f"session={session_id[:16]}", file=sys.stderr)
 
 
 # ── C12: Agent crash detection ────────────────────────────────────────────────

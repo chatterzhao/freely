@@ -1191,19 +1191,71 @@ def h_a2a_task_latest_manager(daemon: DbDaemon, params: dict) -> dict:
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
+# ── Valid roles for A2A messages ────────────────────────────────────────
+_A2A_VALID_ROLES = {"manager", "worker", "reviewer"}
+
 @_h("a2a_task.update-message")
 def h_a2a_task_update_message(daemon: DbDaemon, params: dict) -> dict:
-    """Append a message to messages_json and update state + message fields."""
-    task_id = params["task_id"]
+    """Append a message to messages_json and update state + message fields.
+
+    Validation (SQLite layer gate):
+    - content must be non-empty
+    - role must be valid (manager/worker/reviewer)
+    - task must exist
+
+    On validation failure, returns structured error with fix_hint and example
+    so the AI caller can reorganize its data and re-submit correctly.
+    """
+    task_id = params.get("task_id", "")
     msg_role = params.get("role", "worker")
     msg_type = params.get("type", "text")
     msg_content = params.get("content", "")
 
+    # ── Gate 1: content must be non-empty ──
+    if not msg_content or not msg_content.strip():
+        return {
+            "valid": False,
+            "affected": 0,
+            "error": "消息内容不能为空 (content must not be empty)",
+            "fix_hint": (
+                "请重新组织你的消息数据再写入，不要重试同样的空内容。"
+                "确保 'content' 字段包含有效的消息正文，至少 1 个字符。"
+            ),
+            "example": {
+                "role": msg_role,
+                "type": msg_type,
+                "content": "你的具体消息内容写在这里，说明你想告诉对方什么",
+            },
+        }
+
+    # ── Gate 2: role must be valid ──
+    if msg_role not in _A2A_VALID_ROLES:
+        return {
+            "valid": False,
+            "affected": 0,
+            "error": f"无效的角色 '{msg_role}'，合法值: {', '.join(sorted(_A2A_VALID_ROLES))}",
+            "fix_hint": (
+                f"角色 '{msg_role}' 不在合法范围内。"
+                f"请将 'role' 字段改为以下之一: {', '.join(sorted(_A2A_VALID_ROLES))}。"
+                f"例如 manager 给 worker 发消息时 role='worker'，worker 回复时 role='manager'。"
+            ),
+            "example": {"role": "manager", "type": "text", "content": "..."},
+        }
+
+    # ── Gate 3: task must exist ──
     row = daemon.conn.execute(
         "SELECT messages_json FROM a2a_tasks WHERE task_id = ?", (task_id,)
     ).fetchone()
     if not row:
-        return {"affected": 0, "error": "task not found"}
+        return {
+            "valid": False,
+            "affected": 0,
+            "error": f"任务 {task_id[:24]}... 不存在，无法写入消息",
+            "fix_hint": (
+                "请先确认 task_id 是否正确。用 a2a_task.py list 查看当前所有任务。"
+                "如果任务已被删除或从未创建，需要先 a2a-exit --state submitted 创建新任务。"
+            ),
+        }
 
     import json as _json
     messages = _json.loads(row[0] or "[]")
@@ -1220,7 +1272,7 @@ def h_a2a_task_update_message(daemon: DbDaemon, params: dict) -> dict:
         (msg_content, _json.dumps(messages, ensure_ascii=False), now, task_id),
     )
     daemon.conn.commit()
-    return {"affected": 1}
+    return {"valid": True, "affected": 1}
 
 
 @_h("a2a_task.update-worker-pid")

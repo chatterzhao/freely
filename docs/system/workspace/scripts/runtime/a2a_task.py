@@ -558,7 +558,25 @@ def latest_manager() -> Optional[dict]:
 
 def update_message(task_id: str, content: str, role: str = "worker",
                    msg_type: str = "text") -> int:
-    return 1 if _client().add_message(task_id, role, msg_type, content).get("ok") else 0
+    """Send message via A2A Server. Returns 1 on success, 0 on validation failure.
+
+    On validation failure, prints error + fix_hint to stderr so the AI agent
+    sees what went wrong and how to reorganize its data before retrying.
+    """
+    import sys
+    result = _client().add_message(task_id, role, msg_type, content)
+    if result.get("ok"):
+        return 1
+    error = result.get("error", "unknown error")
+    fix_hint = result.get("fix_hint", "")
+    example = result.get("example", {})
+    print(f"[a2a_task] 消息写入失败: {error}", file=sys.stderr)
+    if fix_hint:
+        print(f"[a2a_task] 修复建议: {fix_hint}", file=sys.stderr)
+    if example:
+        print(f"[a2a_task] 正确格式示例: {json.dumps(example, ensure_ascii=False)}", file=sys.stderr)
+    print("[a2a_task] 请重新组织数据后重试，不要用同样的内容重试。", file=sys.stderr)
+    return 0
 
 def set_worker_pid(task_id: str, worker_pid: str) -> int:
     return 1 if _client().set_worker_pid(task_id, worker_pid).get("ok") else 0
