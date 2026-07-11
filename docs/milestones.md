@@ -7394,5 +7394,11 @@
 ## M-20260711T030122Z-A
 - title: fix — agent docs v2
 ### completed_issues
-1. `I-20260711T030122Z-A` - status: done_b2_ibm
-2. `C-20260711T030122Z-A` - status: absorbed - absorbed_into: `I-20260711T030122Z-A`
+1. `I-20260711T030122Z-A`
+- milestone: M-20260711T030122Z-A
+- phase_state: done_b2_ibm
+- path: docs/B2-docs/ibm/b2-governance/raw-20260711T030122Z/issues/I-20260711T030122Z-A.md
+2. `C-20260711T030122Z-A`
+- milestone: M-20260711T030122Z-A
+- status: absorbed
+- absorbed_into: `I-20260711T030122Z-A` - absorbed_into: `I-20260711T030122Z-A`
