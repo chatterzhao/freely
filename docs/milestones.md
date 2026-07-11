@@ -7390,3 +7390,9 @@
 ### completed_issues
 1. `I-20260711T023009Z-A` - phase_state: completed - path: docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/raw-20260711T023009Z/issues/I-20260711T023009Z-A.md
 2. `C-20260711T023009Z-A` - status: absorbed - absorbed_into: `I-20260711T023009Z-A`
+
+## M-20260711T030122Z-A
+- title: fix — agent docs v2
+### completed_issues
+1. `I-20260711T030122Z-A` - status: done_b2_ibm
+2. `C-20260711T030122Z-A` - status: absorbed - absorbed_into: `I-20260711T030122Z-A`
