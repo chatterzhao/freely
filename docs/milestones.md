@@ -7396,7 +7396,7 @@
 ### completed_issues
 1. `I-20260711T030122Z-A`
 - milestone: M-20260711T030122Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/ibm/b2-governance/raw-20260711T030122Z/issues/I-20260711T030122Z-A.md
 2. `C-20260711T030122Z-A`
 - milestone: M-20260711T030122Z-A
