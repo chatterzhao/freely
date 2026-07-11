@@ -1,5 +1,7 @@
 # Pre-Tests
 - issue_id: I-20260711T023009Z-A
+## Acceptance Items
+
 ### acceptance-1
 - id: AT-001
 - requirement: SVG 无旧 skill 名残留
@@ -30,9 +32,33 @@
 - red-green-status: green
 - status: pass
 - red_how: fix
-## Unit: not_applicable (covered_by_more_realistic_required_surface)
-## Integration: not_applicable (covered_by_more_realistic_required_surface)
-## End-to-End: not_applicable (covered_by_more_realistic_required_surface)
-## Real-Environment: pass
+## Unit
+- acceptance_target: SVG correctness
+- testing_layer: unit
+- target_environment: develop
+- required_evidence: AT-001/AT-002
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 代码级验证已被 AT-001/AT-002 的 grep 检查覆盖
+- replacement_evidence: AT-001/AT-002
+## Integration
+- acceptance_target: SVG correctness
+- testing_layer: integration
+- target_environment: develop
+- required_evidence: AT-001/AT-002
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 代码级验证已被 AT-001/AT-002 的 grep 检查覆盖
+- replacement_evidence: AT-001/AT-002
+## End-to-End
+- acceptance_target: SVG correctness
+- testing_layer: end-to-end
+- target_environment: develop
+- required_evidence: AT-001/AT-002
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 代码级验证已被 AT-001/AT-002 的 grep 检查覆盖
+- replacement_evidence: AT-001/AT-002
+## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: SVG 文档修改，无运行时影响
