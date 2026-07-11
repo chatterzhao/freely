@@ -1,0 +1,5 @@
+=== AT-003: Invalid role validation ===
+Test: python3 validation gate test
+Result: PASS - invalid role 'invalid_role' rejected
+Valid values: manager, worker, reviewer
+Return format: {valid: False, error: "无效的角色...", fix_hint: "..."}
