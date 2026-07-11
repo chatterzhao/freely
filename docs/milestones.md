@@ -7421,3 +7421,15 @@
 - milestone: M-20260711T083155Z-A
 - phase_state: completed
 - path: docs/B2-docs/a2a/message-delivery/raw-20260711T083155Z/issues/I-20260711T083155Z-A.md
+
+
+## M-20260711T100936Z-A
+- title: fix — daemon stop rc=143 与意外崩溃区分
+- status: active
+### candidate_issues
+1. `C-20260711T100936Z-A`
+- milestone: M-20260711T100936Z-A
+- status: promoted
+- promoted_issue_id: `I-20260711T100936Z-A`
+### committed_issues
+### completed_issues
