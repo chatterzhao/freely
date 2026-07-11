@@ -7384,3 +7384,9 @@
 - milestone: M-20260710T142858Z-A
 - status: absorbed
 - absorbed_into: `I-20260710T142858Z-A`
+
+## M-20260711T023009Z-A
+- title: fix — three-loop SVG update
+### completed_issues
+1. `I-20260711T023009Z-A` - phase_state: done_b2_ibm - path: docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/raw-20260711T023009Z/issues/I-20260711T023009Z-A.md
+2. `C-20260711T023009Z-A` - status: absorbed - absorbed_into: `I-20260711T023009Z-A`

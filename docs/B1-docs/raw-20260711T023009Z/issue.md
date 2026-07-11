@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260711T023009Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   gitee:
     issue_id: IK0AZG
