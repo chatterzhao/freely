@@ -22749,7 +22749,7 @@ print(ready)
         --debug-log-file "$cycle_debug_log" \
         --claude-session-id "${TOOL_SESSION_ID_CURRENT:-}" \
         --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")" \
-        --mode "$AI_MODE" \
+        --mode "${AI_MODE:-auto}" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
         --log-file "$cycle_log" \
