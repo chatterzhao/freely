@@ -7518,3 +7518,14 @@
 - milestone: M-20260712T125520Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260712T125520Z/issues/I-20260712T125520Z-A.md
+
+## M-20260712T131930Z-A
+- title: fix — config.toml.example allowed_paths TOML format
+- status: active
+### candidate_issues
+1. `C-20260712T131930Z-A`
+- milestone: M-20260712T131930Z-A
+- status: promoted
+- promoted_issue_id: I-20260712T131930Z-A
+### committed_issues
+### completed_issues
