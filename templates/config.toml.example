@@ -318,6 +318,8 @@ FREELY_ACP_CLINE_BIN = ""
 # 路径是相对项目根目录的前缀匹配 (startswith)。
 
 [skip_ibm_gate]
-allowed_paths = [
-  # "docs/my-custom-governance-dir/",
-]
+# 添加允许跳过 IBM 门禁的额外路径前缀（相对项目根目录）。
+# 每行一个路径，例如:
+#   allowed_paths = ["docs/my-governance-dir/", "docs/epics-map.svg"]
+# 留空 = 仅使用硬编码治理路径。
+allowed_paths = []
