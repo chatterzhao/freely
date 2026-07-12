@@ -7447,6 +7447,10 @@
 - title: feat — FREELY_SKIP_IBM_GATE configurable
 - status: active
 ### candidate_issues
+1. `C-20260712T105347Z-A`
+- milestone: M-20260712T105347Z-A
+- status: absorbed
+- absorbed_into: I-20260712T105347Z-A
 ### committed_issues
 1. `I-20260712T105347Z-A`
 - milestone: M-20260712T105347Z-A
