@@ -223,9 +223,9 @@ parse_ai_spec_or_fail() {
   _runtime_dir="$_script_dir/runtime"
   # Direct Python query: check if base tool is registered (avoids shell loop issues)
   local _is_known
-  _is_known=$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" "$_case_tool" "acp.binary" >/dev/null 2>&1 && echo 1 || echo 0)
+  _is_known=$("$_runtime_dir/tool-registry-query.py" "docs/system/workspace/tools/tool-registry.toml" "$_case_tool" "acp.binary" >/dev/null 2>&1 && echo 1 || echo 0)
   if [[ "$_is_known" != "1" ]]; then
-    local _reg_list; _reg_list=$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" --list 2>/dev/null || echo "(query failed)")
+    local _reg_list; _reg_list=$("$_runtime_dir/tool-registry-query.py" "docs/system/workspace/tools/tool-registry.toml" --list 2>/dev/null || echo "(query failed)")
     cat >&2 <<SLOT_ERR
 [ERROR] slot 对应的工具 '$tool' (→ base: $_case_tool) 未在 tool-registry.toml 中注册。
 
