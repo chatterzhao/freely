@@ -285,3 +285,39 @@ FREELY_ACP_CLAUDE_BIN = ""
 FREELY_ACP_CODEX_BIN = ""
 FREELY_ACP_OPENCODE_BIN = ""
 FREELY_ACP_CLINE_BIN = ""
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十五、IBM 门禁跳过白名单
+# ══════════════════════════════════════════════════════════════════════
+#
+# 工作原理:
+#   当 FREELY_SKIP_IBM_GATE=1 时，governance-merge-gate 检查所有变更文件
+#   是否全部属于「治理纯文档」路径。只有下面三类文件允许跳过 IBM 治理门禁:
+#
+#   A. 硬编码治理路径 (代码内置，不可配置):
+#      - docs/B1-docs/, docs/B2-docs/, docs/system/workspace/agents/,
+#        docs/system/workspace/skills/, docs/system/workspace/scripts/quality/,
+#        docs/system/workspace/hooks/*.md, milestones.md, CONSTITUTION.md 等
+#
+#   B. 下面 [skip_ibm_gate] 配置的 allowed_paths (用户可扩展):
+#      格式: 每行一条路径，支持目录前缀匹配 (startswith)
+#      例如: "docs/system/workspace/skills/" 会匹配该目录下所有文件
+#            "docs/epics-map.svg"            匹配单个文件
+#
+#   C. allowed_paths 空 = 仅使用硬编码路径 (等同于没有此节)
+#
+#  注意:
+#  - runtime scripts (scripts/runtime/)、hooks (*.sh)、test scripts (*.py)
+#    永远不能跳过 — 即使加入 allowed_paths 也会被代码层 (is_governance_only_path) 拒绝
+#  - 此跳过机制仅适用于「不需要 IBM 生命周期的纯文档/格式/清理变更」
+#  - 任何实现变更 (代码、配置逻辑、运行时) 必须走完整 B1→B2→dev→PR 流程
+
+# [可选] FREELY_SKIP_IBM_GATE 允许的额外路径。
+# 这些路径是硬编码治理路径之外的补充。init 时默认为空。
+# 路径是相对项目根目录的前缀匹配 (startswith)。
+
+[skip_ibm_gate]
+allowed_paths = [
+  # "docs/my-custom-governance-dir/",
+]

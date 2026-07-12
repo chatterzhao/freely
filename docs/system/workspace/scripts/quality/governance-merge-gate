@@ -7,7 +7,16 @@ import sqlite3
 import subprocess
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, List, Optional, Set
+
+try:
+    import tomllib
+except ImportError:
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None  # type: ignore
 
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
@@ -318,7 +327,11 @@ def is_governance_only_path(rel_path: str) -> bool:
       - docs/system/workspace/scripts/runtime/ (daemon, bridge, launchers)
       - docs/system/workspace/scripts/worktree/ (wt-close, pr-merge, etc.)
       - docs/system/workspace/scripts/tests/    (test code)
+
+    Also reads [skip_ibm_gate] allowed_paths from .freely/config.toml
+    to allow project-specific governance-only paths.
     """
+    # Check hardcoded exact-path set
     if rel_path in {
         "AGENTS.md",
         "CLAUDE.md",
@@ -343,7 +356,59 @@ def is_governance_only_path(rel_path: str) -> bool:
     # Hook documentation (.md only, not hook scripts which are runtime code)
     if rel_path.startswith("docs/system/workspace/hooks/") and rel_path.endswith(".md"):
         return True
+
+    # Project-specific allowed paths from .freely/config.toml
+    config_paths = _load_skip_ibm_allowed_paths()
+    for prefix in config_paths:
+        if rel_path.startswith(prefix):
+            return True
+
     return False
+
+
+def _load_skip_ibm_allowed_paths() -> List[str]:
+    """Load additional governance-only paths from .freely/config.toml.
+
+    Reads [skip_ibm_gate].allowed_paths array from config.toml.
+    Returns empty list if config doesn't exist or parse fails.
+    """
+    paths: List[str] = []
+    cfg_path = os.path.join(os.getcwd(), ".freely", "config.toml")
+    if not os.path.isfile(cfg_path):
+        cfg_path = os.path.join(_find_project_root(), ".freely", "config.toml")
+    if not os.path.isfile(cfg_path):
+        return paths
+    if tomllib is None:
+        return paths
+
+    try:
+        with open(cfg_path, "rb") as f:
+            cfg = tomllib.load(f)
+        skip_cfg = cfg.get("skip_ibm_gate", {})
+        if isinstance(skip_cfg, dict):
+            raw = skip_cfg.get("allowed_paths", [])
+            if isinstance(raw, list):
+                for item in raw:
+                    if isinstance(item, str) and item.strip():
+                        paths.append(item.strip())
+    except Exception:
+        pass
+
+    return paths
+
+
+def _find_project_root() -> str:
+    """Find git project root, falling back to cwd."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return os.getcwd()
 
 
 _CODE_EXTS = {".sh", ".py", ".rs", ".ts", ".js", ".tsx", ".jsx", ".go", ".java", ".c", ".cpp", ".h", ".toml"}
