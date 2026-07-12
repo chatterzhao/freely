@@ -349,11 +349,11 @@ def is_governance_only_path(rel_path: str) -> bool:
     if rel_path.startswith(("docs/B1-docs/", "docs/B2-docs/", "docs/B2-docs/ibm/_legacy-progress/")):
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
+        return True
+        return True
     # Project config templates and examples (init templates)
     if rel_path.startswith("templates/"):
         return True
-        return True
-    # Meta-governance quality scripts (governance-merge-gate itself)
     if rel_path.startswith("docs/system/workspace/scripts/quality/"):
         return True
     # Hook documentation (.md only, not hook scripts which are runtime code)
