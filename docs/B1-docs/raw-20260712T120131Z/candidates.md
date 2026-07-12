@@ -7,3 +7,4 @@
 - promotion_gate: 所有引用路径更新 + PR merge
 - promoted_issue_id: I-20260712T120131Z-A
 - milestone: M-20260712T120131Z-A
+- promoted_issue_path: docs/B2-docs/config/tool-registry/raw-20260712T120131Z/issues/I-20260712T120131Z-A.md
