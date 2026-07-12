@@ -20265,7 +20265,7 @@ PROMPT_AGENT
       --project "$PROJECT_ROOT" \
       --intent "$INTENT_FILE" \
       --constitution "$CONSTITUTION_FILE" \
-      --ai "${AGENT_AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
+      --ai "${AGENT_AI_TOOL}:${AI_MODEL:-}:${AI_MODE:-auto}" \
       --workspace-root "$workspace_root" \
       --reasoning-effort "${AI_REASONING_EFFORT:-}" \
 	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
