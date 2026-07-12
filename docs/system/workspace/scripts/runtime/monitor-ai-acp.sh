@@ -497,6 +497,18 @@ except: pass
     stop_reason="unknown"
   fi
 
+  # C14: Distinguish intentional daemon stop from crash/abort.
+  # When freely daemon stop is called, it writes a stop marker file BEFORE
+  # sending SIGTERM. If the ACP cycle ended with no clean stopReason and the
+  # stop marker exists, reclassify as "stop_requested" (clean, intentional).
+  # This prevents rc=143 from being misclassified as an AI crash.
+  local _stop_marker
+  _stop_marker="$(stop_marker_file "$project" 2>/dev/null || true)"
+  if [[ "$stop_reason" == "unknown" && -n "$_stop_marker" && -f "$_stop_marker" ]]; then
+    stop_reason="stop_requested"
+    echo "[ACP] intentional stop detected (marker=$_stop_marker), reclassifying from unknown→stop_requested" >&2
+  fi
+
 # Persist clean session ID to session-store (authoritative source)
   if [[ -n "$session_id_clean" ]]; then
     local resume_mode_detected=""
@@ -536,8 +548,8 @@ except: pass
     fi
     echo "[WARN] ACP cycle failed: session=${session_id_clean:-unknown} reason=$failure_detected" >&2
     exit 1
-  elif [[ "$stop_reason" == "end_turn" ]]; then
-    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=end_turn" >&2
+  elif [[ "$stop_reason" == "end_turn" || "$stop_reason" == "stop_requested" ]]; then
+    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=${stop_reason}" >&2
     exit 0
   else
     # Network failure or unknown: keep session active for retry

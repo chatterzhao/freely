@@ -3,6 +3,10 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+1. `I-20260711T100936Z-A`
+- milestone: M-20260711T100936Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/monitor/raw-20260711T100936Z/issues/I-20260711T100936Z-A.md
 ### completed_issues
 1. `I-20260710T142858Z-A`
 - milestone: M-20260710T142858Z-A
@@ -32,6 +36,10 @@
 - title: hook 提示 + 命令速查
 - status: completed
 ### committed_issues
+1. `I-20260711T100936Z-A`
+- milestone: M-20260711T100936Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/monitor/raw-20260711T100936Z/issues/I-20260711T100936Z-A.md
 ### completed_issues
 1. `I-20260710T142858Z-A`
 - milestone: M-20260710T142858Z-A
@@ -7421,3 +7429,15 @@
 - milestone: M-20260711T083155Z-A
 - phase_state: completed
 - path: docs/B2-docs/a2a/message-delivery/raw-20260711T083155Z/issues/I-20260711T083155Z-A.md
+
+
+## M-20260711T100936Z-A
+- title: fix — daemon stop rc=143 与意外崩溃区分
+- status: active
+### candidate_issues
+1. `C-20260711T100936Z-A`
+- milestone: M-20260711T100936Z-A
+- status: absorbed
+- absorbed_into: I-20260711T100936Z-A
+### committed_issues
+### completed_issues
