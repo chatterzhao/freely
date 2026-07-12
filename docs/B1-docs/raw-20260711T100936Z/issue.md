@@ -18,6 +18,7 @@ intake_id: ''
 author: zhaoquan
 channel: freely
 session_refs: []
+platform_state: closed
 ---
 
 # fix: daemon stop rc=143 与意外崩溃区分
