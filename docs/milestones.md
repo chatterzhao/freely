@@ -3,6 +3,10 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+1. `I-20260711T100936Z-A`
+- milestone: M-20260711T100936Z-A
+- phase_state: completed
+- path: docs/B2-docs/runtime/monitor/raw-20260711T100936Z/issues/I-20260711T100936Z-A.md
 ### completed_issues
 1. `I-20260710T142858Z-A`
 - milestone: M-20260710T142858Z-A

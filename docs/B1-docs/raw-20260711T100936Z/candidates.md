@@ -10,3 +10,4 @@
 - promotion_gate: 代码合并 + daemon 验证
 - promoted_issue_id: I-20260711T100936Z-A
 - milestone: M-20260711T100936Z-A
+- promoted_issue_path: docs/B2-docs/runtime/monitor/raw-20260711T100936Z/issues/I-20260711T100936Z-A.md
