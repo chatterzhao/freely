@@ -7487,3 +7487,18 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/config/tool-registry/raw-20260712T123319Z/issues/I-20260712T123319Z-A.md
 ### completed_issues
+
+## M-20260712T124601Z-A
+- title: hotfix — AI_MODE unbound variable
+- status: active
+### candidate_issues
+1. `C-20260712T124601Z-A`
+- milestone: M-20260712T124601Z-A
+- status: promoted
+- promoted_issue_id: I-20260712T124601Z-A
+### committed_issues
+1. `I-20260712T124601Z-A`
+- milestone: M-20260712T124601Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260712T124601Z/issues/I-20260712T124601Z-A.md
+### completed_issues
