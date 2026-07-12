@@ -7457,3 +7457,18 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/config/skip-ibm/raw-20260712T105347Z/issues/I-20260712T105347Z-A.md
 ### completed_issues
+
+## M-20260712T120131Z-A
+- title: fix — tool-registry move to tools/
+- status: active
+### candidate_issues
+1. `C-20260712T120131Z-A`
+- milestone: M-20260712T120131Z-A
+- status: absorbed
+- absorbed_into: I-20260712T120131Z-A
+### committed_issues
+1. `I-20260712T120131Z-A`
+- milestone: M-20260712T120131Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/config/tool-registry/raw-20260712T120131Z/issues/I-20260712T120131Z-A.md
+### completed_issues
