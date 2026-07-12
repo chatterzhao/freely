@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4136" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4158" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="136" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -289,7 +289,7 @@
   <text x="65" y="3287" fill="#333">worker-reactivation-and-local-reentry-residual-runtime-governance</text>
   <rect id="story-workflow" x="55" y="3296" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="3309" fill="#333">workflow</text>
-  <rect id="epic-runtime" x="35" y="3330" width="730" height="774" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
+  <rect id="epic-runtime" x="35" y="3330" width="730" height="796" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
   <text x="50" y="3346" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
   <rect id="story-application-native-runtime-observation-contract-and-observability-planes" x="55" y="3356" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="3369" fill="#333">application-native-runtime-observation-contract-and-observability-planes</text>
@@ -301,62 +301,64 @@
   <text x="65" y="3435" fill="#333">control-surface</text>
   <rect id="story-daemon" x="55" y="3444" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="3457" fill="#333">daemon</text>
-  <rect id="story-runtime-adapter-axis-and-per-tool-adapter-selection" x="55" y="3466" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3479" fill="#333">runtime-adapter-axis-and-per-tool-adapter-selection</text>
-  <rect id="story-runtime-audio-notifier-and-sound-semantics-governance" x="55" y="3488" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3501" fill="#333">runtime-audio-notifier-and-sound-semantics-governance</text>
-  <rect id="story-runtime-blocked-intake-and-continuity-truth-governance" x="55" y="3510" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3523" fill="#333">runtime-blocked-intake-and-continuity-truth-governance</text>
-  <rect id="story-runtime-claude-launch-and-session-evidence-governance" x="55" y="3532" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3545" fill="#333">runtime-claude-launch-and-session-evidence-governance</text>
-  <rect id="story-runtime-closeout-selfhost-validation-followthrough-governance" x="55" y="3554" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3567" fill="#333">runtime-closeout-selfhost-validation-followthrough-governance</text>
-  <rect id="story-runtime-concurrent-start-stop-followthrough-governance" x="55" y="3576" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3589" fill="#333">runtime-concurrent-start-stop-followthrough-governance</text>
-  <rect id="story-runtime-daemon-self-loop-followthrough-governance" x="55" y="3598" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3611" fill="#333">runtime-daemon-self-loop-followthrough-governance</text>
-  <rect id="story-runtime-evidence-provenance-research-retirement-followthrough-governance" x="55" y="3620" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3633" fill="#333">runtime-evidence-provenance-research-retirement-followthrough-governance</text>
-  <rect id="story-runtime-forensic-time-alignment-and-stall-recovery-observability-governance" x="55" y="3642" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3655" fill="#333">runtime-forensic-time-alignment-and-stall-recovery-observability-governance</text>
-  <rect id="story-runtime-human-readable-time-display-governance" x="55" y="3664" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3677" fill="#333">runtime-human-readable-time-display-governance</text>
-  <rect id="story-runtime-lifecycle-receipt-followthrough-governance" x="55" y="3686" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3699" fill="#333">runtime-lifecycle-receipt-followthrough-governance</text>
-  <rect id="story-runtime-loop-log-timezone-label-followthrough-governance" x="55" y="3708" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3721" fill="#333">runtime-loop-log-timezone-label-followthrough-governance</text>
-  <rect id="story-runtime-network-failure-taxonomy-and-bounded-recovery-governance" x="55" y="3730" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3743" fill="#333">runtime-network-failure-taxonomy-and-bounded-recovery-governance</text>
-  <rect id="story-runtime-selfhost-continuity-gap-and-status-truth-governance" x="55" y="3752" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3765" fill="#333">runtime-selfhost-continuity-gap-and-status-truth-governance</text>
-  <rect id="story-runtime-start-stop-lifecycle-and-process-leak-governance" x="55" y="3774" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3787" fill="#333">runtime-start-stop-lifecycle-and-process-leak-governance</text>
-  <rect id="story-runtime-startup-authority-and-readiness-governance" x="55" y="3796" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3809" fill="#333">runtime-startup-authority-and-readiness-governance</text>
-  <rect id="story-runtime-startup-root-cause-packet-governance" x="55" y="3818" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3831" fill="#333">runtime-startup-root-cause-packet-governance</text>
-  <rect id="story-runtime-startup-self-healing-governance" x="55" y="3840" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3853" fill="#333">runtime-startup-self-healing-governance</text>
-  <rect id="story-runtime-supervisor-attach-reuse-followthrough-governance" x="55" y="3862" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3875" fill="#333">runtime-supervisor-attach-reuse-followthrough-governance</text>
-  <rect id="story-runtime-worker-launch-linkage-and-stall-recovery-governance" x="55" y="3884" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3897" fill="#333">runtime-worker-launch-linkage-and-stall-recovery-governance</text>
-  <rect id="story-scan" x="55" y="3906" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3919" fill="#333">scan</text>
-  <rect id="story-scan-lifecycle-migration" x="55" y="3928" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3941" fill="#333">scan-lifecycle-migration</text>
-  <rect id="story-scan-pr-platform-config" x="55" y="3950" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3963" fill="#333">scan-pr-platform-config</text>
-  <rect id="story-sse-watchdog" x="55" y="3972" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3985" fill="#333">sse-watchdog</text>
-  <rect id="story-stale-prebrainstorm-truth-reconcile-governance" x="55" y="3994" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4007" fill="#333">stale-prebrainstorm-truth-reconcile-governance</text>
-  <rect id="story-stale-start-lock-cleanup" x="55" y="4016" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4029" fill="#333">stale-start-lock-cleanup</text>
-  <rect id="story-timeout" x="55" y="4038" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4051" fill="#333">timeout</text>
-  <rect id="story-watchdog-live-status-surface-and-manager-supervision" x="55" y="4060" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4073" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
-  <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4082" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4095" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
+  <rect id="story-monitor" x="55" y="3466" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3479" fill="#333">monitor</text>
+  <rect id="story-runtime-adapter-axis-and-per-tool-adapter-selection" x="55" y="3488" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3501" fill="#333">runtime-adapter-axis-and-per-tool-adapter-selection</text>
+  <rect id="story-runtime-audio-notifier-and-sound-semantics-governance" x="55" y="3510" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3523" fill="#333">runtime-audio-notifier-and-sound-semantics-governance</text>
+  <rect id="story-runtime-blocked-intake-and-continuity-truth-governance" x="55" y="3532" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3545" fill="#333">runtime-blocked-intake-and-continuity-truth-governance</text>
+  <rect id="story-runtime-claude-launch-and-session-evidence-governance" x="55" y="3554" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3567" fill="#333">runtime-claude-launch-and-session-evidence-governance</text>
+  <rect id="story-runtime-closeout-selfhost-validation-followthrough-governance" x="55" y="3576" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3589" fill="#333">runtime-closeout-selfhost-validation-followthrough-governance</text>
+  <rect id="story-runtime-concurrent-start-stop-followthrough-governance" x="55" y="3598" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3611" fill="#333">runtime-concurrent-start-stop-followthrough-governance</text>
+  <rect id="story-runtime-daemon-self-loop-followthrough-governance" x="55" y="3620" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3633" fill="#333">runtime-daemon-self-loop-followthrough-governance</text>
+  <rect id="story-runtime-evidence-provenance-research-retirement-followthrough-governance" x="55" y="3642" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3655" fill="#333">runtime-evidence-provenance-research-retirement-followthrough-governance</text>
+  <rect id="story-runtime-forensic-time-alignment-and-stall-recovery-observability-governance" x="55" y="3664" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3677" fill="#333">runtime-forensic-time-alignment-and-stall-recovery-observability-governance</text>
+  <rect id="story-runtime-human-readable-time-display-governance" x="55" y="3686" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3699" fill="#333">runtime-human-readable-time-display-governance</text>
+  <rect id="story-runtime-lifecycle-receipt-followthrough-governance" x="55" y="3708" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3721" fill="#333">runtime-lifecycle-receipt-followthrough-governance</text>
+  <rect id="story-runtime-loop-log-timezone-label-followthrough-governance" x="55" y="3730" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3743" fill="#333">runtime-loop-log-timezone-label-followthrough-governance</text>
+  <rect id="story-runtime-network-failure-taxonomy-and-bounded-recovery-governance" x="55" y="3752" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3765" fill="#333">runtime-network-failure-taxonomy-and-bounded-recovery-governance</text>
+  <rect id="story-runtime-selfhost-continuity-gap-and-status-truth-governance" x="55" y="3774" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3787" fill="#333">runtime-selfhost-continuity-gap-and-status-truth-governance</text>
+  <rect id="story-runtime-start-stop-lifecycle-and-process-leak-governance" x="55" y="3796" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3809" fill="#333">runtime-start-stop-lifecycle-and-process-leak-governance</text>
+  <rect id="story-runtime-startup-authority-and-readiness-governance" x="55" y="3818" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3831" fill="#333">runtime-startup-authority-and-readiness-governance</text>
+  <rect id="story-runtime-startup-root-cause-packet-governance" x="55" y="3840" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3853" fill="#333">runtime-startup-root-cause-packet-governance</text>
+  <rect id="story-runtime-startup-self-healing-governance" x="55" y="3862" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3875" fill="#333">runtime-startup-self-healing-governance</text>
+  <rect id="story-runtime-supervisor-attach-reuse-followthrough-governance" x="55" y="3884" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3897" fill="#333">runtime-supervisor-attach-reuse-followthrough-governance</text>
+  <rect id="story-runtime-worker-launch-linkage-and-stall-recovery-governance" x="55" y="3906" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3919" fill="#333">runtime-worker-launch-linkage-and-stall-recovery-governance</text>
+  <rect id="story-scan" x="55" y="3928" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3941" fill="#333">scan</text>
+  <rect id="story-scan-lifecycle-migration" x="55" y="3950" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3963" fill="#333">scan-lifecycle-migration</text>
+  <rect id="story-scan-pr-platform-config" x="55" y="3972" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3985" fill="#333">scan-pr-platform-config</text>
+  <rect id="story-sse-watchdog" x="55" y="3994" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4007" fill="#333">sse-watchdog</text>
+  <rect id="story-stale-prebrainstorm-truth-reconcile-governance" x="55" y="4016" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4029" fill="#333">stale-prebrainstorm-truth-reconcile-governance</text>
+  <rect id="story-stale-start-lock-cleanup" x="55" y="4038" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4051" fill="#333">stale-start-lock-cleanup</text>
+  <rect id="story-timeout" x="55" y="4060" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4073" fill="#333">timeout</text>
+  <rect id="story-watchdog-live-status-surface-and-manager-supervision" x="55" y="4082" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4095" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
+  <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4104" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4117" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
 </svg>
