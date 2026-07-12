@@ -7452,10 +7452,6 @@
 - status: absorbed
 - absorbed_into: I-20260712T105347Z-A
 ### committed_issues
-1. `I-20260712T105347Z-A`
-- milestone: M-20260712T105347Z-A
-- phase_state: completed
-- path: docs/B2-docs/config/skip-ibm/raw-20260712T105347Z/issues/I-20260712T105347Z-A.md
 ### completed_issues
 1. `I-20260712T105347Z-A`
 - milestone: M-20260712T105347Z-A
