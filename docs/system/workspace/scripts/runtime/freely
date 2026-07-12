@@ -43,7 +43,7 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 # ── Tool registry  ──
-TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
+TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/tools/tool-registry.toml"
 TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
 
 _sse_watchdog_sh="$SELF_ROOT/docs/system/workspace/scripts/runtime/sse-watchdog.sh"
