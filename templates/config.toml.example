@@ -314,10 +314,10 @@ FREELY_ACP_CLINE_BIN = ""
 #  - 任何实现变更 (代码、配置逻辑、运行时) 必须走完整 B1→B2→dev→PR 流程
 
 # [可选] FREELY_SKIP_IBM_GATE 允许的额外路径。
-# 这些路径是硬编码治理路径之外的补充。init 时默认为空。
-# 路径是相对项目根目录的前缀匹配 (startswith)。
+# 硬编码治理路径已包含: docs/B1-docs/, docs/B2-docs/, templates/,
+#   docs/system/workspace/agents/, docs/system/workspace/skills/ 等。
+# 此处添加项目特有的治理路径前缀（相对项目根目录，startswith 匹配）。
+# 留空 = 仅使用硬编码路径。init 时默认为 ["templates/"]。
 
 [skip_ibm_gate]
-allowed_paths = [
-  # "docs/my-custom-governance-dir/",
-]
+allowed_paths = ["templates/"]

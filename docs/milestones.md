@@ -7518,3 +7518,19 @@
 - milestone: M-20260712T125520Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260712T125520Z/issues/I-20260712T125520Z-A.md
+
+## M-20260712T131930Z-A
+- title: fix — config.toml.example allowed_paths TOML format
+- status: active
+### candidate_issues
+1. `C-20260712T131930Z-A`
+- milestone: M-20260712T131930Z-A
+- status: promoted
+- promoted_issue_id: I-20260712T131930Z-A
+- promoted_issue_path: docs/B2-docs/config/skip-ibm/raw-20260712T131930Z/issues/I-20260712T131930Z-A.md
+### committed_issues
+1. `I-20260712T131930Z-A`
+- milestone: M-20260712T131930Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/config/skip-ibm/raw-20260712T131930Z/issues/I-20260712T131930Z-A.md
+### completed_issues
