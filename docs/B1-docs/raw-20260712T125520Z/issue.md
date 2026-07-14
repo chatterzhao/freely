@@ -28,4 +28,4 @@ session_refs: []
 --mode "$AI_MODE" 同样缺少默认值，导致 daemon fresh_with_handoff crash。
 
 ## 修复
-$AI_MODE → ${AI_MODE:-auto}
+$AI_MODE → ${AI_MODE:-wait}
