@@ -1,4 +1,7 @@
 # Implementation Decision Note — I-20260712T125520Z-A
+- issue_id: I-20260712T125520Z-A
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260712T125520Z/issues/I-20260712T125520Z-A.md
+- source_candidate: docs/B1-docs/raw-20260712T125520Z/candidates.md
 
 ## Decision
 Fix remaining unguarded `$AI_MODE` reference AND correct default value from `auto` to `wait` in all 6 occurrences.
