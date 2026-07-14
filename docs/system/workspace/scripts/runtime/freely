@@ -2208,7 +2208,7 @@ resolve_ai_spec_for_project_or_global() {
     source_config "$project"
     tool="${AGENT_AI_TOOL:-}"
     model="${AI_MODEL:-}"
-    mode="${AI_MODE:-auto}"
+    mode="${AI_MODE:-wait}"
     if [[ -n "$tool" ]]; then
       compose_ai_spec "$tool" "$model" "$mode"
       return 0
@@ -2218,7 +2218,7 @@ resolve_ai_spec_for_project_or_global() {
   if source_global_config; then
     tool="${AGENT_AI_TOOL:-}"
     model="${AI_MODEL:-}"
-    mode="${AI_MODE:-auto}"
+    mode="${AI_MODE:-wait}"
     if [[ -n "$tool" ]]; then
       compose_ai_spec "$tool" "$model" "$mode"
       return 0
@@ -5879,7 +5879,7 @@ materialize_project_tooling_for_loaded_config() {
   local project="$1" force="${2:-false}"
   local tool="${AGENT_AI_TOOL:-}"
   local tool_capabilities="${AGENT_AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
-  local mode="${AI_MODE:-auto}"
+  local mode="${AI_MODE:-wait}"
 
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     write_project_codex_config "$project" "$force" "$mode"
@@ -13025,7 +13025,7 @@ ensure_runtime_workcell_initialized_for_launch() {
     --project "$target_project" \
     --intent "$target_project/docs/PROJECT_INTENT.md" \
     --constitution "$target_project/docs/CONSTITUTION.md" \
-    --ai "${AGENT_AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" \
+    --ai "${AGENT_AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-wait}" \
     --accept-default-autonomy >/dev/null
   init_rc=$?
   (( init_rc == 0 )) || return "$init_rc"
@@ -20265,7 +20265,7 @@ PROMPT_AGENT
       --project "$PROJECT_ROOT" \
       --intent "$INTENT_FILE" \
       --constitution "$CONSTITUTION_FILE" \
-      --ai "${AGENT_AI_TOOL}:${AI_MODEL:-}:${AI_MODE:-auto}" \
+      --ai "${AGENT_AI_TOOL}:${AI_MODEL:-}:${AI_MODE:-wait}" \
       --workspace-root "$workspace_root" \
       --reasoning-effort "${AI_REASONING_EFFORT:-}" \
 	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
@@ -22749,7 +22749,7 @@ print(ready)
         --debug-log-file "$cycle_debug_log" \
         --claude-session-id "${TOOL_SESSION_ID_CURRENT:-}" \
         --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")" \
-        --mode "${AI_MODE:-auto}" \
+        --mode "${AI_MODE:-wait}" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
         --log-file "$cycle_log" \
