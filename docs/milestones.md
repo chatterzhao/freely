@@ -7582,3 +7582,15 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260715T060415Z/issues/I-20260715T060415Z-A.md
 ### completed_issues
+
+## M-20260715T063959Z-A
+- title: fix — revert AI_MODE default wait→auto (concept confusion with task_mode)
+- status: active
+### candidate_issues
+1. `C-20260715T063959Z-A`
+- milestone: M-20260715T063959Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T063959Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260715T063959Z/issues/I-20260715T063959Z-A.md
+### committed_issues
+### completed_issues
