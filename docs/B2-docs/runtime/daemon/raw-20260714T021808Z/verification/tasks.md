@@ -1,0 +1,12 @@
+# Tasks: task_mode propagation + AI_MODE guard
+- issue_id: I-20260714T021808Z-A
+- [ ] launch_project_runtime_daemon_or_fail: accept $2 task_mode, pass to Python spawn --task-mode
+- [ ] cmd_daemon_start: pass $task_mode to launcher
+- [ ] start_project_runtime: accept $3 task_mode, use in ensure_task_mode_gate
+- [ ] cmd_daemon_run: pass $task_mode to start_project_runtime
+- [ ] launch_manager_supervisor: add listen to allowed modes, change fallback to wait
+- [ ] Line 22697: $AI_MODE → ${AI_MODE:-none}
+- [ ] Line 22719: $AI_MODE → ${AI_MODE:-none}
+- [ ] Line 24994: ${AI_MODE} → ${AI_MODE:-none}
+- [ ] bash -n syntax check PASS
+- [ ] All 5 acceptance tests PASS
