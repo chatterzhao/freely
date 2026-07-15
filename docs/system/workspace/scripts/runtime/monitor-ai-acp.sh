@@ -140,10 +140,23 @@ _bridge_ensure_running() {
   done
   [[ $_sanitized -gt 0 ]] && echo "[bridge] env sanitized: $_sanitized AI tool vars unset" >&2
 
-  python3 "$bridge_script" start --project "$project" "${_bt_flag[@]}" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
-    echo "[ERROR] failed to start ACP bridge" >&2
-    return 1
-  }
+  # Load slot-specific env vars via registry (no alias dependency)
+  local -a _bridge_env_vars=()
+  while IFS='=' read -r key value; do
+    [[ -n "$key" ]] && _bridge_env_vars+=("$key=$value")
+  done < <(_load_slot_env_vars "$tool" 2>/dev/null)
+
+  if [[ ${#_bridge_env_vars[@]} -gt 0 ]]; then
+    env "${_bridge_env_vars[@]}" python3 "$bridge_script" start --project "$project" "${_bt_flag[@]}" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
+      echo "[ERROR] failed to start ACP bridge" >&2
+      return 1
+    }
+  else
+    python3 "$bridge_script" start --project "$project" "${_bt_flag[@]}" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
+      echo "[ERROR] failed to start ACP bridge" >&2
+      return 1
+    }
+  fi
 
   # Wait for socket
   local waited=0

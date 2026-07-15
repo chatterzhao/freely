@@ -438,6 +438,80 @@ except: pass
 }
 
 
+# _load_slot_env_vars: registry-driven slot credential loading.
+# No alias dependency — reads ~/.ai-auth/<slot>/<config_file> directly
+# using tool-registry.toml to determine config file path and format.
+# Outputs KEY=VALUE lines suitable for `env` or `export`.
+_load_slot_env_vars() {
+  local tool="$1"
+  [[ -n "$tool" ]] || return 1
+
+  local base_tool="${tool%%-*}"
+  case "$tool" in
+    *-apikey-*) base_tool="${tool%%-apikey-*}" ;;
+    *-account-*) base_tool="${tool%%-account-*}" ;;
+  esac
+
+  local cfg_file; cfg_file="$(_tool_registry_get "$base_tool" "slot.config_file" 2>/dev/null || true)"
+  local is_dir; is_dir="$(_tool_registry_get "$base_tool" "slot.is_dir" 2>/dev/null || echo "false")"
+  local fmt; fmt="$(_tool_registry_get "$base_tool" "config_schema.file_format" 2>/dev/null || echo "json")"
+  local bridge_env; bridge_env="$(_tool_registry_get "$base_tool" "slot.bridge_config_env" 2>/dev/null || true)"
+  local perm_field; perm_field="$(_tool_registry_get "$base_tool" "permission.config_field" 2>/dev/null || echo "permissionMode")"
+  local perm_fb; perm_fb="$(_tool_registry_get "$base_tool" "permission.fallback_field" 2>/dev/null || echo "permissions.defaultMode")"
+
+  local slot_dir="$HOME/.ai-auth/$tool"
+  [[ -d "$slot_dir" ]] || return 1
+
+  local config_path=""
+  if [[ "$is_dir" == "true" && -n "$cfg_file" ]]; then
+    config_path="$slot_dir/$cfg_file"
+  elif [[ "$is_dir" != "true" ]]; then
+    config_path="$slot_dir/${cfg_file:-settings.json}"
+  fi
+  [[ -n "$config_path" && -f "$config_path" ]] || return 1
+
+  if [[ -n "$bridge_env" ]]; then
+    if [[ "$bridge_env" == --* ]]; then
+      echo "ACP_CLI:${bridge_env}=$slot_dir"
+    else
+      echo "${bridge_env}=$slot_dir"
+    fi
+  fi
+
+  case "$fmt" in
+    json)
+      python3 -c "
+import json
+with open('$config_path') as f:
+    d = json.load(f)
+for k, v in d.get('env', {}).items():
+    print(f'{k}={v}')
+pf = '$perm_field'
+fb = '$perm_fb'
+pm = ''
+if pf and pf in d:
+    pm = d[pf]
+elif fb:
+    parts = fb.split('.')
+    cur = d
+    for p in parts:
+        if isinstance(cur, dict) and p in cur:
+            cur = cur[p]
+        else:
+            cur = None; break
+    if cur is not None:
+        pm = str(cur)
+if pm:
+    print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
+" 2>/dev/null || true
+      ;;
+    toml)
+      :
+      ;;
+  esac
+  return 0
+}
+
 
 tool_has_capability() {
   local capabilities="$1" capability="$2"
