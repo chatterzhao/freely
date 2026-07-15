@@ -3758,7 +3758,7 @@ valid_ai_pid_for_project() {
 
   # ACP mode: the AI PID is the bridge PID (acp-bridge.py).
   # Bridge has --project in its command line, matches via project path.
-  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${tool_adapter:-acp}" == "acp" ]]; then
     pid_matches_project "$pid" "$project" "" && return 0
   fi
 
@@ -3905,7 +3905,7 @@ tool_runtime_resume_target_before_launch() {
 
   # ACP mode: sessions are persisted in-memory by the bridge.
   # Resume target is the session ID from session state (no JSONL needed).
-  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${tool_adapter:-acp}" == "acp" ]]; then
     local sid="${TOOL_SESSION_ID_CURRENT:-${LAST_TOOL_SESSION_ID:-}}"
     if [[ -n "$sid" ]]; then
       printf '%s\n' "$sid"
@@ -4140,7 +4140,7 @@ ensure_runtime_tool_session_anchor() {
     # ACP mode: use session-store (SQLite), NOT tool directory scan.
     # Non-ACP mode: scan the tool's session dir for JSONL files.
     if [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
-      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${tool_adapter:-acp}" == "acp" ]]; then
         local _acp_sid
         _acp_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
           --project "$project" session.get-active \
@@ -4160,7 +4160,7 @@ ensure_runtime_tool_session_anchor() {
       fi
     fi
     # Resume evidence: ACP mode checks session-store (SQLite); non-ACP checks JSONL.
-    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    if [[ "${tool_adapter:-acp}" == "acp" ]]; then
       local _acp_evidence_sid
       _acp_evidence_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
         --project "$project" session.get-active \
@@ -4187,7 +4187,7 @@ ensure_runtime_tool_session_anchor() {
         exit 1
       fi
       if [[ "$current_verified" != "1" ]]; then
-        if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+        if [[ "${tool_adapter:-acp}" != "acp" ]]; then
           log_error "AI_RESUME_ON_START/RESTART=true but session ${TOOL_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
         else
           log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${TOOL_SESSION_ID_CURRENT}. Cannot resume."
@@ -13866,7 +13866,7 @@ EOF
 # Returns 0 (active) if any signal shows recent work; 1 (inactive) otherwise.
 _ai_shows_liveness() {
   local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
-  local adapter="${AGENT_AI_TOOL_ADAPTER:-direct}"
+  local adapter="${tool_adapter:-acp}"
 
   case "$adapter" in
     acp)
@@ -17942,7 +17942,7 @@ select_launch_kind() {
   # tool_switch_events is the unified truth source for session continuity —
   # consulted FIRST, before session-store, to detect cross-tool switches and
   # bridge restarts that invalidated old sessions.
-  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${tool_adapter:-acp}" == "acp" ]]; then
     # Fork: worker inherits parent session context.
     if [[ -n "${SESSION_PARENT_ID:-}" && -z "${TOOL_SESSION_ID_CURRENT:-}" \
           && "${LAST_LAUNCH_KIND:-}" != "fork" && -z "${LAST_LAUNCH_KIND:-}" ]]; then
@@ -21685,7 +21685,7 @@ print(f'/tmp/freely-db-{h}.pid')
       ;;
     *)
       rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
-      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${tool_adapter:-acp}" == "acp" ]]; then
         _stop_acp_bridge "$project" "${_cross_base_tool:-}"
       fi
       # Aggressively kill ALL project-related AI processes.
@@ -22367,7 +22367,7 @@ start_project_runtime() {
   load_session_state_or_defaults "$project"
 
   # ACP bridge lifecycle: start one bridge per unique base_tool in agent-table
-  if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+  if [[ "${tool_adapter:-acp}" == "acp" ]]; then
     local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
     local _aq="${PROJECT_ROOT}/bin/agent-table-query"
     local -a _unique_tools=()
@@ -22532,7 +22532,7 @@ print('ok')
     load_session_state_or_defaults "$project"
 
     # Ensure all ACP bridges are alive (tool may have been switched by auto-recovery)
-    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    if [[ "${tool_adapter:-acp}" == "acp" ]]; then
       local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
       local _aq="${PROJECT_ROOT}/bin/agent-table-query"
       local -a _cycle_tools=()
@@ -22754,7 +22754,7 @@ print(ready)
       echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AGENT_AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=${AI_MODE:-none} rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
-      case "${AGENT_AI_TOOL_ADAPTER:-direct}" in
+      case "${tool_adapter:-acp}" in
         acp)
           monitor_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/monitor-ai-acp.sh"
           [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/runtime/monitor-ai-acp.sh"
@@ -22766,7 +22766,7 @@ print(ready)
       esac
       # Per-adapter extra args (ACP-only args must not be passed to non-ACP monitors).
       local -a _adapter_extra_args=()
-      if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      if [[ "${tool_adapter:-acp}" == "acp" ]]; then
         _adapter_extra_args=(--bridge-lost-marker-file "$bridge_lost_marker_file")
       fi
       bash "$monitor_script" \
@@ -22806,7 +22806,7 @@ print(ready)
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
     tool_session_id="$(runtime_capture_or_empty extract_tool_session_id_from_log "$AGENT_AI_TOOL" "$cycle_log")"
     # ACP mode: extract clean UUID from cycle log (search all lines, line 1 may be blank)
-    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" == "acp" && ( -z "$tool_session_id" || "$tool_session_id" == "unavailable" ) ]]; then
+    if [[ "${tool_adapter:-acp}" == "acp" && ( -z "$tool_session_id" || "$tool_session_id" == "unavailable" ) ]]; then
       if [[ -f "$cycle_log" ]]; then
         local _line1_uuid
         _line1_uuid=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$cycle_log" 2>/dev/null | head -1) || true
@@ -23159,7 +23159,7 @@ print(ready)
       log_info "crash evidence saved: $_crash_log"
     fi
     # ACP mode: bridge persists across cycles — keep child_pid_file so watchdog knows AI is alive
-    if [[ "${AGENT_AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+    if [[ "${tool_adapter:-acp}" != "acp" ]]; then
       rm -f "$child_pid_file"
     fi
 
