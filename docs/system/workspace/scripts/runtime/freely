@@ -17458,8 +17458,8 @@ except Exception:
 
 items = data.get("items", [])
 summary = data.get("summary", {})
-total = summary.get("total_incomplete", 0)
-by_stage = summary.get("by_stage", {})
+total = summary.get("total", summary.get("total_incomplete", 0))
+by_stage = summary.get("by_station", summary.get("by_stage", {}))
 ready = summary.get("ready", 0)
 
 # When task_mode is id:raw-xxx, filter items to only the targeted raw key\'s chain
@@ -17474,7 +17474,7 @@ if task_mode.startswith("id:"):
     by_stage = {}
     ready = 0
     for it in items:
-        s = it.get("stage", "unknown")
+        s = it.get("station", it.get("stage", "unknown"))
         by_stage[s] = by_stage.get(s, 0) + 1
         if it.get("ready"):
             ready += 1
@@ -17500,7 +17500,7 @@ print("")
 # Group by stage \u2014 dynamically from scan data, sorted by item count (most first)
 stage_order = sorted(by_stage.keys(), key=lambda s: -by_stage.get(s, 0))
 for stage in stage_order:
-    stage_items = [it for it in items if it.get("stage") == stage]
+    stage_items = [it for it in items if it.get("station", it.get("stage")) == stage]
     if not stage_items:
         continue
     # Show ready items first, limit per stage to keep prompt manageable
