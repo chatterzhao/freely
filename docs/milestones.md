@@ -7614,3 +7614,19 @@
 - milestone: M-20260715T082216Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260715T082216Z/issues/I-20260715T082216Z-A.md
+
+## M-20260715T115327Z-A
+- title: fix — AI monitor adapter variable bypassed ACP
+- status: active
+### candidate_issues
+1. `C-20260715T115327Z-A`
+- milestone: M-20260715T115327Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T115327Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260715T115327Z/issues/I-20260715T115327Z-A.md
+### committed_issues
+### completed_issues
+1. `I-20260715T115327Z-A`
+- milestone: M-20260715T115327Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260715T115327Z/issues/I-20260715T115327Z-A.md
