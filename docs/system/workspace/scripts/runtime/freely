@@ -18251,7 +18251,7 @@ launch_manager_supervisor() {
     return 0
   fi
   local _restart_mode; _restart_mode="$(read_task_mode "$project")"
-  [[ "$_restart_mode" == "auto" || "$_restart_mode" == "wait" || "$_restart_mode" == id:* ]] || _restart_mode="auto"
+  [[ "$_restart_mode" == "auto" || "$_restart_mode" == "wait" || "$_restart_mode" == "listen" || "$_restart_mode" == id:* ]] || _restart_mode="wait"
   nohup bash "$launch_bin" "$launch_mode_command" --project "$project" --task-mode "$_restart_mode" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
@@ -21977,7 +21977,7 @@ ensure_no_active_supervisor_conflict() {
 }
 
 start_project_runtime() {
-  local project="$1" entrypoint_mode="${2:-foreground}"
+  local project="$1" entrypoint_mode="${2:-foreground}" task_mode="${3:-wait}"
   local WORKCELL_ENTRYPOINT_MODE_OVERRIDE="$entrypoint_mode"
   local sup_pid_file child_pid_file
   sup_pid_file="$(run_dir_for_project "$project")/supervisor.pid"
@@ -22000,7 +22000,7 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
   ensure_freely_db "$project"
-  ensure_task_mode_gate "$project" "wait"
+  ensure_task_mode_gate "$project" "$task_mode"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
@@ -22694,7 +22694,7 @@ print(ready)
     rm -f "$network_failure_marker_file"
     rm -f "$bridge_lost_marker_file"
     exit_if_stop_requested_before_launch
-    log_info "launching $AGENT_AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
+    log_info "launching $AGENT_AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=${AI_MODE:-none})"
     append_runtime_event "$project" "ai_launch_begin" \
       "supervisor_pid=$$" \
       "tool=$AGENT_AI_TOOL" \
@@ -22716,7 +22716,7 @@ print(ready)
       "expected_next=L041"
     set +e
     {
-      echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AGENT_AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
+      echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AGENT_AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=${AI_MODE:-none} rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
       case "${AGENT_AI_TOOL_ADAPTER:-direct}" in
@@ -23478,7 +23478,7 @@ wait_for_daemon_supervisor_ready_or_fail() {
 }
 
 launch_project_runtime_daemon_or_fail() {
-  local project="$1"
+  local project="$1" task_mode="${2:-}"
   local runtime_script launcher_log launcher_pid supervisor_pid wait_secs
   runtime_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
   wait_secs="${FREELY_DAEMON_READY_WAIT_SECS:-60}"
@@ -23492,15 +23492,19 @@ launch_project_runtime_daemon_or_fail() {
   # after `freely daemon start` returns, so regressions here need a stronger guard
   # than ordinary shell job control.
   launcher_pid="$(
-    python3 - "$project" "$runtime_script" "$launcher_log" <<'PY'
+    python3 - "$project" "$runtime_script" "$launcher_log" "$task_mode" <<'PY'
 import subprocess
 import sys
 
 project, runtime_script, launcher_log = sys.argv[1:4]
+task_mode = sys.argv[4] if len(sys.argv) > 4 else ""
 argv0 = f"runtime/freely daemon-run --project {project}"
+cmd = [argv0, runtime_script, "daemon-run", "--project", project]
+if task_mode:
+    cmd.extend(["--task-mode", task_mode])
 with open(launcher_log, "ab", buffering=0) as log_file:
     child = subprocess.Popen(
-        [argv0, runtime_script, "daemon-run", "--project", project],
+        cmd,
         executable="bash",
         cwd=project,
         stdin=subprocess.DEVNULL,
@@ -23639,7 +23643,7 @@ REASON_GATE
   fi
   release_project_start_lock_for_runtime "$project"
   trap - EXIT
-  launch_project_runtime_daemon_or_fail "$project"
+  launch_project_runtime_daemon_or_fail "$project" "$task_mode"
 }
 
 cmd_daemon_stop() {
@@ -23708,7 +23712,7 @@ cmd_daemon_run() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
-  start_project_runtime "$project" "daemon"
+  start_project_runtime "$project" "daemon" "${task_mode:-wait}"
 }
 
 cmd_task_mode() {
@@ -24991,7 +24995,7 @@ cmd_baseline_status() {
   echo "project: $PROJECT_ROOT"
   echo "intent: $INTENT_FILE"
   echo "constitution: $CONSTITUTION_FILE"
-  echo "ai: ${AGENT_AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
+  echo "ai: ${AGENT_AI_TOOL}:${AI_MODEL:-default}:${AI_MODE:-none}"
   echo "tool_adapter: ${AGENT_AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AGENT_AI_TOOL:-}")}"
   echo "tool_adapter_policy: ${AGENT_AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AGENT_AI_TOOL:-}")}"
   echo "tool_supported_adapters: $(tool_supported_adapters_for_runtime "${AGENT_AI_TOOL:-}" | paste -sd ',' -)"
