@@ -16056,6 +16056,39 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
   esac
   [[ -n "$kind" ]] || kind="$(manager_exit_contract_kind "$project" || true)"
   stop_reason="$(_db_exit_contract_field "$project" manager reason)"
+
+  # ── Universal auto→listen gate: in auto mode, if the scan has no ready
+  # items, switch to listen regardless of the exit kind. This prevents
+  # restart loops when the AI exits with non-stop_ai reasons
+  # (e.g. tool_unproductive) and there is no work to do.
+  # stop_ai below still has its own retry/override logic.
+  local _gate_mode
+  _gate_mode="$(read_task_mode "$project")"
+  if [[ "$_gate_mode" == "auto" ]]; then
+    local _scan_json_path _ready_count
+    _scan_json_path="$(task_source_scan_json_path_for_project "$project")"
+    _ready_count=0
+    if [[ -f "$_scan_json_path" && -s "$_scan_json_path" ]]; then
+      _ready_count="$(python3 -c "
+import json
+with open('$_scan_json_path') as f: data=json.load(f)
+items=data if isinstance(data,list) else data.get('items',[])
+ready=sum(1 for i in items if i.get('ready'))
+print(ready)
+" 2>/dev/null || echo 0)"
+    fi
+    if [[ "$_ready_count" -eq 0 ]]; then
+      write_task_mode "$project" "listen"
+      append_runtime_event "$project" "task_mode_auto_to_listen_universal" \
+        "gate_mode=auto" \
+        "ready_count=$_ready_count" \
+        "exit_kind=${kind:-unknown}" \
+        "action=switch_to_listen"
+      printf 'continue\n'
+      return 0
+    fi
+  fi
+
   case "$kind" in
     stop_ai)
       if manager_has_unresolved_expected_running_workers "$project"; then
@@ -22001,6 +22034,8 @@ start_project_runtime() {
     "entrypoint_mode=$entrypoint_mode"
   ensure_freely_db "$project"
   ensure_task_mode_gate "$project" "$task_mode"
+  # Force fresh scan on daemon start — cached scan may be stale from prior run
+  rm -f "$(run_dir_for_project "$project")/manager-task-source-scan-latest.json"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"

@@ -7550,3 +7550,19 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/issues/I-20260714T021808Z-A.md
 ### completed_issues
+
+## M-20260715T055018Z-A
+- title: fix — scan cache stale on daemon start + auto→listen universal
+- status: active
+### candidate_issues
+1. `C-20260715T055018Z-A`
+- milestone: M-20260715T055018Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T055018Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260715T055018Z/issues/I-20260715T055018Z-A.md
+### committed_issues
+### completed_issues
+1. `I-20260715T055018Z-A`
+- milestone: M-20260715T055018Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260715T055018Z/issues/I-20260715T055018Z-A.md
