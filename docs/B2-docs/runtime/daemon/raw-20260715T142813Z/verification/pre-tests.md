@@ -15,11 +15,11 @@
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: syntax error
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: FAIL - agent-id.env in _init_agent_table_slot_pin
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T142813Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-2
@@ -34,11 +34,11 @@
 - test_command: grep -q '_resolve_current_agent_id' docs/system/workspace/scripts/runtime/freely && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: FAIL - agent-id.env in _init_agent_table_slot_pin
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T142813Z/verification/test-evidence/acceptance-2.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-3
@@ -50,14 +50,14 @@
 - required_evidence: grep 输出为空
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/runtime/daemon/raw-20260715T142813Z/verification/test-evidence/acceptance-3.log
-- test_command: grep -q 'agent-id\.env' docs/system/workspace/scripts/runtime/freely && echo FAIL || echo PASS
+- test_command: grep -A10 "_init_agent_table_slot_pin()" docs/system/workspace/scripts/runtime/freely | grep -q "agent-id.env" && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL (agent-id.env 仍被引用)
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: FAIL - agent-id.env in _init_agent_table_slot_pin
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T142813Z/verification/test-evidence/acceptance-3.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ## Unit
