@@ -15,11 +15,11 @@
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: PASS (syntax baseline)
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: RED confirmed — 6 :-wait, 0 :-auto
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T063959Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-2
@@ -34,11 +34,11 @@
 - test_command: grep -c 'AI_MODE:-wait' docs/system/workspace/scripts/runtime/freely | grep -q '^0$' && test $(grep -c 'AI_MODE:-auto' docs/system/workspace/scripts/runtime/freely) -eq 6 && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (6 :-wait present, 0 :-auto)
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: RED confirmed — 6 :-wait, 0 :-auto
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T063959Z/verification/test-evidence/acceptance-2.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-3
@@ -53,11 +53,11 @@
 - test_command: test $(grep -c 'AI_MODE:-none' docs/system/workspace/scripts/runtime/freely) -ge 3 && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: PASS (guards already present)
-- actual_RED_output: (RED)
-- actual_output: (GREEN)
+- actual_RED_output: RED confirmed — 6 :-wait, 0 :-auto
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260715T063959Z/verification/test-evidence/acceptance-3.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ## Unit
