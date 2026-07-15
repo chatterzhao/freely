@@ -4807,11 +4807,9 @@ _init_agent_table_slot_pin() {
   local _aq="${PROJECT_ROOT}/bin/agent-table-query"
   [[ -x "$_aq" ]] || return 0
 
-  # Resolve current agent identity from agent-id.env
-  local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env" _my_id=""
-  if [[ -f "$_agent_env" ]]; then
-    _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+|reviewer_[0-9]+)' | head -1 || true)
-  fi
+  # Resolve current agent identity: agent_working table (primary) → agent-id.env (fallback)
+  local _my_id=""
+  _my_id="$(_resolve_current_agent_id "$project")"
   [[ -z "$_my_id" ]] && _my_id="manager_01"
 
   local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
