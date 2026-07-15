@@ -7534,3 +7534,19 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/config/skip-ibm/raw-20260712T131930Z/issues/I-20260712T131930Z-A.md
 ### completed_issues
+
+## M-20260714T021808Z-A
+- title: fix — task_mode propagation chain + AI_MODE unguarded crash + listen fallback
+- status: active
+### candidate_issues
+1. `C-20260714T021808Z-A`
+- milestone: M-20260714T021808Z-A
+- status: promoted
+- promoted_issue_id: I-20260714T021808Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/issues/I-20260714T021808Z-A.md
+### committed_issues
+1. `I-20260714T021808Z-A`
+- milestone: M-20260714T021808Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/issues/I-20260714T021808Z-A.md
+### completed_issues
