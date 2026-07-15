@@ -7630,3 +7630,15 @@
 - milestone: M-20260715T115327Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260715T115327Z/issues/I-20260715T115327Z-A.md
+
+## M-20260715T142813Z-A
+- title: fix — _init_agent_table_slot_pin uses agent_working table
+- status: active
+### candidate_issues
+1. `C-20260715T142813Z-A`
+- milestone: M-20260715T142813Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T142813Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260715T142813Z/issues/I-20260715T142813Z-A.md
+### committed_issues
+### completed_issues
