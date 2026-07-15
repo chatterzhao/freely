@@ -16,7 +16,7 @@
 - expected_output: PASS
 - expected_RED_output: syntax error near unexpected token
 - actual_RED_output: PASS — bash -n always passes on unchanged file (syntax baseline)
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-1.log
 - red-green-status: not_applicable
 - status: not_applicable
@@ -38,10 +38,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: FAIL — launch_project_runtime_daemon_or_fail() only accepts $1 (project), no task_mode parameter. Python spawn line 23503: [argv0, runtime_script, "daemon-run", "--project", project] — no --task-mode.
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-3
@@ -57,10 +57,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (listen 不在列表，fallback=auto)
 - actual_RED_output: FAIL — line 18254: [[ "$_restart_mode" == "auto" || "$_restart_mode" == "wait" || "$_restart_mode" == id:* ]] || _restart_mode="auto" — listen missing, fallback=auto not wait
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-4
@@ -76,10 +76,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (3 处裸引用)
 - actual_RED_output: FAIL — 3 bare references: line 22697 ai_mode=$AI_MODE, line 22719 ai_mode=$AI_MODE, line 24994 :${AI_MODE} all unguarded
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ### acceptance-5
@@ -95,10 +95,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (hardcode wait)
 - actual_RED_output: FAIL — line 22003: ensure_task_mode_gate "$project" "wait" hardcoded
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-5.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: definition_missing
 
 ## Unit
