@@ -7598,3 +7598,19 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260715T063959Z/issues/I-20260715T063959Z-A.md
 ### completed_issues
+
+## M-20260715T082216Z-A
+- title: fix — _bridge_ensure_running missing registry-driven slot env vars
+- status: active
+### candidate_issues
+1. `C-20260715T082216Z-A`
+- milestone: M-20260715T082216Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T082216Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260715T082216Z/issues/I-20260715T082216Z-A.md
+### committed_issues
+### completed_issues
+1. `I-20260715T082216Z-A`
+- milestone: M-20260715T082216Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260715T082216Z/issues/I-20260715T082216Z-A.md
