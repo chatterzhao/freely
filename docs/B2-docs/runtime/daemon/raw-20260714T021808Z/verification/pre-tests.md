@@ -15,11 +15,14 @@
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: syntax error near unexpected token
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: PASS — bash -n always passes on unchanged file (syntax baseline)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
-- status: pending
+- red-green-status: not_applicable
+- status: not_applicable
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: bash -n 在原始代码上通过是正常的——这是语法基线测试，不是缺陷验证测试。真正的 RED 验证由 AT-002~005 的 grep 检查覆盖。
+- replacement_evidence: AT-002~005 全部 RED 确认
 - blocker: definition_missing
 
 ### acceptance-2
@@ -34,10 +37,10 @@
 - test_command: grep -q 'task_mode.*\$2\|\$2.*task_mode\|--task-mode.*task_mode' docs/system/workspace/scripts/runtime/freely && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: FAIL — launch_project_runtime_daemon_or_fail() only accepts $1 (project), no task_mode parameter. Python spawn line 23503: [argv0, runtime_script, "daemon-run", "--project", project] — no --task-mode.
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-2.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: definition_missing
 
@@ -53,10 +56,10 @@
 - test_command: grep -A1 '_restart_mode.*auto.*wait.*id:' docs/system/workspace/scripts/runtime/freely | grep -q 'listen' && grep -q '_restart_mode="wait"' docs/system/workspace/scripts/runtime/freely && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (listen 不在列表，fallback=auto)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: FAIL — line 18254: [[ "$_restart_mode" == "auto" || "$_restart_mode" == "wait" || "$_restart_mode" == id:* ]] || _restart_mode="auto" — listen missing, fallback=auto not wait
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-3.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: definition_missing
 
@@ -72,10 +75,10 @@
 - test_command: grep -n '\$AI_MODE\|${AI_MODE}' docs/system/workspace/scripts/runtime/freely | grep -v ':-' | grep -v 'unset AI_MODE' | grep -v 'AI_MODE=' | grep -v 'freely_autonomy\|freely_interaction\|freely_approval\|freely_activation\|freely_codex_boundary' > /dev/null && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL (3 处裸引用)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: FAIL — 3 bare references: line 22697 ai_mode=$AI_MODE, line 22719 ai_mode=$AI_MODE, line 24994 :${AI_MODE} all unguarded
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-4.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: definition_missing
 
@@ -91,10 +94,10 @@
 - test_command: grep 'ensure_task_mode_gate' docs/system/workspace/scripts/runtime/freely | grep -v 'wait' | head -1 > /dev/null && echo PASS || echo FAIL
 - expected_output: PASS
 - expected_RED_output: FAIL (hardcode wait)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: FAIL — line 22003: ensure_task_mode_gate "$project" "wait" hardcoded
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260714T021808Z/verification/test-evidence/acceptance-5.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: definition_missing
 
