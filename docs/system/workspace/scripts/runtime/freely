@@ -13053,7 +13053,7 @@ print('')
 # Capture worker's ACP session ID from the cycle log and store it in the A2A task.
 # This enables Manager to use session/prompt for intervention and SSE for streaming.
 capture_worker_session_id_and_store() {
-  local manager_project="$1" worker_cycle_log="$2" task_id="$3"
+  local manager_project="$1" worker_cycle_log="$2" task_id="$3" target_project="${4:-}" agent_id="${5:-}" slot="${6:-}"
   [[ -n "$task_id" ]] || return 0
   (
     # Wait for session ID to appear in the log (first line = clean UUID)
@@ -13076,6 +13076,11 @@ capture_worker_session_id_and_store() {
       if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
         python3 "$_a2a_task_py" update --task-id "$task_id" --session-id "$_session_id" >/dev/null 2>&1 || true
         log_info "worker session-id stored: task=$task_id session=$_session_id"
+      fi
+      # Write session_id to agent_working table for recovery context
+      if [[ -n "$target_project" && -n "$agent_id" ]]; then
+        python3 -c "import sys; sys.path.insert(0, '${manager_project}/docs/system/workspace/scripts/runtime'); from agent_working import acp_session_register; acp_session_register('${manager_project}', '${agent_id}', 'worker', '${agent_id}', session_id='${_session_id}', slot='${slot:-claude}', worktree='${target_project}')" 2>/dev/null || true
+        log_info "agent_working: worker ${agent_id} session=${_session_id} registered"
       fi
     else
       log_warn "worker session-id capture timed out after ${_timeout}s: task=$task_id"
@@ -13255,7 +13260,7 @@ SESSIONEOF
       "worker_pid=$_worker_pid" \
       "target_project=$target_project" \
       "prompt_file=$prompt_file"
-    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id"
+    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "worker_01" "${AGENT_AI_TOOL:-claude}"
     return 0
   fi
 
@@ -13297,7 +13302,7 @@ SESSIONEOF
     "worker_pid=$_worker_pid" \
     "target_project=$target_project" \
     "prompt_file=$prompt_file"
-  capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id"
+  capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "$_worker_agent_id" "$_worker_slot"
   return 0
 }
 
