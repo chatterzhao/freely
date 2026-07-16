@@ -28,10 +28,11 @@
 - required_evidence: grep output
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/verification/test-evidence/acceptance-2.log
-- test_command: grep -q 'grep.*-oE.*[0-9]\{8\}T[0-9]\{6\}Z.*target_project' docs/system/workspace/scripts/runtime/freely && echo PASS || echo FAIL
+- test_command: grep -q "grep -oE '\[0-9\]{8}T\[0-9\]{6}Z'" docs/system/workspace/scripts/runtime/freely && echo PASS || echo FAIL
 - expected_output: PASS
-- expected_RED_output: FAIL
-- actual_RED_output: FAIL
+- expected_RED_output: FAIL (no raw_key extraction before fix)
+- actual_RED_output: FAIL (confirmed: raw_key not extracted from target_project)
+- actual_output: PASS
 - actual_output: PASS
 - evidence_file: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/verification/test-evidence/acceptance-2.log
 - red-green-status: green
