@@ -7710,3 +7710,19 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260716T021939Z/issues/I-20260716T021939Z-A.md
 ### completed_issues
+
+## M-20260716T031047Z-A
+- title: fix — worker session_id written to agent_working with correct raw_key
+- status: active
+### candidate_issues
+1. `C-20260716T031047Z-A`
+- milestone: M-20260716T031047Z-A
+- status: promoted
+- promoted_issue_id: I-20260716T031047Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md
+### committed_issues
+1. `I-20260716T031047Z-A`
+- milestone: M-20260716T031047Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md
+### completed_issues
