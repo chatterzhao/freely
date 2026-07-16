@@ -18011,22 +18011,6 @@ select_launch_kind() {
       fi
       return 0
     fi
-    # Fallback: last-acp-session-id file — written by monitor-ai-acp.sh after
-    # each AI cycle with the real session ID (UUID v4 for Claude/Codex, ses_xxx
-    # for OpenCode). Plain file, zero dependencies, survives daemon restarts.
-    local _sid_file _sid_from_file
-    _sid_file="${PROJECT_ROOT}/.freely/run/last-acp-session-id"
-    if [[ -f "$_sid_file" ]]; then
-      _sid_from_file="$(head -1 "$_sid_file" 2>/dev/null || true)"
-    fi
-    if [[ -n "$_sid_from_file" ]]; then
-      TOOL_SESSION_ID_CURRENT="$_sid_from_file"
-      LAST_TOOL_SESSION_ID="$_sid_from_file"
-      LAUNCH_KIND_SELECTED="resume"
-      LAUNCH_ROTATION_REASON="acp_resume_from_file"
-      log_info "session id recovered from last-acp-session-id: $_sid_from_file"
-      return 0
-    fi
     # No session ID anywhere — fresh launch.
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
@@ -22099,35 +22083,12 @@ start_project_runtime() {
       git diff --name-only 2>/dev/null | while read -r _f; do echo "  (unstaged) $_f"; done
       git diff --cached --name-only 2>/dev/null | while read -r _f; do echo "  (staged)   $_f"; done
       log_error ""
-      log_error "请检查以上 dirty 内容并选择合适的处理方式:"
+      log_error "If the files are stale or exist in another worktree:"
+      log_error "  git checkout -- <file>"
       log_error ""
-      log_error "  如果内容已在其他工位存在 → 丢弃:"
-      log_error "    git checkout -- <file>"
+      log_error "If this is a deliberate change, follow the workflow:"
+      log_error "  freely feedback && freely wt-create"
       log_error ""
-      log_error "  如果是无用的临时文件 → 丢弃:"
-      log_error "    git checkout -- <file>"
-      log_error ""
-      log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error ""
-      log_error "Then retry: freely daemon start --project $project"
-
-	      log_error ""
-	      log_error "  如果是有用的修改 → 按工作流修复:"
-	      log_error ""
-      log_error ""
-      log_error "  如果内容已在其他工位存在 → 丢弃:"
-      log_error "    git checkout -- <file>"
-      log_error ""
-      log_error "  如果是无用的临时文件 → 丢弃:"
-      log_error "    git checkout -- <file>"
-      log_error ""
-      log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error "    freely feedback --kind fix --title '...' --body '...'  # 创建 raw issue"
-      log_error "    freely wt-create --raw-key <key> --source local --kind fix --slug <slug>  # 创建工位"
-      log_error "    cd ../<project>-worktrees/<dir>  # 进入工位修复"
-      log_error "    详细流程见 skill freely-workflow-guarded-execution"
-      log_error ""
-      log_error "Then retry: freely daemon start --project $project"
       exit 1
     fi
 

@@ -540,14 +540,6 @@ except: pass
     _tool_switch_writeback_session_id "$project" "$session_id_clean" || {
       echo "[WARN] tool_switch writeback failed for $session_id_clean" >&2
     }
-    # Persist the real AI session ID to a plain file so select_launch_kind
-    # can find it for cache-hit resume on the next daemon cycle.
-    # Uses a simple file (no db-daemon dependency) — survives daemon restarts.
-    # Handles UUID v4 (Claude/Codex) and ses_xxx (OpenCode) formats.
-    local _session_id_file
-    _session_id_file="${project}/.freely/run/last-acp-session-id"
-    printf '%s\n' "$session_id_clean" > "$_session_id_file"
-    echo "[ACP] persisted session id to $_session_id_file: $session_id_clean" >&2
   fi
 
   # Post-exit failure detection
