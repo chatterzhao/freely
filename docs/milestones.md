@@ -7653,4 +7653,5 @@
 ### candidate_issues
 1. `C-20260716T000513Z-A` - milestone: M-20260716T000513Z-A - status: promoted - promoted_issue_id: I-20260716T000513Z-A - promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260716T000513Z/issues/I-20260716T000513Z-A.md
 ### committed_issues
+1. `I-20260716T000513Z-A` - milestone: M-20260716T000513Z-A - phase_state: completed - issue_path: docs/B2-docs/runtime/daemon/raw-20260716T000513Z/issues/I-20260716T000513Z-A.md
 ### completed_issues
