@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260716T040152Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260716T040152Z
 created_at: 2026-07-16
 milestone: M-20260716T040152Z-A
