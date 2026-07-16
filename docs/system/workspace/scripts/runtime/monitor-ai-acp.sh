@@ -540,28 +540,14 @@ except: pass
     _tool_switch_writeback_session_id "$project" "$session_id_clean" || {
       echo "[WARN] tool_switch writeback failed for $session_id_clean" >&2
     }
-    # Write real AI session ID to agent_working so the daemon can find it
-    # for cache-hit resume on the next cycle. Handles UUID v4 (Claude/Codex)
-    # and ses_xxx (OpenCode) formats — already extracted as session_id_clean.
-    local _aw_role _aw_key _aw_agent_id
-    _aw_role="${FREELY_ROLE_HINT:-manager}"
-    if [[ "$_aw_role" == "manager" ]]; then
-      _aw_key="__manager__"
-      _aw_agent_id="manager_01"
-    elif [[ "$_aw_role" == "worker" ]]; then
-      _aw_key="${RAW_KEY:-unknown}"
-      _aw_agent_id="${AGENT_ID:-worker_01}"
-    else
-      _aw_key="${RAW_KEY:-unknown}"
-      _aw_agent_id="${AGENT_ID:-reviewer_01}"
-    fi
-    python3 -c "
-import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-from agent_working import acp_session_register
-acp_session_register('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
-                     session_id='${session_id_clean}',
-                     slot='${AGENT_AI_TOOL:-}')
-" 2>/dev/null || echo "[WARN] agent_working session writeback failed for ${session_id_clean} (${_aw_role})" >&2
+    # Persist the real AI session ID to a plain file so select_launch_kind
+    # can find it for cache-hit resume on the next daemon cycle.
+    # Uses a simple file (no db-daemon dependency) — survives daemon restarts.
+    # Handles UUID v4 (Claude/Codex) and ses_xxx (OpenCode) formats.
+    local _session_id_file
+    _session_id_file="${project}/.freely/run/last-acp-session-id"
+    printf '%s\n' "$session_id_clean" > "$_session_id_file"
+    echo "[ACP] persisted session id to $_session_id_file: $session_id_clean" >&2
   fi
 
   # Post-exit failure detection
