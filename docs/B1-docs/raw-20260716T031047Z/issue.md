@@ -2,7 +2,7 @@
 local_id: raw-20260716T031047Z
 kind: raw
 phase_state: absorbed
-absorbed_into: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md
+absorbed_into: I-20260716T031047Z-A
 platform_ids:
   github:
     issue_id: '3929'
