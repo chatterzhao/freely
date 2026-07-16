@@ -10,6 +10,7 @@ A2A states: submitted, working, completed, failed, input-required, canceled (Goo
 import argparse
 import json
 import os
+import re
 import socket
 import time
 import threading

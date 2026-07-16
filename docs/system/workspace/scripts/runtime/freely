@@ -16631,7 +16631,7 @@ _append_worker_fleet_status_if_needed() {
   [[ -n "$wt_paths" ]] || return 0
 
   python3 - "$PROJECT_ROOT" "$scan_json_path" <<'PYEOF'
-import json, os, sys
+import json, os, re, sys
 from pathlib import Path
 
 project = sys.argv[1]
