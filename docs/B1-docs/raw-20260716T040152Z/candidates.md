@@ -12,7 +12,7 @@ milestone: M-20260716T040152Z-A
 
 - candidate_format_version: v2
 - title: 修复 Agent 编排链路的 a2a-exit --reason 缺失、Reviewer 调度竞态、测试覆盖缺失
-- status: promoted
+- status: absorbed
 - decision_reason: 分阶段修复——先紧急修 Bug 1 (Reviewer 调度断裂)，再修 Bug 2-5 (竞态和静默失败)，最后补端到端测试。Phase 1 最小改动、最快恢复链路。
 - next_action: B2_IBM 物化 Phase 1 的 I-* issue → 写 pre-tests → RED → dev → GREEN → PR
 - revisit_trigger: N/A (已 promote)
