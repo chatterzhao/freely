@@ -14593,6 +14593,17 @@ manager_ai_stalled_without_runtime_progress() {
 
   now="$(date +%s)"
   if (( now - log_mtime >= threshold_secs && now - prompt_mtime >= threshold_secs )); then
+    # Check debug log — AI tool execution updates this continuously,
+    # but the main cycle log only gets initial output. If the debug log
+    # is fresh, the AI is actively working, not stalled.
+    local debug_log="${cycle_log%.log}.debug.log"
+    if [[ -f "$debug_log" ]]; then
+      local debug_mtime
+      debug_mtime="$(file_mtime_epoch "$debug_log" 2>/dev/null || true)"
+      if [[ -n "$debug_mtime" ]] && (( now - debug_mtime < threshold_secs )); then
+        return 1
+      fi
+    fi
     _ai_shows_liveness "$project" "$ai_pid" "$cycle_log" "$threshold_secs" && return 1
     return 0
   fi
