@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## Bug A (CRITICAL): 内联 Python NameError: name 're' is not defined
