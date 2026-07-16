@@ -13260,6 +13260,15 @@ SESSIONEOF
   fi
 
   log_info "launching worker AI via manager bridge (fork session): target=$target_project prompt=$(basename "$prompt_file")"
+
+  # Write worker entry to agent_working table before fork launch.
+  # This enables _resolve_current_agent_id() to find the worker's role
+  # when the worker process starts in the target worktree.
+  local _worker_agent_id _worker_slot
+  _worker_agent_id="worker_01"
+  _worker_slot="${AGENT_AI_TOOL:-claude-apikey-ds-flash-auto}"
+  python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')" 2>/dev/null || true
+
   local _worker_next_file
   _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
   rm -f "$_worker_next_file"
