@@ -7694,3 +7694,15 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260716T020008Z/issues/I-20260716T020008Z-A.md
 ### completed_issues
+
+## M-20260716T021939Z-A
+- title: fix — auto-merge dev to test in consistency check
+- status: active
+### candidate_issues
+1. `C-20260716T021939Z-A`
+- milestone: M-20260716T021939Z-A
+- status: promoted
+- promoted_issue_id: I-20260716T021939Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260716T021939Z/issues/I-20260716T021939Z-A.md
+### committed_issues
+### completed_issues
