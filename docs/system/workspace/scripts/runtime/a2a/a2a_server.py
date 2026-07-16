@@ -738,6 +738,7 @@ class A2AServer:
                     "completion_summary": body.get("summary", ""),
                     "message": body.get("message", ""),
                     "session_id": body.get("session_id", ""),
+                    "reason": body.get("reason", ""),
                 }
                 self.task_store.raw_rpc("a2a_task.update", dict(fields))
                 return JSONResponse({"id": task.id, "state": "submitted"}, status_code=202)
