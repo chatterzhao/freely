@@ -18000,22 +18000,20 @@ select_launch_kind() {
       fi
       return 0
     fi
-    # Fallback: agent_working table — written by monitor-ai-acp.sh after each
-    # AI cycle with the real session ID (UUID v4 for Claude/Codex, ses_xxx for
-    # OpenCode). This is the most reliable source for cache-hit resume.
-    local _aw_sid
-    _aw_sid="$(python3 -c "
-import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_get_session
-sid = agent_get_session('${PROJECT_ROOT}', '__manager__', 'manager', 'manager_01') or ''
-print(sid)
-" 2>/dev/null || true)"
-    if [[ -n "$_aw_sid" ]]; then
-      TOOL_SESSION_ID_CURRENT="$_aw_sid"
-      LAST_TOOL_SESSION_ID="$_aw_sid"
+    # Fallback: last-acp-session-id file — written by monitor-ai-acp.sh after
+    # each AI cycle with the real session ID (UUID v4 for Claude/Codex, ses_xxx
+    # for OpenCode). Plain file, zero dependencies, survives daemon restarts.
+    local _sid_file _sid_from_file
+    _sid_file="${PROJECT_ROOT}/.freely/run/last-acp-session-id"
+    if [[ -f "$_sid_file" ]]; then
+      _sid_from_file="$(head -1 "$_sid_file" 2>/dev/null || true)"
+    fi
+    if [[ -n "$_sid_from_file" ]]; then
+      TOOL_SESSION_ID_CURRENT="$_sid_from_file"
+      LAST_TOOL_SESSION_ID="$_sid_from_file"
       LAUNCH_KIND_SELECTED="resume"
-      LAUNCH_ROTATION_REASON="acp_resume_from_agent_working"
-      log_info "session id recovered from agent_working: $_aw_sid"
+      LAUNCH_ROTATION_REASON="acp_resume_from_file"
+      log_info "session id recovered from last-acp-session-id: $_sid_from_file"
       return 0
     fi
     # No session ID anywhere — fresh launch.
