@@ -2,6 +2,7 @@
 local_id: raw-20260716T031047Z
 kind: raw
 phase_state: absorbed
+absorbed_into: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md
 platform_ids:
   github:
     issue_id: '3929'
@@ -45,4 +46,3 @@ Without session_id in agent_working:
 2. Extract raw_key from branch name at call sites
 3. Pass raw_key to acp_session_register
 4. Fix agent_assign pre-launch call
-- absorbed_into: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md

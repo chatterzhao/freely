@@ -1,13 +1,13 @@
 # Candidates: worker session_id not written to agent_working
 
 candidate_id: C-20260716T031047Z-A
-status: proposed
+status: promoted
 source_raw: raw-20260716T031047Z
 ---
 ## C-20260716T031047Z-A: Add raw_key extraction to capture_worker_session_id_and_store
 - candidate_format_version: v2
 - title: Extract raw_key from target_project path and use it for agent_working writes
-- status: proposed
+- status: promoted
 - decision_reason: Single function change, no call-site changes needed — simplest and least risky
 
 ### Changes
