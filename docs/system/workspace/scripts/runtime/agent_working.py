@@ -50,12 +50,21 @@ def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
     col = f"{role}_id"
     val = f"{agent_id}:{session_id}" if session_id else agent_id
     method = "agent_working.upsert_only" if update_only else "agent_working.upsert"
-    return _db_rpc(project, method, {
+    result = _db_rpc(project, method, {
         "raw_key": raw_key, "col": col, "val": val,
         "worktree": worktree, "branch": branch,
         "test_worktree": test_worktree, "test_branch": test_branch,
         "slot": slot, "role": role, "agent_id": agent_id
     })
+    if update_only and result.get("status") == "error":
+        import sys as _sys
+        _sys.stderr.write(
+            f"[agent_working] {role}/{agent_id} update_only failed for {raw_key}: "
+            f"{result.get('message', 'row not found or update rejected')} "
+            f"(worktree may have been closed or Worker hasn't created the row yet)\n"
+        )
+        _sys.stderr.flush()
+    return result
 
 
 # ── Unified ACP session management ─────────────────────────────

@@ -833,6 +833,7 @@ def _main() -> int:
     p_exit.add_argument("--branch", default="", help="Branch name")
     p_exit.add_argument("--task-id", default="", help="Existing task ID (updates instead of creating)")
     p_exit.add_argument("--session-id", default="", help="Session ID")
+    p_exit.add_argument("--reason", default="", help="Reason for state change (required when state=input-required, e.g. needs-review:b1)")
 
     args, _ = parser.parse_known_args()
 
@@ -1097,11 +1098,13 @@ def _main() -> int:
             else:
                 c = _client()
                 existing_task_id = getattr(args, 'task_id', '') or ''
+                reason = getattr(args, 'reason', '') or ""
                 if existing_task_id:
                     r = c.update(existing_task_id, state=state,
                                  summary=getattr(args, 'summary', '') or "",
                                  next=getattr(args, 'next', '') or "",
-                                 evidence=getattr(args, 'evidence', '') or "")
+                                 evidence=getattr(args, 'evidence', '') or "",
+                                 reason=reason)
                     task_id = existing_task_id
                 else:
                     r = c.create(
@@ -1116,6 +1119,7 @@ def _main() -> int:
                         summary=getattr(args, 'summary', '') or "",
                         next=getattr(args, 'next', '') or "",
                         evidence=getattr(args, 'evidence', '') or "",
+                        reason=reason,
                     )
                     task_id = r.get("id", "")
                 run_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", ".freely", "run")
@@ -1131,7 +1135,8 @@ def _main() -> int:
                                   "workers": getattr(args, 'workers', '') or "",
                                   "summary": getattr(args, 'summary', '') or "",
                                   "next": getattr(args, 'next', '') or "",
-                                  "evidence": getattr(args, 'evidence', '') or ""}))
+                                  "evidence": getattr(args, 'evidence', '') or "",
+                                  "reason": reason}))
     except RuntimeError as e:
         print(json.dumps({"error": str(e)}))
     return 0

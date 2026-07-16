@@ -1,3 +1,17 @@
+## M-20260716T040152Z-A
+- title: agent orchestration fix
+- status: active
+### candidate_issues
+1. `C-20260716T040152Z-A`
+- milestone: M-20260716T040152Z-A
+- status: promoted
+- promoted_issue_id: `I-20260716T040152Z-A`
+### committed_issues
+1. `I-20260716T040152Z-A`
+- milestone: M-20260716T040152Z-A
+- phase_state: in_b2_ibm
+- path: docs/B2-docs/agent-orchestration/agent-dispatch-fix/raw-20260716T040152Z/issues/I-20260716T040152Z-A.md
+
 ## M-20260627T234054Z-A
 - title: wt-create assignee check
 - status: completed

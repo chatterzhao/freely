@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# a2a-exit: AI agent state declaration — canonical entry point for Manager/Worker/Reviewer.
+# Wraps a2a_task.py a2a-exit so agents can call `a2a-exit --state ...` directly,
+# matching the agent role docs (manager-agent.md, worker-agent.md, reviewer-agent.md).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+A2A_TASK="$ROOT_DIR/docs/system/workspace/scripts/runtime/a2a_task.py"
+
+exec python3 "$A2A_TASK" a2a-exit "$@"
