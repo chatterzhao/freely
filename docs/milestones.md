@@ -2,15 +2,17 @@
 - title: agent orchestration fix
 - status: active
 ### candidate_issues
-1. `C-20260716T040152Z-A`
-- milestone: M-20260716T040152Z-A
-- status: absorbed
-- absorbed_into: `I-20260716T040152Z-A`
 ### committed_issues
+### completed_issues
 1. `I-20260716T040152Z-A`
 - milestone: M-20260716T040152Z-A
 - phase_state: completed
 - path: docs/B2-docs/agent-orchestration/agent-dispatch-fix/raw-20260716T040152Z/issues/I-20260716T040152Z-A.md
+### completed_issues
+1. `C-20260716T040152Z-A`
+- milestone: M-20260716T040152Z-A
+- status: absorbed
+- absorbed_into: `I-20260716T040152Z-A`
 
 ## M-20260627T234054Z-A
 - title: wt-create assignee check
