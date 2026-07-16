@@ -18000,7 +18000,25 @@ select_launch_kind() {
       fi
       return 0
     fi
-    # No session ID in tool_switch record either — fresh launch.
+    # Fallback: agent_working table — written by monitor-ai-acp.sh after each
+    # AI cycle with the real session ID (UUID v4 for Claude/Codex, ses_xxx for
+    # OpenCode). This is the most reliable source for cache-hit resume.
+    local _aw_sid
+    _aw_sid="$(python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+sid = agent_get_session('${PROJECT_ROOT}', '__manager__', 'manager', 'manager_01') or ''
+print(sid)
+" 2>/dev/null || true)"
+    if [[ -n "$_aw_sid" ]]; then
+      TOOL_SESSION_ID_CURRENT="$_aw_sid"
+      LAST_TOOL_SESSION_ID="$_aw_sid"
+      LAUNCH_KIND_SELECTED="resume"
+      LAUNCH_ROTATION_REASON="acp_resume_from_agent_working"
+      log_info "session id recovered from agent_working: $_aw_sid"
+      return 0
+    fi
+    # No session ID anywhere — fresh launch.
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
     return 0
