@@ -228,7 +228,7 @@ _detect_acp_failure() {
   # Scan only NEW content (since cycle start) to avoid matching stale errors.
   _net_err='(Transport channel closed|stream disconnected before completion|error sending request for url|HandshakeFailure|received fatal alert|certificate not valid|certificate expired)'
   local _bridge_fatal
-  _bridge_fatal='(exited unexpectedly|ProcessTransport.*not ready|idle timeout|worker quit with fatal|server stdout closed|Transport channel closed|stream disconnected before completion|error sending request for url|failed to refresh available models|HandshakeFailure|received fatal alert|certificate not valid|certificate expired)'
+  _bridge_fatal='(exited unexpectedly|ProcessTransport.*not ready|idle timeout|worker quit with fatal|Transport channel closed|stream disconnected before completion|error sending request for url|failed to refresh available models|HandshakeFailure|received fatal alert|certificate not valid|certificate expired)'
 
   if _matched=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 -E "$_bridge_fatal" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_fatal matched: ${_matched:0:200}" >&2
@@ -532,10 +532,36 @@ except: pass
         resume_mode_detected="native"
       fi
     fi
-    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected" || true
+    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected" || {
+      echo "[WARN] session-store writeback failed for $session_id_clean" >&2
+    }
     # Write back new session ID to tool_switch_events so _tool_switch_launch_kind()
     # can find it and return "resume" on subsequent cycles.
-    _tool_switch_writeback_session_id "$project" "$session_id_clean" || true
+    _tool_switch_writeback_session_id "$project" "$session_id_clean" || {
+      echo "[WARN] tool_switch writeback failed for $session_id_clean" >&2
+    }
+    # Write real AI session ID to agent_working so the daemon can find it
+    # for cache-hit resume on the next cycle. Handles UUID v4 (Claude/Codex)
+    # and ses_xxx (OpenCode) formats — already extracted as session_id_clean.
+    local _aw_role _aw_key _aw_agent_id
+    _aw_role="${FREELY_ROLE_HINT:-manager}"
+    if [[ "$_aw_role" == "manager" ]]; then
+      _aw_key="__manager__"
+      _aw_agent_id="manager_01"
+    elif [[ "$_aw_role" == "worker" ]]; then
+      _aw_key="${RAW_KEY:-unknown}"
+      _aw_agent_id="${AGENT_ID:-worker_01}"
+    else
+      _aw_key="${RAW_KEY:-unknown}"
+      _aw_agent_id="${AGENT_ID:-reviewer_01}"
+    fi
+    python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import acp_session_register
+acp_session_register('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
+                     session_id='${session_id_clean}',
+                     slot='${AGENT_AI_TOOL:-}')
+" 2>/dev/null || echo "[WARN] agent_working session writeback failed for ${session_id_clean} (${_aw_role})" >&2
   fi
 
   # Post-exit failure detection
