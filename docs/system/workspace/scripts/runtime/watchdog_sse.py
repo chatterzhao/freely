@@ -22,6 +22,14 @@ from agent_working import (
 from input_required_reason import InputRequiredReason
 
 
+import time as _time
+
+def _log(msg: str) -> None:
+    """Timestamped watchdog log line (routing forensics need instance-attributable timestamps)."""
+    ts = _time.strftime("%H:%M:%SZ", _time.gmtime())
+    print(f"[watchdog {ts}] {msg}", file=sys.stderr)
+
+
 def _acp_bridge_socket(project: str, base_tool: str = "") -> Optional[str]:
     """Find the ACP bridge Unix socket for this project/tool."""
     import hashlib
@@ -46,7 +54,7 @@ def _acp_rpc(project: str, method: str, params: dict, base_tool: str = "") -> Op
         s.close()
         return json.loads(resp.decode())
     except Exception as e:
-        print(f"[watchdog] ACP RPC error ({method}): {e}", file=sys.stderr)
+        _log(f"ACP RPC error ({method}): {e}")
         return None
 
 
@@ -70,7 +78,7 @@ def watchdog_run(project: str, a2a_socket: str):
             _subscribe_and_process(project, a2a_socket)
             backoff = 1  # reset on clean disconnect
         except Exception as e:
-            print(f"[watchdog] SSE error: {e}, reconnecting in {backoff}s", file=sys.stderr)
+            _log(f"SSE error: {e}, reconnecting in {backoff}s")
             time.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
 
@@ -183,7 +191,7 @@ def _handle_sse_event(project: str, event_text: str):
     reason = InputRequiredReason.from_string(reason_str)
     needs_role = reason.needs_role
 
-    print(f"[watchdog] input-required: reason={reason.value} needs_role={needs_role}", file=sys.stderr)
+    _log(f"input-required: reason={reason.value} needs_role={needs_role}")
 
     if needs_role == "reviewer":
         _handle_needs_reviewer(project, metadata, reason)
@@ -212,7 +220,7 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
     if not rid:
         rid = agent_next_free(project, "reviewer", 99)
     if not rid:
-        print(f"[watchdog] no reviewer available for {raw_key}", file=sys.stderr)
+        _log(f"no reviewer available for {raw_key}")
         return
 
     is_gate = (reason == InputRequiredReason.NEEDS_REVIEW_GATE)
@@ -225,9 +233,9 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
         force_new=is_gate
     )
     if sid:
-        print(f"[watchdog] reviewer {rid} connected via {op} session={sid[:20]}... for {raw_key}", file=sys.stderr)
+        _log(f"reviewer {rid} connected via {op} session={sid[:20]}... for {raw_key}")
     else:
-        print(f"[watchdog] reviewer {rid} session creation failed for {raw_key}", file=sys.stderr)
+        _log(f"reviewer {rid} session creation failed for {raw_key}")
 
 
 def _build_review_task_message(raw_key: str, from_agent: str, reason: InputRequiredReason) -> str:
@@ -247,7 +255,7 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
     issue_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     MANAGER_KEY = "__manager__"
-    print(f"[watchdog] routing to manager: {from_agent} needs decision on {issue_key} ({reason.value})", file=sys.stderr)
+    _log(f"routing to manager: {from_agent} needs decision on {issue_key} ({reason.value})")
 
     mgr_msg = f"[Freely Watchdog] {from_agent} needs manager input on {issue_key}. Reason: {reason.value}."
     manager_slot = _get_agent_slot(project, "manager", "manager_01")
@@ -257,16 +265,16 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
         slot=manager_slot, message=mgr_msg
     )
     if sid:
-        print(f"[watchdog] manager connected via {op} session={sid[:20]}...", file=sys.stderr)
+        _log(f"manager connected via {op} session={sid[:20]}...")
     else:
-        print(f"[watchdog] could not route to manager — needs human attention", file=sys.stderr)
+        _log("could not route to manager — needs human attention")
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
     """Reviewer/Manager needs worker retry/task."""
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     verdict_msg = _build_worker_verdict_message(raw_key, from_agent, reason, metadata)
-    print(f"[watchdog] routing to worker for {raw_key}: {reason.value} (from {from_agent})", file=sys.stderr)
+    _log(f"routing to worker for {raw_key}: {reason.value} (from {from_agent})")
 
     row = agent_list_by_raw_key(project, raw_key)
     wid = None
@@ -275,7 +283,7 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
     if not wid:
         wid = agent_next_free(project, "worker", 10)
     if not wid:
-        print(f"[watchdog] no worker available, delegating to manager", file=sys.stderr)
+        _log("no worker available, delegating to manager")
         _handle_needs_manager(project, metadata, InputRequiredReason.from_string("needs-manager-decision"))
         return
 
@@ -285,9 +293,9 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
         slot=worker_slot, message=verdict_msg
     )
     if sid:
-        print(f"[watchdog] worker {wid} connected via {op} session={sid[:20]}... for {raw_key}", file=sys.stderr)
+        _log(f"worker {wid} connected via {op} session={sid[:20]}... for {raw_key}")
     else:
-        print(f"[watchdog] worker {wid} session creation failed, delegating to manager", file=sys.stderr)
+        _log(f"worker {wid} session creation failed, delegating to manager")
         _handle_needs_manager(project, metadata, InputRequiredReason.from_string("needs-manager-decision"))
 
 def _build_worker_verdict_message(raw_key: str, from_agent: str,
@@ -345,19 +353,19 @@ def _handle_message_delivery(project: str, data: dict):
         pass
 
     if not raw_key:
-        print(f"[watchdog] message_delivery: no raw_key for task {task_id[:16]}", file=sys.stderr)
+        _log(f"message_delivery: no raw_key for task {task_id[:16]}")
         return
 
     # Look up the target agent's session from agent_working
     row = agent_list_by_raw_key(project, raw_key)
     if not row:
-        print(f"[watchdog] message_delivery: no agent_working row for {raw_key}", file=sys.stderr)
+        _log(f"message_delivery: no agent_working row for {raw_key}")
         return
 
     # Get session_id for the target role (manager/worker/reviewer)
     session_val = row.get(f"{role}_id", "")
     if not session_val or ":" not in str(session_val):
-        print(f"[watchdog] message_delivery: no session for {role} on {raw_key}", file=sys.stderr)
+        _log(f"message_delivery: no session for {role} on {raw_key}")
         return
     session_id = str(session_val).split(":")[-1]
 
@@ -408,7 +416,7 @@ def _check_agent_liveness(project: str):
                     capture_output=True, text=True, timeout=3
                 )
                 if result.returncode != 0:
-                    print(f"[watchdog] DEAD {role}: {agent_id} session={session_id} for {raw_key}", file=sys.stderr)
+                    _log(f"DEAD {role}: {agent_id} session={session_id} for {raw_key}")
                     # Clear the dead session_id but keep the agent assigned
                     try:
                         _db_rpc(project, "agent_working.upsert", {
@@ -418,7 +426,7 @@ def _check_agent_liveness(project: str):
                     except Exception:
                         pass
             except Exception as e:
-                print(f"[watchdog] liveness check error for {agent_id}: {e}", file=sys.stderr)
+                _log(f"liveness check error for {agent_id}: {e}")
 
 
 # ── C13: Session staleness timeout ────────────────────────────────────────────
@@ -452,23 +460,11 @@ def _check_session_staleness(project: str):
             # Stale: assigned but no session_id (never started within timeout)
             if ":" not in val:
                 agent_id = val
-                print(f"[watchdog] STALE {role} {agent_id} for {raw_key}: assigned but never started — releasing", file=sys.stderr)
+                _log(f"STALE {role} {agent_id} for {raw_key}: assigned but never started — releasing")
                 try:
                     agent_release(project, raw_key, role, agent_id)
                 except Exception as e:
-                    print(f"[watchdog] release failed for {agent_id}: {e}", file=sys.stderr)
-
-
-# ── CLI Entry Point ───────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description="Freely SSE Watchdog (Python)")
-    parser.add_argument("--project", required=True, help="Project root path")
-    parser.add_argument("--a2a-socket", required=True, help="Path to A2A Unix socket")
-    args = parser.parse_args()
-    print(f"[watchdog] starting: project={args.project} socket={args.a2a_socket}", file=sys.stderr)
-    watchdog_run(args.project, args.a2a_socket)
+                    _log(f"release failed for {agent_id}: {e}")
 
 
 def _get_agent_slot(project: str, role: str, agent_id: str) -> str:
@@ -483,3 +479,17 @@ def _get_agent_slot(project: str, role: str, agent_id: str) -> str:
     except Exception:
         pass
     return ""
+
+
+# ── CLI Entry Point ───────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Freely SSE Watchdog (Python)")
+    parser.add_argument("--project", required=True, help="Project root path")
+    parser.add_argument("--a2a-socket", required=True, help="Path to A2A Unix socket")
+    args = parser.parse_args()
+    _log(f"starting: project={args.project} socket={args.a2a_socket}")
+    watchdog_run(args.project, args.a2a_socket)
+
+
