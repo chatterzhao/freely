@@ -326,7 +326,7 @@ dev:             │           └── implement→evidence ──────
 ### Restart storm / churn 观测（现行阈值）
 
 - 窗口 `RESTART_STORM_WINDOW_SECS=120`，计数阈值 `RESTART_STORM_COUNT=10`，进程峰值阈值 `PROCESS_CHURN_PEAK=3`（计数口径 supervisor+dispatcher+ai，上限 3）
-- 记录点：AI 周期完成处 + **ensure-manager 侧 supervisor 死亡/teardown/非 operator 重拉处**（`record_supervisor_death_for_storm_window`，不在 dying process 的 EXIT trap 内写文件）
+- 记录点：AI 周期完成处（kind=cycle）+ **ensure-manager 侧 supervisor 死亡/teardown/非 operator 重拉处**（kind=death，`record_supervisor_death_for_storm_window`）。peak 仅统计 death 行——cycle 行不计峰（健康态恒 3 会误触,raw-20260717T090202Z 自查修正）
 - 阈值命中 → `record_restart_storm_signal` → manager bootstrap handoff + `restart_storm_supervisor_churn_signal` 事件；信号 advisory，terminal judgement 归 manager（watchdog-control-plane 契约）
 
 ### Loop Guard（L0-L3 防呆层）
