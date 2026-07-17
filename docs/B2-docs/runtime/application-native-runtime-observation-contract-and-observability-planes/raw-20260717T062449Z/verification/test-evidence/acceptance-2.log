@@ -1,7 +1,3 @@
-ok!=1: 2026-07-17T06:35:50Z seq=6 ph=OUT me=A-L090 to=UNSET ok=0 checkpoint=L090 stage=supervisor_cleanup_begin supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop stop_requested=1
-to 非单值: 2026-07-17T06:35:50Z seq=6 ph=OUT me=A-L090 to=UNSET ok=0 checkpoint=L090 stage=supervisor_cleanup_begin supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop stop_requested=1
-ok!=1: 2026-07-17T06:35:50Z seq=8 ph=OUT me=A-L092 to=UNSET ok=0 checkpoint=L092 stage=supervisor_cleanup_complete supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop next=stopped
-to 非单值: 2026-07-17T06:35:50Z seq=8 ph=OUT me=A-L092 to=UNSET ok=0 checkpoint=L092 stage=supervisor_cleanup_complete supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop next=stopped
-observed L090: 2026-07-17T06:35:50Z seq=6 ph=OUT me=A-L090 to=UNSET ok=0 checkpoint=L090 stage=supervisor_cleanup_begin supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop stop_requested=1
-observed L092: 2026-07-17T06:35:50Z seq=8 ph=OUT me=A-L092 to=UNSET ok=0 checkpoint=L092 stage=supervisor_cleanup_complete supervisor_pid=67897 desired_state=stopped exit_reason=operator_stop next=stopped
-AT-002 FAIL
+observed L090: 2026-07-17T06:48:02Z seq=34 ph=OUT me=A-L090 to=A-L092 ok=1 checkpoint=L090 stage=supervisor_cleanup_begin supervisor_pid=3757
+observed L092: 2026-07-17T06:48:02Z seq=36 ph=OUT me=A-L092 to=TERM ok=1 checkpoint=L092 stage=supervisor_cleanup_complete supervisor_pid=3757 desired_state=stopped exit_reason=operator_stop next=stopped
+AT-002 PASS

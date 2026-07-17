@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS"
 - expected_RED_output: "AT-001 FAIL（l041_delta 数十秒级或缺失; l042_out 含候选集竖线）"
 - actual_RED_output: observed: l041_delta=269s l042_out='to=A-L020|A-L090|...' → AT-001 FAIL（时差 269s + 候选集实抓）
-- actual_output: (GREEN 后填写)
+- actual_output: observed: l041_delta=1s l042_out='to=A-L020' → AT-001 PASS（对照 RED: 269s/候选集）
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现状 L041 于 post-cycle 发出(2026-07-16 实测晚 94s)、L042 expected_next 为候选集,真实 auto 周期即复现
 
@@ -36,10 +36,10 @@
 - expected_output: "AT-002 PASS"
 - expected_RED_output: "AT-002 FAIL（to=UNSET ok=0）"
 - actual_RED_output: L090/L092 OUT 均 to=UNSET ok=0（stop 场景实抓 seq=6/8）→ AT-002 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: L090 OUT to=A-L092 ok=1；L092 OUT to=TERM ok=1 → AT-002 PASS（对照 RED: 双 UNSET）
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现状 cleanup 链恒 to=UNSET ok=0（今日 trace 全量可证）,stop 场景即复现
 
@@ -61,10 +61,10 @@
 - expected_output: "AT-003 PASS"
 - expected_RED_output: "AT-003 FAIL（resolved_entries=0）"
 - actual_RED_output: resolved_entries=0 semantics_note=0 → AT-003 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: resolved_entries=3 semantics_note=1 → AT-003 PASS
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — §12 现三条目均 open,断言必 FAIL
 
@@ -96,5 +96,5 @@
 2. AT-002
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-001/002 后更新
+- real_environment_status: pass
+- real_environment_reason: 真实 auto 周期(l041_delta=1s,to=A-L020)与真实 stop 场景(L090→L092→TERM ok=1)双面通过

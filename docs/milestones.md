@@ -7874,5 +7874,5 @@
 ### committed_issues
 1. `I-20260717T062449Z-A`
 - milestone: M-20260717T062449Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/issues/I-20260717T062449Z-A.md
