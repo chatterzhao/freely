@@ -4393,9 +4393,9 @@ write_config() {
     --value "CHECKPOINT_WARN_DIRTY_ENTRIES=40" \
     --value "CHECKPOINT_BLOCK_DIRTY_ENTRIES=120" \
     --value "CHECKPOINT_DRIFT_STREAK_THRESHOLD=2" \
-    --value "RESTART_STORM_WINDOW_SECS=30" \
+    --value "RESTART_STORM_WINDOW_SECS=120" \
     --value "RESTART_STORM_COUNT=10" \
-    --value "PROCESS_CHURN_PEAK=10" \
+    --value "PROCESS_CHURN_PEAK=3" \
     --value "RESTART_STORM_OBSERVE_DELAY_SECS=30" \
     --value "FREELY_NETWORK_PROXY_MODE=inherit" \
     --value "FREELY_NETWORK_PROXY_URL=" \
@@ -14854,7 +14854,7 @@ update_restart_storm_window() {
   window_file="$(restart_storm_window_file "$project")"
   mkdir -p "$(dirname "$window_file")"
   tmp_file="$(mktemp "$(dirname "$window_file")/restart-storm-window.XXXXXX")"
-  window_secs="${RESTART_STORM_WINDOW_SECS:-30}"
+  window_secs="${RESTART_STORM_WINDOW_SECS:-120}"
   {
     if [[ -f "$window_file" ]]; then
       awk -F '\t' -v now="$now_epoch" -v window="$window_secs" '
@@ -14899,7 +14899,7 @@ restart_storm_window_stats() {
 
 restart_storm_signal_reason_for_window() {
   local restart_count="$1" process_peak="$2"
-  if (( ${restart_count:-0} >= ${RESTART_STORM_COUNT:-4} )); then
+  if (( ${restart_count:-0} >= ${RESTART_STORM_COUNT:-10} )); then
     printf 'restart_storm_count_threshold\n'
     return 0
   fi
@@ -14912,7 +14912,7 @@ restart_storm_signal_reason_for_window() {
 
 record_restart_storm_signal() {
   local project="$1" signal_reason="$2" restart_count="$3" process_peak="$4"
-  LAST_RESTART_STORM_WINDOW_SECS="${RESTART_STORM_WINDOW_SECS:-30}"
+  LAST_RESTART_STORM_WINDOW_SECS="${RESTART_STORM_WINDOW_SECS:-120}"
   LAST_RESTART_STORM_COUNT="${restart_count:-0}"
   LAST_PROCESS_CHURN_PEAK="${process_peak:-0}"
   LAST_RESTART_STORM_SIGNAL_AT="$(current_timestamp_utc_for_machine)"
@@ -14920,6 +14920,28 @@ record_restart_storm_signal() {
   LAST_RESTART_STORM_ESCALATED_AT="$LAST_RESTART_STORM_SIGNAL_AT"
   LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"
   write_manager_bootstrap_handoff "$project" "restart_storm_detected" "${LAST_ACTIVE_SLOT:-unknown}" "${LAST_ACTIVE_SLOT:-unknown}" "$signal_reason" "inspect-runtime-restart-storm-before-relaunch"
+}
+
+record_supervisor_death_for_storm_window() {
+  # Storm-window accounting for supervisor lifecycle churn. Lives on the
+  # ensure-manager (watchdog) side rather than the dying supervisor's EXIT
+  # trap: signal-context file I/O in a dying process is unreliable, and a
+  # murdered process cannot observe its own death anyway. Called when the
+  # watchdog tears a supervisor down or relaunches after a non-operator exit.
+  local project="$1" now_epoch stats restart_count process_peak signal_reason
+  now_epoch="$(runtime_now_epoch)"
+  update_restart_storm_window "$project" "$now_epoch" "$(runtime_active_process_count_for_project "$project")"
+  stats="$(restart_storm_window_stats "$project")"
+  restart_count="${stats%%|*}"
+  process_peak="${stats##*|}"
+  if signal_reason="$(restart_storm_signal_reason_for_window "$restart_count" "$process_peak")"; then
+    record_restart_storm_signal "$project" "$signal_reason" "$restart_count" "$process_peak"
+    append_runtime_event "$project" "restart_storm_supervisor_churn_signal" \
+      "reason=$signal_reason" \
+      "count=$restart_count" \
+      "peak=$process_peak"
+  fi
+  return 0
 }
 
 write_session_handoff() {
@@ -19220,33 +19242,51 @@ ensure_manager_once() {
   # The supervisor touches supervisor-heartbeat every ~2s via a background
   # subprocess.  If the heartbeat is stale, the supervisor is dead/stuck.
   # No ai.pid dependency, no file-IPC state inference, no grace layers.
-  local _hb_file _hb_timeout _hb_now _hb_epoch _hb_stale
+  local _hb_file _hb_timeout _hb_now _hb_epoch _hb_stale _hb_grace _sup_start_epoch
   _hb_file="$run_dir/supervisor-heartbeat"
   _hb_timeout="${SUPERVISOR_HEARTBEAT_TIMEOUT_SECS:-120}"
+  _hb_grace="${SUPERVISOR_STARTUP_HEARTBEAT_GRACE_SECS:-15}"
   if [[ -n "$current_pid" ]] && kill -0 "$current_pid" 2>/dev/null; then
     _hb_stale=0
+    _sup_start_epoch=$(file_mtime_epoch "$sup_pid_file" 2>/dev/null || echo 0)
+    _hb_now=$(date +%s)
     if [[ -f "$_hb_file" ]]; then
       _hb_epoch=$(file_mtime_epoch "$_hb_file" 2>/dev/null || echo 0)
-      _hb_now=$(date +%s)
-      if (( _hb_now - _hb_epoch > _hb_timeout )); then
+      if (( _sup_start_epoch > _hb_epoch )); then
+        # Heartbeat file predates this supervisor — stale leftover from a previous
+        # run, not evidence about the newborn. Grace the newborn from its own birth
+        # time (sup_pid_file mtime), mirroring the missing-file branch below.
+        if (( _hb_now - _sup_start_epoch > _hb_grace )); then
+          _hb_stale=1
+        fi
+      elif (( _hb_now - _hb_epoch > _hb_timeout )); then
         _hb_stale=1
       fi
     else
       # No heartbeat file yet — supervisor may be starting.  Give it a
-      # short grace (15s) for the first heartbeat to appear.
-      local _sup_start_epoch
-      _sup_start_epoch=$(file_mtime_epoch "$sup_pid_file" 2>/dev/null || echo 0)
-      _hb_now=$(date +%s)
-      if (( _hb_now - _sup_start_epoch > 15 )); then
+      # short grace for the first heartbeat to appear.
+      if (( _hb_now - _sup_start_epoch > _hb_grace )); then
         _hb_stale=1
       fi
     fi
     if [[ "$_hb_stale" == "0" ]]; then
       return 0
     fi
-    log_warn "supervisor heartbeat stale (>${_hb_timeout}s or missing), restarting (pid=$current_pid)"
-    kill "$current_pid" 2>/dev/null || true
-    sleep 1
+    # Stale heartbeat on a live supervisor. Daemon supervisors intentionally ignore
+    # a bare TERM (no stop marker), so a bare `kill` here either murders a newborn
+    # (pre-trap window) or gets ignored — after which launching a second daemon
+    # creates a dual-supervisor split brain. Use the verified teardown channel and
+    # confirm the process is actually gone before treating the slot as free.
+    log_warn "supervisor heartbeat stale (>${_hb_timeout}s, startup grace=${_hb_grace}s), tearing down (pid=$current_pid)"
+    record_supervisor_death_for_storm_window "$project"
+    restart_manager_supervisor_preserving_handoff "$project"
+    if kill -0 "$current_pid" 2>/dev/null; then
+      append_runtime_event "$project" "manager_watchdog_supervisor_kill_failed" \
+        "supervisor_pid=$current_pid" \
+        "reason=still_alive_after_teardown"
+      log_warn "supervisor pid=$current_pid still alive after teardown; skipping relaunch this tick"
+      return 0
+    fi
     current_pid=""
   fi
 
@@ -19288,6 +19328,12 @@ ensure_manager_once() {
   # the operator requested a permanent stop. Only operator_stop should persist.
   if [[ "$desired_state" == "stopped" && "$last_exit_reason" != "operator_stop" ]]; then
     write_workcell_state "$project" "running" "down" "down" "watchdog_restart"
+  fi
+  # Relaunch after a non-operator supervisor exit = lifecycle churn: feed the
+  # storm window so rapid relaunch loops become an observable signal instead of
+  # silent forever-restarts (watchdog-control-plane escalate contract).
+  if [[ -n "$last_exit_reason" && "$last_exit_reason" != "operator_stop" && "$desired_state" != "unknown" ]]; then
+    record_supervisor_death_for_storm_window "$project"
   fi
   append_lifecycle_trace "$project" "L240" "manager_launch_requested" \
     "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
@@ -22340,6 +22386,30 @@ start_project_runtime() {
   trap cleanup_supervisor EXIT
   trap 'request_stop INT' INT
   trap 'request_stop TERM' TERM
+  # ── Heartbeat subprocess: started EARLY (before doc gate / bridge init) so a
+  # newborn supervisor is never blind-windowed against ensure-manager's
+  # heartbeat-staleness check. Checks parent liveness so an orphaned heartbeat
+  # can't fool the watchdog. Pass supervisor PID explicitly — $$ inside () is
+  # the subshell's PID.
+  local _supervisor_pid=$$
+  _update_heartbeat "$PROJECT_ROOT"
+  (
+    while kill -0 $_supervisor_pid 2>/dev/null; do
+      _update_heartbeat "$PROJECT_ROOT"
+      _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
+      _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
+      _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true
+      _rotate_log "$PROJECT_ROOT/.freely/logs/lifecycle-trace.log" 2>/dev/null || true
+      _rotate_log "$PROJECT_ROOT/.freely/logs/runtime-events.log" 2>/dev/null || true
+      sleep 2
+    done
+  ) &
+  _heartbeat_bg_pid=$!
+  # Single merged EXIT trap: reap the heartbeat subprocess, then run supervisor
+  # cleanup. bash overwrites same-signal traps — two separate `trap ... EXIT`
+  # lines would silently drop cleanup_supervisor (that exact overwrite previously
+  # disabled cleanup for every supervisor that survived past bridge init).
+  trap 'kill $_heartbeat_bg_pid 2>/dev/null || true; cleanup_supervisor' EXIT
   exit_if_stop_requested_before_launch
   reconcile_control_plane_processes_for_active_runtime "$project"
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
@@ -22488,25 +22558,10 @@ ${_msg}" >/dev/null 2>&1 || true
     fi
   }
   trap '_on_supervisor_err $LINENO' ERR
-  # ── Heartbeat subprocess: keeps supervisor-heartbeat fresh while we wait ──
-  # Checks parent liveness so an orphaned heartbeat can't fool the watchdog.
-  # Pass supervisor PID explicitly — $$ inside () is the subshell's PID.
-  local _supervisor_pid=$$
-  (
-    while kill -0 $_supervisor_pid 2>/dev/null; do
-      _update_heartbeat "$PROJECT_ROOT"
-    _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
-    _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
-    _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true
-    _rotate_log "$PROJECT_ROOT/.freely/logs/lifecycle-trace.log" 2>/dev/null || true
-    _rotate_log "$PROJECT_ROOT/.freely/logs/runtime-events.log" 2>/dev/null || true
-
-      sleep 2
-    done
-  ) &
-  _heartbeat_bg_pid=$!
-  # Kill the heartbeat subprocess when the supervisor exits (belt and suspenders)
-  trap 'kill $_heartbeat_bg_pid 2>/dev/null || true' EXIT
+  # (Heartbeat subprocess is started early in the supervisor startup sequence —
+  # right after signal traps are installed — so the supervisor is heartbeat-live
+  # before doc gate / bridge init. See the merged EXIT trap there; do NOT add a
+  # second `trap ... EXIT` here: bash same-signal traps overwrite each other.)
 
   # Record manager presence in agent_working table.
   # Manager is created at daemon startup, not lazily. Single row: __manager__.
