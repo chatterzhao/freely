@@ -222,10 +222,27 @@ _extract_raw_key() {
 
 # ── Resolve branch from raw key ──
 _resolve_branch_from_raw_key() {
-  local raw_key="$1"
-  local matched
-  matched=$(git branch --list "fix/raw-${raw_key}-*" "feature/raw-${raw_key}-*" 2>/dev/null | sed 's/^[*+ ]*//' | head -1 || true)
-  echo "$matched"
+  local raw_key="$1" match_list _count first _shortest_count
+  match_list=$(git branch --list "fix/raw-${raw_key}-*" "feature/raw-${raw_key}-*" 2>/dev/null | sed 's/^[*+ ]*//' | sort -u || true)
+  if [[ -z "$match_list" ]]; then
+    match_list=$(git branch --list "*raw-${raw_key}-*" "*raw-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | grep -E "(^fix/|^feature/|^hotfix/)" | sort -u || true)
+  fi
+  _count=$(printf '%s
+' "$match_list" | grep -c . 2>/dev/null || echo 0)
+  if [[ "$_count" -eq 0 ]]; then return 0
+  elif [[ "$_count" -eq 1 ]]; then printf '%s
+' "$match_list"; return 0; fi
+  first=$(printf '%s
+' "$match_list" | awk '{print length, $0}' | sort -n | head -1 | cut -d' ' -f2-)
+  _shortest_count=$(printf '%s
+' "$match_list" | awk -v L="${#first}" 'length==L' | wc -l | tr -d ' ')
+  if [[ "$_shortest_count" -le 1 ]]; then printf '%s
+' "$first"; return 0; fi
+  echo "[closeout-gate] DENIED ambiguous: $_count branches matched, $_shortest_count at shortest length" >&2
+  printf '%s
+' "$match_list" | while read -r line; do echo "  candidate: $line" >&2; done
+  echo "  action: pass explicit branch name, or --force" >&2
+  exit 1
 }
 
 # ── Determine input from --raw-key ──
