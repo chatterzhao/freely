@@ -13262,12 +13262,17 @@ SESSIONEOF
   _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
   if [[ ! -S "$_manager_bridge_socket" ]]; then
     log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
-    local _worker_next_file
+    local _worker_next_file _fallback_own_key
     _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
     rm -f "$_worker_next_file"
+    # Ownership guard companions (raw-20260717T103359Z): identity key for
+    # wt-close foreign-guard + hard boundary laws prepended to the prompt.
+    _fallback_own_key="$(basename "$target_project" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || true)"
+    _prepend_worktree_boundary_laws "$prompt_file" "${_fallback_own_key:-unknown}"
     (
       cd "$target_project" 2>/dev/null || cd "$manager_project"
       export FREELY_ROLE_HINT=worker
+      export FREELY_AGENT_RAW_KEY="${_fallback_own_key:-}"
       export SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
       python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
         --agent "$_worker_base" \
@@ -14977,6 +14982,30 @@ record_restart_storm_signal() {
   LAST_RESTART_STORM_ESCALATED_AT="$LAST_RESTART_STORM_SIGNAL_AT"
   LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"
   write_manager_bootstrap_handoff "$project" "restart_storm_detected" "${LAST_ACTIVE_SLOT:-unknown}" "${LAST_ACTIVE_SLOT:-unknown}" "$signal_reason" "inspect-runtime-restart-storm-before-relaunch"
+}
+
+_prepend_worktree_boundary_laws() {
+  # Idempotently prepend hard worktree-boundary laws to a fallback worker
+  # prompt file. Fallback workers (agent CLI direct-launch) have removed other
+  # agents' worktrees and written straight into the protected develop root —
+  # three incidents on 2026-07-17. Prompt-level laws are one layer; wt-close
+  # ownership-guard is the hard backstop.
+  local prompt_file="$1" own_key="${2:-unknown}"
+  [[ -f "$prompt_file" ]] || return 0
+  grep -q "worktree-boundary-laws v1" "$prompt_file" 2>/dev/null && return 0
+  local _tmp; _tmp="$(mktemp)"
+  {
+    echo "<!-- worktree-boundary-laws v1 -->"
+    echo "## 工位边界铁律（违反=事故,不是偏好）"
+    echo "- 你的身份 key: ${own_key}。只允许写入下方 Worktree 声明的路径"
+    echo "- 禁止 wt-close / git worktree remove 任何非 ${own_key} 的工位"
+    echo "- 禁止在 project root(develop 受保护工作树)创建/修改任何文件"
+    echo "- 无法完成任务时: a2a-exit --state input-required 说明阻塞,保留工位原样退出"
+    echo ""
+    cat "$prompt_file"
+  } > "$_tmp"
+  mv "$_tmp" "$prompt_file"
+  return 0
 }
 
 record_supervisor_death_for_storm_window() {
@@ -22649,8 +22678,25 @@ print('ok')
     log_info "agent_working __manager__ write: status=${_aw_result:-empty}"
   fi
 
+  local _LAST_ROOT_DIRTY_FP=""
   while true; do
     _update_heartbeat "$PROJECT_ROOT"
+    # Protected-root taint detection (raw-20260717T103359Z): a fallback worker
+    # wrote straight into the develop working tree (8 I-* files) with nothing
+    # noticing. Advisory event only — recovery judgement stays with the manager.
+    local _root_dirty_fp
+    _root_dirty_fp="$(git -C "$PROJECT_ROOT" status --porcelain 2>/dev/null | head -5 | cksum | awk '{print $1}')"
+    if [[ -n "$(git -C "$PROJECT_ROOT" status --porcelain 2>/dev/null | head -1)" ]]; then
+      if [[ "$_root_dirty_fp" != "$_LAST_ROOT_DIRTY_FP" ]]; then
+        _LAST_ROOT_DIRTY_FP="$_root_dirty_fp"
+        append_runtime_event "$PROJECT_ROOT" "protected_root_dirty_detected" \
+          "supervisor_pid=$$" \
+          "fingerprint=$_root_dirty_fp" \
+          "sample=$(git -C "$PROJECT_ROOT" status --porcelain 2>/dev/null | head -1 | tr ' ' '_')"
+      fi
+    else
+      _LAST_ROOT_DIRTY_FP=""
+    fi
     _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
     _rotate_log "$PROJECT_ROOT/.freely/run/db-daemon.log" 2>/dev/null || true
     _rotate_log "$PROJECT_ROOT/.freely/run/watchdog-sse.log" 2>/dev/null || true

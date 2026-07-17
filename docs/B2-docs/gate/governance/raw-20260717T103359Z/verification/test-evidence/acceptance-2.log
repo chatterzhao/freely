@@ -1,2 +1,2 @@
-observed: foreign_blocked=0 self_blocked=0
-AT-002 FAIL: f=0 s=0
+observed: foreign_blocked=1 self_blocked=0
+AT-002 PASS

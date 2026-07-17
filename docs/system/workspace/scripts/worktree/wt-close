@@ -167,6 +167,40 @@ else
   set --
 fi
 
+# ── Ownership guard (raw-20260717T103359Z) ────────────────────────────────
+# Three production incidents (2026-07-17): fallback workers removed worktrees
+# with ZERO deliverables — twice their own assignment, once someone else's.
+# Two hard checks before any worktree-destroying action (--platform-only skips):
+#   1. unfinished guard: closing a key with no develop merge evidence requires
+#      --force --reason (existing semantics — no new bypass surface)
+#   2. foreign guard: FREELY_AGENT_RAW_KEY (exported by worker launch paths)
+#      differing from the target key requires --force
+_ownership_guard() {
+  local target_key="$1"
+  [[ "$PLATFORM_ONLY" == "true" ]] && return 0
+  [[ "$FORCE" == "true" ]] && return 0
+  if [[ -n "${FREELY_AGENT_RAW_KEY:-}" && "$FREELY_AGENT_RAW_KEY" != "$target_key" ]]; then
+    echo "[ownership-guard] BLOCKED (foreign/异主): 你的身份 key=$FREELY_AGENT_RAW_KEY ≠ 目标 key=$target_key" >&2
+    echo "  非自有工位不得关闭。确需代关: --force --reason "..."" >&2
+    exit 1
+  fi
+  # merge evidence: look for a Merge commit whose subject references the key
+  # branch pattern (merge of fix/raw-{key}-* or feature/raw-{key}-*)
+  if ! git log develop --oneline --grep "raw-${target_key}" 2>/dev/null | grep -qiE "^[0-9a-f]+ Merge.*raw-${target_key}"; then
+    local _b1_state=""
+    local _b1_file="docs/B1-docs/raw-${target_key}/issue.md"
+    if [[ -f "$_b1_file" ]]; then
+      _b1_state=$(grep -m1 "^phase_state:" "$_b1_file" 2>/dev/null | awk '{print $2}')
+    fi
+    if [[ "$_b1_state" != "dropped" ]]; then
+      echo "[ownership-guard] BLOCKED (unfinished/未完成): raw-$target_key 在 develop 无 merge 证据且非 dropped" >&2
+      echo "  零交付关工位是三次生产事故的根源。确认放弃: --force --reason "..."" >&2
+      exit 1
+    fi
+  fi
+  return 0
+}
+
 # ── Extract raw key from various formats ──
 # Supports: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ
 _extract_raw_key() {
@@ -202,6 +236,7 @@ if [[ -n "${RAW_KEY:-}" ]]; then
     echo "  Supported formats: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ" >&2
     exit 1
   fi
+  _ownership_guard "$_raw_key"
   if [[ "${PLATFORM_ONLY:-false}" == true ]]; then
     # --platform-only: skip branch resolution, use raw key directly for API close
     input="raw-${_raw_key}"

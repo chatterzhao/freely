@@ -1,1 +1,2 @@
-AT-004 FAIL: prepend 函数不存在
+observed: marker_count=1 laws=1 original_kept=1
+AT-004 PASS
