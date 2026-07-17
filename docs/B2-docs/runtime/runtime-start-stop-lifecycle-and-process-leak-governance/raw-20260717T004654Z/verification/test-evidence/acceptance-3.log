@@ -1,2 +1,2 @@
-observed: bridge_spawn_events=19 live_bridges=19 opencode=6 cline=6
-AT-003 FAIL: spawns=19 bridges=19 opencode=6 cline=6
+observed: bridge_spawn_events=1 live_bridges=1 opencode=0 cline=0
+AT-003 PASS: lazy-start 生效且无泄漏

@@ -1,2 +1,2 @@
-lazy_guard=0
-FAIL: 无守卫,非 manager 工具被无条件 ensure
+lazy_guard=1
+PASS: lazy 守卫在位

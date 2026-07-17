@@ -1,2 +1,2 @@
-orphan_reap=0 warmup_grace=0
-FAIL: reap=0 warmup=0
+orphan_reap=1 warmup_grace=1 no_fallthrough=1
+PASS: 回收+暖机+无吞噬在位

@@ -22,10 +22,10 @@
 - expected_output: "PASS: 回收+暖机+无吞噬在位"
 - expected_RED_output: "FAIL: reap=0 warmup=0"
 - actual_RED_output: orphan_reap=0 warmup_grace=0 → FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: orphan_reap=1 warmup_grace=1 no_fallthrough=1 → PASS: 回收+暖机+无吞噬在位
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 fall-through 只 rm 文件不杀进程、无暖机宽限，断言必 FAIL
 
@@ -46,10 +46,10 @@
 - expected_output: "PASS: lazy 守卫在位"
 - expected_RED_output: "FAIL: 无守卫,非 manager 工具被无条件 ensure"
 - actual_RED_output: lazy_guard=0 → FAIL: 无守卫
-- actual_output: (GREEN 后填写)
+- actual_output: lazy_guard=1 → PASS: lazy 守卫在位
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 cycle ensure 块无条件遍历三工具，断言必 FAIL
 
@@ -66,10 +66,10 @@
 - expected_output: "AT-003 PASS: lazy-start 生效且无泄漏"
 - expected_RED_output: "AT-003 FAIL: spawns>=3（三工具 eager 启动，2026-07-17 每次启动实测 3-4 次 spawn 事件）"
 - actual_RED_output: observed: bridge_spawn_events=19 live_bridges=19 opencode=6 cline=6 → AT-003 FAIL（单 supervisor 下 100s 泄漏 19 个 bridge,eager 启动 opencode/cline 各 6 个）
-- actual_output: (GREEN 后填写)
+- actual_output: observed: bridge_spawn_events=1 live_bridges=1 opencode=0 cline=0 → AT-003 PASS（对照 RED: 19 spawns→1）
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 今日所有启动周期均实测 3-4 个 acp_bridge_started（claude+opencode+cline eager），真实 daemon 启动即复现
 
@@ -101,5 +101,5 @@
 1. AT-003
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-003 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-003 test-pre-merge 真实 daemon wait 模式 100s:spawn 1 次(仅 manager)、存活 bridge 1、opencode/cline 0;对照 RED 19 spawns
