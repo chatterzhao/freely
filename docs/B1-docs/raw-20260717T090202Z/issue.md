@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: gitee
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 回归（raw-20260717T004620Z lane 的 C4-fix-2 引入,自查发现）
