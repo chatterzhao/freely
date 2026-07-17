@@ -13901,6 +13901,10 @@ _ai_shows_liveness() {
 _ai_shows_liveness_acp() {
   local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
   local now debug_log debug_mtime
+  # Derive base_tool safely — this function runs in ensure-manager context where
+  # base_tool is not otherwise bound (set -u would kill Signal 3 silently).
+  local base_tool="${AGENT_AI_TOOL%%-*}"
+  base_tool="${base_tool:-claude}"
   now="$(date +%s)"
 
   # Signal 1: debug log mtime
@@ -13916,7 +13920,10 @@ _ai_shows_liveness_acp() {
   if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
     local proc_state
     proc_state=$(ps -o state= -p "$ai_pid" 2>/dev/null | tr -d ' ')
-    if [[ "$proc_state" == "R" || "$proc_state" == "S" ]]; then
+    # Prefix match: macOS annotates states (SN = niced sleep, S+ = foreground,
+    # Ss = session leader). Daemon-spawned processes are niced — an exact R/S
+    # match mis-judges a perfectly alive SN process as dead.
+    if [[ "$proc_state" == R* || "$proc_state" == S* ]]; then
       # Check for fatal errors before returning active — a process that
       # is technically alive but stuck on unrecoverable errors is not healthy.
       _acp_bridge_has_fatal_error "$project" && return 1
@@ -14015,7 +14022,10 @@ _ai_shows_liveness_pid_signals() {
   if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
     local proc_state
     proc_state=$(ps -o state= -p "$ai_pid" 2>/dev/null | tr -d ' ')
-    if [[ "$proc_state" == "R" || "$proc_state" == "S" ]]; then
+    # Prefix match: macOS annotates states (SN = niced sleep, S+ = foreground,
+    # Ss = session leader). Daemon-spawned processes are niced — an exact R/S
+    # match mis-judges a perfectly alive SN process as dead.
+    if [[ "$proc_state" == R* || "$proc_state" == S* ]]; then
       return 0
     fi
   fi
