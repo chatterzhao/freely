@@ -43,3 +43,18 @@
 - milestone: M-20260717T084757Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T084757Z/issues/I-20260717T084757Z-A.md
+
+## M-20260717T103359Z-A
+- title: fix — 工位所有权三道硬防线
+- status: active
+### candidate_issues
+1. `C-20260717T103359Z-A`
+- milestone: M-20260717T103359Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T103359Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260717T103359Z/issues/I-20260717T103359Z-A.md
+### committed_issues
+1. `I-20260717T103359Z-A`
+- milestone: M-20260717T103359Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/gate/governance/raw-20260717T103359Z/issues/I-20260717T103359Z-A.md
