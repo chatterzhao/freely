@@ -7,4 +7,4 @@
 - [x] D3: capability-lifecycle 监督面真源章 (AT-002)
 - [x] D4: watchdog SKILL 补 heartbeat/storm (AT-002)
 - [x] D5: AGENTS.md pre-init-runtime 纠错 (AT-004)
-- [ ] D6: deploy-skills + test 工位全量 GREEN
+- [x] D6: deploy-skills + test 工位全量 GREEN

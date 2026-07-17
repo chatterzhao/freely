@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS"
 - expected_RED_output: "AT-001 FAIL: 未注册 checkpoint: L090 L091 L092 L201 L202 ..."
 - actual_RED_output: AT-001 FAIL: 未注册 checkpoint: L091 L092 L202 L211 L212 L225 L231 L232 L332 L333 L334 L335 L336
-- actual_output: (GREEN 后填写)
+- actual_output: AT-001 PASS: 全部 29 个 checkpoint 已注册
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — §11 现只注册 9 个 checkpoint，脚本对照必列出缺失清单
 
@@ -48,10 +48,10 @@
 - expected_output: "AT-002 PASS: 全部锚点在位"
 - expected_RED_output: "miss: heartbeat@CL ... AT-002 FAIL"
 - actual_RED_output: 8 项锚点全缺(heartbeat/新生宽限/warmup/task_mode wait/AI_MODE/storm@SKILL/heartbeat@SKILL/LoopGuard) → AT-002 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: AT-002 PASS: 全部锚点在位
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 审计确认全部锚点缺失，grep 组必 FAIL
 
@@ -68,10 +68,10 @@
 - expected_output: "AT-003 PASS"
 - expected_RED_output: "AT-003 FAIL: to/ok 仍为 UNSET/0"
 - actual_RED_output: L240_OUT: seq=22 ph=OUT me=A-L240 to=UNSET ok=0 ...（kill -9 猝死触发 watchdog 重拉,实抓）→ AT-003 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: L240_OUT: seq=28 ph=OUT me=A-L240 to=A-L010 ok=1 ...（kill -9 猝死→watchdog 重拉路径实抓）→ AT-003 PASS
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — L240 仅在 watchdog 重拉路径打点；harness 以 kill -9 猝死 supervisor 触发 ensure-manager 重拉复现（今日主仓 trace 中全部 L240 OUT 均 to=UNSET ok=0）
 
@@ -92,10 +92,10 @@
 - expected_output: "AT-004 PASS"
 - expected_RED_output: "AT-004 FAIL: ghost>=1"
 - actual_RED_output: ghost_refs=1 agent_table_refs=0 → AT-004 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: ghost_refs=0 agent_table_refs=1 → AT-004 PASS
 - evidence_file: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — AGENTS.md L98 现引用该幽灵命令（2026-07-16 test 工位实测 unknown command）
 
@@ -125,5 +125,5 @@
 1. AT-003
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-003 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-003 在 test-pre-merge 真实 daemon 以 kill -9 猝死触发 watchdog 重拉,实抓 L240 OUT to=A-L010 ok=1
