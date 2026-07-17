@@ -7771,3 +7771,18 @@
 - milestone: M-20260717T004721Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/issues/I-20260717T004721Z-A.md
+
+## M-20260716T114802Z-A
+- title: fix — stall 误判复发（liveness 兜底链 S2/S3 失效）
+- status: active
+### candidate_issues
+1. `C-20260716T114802Z-A`
+- milestone: M-20260716T114802Z-A
+- status: promoted
+- promoted_issue_id: I-20260716T114802Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/issues/I-20260716T114802Z-A.md
+### committed_issues
+1. `I-20260716T114802Z-A`
+- milestone: M-20260716T114802Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/issues/I-20260716T114802Z-A.md
