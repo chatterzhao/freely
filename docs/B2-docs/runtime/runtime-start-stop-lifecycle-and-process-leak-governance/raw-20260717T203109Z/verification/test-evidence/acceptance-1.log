@@ -1,0 +1,4 @@
+  g1-foreign-merged: ok ([closeout-gate] foreign raw-20260717T004620Z has merge/dropped — allowing sweep)
+  g2-self-unfinished: ok ([closeout-gate] self-owned raw-20260717T999998Z: no merge evidence, zero agent activity — allowing close)
+  g3-foreign-unfinish: ok ([closeout-gate] DENIED foreign unfinished raw-20260717T999998Z)
+AT001_RESULT: PASS

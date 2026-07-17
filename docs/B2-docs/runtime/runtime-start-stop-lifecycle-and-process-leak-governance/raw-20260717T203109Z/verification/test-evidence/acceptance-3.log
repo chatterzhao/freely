@@ -1,0 +1,2 @@
+  get keys: ['branch', 'created_at', 'manager_id', 'raw_key', 'reviewer_id', 'slot', 'test_branch', 'test_worktree', 'updated_at', 'worker_id', 'worktree']
+AT003_RESULT: PASS

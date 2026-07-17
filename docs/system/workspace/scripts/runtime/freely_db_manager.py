@@ -1519,7 +1519,7 @@ def h_aw_get(daemon: DbDaemon, params: dict) -> dict:
     """agent_list_by_raw_key: return full row as dict."""
     row = daemon.conn.execute("SELECT * FROM agent_working WHERE raw_key = ?", (params["raw_key"],)).fetchone()
     if not row: return {"row": {}}
-    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    cols = [d[1] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
     return {"row": dict(zip(cols, row))}
 
 
@@ -1546,7 +1546,7 @@ def h_aw_cleanup_stale(daemon: DbDaemon, params: dict) -> dict:
 @_h("agent_working.get_all")
 def h_aw_get_all(daemon: DbDaemon, params: dict) -> dict:
     rows = daemon.conn.execute("SELECT * FROM agent_working").fetchall()
-    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    cols = [d[1] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 @_h("agent_working.stats")

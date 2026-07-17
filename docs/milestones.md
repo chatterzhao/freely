@@ -73,3 +73,18 @@
 - milestone: M-20260717T124926Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/issues/I-20260717T124926Z-A.md
+
+## M-20260717T203109Z-A
+- title: fix — wt-close autonomous gate 收尾（静默退出/merge 竞态/RPC 数字键根修）
+- status: active
+### candidate_issues
+1. `C-20260717T203109Z-A`
+- milestone: M-20260717T203109Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T203109Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/issues/I-20260717T203109Z-A.md
+### committed_issues
+1. `I-20260717T203109Z-A`
+- milestone: M-20260717T203109Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/issues/I-20260717T203109Z-A.md
