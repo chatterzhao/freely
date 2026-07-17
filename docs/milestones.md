@@ -7786,3 +7786,18 @@
 - milestone: M-20260716T114802Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/issues/I-20260716T114802Z-A.md
+
+## M-20260717T004654Z-A
+- title: fix — ACP bridge 孤儿回收 + 暖机宽限 + lazy-start 守卫
+- status: active
+### candidate_issues
+1. `C-20260717T004654Z-A`
+- milestone: M-20260717T004654Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T004654Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/issues/I-20260717T004654Z-A.md
+### committed_issues
+1. `I-20260717T004654Z-A`
+- milestone: M-20260717T004654Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/issues/I-20260717T004654Z-A.md

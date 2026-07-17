@@ -1,0 +1,2 @@
+observed: bridge_spawn_events=1 live_bridges=1 opencode=0 cline=0
+AT-003 PASS: lazy-start 生效且无泄漏
