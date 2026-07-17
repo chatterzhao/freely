@@ -1,0 +1,4 @@
+  rounds passed: 0/3
+AT002_RESULT: FAIL
+    [closeout-gate] DENIED foreign unfinished raw-20260717T004620Z
+      action: owner close, batch-reconcile, or --force

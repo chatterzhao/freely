@@ -1,0 +1,6 @@
+  --force description lacks autonomous-gate wording
+      --force            永久丢弃。必须配合 --raw-key 和 --reason。
+      --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
+    
+      ── 仅操作平台，不管本地 ──
+AT005_RESULT: FAIL
