@@ -7831,3 +7831,33 @@
 - milestone: M-20260717T041435Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/issues/I-20260717T041435Z-A.md
+
+## M-20260715T121608Z-A
+- title: fix — 历史状态批量收敛（承载 raw-20260715T121608Z + raw-20260715T122119Z）
+- status: active
+### candidate_issues
+1. `C-20260715T121608Z-A`
+- milestone: M-20260715T121608Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T121608Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260715T121608Z/issues/I-20260715T121608Z-A.md
+### committed_issues
+1. `I-20260715T121608Z-A`
+- milestone: M-20260715T121608Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20260715T121608Z/issues/I-20260715T121608Z-A.md
+
+## M-20260612T000223Z-A
+- title: fix — gate crash on missing source_candidate（历史补锚：candidate promoted 未入队欠账收敛）
+- status: active
+### candidate_issues
+1. `C-20260612T000223Z-A`
+- milestone: M-20260612T000223Z-A
+- status: promoted
+- promoted_issue_id: I-20260612T000223Z-A
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20260612T000223Z/issues/issues/I-20260612T000223Z-A.md
+### committed_issues
+1. `I-20260612T000223Z-A`
+- milestone: M-20260612T000223Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20260612T000223Z/issues/issues/I-20260612T000223Z-A.md
