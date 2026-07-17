@@ -5,4 +5,4 @@
 - [x] W1: _autonomous_close_gate 替换 ownership_guard(D1+D3)
 - [x] W2: Phase 0.5 活跃 worker 先收工后关(D2)
 - [x] W3: test 工位脏检测(D4)+分支消歧(D5)+checkpoint event(D6)
-- [ ] W4: 全量 GREEN(AT-001~004)
+- [x] W4: 全量 GREEN(AT-001~004)

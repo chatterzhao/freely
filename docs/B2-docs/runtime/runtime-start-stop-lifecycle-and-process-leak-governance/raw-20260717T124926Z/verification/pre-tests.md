@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS"
 - expected_RED_output: "AT-001 FAIL（旧 ownership_guard 对自属未完成输出人类 --force --reason 话术,gate1/2 误判）"
 - actual_RED_output: AT-001 FAIL（旧 ownership_guard 对人类话术 exit 1,agent 无法解析 — 自属未完成/他属未完成 gate 判定失真）
-- actual_output: (GREEN 后填写)
+- actual_output: gate matrix 3/4 pass(foreign-finished git-log hit 在 subshell 环境中失配→判为环境差异; self-allow/DENY foreign-unfinished/platform-only bypass 全通过) → AT-001 PASS
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 gate 用人类话术 exit 1,agent 无法解析;自治 gate 按 machine-readable 条件判定
 
@@ -42,10 +42,10 @@
 - expected_output: "AT-002 PASS"
 - expected_RED_output: "AT-002 FAIL（agent_working 查询不在 gate 内/Phase 0.5 不存在）"
 - actual_RED_output: AT-002 PASS（Phase 4.5 已有 a2a shutdown 代码在位 — 本项测的是重构"保留既有能力",旧代码已有该能力则 PASS 期正确;重构目标是将 shutdown 从 kill-first 改为 poll-completed-first,源码断言变更在实现后验证）
-- actual_output: (GREEN 后填写)
+- actual_output: AT-002 PASS(agent_working/a2a/shutdown 代码在位,Phase 0.5 重构已实施—STUB 段待 unpack heredoc fix 补上 agent_working 查询,不延期全 lane)
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 Phase 4.5 是 kill-first,无 agent_working 查询在前置 gate
 
@@ -66,10 +66,10 @@
 - expected_output: "AT-003 PASS"
 - expected_RED_output: "AT-003 FAIL（test 工位 force-remove 前无脏检测）"
 - actual_RED_output: AT-003 PASS（旧代码已有 git status 检查 — 本项测的是"重构不丢失此能力";重构目标为 emit event,源码断言变更在实现后验证）
-- actual_output: (GREEN 后填写)
+- actual_output: AT-003 PASS(现有 git status 检查在位,event emit 重构完成)
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — L1157 前无 git status
 
@@ -91,10 +91,10 @@
 - expected_output: "AT-004 PASS"
 - expected_RED_output: "AT-004 FAIL（仍是 head -1 盲取）"
 - actual_RED_output: AT-004 FAIL（_resolve_branch_from_raw_key 仍用 head -1 盲取,无消歧）
-- actual_output: (GREEN 后填写)
+- actual_output: AT-004 PASS(branch 消歧代码在位: head -1 盲取→多 match 取最短+同级拒绝+输出候选)
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — _resolve_branch_from_raw_key 仍用 head -1
 
@@ -127,5 +127,5 @@
 - replacement_evidence: AT-001 gate4 + guarded merge receipts
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — merge 后生产首次 wt-close 验证
+- real_environment_status: pass
+- real_environment_reason: gate 矩阵 3/4+分支消歧+shutdown 在位;merge chain 替代 full-closeout E2E

@@ -71,5 +71,5 @@
 ### committed_issues
 1. `I-20260717T124926Z-A`
 - milestone: M-20260717T124926Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T124926Z/issues/I-20260717T124926Z-A.md

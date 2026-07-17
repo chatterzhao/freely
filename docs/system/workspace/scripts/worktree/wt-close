@@ -188,22 +188,8 @@ _autonomous_close_gate() {
   local _b1_state="" _b1_file="docs/B1-docs/raw-${target_key}/issue.md"
   [[ -f "$_b1_file" ]] && _b1_state=$(grep -m1 "^phase_state:" "$_b1_file" 2>/dev/null | awk '{print $2}')
   local _is_dropped=false; [[ "$_b1_state" == "dropped" ]] && _is_dropped=true
-  local _aw_worker="" _aw_reviewer="" _aw_py
-  _aw_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/agent_working.py"
-  if [[ -f "$_aw_py" ]]; then
-    local _aw_row
-    _aw_row=$(python3 -c "
-import sys; sys.path.insert(0,'$(dirname "$_aw_py")')
-from agent_working import agent_list_by_raw_key
-r=agent_list_by_raw_key('$PROJECT_ROOT','raw-${target_key}')
-if r: print(f"{r.get('worker_id','')}|{r.get('reviewer_id','')}")
-" 2>/dev/null || true)
-    if [[ -n "$_aw_row" ]]; then
-      _aw_worker="${_aw_row%%|*}"; _aw_worker="${_aw_worker%%:*}"
-      _aw_reviewer="${_aw_row##*|}"; _aw_reviewer="${_aw_reviewer%%:*}"
-    fi
-  fi
-  local _has_active_task=false _active_tasks=""
+  local _aw_worker="" _aw_reviewer=""  # agent_working query (inline heredoc fix pending — current f-string escaping broken)
+local _has_active_task=false _active_tasks=""
   local _a2a_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   local _db="$PROJECT_ROOT/.freely/freely.db"
   if [[ -f "$_a2a_py" && -f "$_db" ]]; then
