@@ -244,6 +244,6 @@ event=worker_launch_failed task_id=<id> reason=<reason>
 
 | 缺口 | 现状 | 契约条款 | 状态 |
 |------|------|---------|------|
-| `A-L041` 发出时机 | 实测于 cycle 收尾阶段发出（2026-07-16 实测晚于 ai_launch_begin 94s），非"启动后立即确认"语义 | §8（stage 语义稳定） | open — 涉 monitor 结构，待独立 lane |
-| `A-L042` OUT `to=` | 打印候选集 `A-L020\|A-L090\|...` 而非实际选中的下一跳 | §4（to=actual next） | open — 实际下一跳在 L042 之后才决策，需重排打点归属层 |
-| `A-L090`/`A-L092` OUT `to=UNSET` | 清理链未声明下一跳（desired=running 时实际为重拉控制面） | §5 | open |
+| `A-L041` 发出时机 | 后台观察者于 monitor pid-file 首活时发出（≤60s 观察窗，超时显式缺席） | §8 | resolved (raw-20260717T062449Z) |
+| `A-L042` OUT `to=` | 拆相：原位仅 IN，六个真实出口分支各打 OUT（continue→`A-L020`，exit→`TERM`）。语义修订：接力型下游由 `fr=A-L042` 的 IN 记录（L201/L210/L230/L240 属外部进程决策，supervisor 不代打） | §4/§8 | resolved (raw-20260717T062449Z) |
+| `A-L090`/`A-L092` OUT `to=UNSET` | L090 拆相（分支出口 to=L091/L092）；L092 按 desired_state 声明 to=L240/TERM；L091 to=TERM | §5 | resolved (raw-20260717T062449Z) |

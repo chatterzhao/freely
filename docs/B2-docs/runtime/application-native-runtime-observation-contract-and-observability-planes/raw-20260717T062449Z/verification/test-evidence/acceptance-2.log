@@ -1,0 +1,3 @@
+observed L090: 2026-07-17T06:48:02Z seq=34 ph=OUT me=A-L090 to=A-L092 ok=1 checkpoint=L090 stage=supervisor_cleanup_begin supervisor_pid=3757
+observed L092: 2026-07-17T06:48:02Z seq=36 ph=OUT me=A-L092 to=TERM ok=1 checkpoint=L092 stage=supervisor_cleanup_complete supervisor_pid=3757 desired_state=stopped exit_reason=operator_stop next=stopped
+AT-002 PASS
