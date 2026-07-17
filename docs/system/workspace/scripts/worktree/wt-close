@@ -292,7 +292,7 @@ if [[ -n "${RAW_KEY:-}" ]]; then
     echo "  Supported formats: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ" >&2
     exit 1
   fi
-  _ownership_guard "$_raw_key"
+  _autonomous_close_gate "$_raw_key"
   if [[ "${PLATFORM_ONLY:-false}" == true ]]; then
     # --platform-only: skip branch resolution, use raw key directly for API close
     input="raw-${_raw_key}"
