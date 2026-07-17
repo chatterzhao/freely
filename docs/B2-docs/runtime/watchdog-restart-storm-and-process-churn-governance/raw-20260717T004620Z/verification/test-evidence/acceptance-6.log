@@ -1,0 +1,2 @@
+peak=10 cfg_count=10 fallback_count=4
+FAIL: peak=10 cfg=10 fb=4

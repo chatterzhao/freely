@@ -7741,3 +7741,18 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/daemon/raw-20260716T031047Z/issues/I-20260716T031047Z-A.md
 ### completed_issues
+
+## M-20260717T004620Z-A
+- title: fix — supervisor 生死判定一体收口（heartbeat 宽限 + teardown 语义 + storm 观测）
+- status: active
+### candidate_issues
+1. `C-20260717T004620Z-A`
+- milestone: M-20260717T004620Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T004620Z-A
+- promoted_issue_path: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/issues/I-20260717T004620Z-A.md
+### committed_issues
+1. `I-20260717T004620Z-A`
+- milestone: M-20260717T004620Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/issues/I-20260717T004620Z-A.md

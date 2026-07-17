@@ -1,0 +1,2 @@
+observed: ignored_TERM=1 supervisor_started=1 daemon_run_procs=2 cleanups=0
+AT-001 FAIL: ignored=1 starts=1 daemon_runs=2 cleanups=0

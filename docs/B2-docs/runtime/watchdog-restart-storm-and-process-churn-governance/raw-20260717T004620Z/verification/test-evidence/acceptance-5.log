@@ -1,0 +1,3 @@
+part-a FAIL: record_supervisor_death_for_storm_window 函数不存在
+part-b FAIL: 10 次记录后 storm reason 为空(阈值不可达或记录未生效)
+AT-005 FAIL
