@@ -1,0 +1,2 @@
+L240_OUT: 2026-07-17T04:25:58Z seq=22 ph=OUT me=A-L240 to=UNSET ok=0 checkpoint=L240 stage=manager_launch_requested decision=none tool=claude-apikey-ds-flash-auto next=launch_manager_supervisor
+AT-003 FAIL: to/ok 仍为 UNSET/0

@@ -1,0 +1,9 @@
+miss: heartbeat@CL
+miss: 新生宽限@CL
+miss: warmup@CL
+miss: task_mode wait 语义@CL
+miss: AI_MODE 区分@CL
+miss: storm 阈值@SKILL
+miss: heartbeat@SKILL
+miss: Loop Guard@CL
+AT-002 FAIL

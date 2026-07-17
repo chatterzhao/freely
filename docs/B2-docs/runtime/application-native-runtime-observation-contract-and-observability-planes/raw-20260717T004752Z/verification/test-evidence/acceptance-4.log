@@ -1,0 +1,2 @@
+ghost_refs=1 agent_table_refs=0
+AT-004 FAIL: ghost=1 table=0

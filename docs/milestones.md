@@ -7801,3 +7801,18 @@
 - milestone: M-20260717T004654Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T004654Z/issues/I-20260717T004654Z-A.md
+
+## M-20260717T004752Z-A
+- title: fix — 监督面观测真源对齐（文档批量 + L240 打点）
+- status: active
+### candidate_issues
+1. `C-20260717T004752Z-A`
+- milestone: M-20260717T004752Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T004752Z-A
+- promoted_issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/issues/I-20260717T004752Z-A.md
+### committed_issues
+1. `I-20260717T004752Z-A`
+- milestone: M-20260717T004752Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/issues/I-20260717T004752Z-A.md
