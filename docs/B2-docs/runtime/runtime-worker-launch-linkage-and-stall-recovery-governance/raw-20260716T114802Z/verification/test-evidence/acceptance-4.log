@@ -1,0 +1,2 @@
+observed: stall_triggers=0 ai_launched=1 ai_rc1_exits=0
+AT-004 PASS: 150s 窗口无 stall 误触发
