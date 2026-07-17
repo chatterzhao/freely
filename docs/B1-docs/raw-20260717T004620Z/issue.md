@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 现象（2026-07-16 全天 493 次 supervisor_cleanup，storm 三次，runtime 不可用 9 小时）
