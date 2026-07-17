@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 描述修正（2026-07-16 排查）
