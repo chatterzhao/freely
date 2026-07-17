@@ -1,0 +1,2 @@
+observed: sse_false_clears=1 supervisor_started=1
+AT-003 FAIL: clears=1 starts=1

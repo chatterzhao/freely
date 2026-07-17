@@ -7756,3 +7756,18 @@
 - milestone: M-20260717T004620Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/issues/I-20260717T004620Z-A.md
+
+## M-20260717T004721Z-A
+- title: fix — sse pid 校验参数顺序对齐家族约定
+- status: active
+### candidate_issues
+1. `C-20260717T004721Z-A`
+- milestone: M-20260717T004721Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T004721Z-A
+- promoted_issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/issues/I-20260717T004721Z-A.md
+### committed_issues
+1. `I-20260717T004721Z-A`
+- milestone: M-20260717T004721Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/issues/I-20260717T004721Z-A.md
