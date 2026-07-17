@@ -291,3 +291,46 @@ dev:             │           └── implement→evidence ──────
 [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 （跳过 B1、B2。test 不可跳过，即使是纯文档也必须验证）
 ```
+
+## Runtime 监督面机制真源（2026-07-17 与实现对齐）
+
+本章镜像 `docs/system/workspace/scripts/runtime/freely` 的现行监督机制。修改这些机制的 lane 必须同步本章。
+
+### Supervisor 存活检测：heartbeat（替代已废除的 L220-L240 grace chain）
+
+- supervisor 启动后（信号 trap 安装后、doc gate / bridge init 之前）立即同步 touch `.freely/run/supervisor-heartbeat` 并启动后台子进程每 2s 续 touch；子进程以 `kill -0 父进程` 自检，父死自灭
+- `ensure-manager` 以 heartbeat mtime 判活：超时 `SUPERVISOR_HEARTBEAT_TIMEOUT_SECS`（默认 120s）
+- **新生宽限**：heartbeat 文件缺失，或其 mtime 早于 `supervisor.pid`（上代遗留），以 supervisor 自身出生时间起算宽限 `SUPERVISOR_STARTUP_HEARTBEAT_GRACE_SECS`（默认 15s），绝不因上代 stale 债处决新生 supervisor
+- 判死动作走 `restart_manager_supervisor_preserving_handoff`（TERM→等待→KILL 兜底）并以 `kill -0` 验证消亡后才重拉；不可杀时记 `manager_watchdog_supervisor_kill_failed` 并跳过本 tick（防双 daemon）——daemon supervisor 有意忽略无 stop-marker 的裸 TERM（operator-stop 区分，raw-20260711T100936Z）
+- supervisor 的 EXIT trap 为单一合并 handler（heartbeat 子进程回收 + cleanup_supervisor）；bash 同信号 trap 后写覆盖前写，禁止再加第二条 `trap ... EXIT`
+
+### ACP Bridge 生命周期（lazy-start / warmup / 回收 / idle-sleep / auto-wake）
+
+- daemon 启动只 eager 启动 manager base_tool 的 bridge；worker/reviewer 工具在首次委派时 auto-wake（`_sync_project_tooling`）
+- 主循环 per-cycle ensure 带 **lazy-start 守卫**：非 manager 且无 pid 文件（未被 auto-wake 启动过）的工具跳过，不 eager 重生
+- 复用判定顺序：bin 变更→重启；base tool 变更→重启；同 tool→健康检查（5s socket initialize 探针，bridge 从缓存应答）；健康检查失败但 bridge 龄 < `ACP_BRIDGE_WARMUP_GRACE_SECS`（默认 20s）→ warming 复用（ACP server 冷启动 ~8s）
+- 判定需重生时，先 `terminate_pid_with_graceful_wait` 回收存活旧 pid 再删跟踪文件（防孤儿泄漏）
+- bridge 自身 idle 监视：`ACP_IDLE_TIMEOUT`（180s）+ `ACP_IDLE_SHUTDOWN_GRACE`（30s）＝约 210s 无活动自关（有活跃 session/prompt 时跳过）
+
+### task_mode 三态语义（daemon 运行模式；与 AI_MODE 区分）
+
+| 模式 | 主循环行为 |
+|------|-----------|
+| `auto` | 全功能：scan → prompt build（A-L020）→ AI launch → patrol |
+| `wait` | `sleep CHECK_INTERVAL(10s) + continue`——**跳过 prompt build 与 AI launch**，静默轮询 |
+| `listen` | 每轮仅 scan；发现 ready item **自动切回 auto**；否则 sleep `LISTEN_INTERVAL`(300s) |
+| `id:<scan-id>` | 单任务过滤 |
+
+`AI_MODE`（交互姿态，auto/step，默认 auto）与 `task_mode`（默认 wait）是两个独立轴（raw-20260715T063959Z）。daemon start 未显式传 `--task-mode` 时为 wait——不启动 AI 是设计内行为。
+
+### Restart storm / churn 观测（现行阈值）
+
+- 窗口 `RESTART_STORM_WINDOW_SECS=120`，计数阈值 `RESTART_STORM_COUNT=10`，进程峰值阈值 `PROCESS_CHURN_PEAK=3`（计数口径 supervisor+dispatcher+ai，上限 3）
+- 记录点：AI 周期完成处 + **ensure-manager 侧 supervisor 死亡/teardown/非 operator 重拉处**（`record_supervisor_death_for_storm_window`，不在 dying process 的 EXIT trap 内写文件）
+- 阈值命中 → `record_restart_storm_signal` → manager bootstrap handoff + `restart_storm_supervisor_churn_signal` 事件；信号 advisory，terminal judgement 归 manager（watchdog-control-plane 契约）
+
+### Loop Guard（L0-L3 防呆层）
+
+- L0：fresh launch storm（`LOOP_GUARD_L0_WINDOW_SECS=300` 内 fresh 启动 ≥`LOOP_GUARD_L0_FRESH_THRESHOLD=3`）
+- L1：action 指纹停滞；L2：token 浪费；L3：硬预算上限
+- 详见 runtime 源码 `_loop_guard_*`；命中动作为 task_mode 门控切换，不直接杀进程

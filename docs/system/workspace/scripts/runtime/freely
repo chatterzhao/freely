@@ -19365,7 +19365,8 @@ ensure_manager_once() {
   append_lifecycle_trace "$project" "L240" "manager_launch_requested" \
     "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
     "tool=${AGENT_AI_TOOL:-unknown}" \
-    "next=launch_manager_supervisor"
+    "next=launch_manager_supervisor" \
+    "expected_next=L010"
   launch_manager_supervisor "$project"
   log_info "manager bootstrap requested"
 }
