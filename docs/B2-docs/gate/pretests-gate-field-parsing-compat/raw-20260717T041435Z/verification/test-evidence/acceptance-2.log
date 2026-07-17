@@ -1,4 +1,1 @@
-bare 解析失败: got=- verification_artifact_dir: docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews
-double 解析失败: got=- verification_artifact_dir: "docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews"
-backtick 解析失败: got=- verification_artifact_dir: `docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews`
-AT-002 FAIL: 裸值格式解析出整行 (1/4)
+AT-002 PASS: 4/4 格式解析通过

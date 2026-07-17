@@ -4,4 +4,4 @@
 
 - [x] E1: pretests-gate extract 引号可选 (AT-001)
 - [x] E2: pr-review-guarded 取值兼容 (AT-002)
-- [ ] E3: 存量回归 + test 工位 GREEN (AT-003)
+- [x] E3: 存量回归 + test 工位 GREEN (AT-003)

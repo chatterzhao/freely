@@ -1,3 +1,1 @@
-single 解析失败: got="'docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews'"
-double 解析失败: got='"docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews"'
-AT-001 FAIL: quoted 格式解析失败 (2/4)
+AT-001 PASS: 4/4 格式解析通过

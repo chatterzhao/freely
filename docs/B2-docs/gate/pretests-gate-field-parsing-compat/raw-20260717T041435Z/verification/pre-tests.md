@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS: 4/4 格式解析通过"
 - expected_RED_output: "AT-001 FAIL: quoted 格式解析失败"
 - actual_RED_output: single/double 引号格式解析失败 → AT-001 FAIL (2/4)
-- actual_output: (GREEN 后填写)
+- actual_output: AT-001 PASS: 4/4 格式解析通过
 - evidence_file: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现 extract 只剥反引号，单/双引号格式必失配 RE
 
@@ -36,10 +36,10 @@
 - expected_output: "AT-002 PASS: 4/4 格式解析通过"
 - expected_RED_output: "AT-002 FAIL: 裸值格式解析出整行"
 - actual_RED_output: bare/double/backtick 解析出整行 → AT-002 FAIL (1/4)
-- actual_output: (GREEN 后填写)
+- actual_output: AT-002 PASS: 4/4 格式解析通过
 - evidence_file: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现 sed 只认单引号包裹，裸值必返回整行
 
@@ -56,10 +56,10 @@
 - expected_output: "AT-003 PASS: 存量双格式全通过"
 - expected_RED_output: "AT-003 FAIL（引号版被 gate 解析失配 或 无引号 bullet 被 review 解析成整行）"
 - actual_RED_output: gate 解析失配: I-20260717T004620Z-A.md got='...'(带引号) → AT-003 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: AT-003 PASS: 存量双格式全通过（引号版 I-20260717T004620Z-A + 双行版 I-20260717T004721Z-A 双解析器重放）
 - evidence_file: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 今日 lane A/C 双向拦截即实证；对已合并真实文件重放解析即复现
 
@@ -91,5 +91,5 @@
 1. AT-003
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-003 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-003 对 develop 已合并真实 I-* 文件（引号版+双行版）双解析器重放全通过
