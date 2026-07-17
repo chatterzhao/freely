@@ -19,6 +19,19 @@ _quiesce() {
   rm -f "$proj/.freely/run/stop.requested"
 }
 
+_top_level_daemon_runs() {
+  # 只数顶层 daemon-run：排除 argv 相同的 fork 子进程（如 heartbeat 子 shell，其
+  # PPID 在匹配集内）。真正的第二个 daemon（nohup+disown, PPID=1）仍会被计入。
+  local proj="$1" pids pid pp n=0
+  pids=$(pgrep -f "daemon-run --project $proj" 2>/dev/null || true)
+  for pid in $pids; do
+    pp=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d " ")
+    if [ -n "$pp" ] && printf "%s\n" $pids | grep -q "^$pp$"; then continue; fi
+    n=$((n+1))
+  done
+  echo "$n"
+}
+
 _quiesce "$P"
 EV="$P/.freely/logs/runtime-events.log"
 TR="$P/.freely/logs/lifecycle-trace.log"
@@ -36,7 +49,7 @@ done
 NEWEV="$(sed -n "$((M0+1)),\$p" "$EV")"
 NEWTR="$(sed -n "$((T0+1)),\$p" "$TR")"
 IGN=$(printf '%s\n' "$NEWEV" | grep -c "daemon_signal_ignored" || true)
-DRC=$(pgrep -f "daemon-run --project $P" | wc -l | tr -d ' ')
+DRC=$(_top_level_daemon_runs "$P")
 CHAIN=1
 for cp in L010 L020 L021 L022 L040; do
   printf '%s\n' "$NEWTR" | grep -q "checkpoint=$cp" || { CHAIN=0; echo "missing checkpoint: $cp"; }

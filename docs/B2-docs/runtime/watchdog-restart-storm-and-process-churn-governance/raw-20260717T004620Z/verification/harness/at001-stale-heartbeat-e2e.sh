@@ -20,6 +20,19 @@ _quiesce() {
   rm -f "$proj/.freely/run/stop.requested"
 }
 
+_top_level_daemon_runs() {
+  # 只数顶层 daemon-run：排除 argv 相同的 fork 子进程（如 heartbeat 子 shell，其
+  # PPID 在匹配集内）。真正的第二个 daemon（nohup+disown, PPID=1）仍会被计入。
+  local proj="$1" pids pid pp n=0
+  pids=$(pgrep -f "daemon-run --project $proj" 2>/dev/null || true)
+  for pid in $pids; do
+    pp=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d " ")
+    if [ -n "$pp" ] && printf "%s\n" $pids | grep -q "^$pp$"; then continue; fi
+    n=$((n+1))
+  done
+  echo "$n"
+}
+
 _quiesce "$P"
 EV="$P/.freely/logs/runtime-events.log"
 mkdir -p "$P/.freely/run" "$P/.freely/logs"; touch "$EV"
@@ -32,11 +45,11 @@ sleep 45
 NEW="$(sed -n "$((M0+1)),\$p" "$EV")"
 IGN=$(printf '%s\n' "$NEW" | grep -c "daemon_signal_ignored" || true)
 STARTS=$(printf '%s\n' "$NEW" | grep -c "event=supervisor_started" || true)
-DRC=$(pgrep -f "daemon-run --project $P" | wc -l | tr -d ' ')
+DRC=$(_top_level_daemon_runs "$P")
 CLEAN=$(printf '%s\n' "$NEW" | grep -c "event=supervisor_cleanup " || true)
 _quiesce "$P"
 echo "observed: ignored_TERM=$IGN supervisor_started=$STARTS daemon_run_procs=$DRC cleanups=$CLEAN"
-if [ "$IGN" -eq 0 ] && [ "$DRC" -le 1 ] && [ "$STARTS" -ge 1 ] && [ "$CLEAN" -le 1 ]; then
+if [ "$IGN" -eq 0 ] && [ "$DRC" -eq 1 ] && [ "$STARTS" -eq 1 ] && [ "$CLEAN" -eq 0 ]; then
   echo "AT-001 PASS: newborn survived stale heartbeat, single daemon"
 else
   echo "AT-001 FAIL: ignored=$IGN starts=$STARTS daemon_runs=$DRC cleanups=$CLEAN"
