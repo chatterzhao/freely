@@ -4,4 +4,4 @@
 
 - [x] S1: S2 进程态前缀匹配 (AT-001/002)
 - [x] S2: S3 base_tool 安全推导 (AT-002/003)
-- [ ] S3: test 工位全量 GREEN (AT-001~004)
+- [x] S3: test 工位全量 GREEN (AT-001~004)

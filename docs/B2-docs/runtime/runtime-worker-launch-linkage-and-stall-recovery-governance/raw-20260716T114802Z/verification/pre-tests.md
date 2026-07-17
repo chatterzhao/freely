@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS: niced 存活进程(state=SN)判活"
 - expected_RED_output: "AT-001 FAIL: niced 存活进程(state=SN)被判死(S2 精确匹配击穿)"
 - actual_RED_output: AT-001 FAIL: niced 存活进程(state=SN)被判死(S2 精确匹配击穿)
-- actual_output: (GREEN 后填写)
+- actual_output: AT-001 PASS: niced 存活进程(state=SN)判活
 - evidence_file: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 真实 nice -n 10 进程 ps 态为 SN，当前精确匹配 R/S 必判死（06:11:47 生产误杀同路径）
 
@@ -41,10 +41,10 @@
 - expected_output: "PASS: S2/S3 修复在位"
 - expected_RED_output: "FAIL: prefix=0 basetool=0"
 - actual_RED_output: prefix_match=0 base_tool_derived=0 → FAIL: prefix=0 basetool=0
-- actual_output: (GREEN 后填写)
+- actual_output: prefix_match=1 base_tool_derived=1 → PASS: S2/S3 修复在位
 - evidence_file: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前为精确匹配且无 local base_tool，断言必 FAIL
 
@@ -61,10 +61,10 @@
 - expected_output: "AT-003 PASS: 无 unbound variable"
 - expected_RED_output: "AT-003 FAIL: base_tool unbound variable"
 - actual_RED_output: AT-003 FAIL: base_tool unbound variable (1 处)
-- actual_output: (GREEN 后填写)
+- actual_output: AT-003 PASS: 无 unbound variable
 - evidence_file: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — L13928 引用未定义 $base_tool，set -u 沙箱必报 unbound
 
@@ -81,10 +81,10 @@
 - expected_output: "AT-004 PASS: 150s 窗口无 stall 误触发"
 - expected_RED_output: "AT-004 FAIL 或 PASS（本项为回归防护——误杀依赖 debug 静默>90s 的时序，RED 阶段不强求复现，机制性 RED 由 AT-001/003 承担）"
 - actual_RED_output: 生产实证 2026-07-16T13:11:47Z runtime_stalled_ai_recovery_triggered 误杀活跃 manager(reason=manager_ai_stalled_without_runtime_progress);时序依赖不做确定性 E2E 复现,机制 RED 由 AT-001/003 承担
-- actual_output: (GREEN 后填写)
+- actual_output: observed: stall_triggers=0 ai_launched=1 ai_rc1_exits=0 → AT-004 PASS: 150s 窗口无 stall 误触发
 - evidence_file: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/raw-20260716T114802Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 06:11:47 生产事件即该路径实证；时序依赖（debug 静默≥90s + 检查窗对齐）使 E2E 确定性复现不可行，机制性复现由 AT-001（真实 SN 进程判死）与 AT-003（unbound 实证）承担，本项承担修复后回归防护
 
@@ -114,5 +114,5 @@
 1. AT-004
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-004 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-004 在 test-pre-merge 工位真实 daemon + 真实 AI CLI auto 周期执行:150s 观察窗 0 次 stall 误触发,AI 正常启动无 rc=1
