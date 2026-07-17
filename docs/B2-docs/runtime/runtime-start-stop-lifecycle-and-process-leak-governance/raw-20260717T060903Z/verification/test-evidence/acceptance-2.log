@@ -1,2 +1,2 @@
-observed: dead_left=2 live_ok=1 respawns=0
-AT-002 FAIL: dead_left=2 live_ok=1 respawns=0
+observed: dead_left=0 live_ok=1 respawns=0
+AT-002 PASS: 清死不伤活且无重生

@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS: 清死不伤活"
 - expected_RED_output: "AT-001 FAIL: per-tool self-heal 函数不存在"
 - actual_RED_output: AT-001 FAIL: per-tool self-heal 函数不存在
-- actual_output: (GREEN 后填写)
+- actual_output: observed: dead_left=0 live_left=4 → AT-001 PASS: 清死不伤活
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T060903Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现无逐文件枚举函数,harness 必 FAIL
 
@@ -36,10 +36,10 @@
 - expected_output: "AT-002 PASS: 清死不伤活且无重生"
 - expected_RED_output: "AT-002 FAIL: dead_left>=1（glob 多行展开使 self-heal 静默失效,dead 文件残留）"
 - actual_RED_output: observed: dead_left=2 live_ok=1 respawns=0 → AT-002 FAIL（dead pid+sock 残留=self-heal 静默失效实证；活 bridge 未受伤系缺陷1使广播分支未达）
-- actual_output: (GREEN 后填写)
+- actual_output: observed: dead_left=0 live_ok=1 respawns=0 → AT-002 PASS（对照 RED: dead_left 2→0）
 - evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T060903Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现状 runtime_pid_file_for_role 对多文件 glob 展开多行,self-heal cat/rm 静默失败,dead 文件必残留
 
@@ -70,5 +70,5 @@
 1. AT-002
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-002 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-002 真实 daemon + 活 claude bridge 下执行:dead 别名文件被 per-tool self-heal 清除,活 bridge 文件/进程完好,零重生
