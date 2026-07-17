@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 缺口（trace-contract.md §12 已登记，本案落地修复）
