@@ -1817,6 +1817,23 @@ runtime_pid_valid_for_role() {
   esac
 }
 
+_clear_stale_acp_bridge_pid_file_if_invalid() {
+  # Per-tool self-heal for one bridge pid file. The old role-level path fed a
+  # multi-file glob through a single-file cat/rm (silent no-op with >1 bridge)
+  # and its stale branch nuked EVERY tool's sock/pid (orphaning live bridges).
+  local project="$1" pid_file="$2" pid tool base
+  [[ -f "$pid_file" ]] || return 1
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+    return 1
+  fi
+  base="${pid_file%.pid}"
+  tool="${base##*-}"
+  rm -f "$base.pid" "$base.sock" "$base.pid.bin" "$base.pid.tool"
+  append_runtime_event "$project" "startup_self_heal_stale_pid_cleared"     "trigger=acp_bridge_pertool"     "role=acp_bridge"     "tool=$tool"     "pid=${pid:-empty}"
+  return 0
+}
+
 clear_stale_runtime_pid_file_if_invalid() {
   local project="$1" role="$2" trigger="${3:-runtime_read}"
   local pid_file pid
@@ -1834,11 +1851,9 @@ clear_stale_runtime_pid_file_if_invalid() {
     return 1
   fi
   rm -f "$pid_file"
-  # ACP bridge owns a Unix socket — clean it alongside the stale PID.
-  if [[ "$role" == "acp_bridge" ]]; then
-    # Clean up all project bridge sockets (including per-tool variants)
-    rm -f /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.sock /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.pid
-  fi
+  # (acp_bridge no longer routes through here — see per-tool enumeration in
+  # startup_self_heal_clear_stale_pid_files_if_needed; the old broadside
+  # rm of every tool's sock/pid orphaned live bridges.)
   append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
     "trigger=$trigger" \
     "role=$role" \
@@ -1847,9 +1862,17 @@ clear_stale_runtime_pid_file_if_invalid() {
 }
 
 startup_self_heal_clear_stale_pid_files_if_needed() {
-  local project="$1" trigger="${2:-runtime_read}" role cleared_any=1
-  for role in supervisor ai acp_bridge manager_watchdog interruption_dispatcher sse_watchdog; do
+  local project="$1" trigger="${2:-runtime_read}" role cleared_any=1 _bpf
+  for role in supervisor ai manager_watchdog interruption_dispatcher sse_watchdog; do
     if clear_stale_runtime_pid_file_if_invalid "$project" "$role" "$trigger"; then
+      cleared_any=0
+    fi
+  done
+  # acp_bridge: per-tool pid files — enumerate individually (a role-level
+  # single-path lookup glob-expands to multiple lines and no-ops silently).
+  for _bpf in "${FREELY_ACP_TMPDIR:-/tmp}/freely-acp-$(_acp_bridge_short_hash "$project")-"*.pid; do
+    [[ -e "$_bpf" ]] || continue
+    if _clear_stale_acp_bridge_pid_file_if_invalid "$project" "$_bpf"; then
       cleared_any=0
     fi
   done

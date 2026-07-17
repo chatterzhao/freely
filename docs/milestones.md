@@ -7846,3 +7846,18 @@
 - milestone: M-20260715T121608Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/gate/governance/raw-20260715T121608Z/issues/I-20260715T121608Z-A.md
+
+## M-20260717T060903Z-A
+- title: fix — acp_bridge pid 族 per-tool 枚举与定向清理
+- status: active
+### candidate_issues
+1. `C-20260717T060903Z-A`
+- milestone: M-20260717T060903Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T060903Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T060903Z/issues/I-20260717T060903Z-A.md
+### committed_issues
+1. `I-20260717T060903Z-A`
+- milestone: M-20260717T060903Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T060903Z/issues/I-20260717T060903Z-A.md
