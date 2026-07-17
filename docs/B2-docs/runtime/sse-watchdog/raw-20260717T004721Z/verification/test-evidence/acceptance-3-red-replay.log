@@ -1,0 +1,2 @@
+observed: live_sse_pid=74868 false_clears=1 still_alive=1 pidfile_intact=1
+AT-003 FAIL: clears=1 alive=1 pidfile=1
