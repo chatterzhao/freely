@@ -1,2 +1,2 @@
-defs_after_main=['_get_agent_slot'] referenced_dead=['_get_agent_slot'] timestamped=False
-AT-001 FAIL
+defs_after_main=[] referenced_dead=[] timestamped=True
+AT-001 PASS

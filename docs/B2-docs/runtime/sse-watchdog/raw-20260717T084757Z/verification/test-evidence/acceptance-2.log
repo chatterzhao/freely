@@ -1,2 +1,2 @@
-defined_before_block=False
-AT-002 FAIL: 阻塞点前未定义(死代码位置)
+defined_before_block=True
+AT-002 PASS
