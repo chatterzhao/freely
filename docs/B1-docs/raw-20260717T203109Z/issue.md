@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 两项遗留（PR #3980 autonomous gate 已合入,gate 核心判定在位,两个技术点需补）
