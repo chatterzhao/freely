@@ -1,23 +1,22 @@
-#!/usr/bin/env bash
-# AT-002: pr-review-guarded 的取值逻辑对四种格式均得纯路径
+#!/bin/bash
+# AT-002: pr-review-guarded 取值逻辑四格式兼容
+# 方法: (a) 锚定断言——文件含三段式引号可选管道特征; (b) 行为——同款管道四格式矩阵
 set -u
 RV="$(pwd)/bin/pr-review-guarded"
-SEDLINE=$(grep -n "verification_artifact_dir:" "$RV" | grep "sed" | head -1 | cut -d: -f1)
-[ -z "$SEDLINE" ] && { echo "AT-002 FAIL: 未找到取值行"; exit 0; }
-EXPR=$(sed -n "${SEDLINE}p" "$RV")
+FAIL=0
+grep -q "s/^\[^:\]\*:\[\[:space:\]\]\*//" "$RV" || { echo "anchor FAIL: 去前缀段缺失"; FAIL=1; }
+LINE=$(grep "_verification_dir=" "$RV" | head -1)
+printf '%s' "$LINE" | grep -q "sed -e" || { echo "anchor FAIL: 非多段 sed"; FAIL=1; }
+printf '%s' "$LINE" | grep -Fq "s/.*: *'" && { echo "anchor FAIL: 仍是旧单引号强制 sed"; FAIL=1; }
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 path='docs/B2-docs/gate/x/raw-20260717T000000Z/code-reviews'
+printf -- "- verification_artifact_dir: %s\n" "$path" > $TMP/a
+printf -- "- verification_artifact_dir: '%s'\n" "$path" > $TMP/b
+printf -- '- verification_artifact_dir: "%s"\n' "$path" > $TMP/c
+printf -- '- verification_artifact_dir: `%s`\n' "$path" > $TMP/d
 ok=0
-for label in bare single double backtick; do
-  case $label in
-    bare) line="- verification_artifact_dir: $path" ;;
-    single) line="- verification_artifact_dir: '$path'" ;;
-    double) line="- verification_artifact_dir: \"$path\"" ;;
-    backtick) line="- verification_artifact_dir: \`$path\`" ;;
-  esac
-  TMP=$(mktemp); printf '%s\n' "$line" > "$TMP"
-  # 用与 pr-review-guarded 同一行逻辑取值（把 $_i_issue_file 替换为 TMP 执行）
-  GOT=$(eval "$(printf '%s' "$EXPR" | sed 's/^[0-9]*://; s/_verification_dir=\$(//; s/ || true)$//; s|"\$_i_issue_file"|"'$TMP'"|')" 2>/dev/null | head -1)
-  rm -f "$TMP"
-  if [ "$GOT" = "$path" ]; then ok=$((ok+1)); else echo "$label 解析失败: got=$GOT"; fi
+for f in a b c d; do
+  got=$(grep "verification_artifact_dir:" "$TMP/$f" | head -1 | sed -e 's/^[^:]*:[[:space:]]*//' -e $'s/^[\'"`]//' -e $'s/[\'"`][[:space:]]*$//')
+  [ "$got" = "$path" ] && ok=$((ok+1)) || echo "$f fail: $got"
 done
-[ "$ok" -eq 4 ] && echo "AT-002 PASS: 4/4 格式解析通过" || echo "AT-002 FAIL: 裸值格式解析出整行 ($ok/4)"
+if [ "$FAIL" -eq 0 ] && [ "$ok" -eq 4 ]; then echo "AT-002 PASS: 4/4 格式解析通过"; else echo "AT-002 FAIL ($ok/4, anchor_fail=$FAIL)"; fi

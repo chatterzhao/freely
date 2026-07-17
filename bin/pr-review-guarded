@@ -208,7 +208,10 @@ fi
 	  echo >&2 "  Run: find docs/B2-docs -path '*/raw-${_raw_key}/issues/${_issue_id}.md'"
 	  exit 1
 	fi
-	_verification_dir=$(grep "verification_artifact_dir:" "$_i_issue_file" 2>/dev/null | sed "s/.*: *'\([^']*\)'/\1/" | head -1 || true)
+	# Quote-optional value extraction: accept bare, 'single', "double", or `backtick`
+	# wrapped values (pretests-gate historically demanded bare while this sed
+	# demanded single quotes — both parsers now accept all four).
+	_verification_dir=$(grep "verification_artifact_dir:" "$_i_issue_file" 2>/dev/null | head -1 | sed -e 's/^[^:]*:[[:space:]]*//' -e $'s/^[\'"`]//' -e $'s/[\'"`][[:space:]]*$//' || true)
 	if [[ -z "$_verification_dir" ]]; then
 	  echo >&2 "[pr-review-guarded] ERROR: verification_artifact_dir missing in $_i_issue_file"
 	  echo >&2 "  Add: verification_artifact_dir: docs/B2-docs/{epic-name}/{story-name}/raw-${_raw_key}/code-reviews"

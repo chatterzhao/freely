@@ -162,7 +162,10 @@ def phase_state(text: str) -> str:
 
 def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     def extract(field: str) -> str:
-        match = re.search(rf"^- {re.escape(field)}:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+        # Quote-optional: accept bare, 'single', "double", or `backtick` wrapped
+        # values — pr-review-guarded historically required quotes while this
+        # gate rejected them; both parsers now accept all four (#3957 lane).
+        match = re.search(rf"^- {re.escape(field)}:\s*['\"`]?([^'\"`\n]+)['\"`]?\s*$", text, re.MULTILINE)
         return match.group(1).strip() if match else ""
 
     pre_tests_path = extract("pre_tests_path")
