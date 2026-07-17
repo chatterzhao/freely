@@ -1,0 +1,3 @@
+part-a PASS
+part-b PASS: 阈值 10 次死亡记录后 storm reason='restart_storm_count_threshold'
+AT-005 PASS
