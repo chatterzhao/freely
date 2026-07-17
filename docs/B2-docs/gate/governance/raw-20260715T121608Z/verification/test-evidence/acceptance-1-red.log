@@ -1,0 +1,20 @@
+I-drift: I-20260612T000223Z-A.md=done_b2_ibm
+I-drift: I-20260616T030213Z-A.md=done_b2_ibm
+I-drift: I-20260705T231534Z-A.md=done_b2_ibm
+I-drift: I-20260706T023422Z-A.md=done_b2_ibm
+I-drift: I-20260615T001626Z-A.md=in_b2_ibm
+I-drift: I-20260710T171329Z-A.md=not_applicable
+raw-drift: 20260506T100000Z=proposed
+raw-drift: 20260517T113021Z=none
+raw-drift: 20260517T113514Z=none
+raw-drift: 20260517T113807Z=none
+raw-drift: 20260517T114147Z=none
+raw-drift: 20260517T114702Z=none
+raw-drift: 20260517T115113Z=none
+raw-drift: 20260517T115824Z=none
+raw-drift: 20260517T120124Z=none
+raw-drift: 20260517T120752Z=none
+raw-drift: 20260517T121432Z=none
+raw-drift: 20260527T004453Z=proposed
+raw-drift: 20260617T035314Z=proposed
+AT-001 FAIL: 19 处未收敛

@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260506T010000Z00Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '231'
@@ -68,3 +68,8 @@ wait 模式 supervisor 不 build prompt、不 launch AI，仅轮询 task_mode_ga
 ## 修复方案
 
 Supervisor 主循环 `select_launch_kind` 前增加 manager 专属前置门禁：`read_task_mode=wait` → `sleep CHECK_INTERVAL` → `continue`。
+
+
+## State Reconcile Note (2026-07-17, raw-20260715T122119Z batch)
+
+- 平台 issue 已 CLOSED、实现已进 develop（前 I-* 物化时代 lane，无 canonical I-* 锚，跟随 raw-20260501 absorbed 惯例收敛）
