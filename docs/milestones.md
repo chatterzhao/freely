@@ -7861,3 +7861,18 @@
 - milestone: M-20260717T060903Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T060903Z/issues/I-20260717T060903Z-A.md
+
+## M-20260717T062449Z-A
+- title: fix — trace 打点拆相与 launch_observed 前移
+- status: active
+### candidate_issues
+1. `C-20260717T062449Z-A`
+- milestone: M-20260717T062449Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T062449Z-A
+- promoted_issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/issues/I-20260717T062449Z-A.md
+### committed_issues
+1. `I-20260717T062449Z-A`
+- milestone: M-20260717T062449Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/issues/I-20260717T062449Z-A.md

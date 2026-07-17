@@ -1,0 +1,4 @@
+observed: l041_delta=269s l042_out='to='A-L020|A-L090|A-L201|A-L210|A-L230|TERM''
+L041 时差超限或缺失
+L042 OUT 非单值
+AT-001 FAIL
