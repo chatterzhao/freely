@@ -5,7 +5,7 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: 孤儿回收 + 暖机宽限在位（AC1/AC2）
+- requirement: 孤儿回收 + 暖机宽限 + same-tool 不再 fall-through 重生（AC1/AC2+实现期缺陷4）
 - acceptance_target: reuse fall-through 重生前 terminate 存活旧 pid；健康检查失败分支含 ACP_BRIDGE_WARMUP_GRACE_SECS 暖机复用
 - testing_layer: unit
 - target_environment: fix/raw-20260717T004654Z-bridge-orphan-leak
@@ -16,9 +16,10 @@
   BODY=$(awk '/^_ensure_acp_bridge_running\(\)/,/^  # ── Config.toml binary path lookup ──/' docs/system/workspace/scripts/runtime/freely)
   T1=0; printf '%s' "$BODY" | grep -q 'terminate_pid_with_graceful_wait "$pid"' && T1=1
   T2=0; printf '%s' "$BODY" | grep -q 'ACP_BRIDGE_WARMUP_GRACE_SECS' && T2=1
-  echo "orphan_reap=$T1 warmup_grace=$T2"
-  if [ "$T1" -eq 1 ] && [ "$T2" -eq 1 ]; then echo "PASS: 回收+暖机在位"; else echo "FAIL: reap=$T1 warmup=$T2"; fi
-- expected_output: "PASS: 回收+暖机在位"
+  T3=0; printf '%s' "$BODY" | grep -q 'elif \[\[ -n "\$running_tool" && ' && T3=1
+  echo "orphan_reap=$T1 warmup_grace=$T2 no_fallthrough=$T3"
+  if [ "$T1" -eq 1 ] && [ "$T2" -eq 1 ] && [ "$T3" -eq 1 ]; then echo "PASS: 回收+暖机+无吞噬在位"; else echo "FAIL: reap=$T1 warmup=$T2 fallthrough=$T3"; fi
+- expected_output: "PASS: 回收+暖机+无吞噬在位"
 - expected_RED_output: "FAIL: reap=0 warmup=0"
 - actual_RED_output: orphan_reap=0 warmup_grace=0 → FAIL
 - actual_output: (GREEN 后填写)
