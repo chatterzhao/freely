@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: gitee
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 缺陷（raw-20260717T041435Z 附带段正式立案）
