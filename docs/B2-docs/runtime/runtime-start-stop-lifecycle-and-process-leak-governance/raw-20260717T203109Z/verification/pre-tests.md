@@ -19,10 +19,10 @@ RED 方式：AT-001/002/005 对 **HEAD 已提交版本**（`git show HEAD:` 提�
 - expected_output: AT001_RESULT: PASS
 - expected_RED_output: at004 harness 对 HEAD 版 wt-close + HEAD 版 runtime，deny 阶段无 "DENIED" → AT004_RESULT: FAIL（证明 STUB 未实现查询）
 - actual_RED_output: at004 harness(HEAD wt-close+HEAD rt): deny 阶段输出 'zero agent activity — allowing close'（应 DENIED）→ AT004_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-1-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: g1 'foreign … has merge/dropped — allowing sweep' / g2 'allowing close' / g3 'DENIED foreign unfinished'，stderr 均非空 → AT001_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: RED 用 at004-active-worker-deny.sh <HEAD版wt-close> <HEAD版runtime>（纯未实现态）——deny 阶段不产生 DENY，证明 STUB 未实现查询。初版设计"HEAD 矩阵 0 字节"意外 PASS（静默死只存在于 lane 内中间态：无 try/except 的 heredoc + FileNotFoundError + set -e，bash -x trace 已留档），按 RED skill 已修正测试设计。GREEN 用 at001 矩阵断言可见输出（db 不可达降级不阻断）
 
@@ -39,10 +39,10 @@ RED 方式：AT-001/002/005 对 **HEAD 已提交版本**（`git show HEAD:` 提�
 - expected_output: AT002_RESULT: PASS
 - expected_RED_output: HEAD 版对已合并 key 无 "allowing sweep"（静默死或 DENIED foreign unfinished）→ AT002_RESULT: FAIL
 - actual_RED_output: rounds passed: 0/3, stderr='DENIED foreign unfinished raw-20260717T004620Z' → AT002_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-2-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: rounds passed: 5/5 → AT002_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: HEAD 版 grep -q 早退触发 git SIGPIPE，pipefail 判整条 pipeline 失败 → _has_merge 恒 false；bash -x trace 已证（_has_merge=true 从未赋值）
 
@@ -59,10 +59,10 @@ RED 方式：AT-001/002/005 对 **HEAD 已提交版本**（`git show HEAD:` 提�
 - expected_output: AT003_RESULT: PASS
 - expected_RED_output: get keys 为 ['0','1',...,'10'] 数字键 → AT003_RESULT: FAIL
 - actual_RED_output: get keys: ['0','1','10','2',...,'9'] 数字键 → AT003_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-3-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: get keys: ['branch','created_at','manager_id','raw_key','reviewer_id','slot','test_branch','test_worktree','updated_at','worker_id','worktree'] → AT003_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-3.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: 对 HEAD 版 freely_db_manager.py 起临时 daemon，agent_assign + agent_list_by_raw_key，行键为数字（主仓 live daemon 已实测同现象：活跃行存在但 gate 判 zero activity）
 
@@ -79,10 +79,10 @@ RED 方式：AT-001/002/005 对 **HEAD 已提交版本**（`git show HEAD:` 提�
 - expected_output: AT004_RESULT: PASS
 - expected_RED_output: deny 阶段无 DENIED（数字键 → 读不到 worker_id → 误判 zero activity 放行）→ AT004_RESULT: FAIL
 - actual_RED_output: at004 harness(工位已修wt-close+HEAD rt): deny 阶段 'zero agent activity — allowing close'（应 DENIED w=w07）→ AT004_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-4-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: deny: 'DENIED self-owned raw-20260717T888888Z: w=w07' / allow: 'allowing close' → AT004_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-4.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: RED 用 at004.sh <工位已修wt-close> <HEAD版runtime>——gate 侧修复在位但 db_manager 数字键仍使 deny 阶段误放行，单变量隔离 P4 是链路阻断点。主仓 live daemon 亦实测同现象（agent_assign 写 gate-test-agent 行后 gate 判 "zero agent activity — allowing close"，行已即时清理）
 
@@ -99,10 +99,10 @@ RED 方式：AT-001/002/005 对 **HEAD 已提交版本**（`git show HEAD:` 提�
 - expected_output: AT005_RESULT: PASS
 - expected_RED_output: HEAD 版 --force 描述为旧文案（无"自治门禁"）→ AT005_RESULT: FAIL
 - actual_RED_output: --force 段为旧文案'永久丢弃。必须配合 --raw-key 和 --reason。'，无自治门禁描述 → AT005_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-5-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: --force 段含自治门禁描述 → AT005_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/verification/test-evidence/acceptance-5.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: git show HEAD: 版 usage() --force 行为"永久丢弃。必须配合 --raw-key 和 --reason。"，无 autonomous gate 语义描述
 

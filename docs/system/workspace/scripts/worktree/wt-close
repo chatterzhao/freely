@@ -45,7 +45,9 @@ Options (按场景选择):
                       passed pretests, completed phase_state.
 
   ── 彻底丢弃（不可恢复）──
-  --force            永久丢弃。必须配合 --raw-key 和 --reason。
+  --force            永久丢弃。必须配合 --raw-key 和 --reason。绕过自治门禁的拒绝判定
+                      (unfinished/foreign block),使用既有 kill-and-continue 路径。
+                      正常自治关闭不需要此标志——gate 会自动判定放行条件。
   --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
 
   ── 仅操作平台，不管本地 ──
@@ -60,7 +62,7 @@ Scenarios:
   freely wt-close --raw-key 20260627T021849Z
   # 确定放弃此 issue
     # PR 已 merge，正常收口
-  freely wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
+  freely wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃（自治 gate 判定为 deny 时的人类兜底）"
 
   # 无工位，只关闭平台 issue
     # PR 已 merge，正常收口
@@ -183,15 +185,51 @@ _autonomous_close_gate() {
   [[ "$FORCE" == "true" ]] && return 0
   local _own_key="${FREELY_AGENT_RAW_KEY:-}"
   local _is_self=false; [[ -n "$_own_key" && "$_own_key" == "$target_key" ]] && _is_self=true
-  local _has_merge=false
-  git log develop --oneline --grep "raw-${target_key}" 2>/dev/null | grep -qiE "^[0-9a-f]+ Merge.*raw-${target_key}" && _has_merge=true
-  local _b1_state="" _b1_file="docs/B1-docs/raw-${target_key}/issue.md"
-  [[ -f "$_b1_file" ]] && _b1_state=$(grep -m1 "^phase_state:" "$_b1_file" 2>/dev/null | awk '{print $2}')
+  local _has_merge=false _merge_count
+  # rev-list --count: no pipe → immune to pipefail/SIGPIPE race that broke grep -q here
+  _merge_count=$(git -C "$PROJECT_ROOT" rev-list develop --merges --grep "raw-${target_key}" --count 2>/dev/null || echo 0)
+  [[ "$_merge_count" =~ ^[0-9]+$ && "$_merge_count" -gt 0 ]] && _has_merge=true
+  # B1 phase_state: read from develop (authoritative), fall back to working tree
+  local _b1_state="" _b1_rel="docs/B1-docs/raw-${target_key}/issue.md"
+  _b1_state=$(git -C "$PROJECT_ROOT" show "develop:${_b1_rel}" 2>/dev/null | grep -m1 "^phase_state:" | awk '{print $2}' || true)
+  [[ -z "$_b1_state" && -f "$PROJECT_ROOT/$_b1_rel" ]] && _b1_state=$(grep -m1 "^phase_state:" "$PROJECT_ROOT/$_b1_rel" 2>/dev/null | awk '{print $2}' || true)
   local _is_dropped=false; [[ "$_b1_state" == "dropped" ]] && _is_dropped=true
-  local _aw_worker="" _aw_reviewer=""  # agent_working query (inline heredoc fix pending — current f-string escaping broken)
-local _has_active_task=false _active_tasks=""
-  local _a2a_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
-  local _db="$PROJECT_ROOT/.freely/freely.db"
+  # agent_working lives in the MAIN repo's db daemon (socket hashed by main root path).
+  # From a worktree, PROJECT_ROOT hashes differently — resolve main root via git-common-dir.
+  local _main_root
+  _main_root=$(dirname "$(git -C "$PROJECT_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" 2>/dev/null) || _main_root="$PROJECT_ROOT"
+  [[ -d "$_main_root" ]] || _main_root="$PROJECT_ROOT"
+  local _aw_worker="" _aw_reviewer="" _aw_py
+  _aw_py="$_main_root/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    export _AW_PROJECT="$_main_root" _AW_RAW_KEY="raw-${target_key}"
+    # try/except everything: db daemon down (socket missing) = runtime not
+    # running = no active agents. Gate degrades gracefully, never blocks close.
+    _aw_row=$(python3 2>/dev/null <<'PYAW' || true
+import os, sys
+try:
+    _PROJECT = os.environ.get("_AW_PROJECT", "")
+    _AW_RAW_KEY = os.environ.get("_AW_RAW_KEY", "")
+    sys.path.insert(0, os.path.join(_PROJECT, "docs/system/workspace/scripts/runtime"))
+    from agent_working import agent_list_by_raw_key
+    r = agent_list_by_raw_key(_PROJECT, _AW_RAW_KEY)
+    if r:
+        wid = r.get("worker_id", "") or ""
+        rid = r.get("reviewer_id", "") or ""
+        if wid or rid:
+            print(f"{wid}|{rid}")
+except Exception:
+    pass
+PYAW
+    )
+    if [[ -n "${_aw_row:-}" ]]; then
+      _aw_worker="${_aw_row%%|*}"; _aw_worker="${_aw_worker%%:*}"
+      _aw_reviewer="${_aw_row##*|}"; _aw_reviewer="${_aw_reviewer%%:*}"
+    fi
+  fi
+  local _has_active_task=false _active_tasks=""
+  local _a2a_py="$_main_root/docs/system/workspace/scripts/runtime/a2a_task.py"
+  local _db="$_main_root/.freely/freely.db"
   if [[ -f "$_a2a_py" && -f "$_db" ]]; then
     _active_tasks=$(python3 "$_a2a_py" list --raw-key "$target_key" --status working,submitted,launched 2>/dev/null | python3 -c "
 import json,sys

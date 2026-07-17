@@ -5,6 +5,7 @@
 set -uo pipefail
 WTC="$1"; RT="$2"
 SB=$(mktemp -d)
+SB=$(cd "$SB" && pwd -P)   # 物理路径：daemon socket 按 abspath hash，git 返回物理路径，两者必须同形态
 cleanup() { python3 "$SB/docs/system/workspace/scripts/runtime/freely_db_manager.py" stop --project "$SB" >/dev/null 2>&1; rm -rf "$SB"; }
 trap cleanup EXIT
 git -C "$SB" init -q -b develop
