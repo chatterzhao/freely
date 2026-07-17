@@ -3568,7 +3568,7 @@ valid_interruption_dispatcher_pid_for_project() {
 }
 
 valid_sse_watchdog_pid_for_project() {
-  local pid="$1" project="$2"
+  local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/sse-watchdog.sh --project" || return 1
   [[ "$pid" =~ ^[0-9]+$ ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
