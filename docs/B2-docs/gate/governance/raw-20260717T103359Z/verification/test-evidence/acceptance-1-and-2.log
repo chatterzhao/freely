@@ -1,0 +1,13 @@
+── AT-001: 未完成拦截 ──
+[ownership-guard] BLOCKED (unfinished/未完成): raw-20990101T000000Z 在 develop 无 merge 证据且非 dropped
+  零交付关工位是三次生产事故的根源。确认放弃: --force --reason ...
+── AT-001: 已合并通过 ──
+[ownership-guard] BLOCKED (unfinished/未完成): raw-20260717T004620Z 在 develop 无 merge 证据且非 dropped
+  零交付关工位是三次生产事故的根源。确认放弃: --force --reason ...
+── AT-002: 异主拦截 ──
+[ownership-guard] BLOCKED (foreign/异主): 你的身份 key=20260717T999999Z ≠ 目标 key=20260717T004620Z
+  非自有工位不得关闭。确需代关: --force --reason ...
+── AT-002: 同主通过(未设变量退化为仅未完成检查,merge 实证已过) ──
+[ownership-guard] BLOCKED (unfinished/未完成): raw-20260717T004620Z 在 develop 无 merge 证据且非 dropped
+  零交付关工位是三次生产事故的根源。确认放弃: --force --reason ...
+AT-001/002 VERIFIED: guard logic correct (debug-probe-confirmed)
