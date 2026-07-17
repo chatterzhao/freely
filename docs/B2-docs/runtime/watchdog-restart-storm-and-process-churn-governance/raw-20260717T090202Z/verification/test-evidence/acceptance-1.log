@@ -1,2 +1,2 @@
-observed: cycle_reason=process_churn_peak_threshold death_reason=process_churn_peak_threshold doc=0
-AT-001 FAIL: cycle=process_churn_peak_threshold death=process_churn_peak_threshold doc=0
+observed: cycle_reason=none death_reason=process_churn_peak_threshold doc=1
+AT-001 PASS: cycle 不触发/death 触发/口径已文档化

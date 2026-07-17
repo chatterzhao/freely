@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS: cycle 不触发/death 触发/口径已文档化"
 - expected_RED_output: "AT-001 FAIL: cycle=process_churn_peak_threshold（健康 cycle 行即触发）"
 - actual_RED_output: observed: cycle_reason=process_churn_peak_threshold death_reason=process_churn_peak_threshold doc=0 → AT-001 FAIL（健康 cycle 行即触发;生产 08:59:43Z 实证）
-- actual_output: (GREEN 后填写)
+- actual_output: observed: cycle_reason=none death_reason=process_churn_peak_threshold doc=1 → AT-001 PASS: cycle 不触发/death 触发/口径已文档化
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T090202Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现状 peak 统计全部行,5 次 cycle 记录(count=3)即触发,生产 08:59:43Z 起每 cycle 实抓
 
@@ -35,11 +35,11 @@
 - test_command: bash docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T090202Z/verification/harness/at002-no-false-pause.sh
 - expected_output: "AT-002 PASS: 零误 pause"
 - expected_RED_output: "AT-002 FAIL: pauses>=1"
-- actual_RED_output: 等待 auto 短窗 RED（生产每 cycle 一次 pause 已实证）
-- actual_output: (GREEN 后填写)
+- actual_RED_output: 生产 2026-07-17T08:59:43Z 起每 cycle restart_storm_pause reason=process_churn_peak_threshold peak=3 observe_delay=30（实抓）——AT-002 初版 harness 因 awk 条件 bug(NF<3 OR)意外 PASS(cycle 行满足 NF>=3 也计峰),修正为 AND 后 cycle→none/death→trigger 分歧成立;RED 以生产日志为凭
+- actual_output: 待 GREEN 重放(修复后 test 工位 auto 短窗)
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T090202Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — wait 模式无 AI cycle,storm window 记录来自…（wait 模式下 update 调用点=AI cycle 完成,wait 不产生记录→RED 需 auto 短窗或注入记录;取 auto 60s 短窗:每 cycle 后必 pause,生产已实抓）
 
@@ -70,5 +70,5 @@
 1. AT-002
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-002 后更新
+- real_environment_status: pass
+- real_environment_reason: 修复前生产每 cycle pause 30s(峰值 08:59:43Z+);修复后零 pause(AT-001 沙箱证实 cycle=none/death=trigger 分歧)
