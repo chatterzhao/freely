@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: gitee
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 缺陷（多 agent 交接链路 SSE→session/* 环断点）
