@@ -94,10 +94,9 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
   	     - develop 的干净面 = 每次 merge 前都经过了 test-pre-merge 的端到端验证
   	     - 未经 test-pre-merge 验证的代码不得 merge 到 develop
   	   - **test-pre-merge 运行环境初始化**：
-  	     - pre 工位从 develop 创建后是裸分支，无 config、无 session-store、无 continuity
-  	     - 必须运行 `freely pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
-  	     - 这会复制 config.toml（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
-  	     - 初始化后 pre 工位具备完整的 Manager 运行能力
+  	     - pre 工位由 `freely wt-create` 创建时已放置 config.toml 与 freely.db（session-store）
+  	     - 若要在 pre 工位运行 daemon，还需从主仓复制 agent 配置：`cp <project-root>/.freely/agent-table.toml <pre-worktree>/.freely/`（缺失会报 AGENT_AI_TOOL not set）
+  	     - 完成后 pre 工位具备完整的 Manager 运行能力
   	   - **test-pre-merge 的验证**：验证方式由 pre-tests.md 中的测试用例决定（pre-tests.md 由 B2_IBM 编写，test-execution 执行）。feature 合并到 test-pre-merge 后必须通过验证才能合并到 develop。具体测试步骤由项目对应的 pre-tests.md 定义。
 
   	     Freely 自举端到端门禁（daemon 型项目参考）的 pre-tests.md 应定义自举验证所需步骤，通过预置脚本 `freely test-pre-merge-selfhost <project>` 执行。成功标准：打包版本能开发 Freely 自己。这个测试落地了"编译器自举"——用上一个版本开发下一个版本。通过 → pr-merge-guarded develop <feature-branch> 合并；失败 → 丢弃 test-pre-merge，修 feature。

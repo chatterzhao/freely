@@ -166,7 +166,23 @@ Freely 的主链 trace 不是普通 debug 文本，而是三 loop 执行链的 m
 |--------|-------|------|
 | `A-L001` | `start_requested` | 用户发出 daemon start 命令 |
 | `A-L010` | `supervisor_started` | Supervisor 进程已启动，进入 daemon-run 主循环 |
-| `A-L240` | `manager_launch_requested` | Supervisor 请求启动 Manager AI session |
+| `A-L240` | `manager_launch_requested` | Supervisor 请求启动 Manager AI session（下一跳 `A-L010`） |
+
+### 监督与恢复链（ensure-manager / watchdog 侧）
+| 检查点 | Stage | 说明 |
+|--------|-------|------|
+| `A-L090` | `supervisor_cleanup_begin` | Supervisor 退出清理开始 |
+| `A-L091` | `supervisor_cleanup_superseded` | 清理让位于更新的活跃 supervisor |
+| `A-L092` | `supervisor_cleanup_complete` | 清理完成（desired=running 时下一跳为重拉控制面） |
+| `A-L201` | `manager_waiting_for_supervisor_teardown` | Watchdog 等待旧 supervisor 退出 |
+| `A-L202` | `manager_supervisor_teardown_observed` | Watchdog 观测到 teardown 完成 |
+| `A-L210` | `manager_bootstrap_paused` | 网络恢复门控暂停 bootstrap |
+| `A-L211` | `manager_same_tool_recovery_blocked` | 同工具 slot 耗尽阻塞 |
+| `A-L212` | `manager_same_tool_recovery_blocked` | 当前 slot 入口不可用阻塞 |
+| `A-L225` | `manager_stale_pid_scan` | Worker stale pid 扫描 |
+| `A-L230` | `manager_recovery_waiting` | 全部恢复路径不可用，等待 |
+| `A-L231` | `manager_bootstrap_skipped` | 无可用恢复工具，跳过本轮 |
+| `A-L232` | `manager_supervisor_already_running` | 已有活跃 supervisor，保持现状 |
 
 ### Prompt 构建链
 | 检查点 | Stage | 说明 |
@@ -179,8 +195,22 @@ Freely 的主链 trace 不是普通 debug 文本，而是三 loop 执行链的 m
 | 检查点 | Stage | 说明 |
 |--------|-------|------|
 | `A-L040` | `ai_launch_begin` | AI 进程已启动（ACP Bridge → AI CLI Tool） |
-| `A-L041` | `ai_launch_observed` | AI 进程存活确认 |
+| `A-L041` | `ai_launch_observed` | AI 进程存活确认（当前于 cycle 收尾阶段发出，见 §12） |
 | `A-L042` | `ai_cycle_finished` | AI 周期结束（exit_reason=ai_exit_rc_0 / ...） |
+
+### Intake 链（human interruption / chat）
+| 检查点 | Stage | 说明 |
+|--------|-------|------|
+| `A-L300` | `intake_recorded` | 插话已记录 |
+| `A-L310` | `intake_claimed` | 插话已被 claim |
+| `A-L320` | `intake_resolved` | 插话已 resolve |
+| `A-L330` | `intake_handler_started` | dispatcher 处理开始 |
+| `A-L331` | `intake_handler_decision_parsed` | 处理决策已解析 |
+| `A-L332` | `intake_handler_path_unavailable` | 处理路径不可用 |
+| `A-L333` | `intake_handler_failed` | 处理失败 |
+| `A-L334` | `intake_handler_stderr_without_decision` | 处理有 stderr 无决策 |
+| `A-L335` | `intake_handler_stderr_with_decision` | 处理有 stderr 有决策 |
+| `A-L336` | `intake_handler_no_decision` | 处理无决策 |
 
 ### L042 出口路由
 
@@ -207,3 +237,13 @@ event=worker_launch_failed task_id=<id> reason=<reason>
 1. Manager 使用了 `--agent-id worker` 而非 `--role worker`（task 创建为 agent_id=manager）
 2. a2a-exit 命令未被实际执行（AI 仅在文本中讨论了它）
 3. a2a_tasks 表不可用（freely-db 未运行或 crash）
+
+## 12. Known gaps（显式暴露，按 §5 UNSET 精神登记）
+
+以下为已确认但尚未修复的契约偏差。修复它们的 lane 必须同步更新本表。
+
+| 缺口 | 现状 | 契约条款 | 状态 |
+|------|------|---------|------|
+| `A-L041` 发出时机 | 实测于 cycle 收尾阶段发出（2026-07-16 实测晚于 ai_launch_begin 94s），非"启动后立即确认"语义 | §8（stage 语义稳定） | open — 涉 monitor 结构，待独立 lane |
+| `A-L042` OUT `to=` | 打印候选集 `A-L020\|A-L090\|...` 而非实际选中的下一跳 | §4（to=actual next） | open — 实际下一跳在 L042 之后才决策，需重排打点归属层 |
+| `A-L090`/`A-L092` OUT `to=UNSET` | 清理链未声明下一跳（desired=running 时实际为重拉控制面） | §5 | open |

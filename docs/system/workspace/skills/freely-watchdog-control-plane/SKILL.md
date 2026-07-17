@@ -98,3 +98,10 @@ description: >- 统一 Freely 外层监督与恢复控制面。覆盖 availabili
 - 若需要账号探测/切号实现细节：继续看 `skill:freely-ai-cli-availability-manager`
 - 若需要 Freely runtime 监督策略：继续看 `docs/system/workspace/scripts/runtime/freely`
 - 若需要 continuity 触发边界：继续看 `skill:freely-continuity-watchdog`
+
+## Runtime Watchdog 现行机制锚点（2026-07-17 对齐）
+
+- **supervisor 存活**：`supervisor-heartbeat` mtime（2s touch / `SUPERVISOR_HEARTBEAT_TIMEOUT_SECS=120` 超时 / 新生宽限 `SUPERVISOR_STARTUP_HEARTBEAT_GRACE_SECS=15`，以 supervisor.pid mtime 判代际）
+- **判死动作**：verified teardown（TERM→KILL 兜底 + kill -0 验证消亡），禁止裸 TERM（daemon 有意忽略无 stop-marker 的 TERM）；不可杀 → `manager_watchdog_supervisor_kill_failed` + 本 tick 不拉新
+- **storm/churn 检测**：`RESTART_STORM_WINDOW_SECS=120` / `RESTART_STORM_COUNT=10` / `PROCESS_CHURN_PEAK=3`；supervisor 死亡由 ensure-manager 侧 `record_supervisor_death_for_storm_window` 记入窗口；命中即升级 manager bootstrap handoff（advisory，不自动动作）
+- 完整真源见 `three-loop-capability-lifecycle.md` §Runtime 监督面机制真源
