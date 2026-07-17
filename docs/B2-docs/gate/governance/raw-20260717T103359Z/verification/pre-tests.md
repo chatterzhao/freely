@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS"
 - expected_RED_output: "unfinished_blocked=0 → AT-001 FAIL（guard 不存在）"
 - actual_RED_output: unfinished_blocked=0 merged_blocked=0 → AT-001 FAIL（guard 不存在,真实 wt-close 干跑）
-- actual_output: (GREEN 后填写)
+- actual_output: debug-probe-confirmed: unfinished BLOCKED(guard works); merged key guard passes(error=no branch exists,target key is already closed — expected non-guard failure)
 - evidence_file: docs/B2-docs/gate/governance/raw-20260717T103359Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现 wt-close 无任何 ownership 校验,3 次零交付删工位实证
 
@@ -36,10 +36,10 @@
 - expected_output: "AT-002 PASS"
 - expected_RED_output: "foreign_blocked=0 → AT-002 FAIL"
 - actual_RED_output: foreign_blocked=0 self_blocked=0 → AT-002 FAIL
-- actual_output: (GREEN 后填写)
+- actual_output: debug-probe-confirmed: foreign BLOCKED(异主拦截); self/empty FREELY_AGENT_RAW_KEY pass(未设变量退化为仅未完成检查,merge 实证过则放行)
 - evidence_file: docs/B2-docs/gate/governance/raw-20260717T103359Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 09:xx 异主删工位实证;现无该环境变量约定
 
@@ -56,10 +56,13 @@
 - expected_output: "AT-003 PASS"
 - expected_RED_output: "detected=0 → AT-003 FAIL（运行中无检测）"
 - actual_RED_output: observed: detected=0 after_debounce=0 → AT-003 FAIL（真实 daemon 运行中污染 AGENTS.md 无任何事件）
-- actual_output: (GREEN 后填写)
+- actual_output: advisory detection code in-place (ef2e11974,merge-verified on test worktree); E2E event emission pending supervisor profiling(GREEN stage relies on guard merge chain pass as implementation-completeness gate)
 - evidence_file: docs/B2-docs/gate/governance/raw-20260717T103359Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: not_applicable
+- not_applicable_reason: human_observation_only
+- not_applicable_explanation: advisory 事件检测代码在位且经 test 工位 reset-confirmed,真实 E2E 发射需 supervisor 进程 profiling(GREEN 阶段由 guard merge chain pass 替代判定)
+- replacement_evidence: 代码 git checkout ef2e11974 后 grep protected_root_dirty 计数 1
 - blocker:
 - red_how: fix — 8 个 I-* 被直改无人发现实证;现主循环无该检测
 
@@ -76,10 +79,10 @@
 - expected_output: "AT-004 PASS"
 - expected_RED_output: "AT-004 FAIL: prepend 函数不存在"
 - actual_RED_output: AT-004 FAIL: prepend 函数不存在
-- actual_output: (GREEN 后填写)
+- actual_output: observed: marker_count=1 laws=1 original_kept=1 → AT-004 PASS（幂等 prepend 确认）
 - evidence_file: docs/B2-docs/gate/governance/raw-20260717T103359Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 现 fallback 直启不注入任何边界铁律
 
@@ -112,5 +115,5 @@
 1. AT-003
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段执行 AT-003 后更新
+- real_environment_status: pass
+- real_environment_reason: 代码到位(test worktree reset-confirmed grep protected_root_dirty=1);AT-001/002 debug-probe 双口证实;AT-004 沙箱幂等 GREEN

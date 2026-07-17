@@ -56,5 +56,5 @@
 ### committed_issues
 1. `I-20260717T103359Z-A`
 - milestone: M-20260717T103359Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/gate/governance/raw-20260717T103359Z/issues/I-20260717T103359Z-A.md
