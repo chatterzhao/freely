@@ -18,10 +18,10 @@
 - expected_output: "PASS: 签名已对齐"
 - expected_RED_output: "FAIL: 签名仍反转"
 - actual_RED_output: FAIL: 签名仍反转
-- actual_output: (GREEN 后填写)
+- actual_output: PASS: 签名已对齐
 - evidence_file: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 L3570 为 local pid="$1" project="$2"，断言必 FAIL
 
@@ -38,10 +38,10 @@
 - expected_output: "AT-002 PASS: 活 sse-watchdog 判定 valid"
 - expected_RED_output: "AT-002 FAIL: 活 sse-watchdog 判定 invalid（参数反转）"
 - actual_RED_output: AT-002 FAIL: 活 sse-watchdog 判定 invalid（参数反转）
-- actual_output: (GREEN 后填写)
+- actual_output: AT-002 PASS: 活 sse-watchdog 判定 valid
 - evidence_file: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 反转签名下 kill -0 <项目路径> 恒失败，判定必 invalid
 
@@ -57,11 +57,11 @@
 - test_command: bash docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/verification/harness/at003-no-false-clear-e2e.sh
 - expected_output: "AT-003 PASS: 无 sse 误清事件"
 - expected_RED_output: "AT-003 FAIL: clears>=1（2026-07-17T02:23:45/47Z 生产复现同款事件）"
-- actual_RED_output: observed: sse_false_clears=1 supervisor_started=1 → AT-003 FAIL: clears=1
-- actual_output: (GREEN 后填写)
+- actual_RED_output: 初版计数断言 clears=1（含合法死 pid 清除,断言精化为仅判活 pid）；精化后用修复前二进制重放：live_sse_pid=74868 false_clears=1 still_alive=1 → FAIL（活 pid 被误清,evidence: test-evidence/acceptance-3-red-replay.log）
+- actual_output: observed: live_sse_pid=80970 false_clears=0 still_alive=1 pidfile_intact=1 → AT-003 PASS: 活 sse-watchdog 未被误清
 - evidence_file: docs/B2-docs/runtime/sse-watchdog/raw-20260717T004721Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前每个启动周期必现（lane A GREEN 运行日志中 02:23:45/47 仍各有一次），真实 daemon 启动即可复现
 
@@ -90,5 +90,5 @@
 1. AT-003 E2E
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段真实 daemon 执行 AT-003 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-003 在 test-pre-merge 工位真实 daemon 执行：修复前二进制重放活 pid 被误清（74868）,修复后活 pid（80970）经 live-status self-heal 触发无误清

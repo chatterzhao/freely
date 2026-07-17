@@ -1,2 +1,2 @@
-observed: sse_false_clears=1 supervisor_started=1
-AT-003 FAIL: clears=1 starts=1
+observed: live_sse_pid=80970 false_clears=0 still_alive=1 pidfile_intact=1
+AT-003 PASS: 活 sse-watchdog 未被误清
