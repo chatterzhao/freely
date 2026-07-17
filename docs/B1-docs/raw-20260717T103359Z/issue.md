@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 \n\n## 缺陷（3 次生产实证,2026-07-17）
