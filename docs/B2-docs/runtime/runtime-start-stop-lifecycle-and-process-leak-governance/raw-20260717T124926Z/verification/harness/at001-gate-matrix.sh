@@ -25,7 +25,7 @@ else
   echo "  gate3 他属未完成→误放行 ✗"; FAIL=1
 fi
 # 4) 既有 closeout 功能:--platform-only 不受 gate 影响
-OUT4=$("$Q/bin/wt-close" --raw-key 20990101T000000Z --platform-only --reason "测试" 2>&1 | head -10)
+OUT4=$("$Q/bin/wt-close" --raw-key 20990101T000000Z --platform-only --reason "违规绕过门禁中，理由充分，是：测试自治 gate" 2>&1 | head -10)
 if printf '%s' "$OUT4" | grep -qi "platform"; then
   echo "  gate4 platform-only 不受影响 ✓"
 else

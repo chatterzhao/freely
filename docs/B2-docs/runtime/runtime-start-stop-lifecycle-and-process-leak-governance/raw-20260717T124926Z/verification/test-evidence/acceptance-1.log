@@ -1,5 +1,5 @@
-  gate1 自属未完成→拒 ✓
-  gate2 他属已完成→误拒 ✗
-  gate3 他属未完成→拒 ✓
-  gate4 platform-only 不受影响 ✓
+  gate1 自属未完成→误放行 ✗
+  gate2 他属已完成→通过 ✓
+  gate3 他属未完成→误放行 ✗
+  gate4 platform-only 路径异常 ✗
 AT-001 FAIL
