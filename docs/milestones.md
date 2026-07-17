@@ -7876,3 +7876,18 @@
 - milestone: M-20260717T062449Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T062449Z/issues/I-20260717T062449Z-A.md
+
+## M-20260717T084757Z-A
+- title: fix — watchdog_sse 路由死定义搬移
+- status: active
+### candidate_issues
+1. `C-20260717T084757Z-A`
+- milestone: M-20260717T084757Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T084757Z-A
+- promoted_issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T084757Z/issues/I-20260717T084757Z-A.md
+### committed_issues
+1. `I-20260717T084757Z-A`
+- milestone: M-20260717T084757Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/sse-watchdog/raw-20260717T084757Z/issues/I-20260717T084757Z-A.md
