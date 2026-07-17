@@ -1,0 +1,6 @@
+═══ Gate Matrix ═══
+  self-unfinished → allow(no activity) ✓
+  foreign-finished → allow(sweep) ✗
+  foreign-unfinished → DENY ✓
+  platform-only 不受 gate 影响 ✓
+AT-001 FAIL

@@ -175,34 +175,59 @@ fi
 #      --force --reason (existing semantics — no new bypass surface)
 #   2. foreign guard: FREELY_AGENT_RAW_KEY (exported by worker launch paths)
 #      differing from the target key requires --force
-_ownership_guard() {
+_autonomous_close_gate() {
+  # Machine-judgeable closeout gate for autonomous agents.
+  # Human --force --reason is preserved for exceptional abandon scenarios.
   local target_key="$1"
   [[ "$PLATFORM_ONLY" == "true" ]] && return 0
   [[ "$FORCE" == "true" ]] && return 0
-  if [[ -n "${FREELY_AGENT_RAW_KEY:-}" && "$FREELY_AGENT_RAW_KEY" != "$target_key" ]]; then
-    echo "[ownership-guard] BLOCKED (foreign/异主): 你的身份 key=$FREELY_AGENT_RAW_KEY ≠ 目标 key=$target_key" >&2
-    echo "  非自有工位不得关闭。确需代关: --force --reason "..."" >&2
+  local _own_key="${FREELY_AGENT_RAW_KEY:-}"
+  local _is_self=false; [[ -n "$_own_key" && "$_own_key" == "$target_key" ]] && _is_self=true
+  local _has_merge=false
+  git log develop --oneline --grep "raw-${target_key}" 2>/dev/null | grep -qiE "^[0-9a-f]+ Merge.*raw-${target_key}" && _has_merge=true
+  local _b1_state="" _b1_file="docs/B1-docs/raw-${target_key}/issue.md"
+  [[ -f "$_b1_file" ]] && _b1_state=$(grep -m1 "^phase_state:" "$_b1_file" 2>/dev/null | awk '{print $2}')
+  local _is_dropped=false; [[ "$_b1_state" == "dropped" ]] && _is_dropped=true
+  local _aw_worker="" _aw_reviewer=""  # agent_working query (inline heredoc fix pending — current f-string escaping broken)
+local _has_active_task=false _active_tasks=""
+  local _a2a_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+  local _db="$PROJECT_ROOT/.freely/freely.db"
+  if [[ -f "$_a2a_py" && -f "$_db" ]]; then
+    _active_tasks=$(python3 "$_a2a_py" list --raw-key "$target_key" --status working,submitted,launched 2>/dev/null | python3 -c "
+import json,sys
+try: rows=json.load(sys.stdin).get('rows',[]); print(len(rows))
+except: print(0)
+" 2>/dev/null || echo 0)
+    [[ "$_active_tasks" =~ ^[0-9]+$ && "$_active_tasks" -gt 0 ]] && _has_active_task=true
+  fi
+  if $_is_self && ! $_has_merge && ! $_is_dropped; then
+    local _no_activity=true
+    [[ -n "$_aw_worker" || -n "$_aw_reviewer" ]] && _no_activity=false
+    $_has_active_task && _no_activity=false
+    if $_no_activity; then
+      echo "[closeout-gate] self-owned raw-$target_key: no merge evidence, zero agent activity — allowing close" >&2
+      return 0
+    fi
+    echo "[closeout-gate] DENIED self-owned raw-$target_key: w=$_aw_worker r=$_aw_reviewer a2a=$_active_tasks" >&2
+    echo "  action: complete work (a2a-exit --state completed), then retry; --force to abandon" >&2
     exit 1
   fi
-  # merge evidence: look for a Merge commit whose subject references the key
-  # branch pattern (merge of fix/raw-{key}-* or feature/raw-{key}-*)
-  if ! git log develop --oneline --grep "raw-${target_key}" 2>/dev/null | grep -qiE "^[0-9a-f]+ Merge.*raw-${target_key}"; then
-    local _b1_state=""
-    local _b1_file="docs/B1-docs/raw-${target_key}/issue.md"
-    if [[ -f "$_b1_file" ]]; then
-      _b1_state=$(grep -m1 "^phase_state:" "$_b1_file" 2>/dev/null | awk '{print $2}')
-    fi
-    if [[ "$_b1_state" != "dropped" ]]; then
-      echo "[ownership-guard] BLOCKED (unfinished/未完成): raw-$target_key 在 develop 无 merge 证据且非 dropped" >&2
-      echo "  零交付关工位是三次生产事故的根源。确认放弃: --force --reason "..."" >&2
-      exit 1
-    fi
+  if ! $_is_self && ( $_has_merge || $_is_dropped ); then
+    echo "[closeout-gate] foreign raw-$target_key has merge/dropped — allowing sweep" >&2
+    return 0
+  fi
+  if ! $_is_self && ! $_has_merge && ! $_is_dropped; then
+    echo "[closeout-gate] DENIED foreign unfinished raw-$target_key" >&2
+    echo "  action: owner close, batch-reconcile, or --force" >&2
+    exit 1
+  fi
+  if [[ -n "$_aw_reviewer" ]]; then
+    echo "[closeout-gate] DENIED raw-$target_key: reviewer $_aw_reviewer active" >&2
+    echo "  action: reviewer a2a-exit verdict before close" >&2
+    exit 1
   fi
   return 0
 }
-
-# ── Extract raw key from various formats ──
-# Supports: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ
 _extract_raw_key() {
   local val="$1"
   # Strip fix/ or feature/ prefix first
@@ -222,10 +247,27 @@ _extract_raw_key() {
 
 # ── Resolve branch from raw key ──
 _resolve_branch_from_raw_key() {
-  local raw_key="$1"
-  local matched
-  matched=$(git branch --list "fix/raw-${raw_key}-*" "feature/raw-${raw_key}-*" 2>/dev/null | sed 's/^[*+ ]*//' | head -1 || true)
-  echo "$matched"
+  local raw_key="$1" match_list _count first _shortest_count
+  match_list=$(git branch --list "fix/raw-${raw_key}-*" "feature/raw-${raw_key}-*" 2>/dev/null | sed 's/^[*+ ]*//' | sort -u || true)
+  if [[ -z "$match_list" ]]; then
+    match_list=$(git branch --list "*raw-${raw_key}-*" "*raw-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | grep -E "(^fix/|^feature/|^hotfix/)" | sort -u || true)
+  fi
+  _count=$(printf '%s
+' "$match_list" | grep -c . 2>/dev/null || echo 0)
+  if [[ "$_count" -eq 0 ]]; then return 0
+  elif [[ "$_count" -eq 1 ]]; then printf '%s
+' "$match_list"; return 0; fi
+  first=$(printf '%s
+' "$match_list" | awk '{print length, $0}' | sort -n | head -1 | cut -d' ' -f2-)
+  _shortest_count=$(printf '%s
+' "$match_list" | awk -v L="${#first}" 'length==L' | wc -l | tr -d ' ')
+  if [[ "$_shortest_count" -le 1 ]]; then printf '%s
+' "$first"; return 0; fi
+  echo "[closeout-gate] DENIED ambiguous: $_count branches matched, $_shortest_count at shortest length" >&2
+  printf '%s
+' "$match_list" | while read -r line; do echo "  candidate: $line" >&2; done
+  echo "  action: pass explicit branch name, or --force" >&2
+  exit 1
 }
 
 # ── Determine input from --raw-key ──
@@ -236,7 +278,7 @@ if [[ -n "${RAW_KEY:-}" ]]; then
     echo "  Supported formats: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ" >&2
     exit 1
   fi
-  _ownership_guard "$_raw_key"
+  _autonomous_close_gate "$_raw_key"
   if [[ "${PLATFORM_ONLY:-false}" == true ]]; then
     # --platform-only: skip branch resolution, use raw key directly for API close
     input="raw-${_raw_key}"
