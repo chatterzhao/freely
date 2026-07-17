@@ -55,6 +55,8 @@
   <text x="65" y="665" fill="#333">governance-merge-gate-review-aware-regression-alignment-governance</text>
   <rect id="story-pretests-adequacy-item-schema-materialization-governance" x="55" y="674" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="687" fill="#333">pretests-adequacy-item-schema-materialization-governance</text>
+  <rect id="story-pretests-gate-field-parsing-compat" x="55" y="694" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
+  <text x="65" y="707" fill="#333">pretests-gate-field-parsing-compat</text>
   <rect id="story-test-lane-routing-and-enforcement-governance" x="55" y="696" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="709" fill="#333">test-lane-routing-and-enforcement-governance</text>
   <rect id="story-test-pre-merge-family-promotion-gate-enforcement-governance" x="55" y="718" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>

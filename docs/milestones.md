@@ -7816,3 +7816,18 @@
 - milestone: M-20260717T004752Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/raw-20260717T004752Z/issues/I-20260717T004752Z-A.md
+
+## M-20260717T041435Z-A
+- title: fix — 门禁字段解析引号可选化
+- status: active
+### candidate_issues
+1. `C-20260717T041435Z-A`
+- milestone: M-20260717T041435Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T041435Z-A
+- promoted_issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/issues/I-20260717T041435Z-A.md
+### committed_issues
+1. `I-20260717T041435Z-A`
+- milestone: M-20260717T041435Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/issues/I-20260717T041435Z-A.md
