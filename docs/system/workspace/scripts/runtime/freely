@@ -22345,7 +22345,7 @@ start_project_runtime() {
     cleanup_intent="$(project_cleanup_runtime_intent "$PROJECT_ROOT" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}")"
     effective_desired_state="${cleanup_intent%%|*}"
     effective_exit_reason="${cleanup_intent#*|}"
-    append_lifecycle_trace "$PROJECT_ROOT" "L090" "supervisor_cleanup_begin" \
+    append_lifecycle_trace_in "$PROJECT_ROOT" "L090" "supervisor_cleanup_begin" \
       "supervisor_pid=$$" \
       "desired_state=${effective_desired_state:-stopped}" \
       "exit_reason=${effective_exit_reason:-supervisor_exit}" \
@@ -22358,10 +22358,16 @@ start_project_runtime() {
         "replacement_supervisor_pid=$other_supervisors" \
         "desired_state=${effective_desired_state:-running}" \
         "exit_reason=${effective_exit_reason:-supervisor_exit}"
+      append_lifecycle_trace_out "$PROJECT_ROOT" "L090" "supervisor_cleanup_begin" \
+        "supervisor_pid=$$" \
+        "expected_next=L091"
       append_lifecycle_trace "$PROJECT_ROOT" "L091" "supervisor_cleanup_superseded" \
         "supervisor_pid=$$" \
         "replacement_supervisor_pid=$other_supervisors" \
-        "next=handoff_to_active_supervisor"
+        "from_checkpoint=L090" \
+        "expected_from_previous=L091" \
+        "next=handoff_to_active_supervisor" \
+        "expected_next=TERM"
       clear_supervisor_identity_truth "$PROJECT_ROOT" "$$"
       rm -f "$sup_pid_file" "$child_pid_file"
       return 0
@@ -22401,11 +22407,17 @@ start_project_runtime() {
       rm -f "$(stop_marker_file "$PROJECT_ROOT")"
     fi
     write_workcell_state "$project" "${effective_desired_state:-stopped}" "down" "down" "${effective_exit_reason:-supervisor_exit}"
+    append_lifecycle_trace_out "$PROJECT_ROOT" "L090" "supervisor_cleanup_begin" \
+      "supervisor_pid=$$" \
+      "expected_next=L092"
     append_lifecycle_trace "$PROJECT_ROOT" "L092" "supervisor_cleanup_complete" \
       "supervisor_pid=$$" \
       "desired_state=${effective_desired_state:-stopped}" \
       "exit_reason=${effective_exit_reason:-supervisor_exit}" \
-      "next=$( [[ "${effective_desired_state:-stopped}" == "running" ]] && printf 'restart_control_plane' || printf 'stopped' )"
+      "next=$( [[ "${effective_desired_state:-stopped}" == "running" ]] && printf 'restart_control_plane' || printf 'stopped' )" \
+      "from_checkpoint=L090" \
+      "expected_from_previous=L092" \
+      "expected_next=$( [[ "${effective_desired_state:-stopped}" == "running" ]] && printf 'L240' || printf 'TERM' )"
     if [[ "${effective_desired_state:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"
       launch_manager_watchdog "$project"
@@ -22869,6 +22881,32 @@ print(ready)
       "from_checkpoint=L022" \
       "expected_from_previous=L040" \
       "expected_next=L041"
+    # L041 observer: the monitor below runs in the FOREGROUND (supervisor blocks
+    # until the cycle ends), so launch_observed must be emitted by a background
+    # watcher — it fires the moment the monitor's pid-file appears and the AI
+    # process answers kill -0 (previously L041 was emitted post-cycle, ~94s late).
+    (
+      _l041_deadline=$(( $(date +%s) + 60 ))
+      while (( $(date +%s) < _l041_deadline )); do
+        _l041_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
+        if [[ -n "$_l041_pid" ]] && kill -0 "$_l041_pid" 2>/dev/null; then
+          append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
+            "supervisor_pid=$$" \
+            "tool=$AGENT_AI_TOOL" \
+            "launch_kind=$mode_name" \
+            "child_pid=$_l041_pid" \
+            "prompt_file=$prompt_file" \
+            "cycle_log=$cycle_log" \
+            "from_checkpoint=L040" \
+            "expected_from_previous=L041" \
+            "expected_next=L042"
+          exit 0
+        fi
+        sleep 0.5
+      done
+      # timeout: leave the gap explicit (no L041) — contract §5 semantics
+    ) &
+    disown "$!" 2>/dev/null || true
     set +e
     {
       echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AGENT_AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=${AI_MODE:-none} rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
@@ -22948,16 +22986,7 @@ print(ready)
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
     launch_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_before_launch "$AGENT_AI_TOOL" "$PROJECT_ROOT")"
-    append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
-      "supervisor_pid=$$" \
-      "tool=$AGENT_AI_TOOL" \
-      "launch_kind=$mode_name" \
-      "child_pid=${child_pid:-unknown}" \
-      "prompt_file=$prompt_file" \
-      "cycle_log=$cycle_log" \
-      "from_checkpoint=L040" \
-      "expected_from_previous=L041" \
-      "expected_next=L042"
+    # (L041 launch_observed is emitted by the background observer at launch time.)
     if [[ "$AGENT_AI_TOOL" == "codex" || "$AGENT_AI_TOOL" == codex-* ]] && [[ -n "$tool_session_id" ]]; then
       tool_jsonl_path="$(runtime_capture_or_empty find_codex_jsonl_path_for_session "$tool_session_id")"
       context_ratio="$(runtime_capture_or_empty extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
@@ -23252,7 +23281,18 @@ print(ready)
       "context_ratio=${context_ratio:-0}" \
       "acp_process_count=${_cache_acp_count}" \
       "active_session_count=${_cache_active_sessions}"
-    append_lifecycle_trace "$project" "L042" "ai_cycle_finished" \
+    # L042 split-phase: IN here (cycle finished); OUT is emitted at the actual
+    # exit branch via _trace_l042_out — contract §4 demands to=<actual next>,
+    # not the old candidate alternation. Relay-style downstreams (L201/L210/
+    # L230/L240 handled by external processes) record their own IN fr=L042.
+    _trace_l042_out() {
+      append_lifecycle_trace_out "$PROJECT_ROOT" "L042" "ai_cycle_finished" \
+        "supervisor_pid=$$" \
+        "rc=${rc:-unknown}" \
+        "exit_reason=${LAST_WORKCELL_EXIT_REASON:-unknown}" \
+        "expected_next=$1"
+    }
+    append_lifecycle_trace_in "$project" "L042" "ai_cycle_finished" \
       "supervisor_pid=$$" \
       "tool=$AGENT_AI_TOOL" \
       "launch_kind=$mode_name" \
@@ -23264,8 +23304,7 @@ print(ready)
       "cycle_log=$cycle_log" \
       "exit_reason=$LAST_WORKCELL_EXIT_REASON" \
       "from_checkpoint=L041" \
-      "expected_from_previous=L042" \
-      "expected_next=L020|L090|L201|L210|L230|TERM"
+      "expected_from_previous=L042"
 
     FIRST_ROUND=false
 
@@ -23293,6 +23332,7 @@ print(ready)
           manager) LAST_WORKCELL_EXIT_REASON="manager_exit_contract_stop_ai" ;;
           worker) LAST_WORKCELL_EXIT_REASON="worker_exit_contract_stop_ai" ;;
         esac
+        _trace_l042_out "TERM"
         log_info "exit contract requested stop_ai; exiting supervisor"
         exit 0
         ;;
@@ -23309,6 +23349,7 @@ print(ready)
             ;;
         esac
         write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
+        _trace_l042_out "L020"
         sleep "${RESTART_DELAY:-2}"
         continue
         ;;
@@ -23377,6 +23418,7 @@ print(ready)
         "supervisor_pid=$$" \
         "reason=max_restarts" \
         "restart_count=$restart_count"
+      _trace_l042_out "TERM"
       exit 1
     fi
     local auto_recovery_reason=""
@@ -23390,6 +23432,7 @@ print(ready)
     fi
     if [[ -n "$auto_recovery_reason" ]]; then
       if attempt_runtime_proxy_self_heal_after_network_failure "$PROJECT_ROOT" "$AGENT_AI_TOOL" "$auto_recovery_reason"; then
+        _trace_l042_out "L020"
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
         continue
       fi
@@ -23408,6 +23451,7 @@ print(ready)
           "tool=${RUNTIME_AUTO_RECOVERY_TOOL:-$AGENT_AI_TOOL}" \
           "reason=$auto_recovery_reason" \
           "active_slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown}"
+        _trace_l042_out "L020"
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
         continue
       fi
@@ -23415,6 +23459,7 @@ print(ready)
       append_runtime_event "$project" "supervisor_stopping" \
         "supervisor_pid=$$" \
         "reason=$auto_recovery_reason"
+      _trace_l042_out "TERM"
       exit 0
     fi
     if [[ -n "$restart_signal_reason" ]]; then
@@ -23427,6 +23472,7 @@ print(ready)
         "count=${LAST_RESTART_STORM_COUNT:-0}" \
         "peak=${LAST_PROCESS_CHURN_PEAK:-0}" \
         "observe_delay=$observe_delay"
+      _trace_l042_out "L020"
       sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$observe_delay"
       continue
     fi
@@ -23439,6 +23485,7 @@ print(ready)
         "${LAST_PROMPT_BYTES:-0}" || true  # never block supervisor on guard error
     fi
 
+    _trace_l042_out "L020"
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
 }
