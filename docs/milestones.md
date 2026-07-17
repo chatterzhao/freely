@@ -7831,3 +7831,18 @@
 - milestone: M-20260717T041435Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20260717T041435Z/issues/I-20260717T041435Z-A.md
+
+## M-20260715T121608Z-A
+- title: fix — 历史状态批量收敛（承载 raw-20260715T121608Z + raw-20260715T122119Z）
+- status: active
+### candidate_issues
+1. `C-20260715T121608Z-A`
+- milestone: M-20260715T121608Z-A
+- status: promoted
+- promoted_issue_id: I-20260715T121608Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260715T121608Z/issues/I-20260715T121608Z-A.md
+### committed_issues
+1. `I-20260715T121608Z-A`
+- milestone: M-20260715T121608Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20260715T121608Z/issues/I-20260715T121608Z-A.md
