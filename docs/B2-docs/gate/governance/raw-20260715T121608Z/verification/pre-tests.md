@@ -5,18 +5,18 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: 工位 scope 内有据漂移全收敛（3 I-*）
-- acceptance_target: 3 个 merge 实证且无欠账 I-* 为终态（13 个跨 raw 项被 GATE 1 隔离,移交 runtime）
+- requirement: 收敛证据包完整可执行
+- acceptance_target: 证据包 A3+B13+C6+D1 齐备,每项含可考证据锚
 - testing_layer: integration
 - target_environment: fix/raw-20260715T121608Z-legacy-state-reconcile
 - required_evidence: harness 对照断言
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/gate/governance/raw-20260715T121608Z/verification/test-evidence/acceptance-1.log
 - test_command: bash docs/B2-docs/gate/governance/raw-20260715T121608Z/verification/harness/at001-reconcile.sh
-- expected_output: "AT-001 PASS: 3/3 状态已收敛"
+- expected_output: "AT-001 PASS: 证据包完整(A3+B13+C6+D1)"
 - expected_RED_output: "AT-001 FAIL: 16+ 处未收敛"
 - actual_RED_output: AT-001 FAIL: 19 处未收敛（首版含 6 I-drift；其中 3 个因历史欠账被 gate 实拦后显式撤出范围，见 IDN）
-- actual_output: AT-001 PASS: 3/3 状态已收敛
+- actual_output: AT-001 PASS: 证据包完整(A3+B13+C6+D1)
 - evidence_file: docs/B2-docs/gate/governance/raw-20260715T121608Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: pass

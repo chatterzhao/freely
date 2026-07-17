@@ -9,8 +9,8 @@ phase_state: completed
 
 ## Implementation Decision Note
 
-- decision: 工位 scope 内收敛 3 I-* completed（附 merge 实证）+ C-20260612 milestones 历史补锚；13 个跨 raw 终态收敛被 GATE 1（工位隔离）实拦后移交 runtime manager 治理通道（证据随 chat 指令下发）；6 个欠账/无据项显式留档
+- decision: GATE 1 两轮实拦证明跨 raw 批量收敛在现行门禁无合规单工位通道——本 lane 转型为取证交付（证据包 A3+B13+C6+D1）+ 能力缺口立案移交；不绕过、不逐 key 空转 16 个仪式 lane
 - why_this: 状态真源只能跟证据走；07-15 scanner 计数（15/13）与今日现状的差额已被日常 lane 消化，如实按今日证据收敛
 - alternatives_considered: 按 07-15 清单盲改（部分已收敛、部分无证据，否）；等 runtime worker 处理（已实测 worker ACP init 超时且无产出移除工位，否）
 - boundary_non_goals: 不动无 merge 证据的 3 个 legacy I-*；不修 worker ACP init 超时缺陷（另案跟进）
-- residual_risk: absorbed 无 I-* 锚的 13 个 raw 若未来 gate 收紧需 archive 线补锚；3 个欠账 I-* 的历史 RED-GREEN 补章属欠账治理线 scope，本 lane 不代偿
+- residual_risk: 16 项漂移在 batch-reconcile 能力落地前持续存在（证据包保鲜:全部锚为 immutable commit/平台终态）；能力立案若被判 overkill,fallback=逐 key 工位分批
