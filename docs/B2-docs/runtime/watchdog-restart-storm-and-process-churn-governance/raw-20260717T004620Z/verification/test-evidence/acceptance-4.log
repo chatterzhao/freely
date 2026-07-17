@@ -1,2 +1,1 @@
-FAIL: 存在覆盖 cleanup_supervisor 的孤立 heartbeat EXIT trap
-(isolated=1 merged=0)
+PASS: EXIT trap 已合并

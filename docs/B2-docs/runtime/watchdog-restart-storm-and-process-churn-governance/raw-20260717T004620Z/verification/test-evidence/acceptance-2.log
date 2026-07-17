@@ -1,2 +1,2 @@
-heartbeat_block_line=22507 bridge_init_line=22373
-FAIL: heartbeat 块在 bridge init 之后(窗口依赖 bridge 冷启动时长)
+heartbeat_block_line=22407 bridge_init_line=22443
+PASS: heartbeat 先于 bridge init

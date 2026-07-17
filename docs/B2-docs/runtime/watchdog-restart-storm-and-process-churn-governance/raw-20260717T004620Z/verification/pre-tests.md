@@ -16,10 +16,10 @@
 - expected_output: "AT-001 PASS: newborn survived stale heartbeat, single daemon"
 - expected_RED_output: "AT-001 FAIL: ignored>=1 或 daemon_runs>=2（复现 2026-07-17T00:16:27Z daemon_signal_ignored + 双 daemon）"
 - actual_RED_output: observed: ignored_TERM=1 supervisor_started=1 daemon_run_procs=2 cleanups=0 → AT-001 FAIL: ignored=1 starts=1 daemon_runs=2 cleanups=0（复现 ensure-manager 对新生 supervisor 发 TERM 被忽略 + 双 daemon）
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: observed: ignored_TERM=0 supervisor_started=1 daemon_run_procs=1 cleanups=0 → AT-001 PASS: newborn survived stale heartbeat, single daemon
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 在 test-pre-merge 工位真实 daemon start 复现（与 2026-07-17T00:16/00:33 两次生产复现同法）：backdate heartbeat → start → 观察 TERM 忽略事件与 daemon-run 计数
 
@@ -41,10 +41,10 @@
 - expected_output: "PASS: heartbeat 先于 bridge init"
 - expected_RED_output: "FAIL: heartbeat 块在 bridge init 之后(窗口依赖 bridge 冷启动时长)"
 - actual_RED_output: heartbeat_block_line=22507 bridge_init_line=22373 → FAIL: heartbeat 块在 bridge init 之后(窗口依赖 bridge 冷启动时长)
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: heartbeat_block_line=22407 bridge_init_line=22443 → PASS: heartbeat 先于 bridge init（harness at002 实测 delta=2s 辅助佐证）
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-2.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 首版 wall-clock 时延断言在测试工位两次意外 PASS（冷启动下 delta=2s），根因是该工位 bridge init 耗时不同于生产（窗口长度=bridge 冷启动时长，环境相关）；改为确定性源码顺序断言：当前 heartbeat 块(~L22491)在 bridge init 块(~L22380)之后，必 FAIL。harness at002 时延实测保留为 GREEN 辅助证据
 
@@ -66,10 +66,10 @@
 - expected_output: "PASS: teardown 通道 + 无裸 kill"
 - expected_RED_output: "FAIL: 仍有裸 kill"
 - actual_RED_output: FAIL: 仍有裸 kill（ensure_manager_once 含 kill "$current_pid"）
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS: teardown 通道 + 无裸 kill
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-3.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前源码 L19252 即裸 `kill "$current_pid"`，断言必 FAIL
 
@@ -92,10 +92,10 @@
 - expected_output: "PASS: EXIT trap 已合并"
 - expected_RED_output: "FAIL: 存在覆盖 cleanup_supervisor 的孤立 heartbeat EXIT trap"
 - actual_RED_output: FAIL: 存在覆盖 cleanup_supervisor 的孤立 heartbeat EXIT trap (isolated=1 merged=0)
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: PASS: EXIT trap 已合并 (isolated=0 merged=1)
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-4.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 L22340 的 cleanup trap 被 L22509 覆盖，grep 断言必 FAIL
 
@@ -112,10 +112,10 @@
 - expected_output: "AT-005 PASS"
 - expected_RED_output: "part-a FAIL: record_supervisor_death_for_storm_window 函数不存在"
 - actual_RED_output: part-a FAIL: record_supervisor_death_for_storm_window 函数不存在; part-b FAIL: 10 次记录后 storm reason 为空 → AT-005 FAIL
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: part-a PASS; part-b PASS: 阈值 10 次死亡记录后 storm reason='restart_storm_count_threshold' → AT-005 PASS
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-5.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前不存在死亡记录函数，harness part-a 必 FAIL
 
@@ -138,10 +138,10 @@
 - expected_output: "PASS: 阈值口径一致且可达"
 - expected_RED_output: "FAIL: peak=10 cfg=10 fb=4"
 - actual_RED_output: peak=10 cfg_count=10 fallback_count=4 → FAIL: peak=10 cfg=10 fb=4
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: peak=3 cfg_count=10 fallback_count=10 → PASS: 阈值口径一致且可达
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-6.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 当前 config init PROCESS_CHURN_PEAK=10（不可达）且 fallback 4≠config 10，断言必 FAIL
 
@@ -158,10 +158,10 @@
 - expected_output: "AT-007 PASS: auto 模式全链走通且无误杀/双 daemon"
 - expected_RED_output: "AT-007 FAIL: ignored>=1（复现 2026-07-17T00:33:31Z daemon_signal_ignored）"
 - actual_RED_output: observed chain_complete=1 L040_within_240s=1 ignored_TERM=1 daemon_runs=2 → AT-007 FAIL: ignored=1 daemon_runs=2（链路能走通但复现误杀 TERM 与双 daemon）
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: observed: chain_complete=1 L040_within_240s=1 ignored_TERM=0 daemon_runs=1 → AT-007 PASS: auto 模式全链走通且无误杀/双 daemon
 - evidence_file: docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/raw-20260717T004620Z/verification/test-evidence/acceptance-7.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker:
 - red_how: fix — 与 2026-07-17T00:33 生产复现同法：stale heartbeat + auto 启动，当前代码必出 daemon_signal_ignored
 
@@ -194,5 +194,5 @@
 2. AT-007 auto 全链回归
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: pending — GREEN 阶段在 test-pre-merge 工位以真实 daemon/AI CLI 执行 AT-001/002/007 后更新
+- real_environment_status: pass
+- real_environment_reason: AT-001/AT-007 在 test-pre-merge-20260717T004620Z-supervisor-liveness-storm 以真实 daemon + 真实 AI CLI(claude-apikey-ds-flash-auto)执行通过：stale heartbeat 下单 supervisor 存活、auto 模式 L010→L040 全链、0 次误杀 TERM、单 daemon

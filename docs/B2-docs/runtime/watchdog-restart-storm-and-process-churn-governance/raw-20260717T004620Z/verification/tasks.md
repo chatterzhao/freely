@@ -10,4 +10,4 @@
 - [x] A3: heartbeat 判死动作改 restart_manager_supervisor_preserving_handoff + kill -0 消亡验证 + kill_failed 事件（C2-fix；对应 AT-001/AT-003）
 - [x] A4: 新增 record_supervisor_death_for_storm_window 并接入 ensure-manager 死亡检出路径（C4-fix-1；对应 AT-005）
 - [x] A5: PROCESS_CHURN_PEAK 默认 10→3；RESTART_STORM_COUNT 后备 4→10（C4-fix-2/3；对应 AT-006）
-- [ ] A6: test-pre-merge 工位全量 GREEN（AT-001~AT-007）+ 证据落盘 test-evidence/
+- [x] A6: test-pre-merge 工位全量 GREEN（AT-001~AT-007）+ 证据落盘 test-evidence/

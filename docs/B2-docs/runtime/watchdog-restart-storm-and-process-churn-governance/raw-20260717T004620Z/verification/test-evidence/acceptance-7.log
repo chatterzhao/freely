@@ -1,2 +1,2 @@
-observed: chain_complete=1 L040_within_240s=1 ignored_TERM=1 daemon_runs=2
-AT-007 FAIL: chain=1 l040=1 ignored=1 daemon_runs=2
+observed: chain_complete=1 L040_within_240s=1 ignored_TERM=0 daemon_runs=1
+AT-007 PASS: auto 模式全链走通且无误杀/双 daemon

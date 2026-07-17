@@ -1,2 +1,2 @@
-peak=10 cfg_count=10 fallback_count=4
-FAIL: peak=10 cfg=10 fb=4
+peak=3 cfg_count=10 fallback_count=10
+PASS: 阈值口径一致且可达
