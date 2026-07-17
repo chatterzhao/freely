@@ -1,8 +1,7 @@
 ---
 local_id: raw-20260617T035314Z14Z
 kind: raw
-phase_state: absorbed
-absorbed_into: I-20260715T121608Z-A
+phase_state: proposed
 platform_ids:
   github:
     issue_id: '2883'
@@ -118,8 +117,3 @@ pr-merge-guarded L393 `check_branch_context "$target"` 强制要求当前在 dev
 - [ ] pr-merge-guarded 标注"在 develop 分支执行"
 - [ ] 三个 skill 硬性规则增加"禁止原子命令绕过"
 - [ ] deploy-skills 执行
-
-
-## State Reconcile Note (2026-07-17, raw-20260715T122119Z batch)
-
-- 平台 issue 已 CLOSED、实现已进 develop（前 I-* 物化时代 lane，无 canonical I-* 锚，跟随 raw-20260501 absorbed 惯例收敛）

@@ -1,8 +1,7 @@
 ---
 local_id: raw-20260527T004453Z53Z
 kind: raw
-phase_state: absorbed
-absorbed_into: I-20260715T121608Z-A
+phase_state: proposed
 platform_ids:
   github:
     issue_id: '2243'
@@ -64,8 +63,3 @@ freely_db_manager.py — single long-lived daemon owning one SQLite connection:
 - DB overhead per cycle: ~3-5s → ~150ms
 - SQLite connections: 30-50 per cycle → 1 persistent
 - PRIMARY KEY collisions: eliminated (single writer + microsecond IDs)
-
-
-## State Reconcile Note (2026-07-17, raw-20260715T122119Z batch)
-
-- 平台 issue 已 CLOSED、实现已进 develop（前 I-* 物化时代 lane，无 canonical I-* 锚，跟随 raw-20260501 absorbed 惯例收敛）
