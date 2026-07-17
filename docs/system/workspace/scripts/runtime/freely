@@ -14254,8 +14254,25 @@ _ensure_acp_bridge_running() {
       elif _acp_bridge_health_check "$project" 5 "$base_tool"; then
         return 0
       else
+        # Warm-up grace: a just-spawned ACP server can take ~8s to answer its
+        # first health probe (5s timeout). Reuse instead of respawning a bridge
+        # younger than the grace window — respawn-on-cold-start is the churn
+        # engine behind the 2026-07-16 bridge leak.
+        local _bridge_age _pidfile_mtime
+        _pidfile_mtime=$(file_mtime_epoch "$pid_file" 2>/dev/null || echo 0)
+        _bridge_age=$(( $(date +%s) - _pidfile_mtime ))
+        if (( _pidfile_mtime > 0 && _bridge_age < ${ACP_BRIDGE_WARMUP_GRACE_SECS:-20} )); then
+          log_info "ACP bridge (pid=$pid) warming (${_bridge_age}s old), reusing without respawn"
+          return 0
+        fi
         log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
       fi
+    fi
+    # Reap the old bridge before dropping its tracking files — deleting the pid
+    # file of a live process orphans it (leak: 42 python bridges / >1.2GB RSS on
+    # 2026-07-16). terminate_pid_with_graceful_wait always returns 0.
+    if [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null; then
+      terminate_pid_with_graceful_wait "$pid" "stale ACP bridge before respawn"
     fi
     rm -f "$pid_file" "$socket" "$acp_bin_file" "$acp_tool_file"
   fi
@@ -22617,7 +22634,17 @@ print('ok')
         done
       fi
       [[ ${#_cycle_tools[@]} -eq 0 && -n "${AGENT_AI_TOOL:-}" ]] && _cycle_tools+=("${AGENT_AI_TOOL%%-*}")
+      local _mgr_slot_cycle _mgr_bt_cycle
+      _mgr_slot_cycle=$("$_aq" --get-slot "manager_01" 2>/dev/null || true)
+      _mgr_bt_cycle="${_mgr_slot_cycle%%-*}"
+      [[ -z "$_mgr_bt_cycle" ]] && _mgr_bt_cycle="${AGENT_AI_TOOL%%-*}"
       for _bt in "${_cycle_tools[@]}"; do
+        # lazy-start guard: only the manager base_tool is kept eagerly alive.
+        # Worker/reviewer tools start on first delegation (auto-wake) — keep
+        # them alive here only if a pid file shows they were already started.
+        if [[ "$_bt" != "$_mgr_bt_cycle" ]] && [[ ! -f "$(_acp_bridge_pid_file "$project" "$_bt")" ]]; then
+          continue
+        fi
         _ensure_acp_bridge_running "$project" "$_bt" || log_warn "ACP bridge check failed for $_bt"
       done
     fi
