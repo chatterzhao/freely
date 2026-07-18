@@ -14315,7 +14315,12 @@ _ensure_acp_bridge_running() {
   local _config_path; _config_path="${!_config_key:-}"
   if [[ -n "$_config_path" && -x "$_config_path" ]]; then
     acp_bin="$_config_path"
-  elif ! command -v "$acp_bin" >/dev/null 2>&1; then
+  elif _found_bin=$(command -v "$acp_bin" 2>/dev/null) && [[ -n "$_found_bin" ]]; then
+    acp_bin="$_found_bin"
+    # Self-heal: cache discovered path so worker worktrees and future starts
+    # benefit without re-searching PATH (which may differ per context).
+    upsert_config_key "$project" "$_config_key" "$acp_bin" 2>/dev/null || true
+  else
     log_warn "ACP binary '$acp_bin' not in PATH and not found in config.toml ($_config_key)"
     log_warn "Run 'freely init' to set up ACP tools, or set $_config_key in .freely/config.toml"
   fi
