@@ -2117,7 +2117,6 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   [[ "$_warn_workers" =~ ^[0-9]+$ ]] || _warn_workers="7"
   max_parallel_workers="$_max_workers"
   # Reconcile zombie agent-id.env entries before counting (worktree gone but entry remains)
-	    _agent_env="$source_project/.freely/agent-id.env"
   manager_reconcile_agent_id_env 2>/dev/null || true
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
@@ -12904,17 +12903,20 @@ worker_project_is_actively_running() {
 # manager_reconcile_agent_id_env — delegate to agent_working.cleanup_stale().
 # Called before delegation when approaching pool limit, and by agent-table-query --reconcile.
 manager_reconcile_agent_id_env() {
-  local _aw_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
+  # PROJECT_ROOT is only assigned on some dispatch paths (e.g. daemon status
+  # reaches here before it is set) — fall back to SELF_ROOT under set -u.
+  local _proj="${PROJECT_ROOT:-$SELF_ROOT}"
+  local _aw_py="${_proj}/docs/system/workspace/scripts/runtime/agent_working.py"
   if [[ -f "$_aw_py" ]]; then
     python3 -c "
-import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+import sys; sys.path.insert(0, '${_proj}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_cleanup_stale
-agent_cleanup_stale('${PROJECT_ROOT}')
+agent_cleanup_stale('${_proj}')
 " 2>/dev/null || true
     return 0
   fi
   # Fallback: old agent-id.env file-based cleanup
-  local _agent_env="${1:-${PROJECT_ROOT}/.freely/agent-id.env}"
+  local _agent_env="${1:-${_proj}/.freely/agent-id.env}"
   [[ -f "$_agent_env" ]] || return 0
   local _cleaned=0 _line _wt_path
   while IFS= read -r _line; do

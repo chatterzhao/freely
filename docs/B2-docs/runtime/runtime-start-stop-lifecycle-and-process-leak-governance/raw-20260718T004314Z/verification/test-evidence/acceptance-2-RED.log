@@ -1,0 +1,4 @@
+  daemon status rc=1
+  output ends before post-reconcile fields (died at refresh point)
+    control_plane: daemon
+AT002_RESULT: FAIL
