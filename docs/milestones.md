@@ -131,5 +131,5 @@
 ### committed_issues
 1. `I-20260718T035754Z-A`
 - milestone: M-20260718T035754Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T035754Z/issues/I-20260718T035754Z-A.md
