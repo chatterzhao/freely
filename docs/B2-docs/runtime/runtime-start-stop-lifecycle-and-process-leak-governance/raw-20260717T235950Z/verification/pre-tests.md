@@ -16,10 +16,10 @@
 - expected_output: AT001_RESULT: PASS
 - expected_RED_output: 旧文案行无"自治门禁" → AT001_RESULT: FAIL
 - actual_RED_output: row='| `--force` | 永久丢弃（不可恢复）。有未合并提交时需同时 `--discard-unmerged` |' 无自治门禁 → AT001_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T235950Z/verification/test-evidence/acceptance-1-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: row 含'绕过自治门禁的拒绝判定…正常自治关闭不需要此标志' → AT001_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T235950Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: 对未修改的 commands.md 跑 harness，--force 行为旧文案（无自治门禁关键词）→ FAIL 即 RED
 

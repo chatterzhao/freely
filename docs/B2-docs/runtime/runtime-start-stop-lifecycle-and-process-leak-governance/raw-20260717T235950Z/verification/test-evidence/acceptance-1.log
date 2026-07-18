@@ -1,0 +1,2 @@
+  row: | `--force` | 永久丢弃（不可恢复）。绕过自治门禁的拒绝判定（unfinished/foreign block）；正常自治关闭不需要此标志——gate 会自动判定放行条件。有未合并提交时需同时 `--discard-unmerged` |
+AT001_RESULT: PASS
