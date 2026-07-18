@@ -18,10 +18,10 @@ RED 用主仓 develop 现行版脚本（含 L2120）；GREEN 用工位修复版�
 - expected_output: AT001_RESULT: PASS
 - expected_RED_output: probe 静默死（rc=1 无 PROBE_END；unbound 消息被 refresh 内调用点 >/dev/null 2>&1 吞掉——与生产静默死一致）→ AT001_RESULT: FAIL
 - actual_RED_output: "probe died (rc=1) without unbound msg" → AT001_RESULT: FAIL（直调 reconcile 无重定向时实证 line 2120: source_project: unbound variable）
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/verification/test-evidence/acceptance-1-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: "probe survived refresh" → AT001_RESULT: PASS（首轮 GREEN FAIL 暴露第二致命点：manager_reconcile_agent_id_env 内 PROJECT_ROOT unbound，已一并修复）
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: 对主仓 develop 现行版脚本跑 harness，refresh 到 L2120 即 shell 级 unbound 死亡（直调 reconcile 无重定向实证 line 2120: source_project: unbound variable；经 refresh 调用点重定向则表现为纯静默死）
 
@@ -38,10 +38,10 @@ RED 用主仓 develop 现行版脚本（含 L2120）；GREEN 用工位修复版�
 - expected_output: AT002_RESULT: PASS
 - expected_RED_output: "output ends before post-reconcile fields" → AT002_RESULT: FAIL
 - actual_RED_output: rc=1，输出止于 'control_plane: daemon'，post-reconcile 字段缺失 → AT002_RESULT: FAIL
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/verification/test-evidence/acceptance-2-RED.log
-- red-green-status: red
-- status: pending
+- actual_output: daemon status rc=0，post-reconcile 字段（intake_active_items）出现 → AT002_RESULT: PASS
+- evidence_file: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/verification/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 - blocker:
 - red_how: HEAD 版 daemon status 实测仅输出 control_plane 行即死（rc=1），intake_active_items（refresh 点之后打印）缺失即 RED
 

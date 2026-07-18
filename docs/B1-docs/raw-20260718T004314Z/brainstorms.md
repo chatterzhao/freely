@@ -19,6 +19,9 @@ raw-20260718T004314Z。2026-07-18 00:27 起 runtime 无法重启的排查产物�
 5. `source_project` 仅 sync-tooling 函数族有定义。set -u 下 unbound variable 是 shell 级致命错误，**绕过 `|| true` 与重定向防护**直接杀死整个进程——与本批 lane 已根修的"set -e 静默死"同类。
 6. 触发条件：launch-state.env 存在且 LAST_MANAGER_CONTINUITY_* 条件满足（当前含 round-078 残留 prompts）→ 路径必达 L2120。此前 runtime 未触发是因旧 launch-state 走了 early return。
 
+### P7（GREEN 阶段暴露的第二致命点）
+删除 L2120 后 daemon status 仍死于同一 refresh 调用——`manager_reconcile_agent_id_env()` 内 `${PROJECT_ROOT}` 在 status 派发路径（startup_self_heal → refresh → reconcile）到达时尚未赋值（PROJECT_ROOT 全局仅 L3509 某些派发路径赋值），set -u 同样致命且被 `2>/dev/null` 吞。probe 设 PROJECT_ROOT 后存活证明该点：同一缺陷链第二实例。修复：函数内 `local _proj="${PROJECT_ROOT:-$SELF_ROOT}"` 回退（SELF_ROOT 脚本头部恒有值）。
+
 ## Brainstorm
 ### Option A: 删除 L2120 孤儿行 ✅
 正确 _agent_env 逻辑在 manager_reconcile_agent_id_env() 内有默认参（`${1:-${PROJECT_ROOT}/.freely/agent-id.env}`），孤儿行纯冗余。
