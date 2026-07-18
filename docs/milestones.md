@@ -118,3 +118,18 @@
 - milestone: M-20260718T004314Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/issues/I-20260718T004314Z-A.md
+
+## M-20260718T035754Z-A
+- title: fix — bridge 启动时 ACP binary 自愈回写 config.toml
+- status: active
+### candidate_issues
+1. `C-20260718T035754Z-A`
+- milestone: M-20260718T035754Z-A
+- status: promoted
+- promoted_issue_id: I-20260718T035754Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T035754Z/issues/I-20260718T035754Z-A.md
+### committed_issues
+1. `I-20260718T035754Z-A`
+- milestone: M-20260718T035754Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T035754Z/issues/I-20260718T035754Z-A.md
