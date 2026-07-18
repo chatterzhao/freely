@@ -88,3 +88,18 @@
 - milestone: M-20260717T203109Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T203109Z/issues/I-20260717T203109Z-A.md
+
+## M-20260717T235950Z-A
+- title: docs — commands.md wt-close --force 语义同步
+- status: active
+### candidate_issues
+1. `C-20260717T235950Z-A`
+- milestone: M-20260717T235950Z-A
+- status: promoted
+- promoted_issue_id: I-20260717T235950Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T235950Z/issues/I-20260717T235950Z-A.md
+### committed_issues
+1. `I-20260717T235950Z-A`
+- milestone: M-20260717T235950Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T235950Z/issues/I-20260717T235950Z-A.md

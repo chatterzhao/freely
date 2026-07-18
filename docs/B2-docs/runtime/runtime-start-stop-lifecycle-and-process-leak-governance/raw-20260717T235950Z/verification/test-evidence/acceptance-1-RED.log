@@ -1,0 +1,3 @@
+  row: | `--force` | 永久丢弃（不可恢复）。有未合并提交时需同时 `--discard-unmerged` |
+  row lacks 自治门禁 wording
+AT001_RESULT: FAIL
