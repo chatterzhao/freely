@@ -103,3 +103,18 @@
 - milestone: M-20260717T235950Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260717T235950Z/issues/I-20260717T235950Z-A.md
+
+## M-20260718T004314Z-A
+- title: fix — runtime L2120 孤儿行 unbound 静默死
+- status: active
+### candidate_issues
+1. `C-20260718T004314Z-A`
+- milestone: M-20260718T004314Z-A
+- status: promoted
+- promoted_issue_id: I-20260718T004314Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/issues/I-20260718T004314Z-A.md
+### committed_issues
+1. `I-20260718T004314Z-A`
+- milestone: M-20260718T004314Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T004314Z/issues/I-20260718T004314Z-A.md
