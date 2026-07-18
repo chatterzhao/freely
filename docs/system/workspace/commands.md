@@ -190,7 +190,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 |------|------|
 | `--raw-key <key>` | 必填。支持 `raw-YYYYMMDDTHHMMSSZ`、`fix/raw-{key}-{slug}`、纯时间戳等格式 |
 | `--reason <text>` | 绕过标记（--force/--discard-unmerged/--platform-only/--skip-platform）时必须填写 |
-| `--force` | 永久丢弃（不可恢复）。有未合并提交时需同时 `--discard-unmerged` |
+| `--force` | 永久丢弃（不可恢复）。绕过自治门禁的拒绝判定（unfinished/foreign block）；正常自治关闭不需要此标志——gate 会自动判定放行条件。有未合并提交时需同时 `--discard-unmerged` |
 | `--discard-unmerged` | 确认丢弃未合并提交 |
 | `--platform-only` | 仅通过 API 关闭双平台 issue。**不需要本地 docs** |
 | `--skip-platform` | 跳过平台 issue 关闭 |
