@@ -3,9 +3,10 @@ local_id: raw-20260718T035754Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260718T035754Z-A
-created_at: 2026-07-18T03:57:54Z
+created_at: 2026-07-18 03:57:54+00:00
 author: zhaoquan
 channel: freely-workflow-guarded-execution
+platform_state: closed
 ---
 
 ## 根因
