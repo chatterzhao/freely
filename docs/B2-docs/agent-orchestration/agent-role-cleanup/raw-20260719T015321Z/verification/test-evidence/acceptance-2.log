@@ -1,0 +1,3 @@
+=== AT-002: no dangling lead-agent references in system/workspace ===
+---
+RESULT: PASS — no dangling references

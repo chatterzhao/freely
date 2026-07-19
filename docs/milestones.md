@@ -146,5 +146,5 @@
 ### committed_issues
 1. `I-20260719T015321Z-A`
 - milestone: M-20260719T015321Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/agent-orchestration/agent-role-cleanup/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md

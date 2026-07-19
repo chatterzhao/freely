@@ -11,4 +11,4 @@
 - [x] T6: 4 个治理测试文件删除 fake lead-agent.md fixture
 - [x] T7: scripts/README.md、tools.md、freely runtime 引用更新
 - [x] T8: 其余测试文件引用更新
-- [ ] T9: governance-check 全绿验证 + 全项目 grep 无悬空引用
+- [x] T9: governance-check 全绿验证 + 全项目 grep 无悬空引用
