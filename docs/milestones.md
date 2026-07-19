@@ -251,3 +251,6 @@
 ## M-20260719T130109Z-A / title: fix — worker_slot fork / status: active
 ### candidate_issues: 1. C-20260719T130109Z-A / promoted / I-20260719T130109Z-A / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T130109Z/issues/I-20260719T130109Z-A.md
 ### committed_issues: 1. I-20260719T130109Z-A / completed / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T130109Z/issues/I-20260719T130109Z-A.md
+## M-20260719T133426Z-A / title: pending→submitted / status: active
+### candidate_issues: 1. C-20260719T133426Z-A / promoted / I-20260719T133426Z-A
+### committed_issues: 1. I-20260719T133426Z-A / completed
