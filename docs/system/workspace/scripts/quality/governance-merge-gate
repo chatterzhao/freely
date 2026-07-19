@@ -317,21 +317,23 @@ def normalized_phase(value: Optional[str]) -> str:
 def is_governance_only_path(rel_path: str) -> bool:
     """Paths where FREELY_SKIP_IBM_GATE=1 is allowed.
 
+    Authority: .freely/config.toml [skip_ibm_gate].allowed_paths is the
+    single source of truth when configured. If the config has entries,
+    only those paths skip the IBM gate. The hardcoded defaults below
+    are a fallback for projects without [skip_ibm_gate] configuration.
+
     Per LAWS.md §3: only docs/cleanup/format changes that structurally
-    do not require IBM lifecycle evidence. This means governance process
-    artifacts (pre-brainstorms, epics, progress, issues, milestones,
-    agent/skill definitions) and meta-governance quality scripts.
-
-    Deliberately EXCLUDED (require full IBM lifecycle):
-      - docs/system/workspace/hooks/          (runtime enforcement code)
-      - docs/system/workspace/scripts/runtime/ (daemon, bridge, launchers)
-      - docs/system/workspace/scripts/worktree/ (wt-close, pr-merge, etc.)
-      - docs/system/workspace/scripts/tests/    (test code)
-
-    Also reads [skip_ibm_gate] allowed_paths from .freely/config.toml
-    to allow project-specific governance-only paths.
+    do not require IBM lifecycle evidence.
     """
-    # Check hardcoded exact-path set
+    # ── L1: config.toml is the authority ──
+    config_paths = _load_skip_ibm_allowed_paths()
+    if config_paths:
+        for prefix in config_paths:
+            if rel_path.startswith(prefix):
+                return True
+        return False
+
+    # ── L2: hardcoded defaults (fallback when config is absent/empty) ──
     if rel_path in {
         "AGENTS.md",
         "CLAUDE.md",
@@ -350,21 +352,12 @@ def is_governance_only_path(rel_path: str) -> bool:
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
         return True
-        return True
-    # Project config templates and examples (init templates)
     if rel_path.startswith("templates/"):
         return True
     if rel_path.startswith("docs/system/workspace/scripts/quality/"):
         return True
-    # Hook documentation (.md only, not hook scripts which are runtime code)
     if rel_path.startswith("docs/system/workspace/hooks/") and rel_path.endswith(".md"):
         return True
-
-    # Project-specific allowed paths from .freely/config.toml
-    config_paths = _load_skip_ibm_allowed_paths()
-    for prefix in config_paths:
-        if rel_path.startswith(prefix):
-            return True
 
     return False
 
