@@ -205,5 +205,5 @@
 ### committed_issues
 1. `I-20260719T074532Z-A`
 - milestone: M-20260719T074532Z-A
-- phase_state: in_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/a2a/agent-instance-id/raw-20260719T074532Z/issues/I-20260719T074532Z-A.md
