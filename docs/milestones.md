@@ -227,6 +227,13 @@
 - title: fix — 跨tool session创建
 - status: active
 ### candidate_issues
-1. `C-20260719T101009Z-A` / promoted / I-20260719T101009Z-A / docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
+1. `C-20260719T101009Z-A`
+- milestone: M-20260719T101009Z-A
+- status: promoted
+- promoted_issue_id: I-20260719T101009Z-A
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
 ### committed_issues
-1. `I-20260719T101009Z-A` / completed / docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
+1. `I-20260719T101009Z-A`
+- milestone: M-20260719T101009Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
