@@ -53,23 +53,30 @@ return {"agent_id": free[0] if free else None}
 - `acp_session_register` → 统一入口，ACP session/new|fork 时调用
 - 全部正确，已实现
 
-### 第4层：Shell (freely runtime) ❌ 两处断点
+### 第4层：Shell (freely runtime) ❌ 两条 launch 路径各有断点
 
-**断点 A: raw_key 硬编码** (freely L6064)
-```bash
-python3 -c "... agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '$_next_worker', ...)"
-                                                      ^^^^^^^
-```
-传给 agent_assign 的 raw_key 是硬编码的 `'develop'`，不是实际 raw issue key。
-→ agent_working 的 worker_id 写入了 `__manager__` 行或不存在行，而不是 raw_key 对应行
+freely 中有**两条** worker launch 代码路径，各有不同的 bug：
 
-**断点 B: agent_next_free 结果未被 a2a-exit 使用** (freely L6034-6037)
+**路径 A (L6034-6066) — 旧路径：agent_next_free ✅ 但 raw_key 硬编码 ❌**
+
 ```bash
 _next_worker=$(python3 -c "from agent_working import agent_next_free;
   print(agent_next_free('${PROJECT_ROOT}', 'worker', 10) or '')")
 ```
-`_next_worker` 已经正确计算（如 "worker_03"），但这个值只用于 agent_assign，没有传给 a2a-exit。
-a2a-exit 的 agent_id 仍然是 `args.role`（字符串 "worker"）。
+`_next_worker` 正确计算（如 "worker_03"），但：
+- L6064: raw_key 硬编码 `'develop'` → agent_assign 写入错误行
+- `_next_worker` 结果只用于 agent_assign，未传给 a2a-exit
+
+**路径 B (L13300-13309) — 新路径：raw_key ✅ 但 agent_id 硬编码 ❌**
+
+```bash
+_worker_agent_id="worker_01"   # 硬编码！不是 agent_next_free
+_worker_raw_key="$(echo "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+python3 -c "... agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '${_worker_agent_id}', ...)"
+```
+- raw_key 从 target_project 路径提取 → ✅ 正确
+- agent_id 硬编码 `"worker_01"` → 永远只用第一个实例，pool 形同虚设
+- 同样没有传给 a2a-exit
 
 ### 第5层：a2a-exit (a2a_task.py) ❌ agent_id 用 role 字符串
 
