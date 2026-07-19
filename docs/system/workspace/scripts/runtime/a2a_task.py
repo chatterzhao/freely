@@ -1109,6 +1109,23 @@ def _main() -> int:
                                  reason=reason)
                     task_id = existing_task_id
                 else:
+                    # ── L1: validate new worker task required fields ──
+                    if args.role == "worker":
+                        wt = (getattr(args, 'worktree', '') or '').strip()
+                        br = (getattr(args, 'branch', '') or '').strip()
+                        rk = (getattr(args, 'raw_key', '') or '').strip()
+                        sm = (getattr(args, 'summary', '') or '').strip()
+                        missing = []
+                        if not wt: missing.append("--worktree")
+                        if not br: missing.append("--branch")
+                        if not rk: missing.append("--raw-key")
+                        if not sm: missing.append("--summary")
+                        if missing:
+                            print(json.dumps({"ok": False, "error": f"worker task requires: {', '.join(missing)}"}))
+                            return
+                        if state != "submitted":
+                            print(json.dumps({"ok": False, "error": f"new worker task state must be 'submitted', got '{state}'"}))
+                            return
                     r = c.create(
                         agent_id=getattr(args, 'agent_instance', None) or args.role,
                         name=getattr(args, 'agent_instance', None) or args.role,

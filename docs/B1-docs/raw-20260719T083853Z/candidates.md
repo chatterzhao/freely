@@ -22,6 +22,6 @@ milestone: M-20260719T083853Z-A
 - open_questions: []
 - acceptance_reviews: [ reviewer: self-review, mode: inline, verdict: pass ]
 - promoted_issue_id: I-20260719T083853Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260719T083853Z/issues/I-20260719T083853Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/task-field-validation/raw-20260719T083853Z/issues/I-20260719T083853Z-A.md
 - milestone: M-20260719T083853Z-A
 - session_refs: []

@@ -1050,6 +1050,15 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
     """Insert a new A2A Task (with Freely extension fields)."""
     now = _now_utc()
     task_id = params.get("task_id", str(uuid.uuid4()))
+    # ── L2: DB-layer validation for worker tasks ──
+    _agent_id = params.get("agent_id", "")
+    if _agent_id.startswith("worker"):
+        _wt = (params.get("worktree", "") or "").strip()
+        _br = (params.get("branch", "") or "").strip()
+        _rk = (params.get("raw_key", "") or "").strip()
+        _msg = (params.get("message", "") or "").strip()
+        if not _wt or not _br or not _rk or not _msg:
+            return {"error": f"worker task rejected: missing fields (worktree={bool(_wt)} branch={bool(_br)} raw_key={bool(_rk)} message={bool(_msg)})"}
     c = daemon.conn.execute(
         """INSERT INTO a2a_tasks
            (task_id, name, description, state, agent_id, skill, session_id, message,
