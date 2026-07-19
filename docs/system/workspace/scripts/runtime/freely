@@ -15638,7 +15638,7 @@ parse_a2a_task_json_reply() {
         # A2A-native: Manager creates individual worker tasks via a2a-exit --role worker.
         # Check for rotting: submitted + no workers + 30s grace period → resume_manager.
         local _w_count _task_ts _now _age
-        _w_count=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
+        _w_count=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
         _task_ts=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('updated_at',''))" 2>/dev/null || echo "")
         _now=$(date +%s)
         if [[ -n "$_task_ts" ]]; then
@@ -15681,14 +15681,14 @@ manager_exit_contract_kind() {
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     local pending_workers
-    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
+    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
       echo "delegate_workers"
       return 0
     fi
     # PR #2914 removed --workers from a2a-exit; worker_prompts_csv is
     # always empty. Worker delegation is now detected via tasks/list
-    # --status pending above. Fall through to exit_kind.
+    # --status submitted (A2A standard state). Fall through to exit_kind.
     local latest_mgr
     latest_mgr=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
     if [[ -n "$latest_mgr" ]]; then
