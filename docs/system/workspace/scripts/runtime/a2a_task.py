@@ -829,6 +829,7 @@ def _main() -> int:
     p_exit.add_argument("--evidence", default="", help="Evidence paths")
     p_exit.add_argument("--role", required=True, help="Role: manager|worker (REQUIRED — no default, must be explicit)")
     p_exit.add_argument("--agent-id", default=None, help=argparse.SUPPRESS)  # deprecated, use --role
+    p_exit.add_argument("--agent-instance", default=None, help="Specific agent instance ID (e.g. worker_03)")
     p_exit.add_argument("--raw-key", default="", help="Raw issue key")
     p_exit.add_argument("--worktree", default="", help="Worktree path")
     p_exit.add_argument("--branch", default="", help="Branch name")
@@ -1109,8 +1110,8 @@ def _main() -> int:
                     task_id = existing_task_id
                 else:
                     r = c.create(
-                        agent_id=args.role,
-                        name=args.role,
+                        agent_id=getattr(args, 'agent_instance', None) or args.role,
+                        name=getattr(args, 'agent_instance', None) or args.role,
                         raw_key=getattr(args, 'raw_key', '') or "",
                         worktree=getattr(args, 'worktree', '') or "",
                         branch=getattr(args, 'branch', '') or "",
