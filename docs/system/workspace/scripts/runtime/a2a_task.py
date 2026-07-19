@@ -827,7 +827,7 @@ def _main() -> int:
     p_exit.add_argument("--summary", default="", help="Completion summary")
     p_exit.add_argument("--next", default="", help="Next action")
     p_exit.add_argument("--evidence", default="", help="Evidence paths")
-    p_exit.add_argument("--role", default="manager", help="Role: manager|worker")
+    p_exit.add_argument("--role", required=True, help="Role: manager|worker (REQUIRED — no default, must be explicit)")
     p_exit.add_argument("--agent-id", default=None, help=argparse.SUPPRESS)  # deprecated, use --role
     p_exit.add_argument("--raw-key", default="", help="Raw issue key")
     p_exit.add_argument("--worktree", default="", help="Worktree path")
@@ -1090,7 +1090,7 @@ def _main() -> int:
                 print(json.dumps({"ok": True, "task_id": task_id, "state": fields["state"]}))
         elif args.cmd == "a2a-exit":
             # Backward compat: --agent-id maps to --role (deprecated, use --role)
-            if getattr(args, 'agent_id', None) and getattr(args, 'role', 'manager') == 'manager':
+            if getattr(args, 'agent_id', None):
                 args.role = args.agent_id
             raw_state = getattr(args, 'state', '') or ''
             state = normalize_state(raw_state)
@@ -1109,8 +1109,8 @@ def _main() -> int:
                     task_id = existing_task_id
                 else:
                     r = c.create(
-                        agent_id=getattr(args, 'role', 'manager') or "manager",
-                        name=getattr(args, 'role', 'manager') or "manager",
+                        agent_id=args.role,
+                        name=args.role,
                         raw_key=getattr(args, 'raw_key', '') or "",
                         worktree=getattr(args, 'worktree', '') or "",
                         branch=getattr(args, 'branch', '') or "",

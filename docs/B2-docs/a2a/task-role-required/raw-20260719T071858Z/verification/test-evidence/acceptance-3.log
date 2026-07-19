@@ -1,0 +1,14 @@
+AT-003 RED: 存在无 --role 的 a2a-exit 调用
+8607:- Manager 调用 a2a-exit 工具声明状态（见 manager-agent.md），不在回复末尾输出 JSON
+8608:- Worker 调用 a2a-exit 工具声明状态（见 worker-agent.md），不在回复末尾输出 JSON
+11559:      "hint=Please call a2a-exit --state failed if no actionable work"
+13858:本轮结束时必须调用 a2a-exit 工具（见 worker-agent.md）。不要输出 JSON block：
+15201:- 必须在本轮结束前调用 a2a-exit 工具声明状态；否则 runtime 会继续按同一 resume target 拉回修复。
+15211:- 必须在本轮结束前调用 a2a-exit 工具声明状态；否则 runtime 会继续按同一 resume target 拉回修复。
+15526:**本轮结束时必须调用 a2a-exit 工具声明状态（不再通过文本 JSON block）：**
+15528:python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
+15536:  a2a-exit --state submitted --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+15539:  a2a-exit --state failed --summary "no actionable items, scan stale"
+15554:**本轮结束时必须调用 a2a-exit 工具声明状态：**
+15556:python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
+20402:调用 a2a-exit 工具声明本轮状态
