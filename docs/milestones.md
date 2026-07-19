@@ -192,3 +192,18 @@
 - milestone: M-20260719T071858Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/a2a/task-role-required/raw-20260719T071858Z/issues/I-20260719T071858Z-A.md
+
+## M-20260719T074532Z-A
+- title: fix — agent_working + a2a_tasks 使用真实 agent 实例 ID
+- status: active
+### candidate_issues
+1. `C-20260719T074532Z-A`
+- milestone: M-20260719T074532Z-A
+- status: promoted
+- promoted_issue_id: I-20260719T074532Z-A
+- promoted_issue_path: docs/B2-docs/a2a/agent-instance-id/raw-20260719T074532Z/issues/I-20260719T074532Z-A.md
+### committed_issues
+1. `I-20260719T074532Z-A`
+- milestone: M-20260719T074532Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/agent-instance-id/raw-20260719T074532Z/issues/I-20260719T074532Z-A.md

@@ -1132,8 +1132,14 @@ def h_a2a_task_list(daemon: DbDaemon, params: dict) -> dict:
         filters.append("state = ?")
         vals.append(params["state"])
     if "agent_id" in params and params["agent_id"]:
-        filters.append("agent_id = ?")
-        vals.append(params["agent_id"])
+        _aid = params["agent_id"]
+        # Role string (no _NN suffix) → prefix match; instance ID → exact match
+        if re.match(r'^(manager|worker|reviewer)$', _aid):
+            filters.append("agent_id LIKE ?")
+            vals.append(f"{_aid}_%")
+        else:
+            filters.append("agent_id = ?")
+            vals.append(_aid)
     if "skill" in params and params["skill"]:
         filters.append("skill = ?")
         vals.append(params["skill"])

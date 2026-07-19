@@ -6061,7 +6061,7 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', 10) or '')
 	      mkdir -p "$(dirname "$_agent_env")"
 	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
 		      # Phase 1: dual-write to agent_working table
-		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
+		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
 	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env + agent_working)"
 	    fi
 	  fi
@@ -13302,8 +13302,13 @@ SESSIONEOF
   # Write worker entry to agent_working table before fork launch.
   # This enables _resolve_current_agent_id() to find the worker's role
   # when the worker process starts in the target worktree.
-  local _worker_agent_id _worker_slot _worker_raw_key
-  _worker_agent_id="worker_01"
+  local _worker_agent_id _worker_slot _worker_raw_key _worker_pool
+  _worker_pool=$("$SELF_ROOT/bin/agent-table-query" --pool-size worker 2>/dev/null || echo 10)
+  _worker_agent_id=$(python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_next_free
+print(agent_next_free('${PROJECT_ROOT}', 'worker', ${_worker_pool:-10}) or 'worker_01')
+" 2>/dev/null || echo "worker_01")
   _worker_slot="${AGENT_AI_TOOL:-claude-apikey-ds-flash-auto}"
   _worker_raw_key="$(echo "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
   python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')" 2>/dev/null || true
