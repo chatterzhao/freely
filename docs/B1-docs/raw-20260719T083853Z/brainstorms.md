@@ -60,42 +60,79 @@ Runtime:      读到 worktree='' → worker deferred: worktree missing
 - agent_working.worker_id 存 `"worker_03:session_id"`（实例 ID + session）——用于追踪
 - 两者职责不同，不应混淆。a2a_tasks.agent_id 在 task 创建时写 role 字符串（Manager AI 不知道哪个实例空闲），Runtime 分配实例后再更新
 
+## 关键区分
+
+### 新建 task vs 更新已有 task
+
+a2a-exit 有两种调用模式：
+
+| 场景 | 参数 | worktree/branch/raw-key |
+|------|------|------------------------|
+| Manager 委派 Worker（新建） | `--state submitted --role worker --worktree ...` | **必须填** |
+| Worker 退出（更新已有 task） | `--task-id <id> --state completed --role worker` | **不需要**（已有 task 继承原有值） |
+| Manager 自身状态 | `--state submitted --role manager` | 不需要 |
+
+校验仅针对**新建 worker task**（`--role worker` + 无 `--task-id`）。
+
+### role vs agent_id（不要混淆）
+
+- `role` = 角色类型：`"worker"`（字符串，用于 Runtime LIKE 发现）
+- `agent_id` = 具体实例：`"worker_03"`（格式 `{role}_\d{2}`，如 `worker_01`~`worker_10`）
+- a2a_tasks.agent_id：创建时写 role 字符串（Manager AI 不知道哪个实例空闲），Runtime 分配后更新为实例 ID
+- agent_working.worker_id：写 `"worker_03:session_xxx"` 格式（实例+session）
+
 ## Brainstorm
 
 ### 三层防线设计
 
-需要精确的错误消息让调用方知道缺了什么：
+**L1: a2a_task.py handler（最早拦截，报错最精确）**
 
-**L1: argparse 层（最早拦截）**
-`--worktree`、`--branch`、`--raw-key` 改为 `required=True`（仅当 `--role worker` 时）
+`a2a-exit` handler (L1092-1125) 在 `c.create()` 前校验：
 
-→ 问题：argparse 不支持条件 required。需要用 `required=False` + handler 内手动校验。
-
-**方案**：handler 内校验，报错示例：
+```python
+if args.role == "worker" and not existing_task_id:
+    # 新 worker task 必须填
+    if not worktree.strip():   error "--worktree required for new worker task"
+    if not branch.strip():     error "--branch required for new worker task"
+    if not raw_key.strip():    error "--raw-key required for new worker task"
+    if not summary.strip():    error "--summary required for new worker task"
+    if state != "submitted":   error "state must be 'submitted', got '{state}'"
 ```
-{"ok": false, "error": "worker task requires: --worktree (empty)"}
-{"ok": false, "error": "worker task requires: --branch (empty)"}
-{"ok": false, "error": "new worker task state must be 'submitted', got 'input-required'"}
-```
 
-**L2: DB insert 层（写入前检查）**
-`h_a2a_task_insert` 在 INSERT 前检查：agent_id ∈ {worker, worker_*} 时 worktree/branch/raw_key 非空。
+错误消息精确指到缺失的字段名。
 
-→ 报错示例：
-```
-{"error": "worker task rejected: worktree is empty"}
+**L2: DB insert 层（兜底，防止绕过 L1 的调用路径）**
+
+`h_a2a_task_insert` (L1048-1083) 在 INSERT 前检查：
+
+```python
+agent_id = params.get("agent_id","")
+if agent_id.startswith("worker"):
+    if not params.get("worktree","").strip():   return error
+    if not params.get("branch","").strip():     return error
+    if not params.get("raw_key","").strip():    return error
+    if not params.get("message","").strip():    return error
 ```
 
 **L3: agent_assign 层（agent_working 写入检查）**
-`agent_assign` 检查 role=worker 时 agent_id 非空且格式正确（`worker_NN`）。
 
-→ 报错示例：
+`agent_assign` (agent_working.py L39-67) 检查：
+
+```python
+if role == "worker":
+    if not agent_id:  return error "agent_id required for worker"
+    if not re.match(r'^worker_\d{2}$', agent_id):
+        return error f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"
 ```
-{"error": "worker agent_id invalid: 'worker', expected 'worker_NN' format"}
-```
+
+`worker_NN` 格式：两位数字，`worker_01`~`worker_10`（与 `h_aw_next_free` 的 `{prefix}{i:02d}` 一致）。
+
+### 不在此 scope 的
+
+- DB schema migration（agent_working.worker_id → NOT NULL）——独立 issue，需要处理 `__manager__` 行的兼容
+- 清理历史僵尸 task（55 个空 message worker task）——独立 cleanup issue
+- Runtime `worker deferred` 错误消息改进——独立 issue
 
 ### Decision
 
-三层全上。L1 最先拦截、报错最精确。L2/L3 兜底防止绕过 L1 的调用路径。
-
-另外 prompt 模板也要补全 `--worktree --branch --raw-key`（双保险：AI 知道要传 + 传错了 L1 拦住）。
+L1+L2+L3 三层全部实现，加 prompt 模板补全。L1 对新建 worker task 做校验（不拦更新已有 task），L2 做 DB 层兜底，L3 做 agent_id 格式校验。
