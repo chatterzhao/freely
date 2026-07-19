@@ -271,3 +271,6 @@
 ## M-20260719T190945Z-A / title: fix — skip_ibm_gate authority / status: active
 ### candidate_issues: 1. C-20260719T190945Z-A / promoted / I-20260719T190945Z-A / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T190945Z/issues/I-20260719T190945Z-A.md
 ### committed_issues: 1. I-20260719T190945Z-A / completed / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T190945Z/issues/I-20260719T190945Z-A.md
+## M-20260719T192542Z-A / title: fix — agent collaboration / status: active
+### candidate_issues: 1. C-20260719T192542Z-A / promoted / I-20260719T192542Z-A / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T192542Z/issues/I-20260719T192542Z-A.md
+### committed_issues: 1. I-20260719T192542Z-A / completed / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T192542Z/issues/I-20260719T192542Z-A.md
