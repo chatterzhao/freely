@@ -1,0 +1,4 @@
+AT-001 RED: 0 hits (PASS需要1) — 委派Worker示例无 --role worker
+示例 — 委派 Worker:
+  a2a-exit --state submitted --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+

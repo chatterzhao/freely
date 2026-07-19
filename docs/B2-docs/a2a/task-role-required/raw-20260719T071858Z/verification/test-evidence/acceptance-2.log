@@ -1,0 +1,3 @@
+AT-002 RED: default="manager"
+    p_exit.add_argument("--role", default="manager", help="Role: manager|worker")
+    p_exit.add_argument("--agent-id", default=None, help=argparse.SUPPRESS)  # deprecated, use --role
