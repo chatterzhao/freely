@@ -27,6 +27,6 @@ milestone: M-20260719T015321Z-A
   - summary: 所有改动均为删除/替换悬空引用，不引入新功能，不修改业务逻辑。skill 路径修复是 governance-check 正确运行的前提。
   - verdict: pass
 - promoted_issue_id: I-20260719T015321Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md
+- promoted_issue_path: docs/B2-docs/agent-orchestration/agent-role-cleanup/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md
 - milestone: M-20260719T015321Z-A
 - session_refs: []
