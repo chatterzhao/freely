@@ -175,5 +175,5 @@
 ### committed_issues
 1. `I-20260719T045949Z-A`
 - milestone: M-20260719T045949Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/ibm/skill-lifecycle-reference/raw-20260719T045949Z/issues/I-20260719T045949Z-A.md
