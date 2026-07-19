@@ -215,8 +215,8 @@ created_at: 2026-05-08
 
 ## 能力生命周期参考
 
-B1_IBM 是 doc-loop 的第一阶段。doc-loop 的入口是 auto-loop dispatch，出口是
-test 通过 + Reviewer 审查通过。test 或 review 不通过 → 回环重走。
+B1_IBM 是 doc-loop 的第一阶段。doc-loop 只有 review 反馈（无 test——pre-tests.md 是
+设计产物，执行在 dev-loop）。review 不通过 → 回 B1/B2 修正。
 
-三环能力生命周期总图（含 test/review 回环机制）的唯一细节真源：
+三环能力生命周期总图（含回环机制）的唯一细节真源：
 `docs/system/workspace/three-loop-capability-lifecycle.md`

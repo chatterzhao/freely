@@ -106,38 +106,52 @@ Manager 决策出口（manager_exit_contract_kind）:
 
 ## 三 Loop 架构
 
-三个 loop 构成能力生命周期的主体。每个 loop 的**入口是 test 或 review 的反馈信号**，出口是 test 通过 + review 通过。不通过就回环重走——这正是 "loop" 的含义：不是线性流水线，而是由 test/review 驱动的迭代环。
+三个 loop 构成能力生命周期的主体。每个 loop 的入口是 auto-loop dispatch gate 的 Worker 委派，出口是**通过 test（仅 dev-loop）和 review（全部 loop）的验证**。不通过就回环修正——这正是 "loop" 的含义：不是线性流水线，而是由验证反馈驱动的迭代环。
 
 ```
-                    ┌── test 不通过 ──→ 回环重走 ──┐
-                    │                              │
-doc-loop:  B1 → B2 ──→ test (pre-tests) ──→ review (Reviewer) ──→ 通过 → 进入 dev-loop
-                    │                              │
-                    └── review 不通过 ──→ 回环重走 ──┘
+doc-loop:  B1 ──→ B2 ──→ review (Reviewer Agent)
+              ↻ review 不通过          │ pass
+                                       ↓
+                                  dispatch → dev-loop
 
-                    ┌── test 不通过 ──→ 回环重走 ──┐
-                    │                              │
-dev-loop:  RED → 实现 ──→ test (GREEN) ──→ review (Reviewer) ──→ 通过 → 进入 auto-loop PR 阶段
-                    │                              │
-                    └── review 不通过 ──→ 回环重走 ──┘
+dev-loop:  RED ──→ 实现 ──→ test (GREEN, test-pre-merge 工位)
+              ↻ test 不通过       │ pass
+                                  ↓
+                            review (Reviewer Agent)
+                              ↻ review 不通过       │ pass
+                                                    ↓
+                                              PR 阶段
 ```
 
-| Loop | 入口信号 | 回环条件 | 出口条件 | 角色 |
+| Loop | 反馈机制 | 回环条件 | 出口条件 | 角色 |
 |------|---------|---------|---------|------|
-| **doc-loop (L1)** | auto-loop dispatch → Worker 委派 | test 失败 或 Reviewer verdict=fail | test 通过 + review 通过 → B2 完成 | Worker + Reviewer Agent |
-| **dev-loop (L2)** | auto-loop dispatch → Worker 委派 | test-GREEN 失败 或 Reviewer verdict=fail | test 全绿 + review 通过 → 提 PR | Worker + Reviewer Agent |
-| **auto-loop (L3)** | scan / A2A SSE / continuity evidence | gate 失败 → 回修 → 重试 | 全部 gate 通过 → closeout | Manager + Runtime Watchdog |
+| **doc-loop (L1)** | review | Reviewer verdict=fail | review 通过 → dispatch dev-loop | Worker + Reviewer Agent |
+| **dev-loop (L2)** | test + review | test-GREEN 失败 或 Reviewer verdict=fail | test 全绿 + review 通过 → 提 PR | Worker + Reviewer Agent |
+| **auto-loop (L3)** | gate 验证 | gate 失败 → 回修 → 重试 | 全部 gate 通过 → closeout | Manager + Runtime Watchdog |
 
 auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始终由 auto-loop 的 dispatch gate 触发。
 
-### test 与 review：环的驱动力
+### test：dev-loop 的验证反馈
 
-test 和 review 不是三环之外的独立层，而是**每个环的内置反馈机制**：
+test 只作用于 dev-loop。它验证代码是否满足 pre-tests.md（B2_IBM 产物）定义的验收标准：
 
-- **test**：每个环的产出必须经过独立验证。doc-loop 的 test 是 pre-tests.md 定义的测试方案（B2 产物），dev-loop 的 test 是 GREEN 验证（`test-pre-merge-*` 工位执行 `freely-test-execution`）。test 不通过 → 回环重走，不改 test 去凑通过。
-- **review**：每个环的产出必须经过 Reviewer Agent 审查。Reviewer 是 Layer 3 的独立 AI role（与 Manager、Worker 并列），有自己的 ACP session 和 skill（`freely-tdd-review`）。审查从 raw issue 开始逐级检查下游是否忠实消化上游。review 不通过 → 回环重走。
+- **RED 阶段**（`freely-test-RED-execution`）：dev-loop 入口——确认测试当前全部失败（证明 bug 存在 / 功能缺失）
+- **GREEN 阶段**（`freely-test-execution`）：dev-loop 出口——在 `test-pre-merge-*` 工位执行全部测试，全部 GREEN 才算通过
+- **test 不通过** → 回到 dev-loop 实现阶段修正，修改后重新验证
+- **test 不凑**：不能为了通过而修改 pre-tests.md 或降低验收标准
 
-回环不是"重做一遍"——是**针对 test/review 反馈的失败点修正后重新验证**。
+test 有自己的工位（`test-pre-merge-*`）和独立的证据体系（`acceptance-N.log`）。
+
+### review：全部 loop 的审查反馈
+
+review 作用于 **doc-loop 和 dev-loop**。Reviewer Agent 是 Layer 3 的独立 AI role（与 Manager、Worker 并列），有自己的 ACP session 和 skill（`freely-tdd-review`）：
+
+- **对 doc-loop**：审查 B1/B2 产物的 fidelity——raw→brainstorm→candidate→I-* issue 逐级检查
+- **对 dev-loop**：审查实现产物的 fidelity——I-* issue→PRD→代码→测试 逐级检查
+- **review 不通过** → 回到当前环修正，修正后重新提交审查
+- **review 通过** → doc-loop 交付 dev-loop，dev-loop 交付 PR 阶段
+
+Reviewer 通过 A2A SSE（`input-required: needs-review:*`）触发，审查结论写入 `code-reviews/pr-review-*.md`。
 
 ## auto-loop（主管调度层）
 
@@ -288,23 +302,23 @@ auto-loop dispatch gate 触发
 ## 完整管线（feedback → wt-close）在三 loop 中的流转
 
 ```
-阶段:  |  1-3   |   4-5   |    6    |   6T    |   6R    |    7    |    8    |     9     |   10    |   11   |  12
-loop:  | auto   |  doc    |   dev   |  test   | review  |  auto   |  auto   |   auto    | external| auto   | auto
-gate:  |intake  | B1→B2   |implem→  |  GREEN  | Reviewer|  test   |pr-create| pr-review | CI check|pr-merge|closeout
-       |routing |         |evidence | verify  | verdict |  gate   |         |           |         |        |
+阶段:  |  1-3   |   4-5   |    6    |   7    |    8    |     9     |   10    |   11   |  12
+loop:  | auto   |  doc    |   dev   |  auto  |  auto   |   auto    | external| auto   | auto
+gate:  |intake  | B1→B2   |implem→  |  test  |pr-create| pr-review | CI check|pr-merge|closeout
+       |routing |         |evidence |        |         |           |         |        |
 
-环内回环:
-  doc-loop:  B1→B2 ──→ test (fail) ──→ 回 B1/B2 修正 ──→ test (pass) → review (fail) ──→ 回 B1/B2 修正 ──→ 通过
-  dev-loop:  RED→实现 ──→ test-GREEN (fail) ──→ 回实现修正 ──→ test (pass) → review (fail) ──→ 回实现修正 ──→ 通过
+每个环内的回环:
+  doc-loop:  B1→B2 → review (fail) → 回 B1/B2 修正 → review (pass) → dispatch dev-loop
+  dev-loop:  RED→实现 → test-GREEN (fail) → 回实现修正 → test (pass)
+                      → review (fail) → 回实现修正 → review (pass) → PR
 
 auto:  intake → routing → dispatch ──→ test gate → pr-create → pr-review → [CI check] → pr-merge → closeout
-                 │           │           │                              ↑
-doc:             │    B1→B2  │           │                              │
-                 │    ↑review│           │                              │
-dev:             │           └── RED→实现→GREEN ────────────────────────┘
-                 │                       ↑review
-test:            └──────── 不通过则回环 ──┘
-review:          └──────── 不通过则回环 ──┘
+                 │           │
+doc:             │    B1→B2  │
+                 │    ↑review│
+dev:             │           └── RED→实现 ──→ test-GREEN ──→ review ──→ PR
+                 │                   ↑test不通过    ↑review不通过
+                 │                   └── 回环 ──────┘
 ```
 
 ## 命令封装一览
