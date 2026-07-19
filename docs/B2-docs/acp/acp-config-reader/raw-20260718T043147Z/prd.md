@@ -2,7 +2,7 @@
 
 - issue_id: I-20260718T043147Z-A
 - epic: acp
-- story: worker-slot-acp-protocol-compat
+- story: acp-config-reader
 
 ## Goal
 

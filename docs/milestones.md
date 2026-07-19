@@ -142,9 +142,9 @@
 - milestone: M-20260718T043147Z-A
 - status: promoted
 - promoted_issue_id: I-20260718T043147Z-A
-- promoted_issue_path: docs/B2-docs/acp/worker-slot-acp-protocol-compat/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+- promoted_issue_path: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
 ### committed_issues
 1. `I-20260718T043147Z-A`
 - milestone: M-20260718T043147Z-A
 - phase_state: in_dev
-- issue_path: docs/B2-docs/acp/worker-slot-acp-protocol-compat/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+- issue_path: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md

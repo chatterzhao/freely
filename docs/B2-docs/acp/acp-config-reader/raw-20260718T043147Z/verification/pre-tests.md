@@ -11,7 +11,7 @@
 - target_environment: fix-raw-20260718T043147Z-worker-acp-bridge-timeout
 - required_evidence: grep 输出显示 claude-apikey-ds-pro-auto
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/acp/worker-slot-acp-protocol-compat/raw-20260718T043147Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/verification/test-evidence/acceptance-1.log
 - test_command: grep "worker_slot" /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/agent-table.toml
 - expected_output: worker_slot = "claude-apikey-ds-pro-auto"
 - expected_RED_output: worker_slot = "opencode-apikey-ds-flash-auto"
@@ -31,7 +31,7 @@
 - target_environment: fix-raw-20260718T043147Z-worker-acp-bridge-timeout
 - required_evidence: freely live-status 无 acp_initialize_timeout 错误；worker 日志显示 initialize 完成
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/acp/worker-slot-acp-protocol-compat/raw-20260718T043147Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/verification/test-evidence/acceptance-2.log
 - test_command: cd /Users/zhaoyu/Downloads/code/my-freely/freely && freely live-status 2>&1 | grep -E "worker|acp|timeout|initialize"
 - expected_output: 无 acp_timeout / acp_initialize_timeout 相关错误行
 - expected_RED_output: manager_worker_launch_verification_blocked 或 acp timeout 相关错误
@@ -51,7 +51,7 @@
 - target_environment: fix-raw-20260718T043147Z-worker-acp-bridge-timeout
 - required_evidence: freely fleet-status 或 freely live-status 显示至少一个 worker 处于 working 状态
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/acp/worker-slot-acp-protocol-compat/raw-20260718T043147Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/verification/test-evidence/acceptance-3.log
 - test_command: cd /Users/zhaoyu/Downloads/code/my-freely/freely && freely fleet-status 2>&1 | grep -E "worker|working|submitted"
 - expected_output: 至少一个 worker 显示 working 或 activity_state=ai_active
 - expected_RED_output: 所有 worker 处于 submitted 状态，无任何 working
