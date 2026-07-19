@@ -75,11 +75,6 @@ cat > "$REPO/docs/system/workspace/skills/README.md" <<'EOF'
 See docs/system/workspace/three-loop-capability-lifecycle.md
 EOF
 
-cat > "$REPO/docs/system/workspace/agents/lead-agent.md" <<'EOF'
-# Lead Agent
-See docs/system/workspace/three-loop-capability-lifecycle.md
-EOF
-
 cat > "$REPO/docs/system/workspace/agents/manager-agent.md" <<'EOF'
 # Manager Agent
 See docs/system/workspace/three-loop-capability-lifecycle.md

@@ -141,7 +141,7 @@ printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT/.freely/run/session-handoff.t
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT/.freely/run/manager-task-source-scan-latest.json"
 
 if [[ "$PROMPT_OUTPUT" == *'你现在进入 Freely 的首跳闭环。'* ]]; then
-  echo "[FAIL] narrowed repair prompt should bypass the broad lead-agent startup prompt" >&2
+  echo "[FAIL] narrowed repair prompt should bypass the broad manager startup prompt" >&2
   exit 1
 fi
 

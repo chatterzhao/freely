@@ -1,9 +1,9 @@
 ---
 name: freely-context-source-skill
 description: >- 对当前输入做来源分层、可执行性判定、workspace 准备判断与下一跳组装。
-  为 lead-agent 产出自治编排结果。
+  为 manager/worker 产出自治编排结果。
 
-  Use when: lead-agent 需要判定输入来源和可执行性，决定下一跳。
+  Use when: manager 或 worker 需要判定输入来源和可执行性，决定下一跳。
   触发词："context source"、"来源判定"、"可执行性"、"输入分层"。
 ---
 
