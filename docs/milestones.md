@@ -222,3 +222,11 @@
 - milestone: M-20260719T083853Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/a2a/task-field-validation/raw-20260719T083853Z/issues/I-20260719T083853Z-A.md
+
+## M-20260719T101009Z-A
+- title: fix — 跨tool session创建
+- status: active
+### candidate_issues
+1. `C-20260719T101009Z-A` / promoted / I-20260719T101009Z-A / docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
+### committed_issues
+1. `I-20260719T101009Z-A` / completed / docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md

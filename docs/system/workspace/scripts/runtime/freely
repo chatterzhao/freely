@@ -13255,13 +13255,27 @@ SESSIONEOF
 
   local _manager_bridge_socket _worker_pid
   # Resolve worker base_tool from agent-table
-  local _worker_slot _worker_base
+  local _worker_slot _worker_base _mgr_base
   _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || true)
   _worker_base="${_worker_slot%%-*}"
   _validate_base_tool_from_slot "$_worker_slot" "worker_launch"
   [[ -z "$_worker_base" ]] && _worker_base="opencode"
+  # Resolve manager base_tool for cross-tool detection
+  _mgr_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot manager_01 2>/dev/null || true)
+  _mgr_base="${_mgr_slot%%-*}"
+  [[ -z "$_mgr_base" ]] && _mgr_base="${AGENT_AI_TOOL%%-*}"
 
-  _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
+  if [[ "$_worker_base" == "$_mgr_base" ]]; then
+    # Same base_tool → fork from Manager bridge (cache hit)
+    _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_mgr_base")"
+  else
+    # Cross-tool → ensure Worker bridge, then session/new
+    _ensure_acp_bridge_running "$manager_project" "$_worker_base" || {
+      log_warn "failed to start worker bridge for $_worker_base, deferring assignment"
+      return 1
+    }
+    _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
+  fi
   if [[ ! -S "$_manager_bridge_socket" ]]; then
     log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
     local _worker_next_file _fallback_own_key
@@ -19128,13 +19142,25 @@ acp_session_register('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
              worktree='$(pwd)', branch='$(git branch --show-current 2>/dev/null || echo develop)')
 " 2>/dev/null || true
 
-  # Start ACP session for reviewer (reuse same bridge, new session)
-  # The ACP bridge already runs for Manager; reviewer uses session/fork (same tool)
-  # or session/new (different tool). For Phase 1, reviewer shares Manager's tool.
-  log_info "reviewer $_reviewer_id: creating ACP session/new via bridge"
+  # Resolve reviewer base_tool and compare with Manager for cross-tool detection
+  local _reviewer_base _mgr_base_rev _mgr_slot_rev
+  _reviewer_base="${_reviewer_slot%%-*}"
+  _mgr_slot_rev=$("$_aq" --get-slot manager_01 2>/dev/null || true)
+  _mgr_base_rev="${_mgr_slot_rev%%-*}"
+  [[ -z "$_mgr_base_rev" ]] && _mgr_base_rev="${AGENT_AI_TOOL%%-*}"
 
-  # Create ACP session for reviewer via bridge socket
-  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$PROJECT_ROOT")"
+  # Ensure reviewer bridge is running (cross-tool: different from Manager)
+  if [[ "$_reviewer_base" != "$_mgr_base_rev" ]]; then
+    log_info "reviewer $_reviewer_id: cross-tool ($_reviewer_base vs $_mgr_base_rev), ensuring reviewer bridge"
+    _ensure_acp_bridge_running "$PROJECT_ROOT" "$_reviewer_base" || {
+      log_warn "failed to start reviewer bridge for $_reviewer_base"
+      return 1
+    }
+  fi
+  log_info "reviewer $_reviewer_id: creating ACP session/new via $_reviewer_base bridge"
+
+  # Create ACP session for reviewer via reviewer's bridge socket
+  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$PROJECT_ROOT" "$_reviewer_base")"
   if [[ -S "$_bridge_socket" ]]; then
     local _session_id; _session_id="rev_$(date +%s)_${_reviewer_id}"
     python3 -c "
