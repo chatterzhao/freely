@@ -26,6 +26,6 @@ milestone: M-20260718T043147Z-A
   - summary: 根因通过手动测试 opencode acp 行为确认。修复方案为最小单行配置变更，无代码风险。
   - verdict: pass
 - promoted_issue_id: I-20260718T043147Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+- promoted_issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
 - milestone: M-20260718T043147Z-A
 - session_refs: []
