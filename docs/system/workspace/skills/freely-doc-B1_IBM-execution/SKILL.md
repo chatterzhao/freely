@@ -212,3 +212,11 @@ created_at: 2026-05-08
 
 - `status` / `why` / `updated_artifacts` / `next_recommended_route`
 - `recovery_context` / `execution_base` / `integration_target` / `depends_on`
+
+## 能力生命周期参考
+
+B1_IBM 是 doc-loop 的第一阶段。doc-loop 只有 review 反馈（无 test——pre-tests.md 是
+设计产物，执行在 dev-loop）。review 不通过 → 回 B1/B2 修正。
+
+三环能力生命周期总图（含回环机制）的唯一细节真源：
+`docs/system/workspace/three-loop-capability-lifecycle.md`

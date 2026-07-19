@@ -106,15 +106,52 @@ Manager 决策出口（manager_exit_contract_kind）:
 
 ## 三 Loop 架构
 
-| Loop | 驱动源 | 角色 | 核心职责 |
-|------|--------|------|---------|
-| **auto-loop (L3)** | task-mode (auto/wait/listen) → scan + A2A SSE + continuity evidence | Manager + Runtime Watchdog | 信号接收 → 路由分发 → gate 序列 → Reviewer 调度 → 收口 |
-| **doc-loop (L1)** | auto-loop dispatch gate → 委派 Worker → Reviewer 审查 | Worker + Reviewer | B1_IBM (预研) → Reviewer → B2_IBM (设计) → Reviewer |
-| **dev-loop (L2)** | auto-loop dispatch gate → 委派 Worker → Reviewer 审查 | Worker + Reviewer | RED → Reviewer → dev → Reviewer → test-GREEN → Reviewer |
+三个 loop 构成能力生命周期的主体。每个 loop 的入口是 auto-loop dispatch gate 的 Worker 委派，出口是**通过 test（仅 dev-loop）和 review（全部 loop）的验证**。不通过就回环修正——这正是 "loop" 的含义：不是线性流水线，而是由验证反馈驱动的迭代环。
+
+```
+doc-loop:  B1 ──→ B2 ──→ review (Reviewer Agent)
+              ↻ review 不通过          │ pass
+                                       ↓
+                                  dispatch → dev-loop
+
+dev-loop:  RED ──→ 实现 ──→ test (GREEN, test-pre-merge 工位)
+              ↻ test 不通过       │ pass
+                                  ↓
+                            review (Reviewer Agent)
+                              ↻ review 不通过       │ pass
+                                                    ↓
+                                              PR 阶段
+```
+
+| Loop | 反馈机制 | 回环条件 | 出口条件 | 角色 |
+|------|---------|---------|---------|------|
+| **doc-loop (L1)** | review | Reviewer verdict=fail | review 通过 → dispatch dev-loop | Worker + Reviewer Agent |
+| **dev-loop (L2)** | test + review | test-GREEN 失败 或 Reviewer verdict=fail | test 全绿 + review 通过 → 提 PR | Worker + Reviewer Agent |
+| **auto-loop (L3)** | gate 验证 | gate 失败 → 回修 → 重试 | 全部 gate 通过 → closeout | Manager + Runtime Watchdog |
 
 auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始终由 auto-loop 的 dispatch gate 触发。
-每阶段完成后通过 A2A SSE (input-required + reason Enum) 触发 Reviewer 审查，
-审查通过后返回继续下一阶段，完成后返回 auto-loop 继续下一 gate。
+
+### test：dev-loop 的验证反馈
+
+test 只作用于 dev-loop。它验证代码是否满足 pre-tests.md（B2_IBM 产物）定义的验收标准：
+
+- **RED 阶段**（`freely-test-RED-execution`）：dev-loop 入口——确认测试当前全部失败（证明 bug 存在 / 功能缺失）
+- **GREEN 阶段**（`freely-test-execution`）：dev-loop 出口——在 `test-pre-merge-*` 工位执行全部测试，全部 GREEN 才算通过
+- **test 不通过** → 回到 dev-loop 实现阶段修正，修改后重新验证
+- **test 不凑**：不能为了通过而修改 pre-tests.md 或降低验收标准
+
+test 有自己的工位（`test-pre-merge-*`）和独立的证据体系（`acceptance-N.log`）。
+
+### review：全部 loop 的审查反馈
+
+review 作用于 **doc-loop 和 dev-loop**。Reviewer Agent 是 Layer 3 的独立 AI role（与 Manager、Worker 并列），有自己的 ACP session 和 skill（`freely-tdd-review`）：
+
+- **对 doc-loop**：审查 B1/B2 产物的 fidelity——raw→brainstorm→candidate→I-* issue 逐级检查
+- **对 dev-loop**：审查实现产物的 fidelity——I-* issue→PRD→代码→测试 逐级检查
+- **review 不通过** → 回到当前环修正，修正后重新提交审查
+- **review 通过** → doc-loop 交付 dev-loop，dev-loop 交付 PR 阶段
+
+Reviewer 通过 A2A SSE（`input-required: needs-review:*`）触发，审查结论写入 `code-reviews/pr-review-*.md`。
 
 ## auto-loop（主管调度层）
 
@@ -219,45 +256,69 @@ auto-loop dispatch gate 触发
   │   └── brainstorm → converge → candidate → promote/absorb/drop
   │       ↻ 边界未稳 → 继续 brainstorm
   │
+  ├── [review] Reviewer Agent 审查 B1 产物
+  │   └── pass → 继续 B2 / fail → 回到 B1 修正
+  │
   └── B2_IBM (阶段5)
       └── I-* → prd.md → pre-tests.md → tasks.md → code-reviews/
           ↻ 设计未 ready → 继续设计
-      
-完成后返回 auto-loop dispatch gate（判断进入 dev-loop）
+
+完成后 Review 通过 → 返回 auto-loop dispatch gate（判断进入 dev-loop）
 ```
 
-触发命令: `skill:freely-doc-B1_IBM-execution` / `skill:freely-doc-B2_IBM-execution`
+触发命令:
+- 设计: `skill:freely-doc-B1_IBM-execution` / `skill:freely-doc-B2_IBM-execution`
+- 审查: Reviewer Agent 通过 A2A SSE（`input-required: needs-review:doc`）触发，执行 `skill:freely-tdd-review`
 
 ## dev-loop（开发实现层）
 
 ```
 auto-loop dispatch gate 触发
   │
-  ├── implement (阶段6)
-  │   └── 写代码 → feature-local 测试
-  │       ↻ fail → fix → re-test
+  ├── RED 阶段: 执行 pre-tests.md → 确认全部 RED（失败）
+  │   └── 证明 bug 可复现 / 功能未实现
   │
-  └── evidence (阶段6)
-      └── progress → code-review → implementation decision note
-          ↻ 证据不足 → 补充
+  ├── 实现: 写代码，不碰 pre-tests.md
+  │   └── 所有 pre-tests 从 RED → GREEN
+  │   ↻ 自测 fail → 继续修
+  │
+  ├── [test] test-pre-merge 工位执行 GREEN 验证
+  │   └── 全部 GREEN → 通过 / 有 failed → 回环修正
+  │   ↻ test 不通过 → 回到实现阶段
+  │
+  └── [review] Reviewer Agent 审查实现质量
+      └── pass → 返回 auto-loop PR 阶段 / fail → 回环修正
+      ↻ review 不通过 → 回到实现阶段
 
-完成后返回 auto-loop test gate
+完成后 test 全绿 + review 通过 → 返回 auto-loop，进入 pr-create gate
 ```
 
-触发命令: `skill:freely-dev-loop-execution`
+触发命令:
+- RED: `skill:freely-test-RED-execution`
+- 实现: `skill:freely-dev-loop-execution`
+- test: `skill:freely-test-execution`
+- review: Reviewer Agent 通过 A2A SSE（`input-required: needs-review:dev`）触发，执行 `skill:freely-tdd-review`
 
 ## 完整管线（feedback → wt-close）在三 loop 中的流转
 
 ```
-阶段:  |  1-3   |   4-5   |    6    |    7    |    8    |     9     |   10    |   11   |  12
-loop:  | auto   |  doc    |   dev   |  auto   |  auto   |   auto    | external| auto   | auto
-gate:  |intake  | B1→B2   |implem→  |  test   |pr-create| pr-review | CI check|pr-merge|closeout
-       |routing |         |evidence |         |         |           |         |        |
+阶段:  |  1-3   |   4-5   |    6    |   7    |    8    |     9     |   10    |   11   |  12
+loop:  | auto   |  doc    |   dev   |  auto  |  auto   |   auto    | external| auto   | auto
+gate:  |intake  | B1→B2   |implem→  |  test  |pr-create| pr-review | CI check|pr-merge|closeout
+       |routing |         |evidence |        |         |           |         |        |
 
-auto:  intake → routing → dispatch ──→ test → pr-create → pr-review → [CI check] → pr-merge → closeout
-                 │           │           │                              ↑
-doc:             │    B1→B2  │           │                              │
-dev:             │           └── implement→evidence ────────────────────┘
+每个环内的回环:
+  doc-loop:  B1→B2 → review (fail) → 回 B1/B2 修正 → review (pass) → dispatch dev-loop
+  dev-loop:  RED→实现 → test-GREEN (fail) → 回实现修正 → test (pass)
+                      → review (fail) → 回实现修正 → review (pass) → PR
+
+auto:  intake → routing → dispatch ──→ test gate → pr-create → pr-review → [CI check] → pr-merge → closeout
+                 │           │
+doc:             │    B1→B2  │
+                 │    ↑review│
+dev:             │           └── RED→实现 ──→ test-GREEN ──→ review ──→ PR
+                 │                   ↑test不通过    ↑review不通过
+                 │                   └── 回环 ──────┘
 ```
 
 ## 命令封装一览

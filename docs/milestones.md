@@ -162,3 +162,18 @@
 - milestone: M-20260719T015321Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/agent-orchestration/agent-role-cleanup/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md
+
+## M-20260719T045949Z-A
+- title: docs — B1/B2 skill 补充三环能力生命周期交叉引用
+- status: active
+### candidate_issues
+1. `C-20260719T045949Z-A`
+- milestone: M-20260719T045949Z-A
+- status: promoted
+- promoted_issue_id: I-20260719T045949Z-A
+- promoted_issue_path: docs/B2-docs/ibm/skill-lifecycle-reference/raw-20260719T045949Z/issues/I-20260719T045949Z-A.md
+### committed_issues
+1. `I-20260719T045949Z-A`
+- milestone: M-20260719T045949Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/skill-lifecycle-reference/raw-20260719T045949Z/issues/I-20260719T045949Z-A.md

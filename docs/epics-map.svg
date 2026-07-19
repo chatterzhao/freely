@@ -169,6 +169,8 @@
   <text x="65" y="1923" fill="#333">historical-completed-queue-identity-followthrough-governance</text>
   <rect id="story-ibm-pretests-executable-acceptance-quality-governance" x="55" y="1932" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="1945" fill="#333">ibm-pretests-executable-acceptance-quality-governance</text>
+  <rect id="story-skill-lifecycle-reference" x="55" y="1952" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
+  <text x="65" y="1965" fill="#333">skill-lifecycle-reference</text>
   <rect id="story-implementation-decision-notes-in-issue-review-artifacts-governance" x="55" y="1954" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="1967" fill="#333">implementation-decision-notes-in-issue-review-artifacts-governance</text>
   <rect id="story-integration-acceptance-first-verification-governance" x="55" y="1976" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
