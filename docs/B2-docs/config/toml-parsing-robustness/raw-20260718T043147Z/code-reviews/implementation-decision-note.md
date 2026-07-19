@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260718T043147Z-A
-issue_path: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
 phase_state: in_dev
 ---
 
 - issue_id: I-20260718T043147Z-A
-- issue_path: docs/B2-docs/acp/acp-config-reader/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+- issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
 
 ## Implementation Decision Note
 
