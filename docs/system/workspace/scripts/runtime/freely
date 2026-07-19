@@ -15541,6 +15541,28 @@ append_manager_exit_contract_directive_if_needed() {
   [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
   cat <<'EOF'
 
+## Manager 角色边界（不可越界）
+
+你能做的:
+- 读 scan + agent_working 数据，诊断问题，判断优先级
+- freely feedback → 创建 raw issue
+- freely wt-create → 创建 worktree
+- a2a-exit --state submitted --role worker → 委派 Worker
+- a2a_task.py prompt → 指导卡住的 Worker
+
+你绝不能做的:
+- 在 worktree 里写代码或修改文件 → 那是 Worker 的职责
+- 自己执行 B1/B2/dev/test → 那是 Worker 的职责
+- 在 develop 上直接 commit → 违反宪法
+- 直接调用 pr-create-guarded / pr-merge-guarded → 那是 Worker 的职责
+- 委派时只给 "PR+merge" → 必须委派完整 workflow skill
+
+委派 Worker 时 --summary 必须包含:
+"请严格按照 skill:freely-workflow-guarded-execution 执行完整流程。
+每个阶段(B1/B2/dev)完成后调用:
+  a2a-exit --state input-required --reason needs-review:<phase> --summary '产出说明'
+等待 Reviewer 审查通过后再进入下一阶段。"
+
 委派前查 worker 状态：
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status blocked
@@ -15596,6 +15618,17 @@ append_worker_exit_contract_directive_if_needed() {
   [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 0
 
   cat <<'EOF'
+
+## Worker-Reviewer 协作
+
+完成每个阶段(B1/B2/dev/GREEN)后:
+1. a2a-exit --state input-required --reason needs-review:<phase> --summary "产出说明"
+2. Reviewer 审查你的产出，写入 code-reviews/pr-review-raw-{key}.md
+3. 如果 PASS → 进入下一阶段
+4. 如果 FAIL → 读 Reviewer 的具体 feedback(逐条指出了问题+修正指导+参考哪个skill哪一节)
+   → 按指导修正 → 重新提交同一阶段的审查
+   → 重复直到 PASS
+5. 同一阶段连续3次 FAIL → needs-manager-help
 
 **本轮结束时必须调用 a2a-exit 工具声明状态：**
 ```
@@ -16992,6 +17025,66 @@ if scan_covered:
         active_count = sum(1 for r in rows if sc in r.get("scan_match", "") or r["intent"] == sc)
         print(f"- `{sc}`: {active_count} active/pending worker(s) → check if new scan item is the same task before delegating")
 PYEOF
+
+  # ── Agent working table injection ──
+  local _aw_db="${PROJECT_ROOT}/.freely/freely.db"
+  if [[ -f "$_aw_db" ]]; then
+    python3 - "$_aw_db" <<'PYEOF'
+import sqlite3, sys
+db = sqlite3.connect(sys.argv[1])
+
+# Read agent_working
+rows = list(db.execute("SELECT raw_key, manager_id, worker_id, reviewer_id, slot FROM agent_working ORDER BY raw_key"))
+if not rows:
+    sys.exit(0)
+
+# Read agent-table pool sizes
+import tomllib
+at_path = sys.argv[1].replace(".freely/freely.db", ".freely/agent-table.toml")
+pools = {}
+try:
+    with open(at_path, 'rb') as f:
+        for agent in tomllib.load(f).get("agents", []):
+            pools[agent["role"]] = int(agent.get("pool", 0))
+except Exception:
+    pools = {"manager": 1, "worker": 10, "reviewer": 99}
+
+# Compute occupancy
+occupied = {"manager": set(), "worker": set(), "reviewer": set()}
+worker_rows = []
+for r in rows:
+    rk, mgr, wrk, rev, slot = r
+    if mgr:
+        occupied["manager"].add(mgr.split(":")[0] if ":" in (mgr or "") else mgr)
+    if wrk:
+        occ_id = wrk.split(":")[0] if ":" in (wrk or "") else wrk
+        occupied["worker"].add(occ_id)
+        worker_rows.append((rk, wrk, slot))
+    if rev:
+        for p in (rev or "").split(","):
+            occupied["reviewer"].add(p.split(":")[0])
+
+print()
+print("## Active Agent Assignments (agent_working + agent-table)")
+print()
+for role in ["manager", "worker", "reviewer"]:
+    pool = pools.get(role, 0)
+    busy = len(occupied[role])
+    free = max(0, pool - busy)
+    print(f"- {role}: pool={pool} busy={busy} free={free}")
+
+if worker_rows:
+    print()
+    print("| raw_key | worker_id | slot |")
+    print("|---------|-----------|------|")
+    for rk, wrk, slot in worker_rows:
+        wid = wrk.split(":")[0] if ":" in wrk else wrk
+        sid = wrk.split(":")[1][:16] if ":" in wrk else ""
+        print(f"| {rk} | {wid} | {slot} |")
+    print()
+    print("以上每个raw_key已有Worker在处理。不可对这些raw_key重复委派新Worker！")
+PYEOF
+  fi
 }
 
 append_human_chat_intake_if_needed() {
