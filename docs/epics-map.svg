@@ -19,7 +19,7 @@
   <text x="65" y="179" fill="#333">agent-instance-id</text>
   <rect id="story-task-field-validation" x="55" y="181" width="690" height="18" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="2"/>
   <text x="65" y="194" fill="#333">task-field-validation</text>
-  <rect id="epic-acp" x="35" y="198" width="730" height="136" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
+  <rect id="epic-acp" x="35" y="198" width="730" height="158" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
   <text x="50" y="214" font-size="14" font-weight="bold" fill="#c62828">acp</text>
   <rect id="story-acp-bridge-crash-resilience" x="55" y="224" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
   <text x="65" y="237" fill="#333">acp-bridge-crash-resilience</text>
@@ -31,6 +31,8 @@
   <text x="65" y="303" fill="#333">bridge-lifecycle-management</text>
   <rect id="story-multi-bridge" x="55" y="312" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
   <text x="65" y="325" fill="#333">multi-bridge</text>
+  <rect id="story-cross-tool-session" x="55" y="336" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
+  <text x="65" y="349" fill="#333">cross-tool-session</text>
   <rect id="epic-config" x="35" y="346" width="730" height="114" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
   <text x="50" y="362" font-size="14" font-weight="bold" fill="#616161">config</text>
   <rect id="story-skip-ibm" x="55" y="372" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
