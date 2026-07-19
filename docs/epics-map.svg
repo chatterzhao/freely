@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4260" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
-  <rect id="epic-a2a" x="35" y="50" width="730" height="158" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+  <rect id="epic-a2a" x="35" y="50" width="730" height="180" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
   <rect id="story-handoff" x="55" y="76" width="690" height="18" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="2"/>
   <text x="65" y="89" fill="#333">handoff</text>
@@ -15,6 +15,8 @@
   <text x="65" y="177" fill="#333">task-lifecycle</text>
   <rect id="story-task-role-required" x="55" y="186" width="690" height="18" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="2"/>
   <text x="65" y="199" fill="#333">task-role-required</text>
+  <rect id="story-agent-instance-id" x="55" y="208" width="690" height="18" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="2"/>
+  <text x="65" y="221" fill="#333">agent-instance-id</text>
   <rect id="epic-acp" x="35" y="198" width="730" height="136" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
   <text x="50" y="214" font-size="14" font-weight="bold" fill="#c62828">acp</text>
   <rect id="story-acp-bridge-crash-resilience" x="55" y="224" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
