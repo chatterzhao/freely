@@ -1,6 +1,6 @@
 # Workspace Tools
 
-本文件定义 Freely 当前可用的外部 AI 工具清单，供 `lead-agent` 与 `freely-context-source-skill` 读取。
+本文件定义 Freely 当前可用的外部 AI 工具清单，供 `manager`、`worker` 与 `freely-context-source-skill` 读取。
 
 ## Routing Principle
 

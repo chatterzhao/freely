@@ -11,7 +11,7 @@ with_issue_milestone="$TMP_DIR/milestone-with-issue.md"
 no_issue_milestone="$TMP_DIR/milestone-no-issue.md"
 
 cat >"$with_issue_chat" <<'EOF'
-我们已经有这条 lead-agent / freely-context-source-skill 路线了，继续把它补成正式 issue 产物，优先走现有 issue 的文档收敛。
+我们已经有这条 manager / freely-context-source-skill 路线了，继续把它补成正式 issue 产物，优先走现有 issue 的文档收敛。
 EOF
 
 cat >"$no_issue_chat" <<'EOF'
@@ -23,7 +23,7 @@ cat >"$with_issue_milestone" <<'EOF'
 
 ### committed_issues
 1. `C-test-001`
-- title: `lead-agent.md`
+- title: `manager-agent.md`
 - milestone_state: committed
 - promoted_issue_path: `pending://issue-materialization`
 EOF

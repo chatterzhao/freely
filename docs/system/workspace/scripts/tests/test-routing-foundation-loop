@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 required_files=(
   "docs/milestones.md"
-  "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/agents/manager-agent.md"
   "docs/system/workspace/tools.md"
   "docs/system/workspace/scripts/README.md"
   "docs/system/workspace/scripts/start-lead-agent.sh"
@@ -33,13 +33,13 @@ prompt="$(
 )"
 current_branch="$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf 'unknown')"
 
-printf '%s\n' "$prompt" | grep -q 'lead-agent'
+printf '%s\n' "$prompt" | grep -q 'manager-agent'
 printf '%s\n' "$prompt" | grep -q 'freely-context-source-skill'
 printf '%s\n' "$prompt" | grep -q '项目治理入口：'
 printf '%s\n' "$prompt" | grep -q "$ROOT_DIR/AGENTS.md"
 printf '%s\n' "$prompt" | grep -q '先遵守 `PROJECT_ROOT/AGENTS.md`'
 printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
-printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/agents/manager-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'

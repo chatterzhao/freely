@@ -1,0 +1,15 @@
+=== AT-001: governance-check (lead-agent FIXED, remaining FAILs pre-existing) ===
+  ▸ freely [dev]
+[FAIL] missing file: docs/system/workspace/hooks/protected-branch-breakglass-receipts.md
+[FAIL] missing file: docs/B1-docs/README.md
+[FAIL] missing file: docs/B1-docs/INDEX.md
+[FAIL] missing file: docs/B1-docs/CONVERGENCE.md
+[FAIL] missing three-loop lifecycle reference in docs/system/workspace/agents/manager-agent.md
+[FAIL] missing three-loop lifecycle reference in docs/system/workspace/agents/worker-agent.md
+[FAIL] missing three-loop lifecycle reference in docs/system/workspace/skills/freely-doc-B1_IBM-execution/SKILL.md
+[FAIL] missing three-loop lifecycle reference in docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md
+[FAIL] missing PRD quality bar reference in docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md
+[FAIL] missing PRD-derived pre-tests/tasks requirement in docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md
+[FAIL] pre-brainstorm entry 'raw-20260303T000000Z' does not match naming convention: YYYYMMDD-HHMM--<topic>
+---
+RESULT: lead-agent.md FAIL removed. Remaining FAILs are pre-existing.
