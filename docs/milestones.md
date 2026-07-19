@@ -243,3 +243,7 @@
 1. `C-20260719T113413Z-A` / promoted / I-20260719T113413Z-A / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T113413Z/issues/I-20260719T113413Z-A.md
 ### committed_issues
 1. `I-20260719T113413Z-A` / completed / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T113413Z/issues/I-20260719T113413Z-A.md
+
+## M-20260719T123039Z-A / title: fix — agent lifecycle / status: active
+### candidate_issues: 1. C-20260719T123039Z-A / promoted / I-20260719T123039Z-A / docs/B2-docs/config/agent-lifecycle-test/raw-20260719T123039Z/issues/I-20260719T123039Z-A.md
+### committed_issues: 1. I-20260719T123039Z-A / completed / docs/B2-docs/config/agent-lifecycle-test/raw-20260719T123039Z/issues/I-20260719T123039Z-A.md
