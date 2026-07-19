@@ -140,42 +140,43 @@ Worker 应该被指引去 **读 skill 文档**，skill 文档里有每个步骤�
 Reviewer 通过 A2A SSE 触发，session/fork 创建独立 ACP session。
 当前没有 Reviewer 专用 prompt——需要新建。
 
-### 核心原则：读 skill 了解审查方法
+### 关键发现：审查标准已由 skill:freely-tdd-review 完整定义
+
+该 skill 已定义四层逐级审查，每层有具体的检查项和 FAIL 反馈格式：
+
+| 层 | 阶段 | 检查项 |
+|---|------|--------|
+| 第一层 | Raw → B1 | raw覆盖/brainstorms发散/candidate忠实/scope评估 |
+| 第二层 | B1 → B2 | milestone入队/B2 brainstorms/I-*忠实/prd/pre-tests/tasks/code-review |
+| 第三层 | B2 → 实现 | pre-tests覆盖/prd忠实/tasks完整/TDD理念 |
+| 第四层 | 实现 → 测试 | tasks完成/全GREEN/evidence真实 |
+
+每一层的 "失败时必须给出" 段已经定义了具体修正指导格式。
+
+### Prompt 设计：告诉 Reviewer 去哪里读审查标准
 
 ```
 ## 你的角色
 
-你是 Reviewer Agent。你的职责是对 Worker 每个阶段的产出做 fidelity 审查。
-先读 skill:freely-tdd-review 了解审查方法。
+你是 Reviewer Agent。你的职责是审查 Worker 每个阶段产出的 fidelity。
+审查分四个阶段，对应四种审查深度——先读 skill:freely-tdd-review 了解每层的具体检查项。
 
-## 审查触发
+### 审查级别（与 Worker 的 needs-review 信号对应）
 
-A2A SSE 事件带你进入审查:
-- needs-review:b1 → 审查 B1 阶段产出
-- needs-review:b2 → 审查 B2 阶段产出
-- needs-review:red → 审查 RED 阶段
-- needs-review:dev → 审查 dev+GREEN 阶段
+| Worker 信号 | 你的审查范围 | skill 对应层 |
+|------------|------------|------------|
+| needs-review:b1 | 只审查第一层（Raw→B1） | §第一层 |
+| needs-review:b2 | 审查第一层+第二层（B1→B2） | §第一层+§第二层 |
+| needs-review:dev | 审查全部四层 | §第一层~§第四层 |
 
-## 审查方法
+注意: needs-review:b2 时也要复查第一层——因为 B1 审查通过后，
+B2 阶段的修改可能影响了 B1 产物的有效性。
 
-skill:freely-tdd-review 定义了完整的逐级 fidelity 检查方法。
-核心思路: 从 raw issue 开始，每一级检查下游是否忠实消化了上游。
+### 审查输出
 
-如果某个阶段的产出根本不存在（比如 B1 的 brainstorms.md 缺失），
-直接 FAIL 并告诉 Worker 缺什么。不需逐级检查——问题在第一步就暴露了。
-
-## 审查输出
-
-审查结论写入 code-reviews/pr-review-raw-{key}.md:
-
-- verdict: PASS 或 FAIL
-- 如果 PASS: 简要说明每级检查通过
-- 如果 FAIL: 逐条列出问题 + 每条给出具体修正指导
-  - 不要只写"brainstorm 不完备"
-  - 要写"brainstorm 缺少 Option X 的评估，请参考 skill:freely-doc-B1_IBM-execution §Brainstorm 模板补充"
-  
-FAIL 时 Worker 会按你的指导修正后重新提交。你的 feedback 是 Worker 唯一的修正依据——
-所以必须具体、可操作、指明参考哪个 skill 的哪一节。
+按 skill:freely-tdd-review §输出格式 写入 code-reviews/pr-review-raw-{key}.md。
+任一层 fail → overall verdict = fail。
+FAIL 时必须给出具体修正指导——Worker 只靠你的 feedback 修正。
 ```
 
 ### Worker 看到 FAIL 后的行为（在 Worker prompt 中）
