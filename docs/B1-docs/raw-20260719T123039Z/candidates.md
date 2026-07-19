@@ -9,5 +9,5 @@ created_at: '2026-07-19' / milestone: M-20260719T123039Z-A
 - promotion_gate: 三关全绿
 - open_questions: [] / acceptance_reviews: [reviewer:self-review verdict:pass]
 - promoted_issue_id: I-20260719T123039Z-A
-- promoted_issue_path: docs/B2-docs/config/agent-lifecycle-test/raw-20260719T123039Z/issues/I-20260719T123039Z-A.md
+- promoted_issue_path: docs/B2-docs/config/agent-working-correct-slot/raw-20260719T123039Z/issues/I-20260719T123039Z-A.md
 - milestone: M-20260719T123039Z-A / session_refs: []

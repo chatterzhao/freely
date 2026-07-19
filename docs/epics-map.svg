@@ -45,8 +45,6 @@
   <text x="65" y="451" fill="#333">toml-parsing-robustness</text>
     <rect id="story-agent-working-correct-slot" x="55" y="438" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
   <text x="65" y="451" fill="#333">agent-working-correct-slot</text>
-  <rect id="story-agent-lifecycle-test" x="55" y="460" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
-  <text x="65" y="473" fill="#333">agent-lifecycle-test</text>
 <rect id="epic-gate" x="35" y="450" width="730" height="290" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
   <text x="50" y="466" font-size="14" font-weight="bold" fill="#e65100">gate</text>
   <rect id="story-checkpoint-commit-and-multi-worktree-supervision-governance" x="55" y="476" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
