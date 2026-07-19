@@ -41,7 +41,7 @@
   │
   ├─ 委派 Worker: a2a-exit --state submitted --role worker
   │     → A2A Server 创建 Task
-  │     → Runtime 查询 submitted tasks → 启动 Worker ACP session (fork)
+  │     → Runtime 查询 submitted tasks → 启动 Worker ACP session (fork同tool|session/new跨tool)
   │     → Worker 在独立 worktree 中执行 (openCode bridge)
   │
   ├─ 指导 Worker: a2a_task.py prompt --task-id <id> --message "..."
@@ -52,7 +52,7 @@
   │
   └─ Reviewer 触发: Worker 完成 B1/B2/dev/test 阶段
         → a2a-exit input-required (needs-review)
-        → watchdog_sse.py 检测 → ACP session/fork → Reviewer (cline bridge)
+        → watchdog_sse.py 检测 → ACP session/fork(同tool)或session/new(跨tool) → Reviewer
         → Reviewer 审查完毕 → SSE 通知我
 ```
 
@@ -80,7 +80,7 @@
 | 工具 | 用途 | 什么时候用 |
 |------|------|-----------|
 | `agent_working.agent_next_free(project, 'worker', pool_size)` | 查空闲 Worker | 委派前确认有可用 Worker |
-| `a2a-exit --state <submitted\|completed\|failed> --role worker --worktree <path> --branch <branch> --raw-key <key> --summary "..."` | 创建/完成/放弃 Worker task | 委派时 state=submitted，收口时 state=completed |
+| `a2a-exit --state <submitted\|completed\|failed> --role worker --worktree <path> --branch <branch> --raw-key <key> --summary "..." --agent-instance worker_NN` | 创建/完成/放弃 Worker task | 委派时 state=submitted，收口时 state=completed |
 | `agent_working.agent_list_by_raw_key(project, raw_key)` | 查 Worker 的 session_id | 需要和 Worker 对话时 |
 | `a2a_task.py prompt --task-id <id> --message "..."` | 通过 ACP session/prompt 发消息给 Worker | Worker 卡住、遇到 gate、方向偏离 |
 | `a2a_task.py update --task-id <id> --state <submitted\|failed>` | 更新 task 状态 | 修复问题后重试，或确认放弃 |

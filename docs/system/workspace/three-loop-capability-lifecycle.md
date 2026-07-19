@@ -62,7 +62,7 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                                                       │
                               ┌────────────────────────┘
                               ▼
-              A2A Server: a2a_tasks 存储 (agent_id=worker, state=submitted)
+              A2A Server: a2a_tasks 存储 (agent_id=worker_NN(实例ID)或worker(role), state=submitted)
                               │
                               ▼
               Runtime Task Launcher: list --role worker --status submitted

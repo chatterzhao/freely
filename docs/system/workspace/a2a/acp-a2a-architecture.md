@@ -74,7 +74,7 @@
       │                    │    file (temp)       │                    │
       │                    │                      │                    │
       │                    │ 10. session/prompt ──────────────────────►│
-      │                    │     (ACP fork)       │                    │
+      │                    │     (ACP fork for same tool, session/new for cross-tool)       │                    │
       │                    │                      │    11. AI works    │
       │                    │                      │    (B1→B2→dev→...) │
       │                    │                      │                    │
