@@ -535,7 +535,8 @@ phase_state: done_b2_ibm
 
 - PRD 质量门槛：[references/prd-quality-bar.md](references/prd-quality-bar.md)
 - 设计派生的硬约束：`pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生，不能与 PRD 脱节
-- 三环能力生命周期总图与 semantics 的唯一细节真源：`docs/system/workspace/three-loop-capability-lifecycle.md`
 
-B2_IBM 是 doc-loop 的第二阶段（物化设计），完成后交付 dev-loop 实现。三环生命周期定义了
-B1→B2→dev→test→merge 的完整流转关系。
+B2_IBM 是 doc-loop 的第二阶段（物化设计）。完成后交付 dev-loop 实现，
+再经 test（GREEN 验证）和 review（Reviewer Agent 审查）。test 或 review 不通过
+→ 回环重走。三环能力生命周期总图（含 test/review 回环机制）的唯一细节真源：
+`docs/system/workspace/three-loop-capability-lifecycle.md`

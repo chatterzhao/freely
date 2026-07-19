@@ -215,6 +215,8 @@ created_at: 2026-05-08
 
 ## 能力生命周期参考
 
-B1_IBM 是 doc-loop 的第一阶段。raw issue 经 brainstorm→candidate→milestone 收敛后，
-promote 到 B2_IBM 完成物化设计，再进入 dev-loop 实现。三环能力生命周期总图与 semantics
-的唯一细节真源见：`docs/system/workspace/three-loop-capability-lifecycle.md`
+B1_IBM 是 doc-loop 的第一阶段。doc-loop 的入口是 auto-loop dispatch，出口是
+test 通过 + Reviewer 审查通过。test 或 review 不通过 → 回环重走。
+
+三环能力生命周期总图（含 test/review 回环机制）的唯一细节真源：
+`docs/system/workspace/three-loop-capability-lifecycle.md`
