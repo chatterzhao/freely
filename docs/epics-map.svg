@@ -25,7 +25,7 @@
   <text x="65" y="303" fill="#333">bridge-lifecycle-management</text>
   <rect id="story-multi-bridge" x="55" y="312" width="690" height="18" fill="#fff" stroke="#c62828" stroke-width="1" rx="2"/>
   <text x="65" y="325" fill="#333">multi-bridge</text>
-  <rect id="epic-config" x="35" y="346" width="730" height="92" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
+  <rect id="epic-config" x="35" y="346" width="730" height="114" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
   <text x="50" y="362" font-size="14" font-weight="bold" fill="#616161">config</text>
   <rect id="story-skip-ibm" x="55" y="372" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
   <text x="65" y="385" fill="#333">skip-ibm</text>
@@ -33,6 +33,8 @@
   <text x="65" y="407" fill="#333">test-gate</text>
   <rect id="story-tool-registry" x="55" y="416" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
   <text x="65" y="429" fill="#333">tool-registry</text>
+  <rect id="story-toml-parsing-robustness" x="55" y="438" width="690" height="18" fill="#fff" stroke="#616161" stroke-width="1" rx="2"/>
+  <text x="65" y="451" fill="#333">toml-parsing-robustness</text>
   <rect id="epic-gate" x="35" y="450" width="730" height="290" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
   <text x="50" y="466" font-size="14" font-weight="bold" fill="#e65100">gate</text>
   <rect id="story-checkpoint-commit-and-multi-worktree-supervision-governance" x="55" y="476" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>

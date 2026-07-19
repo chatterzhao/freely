@@ -192,6 +192,32 @@ def cmd_print(args: argparse.Namespace) -> None:
             print(f'{key} = {_toml_quote(value)}')
 
 
+def _resolve_dotted(data: dict[str, Any], dotted_key: str) -> Any | None:
+    """Resolve a dotted key like ``section.subkey`` or a top-level ``key``.
+
+    Returns the value or ``None`` if any segment is missing.
+    """
+    parts = dotted_key.split(".")
+    current: Any = data
+    for part in parts:
+        if isinstance(current, dict) and part in current:
+            current = current[part]
+        else:
+            return None
+    return current
+
+
+def cmd_get(args: argparse.Namespace) -> None:
+    data = read_config(args.project)
+    if not data:
+        sys.exit(1)
+    value = _resolve_dotted(data, args.key)
+    if value is None:
+        sys.exit(1)
+    # Print raw value: strings as-is, bools/int as their natural representation.
+    print(value)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Freely project configuration manager"
@@ -221,6 +247,10 @@ def main() -> None:
     p_print = sub.add_parser("print", help="Print config as key=value lines")
     p_print.add_argument("--project", default=".", help="Project root path")
 
+    p_get = sub.add_parser("get", help="Get a single config value by key")
+    p_get.add_argument("--project", default=".", help="Project root path")
+    p_get.add_argument("--key", required=True, help="Config key (dotted, e.g. acp.binary)")
+
     args = parser.parse_args()
 
     if args.command == "toml2env":
@@ -231,6 +261,8 @@ def main() -> None:
         cmd_upsert(args)
     elif args.command == "print":
         cmd_print(args)
+    elif args.command == "get":
+        cmd_get(args)
 
 
 if __name__ == "__main__":

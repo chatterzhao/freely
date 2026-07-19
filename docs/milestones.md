@@ -134,6 +134,20 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260718T035754Z/issues/I-20260718T035754Z-A.md
 
+## M-20260718T043147Z-A
+- title: fix — monitor-ai-acp.sh从config.toml读取配置时awk pattern对空格不鲁棒
+- status: active
+### candidate_issues
+1. `C-20260718T043147Z-A`
+- milestone: M-20260718T043147Z-A
+- status: promoted
+- promoted_issue_id: I-20260718T043147Z-A
+- promoted_issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+### committed_issues
+1. `I-20260718T043147Z-A`
+- milestone: M-20260718T043147Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
 ## M-20260719T015321Z-A
 - title: fix — 清理 lead-agent.md 全项目悬空引用 + governance-check skill 路径修复
 - status: active

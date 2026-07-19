@@ -109,7 +109,7 @@ _bridge_ensure_running() {
 
   # config.toml installation path (takes priority over registry short name)
   local config_key; config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
-  local config_path; config_path=$(awk -F'"' -v k="$config_key" '$1 == k " =" {print $2; exit}' "$project/.freely/config.toml" 2>/dev/null || true)
+  local config_path; config_path=$("$SCRIPT_DIR/freely_config.py" get --project "$project" --key "$config_key" 2>/dev/null || true)
   [[ -n "$config_path" && -x "$config_path" ]] && acp_bin="$config_path"
 
   # Fallback: PATH
