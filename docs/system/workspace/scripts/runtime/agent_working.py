@@ -47,6 +47,13 @@ def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
              行不存在说明 worktree 已被 wt-close 删除或存在 bug
     Manager: 独立行 "__manager__"，UPSERT
     """
+    # ── L3: validate agent_id format for worker role ──
+    if role == "worker":
+        import re as _re
+        if not agent_id:
+            return {"status": "error", "error": "agent_id required for worker role"}
+        if not _re.match(r'^worker_\d{2}$', agent_id):
+            return {"status": "error", "error": f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"}
     col = f"{role}_id"
     val = f"{agent_id}:{session_id}" if session_id else agent_id
     method = "agent_working.upsert_only" if update_only else "agent_working.upsert"

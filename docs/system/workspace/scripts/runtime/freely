@@ -15528,30 +15528,46 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status completed
 ```
 
-**本轮结束时必须调用 a2a-exit 工具声明状态（不再通过文本 JSON block）：**
+**本轮结束时必须调用 a2a-exit 工具声明状态。不传必填字段会被拒绝。**
+
+Manager 自身状态（不需要 worktree/branch/raw-key）:
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
   --state submitted|completed|failed \
-  --role worker|manager \
+  --role manager \
   --summary "本轮做了什么" \
-  --workers "worker-prompt.csv路径（委派时填写）" \
   --next "下一步建议"
 ```
 
-示例 — 委派 Worker（必须 --role worker，否则 Runtime 无法发现）:
-  a2a-exit --state submitted --role worker --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+委派 Worker（全部必填，缺一拒绝）:
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
+  --state submitted \
+  --role worker \
+  --worktree <工位绝对路径> \
+  --branch <分支名> \
+  --raw-key <raw-key> \
+  --summary "委派的任务描述"
+```
 
-示例 — Manager 声明自身状态:
+示例 — 委派 Worker（全部必填）:
+  a2a-exit --state submitted --role worker \
+    --worktree "/path/to/freely-worktrees/fix-raw-xxx" \
+    --branch "fix/raw-xxx" \
+    --raw-key "20260719T070107Z" \
+    --summary "Fix phase_state: PR+merge+close"
+
+示例 — Manager 自身状态:
   a2a-exit --state submitted --role manager --summary "analysis in progress"
 
-示例 — 分析完成无事可做（用 failed 让 Manager 走 stop_ai → listen 降级）:
+示例 — 无事可做:
   a2a-exit --state failed --role manager --summary "no actionable items, scan stale"
 
 三态语义：
-  submitted — 已委派 Worker，等待 Worker 完成
-  completed — 任务完成，Manager 继续巡逻（resume_manager）
-  failed    — 无事可做/任务失败，Manager 走 stop_ai → listen 降级
-  --role worker — task 创建到 worker agent_id，Runtime 可发现
+  submitted — 已委派 Worker 或 Manager 工作中
+  completed — 任务完成
+  failed    — 无事可做，Manager 走 stop_ai → listen 降级
+  注意: --role worker 时必须传 --worktree --branch --raw-key --summary，否则校验拒绝
   --role manager — task 创建到 manager agent_id，Manager 自身状态
 EOF
 }
