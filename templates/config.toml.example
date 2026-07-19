@@ -292,32 +292,26 @@ FREELY_ACP_CLINE_BIN = ""
 # ══════════════════════════════════════════════════════════════════════
 #
 # 工作原理:
-#   当 FREELY_SKIP_IBM_GATE=1 时，governance-merge-gate 检查所有变更文件
-#   是否全部属于「治理纯文档」路径。只有下面三类文件允许跳过 IBM 治理门禁:
-#
-#   A. 硬编码治理路径 (代码内置，不可配置):
-#      - docs/B1-docs/, docs/B2-docs/, docs/system/workspace/agents/,
-#        docs/system/workspace/skills/, docs/system/workspace/scripts/quality/,
-#        docs/system/workspace/hooks/*.md, milestones.md, CONSTITUTION.md 等
-#
-#   B. 下面 [skip_ibm_gate] 配置的 allowed_paths (用户可扩展):
-#      格式: 每行一条路径，支持目录前缀匹配 (startswith)
-#      例如: "docs/system/workspace/skills/" 会匹配该目录下所有文件
-#            "docs/epics-map.svg"            匹配单个文件
-#
-#   C. allowed_paths 空 = 仅使用硬编码路径 (等同于没有此节)
+#   FREELY_SKIP_IBM_GATE=1 时，以下 [skip_ibm_gate].allowed_paths 是唯一权威源。
+#   只有匹配的路径可跳过 IBM 治理门禁。删除此节或留空 = 回退到内置默认。
+#   格式: startswith 前缀匹配。例如 "docs/B1-docs/" 匹配该目录下所有文件。
 #
 #  注意:
-#  - runtime scripts (scripts/runtime/)、hooks (*.sh)、test scripts (*.py)
-#    永远不能跳过 — 即使加入 allowed_paths 也会被代码层 (is_governance_only_path) 拒绝
-#  - 此跳过机制仅适用于「不需要 IBM 生命周期的纯文档/格式/清理变更」
-#  - 任何实现变更 (代码、配置逻辑、运行时) 必须走完整 B1→B2→dev→PR 流程
-
-# [可选] FREELY_SKIP_IBM_GATE 允许的额外路径。
-# 硬编码治理路径已包含: docs/B1-docs/, docs/B2-docs/, templates/,
-#   docs/system/workspace/agents/, docs/system/workspace/skills/ 等。
-# 此处添加项目特有的治理路径前缀（相对项目根目录，startswith 匹配）。
-# 留空 = 仅使用硬编码路径。init 时默认为 ["templates/"]。
+#  - runtime scripts/hooks/test 永远不能跳过
+#  - 任何实现变更必须走完整 B1→B2→dev→PR 流程
 
 [skip_ibm_gate]
-allowed_paths = ["templates/"]
+allowed_paths = [
+  "templates/",
+  "docs/B1-docs/",
+  "docs/B2-docs/",
+  "docs/system/workspace/agents/",
+  "docs/system/workspace/skills/",
+  "docs/system/workspace/scripts/quality/",
+  "docs/system/workspace/hooks/",
+  "docs/CONSTITUTION.md",
+  "docs/LAWS.md",
+  "docs/PROJECT_INTENT.md",
+  "docs/milestones.md",
+  "AGENTS.md",
+]
