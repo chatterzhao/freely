@@ -148,3 +148,17 @@
 - milestone: M-20260718T043147Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/config/toml-parsing-robustness/raw-20260718T043147Z/issues/I-20260718T043147Z-A.md
+## M-20260719T015321Z-A
+- title: fix — 清理 lead-agent.md 全项目悬空引用 + governance-check skill 路径修复
+- status: active
+### candidate_issues
+1. `C-20260719T015321Z-A`
+- milestone: M-20260719T015321Z-A
+- status: promoted
+- promoted_issue_id: I-20260719T015321Z-A
+- promoted_issue_path: docs/B2-docs/agent-orchestration/agent-role-cleanup/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md
+### committed_issues
+1. `I-20260719T015321Z-A`
+- milestone: M-20260719T015321Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/agent-orchestration/agent-role-cleanup/raw-20260719T015321Z/issues/I-20260719T015321Z-A.md

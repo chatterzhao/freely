@@ -146,4 +146,4 @@ if repair_idx == -1 or lead_idx == -1 or repair_idx > lead_idx:
     raise SystemExit(1)
 PY
 
-echo "[PASS] worker repair prompt prioritizes exit-contract recovery before broad lead-agent context"
+echo "[PASS] worker repair prompt prioritizes exit-contract recovery before broad manager startup context"

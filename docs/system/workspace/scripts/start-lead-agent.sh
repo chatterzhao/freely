@@ -316,7 +316,6 @@ initial_read_targets="$(cat <<EOF
 - workspace 根：$workspace_root
 - 工具清单：workspace/tools.md
 - 技能索引：workspace/skills/README.md
-- 首跳代理：workspace/agents/lead-agent.md
 EOF
 )"
 
@@ -399,8 +398,8 @@ ${initial_read_targets_escaped}
 执行要求：
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
 2. 再完成 \`skill:freely-constitution-guard\` 与 \`skill:freely-laws-enforcer\` 预检：默认做法是阅读 \`skill:freely-constitution-guard\` 与 \`skill:freely-laws-enforcer\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
-3. 进入 \`lead-agent\`，不要绕过首跳代理。
-4. 先运行 \`freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`lead-agent\` 参照 \`skill:freely-context-source-skill\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
+3. 进入 \`manager\`，不要绕过首跳入口。
+4. 先运行 \`freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`manager\` 参照 \`skill:freely-context-source-skill\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
 4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，优先把它当作本轮 idle / replan patrol 的结构化入口；仅当该 json 缺失、过时或不足以裁决时，才回退到重新运行 \`task-source-scan\`。其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
 ${startup_bounded_patrol_rule_escaped}
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
@@ -432,7 +431,7 @@ ${role_scope_rule_5b_escaped}
    - 对暂不能收口的研究项，不允许因为本轮不继续实现就跳过；必须明确它继续停留在 \`candidate_issues\`、issue-bound brainstorm 或 blocked state，并写清 \`next_action\` 与 \`revisit_trigger\`
 9. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
 10. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
-   - \`workspace/agents/lead-agent.md\`
+   - \`workspace/agents/manager-agent.md\`
    - \`skill:freely-context-source-skill\`
    - \`skill:freely-doc-B1_IBM-execution\`
    - \`skill:freely-doc-B2_IBM-execution\`

@@ -10,7 +10,7 @@ required_files=(
   "docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
   "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
   "docs/system/workspace/three-loop-capability-lifecycle.md"
-  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/references/prd-quality-bar.md"
   "docs/B1-docs/README.md"
   "docs/B1-docs/INDEX.md"
   "docs/B1-docs/CONVERGENCE.md"
@@ -21,12 +21,11 @@ three_loop_reference_targets=(
   "docs/PROJECT_INTENT.md"
   "docs/system/workspace/scripts/README.md"
   "docs/system/workspace/skills/README.md"
-  "docs/system/workspace/agents/lead-agent.md"
   "docs/system/workspace/agents/manager-agent.md"
   "docs/system/workspace/agents/worker-agent.md"
   "docs/system/workspace/skills/freely-auto-loop-orchestrator/SKILL.md"
-  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
-  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/freely-doc-B1_IBM-execution/SKILL.md"
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md"
   "docs/system/workspace/skills/freely-dev-loop-execution/SKILL.md"
 )
 
@@ -824,28 +823,28 @@ for file in "${three_loop_reference_targets[@]}"; do
 done
 
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md" \
   "references/prd-quality-bar.md" \
   "PRD quality bar reference"
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md" \
   'pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生' \
   "PRD-derived pre-tests/tasks requirement"
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/references/ibm-completion-gate.md" \
   "prd-quality-bar.md" \
   "IBM completion gate PRD quality bar linkage"
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/references/issue-materialization-checklist.md" \
   "prd-quality-bar.md" \
   "issue materialization PRD quality bar linkage"
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/references/prd-quality-bar.md" \
   "## Minimum structure" \
   "PRD quality minimum structure section"
 check_fixed_string \
-  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
-  '## Bar for `done_ibm`' \
+  "docs/system/workspace/skills/freely-doc-B2_IBM-execution/references/prd-quality-bar.md" \
+  '## Bar for `done_b2_ibm`' \
   "PRD quality done_ibm bar"
 
 entries=()

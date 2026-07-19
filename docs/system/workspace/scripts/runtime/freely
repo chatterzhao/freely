@@ -15268,7 +15268,7 @@ ${manager_agent_def}
 - 如果 scan 暂时没有发现待办任务，这不是错误。输出 stop_ai JSON，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue “需求描述”\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
 
 本轮禁止事项：
-- 不要重做完整 lead-agent 首跳。
+- 不要重做完整启动首跳。
 - 不要先展开 \`docs/milestones.md\` 全文、全量 fleet 巡检或多 source broad patrol。
 - 不要把”继续多读一些文档”当作默认下一步；先把 continuity 和 exit contract 写进 DB。
 

@@ -31,7 +31,7 @@
   - 最小首跳启动器
   - 接收项目路径、意图路径、宪法路径、AI 规格
   - 生成交给外部 AI CLI 的首跳提示
-  - 明确进入 `lead-agent`
+  - 明确进入 manager 主循环
   - 不在脚本层决定最终路由，只负责把 AI 送入可自治理解的首跳语境
   - prompt 中引用 workspace 资产时，统一使用相对 `workspace/` 根的路径
 - `compose-context-source-prompt.sh`

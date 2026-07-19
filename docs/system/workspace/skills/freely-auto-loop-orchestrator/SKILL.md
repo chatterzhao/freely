@@ -1,6 +1,6 @@
 ---
 name: freely-auto-loop-orchestrator
-description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工具到首跳 lead-agent、
+description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工具到 manager/worker 编排、
   上下文判定、进入 doc-loop/dev-loop，再回到发现阶段。
 
   Use when: AI 运行自主持续交付循环，或需要编排多 agent 协作。
@@ -10,11 +10,10 @@ description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工�
 # skill:freely-auto-loop-orchestrator
 
 ## 首段闭环主链
-`sh/ps1 -> external AI CLI tool -> lead-agent -> freely-context-source-skill -> freely-doc-B1_IBM-execution | freely-doc-B2_IBM-execution | freely-dev-loop-execution | manager-owned verification / cleanup route`
+`sh/ps1 -> external AI CLI tool -> manager -> freely-context-source-skill -> freely-doc-B1_IBM-execution | freely-doc-B2_IBM-execution | freely-dev-loop-execution | manager-owned verification / cleanup route`
 
 约束：
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime。
-- `lead-agent` 是角色定义，建议落点：`docs/system/workspace/agents/lead-agent.md`。
 - `manager-agent` 与 `worker-agent` 是显式角色定义，建议落点：
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
@@ -29,9 +28,9 @@ description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工�
 
 ## 工作流
 1. 先执行固定前置门禁：`skill:freely-constitution-guard` -> `skill:freely-laws-enforcer`。
-2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
+2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，进入 manager 主循环。
 3. manager / patrol 轮次先把 standing/event source 扫描成 machine-readable `manager-task-source-scan-latest.json`，作为本轮路由的结构化输入。
-4. `lead-agent` 调用 `skill:freely-context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
+4. `manager` 调用 `skill:freely-context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
 5. 根据 `freely-context-source-skill` 的结果分流：
    - 无稳定 issue 边界 -> `skill:freely-doc-B1_IBM-execution`
    - issue-bound brainstorm / mapping / governance -> `skill:freely-doc-B2_IBM-execution`
