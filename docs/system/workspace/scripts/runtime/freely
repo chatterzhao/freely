@@ -15527,21 +15527,27 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
   --state submitted|completed|failed \
+  --role worker|manager \
   --summary "本轮做了什么" \
   --workers "worker-prompt.csv路径（委派时填写）" \
   --next "下一步建议"
 ```
 
-示例 — 委派 Worker:
-  a2a-exit --state submitted --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+示例 — 委派 Worker（必须 --role worker，否则 Runtime 无法发现）:
+  a2a-exit --state submitted --role worker --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+
+示例 — Manager 声明自身状态:
+  a2a-exit --state submitted --role manager --summary "analysis in progress"
 
 示例 — 分析完成无事可做（用 failed 让 Manager 走 stop_ai → listen 降级）:
-  a2a-exit --state failed --summary "no actionable items, scan stale"
+  a2a-exit --state failed --role manager --summary "no actionable items, scan stale"
 
 三态语义：
   submitted — 已委派 Worker，等待 Worker 完成
   completed — 任务完成，Manager 继续巡逻（resume_manager）
   failed    — 无事可做/任务失败，Manager 走 stop_ai → listen 降级
+  --role worker — task 创建到 worker agent_id，Runtime 可发现
+  --role manager — task 创建到 manager agent_id，Manager 自身状态
 EOF
 }
 
@@ -15555,6 +15561,7 @@ append_worker_exit_contract_directive_if_needed() {
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
   --state completed|working|input-required|pending-input \
+  --role worker \
   --summary "完成了什么" \
   --evidence "证据路径" \
   --next "下一步建议"
