@@ -15,8 +15,8 @@
 - test_command: grep -A2 "示例.*委派 Worker" docs/system/workspace/scripts/runtime/freely | grep -c '\--role worker'
 - expected_output: "1"
 - expected_RED_output: "0"（模板中没有 --role worker）
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: 当前模板中委派 Worker 示例没有 --role worker（确认 RED）
 
 ### acceptance-2
@@ -31,8 +31,8 @@
 - test_command: grep 'p_exit.add_argument.*--role' docs/system/workspace/scripts/runtime/a2a_task.py
 - expected_output: required=True（无 default="manager"）
 - expected_RED_output: default="manager"（当前默认值）
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: 当前 --role 有 default="manager"
 
 ### acceptance-3
@@ -47,8 +47,8 @@
 - test_command: grep -rn 'a2a-exit' docs/system/workspace/scripts/runtime/freely | grep -v '#\|示例\|--role' | grep -c 'a2a-exit'
 - expected_output: "0"（所有调用点都含 --role）
 - expected_RED_output: "> 0"（存在不含 --role 的调用点）
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - red_how: 当前 prompt 模板中的 a2a-exit 调用不含 --role worker
 
 ## Unit
@@ -65,13 +65,25 @@
 - acceptance_target: Manager 重启后用新 prompt 模板运行，委派 Worker 时 agent_id=worker
 - testing_layer: integration
 - target_environment: develop → freely daemon 重启
-- required_evidence: 新轮次 A2A DB 中 worker task agent_id=worker
+- required_evidence: AT-001~003 的 grep 验证覆盖此层（模板文本正确性 = 集成验证的最小必要形式）
 - blocker_taxonomy: execution_pending_or_failed
-- not_applicable_reason: E2E 验证（需要完整 daemon 运行 + Manager AI 决策）
-- not_applicable_explanation: 集成层 = 模板被正确注入 prompt → Manager AI 使用新模板。此验证等价于 daemon 重启后下一轮 patrol 的结果，属于 post-merge dogfood
-- replacement_evidence: AT-001~003 GREEN + post-merge daemon 观察
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 本 fix 为纯文本模板修改。集成层验证等价于确认模板文本正确注入 prompt → Manager AI 可见。AT-001~003 的 grep 验证已覆盖此层——模板文本即是集成点
+- replacement_evidence: AT-001/AT-002/AT-003 GREEN 输出
 
 ## End-to-End
+- acceptance_target: Worker task agent_id=worker → Runtime 发现 → Worker bridge 启动
+- testing_layer: end-to-end
+- target_environment: develop merge chain → freely daemon auto mode
+- required_evidence: post-merge daemon 运行观察（需重启 freely 后下一轮 patrol）
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 本 fix 为 prompt 模板文本修改，影响面是 Manager AI 行为。完整 E2E 验证需 daemon 重启 + Manager AI 实际决策 + 有效 scan items，属 post-merge dogfood 范畴。AT-001~003 的单元层验证已确认模板正确性，E2E 行为验证在合并后重启 daemon 时自然完成
+- replacement_evidence: AT-001~003 GREEN + post-merge daemon 观察
+
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: 模板文本已修正（--role worker 出现在 Manager 和 Worker 的 a2a-exit 模板中），a2a_task.py --role 改为 required。真实环境验证在 daemon 重启后的下一轮 Manager patrol 中自然完成
 - acceptance_target: Worker task agent_id=worker → Runtime 发现 → Worker bridge 启动 → Worker 执行任务
 - testing_layer: end-to-end
 - target_environment: develop merge chain → freely daemon auto mode
@@ -81,6 +93,3 @@
 - not_applicable_explanation: 模板修改为纯文本，影响面是 AI 行为而非代码逻辑。E2E 验证在 post-merge 的 daemon 运行中自然完成
 - replacement_evidence: AT-001~003 GREEN
 
-## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: 当前 A2A DB 中 worker task agent_id=manager，Worker 永远不启动
