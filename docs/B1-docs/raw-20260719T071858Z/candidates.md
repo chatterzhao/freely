@@ -27,6 +27,6 @@ milestone: M-20260719T071858Z-A
   - summary: 根因通过 A2A DB 实际数据 + daemon 日志 + 源码追踪三层验证确认。修复方案最小可验证。
   - verdict: pass
 - promoted_issue_id: I-20260719T071858Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260719T071858Z/issues/I-20260719T071858Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/task-role-required/raw-20260719T071858Z/issues/I-20260719T071858Z-A.md
 - milestone: M-20260719T071858Z-A
 - session_refs: []

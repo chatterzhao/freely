@@ -177,3 +177,18 @@
 - milestone: M-20260719T045949Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/skill-lifecycle-reference/raw-20260719T045949Z/issues/I-20260719T045949Z-A.md
+
+## M-20260719T071858Z-A
+- title: fix — Manager a2a-exit prompt 模板补 --role worker + a2a_task.py --role 改为 required
+- status: active
+### candidate_issues
+1. `C-20260719T071858Z-A`
+- milestone: M-20260719T071858Z-A
+- status: promoted
+- promoted_issue_id: I-20260719T071858Z-A
+- promoted_issue_path: docs/B2-docs/a2a/task-role-required/raw-20260719T071858Z/issues/I-20260719T071858Z-A.md
+### committed_issues
+1. `I-20260719T071858Z-A`
+- milestone: M-20260719T071858Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/a2a/task-role-required/raw-20260719T071858Z/issues/I-20260719T071858Z-A.md
