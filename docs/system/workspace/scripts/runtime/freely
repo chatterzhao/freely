@@ -13107,8 +13107,9 @@ capture_worker_session_id_and_store() {
       fi
       # Write session_id to agent_working table for recovery context
       if [[ -n "$target_project" && -n "$agent_id" ]]; then
-        python3 -c "import sys; sys.path.insert(0, '${manager_project}/docs/system/workspace/scripts/runtime'); from agent_working import acp_session_register; acp_session_register('${manager_project}', '${_raw_key:-${agent_id}}', 'worker', '${agent_id}', session_id='${_session_id}', slot='${slot:-claude}', worktree='${target_project}')" 2>/dev/null || true
-        log_info "agent_working: worker ${agent_id} session=${_session_id} registered (raw_key=${_raw_key:-${agent_id}})"
+        python3 -c "import sys; sys.path.insert(0, '${manager_project}/docs/system/workspace/scripts/runtime'); from agent_working import acp_session_register; acp_session_register('${manager_project}', '${_raw_key:-${agent_id}}', 'worker', '${agent_id}', session_id='${_session_id}', slot='${slot:-${AGENT_AI_TOOL:-claude}}', worktree='${target_project}')" 2>/dev/null && \
+          log_info "agent_working: worker ${agent_id} session=${_session_id} registered (raw_key=${_raw_key:-${agent_id}})" || \
+          log_warn "agent_working: failed to register worker ${agent_id} (raw_key=${_raw_key:-${agent_id}})"
       fi
     else
       log_warn "worker session-id capture timed out after ${_timeout}s: task=$task_id"
@@ -13307,7 +13308,11 @@ SESSIONEOF
       "worker_pid=$_worker_pid" \
       "target_project=$target_project" \
       "prompt_file=$prompt_file"
-    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "worker_01" "${AGENT_AI_TOOL:-claude}"
+    local _aw_slot _aw_aq
+    _aw_aq="${PROJECT_ROOT}/bin/agent-table-query"
+    _aw_slot=$("$_aw_aq" --get-slot worker_01 2>/dev/null || true)
+    [[ -z "$_aw_slot" ]] && _aw_slot="${AGENT_AI_TOOL:-claude}"
+    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "worker_01" "$_aw_slot"
     return 0
   fi
 
