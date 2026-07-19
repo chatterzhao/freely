@@ -237,3 +237,9 @@
 - milestone: M-20260719T101009Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260719T101009Z/issues/I-20260719T101009Z-A.md
+
+## M-20260719T113413Z-A / title: fix — agent_working slot / status: active
+### candidate_issues
+1. `C-20260719T113413Z-A` / promoted / I-20260719T113413Z-A / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T113413Z/issues/I-20260719T113413Z-A.md
+### committed_issues
+1. `I-20260719T113413Z-A` / completed / docs/B2-docs/config/agent-working-correct-slot/raw-20260719T113413Z/issues/I-20260719T113413Z-A.md
