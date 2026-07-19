@@ -212,3 +212,9 @@ created_at: 2026-05-08
 
 - `status` / `why` / `updated_artifacts` / `next_recommended_route`
 - `recovery_context` / `execution_base` / `integration_target` / `depends_on`
+
+## 能力生命周期参考
+
+B1_IBM 是 doc-loop 的第一阶段。raw issue 经 brainstorm→candidate→milestone 收敛后，
+promote 到 B2_IBM 完成物化设计，再进入 dev-loop 实现。三环能力生命周期总图与 semantics
+的唯一细节真源见：`docs/system/workspace/three-loop-capability-lifecycle.md`

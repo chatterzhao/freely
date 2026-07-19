@@ -530,3 +530,12 @@ phase_state: done_b2_ibm
 7. 更新 milestones.md committed_issues（写入物化后的 I-* issue）
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
 8. B2_IBM 完成后，进入 RED 阶段（skill `freely-test-RED-execution`）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
+
+## 关键参考
+
+- PRD 质量门槛：[references/prd-quality-bar.md](references/prd-quality-bar.md)
+- 设计派生的硬约束：`pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生，不能与 PRD 脱节
+- 三环能力生命周期总图与 semantics 的唯一细节真源：`docs/system/workspace/three-loop-capability-lifecycle.md`
+
+B2_IBM 是 doc-loop 的第二阶段（物化设计），完成后交付 dev-loop 实现。三环生命周期定义了
+B1→B2→dev→test→merge 的完整流转关系。
