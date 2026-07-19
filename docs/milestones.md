@@ -268,3 +268,6 @@
 - milestone: M-20260719T143409Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T143409Z/issues/I-20260719T143409Z-A.md
+## M-20260719T190945Z-A / title: fix — skip_ibm_gate authority / status: active
+### candidate_issues: 1. C-20260719T190945Z-A / promoted / I-20260719T190945Z-A / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T190945Z/issues/I-20260719T190945Z-A.md
+### committed_issues: 1. I-20260719T190945Z-A / completed / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T190945Z/issues/I-20260719T190945Z-A.md
