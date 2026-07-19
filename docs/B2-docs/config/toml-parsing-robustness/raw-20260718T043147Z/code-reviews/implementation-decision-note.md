@@ -9,8 +9,17 @@ phase_state: in_dev
 
 ## Implementation Decision Note
 
-- decision: 将 `.freely/agent-table.toml` 的 `worker_slot` 从 `opencode-apikey-ds-flash-auto` 改为 `claude-apikey-ds-pro-auto`
-- why_this: opencode acp 是 HTTP server 模式，无法通过 stdio 响应 acp-bridge.py 的 JSON-RPC initialize handshake。claude-agent-acp（claude 家族）与 acp-bridge.py 使用相同的 stdio JSON-RPC 协议栈，是唯一一行配置可验证的最小修复路径。
-- alternatives_considered: (A) 修改 acp-bridge.py 为 opencode 添加 HTTP client 模式——scope 过大，不是 P0 范围；(B) 编写 stdio↔HTTP 转换 shim——引入额外运行时组件，风险更高
-- boundary_non_goals: 不为 opencode HTTP ACP 模式添加支持（独立 feature issue）；不修改 acp-bridge.py 代码；不改变 Manager slot
-- residual_risk: claude-apikey-ds-pro-auto 的并发 rate limit 是否足以支撑 pool=10 worker 同时工作——目前 pool=10 是配置上限，实际并发取决于任务量，暂不调整
+### Decision 1: `monitor-ai-acp.sh` awk pattern 修复
+- decision: 将 awk 条件改为容忍等号两侧空格
+- why_this: 即时解除 P0 阻塞。原 awk pattern `$1 == k " ="` 要求等号左侧恰好一个空格，与 TOML 规范不一致
+- commit: cf6e94c42
+
+### Decision 2: `freely_config.py get` — awk → 标准 TOML 解析器
+- decision: 将 `monitor-ai-acp.sh` 的 config.toml 取值从 awk 替换为 `freely_config.py get`（基于 Python `tomllib` 标准库）
+- why_this: awk/sed/grep 手写 TOML 解析本质上是维护一个残缺的解析器，格式稍有变化（等号空格、多行字符串、inline table）就会出错。`tomllib.load()` 是 Python 3.11+ 标准库，正确处理所有合法 TOML 语法，零维护成本
+- alternatives_considered:
+  - (A) 继续修 awk pattern — 打地鼠式修复，每次遇到新格式都得再修，不解决系统性问题
+  - (B) 引入第三方 TOML CLI（如 `tomlq`、`yj`）— 增加外部依赖，而项目已有 `freely_config.py` 封装了 `tomllib`
+  - (C) 所有取值走 Python — 选择在已有 `freely_config.py` 上加 `get` 子命令，最小增量
+- boundary_non_goals: 不修改其他 `freely_config.py` 子命令；不影响 `start-lead-agent.sh` 中解析 state 文件（非 TOML）的 awk
+- residual_risk: 无。`tomllib` 是标准库，`freely_config.py` 已有成熟的结构

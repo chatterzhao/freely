@@ -168,4 +168,8 @@ submitted → working → input-required → working → ... → completed
 - Worker 启动：`working`（Runtime 自动更新）
 - Worker 遇阻：`input-required`（等 Manager 指导）
 - Worker 完成：`completed`
+
+## 三循环能力生命周期
+
+three-loop 总图与 semantics 的唯一细节真源是 `docs/system/workspace/three-loop-capability-lifecycle.md`；本 agent 定义 Manager 角色职责，不平行维护总图。
 - Manager 放弃：`failed`

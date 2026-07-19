@@ -80,3 +80,7 @@ a2a-exit --state completed --summary "完成了什么" --evidence "证据文件�
 - **Manager** 委派我，通过 A2A state 变化感知我的状态，通过 ACP session/prompt 给我发消息
 - **Reviewer** 审查我的产出。我不直接调用 Reviewer——A2A SSE 事件自动触发（我上报 input-required needs-review 后）
 - 我在独立 worktree 工作，与 Manager（develop）互不干扰
+
+## 三循环能力生命周期
+
+three-loop 总图与 semantics 的唯一细节真源是 `docs/system/workspace/three-loop-capability-lifecycle.md`；本 agent 定义 Worker 角色职责，不平行维护总图。
