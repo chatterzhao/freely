@@ -254,3 +254,6 @@
 ## M-20260719T133426Z-A / title: pending→submitted / status: active
 ### candidate_issues: 1. C-20260719T133426Z-A / promoted / I-20260719T133426Z-A
 ### committed_issues: 1. I-20260719T133426Z-A / completed
+## M-20260719T143409Z-A / title: doc sync / status: active
+### candidate_issues: 1. C-20260719T143409Z-A / promoted / I-20260719T143409Z-A
+### committed_issues: 1. I-20260719T143409Z-A / completed
