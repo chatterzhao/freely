@@ -27,6 +27,6 @@ milestone: M-20260719T074532Z-A
   - summary: 7层追踪，DB+Python 已正确，断点在 shell+prompt。5处修复分布在3个文件。
   - verdict: pass
 - promoted_issue_id: I-20260719T074532Z-A
-- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-20260719T074532Z/issues/I-20260719T074532Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/agent-instance-id/raw-20260719T074532Z/issues/I-20260719T074532Z-A.md
 - milestone: M-20260719T074532Z-A
 - session_refs: []
