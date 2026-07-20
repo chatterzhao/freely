@@ -1,7 +1,7 @@
 ---
-local_id: raw-20260616T110714Z14Z
+local_id: raw-20260616T110714Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '2842'
@@ -12,13 +12,11 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-16T11:07:31Z'
-updated_at: '2026-06-16T12:28:21Z'
+updated_at: '2026-07-18T02:07:56Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-force_closed_at: '2026-06-16T12:28:21Z'
-force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## 问题
