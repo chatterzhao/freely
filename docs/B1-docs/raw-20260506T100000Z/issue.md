@@ -2,6 +2,7 @@
 local_id: raw-20260506T010000Z00Z
 kind: raw
 phase_state: absorbed
+absorbed_into: docs/B2-docs/ibm/_legacy-issues/raw-20260506T1000Z/issues/I-20260506T1000Z-A/issue.md
 platform_ids:
   github:
     issue_id: '231'
