@@ -1,7 +1,8 @@
 ---
-local_id: raw-20260616T111514Z14Z
+local_id: raw-20260616T111514Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: I-20260616T111514Z-A
 platform_ids:
   github:
     issue_id: '2847'
@@ -12,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-16T11:15:30Z'
-updated_at: '2026-06-16T11:15:30Z'
+updated_at: '2026-07-18T02:07:59Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 问题
