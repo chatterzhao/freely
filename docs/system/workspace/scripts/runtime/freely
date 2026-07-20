@@ -8641,6 +8641,23 @@ ensure_freely_db() {
     return 0
   fi
 
+  # Stale PID cleanup: PID file exists but process is gone (e.g. OOM kill).
+  # Clean up the stale artifacts so the daemon can restart cleanly.
+  local _db_pid_file _db_socket_path _db_short_hash
+  _db_short_hash=$(python3 -c "
+import hashlib,os
+h=hashlib.sha256(os.path.abspath('$project').encode()).hexdigest()[:16]
+print(h)" 2>/dev/null || true)
+  _db_pid_file="/tmp/freely-db-${_db_short_hash}.pid"
+  _db_socket_path="/tmp/freely-db-${_db_short_hash}.sock"
+  if [[ -f "$_db_pid_file" ]]; then
+    local _db_old_pid; _db_old_pid=$(cat "$_db_pid_file" 2>/dev/null || true)
+    if [[ -n "$_db_old_pid" ]] && ! kill -0 "$_db_old_pid" 2>/dev/null; then
+      log_warn "stale freely-db PID $_db_old_pid (process gone), cleaning up"
+      rm -f "$_db_pid_file" "$_db_socket_path"
+    fi
+  fi
+
   # Start daemon in foreground mode, background it
   log_info "starting freely-db daemon for $project"
   _rotate_log "$project/.freely/run/db-daemon.log"
@@ -8790,8 +8807,8 @@ read_task_mode() {
     result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) && break
   done
   if [[ -z "$result" ]]; then
-    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work in wait mode. After fixing the root cause, restart with --task-mode auto, or run: freely task-mode set --project <project> --task-mode auto"
-    echo 'wait'; return 0
+    log_error "task_mode DB query failed after 3 retries (freely-db daemon not ready or crashed). Run: freely task-mode set --project <project> --task-mode auto"
+    echo 'error:db_unavailable'; return 1
   fi
   local mode="${result%%|*}"
   local scan_id="${result#*|}"
@@ -22955,6 +22972,15 @@ print('ok')
     # (manager + workers) collapsing the bridge in <60s.
     # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
     exit_if_stop_requested_before_launch
+    # DB health gate: ensure freely-db is alive before reading task mode.
+    # If the daemon is unreachable and cannot be restarted, write db_unavailable
+    # workcell-state and sleep — do NOT drive AI with a dead control plane.
+    if ! ensure_freely_db "$PROJECT_ROOT"; then
+      log_error "freely-db daemon unreachable and restart failed; control plane degraded"
+      write_workcell_state "$PROJECT_ROOT" "error" "up" "down" "db_unavailable"
+      sleep 5
+      continue
+    fi
     # Task-mode gate: listen/wait — skip AI launch when manager is in non-auto modes
     if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]]; then
       local _pre_tm
