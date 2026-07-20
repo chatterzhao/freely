@@ -361,3 +361,18 @@
 - milestone: M-20260720T051323Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T051323Z/issues/I-20260720T051323Z-A.md
+
+## M-20260720T111149Z-A
+- title: fix — DB daemon 存活监控与 task-mode 查询降级修正
+- status: active
+### candidate_issues
+1. `C-20260720T111149Z-A`
+- milestone: M-20260720T111149Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T111149Z-A`
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260720T111149Z/issues/I-20260720T111149Z-A.md
+### committed_issues
+1. `I-20260720T111149Z-A`
+- milestone: M-20260720T111149Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260720T111149Z/issues/I-20260720T111149Z-A.md
