@@ -1,0 +1,11 @@
+# AT-001: Verify || true prevents silent exit when phase_state missing
+
+## RED phase (patrol-level, code review)
+Command: grep -n 'phase_state:' docs/system/workspace/scripts/worktree/wt-create 2>/dev/null
+Expected: grep exit 1 (no match when chain_trace merged_develop items)
+Actual: Exit code 1 — causes silent exit with set -euo pipefail
+
+## GREEN phase (fix applied)
+Command: grep 'phase_state:' docs/system/workspace/scripts/worktree/wt-create 2>/dev/null | head -1 || true
+Expected: _phase=""  (empty string, case falls through)
+Actual: Pipeline exits with code 0, no crash

@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260720T055358Z
 kind: raw
-phase_state: dropped
-dropped_reason: fix applied directly by patrol — one-line || true addition on line 311. No I-* issue needed.
+phase_state: absorbed
+absorbed_into: I-20260720T055358Z-A
 platform_ids:
   github:
     issue_id: '4056'
