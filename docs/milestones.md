@@ -389,3 +389,17 @@
 - milestone: M-20260706T023422Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/b2-governance/raw-20260706T023422Z/issues/I-20260706T023422Z-A.md
+## M-20260720T052921Z-A
+- title: fix — 15 I-* issue phase_state i_non_terminal
+- status: active
+### candidate_issues
+1. `C-20260720T052921Z-A`
+- milestone: M-20260720T052921Z-A
+- status: promoted
+- promoted_issue_id: I-20260720T052921Z-A
+- promoted_issue_path: docs/issues/I-20260720T052921Z-A/issue.md
+### committed_issues
+1. `I-20260720T052921Z-A`
+- milestone: M-20260720T052921Z-A
+- phase_state: completed
+- issue_path: docs/issues/I-20260720T052921Z-A/issue.md
