@@ -39,10 +39,10 @@ milestone: M-20260720T120329Z-A
 
 - candidate_format_version: v2
 - title: 运行时 agent-id.env 退役 — 全部生产路径迁移到 agent_working
-- status: promoted
+- status: blocked
 - decision_reason: agent-id.env 在 9 处生产代码中仍被读写，形成双真源。C-A 补齐 DB 接口后，C-B 将所有消费者切换到 agent_working 唯一真源
-- next_action: 进入 B2_IBM 物化 I-* issue 与设计产物（依赖 C-A 先 merge）
-- revisit_trigger: C-A merge 后被自动消费；若 C-A 接口设计变更则需重新对齐
+- next_action: 等待 C-A merge 到 develop，然后进入 B2_IBM 物化 I-* issue
+- revisit_trigger: C-A 合并后自动解锁；若 C-A 接口变更需重新对齐
 - acceptance_criteria:
   - `_resolve_current_agent_id` (L340/L4323/L4832): 移除 agent-id.env fallback，agent_working 查询失败 → 显式错误退出（不默认 manager_01）
   - Worker assignment (L6014-6065): 移除 agent-id.env 双写，仅写 agent_working
@@ -54,11 +54,7 @@ milestone: M-20260720T120329Z-A
   - `grep -r "agent-id\.env" docs/system/workspace/scripts/` 在生产代码中零命中（治理文档除外）
 - promotion_gate: 9 处引用全部清零，`rg 'agent-id\.env'` 在生产脚本目录无输出
 - open_questions: []
-- acceptance_reviews:
-  - reviewer: claude-opus-4.7
-  - mode: plan-subagent
-  - summary: 审查 9 处 agent-id.env 引用是否全部覆盖，每处替换方案是否正确（agent_working RPC 方法名 + 参数），fallback 默认值是否全部移除
-  - verdict: pass
+- acceptance_reviews: []
 - promoted_issue_id: I-20260720T120329Z-B
 - promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
 - milestone: M-20260720T120329Z-A
@@ -73,10 +69,10 @@ milestone: M-20260720T120329Z-A
 
 - candidate_format_version: v2
 - title: E2E 测试与回归门禁
-- status: promoted
+- status: blocked
 - decision_reason: C-A + C-B 完成代码迁移后，需要 E2E 测试证明真实 DB daemon 下三角色闭环可用，以及回归门禁防止 agent-id.env 重新侵入
-- next_action: 进入 B2_IBM 物化 I-* issue 与设计产物（依赖 C-A + C-B 先 merge）
-- revisit_trigger: C-A 和 C-B merge 后被自动消费
+- next_action: 等待 C-A 和 C-B merge 到 develop，然后进入 B2_IBM 物化 I-* issue
+- revisit_trigger: C-A 和 C-B 合并后自动解锁
 - acceptance_criteria:
   - E2E 测试: Manager 委派 Worker → Worker 注册到 agent_working → Worker 请求 Reviewer → Reviewer verdict 持久化到 agent_working → Worker retry 或 Manager 决策 → close 释放 agent_working
   - 覆盖 daemon 重启恢复（agent_working 状态持久化验证）
@@ -84,11 +80,7 @@ milestone: M-20260720T120329Z-A
   - 回归门禁: CI 中 `rg 'agent-id\.env' docs/system/workspace/scripts/` 发现引用即失败
 - promotion_gate: E2E 测试通过 + 回归门禁生效
 - open_questions: []
-- acceptance_reviews:
-  - reviewer: claude-opus-4.7
-  - mode: plan-subagent
-  - summary: 审查 E2E 测试是否覆盖全部三角色闭环（M→W→R→W→M），回归门禁范围是否正确
-  - verdict: pass
+- acceptance_reviews: []
 - promoted_issue_id: I-20260720T120329Z-C
 - promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 - milestone: M-20260720T120329Z-A
