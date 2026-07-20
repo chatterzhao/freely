@@ -3,8 +3,8 @@ local_id: I-20260616T111514Z-A
 kind: linked
 status: completed
 phase_state: completed
-promoted_from: raw-20260616T111514Z14Z
-source_candidate: docs/B1-docs/raw-20260616T111514Z14Z/candidates.md
+promoted_from: raw-20260616T111514Z
+source_candidate: docs/B1-docs/raw-20260616T111514Z/candidates.md#C-20260616T111514Z-A
 canonical_issue_path: ''
 created_at: 2026-06-17 00:00:00+00:00
 updated_at: 2026-06-17 00:00:00+00:00
