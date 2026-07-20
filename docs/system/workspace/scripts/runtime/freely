@@ -17079,16 +17079,38 @@ for role in ["manager", "worker", "reviewer"]:
     free = max(0, pool - busy)
     print(f"- {role}: pool={pool} busy={busy} free={free}")
 
+# Query latest working a2a_task per raw_key for prompt --task-id
+worker_tasks = {}
+for rk, _, _ in [(r[0], r[1], r[2]) for r in worker_rows]:
+    t = db.execute(
+        "SELECT task_id FROM a2a_tasks WHERE raw_key=? AND state='working' ORDER BY created_at DESC LIMIT 1",
+        (rk,)
+    ).fetchone()
+    if t:
+        worker_tasks[rk] = t[0]
+
 if worker_rows:
     print()
-    print("| raw_key | worker_id | slot |")
-    print("|---------|-----------|------|")
+    print("| raw_key | worker_id | slot | task_id |")
+    print("|---------|-----------|------|---------|")
     for rk, wrk, slot in worker_rows:
         wid = wrk.split(":")[0] if ":" in wrk else wrk
-        sid = wrk.split(":")[1][:16] if ":" in wrk else ""
-        print(f"| {rk} | {wid} | {slot} |")
+        tid = worker_tasks.get(rk, "")[:16] if worker_tasks.get(rk) else ""
+        print(f"| {rk} | {wid} | {slot} | {tid} |")
     print()
-    print("以上每个raw_key已有Worker在处理。不可对这些raw_key重复委派新Worker！")
+    print("## 委派决策规则（必须遵守）")
+    print()
+    print("上表中每个raw_key已有Worker在处理。**严禁对这些raw_key执行a2a-exit --state submitted！**")
+    print()
+    print("正确做法（按Worker状态选择）：")
+    print("- **继续/跟进/纠正/澄清** → `a2a_task.py prompt --task-id <task_id> --message \"...\"`")
+    print("  - 例如：Worker偏离方向、门禁报错、需要补充上下文")
+    print("  - 这是session/prompt，在已有对话线程中追加，不创建新任务")
+    print("- **Worker已完成(completed)** → 检查结果，决定closeout或后续动作")
+    print("- **Worker已失败(failed)/超时** → 先`a2a_task.py update --task-id <id> --state failed`标记旧任务，再重新委派")
+    print("- **只有raw_key不在上表中时** → 才使用`a2a-exit --state submitted --role worker`全新委派")
+    print()
+    print("获取完整任务状态：`a2a_task.py list --raw-key <key>`")
 PYEOF
   fi
 }

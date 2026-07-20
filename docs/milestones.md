@@ -302,3 +302,18 @@
 - milestone: M-20260720T012820Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T012820Z/issues/I-20260720T012820Z-A.md
+
+## M-20260720T032133Z-A
+- title: Manager prompt 委派决策规则
+- status: active
+### candidate_issues
+1. `C-20260720T032133Z-A`
+- milestone: M-20260720T032133Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T032133Z-A`
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T032133Z/issues/I-20260720T032133Z-A.md
+### committed_issues
+1. `I-20260720T032133Z-A`
+- milestone: M-20260720T032133Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T032133Z/issues/I-20260720T032133Z-A.md
