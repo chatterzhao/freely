@@ -396,3 +396,8 @@
 - status: promoted
 - promoted_issue_id: `I-20260720T120329Z-C`
 - promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
+### committed_issues
+1. `I-20260720T120329Z-A`
+- milestone: M-20260720T120329Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-A.md
