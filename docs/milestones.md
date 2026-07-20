@@ -288,3 +288,6 @@
 - milestone: M-20260720T004008Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T004008Z/issues/I-20260720T004008Z-A.md
+## M-20260720T012820Z-A / title: new→fresh / status: active
+### candidate_issues: 1. C-20260720T012820Z-A / promoted / I-20260720T012820Z-A / docs/B2-docs/acp/cross-tool-session/raw-20260720T012820Z/issues/I-20260720T012820Z-A.md
+### committed_issues: 1. I-20260720T012820Z-A / completed / docs/B2-docs/acp/cross-tool-session/raw-20260720T012820Z/issues/I-20260720T012820Z-A.md
