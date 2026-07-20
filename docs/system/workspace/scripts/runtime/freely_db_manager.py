@@ -424,11 +424,17 @@ class DbDaemon:
     # ── Lifecycle ─────────────────────────────────────────────────────
 
     def start(self) -> None:
-        self._open_db()
-        self._ensure_tables()
-        self.running = True
-        self.uptime = time.time()
-        self._run_socket_server()
+        try:
+            self._open_db()
+            self._ensure_tables()
+            self.running = True
+            self.uptime = time.time()
+            self._run_socket_server()
+        except Exception as e:
+            import traceback
+            self.log(f"FATAL: daemon crashed with {type(e).__name__}: {e}")
+            self.log(traceback.format_exc())
+            raise
 
     def stop(self) -> None:
         self.running = False
@@ -1617,7 +1623,9 @@ def cmd_start(args) -> int:
     with open(pid_file, "w") as f:
         f.write(str(os.getpid()))
 
-    def _cleanup(*_):
+    def _cleanup(signum=None, frame=None):
+        sig_name = signal.Signals(signum).name if signum is not None else "EXIT"
+        daemon.log(f"daemon received signal {sig_name}, stopping")
         daemon.stop()
         if os.path.exists(pid_file):
             os.unlink(pid_file)
