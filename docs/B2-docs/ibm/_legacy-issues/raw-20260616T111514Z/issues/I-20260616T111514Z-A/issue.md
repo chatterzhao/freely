@@ -11,7 +11,7 @@ updated_at: 2026-06-17 00:00:00+00:00
 author: zhaoquan
 channel: freely-fix-execution
 pre_tests_path: ''
-verification_artifact_dir: docs/B1-docs/raw-20260616T111514Z14Z/code-reviews
+verification_artifact_dir: docs/B2-docs/ibm/_legacy-issues/raw-20260616T111514Z/code-reviews
 platform_state: closed
 ---
 
