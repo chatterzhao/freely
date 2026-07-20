@@ -2,6 +2,7 @@
 local_id: raw-20260616T110714Z
 kind: raw
 phase_state: absorbed
+absorbed_into: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
 platform_ids:
   github:
     issue_id: '2842'
