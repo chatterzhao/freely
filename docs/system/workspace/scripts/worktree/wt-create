@@ -308,7 +308,7 @@ fi
 # This avoids forcing the user to manually edit develop.
 _issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
 if [[ -f "$_issue_file" ]]; then
-  _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
+  _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"" || true)
   case "$_phase" in
     absorbed|completed|dropped)
       echo "[wt-create] raw-${raw_key} phase_state=${_phase} → proposed (auto-reopen)" >&2
