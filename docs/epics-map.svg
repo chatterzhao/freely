@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4320" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4400" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="147" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -391,4 +391,8 @@
   <text x="65" y="4241" fill="#333">agent-role-cleanup</text>
   <rect id="epic-config-toml-complete" x="35" y="4284" width="730" height="30" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
   <text x="50" y="4300" font-size="14" font-weight="bold" fill="#616161">config-toml-complete</text>
+  <rect id="epic-platform-sync" x="35" y="4324" width="730" height="56" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="4"/>
+  <text x="50" y="4340" font-size="14" font-weight="bold" fill="#7b1fa2">platform-sync</text>
+  <rect id="story-close-merged" x="55" y="4350" width="690" height="18" fill="#fff" stroke="#7b1fa2" stroke-width="1" rx="2"/>
+  <text x="65" y="4363" fill="#333">close-merged</text>
 </svg>
