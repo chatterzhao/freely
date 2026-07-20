@@ -1,8 +1,10 @@
-- candidate_id: C-20260720T012820Z-A
-- status: promoted
-- source_raw: raw-20260720T012820Z
-- created_at: 2026-07-20
-- milestone: M-20260720T012820Z-A
+---
+candidate_id: C-20260720T012820Z-A
+status: promoted
+source_raw: raw-20260720T012820Z
+created_at: '2026-07-20'
+milestone: M-20260720T012820Z-A
+---
 
 ## C-20260720T012820Z-A: cross-tool worker launch-kind new→fresh
 
