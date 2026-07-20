@@ -311,7 +311,7 @@
   <text x="65" y="3331" fill="#333">worker-reactivation-and-local-reentry-residual-runtime-governance</text>
   <rect id="story-workflow" x="55" y="3340" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="3353" fill="#333">workflow</text>
-  <rect id="epic-runtime" x="35" y="3374" width="730" height="796" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
+  <rect id="epic-runtime" x="35" y="3374" width="730" height="818" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
   <text x="50" y="3390" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
   <rect id="story-application-native-runtime-observation-contract-and-observability-planes" x="55" y="3400" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="3413" fill="#333">application-native-runtime-observation-contract-and-observability-planes</text>
@@ -381,6 +381,8 @@
   <text x="65" y="4117" fill="#333">timeout</text>
   <rect id="story-watchdog-live-status-surface-and-manager-supervision" x="55" y="4126" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="4139" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
+  <rect id="story-agent-identity-single-truth" x="55" y="4148" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4161" fill="#333">agent-identity-single-truth</text>
   <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4148" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="4161" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
   <rect id="epic-agent-orchestration" x="35" y="4182" width="730" height="92" fill="#e8eaf6" stroke="#283593" stroke-width="2" rx="4"/>
