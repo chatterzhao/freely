@@ -274,6 +274,17 @@
 ## M-20260719T192542Z-A / title: fix — agent collaboration / status: active
 ### candidate_issues: 1. C-20260719T192542Z-A / promoted / I-20260719T192542Z-A / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T192542Z/issues/I-20260719T192542Z-A.md
 ### committed_issues: 1. I-20260719T192542Z-A / completed / docs/B2-docs/ibm/doc-sync-cross-tool/raw-20260719T192542Z/issues/I-20260719T192542Z-A.md
-## M-20260720T004008Z-A / title: launch-kind cross-tool / status: active
-### candidate_issues: 1. C-20260720T004008Z-A / promoted / I-20260720T004008Z-A / docs/B2-docs/acp/cross-tool-session/raw-20260720T004008Z/issues/I-20260720T004008Z-A.md
-### committed_issues: 1. I-20260720T004008Z-A / completed / docs/B2-docs/acp/cross-tool-session/raw-20260720T004008Z/issues/I-20260720T004008Z-A.md
+## M-20260720T004008Z-A
+- title: launch-kind cross-tool
+- status: active
+### candidate_issues
+1. `C-20260720T004008Z-A`
+- milestone: M-20260720T004008Z-A
+- status: promoted
+- promoted_issue_id: I-20260720T004008Z-A
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T004008Z/issues/I-20260720T004008Z-A.md
+### committed_issues
+1. `I-20260720T004008Z-A`
+- milestone: M-20260720T004008Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T004008Z/issues/I-20260720T004008Z-A.md
