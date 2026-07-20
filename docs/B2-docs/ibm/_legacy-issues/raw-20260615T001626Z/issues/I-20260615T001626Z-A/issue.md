@@ -4,7 +4,7 @@ issue_title: "移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)"
 kind: linked
 phase_state: completed
 promoted_from: raw-20260615T001626Z26Z
-source_candidate: docs/B1-docs/raw-20260615T001626Z26Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md
 canonical_issue_path: docs/B2-docs/a2a/handoff/raw-20260615T001626Zissues/I-20260615T001626Z-A.md
 platform_ids:
   github:
