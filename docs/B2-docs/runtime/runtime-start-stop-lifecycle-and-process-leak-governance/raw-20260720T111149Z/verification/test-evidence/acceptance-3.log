@@ -1,0 +1,3 @@
+AT-003 GREEN: ensure_freely_db has stale PID cleanup
+Verified by code inspection: stale PID detection + cleanup logic inserted after db.ping check.
+Kills zombie PID files and socket when process is gone before restarting daemon.
