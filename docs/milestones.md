@@ -317,3 +317,17 @@
 - milestone: M-20260720T032133Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T032133Z/issues/I-20260720T032133Z-A.md
+## M-20260616T110714Z-A
+- title: B1 cleanup — fix issue.md frontmatter
+- status: active
+### candidate_issues
+1. `C-20260616T110714Z-A`
+- milestone: M-20260616T110714Z-A
+- status: promoted
+- promoted_issue_id: I-20260616T110714Z-parse-env-removal
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260616T110714Z/issues/I-20260616T110714Z-parse-env-removal/issue.md
+### committed_issues
+1. `I-20260616T110714Z-parse-env-removal`
+- milestone: M-20260616T110714Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260616T110714Z/issues/I-20260616T110714Z-parse-env-removal/issue.md
