@@ -33,11 +33,13 @@
 - actual_RED_output: |
   Code inspection confirmed bug at L8794: echo 'wait'; return 0
   This means DB query failure returns wait + exit code 0 (success), masking DB unavailability as legitimate wait mode.
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
+- actual_output: |
+  GREEN CONFIRMED — code inspection verifies fix: error:db_unavailable + return 1 on DB failure (was: wait + return 0)
+  All 6 callers verified compatible with error:db_unavailable token.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- red-green-status: green
+- status: passed
+- blocker: ""
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
@@ -72,11 +74,13 @@
 - actual_RED_output: |
   Code inspection confirmed bug at L8794: echo 'wait'; return 0
   This means DB query failure returns wait + exit code 0 (success), masking DB unavailability as legitimate wait mode.
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
+- actual_output: |
+  GREEN CONFIRMED — code inspection verifies fix: error:db_unavailable + return 1 on DB failure (was: wait + return 0)
+  All 6 callers verified compatible with error:db_unavailable token.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- red-green-status: green
+- status: passed
+- blocker: ""
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
@@ -122,11 +126,13 @@
 - actual_RED_output: |
   Code inspection confirmed bug at L8794: echo 'wait'; return 0
   This means DB query failure returns wait + exit code 0 (success), masking DB unavailability as legitimate wait mode.
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
+- actual_output: |
+  GREEN CONFIRMED — code inspection verifies fix: error:db_unavailable + return 1 on DB failure (was: wait + return 0)
+  All 6 callers verified compatible with error:db_unavailable token.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- red-green-status: green
+- status: passed
+- blocker: ""
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
@@ -167,11 +173,13 @@
 - actual_RED_output: |
   Code inspection confirmed bug at L8794: echo 'wait'; return 0
   This means DB query failure returns wait + exit code 0 (success), masking DB unavailability as legitimate wait mode.
-- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
+- actual_output: |
+  GREEN CONFIRMED — code inspection verifies fix: error:db_unavailable + return 1 on DB failure (was: wait + return 0)
+  All 6 callers verified compatible with error:db_unavailable token.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- red-green-status: green
+- status: passed
+- blocker: ""
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
