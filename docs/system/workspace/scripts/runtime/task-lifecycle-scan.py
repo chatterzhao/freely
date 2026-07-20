@@ -883,21 +883,7 @@ def scan(project: Path) -> dict:
             except Exception:
                 pass
 
-            # Fallback: legacy agent-id.env file
-            if not agent_id:
-                agent_env_file = project / ".freely" / "agent-id.env"
-                if agent_env_file.exists():
-                    try:
-                        wt_path_str = str(wt_path)
-                        for line in agent_env_file.read_text().split("\n"):
-                            if wt_path_str in line:
-                                parts = line.strip().split("=")
-                                if len(parts) >= 3:
-                                    agent_id = parts[-1]
-                                break
-                    except Exception:
-                        pass
-
+            # agent-id.env retired — agent_working is the sole source of truth.
             if not agent_id:
                 items.append({
                     "category": "3_dead_agent",
