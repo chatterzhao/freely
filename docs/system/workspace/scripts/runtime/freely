@@ -13089,8 +13089,7 @@ capture_worker_session_id_and_store() {
     while [[ $_elapsed -lt $_timeout ]]; do
       if [[ -f "$worker_cycle_log" && -s "$worker_cycle_log" ]]; then
         _session_id="$(head -n 1 "$worker_cycle_log" 2>/dev/null | tr -d '[:space:]' || true)"
-        # Validate UUID format (with or without dashes)
-        if [[ "$_session_id" =~ ^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$ ]]; then
+        if is_valid_session_id "$_session_id"; then
           break
         fi
         _session_id=""
