@@ -346,3 +346,18 @@
 - milestone: M-20260616T110714Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260616T110714Z/issues/I-20260616T110714Z-parse-env-removal/issue.md
+
+## M-20260720T051323Z-A
+- title: session ID capture ses_ format
+- status: active
+### candidate_issues
+1. `C-20260720T051323Z-A`
+- milestone: M-20260720T051323Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T051323Z-A`
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T051323Z/issues/I-20260720T051323Z-A.md
+### committed_issues
+1. `I-20260720T051323Z-A`
+- milestone: M-20260720T051323Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T051323Z/issues/I-20260720T051323Z-A.md
