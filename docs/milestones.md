@@ -361,3 +361,18 @@
 - milestone: M-20260720T051323Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T051323Z/issues/I-20260720T051323Z-A.md
+
+## M-20260720T055358Z-A
+- title: fix wt-create silent exit when issue.md lacks phase_state
+- status: active
+### candidate_issues
+1. `C-20260720T055358Z-A`
+- milestone: M-20260720T055358Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T055358Z-A`
+- promoted_issue_path: docs/B2-docs/git-worktree/wt-create/raw-20260720T055358Z/issues/I-20260720T055358Z-A.md
+### committed_issues
+1. `I-20260720T055358Z-A`
+- milestone: M-20260720T055358Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/git-worktree/wt-create/raw-20260720T055358Z/issues/I-20260720T055358Z-A.md

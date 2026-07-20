@@ -1,4 +1,5 @@
 # Implementation Decision Note: wt-create silent exit fix
+- issue_id: I-20260720T055358Z-A
 
 ## Change
 Line 311 of docs/system/workspace/scripts/worktree/wt-create:
