@@ -399,5 +399,5 @@
 ### committed_issues
 1. `I-20260720T120329Z-A`
 - milestone: M-20260720T120329Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-A.md

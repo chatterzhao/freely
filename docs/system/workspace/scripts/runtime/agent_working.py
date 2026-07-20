@@ -39,13 +39,12 @@ def _db_rpc(project: str, method: str, params: dict, timeout: float = 5.0) -> di
 def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
                  worktree: str = "", branch: str = "", session_id: str = "",
                  test_worktree: str = "", test_branch: str = "",
-                 slot: str = "", update_only: bool = False):
+                 slot: str = ""):
     """ACP session/new|fork 时写入。通过 DB RPC。
 
-    Worker:  UPSERT (INSERT OR UPDATE) — raw_key 行不存在就创建
-    Reviewer: UPDATE ONLY — raw_key 行必须已存在（Worker 创建的），
-             行不存在说明 worktree 已被 wt-close 删除或存在 bug
-    Manager: 独立行 "__manager__"，UPSERT
+    All roles use UPSERT (INSERT OR UPDATE) — if the raw_key row doesn't
+    exist yet, it is created. This prevents silent registration failures
+    (e.g. Reviewer starting before Worker has created the row).
     """
     # ── L3: validate agent_id format for worker role ──
     if role == "worker":
@@ -56,21 +55,12 @@ def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
             return {"status": "error", "error": f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"}
     col = f"{role}_id"
     val = f"{agent_id}:{session_id}" if session_id else agent_id
-    method = "agent_working.upsert_only" if update_only else "agent_working.upsert"
-    result = _db_rpc(project, method, {
+    result = _db_rpc(project, "agent_working.upsert", {
         "raw_key": raw_key, "col": col, "val": val,
         "worktree": worktree, "branch": branch,
         "test_worktree": test_worktree, "test_branch": test_branch,
         "slot": slot, "role": role, "agent_id": agent_id
     })
-    if update_only and result.get("status") == "error":
-        import sys as _sys
-        _sys.stderr.write(
-            f"[agent_working] {role}/{agent_id} update_only failed for {raw_key}: "
-            f"{result.get('message', 'row not found or update rejected')} "
-            f"(worktree may have been closed or Worker hasn't created the row yet)\n"
-        )
-        _sys.stderr.flush()
     return result
 
 
@@ -248,8 +238,18 @@ def agent_get_session(project: str, raw_key: str, role: str, agent_id: str = Non
     return result.get("session_id") or None
 
 
-def agent_next_free(project: str, role: str, pool_size: int) -> Optional[str]:
-    """返回下一个可用的 agent NN。"""
+def agent_next_free(project: str, role: str, pool_size: int, raw_key: str = None) -> Optional[str]:
+    """返回下一个可用的 agent NN。
+
+    When raw_key is provided, uses atomic next_free_and_assign to eliminate
+    the TOCTOU window between query and write. Callers that only need the
+    free list (not assignment) can omit raw_key for the legacy query-only path.
+    """
+    if raw_key:
+        result = _db_rpc(project, "agent_working.next_free_and_assign", {
+            "role": role, "pool_size": str(pool_size), "raw_key": raw_key
+        })
+        return result.get("agent_id") if result.get("assigned") else None
     result = _db_rpc(project, "agent_working.next_free", {
         "role": role, "pool_size": str(pool_size)
     })
