@@ -4,23 +4,19 @@ kind: raw
 phase_state: absorbed
 absorbed_into: I-20260720T120329Z-A
 platform_ids:
-  github:
-    issue_id: '4064'
-    url: https://github.com/chatterzhao/freely/issues/4064
-    synced_at: ''
   gitee:
     issue_id: IK2EEZ
     url: https://gitee.com/zhaoquan/freely/issues/IK2EEZ
     synced_at: ''
-primary_platform: github
+primary_platform: gitee
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
-created_at: '2026-07-20T12:03:51Z'
-updated_at: '2026-07-20T12:03:51Z'
+created_at: '2026-07-20T20:03:52+08:00'
+updated_at: '2026-07-20T20:03:52+08:00'
 intake_id: ''
 author: platform
-channel: github
+channel: gitee
 session_refs: []
 platform_state: closed
 ---
