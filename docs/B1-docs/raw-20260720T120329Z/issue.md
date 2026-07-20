@@ -2,6 +2,7 @@
 local_id: raw-20260720T120329Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260720T120329Z-A
 platform_ids:
   gitee:
     issue_id: IK2EEZ
