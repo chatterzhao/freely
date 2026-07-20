@@ -39,10 +39,10 @@ milestone: M-20260720T120329Z-A
 
 - candidate_format_version: v2
 - title: 运行时 agent-id.env 退役 — 全部生产路径迁移到 agent_working
-- status: blocked
+- status: promoted
 - decision_reason: agent-id.env 在 9 处生产代码中仍被读写，形成双真源。C-A 补齐 DB 接口后，C-B 将所有消费者切换到 agent_working 唯一真源
-- next_action: 等待 C-A merge 到 develop，然后进入 B2_IBM 物化 I-* issue
-- revisit_trigger: C-A 合并后自动解锁；若 C-A 接口变更需重新对齐
+- next_action: 进入 B2_IBM 物化 I-* issue 与设计产物
+- revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
   - `_resolve_current_agent_id` (L340/L4323/L4832): 移除 agent-id.env fallback，agent_working 查询失败 → 显式错误退出（不默认 manager_01）
   - Worker assignment (L6014-6065): 移除 agent-id.env 双写，仅写 agent_working

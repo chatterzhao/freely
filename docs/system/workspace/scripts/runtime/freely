@@ -307,7 +307,7 @@ for t in json.load(sys.stdin).get('tools', []):
 }
 
 # ── Agent Working shim — replaces agent-id.env reads ─────────────────
-# Queries agent_working table and outputs in agent-id.env-compatible format.
+    # Queries agent_working table for agent-worktree binding.
 # Format: worktree_path=role=agent_id (one per line)
 
 _agent_working_read_all() {
@@ -337,7 +337,7 @@ for r in rows:
 # ── Slot testing helpers ──────────────────────────────────────────────
 
 # _resolve_current_agent_id: find which agent (manager_01 / worker_03 / …)
-# owns the current worktree. Uses agent_working table, falls back to agent-id.env.
+    # owns the current worktree. Uses agent_working table only.
 _resolve_current_agent_id() {
   local project="${1:-${PROJECT_ROOT:-$(pwd)}}"
   local _my_id="" _current_path; _current_path="$(pwd)"
@@ -360,15 +360,12 @@ for r in rows:
 " 2>/dev/null || true)
   fi
 
-  # Fallback to agent-id.env for compatibility
+  # Identity resolution: agent_working only. agent-id.env is retired.
+  # Failure to resolve = refuse to proceed (no silent fallback to manager_01).
   if [[ -z "$_my_id" ]]; then
-    local _agent_env="$project/.freely/agent-id.env"
-    if [[ -f "$_agent_env" ]]; then
-      _my_id=$(grep -F "$_current_path" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+|reviewer_[0-9]+)' | head -1 || true)
-    fi
+    log_error "unable to resolve agent identity for $_current_path: agent_working has no entry"
+    return 1
   fi
-
-  [[ -z "$_my_id" ]] && _my_id="manager_01"
   printf '%s\n' "$_my_id"
 }
 
@@ -2117,7 +2114,6 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   [[ "$_warn_workers" =~ ^[0-9]+$ ]] || _warn_workers="7"
   max_parallel_workers="$_max_workers"
   # Reconcile zombie agent-id.env entries before counting (worktree gone but entry remains)
-  manager_reconcile_agent_id_env 2>/dev/null || true
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
@@ -4326,16 +4322,12 @@ load_config() {
   if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
     local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
     local _aq="${PROJECT_ROOT}/bin/agent-table-query"
-    local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
     local _my_id=""
 
-    # Resolve agent identity: agent-id.env maps worktree_path → agent_id
-    # Anchor with = to avoid substring match: develop path (.../freely)
-    # must not match worktree paths (.../freely-worktrees/...).
-    if [[ -f "$_agent_env" ]]; then
-      _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
-    fi
-    # Manager runs on develop worktree — not in agent-id.env
+    # Resolve agent identity via agent_working table (single source of truth).
+    # agent-id.env has been retired — no fallback to file.
+    _my_id="$(_resolve_current_agent_id "$PROJECT_ROOT" || true)"
+    # Manager runs on develop worktree — not in agent_working
     [[ -z "$_my_id" ]] && _my_id="manager_01"
 
     if [[ -f "$_at" && -x "$_aq" ]]; then
@@ -6018,9 +6010,7 @@ sync_project_tooling_from_source() {
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    # ── Concurrency control: reconcile zombies, count active, pick idle worker ──
-	    _agent_env="$source_project/.freely/agent-id.env"
-	    manager_reconcile_agent_id_env "$_agent_env" 2>/dev/null || true
-	    local _active_count _max_workers _all_workers _picked _wt_path
+	    local _active_count _max_workers _picked _wt_path
 	    _active_count=$(count_active_running_workers_for_manager_project "$source_project" 2>/dev/null || echo 0)
 	    _max_workers="$(manager_max_parallel_workers)"
 	    _max_workers="${_max_workers%%:*}"
@@ -6030,23 +6020,11 @@ sync_project_tooling_from_source() {
 	      return 0
 	    fi
 	    # Pick first idle worker — use agent_working table (authoritative source).
-	    # Falls back to legacy agent-id.env grep if DB RPC fails.
 	    _next_worker=$(python3 -c "
 import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_next_free
-print(agent_next_free('${PROJECT_ROOT}', 'worker', 10) or '')
+print(agent_next_free('${PROJECT_ROOT}', 'worker', 10, raw_key='${_worker_raw_key:-develop}') or '')
 " 2>/dev/null || true)
-	    # Fallback: legacy agent-id.env grep
-	    if [[ -z "$_next_worker" ]]; then
-	      _all_workers=$("$_agent_query" --project "$source_project" --list worker 2>/dev/null || true)
-	      for _w in $_all_workers; do
-	        [[ -n "$_w" ]] || continue
-	        if ! grep -q "=$_w\$" "$_agent_env" 2>/dev/null; then
-	          _next_worker="$_w"; break
-	        fi
-	      done
-	      [[ -z "$_next_worker" ]] && _next_worker="${_all_workers%% *}"
-	    fi
 	    if [[ -n "$_next_worker" ]]; then
 	      # Auto-wake: ensure target bridge is alive before delegation.
 	      local _worker_slot _worker_bt
@@ -6058,11 +6036,9 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', 10) or '')
 	          return 1
 	        }
 	      fi
-	      mkdir -p "$(dirname "$_agent_env")"
-	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
 		      # Phase 1: dual-write to agent_working table
-		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
-	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env + agent_working)"
+		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '$_next_worker', worktree='${target_project}')"
+	      log_info "agent-table: assigned $_next_worker to $target_project (agent_working)"
 	    fi
 	  fi
 	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
@@ -12932,19 +12908,7 @@ agent_cleanup_stale('${_proj}')
 " 2>/dev/null || true
     return 0
   fi
-  # Fallback: old agent-id.env file-based cleanup
-  local _agent_env="${1:-${_proj}/.freely/agent-id.env}"
-  [[ -f "$_agent_env" ]] || return 0
-  local _cleaned=0 _line _wt_path
-  while IFS= read -r _line; do
-    [[ -n "$_line" ]] || continue
-    _wt_path="${_line%%=*}"
-    if [[ ! -d "$_wt_path" ]]; then
-      sed -i.bak "|^$_line$|d" "$_agent_env" 2>/dev/null || true
-      _cleaned=$((_cleaned + 1))
-    fi
-  done < "$_agent_env"
-  [[ "$_cleaned" -gt 0 ]] && log_info "agent-id.env: cleaned $_cleaned zombie entries (fallback)"
+  # agent-id.env retired — zombie cleanup handled via agent_working.cleanup_stale only.
   return 0
 }
 
@@ -13346,7 +13310,7 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', ${_worker_pool:-10}) or 'work
 " 2>/dev/null || echo "worker_01")
   _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || echo "${AGENT_AI_TOOL:-claude-apikey-ds-flash-auto}")
   _worker_raw_key="$(echo "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
-  python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')" 2>/dev/null || true
+  python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')"
 
   local _worker_next_file
   _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
@@ -13878,7 +13842,7 @@ print(sum(1 for r in data.get('rows', []) if r.get('worktree','')=='$_target_wor
       _task_id=""
       if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
         _task_id=$(python3 "$_a2a_task_py" insert \
-          --role worker --agent-id "$(grep -F "$_target_worktree" "${PROJECT_ROOT}/.freely/agent-id.env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || echo "worker")" --raw-key "$_raw_key" \
+          --role worker --agent-id "$(python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${PROJECT_ROOT}', '${_raw_key:-develop}'); print(r.get('worker_id','').split(':')[0] if r.get('worker_id') else 'worker')" 2>/dev/null || echo "worker")" --raw-key "$_raw_key" \
           --prompt-file "$_prompt_file" --worktree "$_target_worktree" \
           --created-by manager --consumed-by manager \
           --parent "$_parent_task_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
@@ -24593,7 +24557,7 @@ HELP
   done
 
   project="$(resolve_project_or_fail "$project" 1)"
-  local _stamp _agent_env
+  local _stamp
 
   case "$action" in
     new)
@@ -24603,9 +24567,8 @@ HELP
       python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
         --project "$project" discuss.create \
         --session-id "$session_id" --owner "$(git config user.name)" >/dev/null 2>&1 || true
-      # Record in agent-id.env: project_root=discuss=session_id
-      _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
-      echo "${PROJECT_ROOT}=discuss=${session_id}" >> "$_agent_env"
+      # Record in agent_working: project_root=discuss=session_id
+      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'discuss-${session_id}', 'manager', 'manager_01', session_id='${session_id}', worktree='${PROJECT_ROOT}')" 2>/dev/null || true
       # Create platform Discussions on supported platforms
       local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
       python3 "$_adapter" create-discussion "$session_id" "${message:-New discussion}" 2>&1 || true
@@ -24723,9 +24686,10 @@ HELP
   echo "$_adapter_result"
 
   # Notify active worker via ACP session/prompt if worktree is active
-  local _wt_path _agent_env="${project}/.freely/agent-id.env"
-  if [[ -f "$_agent_env" ]]; then
-    _wt_path=$(grep -F "raw-${_raw_key}" "$_agent_env" 2>/dev/null | head -1 | cut -d= -f1 || true)
+  local _wt_path
+  _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${PROJECT_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
+  if [[ -n "$_wt_path" ]]; then
+    _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${PROJECT_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
     if [[ -n "$_wt_path" && -d "$_wt_path" ]]; then
       local _session_id
       _session_id=$(python3 -c "
