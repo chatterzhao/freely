@@ -406,3 +406,7 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
 
+3. `I-20260720T120329Z-C`
+- milestone: M-20260720T120329Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md

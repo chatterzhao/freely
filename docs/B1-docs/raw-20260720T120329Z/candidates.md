@@ -69,10 +69,10 @@ milestone: M-20260720T120329Z-A
 
 - candidate_format_version: v2
 - title: E2E 测试与回归门禁
-- status: blocked
+- status: promoted
 - decision_reason: C-A + C-B 完成代码迁移后，需要 E2E 测试证明真实 DB daemon 下三角色闭环可用，以及回归门禁防止 agent-id.env 重新侵入
-- next_action: 等待 C-A 和 C-B merge 到 develop，然后进入 B2_IBM 物化 I-* issue
-- revisit_trigger: C-A 和 C-B 合并后自动解锁
+- next_action: 进入 B2_IBM 物化 I-* issue 与设计产物
+- revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
   - E2E 测试: Manager 委派 Worker → Worker 注册到 agent_working → Worker 请求 Reviewer → Reviewer verdict 持久化到 agent_working → Worker retry 或 Manager 决策 → close 释放 agent_working
   - 覆盖 daemon 重启恢复（agent_working 状态持久化验证）
