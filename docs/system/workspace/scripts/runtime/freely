@@ -13340,11 +13340,17 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', ${_worker_pool:-10}) or 'work
     export FREELY_ROLE_HINT=worker
     export SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
     export SESSION_PARENT_PROJECT="$manager_project"
+    local _worker_launch_kind
+    if [[ "$_worker_base" == "$_mgr_base" ]]; then
+      _worker_launch_kind="fork"
+    else
+      _worker_launch_kind="new"
+    fi
     python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
       --bridge-socket "$_manager_bridge_socket" \
       --cwd "$target_project" \
       --prompt-file "$prompt_file" \
-      --launch-kind fork \
+      --launch-kind "$_worker_launch_kind" \
       --mode auto \
       --loop \
       --next-prompt-file "$_worker_next_file"
