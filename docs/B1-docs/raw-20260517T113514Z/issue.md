@@ -15,6 +15,7 @@ updated_at: '2026-07-20T05:58:00Z'
 primary_platform: github
 platform_state: closed
 phase_state: absorbed
+absorbed_into: I-20260517T113514Z-A
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)
