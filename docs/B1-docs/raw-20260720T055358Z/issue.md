@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260720T055358Z
 kind: raw
-phase_state: absorbed
-absorbed_into: docs/system/workspace/scripts/worktree/wt-create
+phase_state: dropped
+dropped_reason: fix applied directly by patrol — one-line || true addition on line 311. No I-* issue needed.
 platform_ids:
   github:
     issue_id: '4056'
