@@ -2,7 +2,7 @@
 local_id: raw-20260616T110714Z
 kind: raw
 phase_state: absorbed
-absorbed_into: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
+absorbed_into: docs/B2-docs/ibm/_legacy-issues/raw-20260616T110714Z/issues/I-20260616T110714Z-parse-env-removal/issue.md
 platform_ids:
   github:
     issue_id: '2842'
