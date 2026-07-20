@@ -13344,7 +13344,7 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', ${_worker_pool:-10}) or 'work
     if [[ "$_worker_base" == "$_mgr_base" ]]; then
       _worker_launch_kind="fork"
     else
-      _worker_launch_kind="new"
+      _worker_launch_kind="fresh"
     fi
     python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
       --bridge-socket "$_manager_bridge_socket" \
