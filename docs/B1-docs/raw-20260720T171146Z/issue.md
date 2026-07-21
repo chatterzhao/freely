@@ -4,14 +4,14 @@ kind: raw
 phase_state: absorbed
 absorbed_into: I-20260720T120329Z-C
 parent_story: M-20260720T120329Z-A / I-20260720T120329Z-A,B,C
-  github:
-    issue_id: '4068'
-    url: https://github.com/chatterzhao/freely/issues/4068
-    synced_at: ''
-  gitee:
-    issue_id: IK2FO8
-    url: https://gitee.com/zhaoquan/freely/issues/IK2FO8
-    synced_at: ''
+github:
+  issue_id: '4068'
+  url: https://github.com/chatterzhao/freely/issues/4068
+  synced_at: ''
+gitee:
+  issue_id: IK2FO8
+  url: https://gitee.com/zhaoquan/freely/issues/IK2FO8
+  synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}

@@ -365,48 +365,6 @@ def _a2a_uvicorn_log_config():
     }
 
 
-# D5: Resume script for _restore_tasks — runs agent_working scan + ACP session/resume
-_aw_resume_script = '''
-import os, sys, json, socket, hashlib
-project = os.environ["FREELY_PROJECT"]
-sys.path.insert(0, os.path.join(project, "docs", "system", "workspace", "scripts", "runtime"))
-from agent_working import _db_rpc
-result = _db_rpc(project, "agent_working.get_all", {})
-rows = result.get("rows", [])
-if rows:
-    h = hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
-    bridge = f"/tmp/freely-acp-{h}.sock"
-    for r in rows:
-        raw_key = r.get("raw_key", "")
-        for role in ("manager", "worker", "reviewer"):
-            val = str(r.get(f"{role}_id", "") or "")
-            if not val or ":" not in val:
-                continue
-            agent_id, session_id = val.split(":", 1)
-            if not session_id or session_id == "pending":
-                continue
-            print(f"agent {role} {agent_id} session={session_id[:16]}... for {raw_key}")
-            if os.path.exists(bridge):
-                try:
-                    s = socket.socket(socket.AF_UNIX); s.settimeout(5); s.connect(bridge)
-                    req = json.dumps({"jsonrpc":"2.0","id":1,"method":"session/resume","params":{"sessionId":session_id,"cwd":project}}) + "\\n"
-                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
-                    resp = b""
-                    while True:
-                        chunk = s.recv(4096)
-                        if not chunk: break
-                        resp += chunk
-                    s.close()
-                    result_r = json.loads(resp.decode())
-                    if "error" in result_r:
-                        print(f"  resume failed: {result_r['error']}")
-                    else:
-                        print(f"  resumed ok")
-                except Exception as e:
-                    print(f"  resume error: {e}")
-'''
-
-
 class A2AServer:
     """A2A Protocol Server — async, official SDK + Starlette + Uvicorn.
 
@@ -574,19 +532,27 @@ class A2AServer:
                         pass
             # D5: attempt ACP session/resume for working agents after restore
             try:
-                import subprocess as _sp, os as _os2, json as _j5
-                aw_py = _os2.path.join(self.project, 'docs', 'system', 'workspace', 'scripts', 'runtime', 'agent_working.py')
-                if _os2.path.exists(aw_py):
+                import subprocess as _sp, os as _os2
+                restore_py = _os2.path.join(
+                    self.project, "docs", "system", "workspace", "scripts",
+                    "runtime", "agent_session_restore.py",
+                )
+                if _os2.path.isfile(restore_py):
                     result = _sp.run(
-                        [_sys.executable, '-c', _aw_resume_script],
-                        capture_output=True, text=True, timeout=15,
-                        env={**_os2.environ, 'FREELY_PROJECT': str(self.project)},
+                        [_sys.executable, restore_py, str(self.project)],
+                        capture_output=True,
+                        text=True,
+                        timeout=15,
+                        cwd=str(self.project),
                     )
-                    for line in (result.stdout or '').splitlines():
+                    for line in (result.stdout or "").splitlines():
                         if line.strip():
                             print(f"[restore] {line.strip()}", file=_sys.stderr)
-            except Exception:
-                pass
+                    if result.returncode != 0:
+                        detail = (result.stderr or "").strip() or f"exit={result.returncode}"
+                        print(f"[restore] session recovery failed: {detail}", file=_sys.stderr)
+            except Exception as exc:
+                print(f"[restore] session recovery failed: {exc}", file=_sys.stderr)
             # D6: push restore-complete SSE event so watchdog re-subscribes
             if restored > 0 or failed > 0:
                 try:
@@ -774,8 +740,9 @@ class A2AServer:
             # the message to the target agent via ACP session/prompt.
             import asyncio as _asyncio
             _asyncio.ensure_future(self._notify_sse(tid, "message_added", {
-                "task_id": tid, "role": role, "type": msg_type,
-                "content": content[:512]}))
+                "task_id": tid, "role": role,
+                "agent_id": body.get("agent_id", body.get("agentId", "")),
+                "type": msg_type, "content": content[:512]}))
             return JSONResponse({"ok": True})
         if task_id.endswith("/worker-pid") and request.method == "PATCH":
             tid = task_id[:-12]; body = await request.json()

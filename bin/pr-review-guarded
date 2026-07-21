@@ -73,6 +73,7 @@ import sys
 sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
 from raw_key_canon import try_canonicalize_raw_key
 from agent_working import agent_list_by_raw_key, AgentWorkingError
+from agent_identity_value import first_agent_id
 rk = try_canonicalize_raw_key('$review_branch')
 if not rk:
     raise SystemExit(0)
@@ -82,9 +83,9 @@ except AgentWorkingError as e:
     print(f'ERROR: agent_working unavailable: {e}', file=sys.stderr)
     raise SystemExit(2)
 if row:
-    wid = row.get('worker_id', '')
+    wid = first_agent_id(row.get('worker_id', ''))
     if wid:
-        print(wid.split(':')[0] if ':' in str(wid) else wid)
+        print(wid)
 " 2>/dev/null || true)
     if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
       _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
@@ -259,6 +260,7 @@ import sys
 sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
 from raw_key_canon import try_canonicalize_raw_key
 from agent_working import agent_list_by_raw_key, AgentWorkingError
+from agent_identity_value import first_agent_id
 rk = try_canonicalize_raw_key('$review_branch')
 if not rk:
     raise SystemExit(0)
@@ -267,9 +269,9 @@ try:
 except AgentWorkingError:
     raise SystemExit(0)
 if row:
-    wid = row.get('worker_id', '')
+    wid = first_agent_id(row.get('worker_id', ''))
     if wid:
-        print(wid.split(':')[0] if ':' in str(wid) else wid)
+        print(wid)
 " 2>/dev/null || true)
 fi
 if [[ -z "$_my_worker_id" ]]; then
