@@ -1345,6 +1345,15 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
 
 # ── agent_working.* handlers ──────────────────────────────────────────
 
+def _aw_canon_raw_key(raw_key: str) -> str:
+    """Normalize raw_key for all agent_working handlers (shared boundary)."""
+    try:
+        from raw_key_canon import canonicalize_raw_key
+        return canonicalize_raw_key(raw_key)
+    except Exception as exc:
+        raise ValueError(f"invalid raw_key: {raw_key!r}") from exc
+
+
 @_h("agent_working.upsert")
 def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
     """agent_assign: INSERT or UPDATE agent_working row.
@@ -1353,7 +1362,7 @@ def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
     of overwriting. Multiple reviewers can review the same raw_key.
     For other columns (worker_id, manager_id): overwrites (one per raw_key).
     """
-    raw_key = params["raw_key"]
+    raw_key = _aw_canon_raw_key(params["raw_key"])
     col = params["col"]; val = params["val"]
     # Defense-in-depth: validate col matches expected {role}_id pattern
     import re as _re
@@ -1399,7 +1408,7 @@ def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
     created by Worker (UPSERT). If the row doesn't exist, the worktree
     was already wt-closed or there's a bug.
     """
-    raw_key = params["raw_key"]
+    raw_key = _aw_canon_raw_key(params["raw_key"])
     col = params["col"]; val = params["val"]
     import re as _re
     if not _re.match(r'^(manager|worker|reviewer)_id$', col):
@@ -1432,7 +1441,7 @@ def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
 @_h("agent_working.release")
 def h_aw_release(daemon: DbDaemon, params: dict) -> dict:
     """agent_release: strip session from agent_id column."""
-    raw_key = params["raw_key"]; role = params.get("role",""); col = f"{role}_id"
+    raw_key = _aw_canon_raw_key(params["raw_key"]); role = params.get("role",""); col = f"{role}_id"
     agent_id = params.get("agent_id","")
     c = daemon.conn
     row = c.execute(f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
@@ -1453,7 +1462,7 @@ def h_aw_release(daemon: DbDaemon, params: dict) -> dict:
 @_h("agent_working.delete")
 def h_aw_delete(daemon: DbDaemon, params: dict) -> dict:
     """agent_release_all: delete row by raw_key."""
-    daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (params["raw_key"],))
+    daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (_aw_canon_raw_key(params["raw_key"]),))
     daemon.conn.commit()
     return {"status": "ok"}
 
@@ -1461,7 +1470,7 @@ def h_aw_delete(daemon: DbDaemon, params: dict) -> dict:
 @_h("agent_working.get_session")
 def h_aw_get_session(daemon: DbDaemon, params: dict) -> dict:
     """agent_get_session: return session_id for agent."""
-    raw_key = params["raw_key"]; role = params.get("role","")
+    raw_key = _aw_canon_raw_key(params["raw_key"]); role = params.get("role","")
     if role not in ("manager", "worker", "reviewer"):
         return {"session_id": None}
     col = f"{role}_id"
@@ -1478,6 +1487,41 @@ def h_aw_get_session(daemon: DbDaemon, params: dict) -> dict:
     return {"session_id": row[col].split(":",1)[1] if ":" in (row[col] or "") else None}
 
 
+def _aw_parse_occupied(role: str, val: str) -> set:
+    """Parse occupied agent ids from a column value.
+
+    Supports bare agent_id and agent_id:session (and comma-separated reviewers).
+    """
+    occupied = set()
+    if not val:
+        return occupied
+    if role == "reviewer":
+        for p in str(val).split(","):
+            p = p.strip()
+            if not p:
+                continue
+            occupied.add(p.split(":", 1)[0] if ":" in p else p)
+    else:
+        agent_part = str(val).split(":", 1)[0] if ":" in str(val) else str(val)
+        if agent_part:
+            occupied.add(agent_part)
+    return occupied
+
+
+def _aw_existing_agent_for_role(role: str, col_val: str) -> str | None:
+    """Return first assigned agent_id for role if already present on the row."""
+    if not col_val:
+        return None
+    if role == "reviewer":
+        for p in str(col_val).split(","):
+            p = p.strip()
+            if not p:
+                continue
+            return p.split(":", 1)[0] if ":" in p else p
+        return None
+    return str(col_val).split(":", 1)[0] if ":" in str(col_val) else str(col_val)
+
+
 @_h("agent_working.next_free")
 def h_aw_next_free(daemon: DbDaemon, params: dict) -> dict:
     """agent_next_free: compute next free agent NN from pool."""
@@ -1488,14 +1532,7 @@ def h_aw_next_free(daemon: DbDaemon, params: dict) -> dict:
     rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
     occupied = set()
     for r in rows:
-        val = r[col] or ""
-        if role == "reviewer":
-            if val:
-                for p in val.split(","):
-                    if ":" in p: occupied.add(p.split(":",1)[0])
-        else:
-            agent_part = val.split(":",1)[0] if ":" in val else val
-            if agent_part: occupied.add(agent_part)
+        occupied |= _aw_parse_occupied(role, r[col] or "")
     all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
     free = sorted(all_ids - occupied)
     return {"agent_id": free[0] if free else None, "free_list": free}
@@ -1505,55 +1542,62 @@ def h_aw_next_free(daemon: DbDaemon, params: dict) -> dict:
 def h_aw_next_free_and_assign(daemon: DbDaemon, params: dict) -> dict:
     """Atomic next_free + assign: allocate a free agent and immediately write it.
 
-    Eliminates the TOCTOU window between agent_next_free and agent_assign
-    where concurrent callers could get the same agent_id.
+    Idempotent for same raw_key + role: if the row already has an agent for that
+    role, return the existing agent_id without overwriting.
     """
-    role = params["role"]; raw_key = params["raw_key"]; pool_size = int(params.get("pool_size","10"))
+    role = params["role"]
+    raw_key = _aw_canon_raw_key(params["raw_key"])
+    pool_size = int(params.get("pool_size", "10"))
     if role not in ("manager", "worker", "reviewer"):
         return {"agent_id": None, "assigned": False}
-    col = f"{role}_id"; prefix = f"{role}_"
-    rows = daemon.conn.execute(f"SELECT raw_key, {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+    col = f"{role}_id"
+    prefix = f"{role}_"
+
+    # Idempotent: same raw_key + role already assigned → return existing
+    existing = daemon.conn.execute(
+        f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)
+    ).fetchone()
+    if existing and existing[col]:
+        prior = _aw_existing_agent_for_role(role, existing[col])
+        if prior:
+            return {"agent_id": prior, "assigned": True, "idempotent": True}
+
+    rows = daemon.conn.execute(
+        f"SELECT raw_key, {col} FROM agent_working WHERE {col} IS NOT NULL"
+    ).fetchall()
     occupied = set()
     for r in rows:
-        val = r[col] or ""
-        if role == "reviewer":
-            if val:
-                for p in val.split(","):
-                    if ":" in p: occupied.add(p.split(":",1)[0])
-        else:
-            agent_part = val.split(":",1)[0] if ":" in val else val
-            if agent_part: occupied.add(agent_part)
+        occupied |= _aw_parse_occupied(role, r[col] or "")
     all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
     free = sorted(all_ids - occupied)
     if not free:
         return {"agent_id": None, "assigned": False}
     agent_id = free[0]
-    # Atomically: check no other caller claimed this agent, then write
-    existing = daemon.conn.execute(
-        f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)
-    ).fetchone()
-    if existing and existing[col]:
-        # Row exists — append to reviewer column or overwrite for other roles
+    if existing is not None:
         if role == "reviewer":
-            new_val = f"{existing[col]},{agent_id}:pending"
+            # First assignment on empty reviewer col handled below; this branch is
+            # only when row exists but col empty (existing[col] falsy).
+            new_val = f"{agent_id}:pending"
         else:
             new_val = f"{agent_id}:pending"
         daemon.conn.execute(
             f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
-            (new_val, raw_key))
+            (new_val, raw_key),
+        )
     else:
         daemon.conn.execute(
             f"INSERT INTO agent_working (raw_key, {col}, updated_at) VALUES (?, ?, datetime('now'))"
             f" ON CONFLICT(raw_key) DO UPDATE SET {col}=excluded.{col}, updated_at=excluded.updated_at",
-            (raw_key, f"{agent_id}:pending"))
+            (raw_key, f"{agent_id}:pending"),
+        )
     daemon.conn.commit()
-    return {"agent_id": agent_id, "assigned": True}
+    return {"agent_id": agent_id, "assigned": True, "idempotent": False}
 
 
 @_h("agent_working.get")
 def h_aw_get(daemon: DbDaemon, params: dict) -> dict:
     """agent_list_by_raw_key: return full row as dict."""
-    row = daemon.conn.execute("SELECT * FROM agent_working WHERE raw_key = ?", (params["raw_key"],)).fetchone()
+    row = daemon.conn.execute("SELECT * FROM agent_working WHERE raw_key = ?", (_aw_canon_raw_key(params["raw_key"]),)).fetchone()
     if not row: return {"row": {}}
     cols = [d[1] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
     return {"row": dict(zip(cols, row))}
@@ -1587,18 +1631,21 @@ def h_aw_get_all(daemon: DbDaemon, params: dict) -> dict:
 
 @_h("agent_working.stats")
 def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
-    """agent_stats: occupancy per role."""
+    """agent_stats: occupancy per role.
+
+    Occupied counts reuse _aw_parse_occupied so bare agent_id and
+    agent_id:session (including multi-reviewer CSV) count consistently.
+    """
     result = {}
-    for role, pool in [("manager",1),("worker",10),("reviewer",99)]:
+    for role, pool in [("manager", 1), ("worker", 10), ("reviewer", 99)]:
         col = f"{role}_id"
-        rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
-        occupied = 0
+        rows = daemon.conn.execute(
+            f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL"
+        ).fetchall()
+        occupied_ids: set = set()
         for r in rows:
-            val = r[col] or ""
-            if role == "reviewer" and val:
-                occupied += len([p for p in val.split(",") if ":" in p])
-            elif val:
-                occupied += 1
+            occupied_ids |= _aw_parse_occupied(role, r[col] or "")
+        occupied = len(occupied_ids)
         result[role] = {"occupied": occupied, "pool": pool, "free": pool - occupied}
     return result
 
@@ -1607,7 +1654,7 @@ def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
 @_h("agent_working.record_review")
 def h_aw_record_review(daemon: DbDaemon, params: dict) -> dict:
     """Persist review verdict. UPSERT by (raw_key, review_stage)."""
-    raw_key = params["raw_key"]
+    raw_key = _aw_canon_raw_key(params["raw_key"])
     review_stage = params["review_stage"]
     verdict = params["verdict"]
     reviewed_by = params.get("reviewed_by", "")
@@ -1632,7 +1679,7 @@ def h_aw_get_reviews(daemon: DbDaemon, params: dict) -> dict:
     """Return all review records for a raw_key as {stage: {verdict, ...}}."""
     rows = daemon.conn.execute(
         "SELECT * FROM reviews WHERE raw_key=? ORDER BY review_stage",
-        (params["raw_key"],)
+        (_aw_canon_raw_key(params["raw_key"]),)
     ).fetchall()
     reviews = {}
     for r in rows:
