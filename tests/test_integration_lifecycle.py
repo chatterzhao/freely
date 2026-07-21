@@ -24,8 +24,7 @@ sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "sc
 sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "agents"))
 
 from watchdog_sse import (
-    _acp_rpc, _acp_session_new, _acp_session_resume,
-    _handle_sse_event, _check_agent_liveness, _check_session_staleness,
+    _acp_rpc, _handle_sse_event, _check_agent_liveness, _check_session_staleness,
 )
 from input_required_reason import InputRequiredReason
 # agent_working helpers are local to test modules — import the inline versions

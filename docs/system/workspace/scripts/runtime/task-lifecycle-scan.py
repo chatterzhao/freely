@@ -32,6 +32,12 @@ from datetime import datetime, timezone
 _LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
 sys.path.insert(0, str(_LIFECYCLE_DIR))
 from raw_metadata_contract import MetadataValidationError, normalize, validate
+from agent_identity_value import first_agent_id
+
+
+def _bound_worker_agent_id(row: dict | None) -> str:
+    """Read the worker identity through the shared wire-value codec."""
+    return first_agent_id((row or {}).get("worker_id", "")) or ""
 
 
 # Raw and linked issues have different lifecycle domains.
@@ -809,10 +815,7 @@ def scan(project: Path) -> dict:
                 from agent_working import agent_list_by_raw_key, AgentWorkingError
                 from raw_key_canon import canonicalize_raw_key
                 row = agent_list_by_raw_key(str(project), canonicalize_raw_key(raw_key))
-                if row:
-                    wid = row.get("worker_id", "")
-                    if wid:
-                        agent_id = wid.split(":")[0] if ":" in str(wid) else str(wid)
+                agent_id = _bound_worker_agent_id(row)
             except Exception as exc:
                 # An unavailable identity store is not evidence that the worker
                 # was never bound; avoid emitting a re-delegation instruction.

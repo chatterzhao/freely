@@ -14,6 +14,7 @@ import socket
 from typing import Optional
 
 from raw_key_canon import canonicalize_raw_key, try_canonicalize_raw_key
+from agent_identity_value import format_agent_entry
 
 
 class AgentWorkingError(RuntimeError):
@@ -99,7 +100,7 @@ def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
         if not re.match(r"^worker_\d{2}$", agent_id):
             return {"status": "error", "error": f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"}
     col = f"{role}_id"
-    val = f"{agent_id}:{session_id}" if session_id else agent_id
+    val = format_agent_entry(agent_id, session_id)
     return _db_rpc(project, "agent_working.upsert", {
         "raw_key": raw_key, "col": col, "val": val,
         "worktree": worktree, "branch": branch,
@@ -130,8 +131,9 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
     bridge_socket = _resolve_bridge_socket(project, base_tool)
 
     if force_new:
-        sid = _acp_bridge_call(project, base_tool, "session/new",
-                               {"role": role, "agentId": agent_id})
+        result = _acp_bridge_call(project, base_tool, "session/new",
+                                  {"role": role, "agentId": agent_id})
+        sid = _session_id_from_result(result)
         acp_session_register(project, raw_key, role, agent_id, sid, slot)
         print(f"[acp-session] {role}/{agent_id} using new (force_new)", file=sys.stderr)
         return sid, "new"
@@ -139,8 +141,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
     existing = agent_list_by_raw_key(project, raw_key)
     old_sid = None
     if existing and existing.get(f"{role}_id"):
-        val = existing[f"{role}_id"]
-        old_sid = val.split(":")[-1] if ":" in str(val) else None
+        old_sid = agent_get_session(project, raw_key, role, agent_id)
 
     if old_sid:
         is_alive = _acp_bridge_ping(project, base_tool, old_sid)
@@ -189,14 +190,24 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
     return _do_new(project, raw_key, role, agent_id, slot, base_tool)
 
 
+def _session_id_from_result(result: dict) -> str:
+    if not isinstance(result, dict):
+        raise AgentWorkingError(
+            f"ACP session/new returned non-dict result: {type(result).__name__}"
+        )
+    session_id = result.get("sessionId")
+    if not isinstance(session_id, str) or not session_id.strip():
+        raise AgentWorkingError("ACP session/new returned no usable sessionId")
+    return session_id.strip()
+
+
 def _do_new(project, raw_key, role, agent_id, slot, base_tool, reason=""):
     result = _acp_bridge_call(project, base_tool, "session/new",
                               {"role": role, "agentId": agent_id})
-    sid = result.get("sessionId", "") if isinstance(result, dict) else ""
-    if sid:
-        acp_session_register(project, raw_key, role, agent_id, sid, slot)
-        label = reason or "no-session"
-        print(f"[acp-session] {role}/{agent_id} using new ({label})", file=sys.stderr)
+    sid = _session_id_from_result(result)
+    acp_session_register(project, raw_key, role, agent_id, sid, slot)
+    label = reason or "no-session"
+    print(f"[acp-session] {role}/{agent_id} using new ({label})", file=sys.stderr)
     return sid, "new"
 
 
@@ -235,7 +246,9 @@ def _resolve_bridge_socket(project: str, base_tool: str = "") -> str:
 
 
 def agent_release(project: str, raw_key: str, role: str, agent_id: str = None):
-    """session/close 时清除 session（保留 agent_id）。"""
+    """Release one assignment; reviewer release requires the exact CSV entry id."""
+    if role == "reviewer" and not agent_id:
+        raise AgentWorkingError("agent_id required when releasing reviewer assignment")
     return _db_rpc(project, "agent_working.release", {
         "raw_key": _canon(raw_key), "role": role, "agent_id": agent_id or "",
     })

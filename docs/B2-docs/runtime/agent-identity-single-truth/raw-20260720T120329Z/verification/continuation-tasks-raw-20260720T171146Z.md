@@ -8,5 +8,8 @@
 6. [x] Remove live agent-id.env from bin + runtime; tighten regression gate
 7. [x] Real AF_UNIX socket E2E
 8. [x] Fix agent-table-query --next-free exit + --pool-size
-9. [x] GREEN: 37/37 (continuation acceptance + fail-closed review regressions)
-10. [x] Independent six-dimensional review completed; blocking findings fixed (PR remains pending owner commit authorization)
+9. [x] GREEN: continuation 验收集 53/53；watchdog/lifecycle 相关集 58/58；规范 `tests/` 全集 124/124；pre-tests 1/1 + 4/4；静态检查 exit 0
+10. [x] Storage/read symmetry closure: codec 覆盖多 reviewer pair、裸预占、含冒号 session、restart restore、lifecycle scan、pr-review 入口
+11. [x] Independent six-dimensional review completed; blocking implementation findings fixed
+12. [x] Governance evidence recorded: identity-dependent status fail-closed without runtime registration; `fleet-status` fallback succeeds; repository-wide pytest/governance pre-existing blockers documented
+13. [ ] Checkpoint commit / PR handoff blocked: governance exposes no Freely-wrapped commit command while this continuation forbids raw `git`; do not bypass
