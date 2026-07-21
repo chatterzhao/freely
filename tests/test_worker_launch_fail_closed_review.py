@@ -60,6 +60,26 @@ class TestFreelyWorkerLaunchFailClosedStatic(unittest.TestCase):
             self.src,
         )
 
+    def test_worker_raw_key_is_extracted_and_never_defaults_to_develop(self):
+        sync_start = self.src.find("sync_project_tooling_from_source()")
+        sync_end = self.src.find("write_project_codex_config()", sync_start)
+        self.assertGreater(sync_start, 0)
+        self.assertGreater(sync_end, sync_start)
+        sync_region = self.src[sync_start:sync_end]
+        self.assertIn('_worker_raw_key="$(printf', sync_region)
+        self.assertIn("agent-table: target worktree has no issue raw_key (fail-closed)", sync_region)
+        self.assertNotIn("or 'develop'", sync_region)
+
+        launch_start = self.src.find(
+            "Atomic assign FIRST — identity must exist before slot/bridge/direct launch."
+        )
+        launch_end = self.src.find("launching worker AI via manager bridge (fork session):", launch_start)
+        self.assertGreater(launch_start, 0)
+        self.assertGreater(launch_end, launch_start)
+        launch_region = self.src[launch_start:launch_end]
+        self.assertIn("worker launch: target worktree has no issue raw_key (fail-closed)", launch_region)
+        self.assertNotIn("or 'develop'", launch_region)
+
     def test_worker_launch_agent_assign_not_swallowed(self):
         """Worker launch enrich path must not use agent_assign ... || true."""
         # Extract region around worker launch atomic assign

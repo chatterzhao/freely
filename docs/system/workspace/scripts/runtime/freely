@@ -6018,7 +6018,12 @@ sync_project_tooling_from_source() {
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    # ── Concurrency control: reconcile zombies, count active, pick idle worker ──
-	    local _active_count _max_workers _picked _wt_path
+	    local _active_count _max_workers _picked _wt_path _worker_raw_key
+	    _worker_raw_key="$(printf '%s' "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+	    if [[ -z "$_worker_raw_key" ]]; then
+	      log_error "agent-table: target worktree has no issue raw_key (fail-closed): $target_project"
+	      return 1
+	    fi
 	    _active_count=$(count_active_running_workers_for_manager_project "$source_project" 2>/dev/null || echo 0)
 	    _max_workers="$(manager_max_parallel_workers)"
 	    _max_workers="${_max_workers%%:*}"
@@ -6032,8 +6037,8 @@ sync_project_tooling_from_source() {
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_next_free_and_assign, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     r = agent_next_free_and_assign('${PROJECT_ROOT}', 'worker', 10, rk)
 except AgentWorkingError as e:
@@ -6054,8 +6059,8 @@ print(r.get('agent_id') or '')
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_release_all, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     agent_release_all('${PROJECT_ROOT}', rk)
 except AgentWorkingError as e:
@@ -6076,8 +6081,8 @@ except AgentWorkingError as e:
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_assign, agent_release_all, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     agent_assign('${PROJECT_ROOT}', rk, 'worker', '$_next_worker', worktree='${target_project}', slot='${_worker_slot}')
 except AgentWorkingError as e:
@@ -13291,13 +13296,17 @@ SESSIONEOF
   # Atomic assign FIRST — identity must exist before slot/bridge/direct launch.
   local _worker_agent_id _worker_slot _worker_raw_key _worker_pool _worker_base _mgr_base _mgr_slot
   _worker_pool=$("$SELF_ROOT/bin/agent-table-query" --pool-size worker 2>/dev/null || echo 10)
-  _worker_raw_key="$(echo "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+  _worker_raw_key="$(printf '%s' "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+  if [[ -z "$_worker_raw_key" ]]; then
+    log_error "worker launch: target worktree has no issue raw_key (fail-closed): $target_project"
+    return 1
+  fi
   _worker_agent_id=$(python3 -c "
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_next_free_and_assign, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     r = agent_next_free_and_assign('${PROJECT_ROOT}', 'worker', int('${_worker_pool:-10}' or 10), rk)
 except AgentWorkingError as e:
@@ -13317,8 +13326,8 @@ print(r.get('agent_id') or '')
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_release_all, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     agent_release_all('${PROJECT_ROOT}', rk)
 except AgentWorkingError as e:
@@ -13332,8 +13341,8 @@ except AgentWorkingError as e:
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_assign, agent_release_all, AgentWorkingError
-from raw_key_canon import try_canonicalize_raw_key
-rk = try_canonicalize_raw_key('${_worker_raw_key:-}', default='') or 'develop'
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
 try:
     agent_assign('${PROJECT_ROOT}', rk, 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')
 except AgentWorkingError as e:
