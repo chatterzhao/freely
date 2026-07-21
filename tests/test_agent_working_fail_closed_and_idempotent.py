@@ -409,6 +409,16 @@ class TestStorageReadSymmetryProductionPaths(unittest.TestCase):
         resume.assert_called_once_with(os.path.abspath(PROJECT))
         self.assertIn('"status": "resumed"', output.call_args.args[0])
 
+    def test_pr_review_guarded_resolves_absorbed_continuation_issue(self):
+        script_path = os.path.join(PROJECT, "bin", "pr-review-guarded")
+        with open(script_path, encoding="utf-8") as source_file:
+            source = source_file.read()
+
+        self.assertIn("absorbed_into:", source)
+        self.assertIn("_absorbed_issue_id", source)
+        self.assertIn('_issue_id="${_absorbed_issue_id:-', source)
+        self.assertIn('find "$_sr/docs/B2-docs" -path "*/issues/${_issue_id}.md"', source)
+
     def test_pr_review_guarded_reads_worker_id_through_codec(self):
         script_path = os.path.join(PROJECT, "bin", "pr-review-guarded")
         with open(script_path, encoding="utf-8") as source_file:

@@ -67,6 +67,24 @@
 - not_applicable_explanation: ""
 - replacement_evidence: `tests/test_agent_working_fail_closed_and_idempotent.py` + `tests/test_worker_launch_fail_closed_review.py`
 
+### acceptance-4
+- id: CAT-011
+- requirement: `pr-review-guarded` 对 absorbed continuation 必须读取 B1 `absorbed_into` 并定位 canonical I-*，不得伪造当前 raw 的新 I 节点
+- acceptance_target: `raw-20260720T171146Z` review 路由到 `I-20260720T120329Z-C`，且从 fix worktree 优先查找对应 B2 issue
+- testing_layer: static production-path regression + guarded command
+- target_environment: fix worktree 与对应 test-pre-merge 工位
+- required_evidence: 静态回归 PASS，`pr-review-guarded` 进入 canonical review 阶段
+- test_command: `python3 -m pytest tests/test_agent_working_fail_closed_and_idempotent.py -q`
+- expected_RED_output: 当前脚本回退到不存在的 `I-20260720T171146Z-A`
+- actual_RED_output: `1 failed, 25 passed`；静态回归确认脚本未读取 `absorbed_into`
+- actual_output: `56 passed in 0.68s`；`bash -n bin/pr-review-guarded` 同轮通过
+- red-green-status: green
+- status: passed
+- blocker: ""
+- not_applicable_reason: ""
+- not_applicable_explanation: ""
+- replacement_evidence: `tests/test_agent_working_fail_closed_and_idempotent.py`
+
 ## Unit
 - acceptance_target: 回归门禁 + E2E 测试全部通过
 - testing_layer: unit

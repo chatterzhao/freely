@@ -44,3 +44,5 @@ RED 测试先行；覆盖 bin 与 runtime 的零引用门禁、真实 socket 客
 独立评审发现真实 worker 分配入口仍可能把缺失的工位 `raw_key` 静默回退为 `develop`。这会把不同 issue 的原子分配错误折叠到同一行，并在幂等更新时覆盖先前的 worktree/slot 绑定。该行为与本条目的单一真源和 fail-closed 边界冲突。
 
 修正范围保持在本 continuation：从目标工位路径提取时间戳型 raw key；无法提取时拒绝分配且不写 `agent_working`；原子分配、释放和注册均使用已验证的同一 key。客户端收到无效 worker identity 时抛出可传播错误，session 查询只返回请求的 worker/manager identity。
+
+PR review 必须沿 B1 `absorbed_into` 回到 canonical `I-*` 与 B2 verification 目录。continuation 不创建 `I-20260720T171146Z-*` 之类的伪节点；当前 raw key 只用于本次 review 产物命名和工位一致性检查。
