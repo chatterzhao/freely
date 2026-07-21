@@ -1,5 +1,8 @@
 # Implementation Decision Note — raw-20260720T171146Z continuation
 
+- issue_id: I-20260720T120329Z-C
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
+
 ## Decisions
 
 1. **Shared raw_key boundary** — new `raw_key_canon.py`; all agent_working client APIs and DB handlers canonicalize before read/write.
