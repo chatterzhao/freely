@@ -1,70 +1,114 @@
 """Regression gate: agent-id.env must not appear in production code.
 
-Per raw-20260720T120329Z acceptance criterion #8:
-  "增加回归门禁：能力目录生产代码出现 agent-id.env 即失败"
-
-This test fails if agent-id.env is read or written in any production script.
-Comments and documentation references are excluded.
+Scans BOTH bin/ and docs/system/workspace/scripts/runtime/ (capability surfaces).
+Only pure comment lines are allowed. No loose string whitelist that masks live fallbacks.
 """
-import os, sys, unittest, subprocess
+import os
+import unittest
 
 PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCRIPTS_DIR = os.path.join(PROJECT, "docs", "system", "workspace", "scripts")
 
-# Allowed: documentation files that may reference agent-id.env historically
-ALLOWED_PATTERNS = [
-    "retired",            # "agent-id.env retired"
-    "replaces",           # "replaces agent-id.env"
-    "已废弃",             # Chinese: deprecated
-    "退役",               # Chinese: retired
-    "单真源",             # Chinese: single source of truth
-    "治理",               # Chinese: governance
-    "_legacy",            # legacy docs
-    "B1-docs",            # B1 documentation (historical records)
-    "B2-docs",            # B2 documentation (historical records)
-    "three-loop",         # lifecycle documentation
-    "SKILL.md",           # skill documentation
-    "AGENTS.md",          # agent documentation
+SCAN_ROOTS = [
+    os.path.join(PROJECT, "bin"),
+    os.path.join(PROJECT, "docs", "system", "workspace", "scripts", "runtime"),
 ]
 
-class TestRegressionAgentIdEnv(unittest.TestCase):
-    """agent-id.env regression gate."""
+# Production code extensions only
+CODE_EXTS = (".sh", ".py", "")  # "" for bin scripts without extension
 
+# Filenames that are pure tests under runtime (skip)
+SKIP_DIR_NAMES = {".git", "__pycache__", "test-evidence", "tests"}
+
+
+def _is_comment_only(line: str, fpath: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return True
+    if stripped.startswith("#"):
+        return True
+    if stripped.startswith("//"):
+        return True
+    # Python docstring-only lines inside triple quotes are still code if they
+    # are the sole content of a string used at runtime — only allow module-level
+    # top-of-file docstrings when the line is purely a docstring quote line
+    # containing historical note AND no assignment/call.
+    if fpath.endswith(".py"):
+        # Allow module docstring first 5 lines if it's a triple-quoted line
+        # without executable constructs — handled by caller with lineno.
+        if stripped in ('"""', "'''") or (
+            (stripped.startswith('"""') or stripped.startswith("'''"))
+            and ("agent-id.env" in stripped or "agent_id.env" in stripped)
+            and "=" not in stripped
+            and "(" not in stripped
+        ):
+            return True
+    return False
+
+
+class TestRegressionAgentIdEnv(unittest.TestCase):
     def test_no_agent_id_env_in_production_code(self):
-        """agent-id.env must not be read/written in production scripts."""
         violations = []
-        for root, dirs, files in os.walk(SCRIPTS_DIR):
-            dirs[:] = [d for d in dirs if d not in ('.git', '__pycache__', 'test-evidence')]
-            for f in files:
-                if not f.endswith(('.sh', '.py')):
-                    continue
-                fpath = os.path.join(root, f)
-                try:
-                    with open(fpath) as fh:
-                        for lineno, line in enumerate(fh, 1):
-                            if 'agent-id.env' not in line and 'agent_id.env' not in line:
+        for root in SCAN_ROOTS:
+            if not os.path.isdir(root):
+                continue
+            for dirpath, dirs, files in os.walk(root):
+                dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
+                for f in files:
+                    fpath = os.path.join(dirpath, f)
+                    # skip non-code
+                    if f.endswith((".md", ".json", ".toml", ".log", ".bak", ".pyc")):
+                        continue
+                    if f.endswith(".bak.py"):
+                        continue
+                    # only scripts
+                    if not (f.endswith(".py") or f.endswith(".sh") or (
+                        os.access(fpath, os.X_OK) and "." not in f
+                    ) or f in ("freely", "pr-review-guarded", "freely-review", "agent-table-query")):
+                        if not f.endswith((".py", ".sh")):
+                            # check if shebang script
+                            try:
+                                with open(fpath, "rb") as fh:
+                                    head = fh.read(32)
+                                if not head.startswith(b"#!"):
+                                    continue
+                            except Exception:
                                 continue
-                            rel = os.path.relpath(fpath, PROJECT)
-                            # Check if line is a comment-only reference
-                            stripped = line.strip()
-                            if stripped.startswith('#') or stripped.startswith('//'):
-                                continue
-                            # Allow docstrings and error detail strings (not actual reads/writes)
-                            if f.endswith('.py') and lineno <= 3:
-                                continue  # module docstring
-                            if 'detail' in line and 'agent_working' in line:
-                                continue  # scan.py: detail message (not a file read)
-                            if any(p in line for p in ALLOWED_PATTERNS):
-                                continue
-                            violations.append(f"{rel}:{lineno}: {stripped[:80]}")
-                except Exception:
-                    pass
+                    try:
+                        with open(fpath, errors="replace") as fh:
+                            in_module_doc = False
+                            for lineno, line in enumerate(fh, 1):
+                                if "agent-id.env" not in line and "agent_id.env" not in line:
+                                    # track simple module docstring start
+                                    if lineno <= 3 and (line.strip().startswith('"""') or line.strip().startswith("'''")):
+                                        in_module_doc = True
+                                    if in_module_doc and (line.strip().endswith('"""') or line.strip().endswith("'''")) and lineno > 1:
+                                        in_module_doc = False
+                                    continue
+                                if _is_comment_only(line, fpath):
+                                    continue
+                                # first-line module docstring allowance only
+                                if fpath.endswith(".py") and lineno <= 5 and (
+                                    '"""' in line or "'''" in line
+                                ) and "=" not in line and "open(" not in line and "AGENT" not in line.split("=")[0] if "=" in line else True:
+                                    # still reject assignments
+                                    if "agent-id.env" in line and any(
+                                        tok in line for tok in ("=", "open(", "read", "write", "Path(", "join(")
+                                    ) and not line.strip().startswith("#"):
+                                        pass  # fall through to violation if assignment-like
+                                    else:
+                                        if line.strip().startswith(('"""', "'''")) or line.count('"""') >= 1 or line.count("'''") >= 1:
+                                            if not any(x in line for x in ("open(", "Path(", "write", "read", "AGENT_ENV", "agent_env")):
+                                                continue
+                                rel = os.path.relpath(fpath, PROJECT)
+                                violations.append(f"{rel}:{lineno}: {line.strip()[:100]}")
+                    except Exception:
+                        pass
 
         if violations:
             self.fail(
-                f"agent-id.env found in {len(violations)} production code location(s):\n" +
-                "\n".join(f"  - {v}" for v in violations) +
-                "\n\nagent-id.env has been retired. All identity resolution must use agent_working table."
+                f"agent-id.env found in {len(violations)} production location(s):\n"
+                + "\n".join(f"  - {v}" for v in violations)
+                + "\n\nagent-id.env is retired. Live fallbacks are forbidden; comments only."
             )
 
 
