@@ -49,6 +49,24 @@
 - replacement_evidence: ""
 - red_how: fix — 旧代码 tests/ 目录无真实 DB daemon E2E 测试（缺陷 #10）
 
+### acceptance-3
+- id: CAT-010
+- requirement: worker 分配只接受从目标工位解析出的时间戳型 raw key；解析失败必须拒绝，绝不能回退为 `develop`
+- acceptance_target: sync 与 direct launch 路径都使用同一已验证 key；无 key 时不调用 allocate/release/register
+- testing_layer: unit + static production-path regression
+- target_environment: fix worktree 与对应 test-pre-merge 工位
+- required_evidence: 新增 raw key 提取单测和 worker launch 静态回归测试 PASS
+- test_command: `python3 -m pytest tests/test_agent_working_fail_closed_and_idempotent.py tests/test_worker_launch_fail_closed_review.py -q`
+- expected_RED_output: 当前实现包含 `or 'develop'` 且 sync 路径未初始化 `_worker_raw_key`
+- actual_RED_output: `2 failed, 32 passed`；缺失 raw key 回退和非法 worker identity 均被新增 RED 用例捕获
+- actual_output: `55 passed in 0.49s`；同轮 `bash -n` 与 Python 编译检查通过
+- red-green-status: green
+- status: passed
+- blocker: ""
+- not_applicable_reason: ""
+- not_applicable_explanation: ""
+- replacement_evidence: `tests/test_agent_working_fail_closed_and_idempotent.py` + `tests/test_worker_launch_fail_closed_review.py`
+
 ## Unit
 - acceptance_target: 回归门禁 + E2E 测试全部通过
 - testing_layer: unit

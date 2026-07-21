@@ -1492,6 +1492,8 @@ def h_aw_get_session(daemon: DbDaemon, params: dict) -> dict:
             return {"session_id": entries.get(agent_id)}
         return {"session_id": next((sid for sid in entries.values() if sid), None)}
     entries = _aw_parse_agent_entries(row[col])
+    if agent_id:
+        return {"session_id": entries.get(agent_id)}
     return {"session_id": next(iter(entries.values()), None)}
 
 

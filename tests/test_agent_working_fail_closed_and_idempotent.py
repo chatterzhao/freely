@@ -57,6 +57,15 @@ class TestDbRpcFailClosed(unittest.TestCase):
                 aw._db_rpc(PROJECT, "agent_working.get", {"raw_key": "x"})
             self.assertIn("db down", str(cm.exception))
 
+    def test_invalid_worker_assignment_raises_and_skips_rpc(self):
+        import agent_working as aw
+
+        with mock.patch.object(aw, "_db_rpc") as rpc:
+            with self.assertRaisesRegex(aw.AgentWorkingError, "invalid"):
+                aw.agent_assign(PROJECT, "raw-20260720T171146Z", "worker", "worker-invalid")
+
+        rpc.assert_not_called()
+
     def test_agent_next_free_no_silent_manager_fallback(self):
         """Production helper must not invent manager_01/worker_01 on failure."""
         import agent_working as aw

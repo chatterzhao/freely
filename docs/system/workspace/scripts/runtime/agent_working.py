@@ -96,9 +96,11 @@ def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
     raw_key = _canon(raw_key)
     if role == "worker":
         if not agent_id:
-            return {"status": "error", "error": "agent_id required for worker role"}
+            raise AgentWorkingError("agent_id required for worker role")
         if not re.match(r"^worker_\d{2}$", agent_id):
-            return {"status": "error", "error": f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"}
+            raise AgentWorkingError(
+                f"agent_id '{agent_id}' invalid, expected 'worker_NN' format"
+            )
     col = f"{role}_id"
     val = format_agent_entry(agent_id, session_id)
     return _db_rpc(project, "agent_working.upsert", {

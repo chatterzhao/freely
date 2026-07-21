@@ -14,12 +14,14 @@
 7. **Scan uncertainty is not absence** — agent_working lookup failures emit non-ready `3_binding_unavailable`; they never become `3a_never_bound` or re-delegation instructions.
 8. **Registration/canonicalization stay fail-closed** — manager session registration propagates failure, and daemon-side raw_key normalization rejects invalid keys instead of writing them unchanged.
 9. **Storage/read symmetry** — a reservation without a live session is stored as bare `agent_NN`; only established sessions use `agent_NN:session_id`. Reviewer CSV preserves mixed bare/session entries, exact-agent session lookup never borrows another reviewer’s session, and release handles both forms.
+10. **Worker identity requires an issue key** — worker allocation derives one timestamp-based raw key from the target worktree, then passes that exact value through allocate/release/register. A target without that key is rejected before any `agent_working` mutation; `develop` is never an allocation fallback.
 
 ## Independent review closure
 
 - Six dimensions reviewed: architecture/data flow, fail-closed behavior, raw_key consistency, concurrency/idempotency, real socket coverage, governance/regression gates.
 - First review verdict: blocked by scan RPC failure being misclassified as `never_bound`; manager registration and daemon canonicalization also had soft-failure paths.
 - Resolution: all findings above fixed; final protocol/lifecycle regression `70/70` GREEN and canonical `tests/` suite `124/124` GREEN; edited-file diagnostics contain no new findings.
+- Follow-up independent review found an uninitialized sync raw key and a `develop` fallback in worker allocation. The continuation now derives one timestamp key from the target worktree, rejects a missing key before RPC, and validates worker identities by exception; focused regression is `55/55` GREEN.
 - Unconstrained repository-wide `pytest -q` still has two pre-existing collection errors: legacy `test_sse_phase1.py` cannot import `a2a_task`, and historical `runtime/a2a/test_a2a.py:203` has an unclosed list literal. They are outside this continuation and not introduced by these changes.
 
 ## Non-goals

@@ -39,3 +39,8 @@ raw-20260720T120329Z 只迁移了部分 runtime 路径，未统一 raw_key 契�
 
 ## 验收
 RED 测试先行；覆盖 bin 与 runtime 的零引用门禁、真实 socket 客户端三角色闭环、并发分配、同 raw 幂等、raw key 跨 assign/scan/review/close 一致、close 后 review 持久化、DB 不可用 fail-closed；在 test-pre-merge 工位全绿并独立评审。
+
+## 续作评审修正
+独立评审发现真实 worker 分配入口仍可能把缺失的工位 `raw_key` 静默回退为 `develop`。这会把不同 issue 的原子分配错误折叠到同一行，并在幂等更新时覆盖先前的 worktree/slot 绑定。该行为与本条目的单一真源和 fail-closed 边界冲突。
+
+修正范围保持在本 continuation：从目标工位路径提取时间戳型 raw key；无法提取时拒绝分配且不写 `agent_working`；原子分配、释放和注册均使用已验证的同一 key。客户端收到无效 worker identity 时抛出可传播错误，session 查询只返回请求的 worker/manager identity。
