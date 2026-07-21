@@ -26,49 +26,11 @@ REVIEW_PROMPT_FILE="$REVIEW_STATE_DIR/review-prompt.txt"
 MAX_ROUNDS=3
 REVIEWER_SKILL="freely-tdd-review"
 # Slot for Reviewer agent — reads from agent-table reviewer_slot.
-# When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
-# Try agent_working table for reviewer_slot if available (preferred over agent-id.env).
 _agent_query="$ROOT_DIR/bin/agent-table-query"
 _aw_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/agent_working.py"
-if [[ -z "$REVIEWER_SLOT" ]]; then
-  if [[ -f "$_aw_py" ]]; then
-    _my_worker_id=$(python3 -c "
-import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
-from agent_working import agent_list_by_raw_key
-rk = '$(echo "$review_branch" | grep -oE "[0-9]{8}T[0-9]{6}Z" | head -1 || echo "")'
-if rk:
-    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
-    if row:
-        wid = row.get('worker_id', '')
-        if wid:
-            print(wid.split(':')[0] if ':' in str(wid) else wid)
-" 2>/dev/null || true)
-    if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
-      _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
-      if [[ -n "$_rev_info" ]]; then
-        _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
-        [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
-      fi
-    fi
-  fi
-  # Fallback: legacy agent-id.env
-  if [[ -z "$REVIEWER_SLOT" ]]; then
-    _agent_env="$ROOT_DIR/.freely/agent-id.env"
-    if [[ -f "$_agent_env" ]]; then
-      _my_worker_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || true)
-      if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
-        _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
-        if [[ -n "$_rev_info" ]]; then
-          _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
-          [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
-        fi
-      fi
-    fi
-  fi
-fi
 
-# Parse arguments
+# Parse arguments FIRST — branch/raw key must be known before agent_working queries.
 review_branch=""
 reviewer="tdd-agent"
 verdict_override=""
@@ -101,6 +63,37 @@ if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
   echo "Usage: freely pr-review-guarded <branch>" >&2
   exit 1
+fi
+
+# Resolve reviewer slot from agent_working after branch is known (canonical raw key).
+if [[ -z "$REVIEWER_SLOT" ]]; then
+  if [[ -f "$_aw_py" ]]; then
+    _my_worker_id=$(python3 -c "
+import sys
+sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from raw_key_canon import try_canonicalize_raw_key
+from agent_working import agent_list_by_raw_key, AgentWorkingError
+rk = try_canonicalize_raw_key('$review_branch')
+if not rk:
+    raise SystemExit(0)
+try:
+    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+except AgentWorkingError as e:
+    print(f'ERROR: agent_working unavailable: {e}', file=sys.stderr)
+    raise SystemExit(2)
+if row:
+    wid = row.get('worker_id', '')
+    if wid:
+        print(wid.split(':')[0] if ':' in str(wid) else wid)
+" 2>/dev/null || true)
+    if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
+      _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
+      if [[ -n "$_rev_info" ]]; then
+        _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
+        [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+      fi
+    fi
+  fi
 fi
 
 base="develop"
@@ -259,24 +252,30 @@ fi
 
 # ── Step 3.5: Call Reviewer (ACP or manual fallback) ──
 _my_worker_id=""
-# Prefer agent_working table (new), fallback to agent-id.env (legacy)
+# agent_working only — no file-based identity fallback
 if [[ -f "$_aw_py" ]]; then
   _my_worker_id=$(python3 -c "
-import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
-from agent_working import agent_list_by_raw_key
-rk = '$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo '')'
-if rk:
-    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
-    if row:
-        wid = row.get('worker_id', '')
-        if wid:
-            print(wid.split(':')[0] if ':' in str(wid) else wid)
+import sys
+sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from raw_key_canon import try_canonicalize_raw_key
+from agent_working import agent_list_by_raw_key, AgentWorkingError
+rk = try_canonicalize_raw_key('$review_branch')
+if not rk:
+    raise SystemExit(0)
+try:
+    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+except AgentWorkingError:
+    raise SystemExit(0)
+if row:
+    wid = row.get('worker_id', '')
+    if wid:
+        print(wid.split(':')[0] if ':' in str(wid) else wid)
 " 2>/dev/null || true)
 fi
-if [[ -z "$_my_worker_id" && -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
-  _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
+if [[ -z "$_my_worker_id" ]]; then
+  echo "ERROR: cannot resolve worker_id from agent_working for branch $review_branch (fail-closed)" >&2
+  exit 1
 fi
-[[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
 
 # Only try freely-review or raw ACP if bridge is actually available
 if [[ "$_acp_available" == "1" ]]; then

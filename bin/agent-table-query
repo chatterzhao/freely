@@ -206,7 +206,8 @@ def main():
     parser.add_argument("--get-slot", metavar="ID", help="Get slot for an agent ID")
     parser.add_argument("--get-reviewer", metavar="WORKER_ID", help="Get reviewer for a worker")
     parser.add_argument("--next-free", metavar="ROLE", help="Get next free agent ID for role")
-    parser.add_argument("--reconcile", action="store_true", help="Reconcile worktree↔agent-table")
+    parser.add_argument("--pool-size", type=int, default=10, help="Pool size for --next-free")
+    parser.add_argument("--reconcile", action="store_true", help="Reconcile worktree↔agent-table via agent_working")
     parser.add_argument("--expand-pools", action="store_true", help="Print expanded agent table")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
@@ -247,63 +248,78 @@ def main():
     elif args.next_free:
         role = args.next_free
         pool_size = int(args.pool_size) if args.pool_size else 10
-        # Delegate to agent_working.agent_next_free() via RPC
+        # Delegate to agent_working.agent_next_free() via RPC (query-only path)
         import subprocess
         result = subprocess.run(
-            [sys.executable, '-c', f'''
-import sys; sys.path.insert(0, "{data["path"]}/docs/system/workspace/scripts/runtime")
-from agent_working import agent_next_free
-print(agent_next_free("{data["path"]}", "{role}", {pool_size}) or "")
+            [sys.executable, "-c", f'''
+import sys
+sys.path.insert(0, "{data["path"]}/docs/system/workspace/scripts/runtime")
+from agent_working import agent_next_free, AgentWorkingError
+try:
+    print(agent_next_free("{data["path"]}", "{role}", {pool_size}) or "")
+except AgentWorkingError as e:
+    print(f"ERROR: {{e}}", file=sys.stderr)
+    sys.exit(2)
 '''],
-            capture_output=True, text=True, timeout=5
+            capture_output=True, text=True, timeout=5,
         )
-        agent_id = result.stdout.strip()
+        if result.returncode not in (0, None) and result.returncode != 0:
+            if result.stderr:
+                print(result.stderr, file=sys.stderr, end="")
+            sys.exit(result.returncode if result.returncode else 1)
+        agent_id = (result.stdout or "").strip()
         if agent_id:
             print(agent_id)
-            sys.exit(1)
-    elif args.next_free:
-        role = args.next_free
-        busy = set()
-        wt_root = os.path.join(os.path.dirname(data["path"]), "..", "..", "worktrees")
-        if os.path.isdir(wt_root):
-            for wt in os.listdir(wt_root):
-                env_file = os.path.join(wt_root, wt, ".freely", "worker-id.env")
-                if os.path.exists(env_file):
-                    wid = open(env_file).read().strip()
-                    if "=" in wid:
-                        wid = wid.split("=", 1)[1]
-                    busy.add(wid)
-        all_ids = list_agents(data, role)
-        free = [aid for aid in all_ids if aid not in busy]
-        if free:
-            print(free[0] if not args.json else json.dumps({"free": free, "busy": list(busy)}))
-        else:
-            print(f"ERROR: no free {{role}} agent", file=sys.stderr)
-            sys.exit(1)
+            sys.exit(0)
+        print(f"ERROR: no free {role} agent", file=sys.stderr)
+        sys.exit(1)
     elif args.reconcile:
-        import subprocess as _sp
-        env_file = os.path.join(os.path.dirname(data['path']), 'agent-id.env')
-        active_workers = {}
-        if os.path.exists(env_file):
-            for line in open(env_file):
-                line = line.strip()
-                if '=' in line:
-                    parts = line.split('=', 2)
-                    if len(parts) >= 3:
-                        active_workers[parts[2]] = parts[0]  # agent_id -> worktree_path
-        pool_workers = set(list_agents(data, 'worker'))
-        orphans = [w for w in active_workers if w not in pool_workers]
-        stale = [w for w in pool_workers if w not in active_workers]
-        active = [w for w in pool_workers if w in active_workers]
-        result = {'active': active, 'orphan_worktrees': orphans, 'stale_pool_entries': stale}
+        # agent_working is sole occupancy truth — compare agent-table pool vs active rows
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "-c", f'''
+import sys, json
+sys.path.insert(0, "{data["path"]}/docs/system/workspace/scripts/runtime")
+from agent_working import _db_rpc, AgentWorkingError
+try:
+    rows = _db_rpc("{data["path"]}", "agent_working.get_all", {{}}).get("rows", [])
+except AgentWorkingError as e:
+    print(json.dumps({{"error": str(e)}}))
+    sys.exit(2)
+active = []
+for r in rows:
+    wid = r.get("worker_id") or ""
+    if wid:
+        active.append(wid.split(":", 1)[0] if ":" in str(wid) else str(wid))
+print(json.dumps({{"active_workers": active, "count": len(active)}}))
+'''],
+            capture_output=True, text=True, timeout=5,
+        )
+        pool_workers = set(list_agents(data, "worker"))
+        try:
+            payload = json.loads(result.stdout.strip() or "{}")
+        except json.JSONDecodeError:
+            payload = {"error": result.stderr.strip() or "rpc failed"}
+        if "error" in payload:
+            print(f"ERROR: {payload['error']}", file=sys.stderr)
+            sys.exit(2)
+        active = set(payload.get("active_workers", []))
+        orphans = sorted(active - pool_workers)
+        stale = sorted(pool_workers - active)
+        active_in_pool = sorted(pool_workers & active)
+        out = {
+            "active": active_in_pool,
+            "orphan_worktrees": orphans,
+            "stale_pool_entries": stale,
+        }
         if args.json:
-            print(json.dumps(result))
+            print(json.dumps(out))
         else:
-            print(f"Active: {len(active)}/{len(pool_workers)}: {', '.join(sorted(active))}")
+            print(f"Active: {len(active_in_pool)}/{len(pool_workers)}: {', '.join(active_in_pool)}")
             if orphans:
-                print(f"Orphan worktrees (no agent-table entry): {', '.join(sorted(orphans))}")
+                print(f"Orphan worktrees (no agent-table entry): {', '.join(orphans)}")
             if stale:
-                print(f"Stale pool entries (no worktree): {', '.join(sorted(stale))}")
+                print(f"Stale pool entries (no worktree): {', '.join(stale)}")
 
     elif args.expand_pools:
         if args.json:

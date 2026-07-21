@@ -203,9 +203,10 @@ def _handle_sse_event(project: str, event_text: str):
 
 def _normalize_raw_key(raw_key: str) -> str:
     """Ensure raw_key has the 'raw-' prefix for consistent lookups."""
+    from raw_key_canon import try_canonicalize_raw_key
     if not raw_key:
         return raw_key
-    return f"raw-{raw_key}" if not raw_key.startswith("raw-") else raw_key
+    return try_canonicalize_raw_key(raw_key, default=raw_key)
 
 
 def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredReason):
@@ -213,12 +214,23 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
 
-    existing = agent_list_by_raw_key(project, raw_key)
+    try:
+        existing = agent_list_by_raw_key(project, raw_key) if raw_key else {}
+    except Exception as e:
+        _log(f"FAIL-CLOSED: agent_working query failed for reviewer route: {e}")
+        return
     rid = None
     if existing and existing.get("reviewer_id"):
         rid = existing["reviewer_id"].split(":")[0] if ":" in str(existing.get("reviewer_id", "")) else existing.get("reviewer_id", "")
     if not rid:
-        rid = agent_next_free(project, "reviewer", 99)
+        if not raw_key:
+            _log("FAIL-CLOSED: missing raw_key for reviewer assign")
+            return
+        try:
+            rid = agent_next_free(project, "reviewer", 99, raw_key=raw_key)
+        except Exception as e:
+            _log(f"FAIL-CLOSED: reviewer next_free_and_assign failed: {e}")
+            return
     if not rid:
         _log(f"no reviewer available for {raw_key}")
         return
@@ -258,10 +270,18 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
     _log(f"routing to manager: {from_agent} needs decision on {issue_key} ({reason.value})")
 
     mgr_msg = f"[Freely Watchdog] {from_agent} needs manager input on {issue_key}. Reason: {reason.value}."
-    manager_slot = _get_agent_slot(project, "manager", "manager_01")
+    try:
+        mid = agent_next_free(project, "manager", 1, raw_key=MANAGER_KEY)
+    except Exception as e:
+        _log(f"FAIL-CLOSED: manager assign failed: {e}")
+        return
+    if not mid:
+        _log("FAIL-CLOSED: no manager available")
+        return
+    manager_slot = _get_agent_slot(project, "manager", mid)
 
     sid, op = acp_session_connect(
-        project, MANAGER_KEY, "manager", "manager_01",
+        project, MANAGER_KEY, "manager", mid,
         slot=manager_slot, message=mgr_msg
     )
     if sid:
@@ -276,12 +296,23 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
     verdict_msg = _build_worker_verdict_message(raw_key, from_agent, reason, metadata)
     _log(f"routing to worker for {raw_key}: {reason.value} (from {from_agent})")
 
-    row = agent_list_by_raw_key(project, raw_key)
+    try:
+        row = agent_list_by_raw_key(project, raw_key) if raw_key else {}
+    except Exception as e:
+        _log(f"FAIL-CLOSED: agent_working query failed for worker route: {e}")
+        return
     wid = None
     if row and row.get("worker_id"):
         wid = row["worker_id"].split(":")[0] if ":" in str(row.get("worker_id", "")) else row.get("worker_id", "")
     if not wid:
-        wid = agent_next_free(project, "worker", 10)
+        if not raw_key:
+            _log("FAIL-CLOSED: missing raw_key for worker assign")
+            return
+        try:
+            wid = agent_next_free(project, "worker", 10, raw_key=raw_key)
+        except Exception as e:
+            _log(f"FAIL-CLOSED: worker next_free_and_assign failed: {e}")
+            return
     if not wid:
         _log("no worker available, delegating to manager")
         _handle_needs_manager(project, metadata, InputRequiredReason.from_string("needs-manager-decision"))
