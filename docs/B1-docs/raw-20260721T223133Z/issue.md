@@ -12,7 +12,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IK2WN2
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-07-21T22:31:56Z'
