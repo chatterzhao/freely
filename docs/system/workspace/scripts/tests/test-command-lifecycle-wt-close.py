@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 import importlib.util
+import os
+import shutil
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -165,11 +169,77 @@ class WorktreeCloseOwnershipTests(unittest.TestCase):
         self.assertIn('Error: platform close failed for $issue_id; cleanup stopped', source)
         self.assertNotIn('platform-adapter.py" close github', source)
 
-    def test_normal_cleanup_stops_after_platform_close_failure(self):
-        source = WT_CLOSE.read_text(encoding="utf-8")
-        self.assertIn('Error: platform close failed for $_wt_i_absorbed_i; cleanup stopped', source)
-        self.assertNotIn('platform close failed for $issue_id, continuing', source)
-        self.assertNotIn('platform close failed for $_wt_i_absorbed_i, continuing', source)
+    def test_runtime_platform_failure_preserves_worktree_and_branch(self):
+        raw_key = "20260721T223133Z"
+        branch = f"fix/raw-{raw_key}-runtime-failure"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            worktrees = root / "project-worktrees"
+            worktree = worktrees / "dev"
+            worktrees.mkdir()
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            subprocess.run(
+                ["git", "-C", str(root), "config", "user.email", "test@example.test"],
+                check=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(root), "config", "user.name", "Lifecycle Test"],
+                check=True,
+            )
+            subprocess.run(["git", "-C", str(root), "checkout", "-q", "-b", "develop"], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "--allow-empty", "-qm", "baseline"], check=True)
+            subprocess.run(
+                ["git", "-C", str(root), "worktree", "add", "-q", "-b", branch, str(worktree), "develop"],
+                check=True,
+            )
+
+            script_root = root / "docs/system/workspace/scripts"
+            (script_root / "worktree").mkdir(parents=True)
+            (script_root / "sync").mkdir(parents=True)
+            shutil.copy2(WT_CLOSE, script_root / "worktree/wt-close")
+            shutil.copy2(WT_CLOSE.parent / "worktree-common.sh", script_root / "worktree/worktree-common.sh")
+            adapter = script_root / "sync/platform-adapter.py"
+            adapter.write_text(
+                "#!/usr/bin/env python3\n"
+                "import sys\n"
+                "if sys.argv[1:2] == ['close-raw']:\n"
+                "    print('simulated platform failure', file=sys.stderr)\n"
+                "    raise SystemExit(17)\n"
+                "raise SystemExit(0)\n",
+                encoding="utf-8",
+            )
+            issue_dir = worktree / "docs/B1-docs" / f"raw-{raw_key}"
+            issue_dir.mkdir(parents=True)
+            (issue_dir / "issue.md").write_text(
+                "---\nphase_state: absorbed\nplatform_state: open\nplatform_ids: {}\n---\n",
+                encoding="utf-8",
+            )
+
+            environment = os.environ.copy()
+            environment.update({
+                "PROJECT_ROOT": str(root),
+                "PROJECT_WORKTREES_ROOT": str(worktrees),
+                "PROJECT_WORKTREE_PATH": str(worktree),
+                "FREELY_AGENT_RAW_KEY": raw_key,
+            })
+            result = subprocess.run(
+                [str(script_root / "worktree/wt-close"), "--raw-key", raw_key, "--force",
+                 "--reason", "违规绕过门禁中，理由充分，是：测试平台失败保护"],
+                cwd=worktree,
+                env=environment,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("cleanup stopped", result.stderr)
+            self.assertTrue(worktree.exists())
+            branch_result = subprocess.run(
+                ["git", "-C", str(root), "show-ref", "--verify", f"refs/heads/{branch}"],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(branch_result.returncode, 0)
 
 
 if __name__ == "__main__":
