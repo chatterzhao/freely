@@ -24806,35 +24806,23 @@ print(json.dumps({
       return 1
     }
 
-    # Build platform body: preserve the original kind from the platform body.
-    # The local frontmatter kind is always "raw" (document type), not the
-    # workflow kind (fix/feature) recorded at create time in the platform body.
-    # Editing must not change the kind unless the user explicitly asks for it.
+    # Keep strict metadata intact when replacing the human-readable body.
     local _platform_body=""
     if [[ -n "$has_body" ]]; then
-      local _body_kind=""
-      local _gh_id
-      _gh_id=$(echo "$_platform_ids_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('github',{}).get('issue_id',''))" 2>/dev/null)
-      if [[ -n "$_gh_id" ]]; then
-        _body_kind=$(python3 - "$_gh_id" << 'PYEOF'
-import sys, re, subprocess
-gh_id = sys.argv[1]
-result = subprocess.run(
-    ["gh", "issue", "view", gh_id, "--json", "body", "--jq", ".body"],
-    capture_output=True, text=True
-)
-if result.returncode != 0:
-    print("raw")
-    sys.exit(0)
-body = result.stdout
-# Platform body stores frontmatter with literal \n: ---\nkind: fix\n---\n
-m = re.search(r'---\\nkind:\s*(\w+)\\n---', body)
-print(m.group(1) if m else "raw")
+      _platform_body=$(python3 - "$_issue_file" "$edit_body" <<'PYEOF'
+import re
+import sys
+
+file_path, new_body = sys.argv[1:]
+content = open(file_path, encoding="utf-8").read()
+parts = content.split("---\n", 2)
+if len(parts) < 3:
+    raise SystemExit("local issue has no frontmatter")
+match = re.search(r"^workflow_kind:\s*(fix|feature)\s*$", parts[2], re.MULTILINE)
+workflow_kind = match.group(1) if match else "unknown"
+print(f"---\n{parts[1]}---\n\nworkflow_kind: {workflow_kind}\n\n{new_body}")
 PYEOF
-        2>/dev/null)
-      fi
-      [[ -n "$_body_kind" ]] || _body_kind="unknown"
-      _platform_body="---\nkind: ${_body_kind}\n---\n\n${edit_body}"
+      ) || { log_error "failed to preserve raw metadata for edit"; return 1; }
     fi
 
     # Call platform-adapter to update remote issues
@@ -24864,6 +24852,7 @@ PYEOF
     # Update local issue.md body if --body was provided
     if [[ -n "$has_body" ]]; then
       python3 - "$_issue_file" "$edit_body" <<'PYEOF'
+import re
 import sys
 file_path = sys.argv[1]
 new_body = sys.argv[2]
@@ -24871,7 +24860,9 @@ with open(file_path) as f:
     content = f.read()
 parts = content.split('---\n', 2)
 if len(parts) >= 3:
-    new_content = '---\n' + parts[1] + '---\n\n' + new_body
+    match = re.search(r"^workflow_kind:\s*(fix|feature)\s*$", parts[2], re.MULTILINE)
+    prefix = f"workflow_kind: {match.group(1)}\n\n" if match else ""
+    new_content = '---\n' + parts[1] + '---\n\n' + prefix + new_body
     with open(file_path, 'w') as f:
         f.write(new_content)
 PYEOF
@@ -25034,14 +25025,35 @@ HELP
   raw_key="$stamp"
   local_id="raw-${raw_key}"
 
-  # Prepend kind to body so wt-create can read it later
-  body="---\nkind: ${issue_kind}\n---\n\n${body}"
-
   # Platforms are auto-detected by freely start / daemon start and written to config.toml.
   # Read directly from config.toml via freely_config.py, not from env (config.env is long deprecated).
   local _platforms
   _platforms="$("$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" print --project "$SELF_ROOT" 2>/dev/null | grep '^FREELY_REPO_PLATFORMS' | sed 's/^FREELY_REPO_PLATFORMS *= *//; s/"//g' || true)"
   [[ -n "$_platforms" ]] || { log_error "no platforms configured. Run 'freely start' to auto-detect from git remotes."; return 1; }
+
+  local _primary_platform _raw_schema _created_at
+  _primary_platform="${_platforms%%,*}"
+  _created_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  _raw_schema=$(PYTHONPATH="$SELF_ROOT/docs/system/workspace/scripts/lifecycle" python3 - \
+    "$local_id" "$_primary_platform" "$_created_at" <<'PYEOF'
+import sys
+import yaml
+from raw_metadata_contract import new_raw_metadata
+
+local_id, primary, created_at = sys.argv[1:]
+metadata = new_raw_metadata(
+    local_id=local_id,
+    platform_ids={},
+    primary_platform=primary,
+    created_at=created_at,
+    updated_at=created_at,
+    author="platform",
+    channel=primary,
+)
+print(yaml.safe_dump(metadata, allow_unicode=True, sort_keys=False).strip())
+PYEOF
+  ) || { log_error "failed to build raw metadata payload"; return 1; }
+  body="---"$'\n'"${_raw_schema}"$'\n'"---"$'\n\n'"workflow_kind: ${issue_kind}"$'\n\n'"${body}"
 
   # Delegate to platform-adapter — handles all platforms based on FREELY_REPO_PLATFORMS
   local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"

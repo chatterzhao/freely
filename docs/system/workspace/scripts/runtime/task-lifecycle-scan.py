@@ -29,9 +29,14 @@ import json, os, re, sqlite3, subprocess, sys, time
 from pathlib import Path
 from datetime import datetime, timezone
 
+_LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
+sys.path.insert(0, str(_LIFECYCLE_DIR))
+from raw_metadata_contract import MetadataValidationError, normalize, validate
 
-# ── Terminal phase states (lifecycle complete) ──────────────────────
-TERMINAL_PHASES = {"absorbed", "dropped", "completed"}
+
+# Raw and linked issues have different lifecycle domains.
+RAW_TERMINAL_PHASES = {"absorbed", "dropped"}
+LINKED_TERMINAL_PHASES = {"absorbed", "dropped", "completed"}
 
 # ── Timing ──────────────────────────────────────────────────────────
 
@@ -95,24 +100,24 @@ STATION_ACTIONS = {
         "[worker] cd <wt> && skill:freely-dev-loop-execution → 推进 phase_state"
     ),
     "dev_phase_done": (
-        "[worker] cd <wt> && skill:freely-dev-loop-execution → pr-create-guarded → git commit → wt-close"
+        "[worker] cd <wt> && skill:freely-test-execution → freely pr-create-guarded → freely pr-review-guarded → freely pr-merge-guarded → freely wt-close"
     ),
     # ── Close / Sync phase ──
     "platform_create": (
         "[manager] wt-create --raw-key {key} --source platform --kind fix --slug sync\n"
-        "[worker] cd <wt> && issue-sync create → git commit → wt-close"
+        "[worker] cd <wt> && freely issue-sync create → skill:freely-dev-loop-execution → skill:freely-test-execution → guarded PR lifecycle"
     ),
     "merged_develop": (
         "[manager] wt-create --raw-key {key} --source platform --kind fix --slug close\n"
-        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+        "[worker] cd <wt> && freely issue-sync close → skill:freely-dev-loop-execution → skill:freely-test-execution → guarded PR lifecycle"
     ),
     "platform_close": (
         "[manager] freely feedback --title \"Close platform issue\" --body \"Sync close\" --kind fix\n  → wt-create --raw-key {{new_key}} --source platform --kind fix --slug close\n"
-        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+        "[worker] cd <wt> && freely issue-sync close → skill:freely-dev-loop-execution → skill:freely-test-execution → guarded PR lifecycle"
     ),
     "branch_deleted": (
         "[manager] freely feedback --title \"Sync after delete\" --body \"Sync close\" --kind fix\n  → wt-create --raw-key {{new_key}} --source platform --kind fix --slug sync\n"
-        "[worker] cd <wt> && issue-sync close → git commit → wt-close"
+        "[worker] cd <wt> && freely issue-sync close → skill:freely-dev-loop-execution → skill:freely-test-execution → guarded PR lifecycle"
     ),
     # ── Dead agent recovery ──
     "agent_dead": (
@@ -138,9 +143,6 @@ STATION_ACTIONS = {
         "[worker] cd <wt> && 先补充 issue.md 的 phase_state → B1 预研"
     ),
 }
-
-# Terminal phases — issues in these states need no further lifecycle action.
-TERMINAL_PHASES = {"absorbed", "dropped", "completed"}
 
 
 def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
@@ -195,7 +197,7 @@ def _detect_station(item: dict, issues_by_raw: dict, wt_by_raw: dict) -> str:
             if plat == "closed":
                 return "merged_develop"
             return "raw_not_started"
-        if phase in TERMINAL_PHASES:
+        if phase in RAW_TERMINAL_PHASES:
             return "merged_develop"
         return "close_local"
 
@@ -226,15 +228,15 @@ def _stage_action(station: str) -> str:
         "i_created": "创建工位 → dev-loop",
         "dev_worktree": "dev-loop（工位已存在）",
         "dev_worktree_no_wt": "创建工位 → dev-loop",
-        "dev_phase_done": "pr-create → merge → close",
-        "platform_create": "创建工位 → issue-sync create",
-        "merged_develop": "创建工位 → issue-sync close",
-        "platform_close": "freely feedback --kind fix → wt-create → issue-sync close",
-        "branch_deleted": "freely feedback --kind fix → wt-create → issue-sync close",
+        "dev_phase_done": "freely pr-create-guarded → freely pr-review-guarded → freely pr-merge-guarded → freely wt-close",
+        "platform_create": "创建工位 → freely issue-sync create → guarded PR lifecycle",
+        "merged_develop": "创建工位 → freely issue-sync close → guarded PR lifecycle",
+        "platform_close": "freely feedback --kind fix → wt-create → freely issue-sync close → guarded PR lifecycle",
+        "branch_deleted": "freely feedback --kind fix → wt-create → freely issue-sync close → guarded PR lifecycle",
         "agent_dead": "恢复 worker session / 重新委派",
         "B1_proposed": "创建工位 → B1 预研",
         "close_local": "更新本地 phase_state",
-        "close_platform": "issue-sync close → 关闭平台 issue",
+        "close_platform": "freely issue-sync close → 关闭配置平台 issue",
         "收口": "检查并完成收口步骤",
         "恢复": "恢复 worker session 或重新委派",
     }
@@ -305,7 +307,7 @@ def _build_sync_batch(items: list[dict], project_path, ts: str, platforms: list[
             f"[manager] freely feedback --title \"Platform sync batch: sync {total_sync} items\" "
             f"--body \"Batch sync: close_platform={close_platform_count} close_local={close_local_count} merged={merged_count}\" --kind fix\n"
             f"  → wt-create --raw-key {{new_key}} --source platform --kind fix --slug platform-sync\n"
-            f"[worker] cd <wt> && issue-sync close → git commit → wt-close"
+            f"[worker] cd <wt> && freely issue-sync close → skill:freely-dev-loop-execution → skill:freely-test-execution → guarded PR lifecycle"
         )
     else:
         batch_item["next_action"] = "noop — same batch already processed in previous scan"
@@ -468,78 +470,6 @@ def extract_platform_ids(text: str) -> dict[str, str]:
             current_platform = None  # reset after capturing
     return ids
 
-def _sync_platform_direct(raw_key: str, platform_ids: dict, phase_state: str,
-                          project: Path) -> dict:
-    """Directly sync terminal state to all platforms via API. No worktree needed.
-    Flow: 1) update issue body to reflect phase_state (closed/dropped/absorbed)
-          2) check each platform → close any still-OPEN ones
-    Returns {platform: status} per platform."""
-    results = {}
-    local_id = f"raw-{raw_key}"
-    try:
-        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import close_issue, update_issue, fetch_issue_state
-
-        # Step 1: Update issue content to reflect terminal phase_state
-        update_body = f"phase_state: {phase_state}"
-        update_issue(local_id, platform_ids, body=update_body)
-
-        # Step 2: Check each platform and close OPEN ones
-        for pname, pid in platform_ids.items():
-            if not pid:
-                results[pname] = "skipped:no_id"
-                continue
-            try:
-                state = fetch_issue_state(pname, pid)
-                state = state.upper() if state else "UNKNOWN"
-                if state == "OPEN":
-                    close_issue(local_id, {pname: pid})
-                    results[pname] = "OPEN→CLOSED"
-                else:
-                    results[pname] = f"already {state}"
-            except Exception as e:
-                results[pname] = f"error:{e}"
-    except Exception as e:
-        results["error"] = str(e)
-    return results
-
-def _check_platform_state_consistency(raw_key: str, platform_ids: dict, local_phase: str,
-                                       local_platform_state: str, project: Path) -> tuple[bool, str]:
-    """Check if platform OPEN/CLOSED state is consistent with local phase_state.
-    Returns (needs_sync: bool, reason: str).
-    - Terminal phase → all platforms should be CLOSED
-    - Non-terminal phase → all platforms should be OPEN
-    - If platforms disagree among themselves → needs sync to majority/terminal state
-    """
-    platforms = _detect_platforms(project)
-    if not platforms:
-        return False, "no_platforms"
-
-    states = {}
-    try:
-        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import fetch_issue_state
-        for pname in platforms:
-            pid_info = platform_ids.get(pname, {})
-            issue_id = pid_info.get("issue_id", "") if isinstance(pid_info, dict) else str(pid_info or "")
-            if issue_id:
-                state = fetch_issue_state(pname, issue_id)
-                if state:
-                    states[pname] = state.upper()
-    except Exception as e:
-        return False, f"check_error: {e}"
-
-    if not states:
-        return False, "no_platform_data"
-
-    is_terminal = local_phase in TERMINAL_PHASES
-    expected_state = "CLOSED" if is_terminal else "OPEN"
-    mismatches = {p: s for p, s in states.items() if s != expected_state}
-
-    if mismatches:
-        mismatch_str = ", ".join(f"{p}={s}" for p, s in mismatches.items())
-        return True, f"expected={expected_state}, actual: {mismatch_str}"
-    return False, "consistent"
 
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
     try:
@@ -549,36 +479,6 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
     except Exception:
         return {}
 
-def _write_platform_ids(project: Path, issue_path: str, pids: dict[str, str]):
-    """Write discovered platform_ids back to issue.md frontmatter.
-
-    So the next scan can use platform_ids directly without the raw_key fallback.
-    """
-    issue_file = project / issue_path / "issue.md"
-    if not issue_file.is_file():
-        return
-    try:
-        text = issue_file.read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        if len(parts) < 3:
-            return
-        fm = parts[1]
-        if "platform_ids:" in fm:
-            return  # already has platform_ids section, don't overwrite
-        # Build platform_ids YAML block
-        pid_lines = ["platform_ids:"]
-        for pname, pid in sorted(pids.items()):
-            pid_lines.append(f"  {pname}:")
-            pid_lines.append(f"    issue_id: '{pid}'")
-            pid_lines.append(f"    url: ''")
-            pid_lines.append(f"    synced_at: ''")
-        pid_block = "\n".join(pid_lines)
-        # Insert before closing ---
-        new_fm = fm.rstrip() + "\n" + pid_block + "\n"
-        new_text = "---" + new_fm + "---" + parts[2]
-        issue_file.write_text(new_text, encoding="utf-8")
-    except Exception:
-        pass
 
 def _build_raw_key_index(platform_issues: dict[str, dict]) -> dict[str, dict[str, str]]:
     """Build raw_key → {platform_name: issue_id} mapping from platform issues.
@@ -725,17 +625,36 @@ def read_issues_dir(project: Path) -> list[dict]:
             fm = parse_frontmatter(text)
             name = d.name
             kind = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
+            view = normalize(fm) if kind == "raw" else fm
+            validation_error = ""
+            if kind == "raw" and view["strict_schema"]:
+                try:
+                    validate(fm, base_dir=project)
+                except MetadataValidationError as error:
+                    validation_error = str(error)
+            elif kind == "raw" and view.get("phase_state") == "absorbed":
+                target = str(view.get("absorbed_into") or "")
+                canonical = str(view.get("canonical_issue_path") or "")
+                canonical_file = project / canonical if canonical else None
+                if not target and not canonical:
+                    validation_error = "legacy absorbed raw requires a canonical id or path"
+                elif target and not target.startswith("I-"):
+                    validation_error = "legacy absorbed_into must be an I-* id"
+                elif canonical_file and not canonical_file.is_file():
+                    validation_error = "legacy canonical issue path does not exist"
             issues.append({
                 "name": name,
                 "kind": kind,
                 "path": str(d),
-                "phase_state": fm.get("phase_state", ""),
-                "platform_state": fm.get("platform_state", ""),
-                "absorbed_into": fm.get("absorbed_into", ""),
+                "phase_state": view.get("phase_state", ""),
+                "platform_state": view.get("platform_state", ""),
+                "absorbed_into": view.get("absorbed_into", ""),
+                "canonical_issue_path": view.get("canonical_issue_path", ""),
                 "platform_ids": extract_platform_ids(text),
                 "source_raw": fm.get("source_raw", ""),
                 "source_candidate": fm.get("source_candidate", ""),
                 "frontmatter": fm,
+                "metadata_validation_error": validation_error,
             })
 
     # Also scan I-* issues under new structure: docs/B2-docs/{epic}/{story}/raw-{raw key}/issues/
@@ -867,6 +786,18 @@ def scan(project: Path) -> dict:
             for pi in platform_issues.values()
         )
 
+        if raw_issue and raw_issue.get("metadata_validation_error"):
+            items.append({
+                "category": "2_document_misaligned",
+                "subcategory": "2a_invalid_raw_metadata",
+                "key": raw_key,
+                "issue_path": raw_issue["path"],
+                "ready": False,
+                "detail": raw_issue["metadata_validation_error"],
+                "next_action": "[worker] repair raw metadata through the canonical lifecycle transition",
+            })
+            continue
+
         # ── Category 3: worktree exists → check agent liveness ────
         if wt_exists:
             wt_path = wt["path"]
@@ -923,14 +854,12 @@ def scan(project: Path) -> dict:
             plat_state = raw_issue.get("platform_state", "")
             pids = raw_issue.get("platform_ids", {})
 
-            # Fallback: if local frontmatter lacks platform_ids, use
-            # raw_key → platform_id index built from platform issue titles.
+            # Platform-title lookup is an observation fallback only. Scanning must
+            # never materialize or rewrite lifecycle metadata.
             if not pids or not any(v for v in pids.values() if v):
                 fallback_pids = raw_key_pid_index.get(raw_key, {})
                 if fallback_pids:
                     pids = fallback_pids
-                    # Write back to issue.md so next scan uses it directly
-                    _write_platform_ids(project, raw_issue["path"], fallback_pids)
 
             # Check per-platform state alignment
             platform_mismatches = {}
@@ -943,7 +872,7 @@ def scan(project: Path) -> dict:
                         platform_mismatches[pname] = actual
 
             # Subcategory 2a: non-terminal phase
-            if phase not in TERMINAL_PHASES:
+            if phase not in RAW_TERMINAL_PHASES:
                 items.append({
                     "category": "2_document_misaligned",
                     "subcategory": "2a_non_terminal",
@@ -952,30 +881,25 @@ def scan(project: Path) -> dict:
                     "phase_state": phase,
                     "platform_state": plat_state,
                     "ready": True,
-                    "detail": f"phase_state='{phase}' not terminal (expected: absorbed/dropped/completed)",
-                    "next_action": "[manager] 创建 raw issue → 工位 → 修正本地文档状态为 terminal",
+                    "detail": f"phase_state='{phase}' is not a raw terminal phase (expected: absorbed/dropped)",
+                    "next_action": "[manager] 创建 raw issue → 工位 → 通过受控生命周期命令推进状态",
                 })
             else:
-                # Terminal — if platforms disagree, sync them directly via API.
-                # No worktree needed for pure platform sync.
+                # Scanning is observation-only. A mismatch is reported for a
+                # controlled lifecycle command; it is never repaired in-place.
                 if platform_mismatches:
-                    synced = _sync_platform_direct(raw_key, pids, phase, project)
-                    if synced:
-                        print(f"[scan] platform sync: {raw_key} → {synced}", file=sys.stderr)
-                    else:
-                        # Sync failed — flag for Manager attention
-                        items.append({
-                            "category": "2_document_misaligned",
-                            "subcategory": "2a_state_mismatch",
-                            "key": raw_key,
-                            "issue_path": raw_issue["path"],
-                            "phase_state": phase,
-                            "platform_state": plat_state,
-                            "platform_mismatches": platform_mismatches,
-                            "ready": True,
-                            "detail": f"platform sync failed for {raw_key}",
-                            "next_action": "[manager] 手动 platform-adapter sync → 对齐平台状态",
-                        })
+                    items.append({
+                        "category": "2_document_misaligned",
+                        "subcategory": "2a_state_mismatch",
+                        "key": raw_key,
+                        "issue_path": raw_issue["path"],
+                        "phase_state": phase,
+                        "platform_state": plat_state,
+                        "platform_mismatches": platform_mismatches,
+                        "ready": True,
+                        "detail": f"platform state mismatch for {raw_key}",
+                        "next_action": "[manager] 通过 freely issue-sync 对齐配置平台状态",
+                    })
                 elif not plat_state:
                     # platform_state missing in local frontmatter
                     items.append({
@@ -1028,7 +952,7 @@ def scan(project: Path) -> dict:
         # we check platform alignment. If actual state is OPEN, it's in 2a_state_mismatch.
         # But the user said reopen should be Category 1, not 2.
         # Let me add a separate check:
-        if raw_on_develop and raw_issue["phase_state"] in TERMINAL_PHASES and platform_open:
+        if raw_on_develop and raw_issue["phase_state"] in RAW_TERMINAL_PHASES and platform_open:
             pids = raw_issue.get("platform_ids", {})
             any_platform_open = False
             for pname in configured_platforms:
@@ -1052,7 +976,7 @@ def scan(project: Path) -> dict:
     # ── Also check I-* issues for non-terminal state ────────────────
     for i_iss in i_issues:
         phase = i_iss["phase_state"]
-        if phase not in TERMINAL_PHASES:
+        if phase not in LINKED_TERMINAL_PHASES:
             items.append({
                 "category": "2_document_misaligned",
                 "subcategory": "2a_non_terminal",
@@ -1074,7 +998,7 @@ def scan(project: Path) -> dict:
         key = m.group(1)
         raw_issue = issues_by_raw.get(key)
 
-        if raw_issue and raw_issue["phase_state"] in TERMINAL_PHASES:
+        if raw_issue and raw_issue["phase_state"] in RAW_TERMINAL_PHASES:
             items.append({
                 "category": "2_document_misaligned",
                 "subcategory": "2b_worktree_not_cleaned",
@@ -1083,7 +1007,7 @@ def scan(project: Path) -> dict:
                 "branch": branch,
                 "ready": True,
                 "detail": f"Raw issue terminal (phase={raw_issue['phase_state']}) but worktree still exists",
-                "next_action": f"wt-close {branch}",
+                "next_action": f"freely wt-close {branch}",
             })
 
     # ── 1c: Platform-only issues without local raw dir ──────────
