@@ -86,10 +86,15 @@ absorbed:
   canonical_issue_path = 存在的 canonical 文档
 
 dropped:
-  closeout_reason = 非空
+  completed_at = 非空
+  closeout_note = 非空
 ```
 
-`wt-create` 只创建工位，不是 B2 absorption 事件。只有 canonical I-* 物化时，才原子更新 absorbed 三元组。
+`wt-create` 只创建工位，不是 B2 absorption 事件。只有 `promote-finalize` 才能在同一迁移中写入 `absorbed`、可验证的 `absorbed_into` 或项目相对 `canonical_issue_path` 与 `completed_at`。
+
+### 合同收敛（实现前边界的最终校正）
+
+初始预研将终态字段写作 `closeout_reason`、`closed_at`，并要求双吸收关系；在 B2 对既有消费者和 legacy corpus 的审计后已否决该假设。最终合同以 B2 issue 为准：终态仅使用 `completed_at`、`closeout_note`，`absorbed` 至少需要一个可验证关系，不强制同时拥有 ID 与路径。
 
 ### 新文件固定字段顺序
 
@@ -99,10 +104,9 @@ local_id
 kind
 phase_state
 absorbed_into
-canonical_issue_path
 platform_ids
 primary_platform
-platform_state
+canonical_issue_path
 last_synced_comment_at
 hash
 created_at
@@ -111,8 +115,11 @@ intake_id
 author
 channel
 session_refs
-closeout_reason
-closed_at
+platform_state
+promoted_children
+source_candidate
+completed_at
+closeout_note
 ```
 
 平台详细引用继续保留在 `platform_ids` 映射中；所有配置平台由 adapter registry 动态发现，不写死平台名或 remote。

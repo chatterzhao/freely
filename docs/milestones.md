@@ -423,5 +423,5 @@
 ### committed_issues
 1. `I-20260721T223133Z-A`
 - milestone: M-20260721T223133Z-A
-- phase_state: in_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md

@@ -12,23 +12,23 @@
 
 ## RED
 
-- [ ] T5：证明 `wt-create` 仍包含 reopen/生命周期写入路径。
-- [ ] T6：证明 `pr-create-guarded` 仍在 guarded platform update 前执行 merge dry-run。
-- [ ] T7：证明 strict schema、promotion 原子性和 legacy 只读兼容的缺口。
+- [x] T5：证明 `wt-create` 仍包含 reopen/生命周期写入路径。
+- [x] T6：证明 `pr-create-guarded` 仍在 guarded platform update 前执行 merge dry-run。
+- [x] T7：证明 strict schema、promotion 原子性和 legacy 只读兼容的缺口。
 - [ ] T8：记录全部 RED 输出与独立 review。
 
 ## Dev
 
-- [ ] T9：收敛 raw metadata 共享合同并接入生产者、迁移器和消费者。
-- [ ] T10：移除 wt-create 生命周期写入，只保留工位职责。
-- [ ] T11：完成 platform registry 五态观测、受控同步和 PR ensure 聚合。
-- [ ] T12：重排 pr-create 入口为 platform update 后 merge dry-run。
+- [x] T9：收敛 raw metadata 共享合同并接入生产者、迁移器和消费者。
+- [x] T10：移除 wt-create 生命周期写入，只保留工位职责。
+- [x] T11：完成 platform registry 五态观测、受控同步和 PR ensure 聚合。
+- [x] T12：重排 pr-create 入口为 platform update 后 merge dry-run。
 - [ ] T13：写 implementation evidence 与独立 dev review。
 
 ## GREEN / Promotion
 
-- [ ] T14：feature-local 全部 GREEN。
-- [ ] T15：test-pre-merge 集成、回归与命令入口 E2E 全部 GREEN。
+- [x] T14：feature-local 全部 GREEN。
+- [x] T15：test-pre-merge 集成、回归与命令入口 E2E 全部 GREEN。
 - [ ] T16：guarded PR、六维 review、CI 与 guarded merge 完成。
 - [ ] T17：在暂停的 agent-identity continuation 更新 PR #4069，记录真实多平台结果。
 - [ ] T18：closeout 清理工位与平台 issue。
