@@ -215,28 +215,36 @@ class GitHubHandler(PlatformHandler):
 
     def search_raw_issue(self, raw_key):
         repo = self._repo()
-        if not repo: return None
+        if not repo:
+            return None
         try:
-            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
-                               "--search", f"raw-{raw_key} in:title", "--limit", "5",
-                               "--json", "number,title,url"],
-                              capture_output=True, text=True, timeout=15)
-            if r.returncode == 0 and r.stdout.strip():
-                for issue in json.loads(r.stdout):
-                    title = issue.get("title", "")
-                    if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                        return {"issue_number": str(issue["number"]), "title": title, "url": issue.get("url", "")}
-            r2 = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
-                                "--search", f"raw-{raw_key} in:body", "--limit", "5",
-                                "--json", "number,title,url"],
-                               capture_output=True, text=True, timeout=15)
-            if r2.returncode == 0 and r2.stdout.strip():
-                for issue in json.loads(r2.stdout):
-                    return {"issue_number": str(issue["number"]),
-                            "title": issue.get("title", ""), "url": issue.get("url", "")}
+            matches = {}
+            for field in ("title", "body"):
+                result = subprocess.run(
+                    ["gh", "issue", "list", "--repo", repo, "--state", "open",
+                     "--search", f"raw-{raw_key} in:{field}", "--limit", "20",
+                     "--json", "number,title,url,body"],
+                    capture_output=True, text=True, timeout=15,
+                )
+                if result.returncode != 0 or not result.stdout.strip():
+                    continue
+                for issue in json.loads(result.stdout):
+                    haystack = str(issue.get(field, "") or "")
+                    if f"raw-{raw_key}" not in haystack.lower():
+                        continue
+                    issue_id = str(issue.get("number", "") or "")
+                    if issue_id:
+                        matches[issue_id] = {
+                            "issue_number": issue_id,
+                            "title": issue.get("title", ""),
+                            "url": issue.get("url", ""),
+                        }
+            candidates = list(matches.values())
+            if len(candidates) == 1:
+                return {**candidates[0], "matches": candidates}
+            return {"matches": candidates}
         except Exception:
-            pass
-        return None
+            return None
 
     def fetch_issue(self, issue_number):
         try:
@@ -394,21 +402,30 @@ class GiteeHandler(PlatformHandler):
 
     def search_raw_issue(self, raw_key):
         r = self._run("list", "--state", "open", "--per-page", "50")
-        if r.returncode != 0: return None
+        if r.returncode != 0:
+            return None
         try:
             issues = json.loads(r.stdout)
         except Exception:
             return None
+        needle = f"raw-{raw_key}".lower()
+        matches = {}
         for issue in issues:
-            title, body = issue.get("title", ""), issue.get("body", "") or ""
-            if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
-                        "title": title, "url": issue.get("html_url", issue.get("url", ""))}
-        for issue in issues:
-            if f"raw-{raw_key}" in (issue.get("body", "") or ""):
-                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
-                        "title": issue.get("title", ""), "url": issue.get("html_url", issue.get("url", ""))}
-        return None
+            title = issue.get("title", "") or ""
+            body = issue.get("body", "") or ""
+            if needle not in title.lower() and needle not in body.lower():
+                continue
+            issue_id = str(issue.get("number", issue.get("id", "")) or "")
+            if issue_id:
+                matches[issue_id] = {
+                    "issue_number": issue_id,
+                    "title": title,
+                    "url": issue.get("html_url", issue.get("url", "")),
+                }
+        candidates = list(matches.values())
+        if len(candidates) == 1:
+            return {**candidates[0], "matches": candidates}
+        return {"matches": candidates}
 
     def fetch_issue(self, issue_number):
         r = self._run("get", issue_number)
@@ -564,6 +581,67 @@ def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
             continue
         results[platform] = _safe(h.close_issue, issue_id)
     return results
+
+
+def _issue_id(reference: object) -> str:
+    value = reference.get("issue_id", "") if isinstance(reference, dict) else reference
+    value = str(value or "").strip()
+    return value if value and value != "?" else ""
+
+
+def _unique_raw_issue(handler: PlatformHandler, raw_key: str) -> tuple[str, str]:
+    found = _safe(handler.search_raw_issue, raw_key)
+    if not isinstance(found, dict):
+        return "", f"raw key {raw_key} not found"
+    matches = found.get("matches")
+    if matches is not None:
+        if not isinstance(matches, list) or len(matches) != 1:
+            return "", f"raw key {raw_key} did not resolve uniquely"
+        found = matches[0] if isinstance(matches[0], dict) else {}
+    issue_id = str(found.get("issue_number", found.get("issue_id", "")) or "").strip()
+    if not issue_id or issue_id == "?":
+        return "", f"raw key {raw_key} did not resolve uniquely"
+    return issue_id, ""
+
+
+def close_issue_by_raw_key(raw_key: str, platform_ids: dict = None) -> dict[str, dict]:
+    """Close all configured copies after completing the raw-key identity mapping.
+
+    `platform_ids` is only a cache.  Resolution happens for every missing cache
+    entry before any platform close, preventing a partial lookup from becoming a
+    single-platform guess.
+    """
+    resolved = {}
+    failures = {}
+    platforms = configured_platforms()
+    cached = {
+        platform: _issue_id((platform_ids or {}).get(platform, {}))
+        for platform in platforms
+    }
+    if all(cached.values()):
+        return close_issue(f"raw-{raw_key}", {
+            platform: {"issue_id": issue_id}
+            for platform, issue_id in cached.items()
+        })
+    for platform in platforms:
+        handler = _handler_for(platform)
+        if not handler:
+            failures[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            continue
+        issue_id, error = _unique_raw_issue(handler, raw_key)
+        if error:
+            failures[platform] = {"status": "error", "error": error}
+            continue
+        resolved[platform] = {"issue_id": issue_id}
+    if failures:
+        return {
+            platform: failures.get(
+                platform,
+                {"status": "blocked", "error": "raw key resolution failed on another configured platform"},
+            )
+            for platform in platforms
+        }
+    return close_issue(f"raw-{raw_key}", resolved)
 
 def add_comment(local_id: str, platform_ids: dict = None, comment_body: str = "") -> dict[str, dict]:
     results = {}
@@ -919,6 +997,12 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "close-multi":
         platform_ids = json.loads(a[2]) if len(a) > 2 else {}
         result = close_issue("", platform_ids)
+        print(json.dumps(result, indent=2))
+        raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
+    elif len(a) > 1 and a[1] == "close-raw":
+        raw_key = a[2] if len(a) > 2 else ""
+        platform_ids = json.loads(a[3]) if len(a) > 3 else {}
+        result = close_issue_by_raw_key(raw_key, platform_ids)
         print(json.dumps(result, indent=2))
         raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
     elif len(a) > 1 and a[1] == "close":

@@ -93,10 +93,22 @@ elif val is not None:
 }
 
 _close_issue_platforms_readonly() {
+  local raw_key="$1" file="$2" label="$3" platform_ids
+  platform_ids="{}"
+  if [[ -f "$file" ]]; then
+    platform_ids="$(_fm_get "$file" "platform_ids")"
+  fi
+  [[ -n "$platform_ids" && "$platform_ids" != "None" ]] || platform_ids="{}"
+  FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
+    "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    close-raw "$raw_key" "$platform_ids"
+}
+
+_close_platform_ids_readonly() {
   local file="$1" label="$2" platform_ids
   platform_ids="$(_fm_get "$file" "platform_ids")"
   if [[ -z "$platform_ids" || "$platform_ids" == "None" || "$platform_ids" == "{}" ]]; then
-    echo "Warning: no platform_ids for $label" >&2
+    echo "Error: no platform_ids for $label" >&2
     return 1
   fi
   FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
@@ -761,15 +773,11 @@ PLATFORM_BLOCK
     exit 1
   fi
 
-  # Platform cleanup depends on the complete locally materialized mapping.
-  # It must never guess a single platform or proceed on partial close failure.
+  # Local metadata is only a cache.  Missing/incomplete mappings are recovered
+  # through the adapter by resolving this raw key on every configured platform.
   _po_issue_file="$PROJECT_ROOT/docs/B1-docs/$issue_id/issue.md"
-  if [[ ! -f "$_po_issue_file" ]]; then
-    echo "Error: --platform-only requires local metadata for $issue_id" >&2
-    exit 1
-  fi
-  echo "wt-close: closing raw issue via platform-adapter (all platforms)..."
-  if _close_issue_platforms_readonly "$_po_issue_file" "$issue_id"; then
+  echo "wt-close: resolving and closing raw issue via platform-adapter (all platforms)..."
+  if _close_issue_platforms_readonly "$raw_key" "$_po_issue_file" "$issue_id"; then
     echo "wt-close: raw issue closed (all platforms, local files unchanged)"
   else
     echo "Error: platform close failed for $issue_id; cleanup stopped" >&2
@@ -785,7 +793,7 @@ PLATFORM_BLOCK
       _po_i_ps="$(_fm_get "$_po_i_file" "platform_state")"
       if [[ ( "$_po_i_phase" == "completed" || "$_po_i_phase" == "done_b2_ibm" ) && "$_po_i_ps" != "closed" ]]; then
         echo "wt-close: also closing absorbed I-* issue $_po_absorbed_i..."
-        if _close_issue_platforms_readonly "$_po_i_file" "$_po_absorbed_i"; then
+        if _close_platform_ids_readonly "$_po_i_file" "$_po_absorbed_i"; then
           echo "wt-close: absorbed I-* closed ✓"
         else
           echo "Error: platform close failed for $_po_absorbed_i; cleanup stopped" >&2
@@ -844,7 +852,7 @@ WTPLATFORM_MISSING
         exit 1
       fi
       echo "wt-close: --force, closing platform issue for $issue_id..."
-      if _close_issue_platforms_readonly "$issue_file" "$issue_id" 2>&1; then
+      if _close_issue_platforms_readonly "$_raw_key" "$issue_file" "$issue_id" 2>&1; then
         echo "wt-close: platform issue closed ✓"
       else
         echo "Error: platform close failed for $issue_id; cleanup stopped" >&2
@@ -867,7 +875,7 @@ WTPLATFORM_MISSING
         if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
           if [[ "$_wt_i_platform_state" != "closed" ]]; then
             echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
-            if _close_issue_platforms_readonly "$_wt_i_file" "$_wt_i_absorbed_i" 2>&1; then
+            if _close_platform_ids_readonly "$_wt_i_file" "$_wt_i_absorbed_i" 2>&1; then
               echo "wt-close: absorbed I-* closed ✓"
             else
               echo "Error: platform close failed for $_wt_i_absorbed_i; cleanup stopped" >&2

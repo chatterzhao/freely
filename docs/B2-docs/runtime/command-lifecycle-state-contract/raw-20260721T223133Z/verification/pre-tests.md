@@ -18,6 +18,16 @@
 - evidence: 执行前后 issue 文件字节内容和 hash 相同；平台关闭结果与本地 metadata 写入解耦。
 - rationale: `wt-close` 的历史职责是验证、关闭工位和平台 issue；phase/absorption/drop 值必须由产生该事实的更早生命周期命令写入，不能把 closeout 当作修复 metadata 的机会。
 
+### META-000b raw key recovery is all-platform and unique
+
+- requirement: `raw_key` 是 raw 生命周期唯一主身份；`platform_ids` 仅是可丢失的缓存。缺失或不完整时，adapter 必须对每个已配置平台调用 `search_raw_issue(raw_key)`，每个平台均恰好解析出一个 issue 后才能开始关闭。
+- cases:
+  - 缓存完整有效：直接使用缓存，不执行多余查询。
+  - 缓存缺失/部分缺失：对全部已配置平台重新唯一解析，再使用完整临时映射关闭全部平台。
+  - 任一平台无处理器、零结果、多结果或关闭失败：失败闭合；不得开始本地分支/工位清理，不得写回 metadata。
+- evidence: fake 双平台验证调用顺序为 `resolve missing → close every configured platform`；零/多匹配时 close 调用数为零。
+- rationale: 平台 issue ID 是可恢复外部引用，不得反向成为 raw 生命周期的身份边界，也不得退化为任意单平台猜测。
+
 ## Unit acceptance
 
 ### META-001 canonical schema initialization
