@@ -410,3 +410,18 @@
 - milestone: M-20260720T120329Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
+
+## M-20260721T223133Z-A
+- title: fix — 生命周期命令受控更新与 raw metadata 状态合同
+- status: active
+### candidate_issues
+1. `C-20260721T223133Z-A`
+- milestone: M-20260721T223133Z-A
+- status: promoted
+- promoted_issue_id: `I-20260721T223133Z-A`
+- promoted_issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
+### completed_issues
+1. `I-20260721T223133Z-A`
+- milestone: M-20260721T223133Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md

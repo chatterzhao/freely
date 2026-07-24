@@ -92,18 +92,28 @@ elif val is not None:
 " 2>/dev/null || true
 }
 
-_fm_set_str() {
-  local file="$1" key="$2" value="$3"
-  python3 -c "
-import yaml
-with open('$file') as f: content = f.read()
-parts = content.split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-fm['$key'] = '$value'
-new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
-body = parts[2] if len(parts) >= 3 else ''
-with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body)
-" 2>/dev/null || true
+_close_issue_platforms_readonly() {
+  local raw_key="$1" file="$2" label="$3" platform_ids
+  platform_ids="{}"
+  if [[ -f "$file" ]]; then
+    platform_ids="$(_fm_get "$file" "platform_ids")"
+  fi
+  [[ -n "$platform_ids" && "$platform_ids" != "None" ]] || platform_ids="{}"
+  FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
+    "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    close-raw "$raw_key" "$platform_ids"
+}
+
+_close_platform_ids_readonly() {
+  local file="$1" label="$2" platform_ids
+  platform_ids="$(_fm_get "$file" "platform_ids")"
+  if [[ -z "$platform_ids" || "$platform_ids" == "None" || "$platform_ids" == "{}" ]]; then
+    echo "Error: no platform_ids for $label" >&2
+    return 1
+  fi
+  FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
+    "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    close-multi "$platform_ids"
 }
 
 # ── Branch/issue resolution ──
@@ -763,74 +773,36 @@ PLATFORM_BLOCK
     exit 1
   fi
 
-  # Read issue.md from main repo (read-only).  If the file doesn't exist
-  # (e.g. feedback created the issue but no worktree was ever created),
-  # fall back to searching the platform by raw key.
+  # Local metadata is only a cache.  Missing/incomplete mappings are recovered
+  # through the adapter by resolving this raw key on every configured platform.
   _po_issue_file="$PROJECT_ROOT/docs/B1-docs/$issue_id/issue.md"
-  if [[ -f "$_po_issue_file" ]]; then
-    # Get raw issue's GitHub number from local frontmatter
-    _po_raw_gh=$(python3 -c "
-import yaml
-with open('$_po_issue_file') as f:
-    parts = f.read().split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-for p, info in fm.get('platform_ids', {}).items():
-    if isinstance(info, dict) and info.get('issue_id'):
-        print(info['issue_id'])
-        break
-" 2>/dev/null)
+  echo "wt-close: resolving and closing raw issue via platform-adapter (all platforms)..."
+  if _close_issue_platforms_readonly "$raw_key" "$_po_issue_file" "$issue_id"; then
+    echo "wt-close: raw issue closed (all platforms, local files unchanged)"
   else
-    echo "wt-close: no local issue file, searching platform by raw key..."
-    # Search GitHub for open issue containing the raw key in title
-    _po_raw_gh=$(gh issue list --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
-    if [[ -z "$_po_raw_gh" ]]; then
-      # Try Gitee as fallback
-      _po_raw_gh=$(gitee issue list --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
-    fi
+    echo "Error: platform close failed for $issue_id; cleanup stopped" >&2
+    exit 1
   fi
-  # Read platform_ids from issue file for per-platform close
-  _po_platform_ids=$(_fm_get "$_po_issue_file" "platform_ids")
-  if [[ -n "$_po_platform_ids" && "$_po_platform_ids" != "None" ]]; then
-    echo "wt-close: closing raw issue via platform-adapter (all platforms)..."
-    if python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close-multi "$_po_platform_ids" 2>&1; then
-      echo "wt-close: raw issue closed (all platforms, local files unchanged)"
-    else
-      echo "Warning: platform-adapter close failed" >&2
-    fi
-  elif [[ -n "$_po_raw_gh" ]]; then
-    echo "wt-close: closing raw issue #$_po_raw_gh via platform-adapter..."
-    python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close-multi "{\"github\":{\"issue_id\":\"$_po_raw_gh\"}}" 2>&1 && echo "wt-close: raw issue closed" || echo "Warning: close failed" >&2
-  fi
-  
-  # Also close absorbed I-* issue via API
+
+  # A canonical I-* has an independent multi-platform mapping when it exists.
   _po_absorbed_i="$(_fm_get "$_po_issue_file" "absorbed_into")"
   if [[ -n "$_po_absorbed_i" ]]; then
     _po_i_file="$PROJECT_ROOT/docs/B1-docs/$_po_absorbed_i/issue.md"
     if [[ -f "$_po_i_file" ]]; then
       _po_i_phase="$(_fm_get "$_po_i_file" "phase_state")"
       _po_i_ps="$(_fm_get "$_po_i_file" "platform_state")"
-      if [[ "$_po_i_phase" == "completed" || "$_po_i_phase" == "done_b2_ibm" ]]; then
-        if [[ "$_po_i_ps" != "closed" ]]; then
-          _po_i_gh=$(python3 -c "
-import yaml
-with open('$_po_i_file') as f:
-    parts = f.read().split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-for p, info in fm.get('platform_ids', {}).items():
-    if isinstance(info, dict) and info.get('issue_id'):
-        print(info['issue_id'])
-        break
-" 2>/dev/null)
-          _po_i_title="$(_fm_get "$_po_i_file" "local_id")"
-          if [[ -n "$_po_i_gh" ]]; then
-            echo "wt-close: also closing absorbed I-* issue $_po_i_title (#$_po_i_gh)..."
-            python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close github "$_po_i_gh" 2>&1 &&               echo "wt-close: I-* #$_po_i_gh closed ✓ (local files unchanged)" ||               echo "Warning: platform-adapter close failed for I-* #$_po_i_gh" >&2
-          fi
+      if [[ ( "$_po_i_phase" == "completed" || "$_po_i_phase" == "done_b2_ibm" ) && "$_po_i_ps" != "closed" ]]; then
+        echo "wt-close: also closing absorbed I-* issue $_po_absorbed_i..."
+        if _close_platform_ids_readonly "$_po_i_file" "$_po_absorbed_i"; then
+          echo "wt-close: absorbed I-* closed ✓"
+        else
+          echo "Error: platform close failed for $_po_absorbed_i; cleanup stopped" >&2
+          exit 1
         fi
       fi
     fi
   fi
-  
+
   echo "wt-close: --platform-only complete (platform closed, local files unchanged)"
   echo "  Note: local platform_state still shows 'open'. Next scan will detect inconsistency."
   exit 0
@@ -880,10 +852,11 @@ WTPLATFORM_MISSING
         exit 1
       fi
       echo "wt-close: --force, closing platform issue for $issue_id..."
-      if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then
+      if _close_issue_platforms_readonly "$_raw_key" "$issue_file" "$issue_id" 2>&1; then
         echo "wt-close: platform issue closed ✓"
       else
-        echo "Warning: issue-sync close failed for $issue_id, continuing..." >&2
+        echo "Error: platform close failed for $issue_id; cleanup stopped" >&2
+        exit 1
       fi
     fi
 
@@ -902,11 +875,11 @@ WTPLATFORM_MISSING
         if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
           if [[ "$_wt_i_platform_state" != "closed" ]]; then
             echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
-            if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_wt_i_absorbed_i" completed 2>&1; then
-              _fm_set_str "$_wt_i_file" "platform_state" "closed"
+            if _close_platform_ids_readonly "$_wt_i_file" "$_wt_i_absorbed_i" 2>&1; then
               echo "wt-close: absorbed I-* closed ✓"
             else
-              echo "Warning: issue-sync close failed for $_wt_i_absorbed_i, continuing..." >&2
+              echo "Error: platform close failed for $_wt_i_absorbed_i; cleanup stopped" >&2
+              exit 1
             fi
           fi
         fi
@@ -917,36 +890,10 @@ elif [[ "$SKIP_PLATFORM" == true ]]; then
   echo "wt-close: --skip-platform, skipping platform close"
 fi
 
-# ── Phase 3: Force-close trace (--force only) ──
+# ── Phase 3: Lifecycle ownership boundary ──
+# Raw and linked issue metadata must already be terminal before cleanup starts.
+# wt-close performs platform/worktree cleanup only and never writes issue files.
 
-# pr-merge-guarded already writes phase_state=absorbed + force_closed trace
-# into the merge commit. Only write a force-close trace here if the frontmatter
-# was NOT already absorbed by a merge. Otherwise the merge commit's version wins.
-
-	if [[ "$FORCE" == true && -z "$wt_path" ]]; then
-	    :  # skip force-close trace for orphaned branches
-	  elif [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-	  _current_phase=
-	  _current_phase="$(_fm_get "$issue_file" "phase_state")"
-	  if [[ "$_current_phase" == "absorbed" ]]; then
-	    echo "wt-close: frontmatter already absorbed by pr-merge-guarded, skipping force-close trace"
-	  else
-	    ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-	    if [[ "$DRY_RUN" == true ]]; then
-	      _dry "write force_closed trace to $issue_file"
-	    else
-	      _fm_set_str "$issue_file" "force_closed_at" "$ts"
-	      _fm_set_str "$issue_file" "force_closed_reason" "${FORCE_REASON:-wt-close --force: worktree retired without completed phase_state}"
-	      _fm_set_str "$issue_file" "updated_at" "$ts"
-	      echo "wt-close: force-closed $issue_id (force_closed trace written to frontmatter)"
-	    fi
-	  fi
-	fi
-
-# ── Phase 3.5: Frontmatter already absorbed by pr-merge-guarded ──
-# The merge commit carries phase_state=absorbed, force_closed_at, and
-# absorbed_into. wt-close only removes the worktree + branch.
-# Phase 3 above guards against overwriting this with --force.
 # ── Phase 4: Remote branch delete ──
 
 remotes=()
