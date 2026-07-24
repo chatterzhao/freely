@@ -385,6 +385,8 @@
   <text x="65" y="4161" fill="#333">agent-identity-single-truth</text>
   <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4148" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="4161" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
+  <rect id="story-command-lifecycle-state-contract" x="55" y="4170" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4183" fill="#333">command-lifecycle-state-contract</text>
   <rect id="epic-agent-orchestration" x="35" y="4182" width="730" height="92" fill="#e8eaf6" stroke="#283593" stroke-width="2" rx="4"/>
   <text x="50" y="4198" font-size="14" font-weight="bold" fill="#283593">agent-orchestration</text>
   <rect id="story-agent-dispatch-fix" x="55" y="4208" width="690" height="18" fill="#fff" stroke="#283593" stroke-width="1" rx="2"/>
