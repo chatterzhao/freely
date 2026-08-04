@@ -1,3 +1,19 @@
+---
+name: freely-workflow-guarded-execution
+description: >-
+  Freely 项目所有开发工作的唯一流程入口。编排从 `freely feedback` 命令到
+  `freely wt-close` 命令的完整生命周期。底层是 raw → candidate（C-{key}-A）
+  → milestone（M-{key}-A）→ I-* issue（I-{key}-A）四节点链路，上层是 B1 预研 →
+  B2 设计 → RED 测试先行 → dev 实现 → test-GREEN 验证 → PR 门禁合并 → 收口。
+  fix 和 feature 共用同一流程。
+
+  Use when: starting any development task, fixing a bug, implementing
+  a feature, creating a worktree, or when the user mentions "修 bug",
+  "开工位", "开发流程", "怎么开始", "反馈", "提 PR" without specifying
+  which skill to use. Also use when the user describes a task without
+  a clear workflow — this skill provides the canonical process.
+---
+
 # ═══════════════════════════════════════════════════════════════
 # 铁律 ZERO — 任何变更必须走完整流程，禁止一切绕过
 # ═══════════════════════════════════════════════════════════════
@@ -17,23 +33,6 @@
 #
 # 违规后果: CI 硬拦截 → 合并被阻止 → 必须 revert → 重新走流程
 # ═══════════════════════════════════════════════════════════════
-
-
----
-name: freely-workflow-guarded-execution
-description: >-
-  Freely 项目所有开发工作的唯一流程入口。编排从 `freely feedback` 命令到
-  `freely wt-close` 命令的完整生命周期。底层是 raw → candidate（C-{key}-A）
-  → milestone（M-{key}-A）→ I-* issue（I-{key}-A）四节点链路，上层是 B1 预研 →
-  B2 设计 → RED 测试先行 → dev 实现 → test-GREEN 验证 → PR 门禁合并 → 收口。
-  fix 和 feature 共用同一流程。
-
-  Use when: starting any development task, fixing a bug, implementing
-  a feature, creating a worktree, or when the user mentions "修 bug",
-  "开工位", "开发流程", "怎么开始", "反馈", "提 PR" without specifying
-  which skill to use. Also use when the user describes a task without
-  a clear workflow — this skill provides the canonical process.
----
 
 # skill:freely-workflow-guarded-execution
 
@@ -348,3 +347,4 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 | B2 pre-tests 缺失 | 必须有覆盖全部改动面的 pre-tests，端到端优先 |
 | RED 未通过就进了 dev | 回退，先跑 skill:freely-test-RED-execution |
 | red-green-status 不是 green 就提 PR | 完成 RED→dev→GREEN 循环 |
+

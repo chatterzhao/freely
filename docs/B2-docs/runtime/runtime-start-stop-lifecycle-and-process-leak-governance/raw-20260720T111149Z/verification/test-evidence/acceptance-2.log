@@ -1,0 +1,3 @@
+AT-002 GREEN: Supervisor loop has DB health gate before read_task_mode
+Verified by code inspection: grep 'DB health gate' found in supervisor loop.
+If ensure_freely_db fails, supervisor writes db_unavailable workcell-state and sleeps 5s.

@@ -1,240 +1,58 @@
 #!/usr/bin/env bash
-# pre-scan-fix.sh — 在 task-lifecycle-scan 之前自动修复本地文档
-#
-# 处理 terminal phase + 无 platform_ids 的 raw issue 本地文档。
-# 这些文档不需要平台 API 同步，只需对齐本地 frontmatter。
-# 纯文档修改，使用 FREELY_SKIP_IBM_GATE 跳过 IBM 治理。
-#
-# 流程:
-#   1. 收集需要修复的 items
-#   2. freely feedback → 创建 batch raw issue
-#   3. freely wt-create → 创建工位
-#   4. 在工位中批量修改 docs/B1-docs/raw-*/issue.md
-#   5. git commit
-#   6. FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>" freely pr-create-guarded
-#   7. FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>" freely pr-merge-guarded
-#   8. freely wt-close
-#
-# Usage:
-#   pre-scan-fix.sh --project <path> [--dry-run]
+# Audit terminal raw metadata before task scanning. This entry is deliberately
+# read-only: scan preparation must not create lifecycle facts, worktrees, PRs,
+# commits, or platform side effects.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 PROJECT=""
 DRY_RUN=0
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project) PROJECT="$2"; shift 2 ;;
+    --project) PROJECT="${2:-}"; shift 2 ;;
     --dry-run) DRY_RUN=1; shift ;;
-    *) echo "[ERROR] unknown arg: $1" >&2; exit 1 ;;
+    *) echo "[pre-scan-audit] unknown arg: $1" >&2; exit 1 ;;
   esac
 done
 
-[[ -n "$PROJECT" ]] || { echo "[ERROR] --project required" >&2; exit 1; }
-[[ -d "$PROJECT" ]] || { echo "[ERROR] project not found: $PROJECT" >&2; exit 1; }
+[[ -n "$PROJECT" ]] || { echo "[pre-scan-audit] --project required" >&2; exit 1; }
+[[ -d "$PROJECT" ]] || { echo "[pre-scan-audit] project not found: $PROJECT" >&2; exit 1; }
 
-B1_DIR="$PROJECT/docs/B1-docs"
-FREELY="$PROJECT/bin/freely"
-[[ -x "$FREELY" ]] || { echo "[ERROR] freely not executable: $FREELY" >&2; exit 1; }
+python3 - "$PROJECT" "$DRY_RUN" <<'PYEOF'
+from __future__ import annotations
 
-# ── Phase 1: 收集需要修复的 items ──────────────────────
-log() { echo "[pre-scan-fix] $(date -u +%Y-%m-%dT%H:%M:%SZ) $*"; }
-
-TERMINAL_PHASES="absorbed dropped completed"
-NEEDS_FIX_FILE="$PROJECT/.freely/run/pre-scan-fix-items.txt"
-: > "$NEEDS_FIX_FILE"
-
-total=0 needs_fix=0
-for issue_md in "$B1_DIR"/raw-*/issue.md; do
-  [[ -f "$issue_md" ]] || continue
-  total=$((total + 1))
-
-  # Extract fields from frontmatter
-  phase=$(python3 -c "
 import sys
-with open('$issue_md') as f:
-    text = f.read()
-# Parse YAML frontmatter between --- markers
-parts = text.split('---', 2)
-if len(parts) >= 3:
-    fm = parts[1]
-    for line in fm.split('\n'):
-        line = line.strip()
-        if line.startswith('phase_state:'):
-            print(line.split(':',1)[1].strip())
-            break
-" 2>/dev/null || echo "")
+from pathlib import Path
 
-  [[ -n "$phase" ]] || continue
+import yaml
 
-  # Check if terminal phase
-  is_terminal=0
-  for tp in $TERMINAL_PHASES; do
-    [[ "$phase" == "$tp" ]] && { is_terminal=1; break; }
-  done
-  [[ $is_terminal -eq 1 ]] || continue
+project = Path(sys.argv[1])
+lifecycle = project / "docs/system/workspace/scripts/lifecycle"
+sys.path.insert(0, str(lifecycle))
+from raw_metadata_contract import MetadataValidationError, normalize, validate
 
-  # Check if has platform_ids
-  has_pids=$(python3 -c "
-with open('$issue_md') as f:
-    text = f.read()
-parts = text.split('---', 2)
-if len(parts) >= 3:
-    fm = parts[1]
-    if 'issue_id:' in fm or 'platform_ids:' in fm:
-        # Has platform_ids section with actual IDs
-        in_pids = False
-        has_id = False
-        for line in fm.split('\n'):
-            line = line.strip()
-            if line.startswith('platform_ids:'):
-                in_pids = True
-                continue
-            if in_pids and line.startswith('issue_id:') and len(line.split(':',1)[1].strip().strip(\"'\")) > 0:
-                has_id = True
-                break
-            if in_pids and not line.startswith(' '):
-                break
-        print('yes' if has_id else 'no')
-    else:
-        print('no')
-else:
-    print('no')
-" 2>/dev/null || echo "no")
+findings = []
+for issue_file in sorted((project / "docs/B1-docs").glob("raw-*/issue.md")):
+    parts = issue_file.read_text(encoding="utf-8").split("---", 2)
+    if len(parts) < 3:
+        continue
+    metadata = yaml.safe_load(parts[1]) or {}
+    if not isinstance(metadata, dict):
+        continue
+    view = normalize(metadata)
+    if view["strict_schema"]:
+        try:
+            validate(metadata, base_dir=project)
+        except MetadataValidationError as error:
+            findings.append(f"{issue_file.parent.name}: {error}")
+    elif view["phase_state"] == "absorbed":
+        target = str(view.get("absorbed_into") or "")
+        canonical = str(view.get("canonical_issue_path") or "")
+        if not target and not canonical:
+            findings.append(
+                f"{issue_file.parent.name}: legacy absorbed state has no canonical relationship"
+            )
 
-  if [[ "$has_pids" == "no" ]]; then
-    rel="${issue_md#$PROJECT/}"
-    echo "$rel" >> "$NEEDS_FIX_FILE"
-    needs_fix=$((needs_fix + 1))
-  fi
-done
-
-log "scanned $total issues, $needs_fix need fix (terminal phase, no platform_ids)"
-
-[[ $needs_fix -gt 0 ]] || { log "nothing to fix"; exit 0; }
-[[ $DRY_RUN -eq 1 ]] && { log "DRY RUN — would fix $needs_fix issues"; exit 0; }
-
-# ── Phase 2: 批量修复 ─────────────────────────────────
-TS=$(date -u +%Y%m%dT%H%M%SZ)
-
-# Create batch raw issue via worktree workflow
-log "creating batch raw issue..."
-BATCH_TITLE="fix: pre-scan batch fix $needs_fix local docs (terminal phase, no platform_ids)"
-BATCH_BODY="## 问题
-pre-scan batch: $needs_fix terminal-phase local raw issues lack platform_ids in frontmatter.
-
-## 修复
-Align platform_state=closed for all terminal-phase (absorbed/completed/dropped) raw issues without platform_ids.
-Pure documentation fix — no code changes, no governance required.
-Uses FREELY_SKIP_IBM_GATE to bypass IBM governance gates (per LAWS.md §304).
-
-## 验收
-All affected issue.md files have platform_state=closed aligned with phase_state.
-Fixed items: $(head -5 "$NEEDS_FIX_FILE" | tr '\n' ' ')..."
-
-cd "$PROJECT"
-RAW_KEY=$("$FREELY" feedback --title "$BATCH_TITLE" --body "$BATCH_BODY" --kind fix 2>&1 | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-
-if [[ -z "$RAW_KEY" ]]; then
-  log "ERROR: feedback failed, cannot create batch raw issue"
-  exit 1
-fi
-log "batch raw issue: $RAW_KEY"
-
-# Create worktree
-SLUG="pre-scan-batch-${TS}"
-log "creating worktree: $SLUG"
-"$FREELY" wt-create --raw-key "${RAW_KEY#raw-}" --source platform --kind fix --slug "$SLUG" || {
-  log "ERROR: wt-create failed"
-  exit 1
-}
-
-# Find the worktree
-WT_DIR=$(ls -d "$PROJECT"/*-worktrees/fix-raw-*-"$SLUG" 2>/dev/null | head -1 || true)
-[[ -d "$WT_DIR" ]] || WT_DIR=$(ls -d "$PROJECT"/../*-worktrees/fix-raw-*-"$SLUG" 2>/dev/null | head -1 || true)
-[[ -d "$WT_DIR" ]] || { log "ERROR: worktree not found"; exit 1; }
-log "worktree: $WT_DIR"
-
-# Fix each issue in the worktree
-log "fixing $needs_fix issues..."
-fixed=0
-while IFS= read -r rel; do
-  [[ -n "$rel" ]] || continue
-  target="$WT_DIR/$rel"
-  if [[ -f "$target" ]]; then
-    python3 -c "
-with open('$target') as f:
-    text = f.read()
-parts = text.split('---', 2)
-if len(parts) >= 3:
-    fm_lines = parts[1].split('\n')
-    new_fm_lines = []
-    has_platform_state = False
-    has_absorbed_into = False
-    phase = ''
-    for line in fm_lines:
-        stripped = line.strip()
-        if stripped.startswith('phase_state:'):
-            phase = stripped.split(':',1)[1].strip()
-        if stripped.startswith('platform_state:'):
-            has_platform_state = True
-            new_fm_lines.append('platform_state: closed')
-        elif stripped.startswith('absorbed_into:'):
-            has_absorbed_into = True
-            new_fm_lines.append(line)
-        else:
-            new_fm_lines.append(line)
-    if not has_platform_state:
-        new_fm_lines.append('platform_state: closed')
-    new_fm = '\n'.join(new_fm_lines)
-    text = '---' + new_fm + '---' + parts[2]
-with open('$target', 'w') as f:
-    f.write(text)
-" 2>/dev/null && fixed=$((fixed + 1))
-  fi
-done < "$NEEDS_FIX_FILE"
-
-log "fixed $fixed / $needs_fix issues"
-
-# Commit in worktree
-cd "$WT_DIR"
-git add docs/B1-docs/raw-*/issue.md 2>/dev/null || true
-git commit -m "fix: pre-scan batch — align platform_state=closed for $fixed terminal-phase local docs
-
-Pure documentation fix. Terminal phase_state issues without platform_ids
-had their platform_state set to 'closed' to align local frontmatter.
-
-FREELY_SKIP_IBM_GATE: no governance required for this batch doc fix.
-
-Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || {
-  log "nothing to commit (all already aligned)"
-  cd "$PROJECT"
-  "$FREELY" wt-close --raw-key "${RAW_KEY#raw-}" --force --reason "违规绕过门禁中，理由充分，是：pre-scan batch fix 无修改内容" 2>/dev/null || true
-  exit 0
-}
-
-# PR + merge with FREELY_SKIP_IBM_GATE for pure doc changes
-log "pr-create-guarded (FREELY_SKIP_IBM_GATE)..."
-cd "$WT_DIR"
-FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：pre-scan batch fix 纯文档修改无需 IBM 治理" \
-  "$FREELY" pr-create-guarded 2>&1 || {
-  log "ERROR: pr-create-guarded failed"
-  exit 1
-}
-
-log "pr-merge-guarded (FREELY_SKIP_IBM_GATE)..."
-cd "$PROJECT"
-BRANCH=$(cd "$WT_DIR" && git rev-parse --abbrev-ref HEAD)
-FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：pre-scan batch fix 纯文档修改无需 IBM 治理" \
-  "$FREELY" pr-merge-guarded develop "$BRANCH" 2>&1 || {
-  log "ERROR: pr-merge-guarded failed"
-  exit 1
-}
-
-# Cleanup
-log "wt-close..."
-"$FREELY" wt-close --raw-key "${RAW_KEY#raw-}" 2>&1 || true
-
-log "done: fixed $fixed issues via batch workflow"
-rm -f "$NEEDS_FIX_FILE"
+for finding in findings:
+    print(f"[pre-scan-audit] {finding}")
+print(f"[pre-scan-audit] read-only: {len(findings)} finding(s), 0 files changed")
+PYEOF

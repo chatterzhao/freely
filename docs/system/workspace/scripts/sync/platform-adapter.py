@@ -33,6 +33,9 @@ Usage:
 """
 from __future__ import annotations
 import json, os, re, subprocess, sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
@@ -40,8 +43,10 @@ from typing import Optional
 _ADAPTER_DIR = Path(__file__).resolve().parent
 _SCRIPTS_DIR = _ADAPTER_DIR.parent
 _RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
+sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 from freely_user_env import value as freely_env_value
+from freely_config import read_config
 
 # ══════════════════════════════════════════════
 # Abstract PlatformHandler — new platform? subclass this.
@@ -67,6 +72,60 @@ class PlatformHandler(ABC):
     def fetch_issue(self, issue_number: str) -> dict: return {}
     def create_pr(self, branch: str, base: str, title: str, body: str) -> dict:
         return {"status": "error", "error": "not implemented"}
+    def ensure_pr(self, branch: str, base: str, title: str, body: str) -> dict:
+        return self.create_pr(branch, base, title, body)
+    def remote_name(self) -> str:
+        try:
+            remotes = subprocess.run(
+                ["git", "remote"], capture_output=True, text=True, check=True
+            ).stdout.splitlines()
+            fallback = ""
+            for remote in remotes:
+                url = subprocess.run(
+                    ["git", "remote", "get-url", remote], capture_output=True, text=True
+                ).stdout.strip()
+                if self.name in remote.lower() or self.name in url.lower():
+                    return remote
+                if not fallback and remote != "all":
+                    fallback = remote
+            return fallback if len([r for r in remotes if r != "all"]) == 1 else ""
+        except Exception:
+            return ""
+    def fetch_branch_head(self, branch: str) -> Optional[str]:
+        remote = self.remote_name()
+        if not remote:
+            return None
+        ref = f"refs/remotes/{remote}/{branch}"
+        fetched = subprocess.run(
+            ["git", "fetch", remote, f"+refs/heads/{branch}:{ref}"],
+            capture_output=True,
+            text=True,
+        )
+        if fetched.returncode != 0:
+            probe = subprocess.run(
+                ["git", "ls-remote", "--heads", remote, branch],
+                capture_output=True,
+                text=True,
+            )
+            if probe.returncode == 0 and not probe.stdout.strip():
+                return None
+            raise RuntimeError((fetched.stderr or probe.stderr).strip()[:300])
+        resolved = subprocess.run(
+            ["git", "rev-parse", ref], capture_output=True, text=True, check=True
+        )
+        return resolved.stdout.strip()
+    def push_branch(self, branch: str) -> dict:
+        remote = self.remote_name()
+        if not remote:
+            return {"status": "error", "error": f"no remote for {self.name}"}
+        pushed = subprocess.run(
+            ["git", "push", remote, f"{branch}:refs/heads/{branch}"],
+            capture_output=True,
+            text=True,
+        )
+        if pushed.returncode != 0:
+            return {"status": "error", "error": pushed.stderr.strip()[:300]}
+        return {"status": "pushed", "remote": remote}
     def merge_pr(self, pr_number: str) -> dict:
         return {"status": "error", "error": "not implemented"}
     def close_pr(self, pr_number: str) -> dict:
@@ -75,6 +134,7 @@ class PlatformHandler(ABC):
     def set_assignee(self, issue_number: str, login: str) -> tuple[bool, str]:
         return False, "not implemented"
     def list_open_issues(self) -> dict[str, str]: return {}
+    def list_open_issue_records(self) -> dict[str, dict]: return {}
 
 # ══════════════════════════════════════════════
 # Registry
@@ -156,39 +216,49 @@ class GitHubHandler(PlatformHandler):
 
     def search_raw_issue(self, raw_key):
         repo = self._repo()
-        if not repo: return None
+        if not repo:
+            return None
         try:
-            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
-                               "--search", f"raw-{raw_key} in:title", "--limit", "5",
-                               "--json", "number,title,url"],
-                              capture_output=True, text=True, timeout=15)
-            if r.returncode == 0 and r.stdout.strip():
-                for issue in json.loads(r.stdout):
-                    title = issue.get("title", "")
-                    if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                        return {"issue_number": str(issue["number"]), "title": title, "url": issue.get("url", "")}
-            r2 = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open",
-                                "--search", f"raw-{raw_key} in:body", "--limit", "5",
-                                "--json", "number,title,url"],
-                               capture_output=True, text=True, timeout=15)
-            if r2.returncode == 0 and r2.stdout.strip():
-                for issue in json.loads(r2.stdout):
-                    return {"issue_number": str(issue["number"]),
-                            "title": issue.get("title", ""), "url": issue.get("url", "")}
+            matches = {}
+            for field in ("title", "body"):
+                result = subprocess.run(
+                    ["gh", "issue", "list", "--repo", repo, "--state", "all",
+                     "--search", f"raw-{raw_key} in:{field}", "--limit", "20",
+                     "--json", "number,title,url,body"],
+                    capture_output=True, text=True, timeout=15,
+                )
+                if result.returncode != 0 or not result.stdout.strip():
+                    continue
+                for issue in json.loads(result.stdout):
+                    haystack = str(issue.get(field, "") or "")
+                    needle = f"raw-{raw_key}".lower()
+                    if needle not in haystack.lower():
+                        continue
+                    issue_id = str(issue.get("number", "") or "")
+                    if issue_id:
+                        matches[issue_id] = {
+                            "issue_number": issue_id,
+                            "title": issue.get("title", ""),
+                            "url": issue.get("url", ""),
+                        }
+            candidates = list(matches.values())
+            if len(candidates) == 1:
+                return {**candidates[0], "matches": candidates}
+            return {"matches": candidates}
         except Exception:
-            pass
-        return None
+            return None
 
     def fetch_issue(self, issue_number):
         try:
             r = subprocess.run(["gh", "issue", "view", issue_number, "--repo", self._repo(),
-                               "--json", "title,body,createdAt,updatedAt,labels,state"],
+                               "--json", "title,body,createdAt,updatedAt,labels,state,comments"],
                               capture_output=True, text=True, timeout=15)
             if r.returncode == 0 and r.stdout.strip():
                 data = json.loads(r.stdout)
                 return {"title": data.get("title", ""), "body": data.get("body", ""),
                         "created_at": data.get("createdAt", ""), "updated_at": data.get("updatedAt", ""),
                         "labels": [l["name"] for l in data.get("labels", [])],
+                        "comments": [c.get("body", "") for c in data.get("comments", [])],
                         "state": data.get("state", "").upper()}
         except Exception:
             pass
@@ -203,6 +273,39 @@ class GitHubHandler(PlatformHandler):
             url = r.stdout.strip()
             return {"url": url, "number": url.split("/")[-1] if url else "", "status": "created"}
         return {"status": "error", "error": r.stderr[:200]}
+
+    def ensure_pr(self, branch, base, title, body):
+        listed = subprocess.run(
+            ["gh", "pr", "list", "--repo", self._repo(), "--head", branch,
+             "--base", base, "--state", "open", "--json", "number,url,title,body"],
+            capture_output=True,
+            text=True,
+        )
+        if listed.returncode != 0:
+            return {"status": "error", "error": listed.stderr.strip()[:200]}
+        try:
+            matches = json.loads(listed.stdout or "[]")
+        except json.JSONDecodeError as exc:
+            return {"status": "error", "error": f"invalid GitHub PR response: {exc}"}
+        if not matches:
+            return self.create_pr(branch, base, title, body)
+        existing = matches[0]
+        number = str(existing.get("number", ""))
+        changed = existing.get("title", "") != title or existing.get("body", "") != body
+        if changed:
+            edited = subprocess.run(
+                ["gh", "pr", "edit", number, "--repo", self._repo(),
+                 "--title", title, "--body", body],
+                capture_output=True,
+                text=True,
+            )
+            if edited.returncode != 0:
+                return {"status": "error", "error": edited.stderr.strip()[:200]}
+        return {
+            "status": "updated" if changed else "reused",
+            "number": number,
+            "url": existing.get("url", ""),
+        }
 
     def merge_pr(self, pr_number):
         r = subprocess.run(["gh", "pr", "merge", pr_number, "--repo", self._repo(),
@@ -241,6 +344,18 @@ class GitHubHandler(PlatformHandler):
             r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
                                "--json", "number,state"], capture_output=True, text=True, timeout=30)
             return {str(i["number"]): i.get("state", "OPEN") for i in json.loads(r.stdout)} if r.returncode == 0 and r.stdout.strip() else {}
+        except Exception:
+            return {}
+
+    def list_open_issue_records(self):
+        repo = self._repo()
+        if not repo:
+            return {}
+        try:
+            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200", "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
+            if r.returncode != 0:
+                return {}
+            return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
         except Exception:
             return {}
 
@@ -301,37 +416,104 @@ class GiteeHandler(PlatformHandler):
         return None
 
     def search_raw_issue(self, raw_key):
-        r = self._run("list", "--state", "open", "--per-page", "50")
-        if r.returncode != 0: return None
+        r = self._run("list", "--state", "all", "--per-page", "50")
+        if r.returncode != 0:
+            return None
         try:
             issues = json.loads(r.stdout)
         except Exception:
             return None
+        needle = f"raw-{raw_key}".lower()
+        matches = {}
         for issue in issues:
-            title, body = issue.get("title", ""), issue.get("body", "") or ""
-            if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
-                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
-                        "title": title, "url": issue.get("html_url", issue.get("url", ""))}
-        for issue in issues:
-            if f"raw-{raw_key}" in (issue.get("body", "") or ""):
-                return {"issue_number": str(issue.get("number", issue.get("id", ""))),
-                        "title": issue.get("title", ""), "url": issue.get("html_url", issue.get("url", ""))}
-        return None
+            title = issue.get("title", "") or ""
+            body = issue.get("body", "") or ""
+            if needle not in title.lower() and needle not in body.lower():
+                continue
+            issue_id = str(issue.get("number", issue.get("id", "")) or "")
+            if issue_id:
+                matches[issue_id] = {
+                    "issue_number": issue_id,
+                    "title": title,
+                    "url": issue.get("html_url", issue.get("url", "")),
+                }
+        candidates = list(matches.values())
+        if len(candidates) == 1:
+            return {**candidates[0], "matches": candidates}
+        return {"matches": candidates}
 
     def fetch_issue(self, issue_number):
         r = self._run("get", issue_number)
         if r.returncode == 0 and r.stdout.strip():
             try:
                 data = json.loads(r.stdout)
+                comments = data.get("comments", [])
+                comments = comments if isinstance(comments, list) else []
                 return {"title": data.get("title", ""), "body": data.get("body", ""),
                         "created_at": data.get("created_at", ""), "updated_at": data.get("updated_at", ""),
                         "labels": [l.get("name", "") for l in data.get("labels", [])],
+                        "comments": [c.get("body", "") for c in comments],
                         "state": data.get("state", "").upper()}
             except Exception: pass
         return {}
 
+    def _api(self, method, path, payload=None):
+        token = freely_env_value("GITEE_ACCESS_TOKEN", "GITEE_TOKEN")
+        url = f"https://gitee.com/api/v5/repos/{self._repo()}{path}"
+        values = dict(payload or {})
+        values["access_token"] = token
+        data = urllib.parse.urlencode(values).encode("utf-8") if method != "GET" else None
+        if method == "GET":
+            url = f"{url}?{urllib.parse.urlencode(values)}"
+        request = urllib.request.Request(url, data=data, method=method)
+        request.add_header("Content-Type", "application/x-www-form-urlencoded")
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                return response.status, json.loads(response.read().decode("utf-8") or "{}")
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:300]
+            raise RuntimeError(f"Gitee API {exc.code}: {detail}") from exc
+
     def create_pr(self, branch, base, title, body):
-        return {"status": "skipped", "error": "gitee PR creation via API not yet implemented"}
+        try:
+            _, result = self._api(
+                "POST",
+                "/pulls",
+                {"head": branch, "base": base, "title": title, "body": body},
+            )
+            return {
+                "status": "created",
+                "number": str(result.get("number", "")),
+                "url": result.get("html_url", ""),
+            }
+        except Exception as exc:
+            return {"status": "error", "error": str(exc)[:300]}
+
+    def ensure_pr(self, branch, base, title, body):
+        try:
+            _, pulls = self._api("GET", "/pulls", {"state": "open", "per_page": "100"})
+            owner = self._repo().split("/", 1)[0]
+            matches = [
+                pull for pull in pulls
+                if pull.get("base", {}).get("ref") == base
+                and pull.get("head", {}).get("ref") == branch
+                and pull.get("head", {}).get("user", {}).get("login", owner) == owner
+            ]
+            if not matches:
+                return self.create_pr(branch, base, title, body)
+            existing = matches[0]
+            number = str(existing.get("number", ""))
+            changed = existing.get("title", "") != title or existing.get("body", "") != body
+            if changed:
+                self._api("PATCH", f"/pulls/{number}", {"title": title, "body": body})
+            return {
+                "status": "updated" if changed else "reused",
+                "number": number,
+                "url": existing.get("html_url", ""),
+            }
+        except Exception as exc:
+            return {"status": "error", "error": str(exc)[:300]}
+
     def merge_pr(self, pr_number):
         return {"status": "skipped", "error": "gitee PR merge via API not yet implemented"}
     def close_pr(self, pr_number):
@@ -363,6 +545,15 @@ class GiteeHandler(PlatformHandler):
         except Exception: pass
         return {}
 
+    def list_open_issue_records(self):
+        try:
+            r = self._run("list", "--state", "open", "--per-page", "50")
+            if r.returncode != 0:
+                return {}
+            return {str(issue.get("number", issue.get("id", ""))): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
+        except Exception:
+            return {}
+
 # ══════════════════════════════════════════════
 # REGISTRATION — new platform? add ONE line here.
 # ══════════════════════════════════════════════
@@ -379,23 +570,96 @@ def available_platforms() -> list[str]:
     return [h.name for h in _handlers()]
 
 def configured_platforms() -> list[str]:
-    csv = os.environ.get("FREELY_REPO_PLATFORMS", "")
-    configured = [p.strip() for p in csv.split(",") if p.strip()]
-    return [p for p in (configured or available_platforms()) if _handler_for(p)]
+    configured = os.environ.get("FREELY_REPO_PLATFORMS", "").strip()
+    if not configured:
+        project = os.environ.get("FREELY_PROJECT_ROOT", "").strip()
+        if not project:
+            resolved = subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"],
+                capture_output=True,
+                text=True,
+            )
+            project = resolved.stdout.strip() if resolved.returncode == 0 else os.getcwd()
+        configured = str(read_config(project).get("FREELY_REPO_PLATFORMS", "")).strip()
+    return list(dict.fromkeys(p.strip() for p in configured.split(",") if p.strip()))
 
 def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
-    return {h.name: _safe(h.create_issue, title, body) for h in _handlers()}
+    results = {}
+    for platform in configured_platforms():
+        handler = _handler_for(platform)
+        results[platform] = (
+            _safe(handler.create_issue, title, body)
+            if handler
+            else {"status": "error", "error": f"unsupported platform: {platform}"}
+        )
+    return results
 
 def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
     results = {}
-    for h in _handlers():
-        pid = (platform_ids or {}).get(h.name, {})
+    for platform in configured_platforms():
+        h = _handler_for(platform)
+        if not h:
+            results[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            continue
+        pid = (platform_ids or {}).get(platform, {})
         issue_id = pid.get('issue_id', '') if isinstance(pid, dict) else str(pid or '')
         if not issue_id:
-            results[h.name] = {'status': 'skipped', 'error': f'no issue_id for {h.name}'}
+            results[platform] = {'status': 'error', 'error': f'no issue_id for {platform}'}
             continue
-        results[h.name] = _safe(h.close_issue, issue_id)
+        results[platform] = _safe(h.close_issue, issue_id)
     return results
+
+
+def _issue_id(reference: object) -> str:
+    value = reference.get("issue_id", "") if isinstance(reference, dict) else reference
+    value = str(value or "").strip()
+    return value if value and value != "?" else ""
+
+
+def _unique_raw_issue(handler: PlatformHandler, raw_key: str) -> tuple[str, str]:
+    found = _safe(handler.search_raw_issue, raw_key)
+    if not isinstance(found, dict):
+        return "", f"raw key {raw_key} not found"
+    matches = found.get("matches")
+    if matches is not None:
+        if not isinstance(matches, list) or len(matches) != 1:
+            return "", f"raw key {raw_key} did not resolve uniquely"
+        found = matches[0] if isinstance(matches[0], dict) else {}
+    issue_id = str(found.get("issue_number", found.get("issue_id", "")) or "").strip()
+    if not issue_id or issue_id == "?":
+        return "", f"raw key {raw_key} did not resolve uniquely"
+    return issue_id, ""
+
+
+def close_issue_by_raw_key(raw_key: str, platform_ids: dict = None) -> dict[str, dict]:
+    """Close all configured copies after completing the raw-key identity mapping.
+
+    `platform_ids` is only a cache.  Resolution happens for every missing cache
+    entry before any platform close, preventing a partial lookup from becoming a
+    single-platform guess.
+    """
+    resolved = {}
+    failures = {}
+    platforms = configured_platforms()
+    for platform in platforms:
+        handler = _handler_for(platform)
+        if not handler:
+            failures[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            continue
+        issue_id, error = _unique_raw_issue(handler, raw_key)
+        if error:
+            failures[platform] = {"status": "error", "error": error}
+            continue
+        resolved[platform] = {"issue_id": issue_id}
+    if failures:
+        return {
+            platform: failures.get(
+                platform,
+                {"status": "blocked", "error": "raw key resolution failed on another configured platform"},
+            )
+            for platform in platforms
+        }
+    return close_issue(f"raw-{raw_key}", resolved)
 
 def add_comment(local_id: str, platform_ids: dict = None, comment_body: str = "") -> dict[str, dict]:
     results = {}
@@ -417,13 +681,17 @@ def add_comment(local_id: str, platform_ids: dict = None, comment_body: str = ""
 
 def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str = "") -> dict[str, dict]:
     results = {}
-    for h in _handlers():
-        piv = (platform_ids or {}).get(h.name, {})
-        issue_id = piv.get("issue_id", "") if isinstance(piv, dict) else str(piv or "")
-        if not issue_id:
-            results[h.name] = {"status": "skipped", "error": f"no issue_id for {h.name}"}
+    for platform in configured_platforms():
+        handler = _handler_for(platform)
+        if not handler:
+            results[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
             continue
-        results[h.name] = _safe(h.update_issue, issue_id, title, body)
+        reference = (platform_ids or {}).get(platform, {})
+        issue_id = reference.get("issue_id", "") if isinstance(reference, dict) else str(reference or "")
+        if not issue_id:
+            results[platform] = {"status": "error", "error": f"no issue_id for {platform}"}
+            continue
+        results[platform] = _safe(handler.update_issue, issue_id, title, body)
     return results
 
 def search_raw_issue(raw_key: str) -> dict[str, dict]:
@@ -438,6 +706,38 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     h = _handler_for(platform)
     return h.fetch_issue(issue_number) if h else {}
 
+
+def discover_raw_replicas(raw_key: str) -> dict[str, dict]:
+    """Read every configured platform once; never convert uncertainty into absence."""
+    records: dict[str, dict] = {}
+    for platform in configured_platforms():
+        handler = _handler_for(platform)
+        if not handler:
+            records[platform] = {"status": "error", "error": "configured platform unavailable"}
+            continue
+        found = _safe(handler.search_raw_issue, raw_key)
+        matches = found.get("matches") if isinstance(found, dict) else None
+        if not isinstance(matches, list):
+            records[platform] = {"status": "error", "error": "raw search failed"}
+            continue
+        if not matches:
+            records[platform] = {"status": "missing", "error": "raw replica not found"}
+            continue
+        if len(matches) != 1:
+            records[platform] = {"status": "ambiguous", "error": f"raw key resolved to {len(matches)} replicas"}
+            continue
+        issue = matches[0] if isinstance(matches[0], dict) else {}
+        issue_id = str(issue.get("issue_number", issue.get("issue_id", "")) or "")
+        details = _safe(handler.fetch_issue, issue_id) if issue_id else {}
+        if not issue_id or not isinstance(details, dict) or not details:
+            records[platform] = {"status": "error", "error": "raw replica fetch failed"}
+            continue
+        records[platform] = {
+            "status": "ok", "raw_key": f"raw-{raw_key}", "issue_id": issue_id,
+            "url": issue.get("url", ""), **details,
+        }
+    return records
+
 def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
     h = _handler_for(platform)
     return h.get_issue_state(issue_number) if h else None
@@ -448,6 +748,14 @@ def list_open_issues(platforms: list[str] = None) -> dict[str, str]:
     for h in targets:
         result.update(_safe(h.list_open_issues) or {})
     return result
+
+def list_open_issue_records(platforms: list[str] = None) -> dict[str, dict]:
+    records: dict[str, dict] = {}
+    targets = [h for h in _handlers() if platforms is None or h.name in platforms]
+    for h in targets:
+        for issue_id, record in (_safe(h.list_open_issue_records) or {}).items():
+            records[f"{h.name}:{issue_id}"] = {"issue_id": str(issue_id), **record}
+    return records
 
 def get_assignees(platform: str, issue_number: str) -> list[str]:
     h = _handler_for(platform)
@@ -470,6 +778,86 @@ def check_and_claim_assignee(platform: str, issue_number: str, my_login: str) ->
 
 def create_pr(branch: str, base: str = "develop", title: str = "", body: str = "") -> dict:
     return {h.name: _safe(h.create_pr, branch, base, title, body) for h in _handlers()}
+
+
+def guarded_pr_update(
+    branch: str, base: str = "develop", title: str = "", body: str = ""
+) -> dict:
+    from pr_lifecycle import aggregate_results, classify_branch, plan_platform_updates
+
+    platforms = configured_platforms()
+    local = subprocess.run(
+        ["git", "rev-parse", branch], capture_output=True, text=True
+    )
+    if local.returncode != 0:
+        return {"success": False, "error": local.stderr.strip()[:300], "platforms": {}}
+    local_head = local.stdout.strip()
+    observations = {}
+
+    def is_ancestor(left, right):
+        return subprocess.run(
+            ["git", "merge-base", "--is-ancestor", left, right],
+            capture_output=True,
+        ).returncode == 0
+
+    for platform in platforms:
+        handler = _handler_for(platform)
+        if not handler:
+            observations[platform] = {"branch_state": "unsupported"}
+            continue
+        try:
+            remote_head = handler.fetch_branch_head(branch)
+            observations[platform] = {
+                "branch_state": classify_branch(local_head, remote_head, is_ancestor),
+                "local_head": local_head,
+                "remote_head": remote_head or "",
+                "remote": handler.remote_name(),
+            }
+        except Exception as exc:
+            observations[platform] = {
+                "branch_state": "error",
+                "error": str(exc)[:300],
+            }
+
+    plan = plan_platform_updates(
+        configured_platforms=platforms, observations=observations
+    )
+    if not plan["safe_to_execute"]:
+        return {
+            "success": False,
+            "stage": "plan",
+            "plan": plan,
+            "recovery": "同步本地分支与对应平台远端后重试；禁止 force push 或原始 push 绕过。",
+        }
+
+    results = {}
+    for item in plan["actions"]:
+        platform = item["platform"]
+        handler = _handler_for(platform)
+        result = dict(observations[platform])
+        if item["action"] == "push_then_ensure_pr":
+            pushed = handler.push_branch(branch)
+            if pushed.get("status") != "pushed":
+                result.update({"branch_state": "error", "pr_state": "error", "push": pushed})
+                results[platform] = result
+                continue
+            try:
+                remote_head = handler.fetch_branch_head(branch)
+            except Exception as exc:
+                result.update({"branch_state": "error", "pr_state": "error", "error": str(exc)[:300]})
+                results[platform] = result
+                continue
+            result["branch_state"] = classify_branch(local_head, remote_head, is_ancestor)
+            result["remote_head"] = remote_head or ""
+            result["push"] = pushed
+        pr = _safe(handler.ensure_pr, branch, base, title, body)
+        result["pr_state"] = pr.get("status", "error")
+        result["pr"] = pr
+        results[platform] = result
+
+    aggregate = aggregate_results(platforms, results)
+    aggregate["stage"] = "complete"
+    return aggregate
 
 def merge_pr(platform: str, pr_number: str) -> dict:
     h = _handler_for(platform)
@@ -563,21 +951,24 @@ def _resolve_issue_state(local_id: str) -> str:
 # ── pull_raw_issue ──
 
 def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
+    replicas = discover_raw_replicas(raw_key)
+    if not replicas or any(item.get("status") != "ok" for item in replicas.values()):
+        print(f"FATAL: raw-{raw_key} replicas are unresolved: {replicas}", file=sys.stderr)
+        return None
     my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
-    for plat, info in search_raw_issue(raw_key).items():
-        ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
+    for plat, info in replicas.items():
+        ok, msg = check_and_claim_assignee(plat, info["issue_id"], my_login)
         print(f"[assignee] {plat}: {msg}", file=sys.stderr)
         if not ok and "already assigned to" in msg.lower():
-            print(f"FATAL: {msg}", file=sys.stderr); return None
+            print(f"FATAL: {msg}", file=sys.stderr)
+            return None
         if not ok:
             print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
 
-    results = search_raw_issue(raw_key)
-    if not results: return None
-    platform = "github" if "github" in results else next(iter(results))
-    info = results[platform]; issue_number = info["issue_number"]
-    details = fetch_issue(platform, issue_number)
-    if not details: return None
+    platform = next(iter(replicas))
+    info = replicas[platform]
+    issue_number = info["issue_id"]
+    details = info
 
     title = info.get("title", "")
     if not (f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title):
@@ -587,23 +978,40 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
             raw_key = sk; target_dir = target_dir.parent / f"raw-{raw_key}"
 
     target_dir.mkdir(parents=True, exist_ok=True)
-    platform_ids = {p: {"issue_id": i["issue_number"], "url": i.get("url", ""), "synced_at": ""}
-                    for p, i in results.items()}
+    platform_ids = {p: {"issue_id": i["issue_id"], "url": i.get("url", ""), "synced_at": ""}
+                    for p, i in replicas.items()}
     phase = "proposed"
     for label in details.get("labels", []):
         if label.startswith("phase/"): phase = label.replace("phase/", ""); break
 
     import yaml
     yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
-    fm = {"local_id": f"raw-{raw_key}", "kind": "raw", "phase_state": phase,
-          "platform_ids": platform_ids, "primary_platform": platform,
-          "canonical_issue_path": "", "last_synced_comment_at": {}, "hash": "",
-          "created_at": details.get("created_at", ""), "updated_at": details.get("updated_at", ""),
-          "intake_id": "", "author": "platform", "channel": platform, "session_refs": []}
-    fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
     body = details.get("body", "")
+    payload = {}
     if body.startswith("---"):
-        body = body.split("---", 2)[2].strip() if len(body.split("---", 2)) >= 3 else body
+        body_parts = body.split("---", 2)
+        if len(body_parts) >= 3:
+            payload = yaml.safe_load(body_parts[1]) or {}
+            body = body_parts[2].strip()
+
+    if str(payload.get("schema_version", "")) == "1":
+        lifecycle_dir = _SCRIPTS_DIR / "lifecycle"
+        sys.path.insert(0, str(lifecycle_dir))
+        from raw_metadata_contract import RAW_METADATA_FIELDS, validate
+        fm = {key: payload.get(key) for key in RAW_METADATA_FIELDS}
+        fm["local_id"] = f"raw-{raw_key}"
+        fm["platform_ids"] = platform_ids
+        fm["primary_platform"] = platform
+        fm["phase_state"] = phase
+        fm["updated_at"] = details.get("updated_at", "") or fm["updated_at"]
+        validate(fm, require_canonical_file=False)
+    else:
+        fm = {"local_id": f"raw-{raw_key}", "kind": "raw", "phase_state": phase,
+              "platform_ids": platform_ids, "primary_platform": platform,
+              "canonical_issue_path": "", "last_synced_comment_at": {}, "hash": "",
+              "created_at": details.get("created_at", ""), "updated_at": details.get("updated_at", ""),
+              "intake_id": "", "author": "platform", "channel": platform, "session_refs": []}
+    fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
     (target_dir / "issue.md").write_text(f"---\n{fm_str}\n---\n\n{body}\n", encoding="utf-8")
     return {"path": str(target_dir / "issue.md"), "local_id": f"raw-{raw_key}",
             "platform": platform, "issue_number": issue_number, "platform_ids": platform_ids}
@@ -645,11 +1053,21 @@ if __name__ == "__main__":
     a = sys.argv
     if len(a) > 1 and a[1] == "search":
         print(json.dumps(search_raw_issue(a[2]) if len(a) > 2 else {}, indent=2))
+    elif len(a) > 1 and a[1] == "discover-raw":
+        print(json.dumps(discover_raw_replicas(a[2]) if len(a) > 2 else {}, indent=2))
     elif len(a) > 1 and a[1] == "fetch":
         print(json.dumps(fetch_issue(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "close-multi":
         platform_ids = json.loads(a[2]) if len(a) > 2 else {}
-        print(json.dumps(close_issue("", platform_ids), indent=2))
+        result = close_issue("", platform_ids)
+        print(json.dumps(result, indent=2))
+        raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
+    elif len(a) > 1 and a[1] == "close-raw":
+        raw_key = a[2] if len(a) > 2 else ""
+        platform_ids = json.loads(a[3]) if len(a) > 3 else {}
+        result = close_issue_by_raw_key(raw_key, platform_ids)
+        print(json.dumps(result, indent=2))
+        raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":
@@ -658,20 +1076,38 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "create-pr":
         print(json.dumps(create_pr(a[2], a[3] if len(a) > 3 else "develop",
                                    a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else ""), indent=2))
+    elif len(a) > 1 and a[1] == "guarded-pr-update":
+        result = guarded_pr_update(
+            a[2], a[3] if len(a) > 3 else "develop",
+            a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else "",
+        )
+        print(json.dumps(result, indent=2))
+        raise SystemExit(0 if result.get("success") else 1)
     elif len(a) > 1 and a[1] == "merge-pr":
         print(json.dumps(merge_pr(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "close-pr":
         print(json.dumps(close_pr(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "create-issue":
-        print(json.dumps(create_issue(a[2], a[3], a[4] if len(a) > 4 else ""), indent=2))
+        result = create_issue(a[2], a[3], a[4] if len(a) > 4 else "")
+        print(json.dumps(result, indent=2))
+        raise SystemExit(
+            0 if result and all(item.get("status") == "created" for item in result.values()) else 1
+        )
     elif len(a) > 1 and a[1] == "get-issue-state":
         print(_resolve_issue_state(a[2]) if len(a) > 2 else "unknown")
     elif len(a) > 1 and a[1] == "comment":
         print(json.dumps(_comment_via_local_issue(a[2], a[3] if len(a) > 3 else ""), indent=2))
     elif len(a) > 1 and a[1] == "update-issue":
-        print(json.dumps(update_issue(a[2] if len(a) > 2 else "",
-                                      json.loads(a[3]) if len(a) > 3 else {},
-                                      a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else ""), indent=2))
+        result = update_issue(
+            a[2] if len(a) > 2 else "",
+            json.loads(a[3]) if len(a) > 3 else {},
+            a[4] if len(a) > 4 else "",
+            a[5] if len(a) > 5 else "",
+        )
+        print(json.dumps(result, indent=2))
+        raise SystemExit(
+            0 if result and all(item.get("status") == "updated" for item in result.values()) else 1
+        )
     elif len(a) > 1 and a[1] == "create-discussion":
         print(json.dumps(create_discussion(a[2], a[3], a[4] if len(a) > 4 else ""), indent=2))
     elif len(a) > 1 and a[1] == "close-discussion":

@@ -1,6 +1,7 @@
 ---
 name: freely-milestone-planning-state-maintenance
-description: >- 维护四节点链路（raw → candidate → milestone → I-* issue）中
+description: >-
+  维护四节点链路（raw → candidate → milestone → I-* issue）中
   milestone（M-{key}-A）节点的 sequencing 和状态一致性。扫描 `docs/milestones.md`
   与关联 candidate、issue、progress evidence，在 B2_IBM materialization 后将
   `M-{issue-id}` 候选编排切换到 `I-*` 正式编排。

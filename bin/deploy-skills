@@ -123,6 +123,17 @@ deploy_to() {
     name=$(head -20 "$skill_md" | grep "^name:" | head -1 | sed 's/^name:\s*//' | xargs)
     [[ -z "$name" ]] && { echo "SKIP ${skill_dir}: missing name in frontmatter" >&2; failed=$((failed + 1)); continue; }
 
+    if ! python3 -c "
+import sys, yaml, re
+text = open('$skill_md', encoding='utf-8').read()
+m = re.match(r'^---\n(.*?)\n---', text, re.S)
+if not m: sys.exit(1)
+yaml.safe_load(m.group(1))
+" 2>/dev/null; then
+      echo "SKIP ${skill_dir}: invalid frontmatter YAML" >&2
+      failed=$((failed + 1)); continue
+    fi
+
     local_dst="$dst/$name"
 
     if [[ "$dry_run" -eq 1 ]]; then
