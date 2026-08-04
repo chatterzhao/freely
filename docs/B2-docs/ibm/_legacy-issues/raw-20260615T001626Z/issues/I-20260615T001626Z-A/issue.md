@@ -2,9 +2,9 @@
 local_id: I-20260615T001626Z-A
 issue_title: "移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)"
 kind: linked
-phase_state: completed
+phase_state: in_b2_ibm
 promoted_from: raw-20260615T001626Z26Z
-source_candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md
+source_candidate: docs/B1-docs/raw-20260615T001626Z26Z/candidates.md
 canonical_issue_path: docs/B2-docs/a2a/handoff/raw-20260615T001626Zissues/I-20260615T001626Z-A.md
 platform_ids:
   github:
@@ -32,7 +32,7 @@ verification_artifact_dir: docs/B2-docs/a2a/handoff/raw-20260615T001626Zcode-rev
 
 | local_id | kind | phase | promoted_from |
 |----------|------|-------|---------------|
-| I-20260615T001626Z-A | linked | completed | raw-20260615T001626Z26Z |
+| I-20260615T001626Z-A | linked | in_b2_ibm | raw-20260615T001626Z26Z |
 
 ### Pre-Brainstorm Summary
 
