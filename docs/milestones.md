@@ -418,7 +418,7 @@
 ### committed_issues
 1. `I-20260725T030511Z-A`
 - milestone: M-20260725T030511Z-A
-- phase_state: in_b2_ibm
+- phase_state: in_dev
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
 
 3. `I-20260720T120329Z-C`
