@@ -23,10 +23,10 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-08-04T08:32:00Z'
 closeout_note: ''
 ---
 
