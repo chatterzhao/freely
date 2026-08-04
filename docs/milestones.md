@@ -362,6 +362,20 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20260720T051323Z/issues/I-20260720T051323Z-A.md
 
+## M-20260720T052911Z-A
+- title: platform-sync cleanup closeout
+- status: active
+### candidate_issues
+1. `C-20260720T052911Z-A`
+- milestone: M-20260720T052911Z-A
+- status: absorbed
+- promoted_issue_id: `I-20260720T052911Z-A`
+- promoted_issue_path: docs/B2-docs/platform-sync/close-merged/raw-20260720T052911Z/issues/I-20260720T052911Z-A.md
+### committed_issues
+1. `I-20260720T052911Z-A`
+- milestone: M-20260720T052911Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform-sync/close-merged/raw-20260720T052911Z/issues/I-20260720T052911Z-A.md
 ## M-20260720T111149Z-A
 - title: fix — DB daemon 存活监控与 task-mode 查询降级修正
 - status: active
