@@ -440,3 +440,12 @@
 - milestone: M-20260721T223133Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
+
+## M-20260804T073054Z-A
+- title: SKILL.md frontmatter YAML 修复 + 部署链校验
+- status: active
+### candidate_issues
+1. `C-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- status: promoted
+- promoted_issue_id: `I-20260804T073054Z-A`
