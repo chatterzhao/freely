@@ -2,7 +2,7 @@
 local_id: raw-20260724T024118Z
 kind: raw
 phase_state: absorbed
-absorbed_into: 'I-20260724T024118Z-A'
+absorbed_into: I-20260724T024118Z-A
 platform_ids:
   github:
     issue_id: '4071'
@@ -22,6 +22,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 
