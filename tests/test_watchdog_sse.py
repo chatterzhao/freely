@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "ag
 
 # Import watchdog helpers (does not start the main loop)
 from watchdog_sse import (
-    _acp_bridge_socket, _acp_rpc, _acp_session_resume, _acp_session_new,
+    _acp_bridge_socket, _acp_rpc,
     _handle_sse_event, _check_agent_liveness, _check_session_staleness,
 )
 from input_required_reason import InputRequiredReason
@@ -102,160 +102,68 @@ class TestAcpRpc(unittest.TestCase):
         result = _acp_rpc("/nonexistent/project", "session/new", {"role": "worker"})
         self.assertIsNone(result)
 
-    def test_acp_session_resume_no_socket(self):
-        """_acp_session_resume returns False when no bridge."""
-        result = _acp_session_resume("/nonexistent/project", "fake-session-id")
-        self.assertFalse(result)
-
-    def test_acp_session_new_no_socket(self):
-        """_acp_session_new returns None when no bridge."""
-        result = _acp_session_new("/nonexistent/project", "worker", "worker_01")
-        self.assertIsNone(result)
-
-
 class TestAgentHandlers(unittest.TestCase):
-    """C14d: Agent handler routing with mocked agent_working."""
+    """C14d: handlers delegate session policy to the unified connector."""
 
-    @patch('watchdog_sse._should_use_fork')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_next_free')
-    @patch('watchdog_sse.agent_assign')
-    @patch('watchdog_sse._acp_session_new')
-    def test_handle_needs_reviewer_new(self, mock_new, mock_assign, mock_next, mock_list, mock_fork):
-        """_handle_needs_reviewer creates new reviewer when none exists.
-
-        When no Manager session available for fork, falls back to session/new.
-        """
-        mock_list.return_value = {}
-        mock_next.return_value = "reviewer_99"
-        mock_new.return_value = "session-abc"
-        mock_fork.return_value = False  # no fork available → use session/new
-
+    @patch("watchdog_sse._get_agent_slot", return_value="cline-slot-01")
+    @patch("watchdog_sse.acp_session_connect", return_value=("session-abc", "new"))
+    @patch("watchdog_sse.agent_next_free", return_value="reviewer_99")
+    @patch("watchdog_sse.agent_list_by_raw_key", return_value={})
+    def test_handle_needs_reviewer_new(self, _list, next_free, connect, _slot):
         from watchdog_sse import _handle_needs_reviewer
+
         _handle_needs_reviewer("/fake/project", {
             "raw_key": "raw-20260701T000000Z",
-            "from_agent": "worker_01"
+            "from_agent": "worker_01",
         }, InputRequiredReason.NEEDS_REVIEW_B1)
 
-        mock_next.assert_called_once()
-        mock_new.assert_called()
-        mock_assign.assert_called()
+        next_free.assert_called_once()
+        self.assertEqual(connect.call_args.args[:4], (
+            "/fake/project", "raw-20260701T000000Z", "reviewer", "reviewer_99",
+        ))
+        self.assertFalse(connect.call_args.kwargs["force_new"])
 
-    @patch('watchdog_sse._should_use_fork')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse.agent_assign')
-    @patch('watchdog_sse._acp_session_new')
-    def test_handle_needs_reviewer_duplicate(self, mock_new, mock_assign, mock_session, mock_list, mock_fork):
-        """_handle_needs_reviewer: existing reviewer with dead session gets new session.
-
-        Reviewer already assigned but session died → create new session via session/new
-        (not fork, because _should_use_fork returns False in test).
-        """
-        mock_list.return_value = {"reviewer_id": "reviewer_05"}
-        mock_session.return_value = None  # session dead
-        mock_new.return_value = "session-new"
-        mock_fork.return_value = False
-
+    @patch("watchdog_sse._get_agent_slot", return_value="cline-slot-01")
+    @patch("watchdog_sse.acp_session_connect", return_value=("session-live", "prompt"))
+    @patch("watchdog_sse.agent_list_by_raw_key", return_value={
+        "reviewer_id": "reviewer_05:session-live,reviewer_06:session-other"
+    })
+    def test_handle_needs_reviewer_preserves_exact_identity(self, _list, connect, _slot):
         from watchdog_sse import _handle_needs_reviewer
+
         _handle_needs_reviewer("/fake/project", {
-            "raw_key": "raw-20260701T000000Z"
-        }, InputRequiredReason.NEEDS_REVIEW_B1)
-
-        # Should create a new session for the dead-session reviewer
-        mock_new.assert_called()
-        mock_assign.assert_called()
-
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse._acp_session_resume')
-    def test_handle_needs_reviewer_resume(self, mock_resume, mock_session, mock_list):
-        """_handle_needs_reviewer resumes existing reviewer session."""
-        mock_list.return_value = {"reviewer_id": "reviewer_05:live-session"}
-        mock_session.return_value = "live-session"
-        mock_resume.return_value = True
-
-        from watchdog_sse import _handle_needs_reviewer
-        _handle_needs_reviewer("/fake/project", {
-            "raw_key": "raw-20260701T000000Z"
+            "raw_key": "raw-20260701T000000Z",
         }, InputRequiredReason.NEEDS_REVIEW_B2)
 
-        mock_resume.assert_called_once()
+        self.assertEqual(connect.call_args.args[:4], (
+            "/fake/project", "raw-20260701T000000Z", "reviewer", "reviewer_05",
+        ))
 
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_next_free')
-    @patch('watchdog_sse.agent_assign')
-    @patch('watchdog_sse._acp_session_new')
-    @patch('watchdog_sse._should_use_fork')
-    def test_handle_needs_reviewer_gate_always_new(self, mock_fork, mock_new, mock_assign, mock_next, mock_list):
-        """Gate review (needs-review:gate) ALWAYS uses session/new, never fork."""
-        mock_list.return_value = {}
-        mock_next.return_value = "reviewer_99"
-        mock_new.return_value = "session-gate"
-
+    @patch("watchdog_sse._get_agent_slot", return_value="cline-slot-01")
+    @patch("watchdog_sse.acp_session_connect", return_value=("session-gate", "new"))
+    @patch("watchdog_sse.agent_next_free", return_value="reviewer_99")
+    @patch("watchdog_sse.agent_list_by_raw_key", return_value={})
+    def test_handle_needs_reviewer_gate_forces_new(self, _list, _next, connect, _slot):
         from watchdog_sse import _handle_needs_reviewer
+
         _handle_needs_reviewer("/fake/project", {
-            "raw_key": "raw-20260701T000000Z"
+            "raw_key": "raw-20260701T000000Z",
         }, InputRequiredReason.NEEDS_REVIEW_GATE)
 
-        mock_new.assert_called()
-        mock_fork.assert_not_called()  # Gate must never fork
+        self.assertTrue(connect.call_args.kwargs["force_new"])
 
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_next_free')
-    def test_handle_needs_reviewer_no_slots(self, mock_next, mock_list):
-        """_handle_needs_reviewer handles no free slots gracefully."""
-        mock_list.return_value = {}
-        mock_next.return_value = None
-
+    @patch("watchdog_sse.agent_next_free", return_value=None)
+    @patch("watchdog_sse.agent_list_by_raw_key", return_value={})
+    def test_handle_needs_reviewer_no_slots(self, _list, _next):
         from watchdog_sse import _handle_needs_reviewer
+
         _handle_needs_reviewer("/fake/project", {
-            "raw_key": "raw-20260701T000000Z"
+            "raw_key": "raw-20260701T000000Z",
         }, InputRequiredReason.NEEDS_REVIEW_DEV)
-        # Should not raise
-
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse._acp_session_resume')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_handle_needs_manager_resume(self, mock_list, mock_resume, mock_session):
-        """_handle_needs_manager resumes existing manager session."""
-        mock_session.return_value = "manager-session-id"
-        mock_resume.return_value = True
-
-        from watchdog_sse import _handle_needs_manager
-        _handle_needs_manager("/fake/project", {
-            "raw_key": "raw-20260701T000000Z",
-            "from_agent": "worker_01"
-        }, InputRequiredReason.NEEDS_MANAGER_DECISION)
-
-        mock_resume.assert_called_once()
-
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse._acp_session_resume')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_handle_needs_worker_resume(self, mock_list, mock_resume, mock_session):
-        """_handle_needs_worker resumes existing worker session."""
-        mock_session.return_value = "worker-session-id"
-        mock_resume.return_value = True
-
-        from watchdog_sse import _handle_needs_worker
-        _handle_needs_worker("/fake/project", {
-            "raw_key": "raw-20260701T000000Z",
-            "from_agent": "reviewer_01"
-        }, InputRequiredReason.NEEDS_WORKER_RETRY)
-
-        mock_resume.assert_called_once()
 
 
 class TestSessionPrompt(unittest.TestCase):
     """Phase 1-2: session/prompt message delivery and handler decision tree."""
-
-    def test_acp_session_prompt_delegates_to_resume(self):
-        """_acp_session_prompt is a semantic wrapper around _acp_session_resume."""
-        from watchdog_sse import _acp_session_prompt, _acp_session_resume
-        self.assertTrue(callable(_acp_session_prompt))
-        # Verify it's a different function (not an alias)
-        self.assertNotEqual(_acp_session_prompt.__name__, _acp_session_resume.__name__)
 
     def test_build_review_task_message(self):
         """_build_review_task_message contains key context fields."""
@@ -276,76 +184,37 @@ class TestSessionPrompt(unittest.TestCase):
         self.assertIn("reviewer_05", msg)
         self.assertIn("needs-worker-retry", msg)
 
-    @patch('watchdog_sse._acp_session_prompt')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_reviewer_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
-        """Alive reviewer session → _acp_session_prompt (not resume/fork/new)."""
-        mock_list.return_value = {"reviewer_id": "reviewer_05:ses_alive"}
-        mock_session.return_value = "ses_alive"
-        mock_prompt.return_value = True
-
-        from watchdog_sse import _handle_needs_reviewer
-        _handle_needs_reviewer("/fake/project", {
-            "raw_key": "raw-20260701T000000Z",
-            "from_agent": "worker_03"
-        }, InputRequiredReason.NEEDS_REVIEW_B2)
-
-        mock_prompt.assert_called_once()  # Prompt used, not fork/new
-        self.assertIn("ses_alive", mock_prompt.call_args[0][1])
-
-    @patch('watchdog_sse._acp_session_prompt')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_worker_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
-        """Alive worker session → _acp_session_prompt (not fork/new)."""
-        mock_list.return_value = {"worker_id": "worker_03:ses_wrk"}
-        mock_session.return_value = "ses_wrk"
-        mock_prompt.return_value = True
-
+    @patch("watchdog_sse._get_agent_slot", return_value="cline-slot-03")
+    @patch("watchdog_sse.acp_session_connect", return_value=("ses_wrk", "prompt"))
+    @patch("watchdog_sse.agent_list_by_raw_key", return_value={"worker_id": "worker_03:ses_wrk"})
+    def test_worker_route_uses_unified_connector(self, _list, connect, _slot):
         from watchdog_sse import _handle_needs_worker
+
         _handle_needs_worker("/fake/project", {
             "raw_key": "raw-20260701T000000Z",
-            "from_agent": "reviewer_05"
+            "from_agent": "reviewer_05",
         }, InputRequiredReason.NEEDS_WORKER_RETRY)
 
-        mock_prompt.assert_called_once()  # Prompt used for alive session
-        self.assertIn("ses_wrk", mock_prompt.call_args[0][1])
+        self.assertEqual(connect.call_args.args[:4], (
+            "/fake/project", "raw-20260701T000000Z", "worker", "worker_03",
+        ))
+        self.assertIn("reviewer_05", connect.call_args.kwargs["message"])
 
-    @patch('watchdog_sse._acp_session_prompt')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_manager_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
-        """Alive manager session → _acp_session_prompt."""
-        mock_list.return_value = {"manager_id": "manager_01:ses_mgr"}
-        mock_session.return_value = "ses_mgr"
-        mock_prompt.return_value = True
-
+    @patch("watchdog_sse._get_agent_slot", return_value="claude-slot-01")
+    @patch("watchdog_sse.acp_session_connect", return_value=("ses_mgr", "prompt"))
+    @patch("watchdog_sse.agent_next_free", return_value="manager_01")
+    def test_manager_route_uses_unified_connector(self, _next, connect, _slot):
         from watchdog_sse import _handle_needs_manager
+
         _handle_needs_manager("/fake/project", {
             "raw_key": "raw-20260701T000000Z",
-            "from_agent": "worker_03"
+            "from_agent": "worker_03",
         }, InputRequiredReason.NEEDS_MANAGER_DECISION)
 
-        mock_prompt.assert_called_once()
-
-    @patch('watchdog_sse._acp_session_prompt')
-    @patch('watchdog_sse.agent_get_session')
-    @patch('watchdog_sse.agent_list_by_raw_key')
-    def test_dead_session_falls_back_to_fork_or_new(self, mock_list, mock_session, mock_prompt):
-        """Dead session → prompt fails → fork/new → delegate to manager (prompt again)."""
-        mock_list.return_value = {"worker_id": "worker_03"}
-        mock_session.return_value = "ses_dead"
-        mock_prompt.return_value = False  # prompt fails (session dead)
-
-        from watchdog_sse import _handle_needs_worker
-        # Should not crash; falls through to fork/new → manager delegation
-        _handle_needs_worker("/fake/project", {
-            "raw_key": "raw-20260701T000000Z",
-            "from_agent": "reviewer_05"
-        }, InputRequiredReason.NEEDS_WORKER_RETRY)
-
-        self.assertGreaterEqual(mock_prompt.call_count, 1)  # Tried prompt for worker + manager
+        self.assertEqual(connect.call_args.args[:4], (
+            "/fake/project", "__manager__", "manager", "manager_01",
+        ))
+        self.assertIn("worker_03", connect.call_args.kwargs["message"])
 
 
 class TestLivenessAndStaleness(unittest.TestCase):

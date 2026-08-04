@@ -27,49 +27,12 @@ REVIEW_PROMPT_FILE="$REVIEW_STATE_DIR/review-prompt.txt"
 MAX_ROUNDS=3
 REVIEWER_SKILL="freely-tdd-review"
 # Slot for Reviewer agent — reads from agent-table reviewer_slot.
-# When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
-# Try agent_working table for reviewer_slot if available (preferred over agent-id.env).
 _agent_query="$ROOT_DIR/bin/agent-table-query"
 _aw_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/agent_working.py"
-if [[ -z "$REVIEWER_SLOT" ]]; then
-  if [[ -f "$_aw_py" ]]; then
-    _my_worker_id=$(python3 -c "
-import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
-from agent_working import agent_list_by_raw_key
-rk = '$(echo "$review_branch" | grep -oE "[0-9]{8}T[0-9]{6}Z" | head -1 || echo "")'
-if rk:
-    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
-    if row:
-        wid = row.get('worker_id', '')
-        if wid:
-            print(wid.split(':')[0] if ':' in str(wid) else wid)
-" 2>/dev/null || true)
-    if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
-      _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
-      if [[ -n "$_rev_info" ]]; then
-        _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
-        [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
-      fi
-    fi
-  fi
-  # Fallback: legacy agent-id.env
-  if [[ -z "$REVIEWER_SLOT" ]]; then
-    _agent_env="$ROOT_DIR/.freely/agent-id.env"
-    if [[ -f "$_agent_env" ]]; then
-      _my_worker_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || true)
-      if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
-        _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
-        if [[ -n "$_rev_info" ]]; then
-          _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
-          [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
-        fi
-      fi
-    fi
-  fi
-fi
 
-# Parse arguments
+# Parse arguments FIRST — branch/raw key must be known before agent_working queries.
+review_branch=""
 reviewer="tdd-agent"
 verdict_override=""
 verdict_reason=""
@@ -101,6 +64,38 @@ if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
   echo "Usage: freely pr-review-guarded <branch>" >&2
   exit 1
+fi
+
+# Resolve reviewer slot from agent_working after branch is known (canonical raw key).
+if [[ -z "$REVIEWER_SLOT" ]]; then
+  if [[ -f "$_aw_py" ]]; then
+    _my_worker_id=$(python3 -c "
+import sys
+sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from raw_key_canon import try_canonicalize_raw_key
+from agent_working import agent_list_by_raw_key, AgentWorkingError
+from agent_identity_value import first_agent_id
+rk = try_canonicalize_raw_key('$review_branch')
+if not rk:
+    raise SystemExit(0)
+try:
+    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+except AgentWorkingError as e:
+    print(f'ERROR: agent_working unavailable: {e}', file=sys.stderr)
+    raise SystemExit(2)
+if row:
+    wid = first_agent_id(row.get('worker_id', ''))
+    if wid:
+        print(wid)
+" 2>/dev/null || true)
+    if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
+      _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
+      if [[ -n "$_rev_info" ]]; then
+        _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
+        [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+      fi
+    fi
+  fi
 fi
 
 base="develop"
@@ -171,49 +166,58 @@ if [[ -n "$_raw_key" ]]; then
   }
 fi
 
-# Find all I-* issues under this raw key
-# Search in fix worktree first (canonical), then fallback to current worktree
+# An absorbed continuation has no own I-* node. Its B1 frontmatter names the
+# canonical parent issue, which owns the B2 verification and review contract.
+_search_roots=("$_wt_path" "$ROOT_DIR")
+_absorbed_issue_id=""
+for _sr in "${_search_roots[@]}"; do
+  _b1_issue_file="$_sr/docs/B1-docs/raw-${_raw_key}/issue.md"
+  [[ -f "$_b1_issue_file" ]] || continue
+  _absorbed_issue_id=$(grep -E '^absorbed_into:[[:space:]]*I-[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9_-]+[[:space:]]*$' "$_b1_issue_file" | head -1 | sed -E 's/^absorbed_into:[[:space:]]*//' || true)
+  [[ -n "$_absorbed_issue_id" ]] && break
+done
+
+# Find all I-* issues under this raw key when this is a standalone issue.
 _all_issues=()
 _raw_issues_dir=""
-_search_roots=("$_wt_path" "$ROOT_DIR")
-for _sr in "${_search_roots[@]}"; do
-  [[ -d "$_sr" ]] || continue
-  _raw_i_glob="$_sr/docs/B2-docs/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
-  for _f in $_raw_i_glob; do
-    [[ -f "$_f" ]] || continue
-    _raw_issues_dir="$(dirname "$_f")"
-    _bn=$(basename "$_f" .md)
-    _all_issues+=("$_bn")
-  done
-  [[ ${#_all_issues[@]} -gt 0 ]] && break
-done
-# Fallback: broad search in fix worktree then current
-if [[ ${#_all_issues[@]} -eq 0 ]]; then
+if [[ -z "$_absorbed_issue_id" ]]; then
   for _sr in "${_search_roots[@]}"; do
     [[ -d "$_sr" ]] || continue
-    while IFS= read -r _f; do
+    _raw_i_glob="$_sr/docs/B2-docs/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
+    for _f in $_raw_i_glob; do
+      [[ -f "$_f" ]] || continue
+      _raw_issues_dir="$(dirname "$_f")"
       _bn=$(basename "$_f" .md)
-      [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
-    done < <(find "$_sr/docs/B2-docs" -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+      _all_issues+=("$_bn")
+    done
     [[ ${#_all_issues[@]} -gt 0 ]] && break
   done
+  # Fallback: broad search in fix worktree then current
+  if [[ ${#_all_issues[@]} -eq 0 ]]; then
+    for _sr in "${_search_roots[@]}"; do
+      [[ -d "$_sr" ]] || continue
+      while IFS= read -r _f; do
+        _bn=$(basename "$_f" .md)
+        [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
+      done < <(find "$_sr/docs/B2-docs" -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+      [[ ${#_all_issues[@]} -gt 0 ]] && break
+    done
+  fi
 fi
-_issue_id="${_all_issues[0]:-I-${_raw_key#raw-}-A}"
+_issue_id="${_absorbed_issue_id:-${_all_issues[0]:-I-${_raw_key#raw-}-A}}"
 _epic_dir=""
-# Search I-* issue under new structure
+# Search canonical I-* issue under the fix worktree before the current tree.
 _i_issue_file=""
-if [[ -n "$_raw_issues_dir" ]]; then
-  _i_issue_file="$_raw_issues_dir/${_issue_id}.md"
-fi
+for _sr in "${_search_roots[@]}"; do
+  [[ -d "$_sr" ]] || continue
+  _i_issue_file=$(find "$_sr/docs/B2-docs" -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+  [[ -n "$_i_issue_file" ]] && break
+done
 if [[ -z "$_i_issue_file" || ! -f "$_i_issue_file" ]]; then
-  _i_issue_file=$(find docs/B2-docs -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+  echo >&2 "[pr-review-guarded] ERROR: I-* issue file not found for issue ${_issue_id}"
+  echo >&2 "  Expected: docs/B2-docs/{epic-name}/{story-name}/raw-*/issues/${_issue_id}.md"
+  exit 1
 fi
-	if [[ -z "$_i_issue_file" || ! -f "$_i_issue_file" ]]; then
-	  echo >&2 "[pr-review-guarded] ERROR: I-* issue file not found for issue ${_issue_id}"
-	  echo >&2 "  Expected: docs/B2-docs/{epic-name}/{story-name}/raw-${_raw_key}/issues/${_issue_id}.md"
-	  echo >&2 "  Run: find docs/B2-docs -path '*/raw-${_raw_key}/issues/${_issue_id}.md'"
-	  exit 1
-	fi
 	# Quote-optional value extraction: accept bare, 'single', "double", or `backtick`
 	# wrapped values (pretests-gate historically demanded bare while this sed
 	# demanded single quotes — both parsers now accept all four).
@@ -265,24 +269,31 @@ fi
 
 # ── Step 3.5: Call Reviewer (ACP or manual fallback) ──
 _my_worker_id=""
-# Prefer agent_working table (new), fallback to agent-id.env (legacy)
+# agent_working only — no file-based identity fallback
 if [[ -f "$_aw_py" ]]; then
   _my_worker_id=$(python3 -c "
-import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
-from agent_working import agent_list_by_raw_key
-rk = '$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo '')'
-if rk:
-    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
-    if row:
-        wid = row.get('worker_id', '')
-        if wid:
-            print(wid.split(':')[0] if ':' in str(wid) else wid)
+import sys
+sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from raw_key_canon import try_canonicalize_raw_key
+from agent_working import agent_list_by_raw_key, AgentWorkingError
+from agent_identity_value import first_agent_id
+rk = try_canonicalize_raw_key('$review_branch')
+if not rk:
+    raise SystemExit(0)
+try:
+    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+except AgentWorkingError:
+    raise SystemExit(0)
+if row:
+    wid = first_agent_id(row.get('worker_id', ''))
+    if wid:
+        print(wid)
 " 2>/dev/null || true)
 fi
-if [[ -z "$_my_worker_id" && -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
-  _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
+if [[ -z "$_my_worker_id" ]]; then
+  echo "ERROR: cannot resolve worker_id from agent_working for branch $review_branch (fail-closed)" >&2
+  exit 1
 fi
-[[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
 
 # Only try freely-review or raw ACP if bridge is actually available
 if [[ "$_acp_available" == "1" ]]; then

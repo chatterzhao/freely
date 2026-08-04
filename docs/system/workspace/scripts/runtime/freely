@@ -2113,7 +2113,7 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   [[ "$_max_workers" =~ ^[0-9]+$ ]] || _max_workers="10"
   [[ "$_warn_workers" =~ ^[0-9]+$ ]] || _warn_workers="7"
   max_parallel_workers="$_max_workers"
-  # Reconcile zombie agent-id.env entries before counting (worktree gone but entry remains)
+  # Reconcile zombie agent_working entries before counting (worktree gone but entry remains)
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
@@ -4097,14 +4097,17 @@ STATEEOF
     return 0
   fi
   # UPSERT: creates __manager__ row on first call, updates session_id on subsequent calls
-  python3 -c "
+  if ! python3 -c "
 import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
 from agent_working import acp_session_register
 acp_session_register('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
                      session_id='${TOOL_SESSION_ID_CURRENT:-}',
                      slot='${AGENT_AI_TOOL:-}',
                      worktree='${project}', branch='develop')
-" 2>/dev/null || true
+" 2>/dev/null; then
+    log_error "manager session registration failed (fail-closed)"
+    return 1
+  fi
 }
 
 # _tool_session_dir: return the session directory for a given tool family.
@@ -4316,7 +4319,7 @@ load_config() {
   # .freely/agent-table.toml at startup.  No config writes needed.
   #
   # Resolution order:
-  #   1. agent-id.env → which agent (manager_01 / worker_03 / …) owns this worktree
+  #   1. agent_working → which agent owns this worktree
   #   2. agent-table → get slot for that agent_id
   #   3. Validate slot is a registered tool
   if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
@@ -4325,10 +4328,12 @@ load_config() {
     local _my_id=""
 
     # Resolve agent identity via agent_working table (single source of truth).
-    # agent-id.env has been retired — no fallback to file.
+    # Fail-closed: no silent manager_01 fallback.
     _my_id="$(_resolve_current_agent_id "$PROJECT_ROOT" || true)"
-    # Manager runs on develop worktree — not in agent_working
-    [[ -z "$_my_id" ]] && _my_id="manager_01"
+    if [[ -z "$_my_id" ]]; then
+      log_error "agent-table: unable to resolve agent identity (agent_working empty) — fail-closed"
+      return 1
+    fi
 
     if [[ -f "$_at" && -x "$_aq" ]]; then
       local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
@@ -4821,10 +4826,13 @@ _init_agent_table_slot_pin() {
   local _aq="${PROJECT_ROOT}/bin/agent-table-query"
   [[ -x "$_aq" ]] || return 0
 
-  # Resolve current agent identity: agent_working table (primary) → agent-id.env (fallback)
+  # Resolve current agent identity: agent_working only (fail-closed)
   local _my_id=""
-  _my_id="$(_resolve_current_agent_id "$project")"
-  [[ -z "$_my_id" ]] && _my_id="manager_01"
+  _my_id="$(_resolve_current_agent_id "$project")" || true
+  if [[ -z "$_my_id" ]]; then
+    log_error "agent-table: unable to resolve agent identity for $project — fail-closed"
+    return 1
+  fi
 
   local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
   if [[ -z "$_slot" ]]; then
@@ -6003,14 +6011,19 @@ sync_project_tooling_from_source() {
 	  mkdir -p "$(dirname "$target_cfg")"
 	  cp "$source_cfg" "$target_cfg"
 	  rewrite_synced_project_config_for_target "$source_project" "$target_project"
-	  # ── Agent-table: write agent-id.env only (NOT config) ──
+	  # ── Agent-table: bind via agent_working only (NOT config) ──
 	  # AGENT_AI_TOOL resolved by load_config from agent-table at startup.
 	  # No config writes needed — agent-table IS the single source of truth.
 	  _agent_table="$source_project/.freely/agent-table.toml"
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    # ── Concurrency control: reconcile zombies, count active, pick idle worker ──
-	    local _active_count _max_workers _picked _wt_path
+	    local _active_count _max_workers _picked _wt_path _worker_raw_key
+	    _worker_raw_key="$(printf '%s' "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+	    if [[ -z "$_worker_raw_key" ]]; then
+	      log_error "agent-table: target worktree has no issue raw_key (fail-closed): $target_project"
+	      return 1
+	    fi
 	    _active_count=$(count_active_running_workers_for_manager_project "$source_project" 2>/dev/null || echo 0)
 	    _max_workers="$(manager_max_parallel_workers)"
 	    _max_workers="${_max_workers%%:*}"
@@ -6019,16 +6032,43 @@ sync_project_tooling_from_source() {
 	      log_warn "agent-table: concurrency limit reached ($_active_count/$_max_workers), deferring worker assignment"
 	      return 0
 	    fi
-	    # Pick first idle worker — use agent_working table (authoritative source).
+	    # Atomic assign via agent_working; use returned agent_id for slot (no second assign).
 	    _next_worker=$(python3 -c "
-import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_next_free
-print(agent_next_free('${PROJECT_ROOT}', 'worker', 10, raw_key='${_worker_raw_key:-develop}') or '')
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_next_free_and_assign, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    r = agent_next_free_and_assign('${PROJECT_ROOT}', 'worker', 10, rk)
+except AgentWorkingError as e:
+    print(f'ERROR:{e}', file=sys.stderr)
+    raise SystemExit(2)
+print(r.get('agent_id') or '')
 " 2>/dev/null || true)
+	    if [[ -z "$_next_worker" || "$_next_worker" == ERROR:* ]]; then
+	      log_error "agent-table: atomic worker assign failed (fail-closed)"
+	      return 1
+	    fi
 	    if [[ -n "$_next_worker" ]]; then
-	      # Auto-wake: ensure target bridge is alive before delegation.
 	      local _worker_slot _worker_bt
 	      _worker_slot=$("$_agent_query" --get-slot "$_next_worker" 2>/dev/null || true)
+	      if [[ -z "$_worker_slot" ]]; then
+	        log_error "agent-table: no slot for assigned $_next_worker (fail-closed)"
+	        python3 -c "
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release_all, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    agent_release_all('${PROJECT_ROOT}', rk)
+except AgentWorkingError as e:
+    print(str(e), file=sys.stderr)
+    raise SystemExit(1)
+" || true
+	        return 1
+	      fi
 	      _worker_bt="${_worker_slot%%-*}"
 	      if [[ -n "$_worker_bt" ]]; then
 	        _ensure_acp_bridge_running "$source_project" "$_worker_bt" || {
@@ -6036,9 +6076,27 @@ print(agent_next_free('${PROJECT_ROOT}', 'worker', 10, raw_key='${_worker_raw_ke
 	          return 1
 	        }
 	      fi
-		      # Phase 1: dual-write to agent_working table
-		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '$_next_worker', worktree='${target_project}')"
-	      log_info "agent-table: assigned $_next_worker to $target_project (agent_working)"
+	      # Enrich worktree/slot — fail-closed (no || true swallow)
+	      if ! python3 -c "
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign, agent_release_all, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    agent_assign('${PROJECT_ROOT}', rk, 'worker', '$_next_worker', worktree='${target_project}', slot='${_worker_slot}')
+except AgentWorkingError as e:
+    try:
+        agent_release_all('${PROJECT_ROOT}', rk)
+    except Exception:
+        pass
+    print(f'agent_assign failed: {e}', file=sys.stderr)
+    raise SystemExit(1)
+"; then
+	        log_error "agent-table: agent_assign failed for $_next_worker (released pending, fail-closed)"
+	        return 1
+	      fi
+	      log_info "agent-table: assigned $_next_worker to $target_project (agent_working atomic)"
 	    fi
 	  fi
 	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
@@ -13235,16 +13293,85 @@ SESSIONEOF
   fi
 
   local _manager_bridge_socket _worker_pid
-  # Resolve worker base_tool from agent-table
-  local _worker_slot _worker_base _mgr_base
-  _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || true)
+  # Atomic assign FIRST — identity must exist before slot/bridge/direct launch.
+  local _worker_agent_id _worker_slot _worker_raw_key _worker_pool _worker_base _mgr_base _mgr_slot
+  _worker_pool=$("$SELF_ROOT/bin/agent-table-query" --pool-size worker 2>/dev/null || echo 10)
+  _worker_raw_key="$(printf '%s' "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+  if [[ -z "$_worker_raw_key" ]]; then
+    log_error "worker launch: target worktree has no issue raw_key (fail-closed): $target_project"
+    return 1
+  fi
+  _worker_agent_id=$(python3 -c "
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_next_free_and_assign, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    r = agent_next_free_and_assign('${PROJECT_ROOT}', 'worker', int('${_worker_pool:-10}' or 10), rk)
+except AgentWorkingError as e:
+    print('', end='')
+    raise SystemExit(2)
+print(r.get('agent_id') or '')
+" 2>/dev/null || true)
+  if [[ -z "$_worker_agent_id" ]]; then
+    log_error "worker launch: atomic assign failed (fail-closed, no worker_01 fallback)"
+    return 1
+  fi
+  # Slot from real assigned agent only — no silent default slot / worker_01.
+  _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot "$_worker_agent_id" 2>/dev/null || true)
+  if [[ -z "$_worker_slot" ]]; then
+    log_error "worker launch: no slot for assigned agent $_worker_agent_id (fail-closed)"
+    python3 -c "
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release_all, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    agent_release_all('${PROJECT_ROOT}', rk)
+except AgentWorkingError as e:
+    print(f'release after slot-miss failed: {e}', file=sys.stderr)
+    raise SystemExit(1)
+" || true
+    return 1
+  fi
+  # Enrich worktree/slot binding — must succeed before any process start.
+  if ! python3 -c "
+import sys
+sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign, agent_release_all, AgentWorkingError
+from raw_key_canon import canonicalize_raw_key
+rk = canonicalize_raw_key('${_worker_raw_key}')
+try:
+    agent_assign('${PROJECT_ROOT}', rk, 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')
+except AgentWorkingError as e:
+    try:
+        agent_release_all('${PROJECT_ROOT}', rk)
+    except Exception:
+        pass
+    print(f'agent_assign failed: {e}', file=sys.stderr)
+    raise SystemExit(1)
+"; then
+    log_error "worker launch: agent_assign/session register failed for $_worker_agent_id (released pending, fail-closed)"
+    return 1
+  fi
   _worker_base="${_worker_slot%%-*}"
   _validate_base_tool_from_slot "$_worker_slot" "worker_launch"
-  [[ -z "$_worker_base" ]] && _worker_base="opencode"
-  # Resolve manager base_tool for cross-tool detection
+  if [[ -z "$_worker_base" ]]; then
+    log_error "worker launch: empty base tool from slot $_worker_slot (fail-closed)"
+    return 1
+  fi
+  # manager_01 here is agent-table.toml static config id (not dynamic fallback)
   _mgr_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot manager_01 2>/dev/null || true)
   _mgr_base="${_mgr_slot%%-*}"
-  [[ -z "$_mgr_base" ]] && _mgr_base="${AGENT_AI_TOOL%%-*}"
+  if [[ -z "$_mgr_base" && -n "${AGENT_AI_TOOL:-}" ]]; then
+    _mgr_base="${AGENT_AI_TOOL%%-*}"
+  fi
+  if [[ -z "$_mgr_base" ]]; then
+    log_error "worker launch: cannot resolve manager base tool (fail-closed)"
+    return 1
+  fi
 
   if [[ "$_worker_base" == "$_mgr_base" ]]; then
     # Same base_tool → fork from Manager bridge (cache hit)
@@ -13258,7 +13385,7 @@ SESSIONEOF
     _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
   fi
   if [[ ! -S "$_manager_bridge_socket" ]]; then
-    log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
+    log_warn "manager bridge socket not found; falling back to --agent mode for assigned $_worker_agent_id"
     local _worker_next_file _fallback_own_key
     _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
     rm -f "$_worker_next_file"
@@ -13286,31 +13413,14 @@ SESSIONEOF
     manager_record_worker_pid_for_launch "$target_project" "$_worker_pid" "$prompt_file"
     append_runtime_event "$manager_project" "worker_launched_directly_agent_fallback" \
       "worker_pid=$_worker_pid" \
+      "worker_agent_id=$_worker_agent_id" \
       "target_project=$target_project" \
       "prompt_file=$prompt_file"
-    local _aw_slot _aw_aq
-    _aw_aq="${PROJECT_ROOT}/bin/agent-table-query"
-    _aw_slot=$("$_aw_aq" --get-slot worker_01 2>/dev/null || true)
-    [[ -z "$_aw_slot" ]] && _aw_slot="${AGENT_AI_TOOL:-claude}"
-    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "worker_01" "$_aw_slot"
+    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id" "$target_project" "$_worker_agent_id" "$_worker_slot"
     return 0
   fi
 
-  log_info "launching worker AI via manager bridge (fork session): target=$target_project prompt=$(basename "$prompt_file")"
-
-  # Write worker entry to agent_working table before fork launch.
-  # This enables _resolve_current_agent_id() to find the worker's role
-  # when the worker process starts in the target worktree.
-  local _worker_agent_id _worker_slot _worker_raw_key _worker_pool
-  _worker_pool=$("$SELF_ROOT/bin/agent-table-query" --pool-size worker 2>/dev/null || echo 10)
-  _worker_agent_id=$(python3 -c "
-import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_next_free
-print(agent_next_free('${PROJECT_ROOT}', 'worker', ${_worker_pool:-10}) or 'worker_01')
-" 2>/dev/null || echo "worker_01")
-  _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || echo "${AGENT_AI_TOOL:-claude-apikey-ds-flash-auto}")
-  _worker_raw_key="$(echo "$target_project" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
-  python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', '${_worker_raw_key:-develop}', 'worker', '${_worker_agent_id}', worktree='${target_project}', slot='${_worker_slot}')"
+  log_info "launching worker AI via manager bridge (fork session): target=$target_project agent=$_worker_agent_id prompt=$(basename "$prompt_file")"
 
   local _worker_next_file
   _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"

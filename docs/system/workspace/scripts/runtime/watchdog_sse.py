@@ -19,6 +19,9 @@ from agent_working import (
     agent_list_by_raw_key, agent_next_free, agent_assign, agent_get_session,
     acp_session_connect
 )
+from agent_identity_value import (
+    bare_agent_ids, first_agent_id, parse_agent_entries, session_entry,
+)
 from input_required_reason import InputRequiredReason
 
 
@@ -203,9 +206,10 @@ def _handle_sse_event(project: str, event_text: str):
 
 def _normalize_raw_key(raw_key: str) -> str:
     """Ensure raw_key has the 'raw-' prefix for consistent lookups."""
+    from raw_key_canon import try_canonicalize_raw_key
     if not raw_key:
         return raw_key
-    return f"raw-{raw_key}" if not raw_key.startswith("raw-") else raw_key
+    return try_canonicalize_raw_key(raw_key, default=raw_key)
 
 
 def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredReason):
@@ -213,12 +217,23 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
 
-    existing = agent_list_by_raw_key(project, raw_key)
+    try:
+        existing = agent_list_by_raw_key(project, raw_key) if raw_key else {}
+    except Exception as e:
+        _log(f"FAIL-CLOSED: agent_working query failed for reviewer route: {e}")
+        return
     rid = None
     if existing and existing.get("reviewer_id"):
-        rid = existing["reviewer_id"].split(":")[0] if ":" in str(existing.get("reviewer_id", "")) else existing.get("reviewer_id", "")
+        rid = first_agent_id(existing["reviewer_id"])
     if not rid:
-        rid = agent_next_free(project, "reviewer", 99)
+        if not raw_key:
+            _log("FAIL-CLOSED: missing raw_key for reviewer assign")
+            return
+        try:
+            rid = agent_next_free(project, "reviewer", 99, raw_key=raw_key)
+        except Exception as e:
+            _log(f"FAIL-CLOSED: reviewer next_free_and_assign failed: {e}")
+            return
     if not rid:
         _log(f"no reviewer available for {raw_key}")
         return
@@ -258,10 +273,18 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
     _log(f"routing to manager: {from_agent} needs decision on {issue_key} ({reason.value})")
 
     mgr_msg = f"[Freely Watchdog] {from_agent} needs manager input on {issue_key}. Reason: {reason.value}."
-    manager_slot = _get_agent_slot(project, "manager", "manager_01")
+    try:
+        mid = agent_next_free(project, "manager", 1, raw_key=MANAGER_KEY)
+    except Exception as e:
+        _log(f"FAIL-CLOSED: manager assign failed: {e}")
+        return
+    if not mid:
+        _log("FAIL-CLOSED: no manager available")
+        return
+    manager_slot = _get_agent_slot(project, "manager", mid)
 
     sid, op = acp_session_connect(
-        project, MANAGER_KEY, "manager", "manager_01",
+        project, MANAGER_KEY, "manager", mid,
         slot=manager_slot, message=mgr_msg
     )
     if sid:
@@ -276,12 +299,23 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
     verdict_msg = _build_worker_verdict_message(raw_key, from_agent, reason, metadata)
     _log(f"routing to worker for {raw_key}: {reason.value} (from {from_agent})")
 
-    row = agent_list_by_raw_key(project, raw_key)
+    try:
+        row = agent_list_by_raw_key(project, raw_key) if raw_key else {}
+    except Exception as e:
+        _log(f"FAIL-CLOSED: agent_working query failed for worker route: {e}")
+        return
     wid = None
     if row and row.get("worker_id"):
-        wid = row["worker_id"].split(":")[0] if ":" in str(row.get("worker_id", "")) else row.get("worker_id", "")
+        wid = first_agent_id(row["worker_id"])
     if not wid:
-        wid = agent_next_free(project, "worker", 10)
+        if not raw_key:
+            _log("FAIL-CLOSED: missing raw_key for worker assign")
+            return
+        try:
+            wid = agent_next_free(project, "worker", 10, raw_key=raw_key)
+        except Exception as e:
+            _log(f"FAIL-CLOSED: worker next_free_and_assign failed: {e}")
+            return
     if not wid:
         _log("no worker available, delegating to manager")
         _handle_needs_manager(project, metadata, InputRequiredReason.from_string("needs-manager-decision"))
@@ -343,11 +377,15 @@ def _handle_message_delivery(project: str, data: dict):
     import sqlite3
     db_path = os.path.join(project, ".freely", "freely.db")
     raw_key = ""
+    task_agent_id = ""
     try:
         db = sqlite3.connect(db_path)
-        row = db.execute("SELECT raw_key FROM a2a_tasks WHERE task_id=?", (task_id,)).fetchone()
+        row = db.execute(
+            "SELECT raw_key, agent_id FROM a2a_tasks WHERE task_id=?", (task_id,)
+        ).fetchone()
         if row:
             raw_key = row[0] or ""
+            task_agent_id = row[1] or ""
         db.close()
     except Exception:
         pass
@@ -362,20 +400,19 @@ def _handle_message_delivery(project: str, data: dict):
         _log(f"message_delivery: no agent_working row for {raw_key}")
         return
 
-    # Get session_id for the target role (manager/worker/reviewer)
-    session_val = row.get(f"{role}_id", "")
-    if not session_val or ":" not in str(session_val):
-        _log(f"message_delivery: no session for {role} on {raw_key}")
+    # Resolve one exact agent/session pair. Reviewer fields can contain multiple
+    # entries, so selecting the final colon-delimited token is not valid.
+    requested_agent_id = str(data.get("agent_id", "") or "")
+    if not requested_agent_id and str(task_agent_id).startswith(f"{role}_"):
+        requested_agent_id = str(task_agent_id)
+    selected = session_entry(row.get(f"{role}_id", ""), requested_agent_id)
+    if not selected:
+        _log(f"message_delivery: no session for {role}/{requested_agent_id or '*'} on {raw_key}")
         return
-    session_id = str(session_val).split(":")[-1]
+    target_agent_id, session_id = selected
 
-    # Determine base_tool from agent role
-    base_tool = ""
-    if role == "worker":
-        base_tool = "opencode"
-    elif role == "reviewer":
-        base_tool = "cline"
-    # manager uses default (claude bridge)
+    slot = _get_agent_slot(project, role, target_agent_id)
+    base_tool = slot.split("-", 1)[0] if slot else ""
 
     # Deliver via ACP session/prompt
     result = _acp_rpc(project, "session/prompt",
@@ -404,29 +441,27 @@ def _check_agent_liveness(project: str):
     for row in rows:
         raw_key = row.get("raw_key", "")
         for role in ("worker", "reviewer", "manager"):
-            val = str(row.get(f"{role}_id", "") or "")
-            if not val or ":" not in val:
-                continue
-            agent_id, session_id = val.split(":", 1)
-            # Check if the process for this session is still alive
-            try:
-                # Look for a process with this session_id in the command line
-                result = subprocess.run(
-                    ["pgrep", "-f", session_id],
-                    capture_output=True, text=True, timeout=3
-                )
-                if result.returncode != 0:
-                    _log(f"DEAD {role}: {agent_id} session={session_id} for {raw_key}")
-                    # Clear the dead session_id but keep the agent assigned
-                    try:
-                        _db_rpc(project, "agent_working.upsert", {
-                            "raw_key": raw_key,
-                            f"{role}_id": agent_id  # session_id cleared
-                        })
-                    except Exception:
-                        pass
-            except Exception as e:
-                _log(f"liveness check error for {agent_id}: {e}")
+            entries = parse_agent_entries(row.get(f"{role}_id", ""))
+            for agent_id, session_id in entries.items():
+                if not session_id:
+                    continue
+                try:
+                    result = subprocess.run(
+                        ["pgrep", "-f", session_id],
+                        capture_output=True, text=True, timeout=3
+                    )
+                    if result.returncode != 0:
+                        _log(f"DEAD {role}: {agent_id} session={session_id} for {raw_key}")
+                        try:
+                            _db_rpc(project, "agent_working.upsert", {
+                                "raw_key": raw_key,
+                                "col": f"{role}_id",
+                                "val": agent_id,
+                            })
+                        except Exception:
+                            pass
+                except Exception as e:
+                    _log(f"liveness check error for {agent_id}: {e}")
 
 
 # ── C13: Session staleness timeout ────────────────────────────────────────────
@@ -434,6 +469,23 @@ def _check_agent_liveness(project: str):
 _last_staleness_check = 0
 STALENESS_INTERVAL = 300  # 5 minutes between staleness scans
 SESSION_STALE_SECONDS = 1800  # 30 minutes without activity = stale
+
+
+def _reservation_is_stale(row: dict, now: float) -> bool:
+    """Only release bare reservations after the configured inactivity window."""
+    from datetime import datetime, timezone
+
+    updated_at = str(row.get("updated_at", "") or "").strip()
+    if not updated_at:
+        return False
+    try:
+        normalized = updated_at.replace("Z", "+00:00")
+        updated = datetime.fromisoformat(normalized)
+        if updated.tzinfo is None:
+            updated = updated.replace(tzinfo=timezone.utc)
+        return now - updated.timestamp() >= SESSION_STALE_SECONDS
+    except ValueError:
+        return False
 
 
 def _check_session_staleness(project: str):
@@ -452,14 +504,11 @@ def _check_session_staleness(project: str):
         return
 
     for row in rows:
+        if not _reservation_is_stale(row, now):
+            continue
         raw_key = row.get("raw_key", "")
         for role in ("worker", "reviewer", "manager"):
-            val = str(row.get(f"{role}_id", "") or "")
-            if not val:
-                continue
-            # Stale: assigned but no session_id (never started within timeout)
-            if ":" not in val:
-                agent_id = val
+            for agent_id in bare_agent_ids(row.get(f"{role}_id", "")):
                 _log(f"STALE {role} {agent_id} for {raw_key}: assigned but never started — releasing")
                 try:
                     agent_release(project, raw_key, role, agent_id)

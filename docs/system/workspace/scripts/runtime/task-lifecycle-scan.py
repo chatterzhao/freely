@@ -32,6 +32,12 @@ from datetime import datetime, timezone
 _LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
 sys.path.insert(0, str(_LIFECYCLE_DIR))
 from raw_metadata_contract import MetadataValidationError, normalize, validate
+from agent_identity_value import first_agent_id
+
+
+def _bound_worker_agent_id(row: dict | None) -> str:
+    """Read the worker identity through the shared wire-value codec."""
+    return first_agent_id((row or {}).get("worker_id", "")) or ""
 
 
 # Raw and linked issues have different lifecycle domains.
@@ -807,21 +813,34 @@ def scan(project: Path) -> dict:
         # ── Category 3: worktree exists → check agent liveness ────
         if wt_exists:
             wt_path = wt["path"]
-            # Query agent_working table first (preferred), fallback to agent-id.env
+            # Query agent_working table only (sole identity truth)
             agent_id = ""
+            agent_binding_error = ""
             try:
                 sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "runtime"))
-                from agent_working import agent_list_by_raw_key
-                row = agent_list_by_raw_key(str(project), f"raw-{raw_key}")
-                if row:
-                    wid = row.get("worker_id", "")
-                    if wid:
-                        agent_id = wid.split(":")[0] if ":" in str(wid) else str(wid)
-            except Exception:
-                pass
+                from agent_working import agent_list_by_raw_key, AgentWorkingError
+                from raw_key_canon import canonicalize_raw_key
+                row = agent_list_by_raw_key(str(project), canonicalize_raw_key(raw_key))
+                agent_id = _bound_worker_agent_id(row)
+            except Exception as exc:
+                # An unavailable identity store is not evidence that the worker
+                # was never bound; avoid emitting a re-delegation instruction.
+                agent_binding_error = str(exc) or type(exc).__name__
 
-            # agent-id.env retired — agent_working is the sole source of truth.
-            if not agent_id:
+            # agent_working is the sole source of truth.
+            if agent_binding_error:
+                items.append({
+                    "category": "3_binding_unavailable",
+                    "subcategory": "3c_agent_working_unavailable",
+                    "key": raw_key,
+                    "worktree": str(wt_path),
+                    "branch": wt.get("branch", ""),
+                    "agent_id": "",
+                    "ready": False,
+                    "detail": f"agent_working binding unavailable — retry required: {agent_binding_error}",
+                    "next_action": "[manager] retry agent_working lookup; do not re-delegate",
+                })
+            elif not agent_id:
                 items.append({
                     "category": "3_dead_agent",
                     "subcategory": "3a_never_bound",
@@ -830,7 +849,7 @@ def scan(project: Path) -> dict:
                     "branch": wt.get("branch", ""),
                     "agent_id": "",
                     "ready": True,
-                    "detail": "agent_working + agent-id.env both missing — delegated but never bound",
+                    "detail": "agent_working missing binding — delegated but never bound",
                     "next_action": "[manager] re-delegate worker for this raw key",
                 })
             elif not a2a.agent_session_active(agent_id):

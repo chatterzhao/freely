@@ -469,18 +469,22 @@
 - promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
 3. `C-20260720T120329Z-C`
 - milestone: M-20260720T120329Z-A
-- status: blocked
+- status: promoted
 - promoted_issue_id: `I-20260720T120329Z-C`
 - promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 ### committed_issues
 1. `I-20260720T120329Z-A`
 - milestone: M-20260720T120329Z-A
-- phase_state: completed
+- phase_state: in_dev
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-A.md
 2. `I-20260720T120329Z-B`
 - milestone: M-20260720T120329Z-A
-- phase_state: completed
+- phase_state: in_dev
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
+3. `I-20260720T120329Z-C`
+- milestone: M-20260720T120329Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 
 ## M-20260725T030511Z-A
 - title: 配置平台 raw 副本一致性门禁
@@ -496,11 +500,6 @@
 - milestone: M-20260725T030511Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
-
-3. `I-20260720T120329Z-C`
-- milestone: M-20260720T120329Z-A
-- phase_state: completed
-- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 
 ## M-20260721T223133Z-A
 - title: fix — 生命周期命令受控更新与 raw metadata 状态合同
@@ -539,3 +538,12 @@
 - milestone: M-20260804T073054Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md
+
+## M-20260720T171146Z-A
+- title: agent_working 单真源 fail-closed（continuation）
+- status: active
+### candidate_issues
+1. `C-20260720T171146Z-A`
+- milestone: M-20260720T171146Z-A
+- status: absorbed
+- absorbed_into: I-20260720T120329Z-C
