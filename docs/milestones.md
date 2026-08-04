@@ -449,3 +449,8 @@
 - milestone: M-20260804T073054Z-A
 - status: promoted
 - promoted_issue_id: `I-20260804T073054Z-A`
+### committed_issues
+1. `I-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md
