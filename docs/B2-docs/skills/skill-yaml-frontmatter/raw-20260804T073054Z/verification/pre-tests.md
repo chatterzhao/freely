@@ -14,10 +14,10 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-skill-frontmatter-valid.py
 - expected_output: OK (37/37 valid)
 - expected_RED_output: 30 files fail (block scalar error)
-- actual_RED_output: pending
+- actual_RED_output: "total=37 invalid=31（block scalar 解析错误）"
 - actual_output: pending
 - evidence_file: pending
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: execution_pending_or_failed
 - red_how: "单元测试 test-skill-frontmatter-valid.py，修复前 30 个文件解析失败"
@@ -33,10 +33,10 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-skill-deploy-gate.py
 - expected_output: OK (bad frontmatter rejected)
 - expected_RED_output: 无校验，坏文件被部署（断言失败）
-- actual_RED_output: pending
+- actual_RED_output: "FAIL: deploy-skills has no frontmatter YAML validation"
 - actual_output: pending
 - evidence_file: pending
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: execution_pending_or_failed
 - red_how: "集成测试 test-skill-deploy-gate.py，修复前 deploy-skills 不校验 frontmatter"
@@ -52,10 +52,10 @@
 - test_command: bash docs/system/workspace/scripts/tests/test-skill-precommit-gate.sh
 - expected_output: OK (pre-commit blocks invalid frontmatter)
 - expected_RED_output: pre-commit 不校验，提交通过（断言失败）
-- actual_RED_output: pending
+- actual_RED_output: "FAIL: pre-commit hook has no skills frontmatter validation"
 - actual_output: pending
 - evidence_file: pending
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: execution_pending_or_failed
 - red_how: "集成测试 test-skill-precommit-gate.sh，修复前 hook 无 skills 校验"
