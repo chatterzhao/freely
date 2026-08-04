@@ -1,6 +1,7 @@
 ---
 name: freely-constitution-guard
-description: >- 在自主执行前后强制校验 `docs/CONSTITUTION.md` 硬性约束。保证
+description: >-
+  在自主执行前后强制校验 `docs/CONSTITUTION.md` 硬性约束。保证
   分支、worktree、架构和治理边界在操作前后均合规。
 
   Use when: AI 规划或完成开发、合并、发布、恢复操作。

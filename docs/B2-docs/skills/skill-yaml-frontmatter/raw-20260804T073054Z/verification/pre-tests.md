@@ -15,10 +15,10 @@
 - expected_output: OK (37/37 valid)
 - expected_RED_output: 30 files fail (block scalar error)
 - actual_RED_output: "total=37 invalid=31（block scalar 解析错误）"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
+- actual_output: "total=37 invalid=0"
+- evidence_file: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/verification/test-evidence/frontmatter-parse.log
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: "单元测试 test-skill-frontmatter-valid.py，修复前 30 个文件解析失败"
 
@@ -34,10 +34,10 @@
 - expected_output: OK (bad frontmatter rejected)
 - expected_RED_output: 无校验，坏文件被部署（断言失败）
 - actual_RED_output: "FAIL: deploy-skills has no frontmatter YAML validation"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
+- actual_output: "OK: deploy-skills validates frontmatter; dry-run clean"
+- evidence_file: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/verification/test-evidence/deploy-gate.log
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: "集成测试 test-skill-deploy-gate.py，修复前 deploy-skills 不校验 frontmatter"
 
@@ -53,10 +53,10 @@
 - expected_output: OK (pre-commit blocks invalid frontmatter)
 - expected_RED_output: pre-commit 不校验，提交通过（断言失败）
 - actual_RED_output: "FAIL: pre-commit hook has no skills frontmatter validation"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
+- actual_output: "[PASS] pre-commit hook validates skills frontmatter"
+- evidence_file: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/verification/test-evidence/precommit-gate.log
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: "集成测试 test-skill-precommit-gate.sh，修复前 hook 无 skills 校验"
 
@@ -72,10 +72,10 @@
 - expected_output: OK (deployed skills parse; zero invalid)
 - expected_RED_output: 部署目录含 30 个坏文件（断言失败）
 - actual_RED_output: pending
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: pending
-- status: pending
+- actual_output: "~/.codex/skills total=71 invalid=0; ~/.claude/skills total=69 invalid=0"
+- evidence_file: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/verification/test-evidence/deploy-load.log
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: "端到端：deploy-skills 后解析 ~/.codex/skills 与源目录 frontmatter"
 
@@ -101,5 +101,5 @@
 - blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
-- real_environment_status: pending
-- real_environment_reason: (GREEN 后填写 codex 启动验证结果)
+- real_environment_status: pass
+- real_environment_reason: 重新部署（--force）后 ~/.codex/skills 与 ~/.claude/skills 全部 SKILL.md 可解析（0 invalid），codex 启动不再 Skipped loading

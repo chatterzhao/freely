@@ -379,3 +379,29 @@ If you must create it manually instead:
 When the work is finished and merged:
   freely wt-close "$branch"
 MSG
+
+# ── Skill frontmatter YAML validation ──
+_project_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [[ -n "$_project_root" ]]; then
+  _changed_skills=$(git diff --cached --name-only -- 'docs/system/workspace/skills/**/SKILL.md' 2>/dev/null || true)
+  if [[ -n "$_changed_skills" ]]; then
+    _bad_skills=""
+    while IFS= read -r _skill_file; do
+      [[ -n "$_skill_file" ]] || continue
+      if ! python3 -c "
+import sys, yaml, re
+text = open('$_project_root/$_skill_file', encoding='utf-8').read()
+m = re.match(r'^---\n(.*?)\n---', text, re.S)
+if not m: sys.exit(1)
+yaml.safe_load(m.group(1))
+" 2>/dev/null; then
+        _bad_skills="$_bad_skills $_skill_file"
+      fi
+    done <<< "$_changed_skills"
+    if [[ -n "$_bad_skills" ]]; then
+      echo "[HOOK] BLOCKED: invalid SKILL.md frontmatter YAML:" >&2
+      echo "$_bad_skills" >&2
+      exit 1
+    fi
+  fi
+fi
