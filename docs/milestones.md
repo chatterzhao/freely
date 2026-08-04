@@ -547,3 +547,12 @@
 - milestone: M-20260720T171146Z-A
 - status: absorbed
 - absorbed_into: I-20260720T120329Z-C
+
+## M-20260724T024118Z-A
+- title: command-wrapper 元数据生命周期契约
+- status: active
+### candidate_issues
+1. `C-20260724T024118Z-A`
+- milestone: M-20260724T024118Z-A
+- status: promoted
+- promoted_issue_id: `I-20260724T024118Z-A`
