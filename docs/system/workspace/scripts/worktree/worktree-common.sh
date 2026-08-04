@@ -277,3 +277,16 @@ FREELY_CONSISTENCY_ERR
 
   return 0
 }
+
+# ── Configured-platform raw reconciliation gate ───────────
+# Read-only: no local metadata or remote platform mutation is permitted here.
+freely_wt_assert_raw_reconciled_readonly() {
+  local _raw_key="$1" _project="${2:-$(git rev-parse --show-toplevel)}"
+  [[ -n "$_raw_key" ]] || return 0
+  _raw_key="${_raw_key#raw-}"
+  local _script_root
+  _script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+  local _gate="$_script_root/lifecycle/raw-reconciliation-gate.py"
+  [[ -f "$_gate" ]] || { echo "[raw-reconciliation] gate script missing: $_gate" >&2; return 1; }
+  FREELY_PROJECT_ROOT="$_project" python3 "$_gate" --project "$_project" --raw-key "$_raw_key" --require-local
+}

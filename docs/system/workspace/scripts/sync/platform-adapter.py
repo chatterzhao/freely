@@ -134,6 +134,7 @@ class PlatformHandler(ABC):
     def set_assignee(self, issue_number: str, login: str) -> tuple[bool, str]:
         return False, "not implemented"
     def list_open_issues(self) -> dict[str, str]: return {}
+    def list_open_issue_records(self) -> dict[str, dict]: return {}
 
 # ══════════════════════════════════════════════
 # Registry
@@ -221,7 +222,7 @@ class GitHubHandler(PlatformHandler):
             matches = {}
             for field in ("title", "body"):
                 result = subprocess.run(
-                    ["gh", "issue", "list", "--repo", repo, "--state", "open",
+                    ["gh", "issue", "list", "--repo", repo, "--state", "all",
                      "--search", f"raw-{raw_key} in:{field}", "--limit", "20",
                      "--json", "number,title,url,body"],
                     capture_output=True, text=True, timeout=15,
@@ -230,7 +231,8 @@ class GitHubHandler(PlatformHandler):
                     continue
                 for issue in json.loads(result.stdout):
                     haystack = str(issue.get(field, "") or "")
-                    if f"raw-{raw_key}" not in haystack.lower():
+                    needle = f"raw-{raw_key}".lower()
+                    if needle not in haystack.lower():
                         continue
                     issue_id = str(issue.get("number", "") or "")
                     if issue_id:
@@ -249,13 +251,14 @@ class GitHubHandler(PlatformHandler):
     def fetch_issue(self, issue_number):
         try:
             r = subprocess.run(["gh", "issue", "view", issue_number, "--repo", self._repo(),
-                               "--json", "title,body,createdAt,updatedAt,labels,state"],
+                               "--json", "title,body,createdAt,updatedAt,labels,state,comments"],
                               capture_output=True, text=True, timeout=15)
             if r.returncode == 0 and r.stdout.strip():
                 data = json.loads(r.stdout)
                 return {"title": data.get("title", ""), "body": data.get("body", ""),
                         "created_at": data.get("createdAt", ""), "updated_at": data.get("updatedAt", ""),
                         "labels": [l["name"] for l in data.get("labels", [])],
+                        "comments": [c.get("body", "") for c in data.get("comments", [])],
                         "state": data.get("state", "").upper()}
         except Exception:
             pass
@@ -344,6 +347,18 @@ class GitHubHandler(PlatformHandler):
         except Exception:
             return {}
 
+    def list_open_issue_records(self):
+        repo = self._repo()
+        if not repo:
+            return {}
+        try:
+            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200", "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
+            if r.returncode != 0:
+                return {}
+            return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
+        except Exception:
+            return {}
+
 # ══════════════════════════════════════════════
 # Gitee Handler
 # ══════════════════════════════════════════════
@@ -401,7 +416,7 @@ class GiteeHandler(PlatformHandler):
         return None
 
     def search_raw_issue(self, raw_key):
-        r = self._run("list", "--state", "open", "--per-page", "50")
+        r = self._run("list", "--state", "all", "--per-page", "50")
         if r.returncode != 0:
             return None
         try:
@@ -432,9 +447,12 @@ class GiteeHandler(PlatformHandler):
         if r.returncode == 0 and r.stdout.strip():
             try:
                 data = json.loads(r.stdout)
+                comments = data.get("comments", [])
+                comments = comments if isinstance(comments, list) else []
                 return {"title": data.get("title", ""), "body": data.get("body", ""),
                         "created_at": data.get("created_at", ""), "updated_at": data.get("updated_at", ""),
                         "labels": [l.get("name", "") for l in data.get("labels", [])],
+                        "comments": [c.get("body", "") for c in comments],
                         "state": data.get("state", "").upper()}
             except Exception: pass
         return {}
@@ -527,6 +545,15 @@ class GiteeHandler(PlatformHandler):
         except Exception: pass
         return {}
 
+    def list_open_issue_records(self):
+        try:
+            r = self._run("list", "--state", "open", "--per-page", "50")
+            if r.returncode != 0:
+                return {}
+            return {str(issue.get("number", issue.get("id", ""))): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
+        except Exception:
+            return {}
+
 # ══════════════════════════════════════════════
 # REGISTRATION — new platform? add ONE line here.
 # ══════════════════════════════════════════════
@@ -614,15 +641,6 @@ def close_issue_by_raw_key(raw_key: str, platform_ids: dict = None) -> dict[str,
     resolved = {}
     failures = {}
     platforms = configured_platforms()
-    cached = {
-        platform: _issue_id((platform_ids or {}).get(platform, {}))
-        for platform in platforms
-    }
-    if all(cached.values()):
-        return close_issue(f"raw-{raw_key}", {
-            platform: {"issue_id": issue_id}
-            for platform, issue_id in cached.items()
-        })
     for platform in platforms:
         handler = _handler_for(platform)
         if not handler:
@@ -688,6 +706,38 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     h = _handler_for(platform)
     return h.fetch_issue(issue_number) if h else {}
 
+
+def discover_raw_replicas(raw_key: str) -> dict[str, dict]:
+    """Read every configured platform once; never convert uncertainty into absence."""
+    records: dict[str, dict] = {}
+    for platform in configured_platforms():
+        handler = _handler_for(platform)
+        if not handler:
+            records[platform] = {"status": "error", "error": "configured platform unavailable"}
+            continue
+        found = _safe(handler.search_raw_issue, raw_key)
+        matches = found.get("matches") if isinstance(found, dict) else None
+        if not isinstance(matches, list):
+            records[platform] = {"status": "error", "error": "raw search failed"}
+            continue
+        if not matches:
+            records[platform] = {"status": "missing", "error": "raw replica not found"}
+            continue
+        if len(matches) != 1:
+            records[platform] = {"status": "ambiguous", "error": f"raw key resolved to {len(matches)} replicas"}
+            continue
+        issue = matches[0] if isinstance(matches[0], dict) else {}
+        issue_id = str(issue.get("issue_number", issue.get("issue_id", "")) or "")
+        details = _safe(handler.fetch_issue, issue_id) if issue_id else {}
+        if not issue_id or not isinstance(details, dict) or not details:
+            records[platform] = {"status": "error", "error": "raw replica fetch failed"}
+            continue
+        records[platform] = {
+            "status": "ok", "raw_key": f"raw-{raw_key}", "issue_id": issue_id,
+            "url": issue.get("url", ""), **details,
+        }
+    return records
+
 def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
     h = _handler_for(platform)
     return h.get_issue_state(issue_number) if h else None
@@ -698,6 +748,14 @@ def list_open_issues(platforms: list[str] = None) -> dict[str, str]:
     for h in targets:
         result.update(_safe(h.list_open_issues) or {})
     return result
+
+def list_open_issue_records(platforms: list[str] = None) -> dict[str, dict]:
+    records: dict[str, dict] = {}
+    targets = [h for h in _handlers() if platforms is None or h.name in platforms]
+    for h in targets:
+        for issue_id, record in (_safe(h.list_open_issue_records) or {}).items():
+            records[f"{h.name}:{issue_id}"] = {"issue_id": str(issue_id), **record}
+    return records
 
 def get_assignees(platform: str, issue_number: str) -> list[str]:
     h = _handler_for(platform)
@@ -893,21 +951,24 @@ def _resolve_issue_state(local_id: str) -> str:
 # ── pull_raw_issue ──
 
 def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
+    replicas = discover_raw_replicas(raw_key)
+    if not replicas or any(item.get("status") != "ok" for item in replicas.values()):
+        print(f"FATAL: raw-{raw_key} replicas are unresolved: {replicas}", file=sys.stderr)
+        return None
     my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
-    for plat, info in search_raw_issue(raw_key).items():
-        ok, msg = check_and_claim_assignee(plat, info["issue_number"], my_login)
+    for plat, info in replicas.items():
+        ok, msg = check_and_claim_assignee(plat, info["issue_id"], my_login)
         print(f"[assignee] {plat}: {msg}", file=sys.stderr)
         if not ok and "already assigned to" in msg.lower():
-            print(f"FATAL: {msg}", file=sys.stderr); return None
+            print(f"FATAL: {msg}", file=sys.stderr)
+            return None
         if not ok:
             print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
 
-    results = search_raw_issue(raw_key)
-    if not results: return None
-    platform = "github" if "github" in results else next(iter(results))
-    info = results[platform]; issue_number = info["issue_number"]
-    details = fetch_issue(platform, issue_number)
-    if not details: return None
+    platform = next(iter(replicas))
+    info = replicas[platform]
+    issue_number = info["issue_id"]
+    details = info
 
     title = info.get("title", "")
     if not (f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title):
@@ -917,8 +978,8 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
             raw_key = sk; target_dir = target_dir.parent / f"raw-{raw_key}"
 
     target_dir.mkdir(parents=True, exist_ok=True)
-    platform_ids = {p: {"issue_id": i["issue_number"], "url": i.get("url", ""), "synced_at": ""}
-                    for p, i in results.items()}
+    platform_ids = {p: {"issue_id": i["issue_id"], "url": i.get("url", ""), "synced_at": ""}
+                    for p, i in replicas.items()}
     phase = "proposed"
     for label in details.get("labels", []):
         if label.startswith("phase/"): phase = label.replace("phase/", ""); break
@@ -992,6 +1053,8 @@ if __name__ == "__main__":
     a = sys.argv
     if len(a) > 1 and a[1] == "search":
         print(json.dumps(search_raw_issue(a[2]) if len(a) > 2 else {}, indent=2))
+    elif len(a) > 1 and a[1] == "discover-raw":
+        print(json.dumps(discover_raw_replicas(a[2]) if len(a) > 2 else {}, indent=2))
     elif len(a) > 1 and a[1] == "fetch":
         print(json.dumps(fetch_issue(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "close-multi":
