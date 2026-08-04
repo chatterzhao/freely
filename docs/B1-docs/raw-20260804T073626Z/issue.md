@@ -30,6 +30,8 @@ completed_at: '2026-08-04T08:32:00Z'
 closeout_note: ''
 ---
 
+# fix: platform-adapter pull KeyError 阻塞 wt-create
+
 workflow_kind: fix
 
 ## 现象
