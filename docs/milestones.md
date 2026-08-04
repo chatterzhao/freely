@@ -397,7 +397,12 @@
 - milestone: M-20260720T052921Z-A
 - status: promoted
 - promoted_issue_id: I-20260720T052921Z-A
-- promoted_issue_path: docs/issues/I-20260720T052921Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260720T052921Z/issues/I-20260720T052921Z-A.md
+### committed_issues
+1. `I-20260720T052921Z-A`
+- milestone: M-20260720T052921Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260720T052921Z/issues/I-20260720T052921Z-A.md
 ### committed_issues
 1. `I-20260720T052921Z-A`
 - milestone: M-20260720T052921Z-A
