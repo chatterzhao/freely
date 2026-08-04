@@ -441,6 +441,15 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
 
+## M-20260804T073626Z-A
+- title: platform-adapter pull KeyError（已被 reconciliation 工位吸收）
+- status: active
+### candidate_issues
+1. `C-20260804T073626Z-A`
+- milestone: M-20260804T073626Z-A
+- status: absorbed
+- absorbed_into: I-20260725T030511Z-A
+
 ## M-20260804T073054Z-A
 - title: SKILL.md frontmatter YAML 修复 + 部署链校验
 - status: active
@@ -452,5 +461,5 @@
 ### committed_issues
 1. `I-20260804T073054Z-A`
 - milestone: M-20260804T073054Z-A
-- phase_state: in_b2_ibm
+- phase_state: in_dev
 - issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md
