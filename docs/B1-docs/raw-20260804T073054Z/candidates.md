@@ -30,5 +30,6 @@ milestone: M-20260804T073054Z-A
   - summary: 复核坏文件数量（30/37）、根因 commit 与部署链缺口，方向正确
   - verdict: pass
 - promoted_issue_id: I-20260804T073054Z-A
+- promoted_issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md
 - milestone: M-20260804T073054Z-A
 - session_refs: []
