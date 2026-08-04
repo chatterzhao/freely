@@ -25,7 +25,11 @@ session_refs: []
 platform_state: closed
 ---
 
-\n\n## 根因
+
+
+# fix: platform sync batch - sync 14 merged items
+
+## 根因
 
 14 个 raw issue 的代码已合并到 develop，但平台 issue（GitHub/Gitee）仍处于 open 状态，未同步关闭。
 
