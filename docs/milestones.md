@@ -481,6 +481,10 @@
 - milestone: M-20260720T120329Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
+3. `I-20260720T120329Z-C`
+- milestone: M-20260720T120329Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 
 ## M-20260725T030511Z-A
 - title: 配置平台 raw 副本一致性门禁
@@ -496,11 +500,6 @@
 - milestone: M-20260725T030511Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
-
-3. `I-20260720T120329Z-C`
-- milestone: M-20260720T120329Z-A
-- phase_state: in_dev
-- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
 
 ## M-20260721T223133Z-A
 - title: fix — 生命周期命令受控更新与 raw metadata 状态合同
