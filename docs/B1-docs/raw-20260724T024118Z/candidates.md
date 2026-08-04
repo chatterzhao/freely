@@ -29,5 +29,6 @@ milestone: M-20260724T024118Z-A
   - summary: 边界（不碰 runtime 强制逻辑）与方案（文档 + 校验）与 raw issue 修复方案一致
   - verdict: pass
 - promoted_issue_id: I-20260724T024118Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/metadata-lifecycle/raw-20260724T024118Z/issues/I-20260724T024118Z-A.md
 - milestone: M-20260724T024118Z-A
 - session_refs: []
