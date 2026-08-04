@@ -24,7 +24,11 @@ channel: github
 session_refs: []
 ---
 
-\n\n## 根因
+
+
+# fix: 修复 agent_working 单真源迁移假绿与分配错绑
+
+## 根因
 raw-20260720T120329Z 只迁移了部分 runtime 路径，未统一 raw_key 契约；原子分配 API 未贯通真实 launch 调用链，测试又只直调 daemon handler 且回归门禁漏扫 bin，导致假绿。
 
 ## 影响

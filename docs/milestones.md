@@ -539,3 +539,12 @@
 - milestone: M-20260804T073054Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md
+
+## M-20260720T171146Z-A
+- title: agent_working 单真源 fail-closed（continuation）
+- status: active
+### candidate_issues
+1. `C-20260720T171146Z-A`
+- milestone: M-20260720T171146Z-A
+- status: absorbed
+- absorbed_into: I-20260720T120329Z-C
