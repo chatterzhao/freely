@@ -22,9 +22,14 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
-\n\n## Root cause
+
+
+# fix: wt-create silent exit when issue.md lacks phase_state
+
+## Root cause
 
 Line 311 of docs/system/workspace/scripts/worktree/wt-create:
   _phase=$(grep 'phase_state:' ... | head -1 | sed | tr)
