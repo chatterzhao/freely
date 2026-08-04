@@ -376,3 +376,104 @@
 - milestone: M-20260720T052911Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/platform-sync/close-merged/raw-20260720T052911Z/issues/I-20260720T052911Z-A.md
+## M-20260720T111149Z-A
+- title: fix — DB daemon 存活监控与 task-mode 查询降级修正
+- status: active
+### candidate_issues
+1. `C-20260720T111149Z-A`
+- milestone: M-20260720T111149Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T111149Z-A`
+- promoted_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260720T111149Z/issues/I-20260720T111149Z-A.md
+### committed_issues
+1. `I-20260720T111149Z-A`
+- milestone: M-20260720T111149Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/raw-20260720T111149Z/issues/I-20260720T111149Z-A.md
+
+## M-20260720T120329Z-A
+- title: fix — agent-id.env 退役与三角色协作单真源收敛
+- status: active
+### candidate_issues
+1. `C-20260720T120329Z-A`
+- milestone: M-20260720T120329Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T120329Z-A`
+- promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-A.md
+2. `C-20260720T120329Z-B`
+- milestone: M-20260720T120329Z-A
+- status: promoted
+- promoted_issue_id: `I-20260720T120329Z-B`
+- promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
+3. `C-20260720T120329Z-C`
+- milestone: M-20260720T120329Z-A
+- status: blocked
+- promoted_issue_id: `I-20260720T120329Z-C`
+- promoted_issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
+### committed_issues
+1. `I-20260720T120329Z-A`
+- milestone: M-20260720T120329Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-A.md
+2. `I-20260720T120329Z-B`
+- milestone: M-20260720T120329Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-B.md
+
+## M-20260725T030511Z-A
+- title: 配置平台 raw 副本一致性门禁
+- status: active
+### candidate_issues
+1. `C-20260725T030511Z-A`
+- milestone: M-20260725T030511Z-A
+- status: promoted
+- promoted_issue_id: I-20260725T030511Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
+### committed_issues
+1. `I-20260725T030511Z-A`
+- milestone: M-20260725T030511Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
+
+3. `I-20260720T120329Z-C`
+- milestone: M-20260720T120329Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/agent-identity-single-truth/raw-20260720T120329Z/issues/I-20260720T120329Z-C.md
+
+## M-20260721T223133Z-A
+- title: fix — 生命周期命令受控更新与 raw metadata 状态合同
+- status: active
+### candidate_issues
+1. `C-20260721T223133Z-A`
+- milestone: M-20260721T223133Z-A
+- status: promoted
+- promoted_issue_id: `I-20260721T223133Z-A`
+- promoted_issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
+### completed_issues
+1. `I-20260721T223133Z-A`
+- milestone: M-20260721T223133Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/command-lifecycle-state-contract/raw-20260721T223133Z/issues/I-20260721T223133Z-A.md
+
+## M-20260804T073626Z-A
+- title: platform-adapter pull KeyError（已被 reconciliation 工位吸收）
+- status: active
+### candidate_issues
+1. `C-20260804T073626Z-A`
+- milestone: M-20260804T073626Z-A
+- status: absorbed
+- absorbed_into: I-20260725T030511Z-A
+
+## M-20260804T073054Z-A
+- title: SKILL.md frontmatter YAML 修复 + 部署链校验
+- status: active
+### candidate_issues
+1. `C-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- status: promoted
+- promoted_issue_id: `I-20260804T073054Z-A`
+### committed_issues
+1. `I-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md

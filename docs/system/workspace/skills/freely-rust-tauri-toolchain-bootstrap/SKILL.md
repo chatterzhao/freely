@@ -1,6 +1,7 @@
 ---
 name: freely-rust-tauri-toolchain-bootstrap
-description: >- 基于 Rust/Cargo/Tauri 官方机制和 rsproxy 镜像完成可复用的 toolchain
+description: >-
+  基于 Rust/Cargo/Tauri 官方机制和 rsproxy 镜像完成可复用的 toolchain
   bootstrap。处理 rustup 下载不稳定或缺少 cargo/rustc 的情况。
 
   Use when: Rust/Tauri 项目缺少工具链或默认 rustup 下载失败。

@@ -1,6 +1,7 @@
 ---
 name: freely-premerge-reconcile
-description: >- 在不回退治理的情况下协调高风险合并冲突。从 test-pre-merge-* 创建
+description: >-
+  在不回退治理的情况下协调高风险合并冲突。从 test-pre-merge-* 创建
   临时 premerge 分支，按语义意图解决冲突后合并回测试批次并清理。
 
   Use when: test-pre-merge-* 合并失败或出现语义回归风险。

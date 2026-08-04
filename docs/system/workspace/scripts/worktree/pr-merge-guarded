@@ -664,6 +664,10 @@ LOCAL_REMOTE_SYNC
         echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-merge。"
         exit 1
       }
+      freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$_src_wt" || {
+        echo "[MERGE-GUARD] raw replicas are inconsistent; resolve explicitly, then retry." >&2
+        exit 1
+      }
     fi
   fi
   run_promotion_gate_if_needed "$target" "$source_branch"

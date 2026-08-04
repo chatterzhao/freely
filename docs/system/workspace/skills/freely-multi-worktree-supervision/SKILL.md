@@ -1,6 +1,7 @@
 ---
 name: freely-multi-worktree-supervision
-description: >- 同时监督多个 Freely worktree 的进度和状态。安排哪些工位继续开发、
+description: >-
+  同时监督多个 Freely worktree 的进度和状态。安排哪些工位继续开发、
   哪些先 checkpoint、哪些进入集成批次。
 
   Use when: 同时管理 2 个以上 worktree，需要做优先级排序和批次规划。

@@ -1,6 +1,7 @@
 ---
 name: freely-discuss-execution
-description: >- 讨论 agent 的头脑风暴 skill。借鉴 B1 发散→收敛→决策框架做独立讨论，
+description: >-
+  讨论 agent 的头脑风暴 skill。借鉴 B1 发散→收敛→决策框架做独立讨论，
   不污染 `freely-doc-B1_IBM-execution` skill 的 worker 执行产物。
 
   Use when: 需要独立讨论技术方案、架构决策，或 AI 群聊讨论。

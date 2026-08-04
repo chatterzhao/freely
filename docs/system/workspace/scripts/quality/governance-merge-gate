@@ -10,6 +10,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
+import yaml
+
+_LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
+sys.path.insert(0, str(_LIFECYCLE_DIR))
+from raw_metadata_contract import MetadataValidationError, validate as validate_raw_metadata
+
 try:
     import tomllib
 except ImportError:
@@ -864,6 +870,15 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None, issues_i
     """
     errors = []
     iid = issue.issue_id or issue.path
+    raw_text = read_repo_text(issue.path)
+    raw_parts = raw_text.split("---", 2)
+    if len(raw_parts) >= 3:
+        raw_frontmatter = yaml.safe_load(raw_parts[1]) or {}
+        if str(raw_frontmatter.get("schema_version", "")) == "1":
+            try:
+                validate_raw_metadata(raw_frontmatter, require_canonical_file=False)
+            except MetadataValidationError as error:
+                errors.append(f"{iid} in {issue.path}: invalid strict raw metadata: {error}")
 
     # 1. local_id sanity
     if not issue.issue_id or not issue.issue_id.startswith("raw-"):
@@ -879,41 +894,44 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None, issues_i
             f"→ 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。Valid B1 phases: {', '.join(sorted(VALID_RAW_PHASES))}."
         )
 
-    # 3. Absorbed chain
+    # 3. Absorbed chain: either relationship may prove canonical ownership.
     if phase == "absorbed":
-        # Read the raw issue file to find absorbed_into
         text = read_repo_text(issue.path)
-        match = re.search(r"^\s*absorbed_into:\s*(.+?)\s*$", text, re.MULTILINE)
-        if not match:
-            # Try YAML format without leading hyphen
-            match = re.search(r"^absorbed_into:\s*(.+?)\s*$", text, re.MULTILINE)
-        if match:
-            target_id = match.group(1).strip("`").strip('"').strip("'")
+
+        def raw_grab(name: str) -> str:
+            match = re.search(rf"^{re.escape(name)}:\s*(.*?)\s*$", text, re.MULTILINE)
+            return normalize_scalar(match.group(1)) if match else ""
+
+        target_id = raw_grab("absorbed_into")
+        canonical_path = raw_grab("canonical_issue_path")
+        target_valid = False
+        canonical_valid = False
+
+        if target_id.startswith("I-"):
             target_dir = os.path.join(ROOT_DIR, "docs", "B1-docs", target_id)
-            found = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "issue.md"))
-            if not found and issues_index:
-                # Look up in the scoped index first (avoids full-repo os.walk)
-                for ipath, irec in issues_index.items():
-                    if irec.issue_id and irec.issue_id == target_id:
-                        found = True; break
-                    if ipath.endswith(f"/{target_id}.md") or f"/{target_id}/" in ipath:
-                        found = True; break
-            if not found and issues_index is None:
-                # Fallback full scan only when no scoped index available
-                for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "B2-docs")):
-                    if "issues" in dirs:
-                        for f in os.listdir(os.path.join(root, "issues")):
-                            if f.startswith(target_id) and f.endswith(".md"):
-                                found = True; break
-                    if found: break
-            if not found:
-                errors.append(
-                    f"{iid} in {issue.path}: absorbed_into '{target_id}' not found at docs/B1-docs/ or docs/B2-docs/**/."
+            target_valid = os.path.isfile(os.path.join(target_dir, "issue.md"))
+            if not target_valid and issues_index:
+                target_valid = any(
+                    (record.issue_id == target_id)
+                    or path.endswith(f"/{target_id}.md")
+                    or f"/{target_id}/" in path
+                    for path, record in issues_index.items()
                 )
-        else:
+            if not target_valid and issues_index is None:
+                target_valid = any(
+                    filename.startswith(target_id) and filename.endswith(".md")
+                    for root, _dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "B2-docs"))
+                    for filename in files
+                )
+
+        if canonical_path and not os.path.isabs(canonical_path) and ".." not in Path(canonical_path).parts:
+            canonical_valid = path_exists(canonical_path)
+
+        if not target_valid and not canonical_valid:
             errors.append(
-                f"{iid} in {issue.path}: phase_state is 'absorbed' but no absorbed_into field. "
-                f"→ 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。Set absorbed_into to the canonical I-* issue."
+                f"{iid} in {issue.path}: phase_state is 'absorbed' but neither absorbed_into "
+                "nor canonical_issue_path resolves to a canonical I-* issue. "
+                "Set at least one verifiable project-relative canonical relationship."
             )
 
     # 4. Dropped validation: prevent using "dropped" as a shortcut for completed code merges.

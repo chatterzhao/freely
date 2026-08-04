@@ -1,6 +1,7 @@
 ---
 name: freely-auto-loop-orchestrator
-description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工具到 manager/worker 编排、
+description: >-
+  编排 AI 自主持续交付循环。从启动外部 AI CLI 工具到 manager/worker 编排、
   上下文判定、进入 doc-loop/dev-loop，再回到发现阶段。
 
   Use when: AI 运行自主持续交付循环，或需要编排多 agent 协作。
