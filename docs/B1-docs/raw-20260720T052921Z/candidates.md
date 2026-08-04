@@ -20,6 +20,6 @@ milestone: M-20260720T052921Z-A
 - open_questions: []
 - acceptance_reviews: []
 - promoted_issue_id: I-20260720T052921Z-A
-- promoted_issue_path: docs/issues/I-20260720T052921Z-A/issue.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260720T052921Z/issues/I-20260720T052921Z-A.md
 - milestone: M-20260720T052921Z-A
 - session_refs: []
