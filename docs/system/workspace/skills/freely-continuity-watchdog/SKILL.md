@@ -1,6 +1,7 @@
 ---
 name: freely-continuity-watchdog
-description: >- 管理 Freely 运行时上下文连续性。覆盖 context warn、context rotate、
+description: >-
+  管理 Freely 运行时上下文连续性。覆盖 context warn、context rotate、
   fresh_with_handoff、continuity artifact 选择与旧会话证据引用边界。
 
   Use when: 上下文超限预警、需要 rotate 或 fresh start、handoff 传递。

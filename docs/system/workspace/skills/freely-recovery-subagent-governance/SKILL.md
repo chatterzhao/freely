@@ -1,6 +1,7 @@
 ---
 name: freely-recovery-subagent-governance
-description: >- 强制恢复耦合和子代理治理约束。确保 AI 委托任务、恢复中断工作时
+description: >-
+  强制恢复耦合和子代理治理约束。确保 AI 委托任务、恢复中断工作时
   保持分支/worktree 上下文和所有权边界。
 
   Use when: AI 恢复中断工作、委托子任务、或需要保持上下文所有权。

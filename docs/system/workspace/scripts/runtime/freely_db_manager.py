@@ -316,6 +316,21 @@ class DbDaemon:
         c.execute("CREATE INDEX IF NOT EXISTS idx_aw_manager ON agent_working(manager_id)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_aw_reviewer ON agent_working(reviewer_id)")
 
+        # reviews — persisted review verdicts per raw_key per stage (replaces in-memory-only)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS reviews (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                raw_key TEXT NOT NULL,
+                review_stage TEXT NOT NULL,
+                verdict TEXT NOT NULL,
+                reviewed_by TEXT NOT NULL DEFAULT '',
+                reviewed_at TEXT NOT NULL DEFAULT (datetime('now')),
+                findings TEXT DEFAULT '[]',
+                UNIQUE(raw_key, review_stage)
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_reviews_raw_key ON reviews(raw_key)")
+
         # Schema migration: review_stage for a2a_tasks
         try:
             c.execute("ALTER TABLE a2a_tasks ADD COLUMN review_stage TEXT DEFAULT ''")
@@ -424,11 +439,17 @@ class DbDaemon:
     # ── Lifecycle ─────────────────────────────────────────────────────
 
     def start(self) -> None:
-        self._open_db()
-        self._ensure_tables()
-        self.running = True
-        self.uptime = time.time()
-        self._run_socket_server()
+        try:
+            self._open_db()
+            self._ensure_tables()
+            self.running = True
+            self.uptime = time.time()
+            self._run_socket_server()
+        except Exception as e:
+            import traceback
+            self.log(f"FATAL: daemon crashed with {type(e).__name__}: {e}")
+            self.log(traceback.format_exc())
+            raise
 
     def stop(self) -> None:
         self.running = False
@@ -1581,6 +1602,49 @@ def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
         result[role] = {"occupied": occupied, "pool": pool, "free": pool - occupied}
     return result
 
+# ── Review persistence ──────────────────────────────────────────────────────
+
+@_h("agent_working.record_review")
+def h_aw_record_review(daemon: DbDaemon, params: dict) -> dict:
+    """Persist review verdict. UPSERT by (raw_key, review_stage)."""
+    raw_key = params["raw_key"]
+    review_stage = params["review_stage"]
+    verdict = params["verdict"]
+    reviewed_by = params.get("reviewed_by", "")
+    findings = params.get("findings", "[]")
+    if verdict not in ("PASS", "FAIL"):
+        return {"status": "error", "message": f"verdict must be PASS or FAIL, got: {verdict}"}
+    daemon.conn.execute("""
+        INSERT INTO reviews (raw_key, review_stage, verdict, reviewed_by, reviewed_at, findings)
+        VALUES (?,?,?,?,datetime('now'),?)
+        ON CONFLICT(raw_key, review_stage) DO UPDATE SET
+            verdict=excluded.verdict,
+            reviewed_by=excluded.reviewed_by,
+            reviewed_at=datetime('now'),
+            findings=excluded.findings
+    """, (raw_key, review_stage, verdict, reviewed_by, findings))
+    daemon.conn.commit()
+    return {"status": "ok", "raw_key": raw_key, "review_stage": review_stage}
+
+
+@_h("agent_working.get_reviews")
+def h_aw_get_reviews(daemon: DbDaemon, params: dict) -> dict:
+    """Return all review records for a raw_key as {stage: {verdict, ...}}."""
+    rows = daemon.conn.execute(
+        "SELECT * FROM reviews WHERE raw_key=? ORDER BY review_stage",
+        (params["raw_key"],)
+    ).fetchall()
+    reviews = {}
+    for r in rows:
+        reviews[r["review_stage"]] = {
+            "verdict": r["verdict"],
+            "reviewed_by": r["reviewed_by"],
+            "reviewed_at": r["reviewed_at"],
+            "findings": r["findings"],
+        }
+    return {"reviews": reviews}
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def cmd_start(args) -> int:
@@ -1617,7 +1681,9 @@ def cmd_start(args) -> int:
     with open(pid_file, "w") as f:
         f.write(str(os.getpid()))
 
-    def _cleanup(*_):
+    def _cleanup(signum=None, frame=None):
+        sig_name = signal.Signals(signum).name if signum is not None else "EXIT"
+        daemon.log(f"daemon received signal {sig_name}, stopping")
         daemon.stop()
         if os.path.exists(pid_file):
             os.unlink(pid_file)

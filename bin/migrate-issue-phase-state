@@ -1,80 +1,63 @@
 #!/usr/bin/env python3
-"""Migration: eliminate residual `status` field, ensure `phase_state` + `platform_state`.
+"""Audit legacy phase metadata without rewriting lifecycle state.
 
-Idempotent. Safe to run multiple times.
-- raw-*: if both status + phase_state → remove status (keep phase_state)
-- raw-*: if only status → rename to phase_state
-- I-*: if status exists → remove it (phase_state is canonical)
-- all: add platform_state if missing
+Historical bulk migration inferred platform state and appended fields. That is
+unsafe for strict raw schema and cannot prove canonical absorption. This command
+is intentionally read-only; lifecycle owners perform any required transition.
 """
+from __future__ import annotations
+
+import sys
 from pathlib import Path
-import re, subprocess, sys
+
+import yaml
 
 PROJECT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
-ISSUES_DIR = PROJECT / "docs" / "issues"
+ISSUES_DIR = PROJECT / "docs" / "B1-docs"
+LIFECYCLE_DIR = PROJECT / "docs" / "system" / "workspace" / "scripts" / "lifecycle"
+sys.path.insert(0, str(LIFECYCLE_DIR))
+
+from raw_metadata_contract import MetadataValidationError, normalize, validate
 
 
-def github_state(issue_number: str) -> str:
-    """Query GitHub issue state. Returns 'open', 'closed', or '' on failure."""
-    try:
-        r = subprocess.run(
-            ["gh", "issue", "view", issue_number, "--repo", "chatterzhao/freely",
-             "--json", "state"], capture_output=True, text=True, timeout=5)
-        return "closed" if "CLOSED" in r.stdout else "open" if "OPEN" in r.stdout else ""
-    except Exception:
-        return ""
-
-
-count = 0
-for d in sorted(ISSUES_DIR.iterdir()):
-    if not d.is_dir():
-        continue
-    mf = d / "issue.md"
-    if not mf.is_file():
-        continue
-    text = mf.read_text(encoding="utf-8")
-    parts = text.split("---", 2)
+def read_frontmatter(path: Path) -> dict:
+    parts = path.read_text(encoding="utf-8").split("---", 2)
     if len(parts) < 3:
-        continue
-    fm = parts[1]
-    changed = False
-    name = d.name
+        return {}
+    value = yaml.safe_load(parts[1]) or {}
+    return value if isinstance(value, dict) else {}
 
-    has_status = bool(re.search(r'^status:', fm, re.MULTILINE))
-    has_phase = "phase_state:" in fm
 
-    # 1. Eliminate status field
-    if name.startswith("raw-"):
-        if has_status and has_phase:
-            # Both exist → remove redundant status
-            fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
-            changed = True
-            print(f"[migrate] {name}: removed redundant status (phase_state exists)")
-        elif has_status and not has_phase:
-            # Only status → rename to phase_state
-            fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
-            changed = True
-            print(f"[migrate] {name}: status → phase_state")
-    elif name.startswith("I-"):
-        if has_status:
-            # I-* uses phase_state exclusively → remove status
-            fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
-            changed = True
-            print(f"[migrate] {name}: removed status (I-* uses phase_state)")
+def main() -> int:
+    findings: list[str] = []
+    if not ISSUES_DIR.is_dir():
+        print(f"[phase-audit] issue directory not found: {ISSUES_DIR}", file=sys.stderr)
+        return 1
 
-    # 2. Add platform_state if missing
-    if "platform_state:" not in fm:
-        m = re.search(r'issue_id:\s*["\']?(\d+)["\']?', fm)
-        if m and m.group(1):
-            state = github_state(m.group(1))
-            fm = fm.rstrip() + f"\nplatform_state: {state}\n"
-        else:
-            fm = fm.rstrip() + "\nplatform_state: ''\n"
-        changed = True
-        print(f"[migrate] {name}: platform_state added")
+    for issue_file in sorted(ISSUES_DIR.glob("*/issue.md")):
+        name = issue_file.parent.name
+        metadata = read_frontmatter(issue_file)
+        if not metadata:
+            continue
+        if name.startswith("raw-"):
+            view = normalize(metadata)
+            if view["strict_schema"]:
+                try:
+                    validate(metadata, base_dir=PROJECT)
+                except MetadataValidationError as error:
+                    findings.append(f"{name}: invalid strict metadata: {error}")
+            elif "status" in metadata or "platform_state" not in metadata:
+                findings.append(
+                    f"{name}: legacy metadata requires explicit lifecycle review; no automatic migration"
+                )
+        elif name.startswith("I-") and "status" in metadata:
+            findings.append(f"{name}: linked legacy status requires its owner workflow")
 
-    if changed:
-        mf.write_text(f"---{fm}---{parts[2]}", encoding="utf-8")
-        count += 1
+    for finding in findings:
+        print(f"[phase-audit] {finding}")
+    print(f"[phase-audit] read-only: {len(findings)} finding(s), 0 files changed")
+    return 0
 
-print(f"[migrate] done: {count} files changed")
+
+if __name__ == "__main__":
+    raise SystemExit(main())

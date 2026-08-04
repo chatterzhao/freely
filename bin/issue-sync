@@ -14,10 +14,8 @@
 #   I-*:  [I-20260426-0000-A] <title>   labels: kind/linked, phase/<state>
 #
 # Lifecycle:
-#   chat → raw-* → B1_IBM → promoted → I-* → B2_IBM → pr-create-guarded → pr-merge-guarded → completed
-#              ↓                                                                       ↓
-#         issue-sync create                                                      issue-sync update
-#         issue-sync close (after promote)                                       issue-sync close (after merge)
+#   chat → raw proposed → B1 promotion_started (1:N children)
+#   → promotion_finalized (absorbed/open) → configured-platform close (absorbed/closed)
 #
 # Usage:
 #   bin/issue-sync create  <local_id>     Create platform issue (idempotent)
@@ -74,6 +72,20 @@ with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body)
 _fm_set_str() {
   local file="$1" key="$2" value="$3"
   _fm_set "$file" "$key" "'$value'"
+}
+
+_raw_effect() {
+  local contract_root="${RAW_METADATA_CONTRACT_ROOT:-$ROOT_DIR}"
+  PYTHONPATH="$contract_root/docs/system/workspace/scripts/lifecycle" python3 \
+    "$contract_root/docs/system/workspace/scripts/lifecycle/raw_lifecycle_effects.py" "$@"
+}
+
+_raw_transition_if_strict() {
+  local file="$1" event="$2" issue_id="${3:-}" issue_path="${4:-}"
+  local source_candidate="${5:-}" at="${6:-}" note="${7:-}"
+  [[ "$(_fm_get "$file" "schema_version")" == "1" ]] || return 1
+  _raw_effect transition "$file" "$event" "$ROOT_DIR" "$issue_id" "$issue_path" \
+    "$source_candidate" "$at" "$note"
 }
 
 # ── scan state & dedup ────────────────────────────────────
@@ -595,6 +607,17 @@ cmd_close() {
   file="$ISSUES_DIR/$local_id/issue.md"
   [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
 
+  # Strict raw closure is delegated to the configured-platform effect. Only a
+  # complete all-platform close may commit platform_state=closed locally.
+  if [[ "$(_fm_get "$file" "schema_version")" == "1" ]]; then
+    if ! _raw_effect close-platforms "$file" "$ROOT_DIR"; then
+      echo "[ERROR] issue-sync close: configured platform close failed for $local_id" >&2
+      return 1
+    fi
+    echo "[issue-sync] close complete: $local_id"
+    return 0
+  fi
+
   gh_id=$(_gh_issue_number "$file")
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
 
@@ -665,16 +688,20 @@ cmd_promote() {
   # 1. Create I-* on platforms (with kind/linked label)
   cmd_create "$i_id"
 
-  # 2. Update raw's promoted_children list
-  local promoted_json
-  promoted_json=$(_fm_get "$raw_file" "promoted_children")
-  if [[ -z "$promoted_json" || "$promoted_json" == "None" ]]; then
-    _fm_set_str "$raw_file" "promoted_children" "[\"$i_id\"]"
+  # 2. Record promotion without changing the raw phase.
+  local promoted_at; promoted_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  if [[ "$(_fm_get "$raw_file" "schema_version")" == "1" ]]; then
+    _raw_transition_if_strict "$raw_file" "promotion_started" "$i_id" "" "" "$promoted_at"
   else
-    # Append to existing list
-    local new_list
-    new_list=$(python3 -c "import json; lst = json.loads('$promoted_json'); lst.append('$i_id'); print(json.dumps(lst))" 2>/dev/null || echo "[\"$i_id\"]")
-    _fm_set "$raw_file" "promoted_children" "$new_list"
+    local promoted_json
+    promoted_json=$(_fm_get "$raw_file" "promoted_children")
+    if [[ -z "$promoted_json" || "$promoted_json" == "None" ]]; then
+      _fm_set "$raw_file" "promoted_children" "[\"$i_id\"]"
+    else
+      local new_list
+      new_list=$(python3 -c "import json; lst = json.loads('$promoted_json'); '$i_id' not in lst and lst.append('$i_id'); print(json.dumps(lst))" 2>/dev/null || echo "[\"$i_id\"]")
+      _fm_set "$raw_file" "promoted_children" "$new_list"
+    fi
   fi
 
   # 3. Update I-* with cross-reference back to raw
@@ -716,8 +743,17 @@ for i, cid in enumerate(children, 1):
 print('\n'.join(lines))
 " 2>/dev/null || echo "Promoted to: $promoted_json")
 
-  # Add closing comment to raw
-  cat >> "$raw_file" <<COMMENT
+  # Strict metadata derives the first verifiable canonical relation from registered children.
+  local finalized_at; finalized_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  if [[ "$(_fm_get "$raw_file" "schema_version")" == "1" ]]; then
+    _raw_effect finalize "$raw_file" "$ROOT_DIR" "$finalized_at"
+  else
+    _fm_set_str "$raw_file" "phase_state" "absorbed"
+  fi
+
+  # Add one retry-safe closing comment to raw.
+  if ! grep -q '^- event: promote_finalized$' "$raw_file"; then
+    cat >> "$raw_file" <<COMMENT
 
 ### comment-$(date -u +"%Y%m%dT%H%M%SZ")
 - source: system
@@ -726,13 +762,12 @@ print('\n'.join(lines))
 
 $children_text
 COMMENT
+  fi
 
-  # Push comment then close raw on platforms
+  # Platform synchronization follows the local terminal transition. A failed close
+  # leaves absorbed/open state for an idempotent batch retry.
   cmd_comment "$raw_id"
   cmd_close "$raw_id" "completed"
-
-  # Update raw local state
-  _fm_set_str "$raw_file" "phase_state" "absorbed"
 
   echo "[issue-sync] promote-finalize complete: $raw_id closed with $promoted_json"
 }

@@ -269,6 +269,16 @@ cd "$ROOT_DIR"
 source "$ROOT_DIR/bin/worktree-common.sh"
 freely_wt_assert_strict_root
 
+if [[ "$using_new" -eq 1 ]]; then
+  echo "wt-create: verifying configured raw replicas..." >&2
+  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" \
+    --project "$ROOT_DIR" --raw-key "$raw_key" || {
+      echo "拒绝创建工位: configured raw replicas are inconsistent or unavailable" >&2
+      exit 1
+    }
+fi
+
 # ── Validate base exists ─────────────────────────────────
 
 if ! git show-ref --verify --quiet "refs/heads/$base" && ! git rev-parse --verify --quiet "$base" >/dev/null; then
@@ -628,25 +638,6 @@ except: pass
 " 2>/dev/null || true
 }
 
-# _mark_raw_issue_absorbed: after successful worktree creation, mark the
-# raw issue as absorbed so scan stops showing it and comment routing works.
-_mark_raw_issue_absorbed() {
-  local raw_key="$1"
-  local target_path="${2:-$ROOT_DIR}"
-  local issue_file="$target_path/docs/B1-docs/raw-${raw_key}/issue.md"
-  [[ -f "$issue_file" ]] || { echo "warning: issue file not found: $issue_file" >&2; return 0; }
-  python3 -c "
-import yaml
-with open('$issue_file') as f: c = f.read()
-p = c.split('---', 2)
-if len(p) < 3: exit(1)
-fm = yaml.safe_load(p[1]) or {}
-fm['phase_state'] = 'absorbed'
-new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
-with open('$issue_file', 'w') as f: f.write('---\n' + new_fm + '\n---' + p[2])
-" 2>/dev/null && echo "phase_state: absorbed → raw-${raw_key}" || echo "warning: failed to update phase_state for raw-${raw_key}" >&2
-}
-
 # ── Create worktree helper ───────────────────────────────
 
 _create_worktree() {
@@ -711,7 +702,6 @@ fi
       return 1
     fi
     _fill_platform_ids "$raw_key"
-    _mark_raw_issue_absorbed "$raw_key" "$fix_target"
 	    _update_scan_state "$raw_key" "working" "$fix_target"
   fi
 

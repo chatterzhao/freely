@@ -1,0 +1,3 @@
+AT-001 GREEN: read_task_mode returns error:db_unavailable + exit 1 on DB failure (was: wait + exit 0)
+Verified by code inspection: grep confirmed 'error:db_unavailable'; return 1 at freely script.
+All 6 callers verified compatible with error:db_unavailable token.

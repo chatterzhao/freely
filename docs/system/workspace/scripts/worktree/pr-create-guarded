@@ -86,6 +86,12 @@ PHASE
       exit 1
     fi
     echo "Step 0b/4: phase_state=absorbed ✓"
+    echo "Step 0b/4: raw replica reconciliation..."
+    freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$ROOT_DIR" || {
+      echo "[PR-CREATE] raw replicas are inconsistent; resolve explicitly, then retry." >&2
+      exit 1
+    }
+    echo "Step 0b/4: raw replicas reconciled ✓"
   fi
 fi
 
@@ -115,19 +121,6 @@ else
   echo "[WARN] check-epics-map not found, skipping"
 fi
 echo ""
-
-# ── Step 2: dry-run merge gate ──
-echo "Step 2b/4: dry-run merge gate..."
-if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
-  "$ROOT_DIR/bin/pr-merge-guarded" --dry-run "$base" "$current_branch"
-  if [[ $? -ne 0 ]]; then
-    echo ""
-    echo "dry-run 门禁未通过。请修复后重试。"
-    exit 1
-  fi
-else
-  echo "[WARN] pr-merge-guarded not found, skipping dry-run"
-fi
 
 # ── Step 2b: IBM governance gate (early check before PR creation) ──
 # Runs governance-merge-gate on the diff between base and current branch.
@@ -434,100 +427,35 @@ if [[ -z "${body:-}" ]]; then
   body="See commits for details."
 fi
 
-_platform_configs() {
-  local configured="${FREELY_REPO_PLATFORMS:-}"
-  if [[ -n "$configured" ]]; then
-    printf '%s\n' "$configured" | tr ',' '\n'
-  else
-    # Auto-detect: check remote URLs to identify platforms.
-    # Uses URL matching so any remote name (origin, upstream, etc.) works.
-    # Also keeps name-based detection for backward compatibility.
-    local found_github=0 found_gitee=0 found_gitlab=0
-    while IFS= read -r remote; do
-      [[ -z "$remote" || "$remote" == "all" ]] && continue
-      local url
-      url=$(git remote get-url "$remote" 2>/dev/null || true)
-      case "$url" in
-        *github.com*|*github-*|*github*)  found_github=1 ;;
-        *gitee.com*|*gitee-*|*gitee*)      found_gitee=1 ;;
-        *gitlab.com*|*gitlab-*|*gitlab*)    found_gitlab=1 ;;
-      esac
-      # Also check remote name as fallback
-      case "$remote" in
-        github) found_github=1 ;;
-        gitee)  found_gitee=1 ;;
-        gitlab) found_gitlab=1 ;;
-      esac
-    done < <(git remote)
-    [[ "$found_github" == "1" ]] && echo "github"
-    [[ "$found_gitee" == "1" ]] && echo "gitee"
-    [[ "$found_gitlab" == "1" ]] && echo "gitlab"
-    # If nothing detected, fall back to origin only
-    if [[ "$found_github" == "0" && "$found_gitee" == "0" && "$found_gitlab" == "0" ]]; then
-      git remote | grep -v '^all$' | while read -r r; do echo "$r"; done
-    fi
-  fi | sort -u
-}
-
-_platform_cli() {
-  case "$1" in
-    github) echo "gh" ;;
-    gitee)  echo "gitee" ;;
-    *)      echo "" ;;
-  esac
-}
-
-_platform_remote_name() {
-  case "$1" in
-    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
-    *)     echo "$1" ;;
-  esac
-}
-
-platforms=$(_platform_configs)
-if [[ -z "$platforms" ]]; then
-  echo "ERROR: no platforms. Set FREELY_REPO_PLATFORMS or add remotes." >&2
-  exit 1
-fi
-echo "Platforms: $(echo "$platforms" | tr '\n' ' ')"
-
-pushed_any=0
-pr_created_any=0
-for platform in $platforms; do
-  remote=$(_platform_remote_name "$platform")
-
-  # Push branch to this platform
-  echo "  [$platform] pushing branch..."
-  if git push --force-with-lease "$remote" "$current_branch" 2>&1; then
-    pushed_any=1
-    echo "  [$platform] push ✓"
-  else
-    echo "  [$platform] push FAILED" >&2
-    continue
-  fi
-done
-echo ""
-
-if [[ "$pushed_any" == "0" ]]; then
-  echo "ERROR: failed to push to any platform" >&2
-  exit 1
-fi
-
-# Create PR on all platforms via platform-adapter (#3340)
-echo "  Creating PR via platform-adapter..."
 _adapter="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
-_pr_result="$(python3 "$_adapter" create-pr "$current_branch" "$base" "$title" "$body" 2>&1)" || true
+set +e
+_pr_result="$(python3 "$_adapter" guarded-pr-update "$current_branch" "$base" "$title" "$body" 2>&1)"
+_pr_rc=$?
+set -e
 echo "$_pr_result"
 
-# Check if at least one platform succeeded
-if echo "$_pr_result" | grep -q '"status": "created"'; then
-  pr_created_any=1
+if [[ "$_pr_rc" -ne 0 ]]; then
+  cat >&2 <<'PR_UPDATE_FAILED'
+ERROR: guarded PR update did not complete on every configured platform.
+No raw push recovery is allowed. Follow the per-platform state and recovery output above.
+PR_UPDATE_FAILED
+  exit 1
 fi
 
-if [[ "$pr_created_any" == "1" ]]; then
-  echo ""
-  echo "Next: freely pr-review-guarded $current_branch"
-  echo ""
+# The merge gate compares the local candidate with the PR branch. Run it only
+# after every configured adapter has synchronized that branch and ensured its PR.
+echo ""
+echo "Step 4/4: dry-run merge gate against synchronized PR heads..."
+if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
+  "$ROOT_DIR/bin/pr-merge-guarded" --dry-run "$base" "$current_branch" || {
+    echo ""
+    echo "dry-run 门禁未通过。平台分支已受控同步；修复门禁问题后重跑 freely pr-create-guarded。"
+    exit 1
+  }
 else
-  echo "WARNING: PR not created on any platform (manual PR may be needed)" >&2
+  echo "[WARN] pr-merge-guarded not found, skipping dry-run"
 fi
+
+echo ""
+echo "Next: freely pr-review-guarded $current_branch"
+echo ""

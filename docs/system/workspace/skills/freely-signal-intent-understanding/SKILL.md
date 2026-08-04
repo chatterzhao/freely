@@ -1,6 +1,7 @@
 ---
 name: freely-signal-intent-understanding
-description: >- 在 manager routing 之前收敛 signal 的最小意图结构：要推进什么、
+description: >-
+  在 manager routing 之前收敛 signal 的最小意图结构：要推进什么、
   是否需要 live inspection、是否需要 analysis/execution。
 
   Use when: 主管面对 interruption、review、test、runtime anomaly 或

@@ -1,198 +1,48 @@
 #!/usr/bin/env python3
-"""
-Batch closeout for raw issues where GitHub issue is already closed
-but local phase_state hasn't been updated.
+"""Report raw closeout drift without producing lifecycle facts.
 
-Usage: bin/batch-closeout-raw-issues [--dry-run]
-
-For each raw-* issue in the scan's local_needs_closeout list:
-1. Verify GitHub issue is actually closed
-2. Update local issue.md: phase_state==absorbed, platform_state==closed
+Platform closure cannot prove absorption or select a canonical I-* owner. This
+historical batch entry therefore remains read-only. Use the command that owns
+the missing fact (`issue-sync promote-finalize`, drop, or platform close) after
+reviewing each reported raw.
 """
 from __future__ import annotations
-import argparse, json, os, re, subprocess, sys
-from datetime import datetime, timezone
-from pathlib import Path
 
+import argparse
+import json
+import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def gh_issue_state(issue_id: str) -> str | None:
-    """Get GitHub issue state via gh CLI."""
-    try:
-        r = subprocess.run(
-            ["gh", "issue", "view", issue_id, "--json", "state", "--repo", "chatterzhao/freely"],
-            capture_output=True, text=True, timeout=15,
-        )
-        if r.returncode != 0:
-            return None
-        data = json.loads(r.stdout)
-        return data.get("state")
-    except (json.JSONDecodeError, subprocess.TimeoutExpired):
-        return None
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Audit raw closeout drift")
+    parser.add_argument("--dry-run", action="store_true", help="Retained compatibility flag; audit is always read-only")
+    parser.parse_args()
 
-
-def update_issue_fm(key: str) -> tuple[bool, str]:
-    """Update issue.md frontmatter. Returns (changed, reason)."""
-    path = ROOT / "docs" / "issues" / key / "issue.md"
-    if not path.is_file():
-        return False, "no issue.md"
-
-    content = path.read_text(encoding="utf-8")
-    parts = content.split("---", 2)
-    if len(parts) < 3:
-        return False, "no valid frontmatter"
-
-    fm_text = parts[1]
-    body = parts[2]
-
-    # Check current phase_state
-    phase_match = re.search(r"^phase_state:\s*(\S+)", fm_text, re.MULTILINE)
-    platform_match = re.search(r"^platform_state:\s*(\S+)", fm_text, re.MULTILINE)
-
-    if not phase_match or not platform_match:
-        return False, "missing phase_state or platform_state"
-
-    phase_val = phase_match.group(1)
-    plat_val = platform_match.group(1)
-
-    if plat_val == "closed" and phase_val in ("absorbed", "completed", "dropped"):
-        return False, f"already closed (phase={phase_val})"
-
-    # Determine phase_state based on current state
-    new_phase = "absorbed" if phase_val in ("proposed", "open") else "completed"
-
-    # Update phase_state
-    fm_text = re.sub(
-        r"^phase_state:\s*\S+",
-        f"phase_state: {new_phase}",
-        fm_text,
-        count=1,
-        flags=re.MULTILINE,
-    )
-    # Update platform_state
-    fm_text = re.sub(
-        r"^platform_state:\s*\S+",
-        "platform_state: closed",
-        fm_text,
-        count=1,
-        flags=re.MULTILINE,
-    )
-    # Add completed_at if not present
-    if "completed_at:" not in fm_text:
-        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        fm_text += f"completed_at: '{now}'\n"
-
-    new_content = parts[0] + "---" + fm_text + "---" + body
-    path.write_text(new_content, encoding="utf-8")
-    return True, f"updated phase_state={new_phase}, platform_state=closed"
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Batch closeout raw issues")
-    parser.add_argument("--dry-run", action="store_true", help="Don't modify files")
-    args = parser.parse_args()
-
-    # Load scan JSON from the authoritative source (project root)
     scan_path = ROOT / ".freely" / "run" / "manager-task-source-scan-latest.json"
     if not scan_path.is_file():
-        # Fallback: look in the source project
-        alt = ROOT.parent.parent / "freely" / ".freely" / "run" / "manager-task-source-scan-latest.json"
-        if alt.is_file():
-            scan_path = alt
-        else:
-            print("ERROR: scan JSON not found", file=sys.stderr)
-            sys.exit(1)
+        print("[closeout-audit] scan JSON not found", file=sys.stderr)
+        return 1
 
-    with open(scan_path) as f:
-        scan = json.load(f)
-
-    items = [i for i in scan.get("items", []) if i.get("stage") == "local_needs_closeout"]
-
-    if not items:
-        print("No local_needs_closeout items found")
-        return
-
-    print(f"Found {len(items)} local_needs_closeout items")
-    print()
-
-    # Phase 1: Verify GitHub issue states (batched)
-    verified_closed = []
-    verified_open = []
-    unchecked = []
+    scan = json.loads(scan_path.read_text(encoding="utf-8"))
+    items = [
+        item
+        for item in scan.get("items", [])
+        if item.get("stage") in {"local_needs_closeout", "close_local", "merged_develop"}
+    ]
 
     for item in items:
-        key = item.get("key", "")
-        pid = item.get("platform_issue", "")
-        if not key or not pid:
-            unchecked.append((key, pid, "no key or platform_issue"))
-            continue
-
-        state = gh_issue_state(str(pid))
-        if state == "CLOSED":
-            verified_closed.append((key, pid))
-        elif state == "OPEN":
-            verified_open.append((key, pid))
-        else:
-            unchecked.append((key, pid, f"gh returned state={state}"))
-
-    print(f"=== Verification Results ===")
-    print(f"Closed on GitHub: {len(verified_closed)}")
-    print(f"Still OPEN on GitHub: {len(verified_open)}")
-    print(f"Unchecked (gh failed): {len(unchecked)}")
-    print()
-
-    if args.dry_run:
-        print("=== DRY RUN — would update these ===")
-        for key, pid in verified_closed:
-            print(f"  {key} (platform #{pid})")
-        return
-
-    # Phase 2: Update files for confirmed-closed issues
-    changed = 0
-    skipped = 0
-    errors = []
-
-    for key, pid in verified_closed:
-        ok, msg = update_issue_fm(key)
-        if ok:
-            changed += 1
-            print(f"  ✓ {key}: {msg}")
-        else:
-            skipped += 1
-            if msg:
-                print(f"  - {key}: {msg}")
-
-    for key, pid, reason in unchecked:
-        # Still try gh one more time for each
-        state = gh_issue_state(str(pid))
-        if state == "CLOSED":
-            ok, msg = update_issue_fm(key)
-            if ok:
-                changed += 1
-                print(f"  ✓ {key}: {msg} (retry)")
-            else:
-                skipped += 1
-                print(f"  - {key}: {msg} (retry)")
-        else:
-            errors.append((key, pid, reason))
-            print(f"  ✗ {key}: could not verify — {reason}")
-
-    print()
-    print(f"=== Summary ===")
-    print(f"Updated: {changed}")
-    print(f"Skipped: {skipped}")
-    print(f"Errors: {len(errors)}")
-
-    if verified_open:
-        print()
-        print("WARNING: These issues are still OPEN on GitHub:")
-        for key, pid in verified_open:
-            print(f"  {key} (platform #{pid})")
-
-    return 0 if not errors else 1
+        key = item.get("key", "<unknown>")
+        phase = item.get("phase_state", "")
+        print(
+            f"[closeout-audit] {key}: phase={phase or '<missing>'}; "
+            "review canonical relation and use its owning lifecycle command"
+        )
+    print(f"[closeout-audit] read-only: {len(items)} finding(s), 0 files changed")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
