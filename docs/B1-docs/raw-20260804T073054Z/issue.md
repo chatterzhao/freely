@@ -30,6 +30,8 @@ completed_at: '2026-08-04T09:21:00Z'
 closeout_note: ''
 ---
 
+# fix: 30 个 workspace skill 的 SKILL.md frontmatter YAML 无效导致 codex 启动跳过加载
+
 workflow_kind: fix
 
 ## 现象
