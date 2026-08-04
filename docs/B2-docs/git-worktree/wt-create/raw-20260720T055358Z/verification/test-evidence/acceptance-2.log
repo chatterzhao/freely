@@ -1,0 +1,9 @@
+# AT-002: Script continues when issue.md exists but lacks phase_state
+
+## RED phase (patrol-level, code review)
+When issue.md lacks phase_state (e.g. chain_trace merged_develop items),
+grep returns exit 1 → set -euo pipefail kills script → no worktree created.
+
+## GREEN phase (fix applied)
+|| true on line 311 absorbs grep's exit 1 → _phase="" → case falls through → no action → script continues.
+Verified by code review of the applied fix on line 311.
