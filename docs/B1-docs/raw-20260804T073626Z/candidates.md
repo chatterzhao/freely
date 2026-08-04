@@ -29,5 +29,6 @@ milestone: M-20260804T073626Z-A
   - summary: 逐项核对 develop 代码（L234/L426/L710/L917/L942）与 wt-create 实测，确认全部落地
   - verdict: pass
 - absorbed_into: I-20260725T030511Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/issues/I-20260725T030511Z-A.md
 - milestone: M-20260804T073626Z-A
 - session_refs: []
