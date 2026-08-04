@@ -36,19 +36,11 @@ class RawIssueMaterializationTests(unittest.TestCase):
             yaml.safe_dump(payload, allow_unicode=True, sort_keys=False).strip()
         )
         original = {
-            "search_raw_issue": adapter.search_raw_issue,
-            "fetch_issue": adapter.fetch_issue,
+            "discover_raw_replicas": adapter.discover_raw_replicas,
             "check_and_claim_assignee": adapter.check_and_claim_assignee,
         }
-        adapter.search_raw_issue = lambda _: {
-            "github": {"issue_number": "4070", "url": "https://example.test/4070"}
-        }
-        adapter.fetch_issue = lambda *_: {
-            "title": "[RAW-20260721T223133Z] fix: example",
-            "body": platform_body,
-            "created_at": created_at,
-            "updated_at": "2026-07-21T23:00:00Z",
-            "labels": ["phase/proposed"],
+        adapter.discover_raw_replicas = lambda _: {
+            "github": {"status": "ok", "issue_id": "4070", "url": "https://example.test/4070", "title": "[RAW-20260721T223133Z] fix: example", "body": platform_body, "created_at": created_at, "updated_at": "2026-07-21T23:00:00Z", "labels": ["phase/proposed"], "state": "OPEN"}
         }
         adapter.check_and_claim_assignee = lambda *_: (True, "claimed")
         try:
@@ -64,6 +56,57 @@ class RawIssueMaterializationTests(unittest.TestCase):
         self.assertEqual(metadata["phase_state"], "proposed")
         self.assertEqual(metadata["updated_at"], "2026-07-21T23:00:00Z")
         self.assertEqual(metadata["promoted_children"], [])
+    def test_github_search_matches_raw_key_case_insensitively(self):
+        adapter = load(ADAPTER, "platform_adapter_search_case")
+        handler = adapter.GitHubHandler()
+        original = adapter.subprocess.run
+
+        def fake_run(args, **kwargs):
+            class Result:
+                returncode = 0
+                stderr = ""
+                stdout = ""
+            result = Result()
+            if args[:3] == ["gh", "repo", "view"]:
+                result.stdout = "chatterzhao/freely"
+            elif args[:3] == ["gh", "issue", "list"]:
+                result.stdout = '[{"number":4074,"title":"[raw-20260725T030511Z] example","url":"https://example.test/4074","body":""}]'
+            return result
+
+        adapter.subprocess.run = fake_run
+        try:
+            found = handler.search_raw_issue("20260725T030511Z")
+        finally:
+            adapter.subprocess.run = original
+        self.assertEqual(found["issue_number"], "4074")
+    def test_close_raw_re_resolves_even_complete_cached_ids(self):
+        adapter = load(ADAPTER, "platform_adapter_close_resolution")
+        original = {
+            "configured_platforms": adapter.configured_platforms,
+            "_handler_for": adapter._handler_for,
+            "close_issue": adapter.close_issue,
+        }
+        seen = {}
+
+        class Handler:
+            def __init__(self, issue_id):
+                self.issue_id = issue_id
+            def search_raw_issue(self, _):
+                return {"matches": [{"issue_number": self.issue_id}]}
+
+        handlers = {"github": Handler("4074"), "gitee": Handler("IK3X79")}
+        adapter.configured_platforms = lambda: list(handlers)
+        adapter._handler_for = handlers.get
+        adapter.close_issue = lambda _, ids: seen.setdefault("ids", ids) or {name: {"status": "closed"} for name in ids}
+        try:
+            adapter.close_issue_by_raw_key("20260725T030511Z", {
+                "github": {"issue_id": "wrong"}, "gitee": {"issue_id": "wrong"},
+            })
+        finally:
+            for name, value in original.items():
+                setattr(adapter, name, value)
+        self.assertEqual(seen["ids"]["github"]["issue_id"], "4074")
+        self.assertEqual(seen["ids"]["gitee"]["issue_id"], "IK3X79")
 
 
 if __name__ == "__main__":

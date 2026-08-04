@@ -1,0 +1,2 @@
+[2026-07-20] Acceptance AT-001: scan 平台同步 batch noop 确认
+Result: PASS (external - scan reports noop, cleanup-only closeout)

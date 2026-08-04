@@ -2,9 +2,11 @@
 import hashlib
 import importlib.util
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[5]
 SCANNER = ROOT / "docs/system/workspace/scripts/runtime/task-lifecycle-scan.py"
@@ -105,6 +107,15 @@ class LifecycleConsumerBoundaryTests(unittest.TestCase):
         self.assertIn('raw_grab("absorbed_into")', text)
         self.assertIn('raw_grab("canonical_issue_path")', text)
         self.assertIn("if not target_valid and not canonical_valid", text)
+
+    def test_adapter_failure_is_degraded_not_empty_platform_list(self):
+        scanner = load_scanner()
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            with mock.patch.dict(sys.modules, {"platform_adapter": None}):
+                platform_issues = scanner.get_platform_open_issues(project)
+        self.assertNotEqual(platform_issues, {})
+        self.assertIn("__degraded__", platform_issues)
 
 
 if __name__ == "__main__":

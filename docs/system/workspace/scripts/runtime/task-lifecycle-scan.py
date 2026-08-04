@@ -480,10 +480,10 @@ def extract_platform_ids(text: str) -> dict[str, str]:
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
     try:
         sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import list_open_issues
-        return list_open_issues()
-    except Exception:
-        return {}
+        from platform_adapter import list_open_issue_records
+        return list_open_issue_records()
+    except Exception as exc:
+        return {"__degraded__": {"platform": "adapter", "error": str(exc)[:200]}}
 
 
 def _build_raw_key_index(platform_issues: dict[str, dict]) -> dict[str, dict[str, str]]:
@@ -497,7 +497,8 @@ def _build_raw_key_index(platform_issues: dict[str, dict]) -> dict[str, dict[str
     multiple platforms (e.g. github: #123, gitee: ABC456).
     """
     index: dict[str, dict[str, str]] = {}
-    for issue_id, info in platform_issues.items():
+    for platform_issue_key, info in platform_issues.items():
+        issue_id = str(info.get("issue_id", platform_issue_key))
         title = info.get("title", "")
         raw_key = extract_raw_key(title)
         if raw_key:
@@ -720,6 +721,11 @@ def scan(project: Path) -> dict:
 
     configured_platforms = _detect_platforms(project)
     platform_issues = get_platform_open_issues(project)
+    platform_health = "ok"
+    platform_degraded_reason = ""
+    if "__degraded__" in platform_issues:
+        platform_health = "degraded"
+        platform_degraded_reason = str(platform_issues.pop("__degraded__").get("error", ""))[:200]
     timer.mark("platform_open")
 
     all_platform_states = get_all_platform_issue_states(project, platform_issues)
@@ -1142,6 +1148,8 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="{current_head}"
         "summary": {
             "total": len(batched_items),
             "ready": ready_count,
+            "platform_health": platform_health,
+            "platform_degraded_reason": platform_degraded_reason,
             "by_category": by_cat,
             "by_station": {st: len(si) for st, si in by_station.items()},
             "batch_count": len(batches),

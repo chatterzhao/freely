@@ -1,6 +1,7 @@
 ---
 name: freely-module-interface-governance
-description: >- 应用可插拔模块和接口版本治理，支持并行演进。覆盖模块替换、
+description: >-
+  应用可插拔模块和接口版本治理，支持并行演进。覆盖模块替换、
   版本化契约和模块间迁移路径。
 
   Use when: 引入模块替换、版本化接口或模块间迁移。

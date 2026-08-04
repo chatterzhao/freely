@@ -1,6 +1,7 @@
 ---
 name: freely-agent-execution-safety-review
-description: >- 在 Freely workspace 中执行 execution-boundary review，输出 reviewer-backed security decision 与 machine-readable evidence。不退化或逐步批准。
+description: >-
+  在 Freely workspace 中执行 execution-boundary review，输出 reviewer-backed security decision 与 machine-readable evidence。不退化或逐步批准。
 
   Use when: 安全敏感变更需要 execution-boundary 独立审查。
   触发词："安全审查"、"execution review"、"boundary check"、"execution boundary"。

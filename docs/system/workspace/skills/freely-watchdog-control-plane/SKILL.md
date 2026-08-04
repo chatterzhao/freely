@@ -1,6 +1,7 @@
 ---
 name: freely-watchdog-control-plane
-description: >- 统一 Freely 外层监督与恢复控制面。覆盖 availability、runtime、continuity
+description: >-
+  统一 Freely 外层监督与恢复控制面。覆盖 availability、runtime、continuity
   三类 watchdog 的职责边界，提供可复用的 watchdog 脚本模块。
 
   Use when: 需要整体理解或修改 watchdog 架构，排查自主运行异常。

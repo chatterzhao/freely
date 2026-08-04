@@ -1,6 +1,7 @@
 ---
 name: freely-worktree-maintenance-governance
-description: >- 核清单个 worktree 真实状态、制定多条 worktree 安全 merge 顺序、
+description: >-
+  核清单个 worktree 真实状态、制定多条 worktree 安全 merge 顺序、
   处理 stacked merge-chain、做 fleet closure 审计、处理 retired worktree。
 
   Use when: 主管需要做 worktree 级别的维护决策和审计。

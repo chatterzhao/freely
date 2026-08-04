@@ -1,6 +1,7 @@
 ---
 name: freely-branch-management
-description: >- 管理 Freely 风格开发的完整分支生命周期。支持 `freely wt-create` 命令创建的
+description: >-
+  管理 Freely 风格开发的完整分支生命周期。支持 `freely wt-create` 命令创建的
   fix/feature worktree 与依赖未合并父分支的派生 worktree。
 
   Use when: 需要创建、切换、合并或删除 fix/feature 分支，或处理分支依赖。

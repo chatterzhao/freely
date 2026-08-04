@@ -467,6 +467,12 @@ fi
 
 if [[ -n "$issue_id" ]]; then
   issue_file="$ISSUES_DIR/$issue_id/issue.md"
+  if [[ "$FORCE" != true ]]; then
+    freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$PROJECT_WORKTREE_PATH" || {
+      echo "[wt-close] raw replicas are inconsistent after merge; resolve explicitly before close." >&2
+      exit 1
+    }
+  fi
 fi
 
 if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then

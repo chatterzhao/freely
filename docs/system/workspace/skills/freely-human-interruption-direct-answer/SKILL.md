@@ -1,6 +1,7 @@
 ---
 name: freely-human-interruption-direct-answer
-description: >- 处理高注意力、低业务价值的快速人类插话。典型场景：查询 AI 进程状态、
+description: >-
+  处理高注意力、低业务价值的快速人类插话。典型场景：查询 AI 进程状态、
   简单问答。由 runtime interruption dispatcher 直接 claim 并回答。
 
   Use when: 用户问简单问题（状态查询、进度确认），无需进入长期主线。
