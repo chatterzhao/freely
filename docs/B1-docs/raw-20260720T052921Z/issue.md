@@ -22,9 +22,14 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
-\n\n## 根因
+
+
+# fix: batch fix I-* issue phase_state (15 items)
+
+## 根因
 
 15 个 I-* issue 的 phase_state 字段未更新为 terminal 状态（absorbed/dropped/completed），而是停留在非终结状态如 proposed 或空值。
 
