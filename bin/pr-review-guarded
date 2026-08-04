@@ -164,6 +164,12 @@ _wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$re
   $1=="branch" && $2==br { print wt; exit }
 ')
 _wt_path="${_wt_path:-$ROOT_DIR}"
+if [[ -n "$_raw_key" ]]; then
+  freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$_wt_path" || {
+    echo "[PR-REVIEW] raw replicas are inconsistent; resolve explicitly, then retry." >&2
+    exit 1
+  }
+fi
 
 # Find all I-* issues under this raw key
 # Search in fix worktree first (canonical), then fallback to current worktree

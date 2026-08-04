@@ -14,11 +14,11 @@
 - expected_output: OK
 - expected_RED_output: ModuleNotFoundError 或断言失败
 - actual_RED_output: "Ran 3 tests in 0.002s FAILED (errors=3) — FileNotFoundError: raw_reconciliation.py 不存在"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- actual_output: "Ran 3 tests in 0.041s OK"
+- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/verification/test-evidence/adapter-reconciliation.log
+- red-green-status: green
+- status: passed
+- blocker: ""
 - red_how: "单元测试 test-raw-reconciliation.py，功能未实现（reconciliation module 缺失），执行结果: errors=3"
 
 ### AT-002
@@ -32,11 +32,11 @@
 - expected_output: OK
 - expected_RED_output: ModuleNotFoundError 或断言失败
 - actual_RED_output: "Ran 3 tests in 0.002s FAILED (errors=3) — FileNotFoundError: raw_reconciliation.py 不存在"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- actual_output: "Ran 3 tests in 0.041s OK"
+- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/verification/test-evidence/adapter-reconciliation.log
+- red-green-status: green
+- status: passed
+- blocker: ""
 - red_how: "集成测试 test-raw-reconciliation.py，discovery/receipt 接口缺失，执行结果: errors=3"
 
 ### AT-003
@@ -50,9 +50,9 @@
 - expected_output: OK
 - expected_RED_output: 缺少 degraded 状态断言
 - actual_RED_output: "Ran 7 tests FAILED (failures=1) — AssertionError: {} == {}（adapter 故障被空集合化）"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
-- status: pending
-- blocker: execution_pending_or_failed
+- actual_output: "Ran 7 tests in 0.101s OK"
+- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20260725T030511Z/verification/test-evidence/scan-reconciliation.log
+- red-green-status: green
+- status: passed
+- blocker: ""
 - red_how: "集成测试 test-command-lifecycle-consumer-boundaries.py::test_adapter_failure_is_degraded_not_empty_platform_list，adapter 故障时 get_platform_open_issues 返回 {}，执行结果: AssertionError"

@@ -86,6 +86,12 @@ PHASE
       exit 1
     fi
     echo "Step 0b/4: phase_state=absorbed ✓"
+    echo "Step 0b/4: raw replica reconciliation..."
+    freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$ROOT_DIR" || {
+      echo "[PR-CREATE] raw replicas are inconsistent; resolve explicitly, then retry." >&2
+      exit 1
+    }
+    echo "Step 0b/4: raw replicas reconciled ✓"
   fi
 fi
 

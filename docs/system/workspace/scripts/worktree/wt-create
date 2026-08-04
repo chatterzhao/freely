@@ -269,6 +269,16 @@ cd "$ROOT_DIR"
 source "$ROOT_DIR/bin/worktree-common.sh"
 freely_wt_assert_strict_root
 
+if [[ "$using_new" -eq 1 ]]; then
+  echo "wt-create: verifying configured raw replicas..." >&2
+  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" \
+    --project "$ROOT_DIR" --raw-key "$raw_key" || {
+      echo "拒绝创建工位: configured raw replicas are inconsistent or unavailable" >&2
+      exit 1
+    }
+fi
+
 # ── Validate base exists ─────────────────────────────────
 
 if ! git show-ref --verify --quiet "refs/heads/$base" && ! git rev-parse --verify --quiet "$base" >/dev/null; then
