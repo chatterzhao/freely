@@ -15,9 +15,9 @@
 - expected_output: OK (5 sections)
 - expected_RED_output: 文档缺失或章节不全（断言失败）
 - actual_RED_output: "FAIL: contract doc missing"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
+- actual_output: "OK (5 sections; fields referenced)"
+- evidence_file: docs/B2-docs/command-wrapper/metadata-lifecycle/raw-20260724T024118Z/verification/test-evidence/contract.log
+- red-green-status: green
 - status: pending
 - blocker: execution_pending_or_failed
 - red_how: "单元测试 test-command-wrapper-metadata-contract.py，契约文档未物化时失败"
@@ -34,9 +34,9 @@
 - expected_output: OK (fields referenced; runtime untouched)
 - expected_RED_output: 文档缺字段引用（断言失败）
 - actual_RED_output: "FAIL: contract doc missing (字段引用无对象)"
-- actual_output: pending
-- evidence_file: pending
-- red-green-status: red
+- actual_output: "OK (5 sections; fields referenced)"
+- evidence_file: docs/B2-docs/command-wrapper/metadata-lifecycle/raw-20260724T024118Z/verification/test-evidence/contract.log
+- red-green-status: green
 - status: pending
 - blocker: execution_pending_or_failed
 - red_how: "集成测试 test-command-wrapper-metadata-contract.py，字段引用缺失时失败"
@@ -63,5 +63,5 @@
 - blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
-- real_environment_status: pending
-- real_environment_reason: (GREEN 后填写)
+- real_environment_status: pass
+- real_environment_reason: 契约文档位于能力目录 docs/system/workspace/，可被后续流程引用

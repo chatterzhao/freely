@@ -556,3 +556,9 @@
 - milestone: M-20260724T024118Z-A
 - status: promoted
 - promoted_issue_id: `I-20260724T024118Z-A`
+
+### committed_issues
+1. `I-20260724T024118Z-A`
+- milestone: M-20260724T024118Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/command-wrapper/metadata-lifecycle/raw-20260724T024118Z/issues/I-20260724T024118Z-A.md

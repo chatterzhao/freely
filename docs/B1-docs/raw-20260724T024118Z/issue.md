@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260724T024118Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: 'I-20260724T024118Z-A'
 platform_ids:
   github:
     issue_id: '4071'
@@ -23,7 +24,11 @@ channel: github
 session_refs: []
 ---
 
-\n\n## 根因
+
+
+# feat: clarify command-wrapper metadata lifecycle boundary
+
+## 根因
 Historical evidence shows I-20260408-1205-A completed the verification handoff contract and explicitly deferred raw-command bypass and wrapper adoption to a follow-on. The repository has wrapper commands and verification metadata, but their lifecycle boundary is not stated as one auditable contract.
 
 ## 影响
