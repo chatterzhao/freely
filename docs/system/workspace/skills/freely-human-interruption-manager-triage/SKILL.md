@@ -1,6 +1,7 @@
 ---
 name: freely-human-interruption-manager-triage
-description: >- 主管型插话 triage 技能。判断 signal 该由主管直接回答，还是委派到
+description: >-
+  主管型插话 triage 技能。判断 signal 该由主管直接回答，还是委派到
   `freely-human-interruption-handling` skill 或 worker 处理链。
 
   Use when: 收到 human interruption signal 需要做首次路由判定。

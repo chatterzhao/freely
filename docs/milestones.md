@@ -449,3 +449,17 @@
 - milestone: M-20260804T073626Z-A
 - status: absorbed
 - absorbed_into: I-20260725T030511Z-A
+
+## M-20260804T073054Z-A
+- title: SKILL.md frontmatter YAML 修复 + 部署链校验
+- status: active
+### candidate_issues
+1. `C-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- status: promoted
+- promoted_issue_id: `I-20260804T073054Z-A`
+### committed_issues
+1. `I-20260804T073054Z-A`
+- milestone: M-20260804T073054Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/skills/skill-yaml-frontmatter/raw-20260804T073054Z/issues/I-20260804T073054Z-A.md

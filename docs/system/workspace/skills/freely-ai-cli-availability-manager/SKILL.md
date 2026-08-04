@@ -1,6 +1,7 @@
 ---
 name: freely-ai-cli-availability-manager
-description: >- Watchdog 控制面中的 availability 子模块。负责 AI CLI 工具的账号可用性检测、
+description: >-
+  Watchdog 控制面中的 availability 子模块。负责 AI CLI 工具的账号可用性检测、
   切号、限流检测与自动恢复探测。
 
   Use when: AI CLI 工具报认证错误、限流、账号不可用，或需要切换账号。

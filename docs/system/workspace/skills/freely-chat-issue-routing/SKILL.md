@@ -1,6 +1,7 @@
 ---
 name: freely-chat-issue-routing
-description: >- 将 `freely chat` 命令收到的消息路由到正确的 raw issue。判断消息属于
+description: >-
+  将 `freely chat` 命令收到的消息路由到正确的 raw issue。判断消息属于
   已有 issue（追加评论）还是需要新建 raw issue。
 
   Use when: `freely chat` 收到新消息需要路由判定。

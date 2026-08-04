@@ -1,6 +1,7 @@
 ---
 name: freely-config-backup-guard
-description: >- 强制配置修改前创建可追溯备份。在编辑任何配置文件之前自动创建
+description: >-
+  强制配置修改前创建可追溯备份。在编辑任何配置文件之前自动创建
   备份和恢复路径，防止误改无法回滚。
 
   Use when: AI 修改任何配置文件（config.toml、settings.json 等）。
