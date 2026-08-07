@@ -15,10 +15,10 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-scan-platform-adapter-import.py
 - expected_output: OK: platform_health=<非 degraded>，total=<大于0>
 - expected_RED_output: FAIL: platform_health degraded: No module named 'platform_adapter'（或 total==0）
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: "FAIL: module 'tls' has no attribute '_get_pa'（修复前 loader 不存在，scan 报 platform_health=degraded: No module named 'platform_adapter'）"
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: ""
 - red_how: "修复前直接跑 test 脚本：_get_pa 不存在（AttributeError）或 scan 报 platform_health=degraded，bug 可复现"
@@ -35,10 +35,10 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-scan-platform-adapter-import.py
 - expected_output: OK: _get_pa() loads platform-adapter.py and exposes required symbols
 - expected_RED_output: FAIL: 模块缺失符号 / _get_pa 不存在
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: "FAIL: module 'tls' has no attribute '_get_pa'（loader 不存在）"
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/verification/test-evidence/acceptance-2.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: ""
 - red_how: "修复前 _get_pa() helper 不存在，加载脚本报 AttributeError"
@@ -55,10 +55,10 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-scan-platform-adapter-import.py
 - expected_output: OK: no direct 'from platform_adapter import' remains
 - expected_RED_output: FAIL: 3 direct 'from platform_adapter import' statements remain
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: "FAIL: 3 direct 'from platform_adapter import' statements remain（修复前 L451/502/548）"
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/verification/test-evidence/acceptance-3.log
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: ""
 - red_how: "修复前 grep 统计 3 处直接导入"
