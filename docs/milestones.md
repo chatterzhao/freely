@@ -562,3 +562,18 @@
 - milestone: M-20260724T024118Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/command-wrapper/metadata-lifecycle/raw-20260724T024118Z/issues/I-20260724T024118Z-A.md
+
+## M-20260807T071225Z-A
+- title: scan parse_frontmatter 嵌套解析修复
+- status: active
+### candidate_issues
+1. `C-20260807T071225Z-A`
+- milestone: M-20260807T071225Z-A
+- status: promoted
+- promoted_issue_id: `I-20260807T071225Z-A`
+- promoted_issue_path: docs/B2-docs/ibm/scan-frontmatter/raw-20260807T071225Z/issues/I-20260807T071225Z-A.md
+### committed_issues
+1. `I-20260807T071225Z-A`
+- milestone: M-20260807T071225Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/ibm/scan-frontmatter/raw-20260807T071225Z/issues/I-20260807T071225Z-A.md
