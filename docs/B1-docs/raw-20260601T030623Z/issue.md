@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260601T030623Z23Z
 kind: raw
-phase_state: absorbed
+- phase_state: dropped
 absorbed_into: raw-20260601T030623Z23Z
 absorbed_at: '2026-06-01T03:06:39Z'
 dropped_reason: Fix applied via fix/raw-20260601T030623Z23Z-cross-platform-fixes commit

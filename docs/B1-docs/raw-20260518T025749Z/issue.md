@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-phase_state: absorbed
+- phase_state: dropped
 source: feedback
 created_at: '2026-05-18T02:57:49Z'
 title: 'runtime crisis: all worker launches fail (stale_pid / launch_failed)'

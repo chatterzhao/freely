@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260516T041048Z48Z
 kind: raw
-phase_state: absorbed
+- phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
