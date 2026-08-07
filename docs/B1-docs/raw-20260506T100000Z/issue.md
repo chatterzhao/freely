@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260506T010000Z00Z
 kind: raw
-phase_state: proposed
+- phase_state: absorbed
 platform_ids:
   github:
     issue_id: '231'
@@ -38,7 +38,7 @@ force_closed_reason: 'wt-close --force: worktree retired without completed phase
 
 local_id: raw-20260506T010000Z00Z
 kind: raw
-phase_state: proposed
+- phase_state: absorbed
 platform_ids:
   github: "229"
 primary_platform: github

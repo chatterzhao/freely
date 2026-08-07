@@ -49,6 +49,9 @@
 - evidence_level: integration
 ^- status: passed
 - artifact_ref: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Z/code-reviews/review.md
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
+- status: not_applicable
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
@@ -95,6 +98,9 @@
 - evidence_level: integration
 ^- status: passed
 - artifact_ref: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Z/code-reviews/review-B.md
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
+- status: not_applicable
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
@@ -106,6 +112,9 @@
 - evidence_level: integration
 ^- status: passed
 - artifact_ref: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Z/code-reviews/review-B.md
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
+- status: not_applicable
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
@@ -117,6 +126,9 @@
 - evidence_level: integration
 ^- status: passed
 - artifact_ref: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Z/code-reviews/review-C.md
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
+- status: not_applicable
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
@@ -128,6 +140,9 @@
 - evidence_level: integration
 ^- status: passed
 - artifact_ref: docs/B2-docs/ibm/issue-state-refactor/raw-20260505T121000Z/code-reviews/review-C.md
+- red-green-status: not_applicable
+- red-green-not-applicable-reason: historical issue completed before TDD RED-GREEN requirement
+- status: not_applicable
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge

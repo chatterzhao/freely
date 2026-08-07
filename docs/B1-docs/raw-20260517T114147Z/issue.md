@@ -3,6 +3,7 @@ local_id: raw-20260517T114147Z47Z
 kind: raw
 priority: P2
 status: open
+- phase_state: absorbed
 source: chat-inbox
 created_at: '2026-05-17T11:41:47Z'
 title: 'supervisor crash: bash rc=0'
