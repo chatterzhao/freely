@@ -22,6 +22,9 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+promoted_children:
+- I-20260720T023136Z-A
+platform_state: closed
 ---
 
 # fix: chat error message shell quoting bug at l6666
@@ -43,3 +46,11 @@ Escape or quote the angle brackets properly so they are printed as literal text.
 
 ## Evidence
 Reproduced every Manager cycle when worker chat tries local raw issue creation (which is blocked). The error message itself crashes before it can be displayed to the user.
+
+### comment-20260807T121137Z
+- source: system
+- event: promote_finalized
+- children: ["I-20260720T023136Z-A"]
+
+拆解为以下任务:
+1. [I-20260720T023136Z-A](will-be-updated)
