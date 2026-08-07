@@ -26,6 +26,7 @@ Usage:
 """
 
 import json, os, re, sqlite3, subprocess, sys, time
+import yaml
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -349,6 +350,24 @@ def cache_put(cache_file: Path, payload: dict):
 
 def parse_frontmatter(text: str) -> dict:
     """Parse YAML frontmatter from issue.md, returning flat dict."""
+    fm_block = []
+    in_fm = False
+    for line in text.split("\n"):
+        s = line.strip()
+        if s == "---":
+            if not in_fm:
+                in_fm = True
+                continue
+            break
+        if in_fm:
+            fm_block.append(line)
+    if fm_block:
+        try:
+            data = yaml.safe_load("\n".join(fm_block))
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
     fm = {}
     lines = text.split("\n")
     in_fm = False
