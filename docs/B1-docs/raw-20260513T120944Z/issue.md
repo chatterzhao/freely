@@ -4,7 +4,6 @@ kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-phase_state: dropped
 platform_ids:
   github:
     issue_id: '336'
@@ -15,7 +14,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-13T12:09:58Z'
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 intake_id: ''
 author: platform
 channel: github
