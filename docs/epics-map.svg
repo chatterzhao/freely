@@ -615,6 +615,8 @@
   <text x="65" y="3331" fill="#333">worker-reactivation-and-local-reentry-residual-runtime-governance</text>
   <rect id="story-workflow" x="55" y="3340" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="3353" fill="#333">workflow</text>
+  <rect id="story-scan-frontmatter" x="55" y="3360" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
+  <text x="65" y="3373" fill="#333">scan-frontmatter</text>
   <rect id="epic-runtime" x="35" y="3374" width="730" height="818" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
   <text x="50" y="3390" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
   <rect id="story-application-native-runtime-observation-contract-and-observability-planes" x="55" y="3400" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
