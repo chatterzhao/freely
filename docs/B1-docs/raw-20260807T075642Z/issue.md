@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20260807T075642Z
 kind: raw
-phase_state: dropped
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20260807T075642Z-A
 platform_ids:
   github:
     issue_id: '4103'
@@ -26,7 +26,7 @@ session_refs: []
 platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-08-07T07:55:00Z'
 closeout_note: ''
 ---
 
