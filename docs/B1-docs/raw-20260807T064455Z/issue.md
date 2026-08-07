@@ -2,7 +2,8 @@
 schema_version: '1'
 local_id: raw-20260807T064455Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: 'I-20260807T064455Z-A'
 absorbed_into: ''
 platform_ids:
   github:
@@ -23,7 +24,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
 completed_at: ''
@@ -31,6 +32,8 @@ closeout_note: ''
 ---
 
 workflow_kind: fix
+
+# chore: 26 个 raw 平台状态与 closeout 字段补齐
 
 ## 现象
 scan 报 20 个 2a_state_mismatch（terminal 但 platform_state=open）与 6 个 2a_invalid_raw_metadata（strict raw absorbed 缺 completed_at）。
