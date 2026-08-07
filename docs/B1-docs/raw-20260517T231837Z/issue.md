@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P3
-- phase_state: dropped
+phase_state: dropped
 title: raw issue metadata stub (empty body)
 platform_state: closed
 platform_ids:

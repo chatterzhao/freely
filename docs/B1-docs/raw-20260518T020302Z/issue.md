@@ -2,7 +2,7 @@
 issue_id: raw-20260518T020345Z02Z
 kind: raw
 priority: P1
-- phase_state: dropped
+phase_state: dropped
 decision_reason: Platform issue
 source: feedback
 created_at: '2026-05-18T02:03:02Z'

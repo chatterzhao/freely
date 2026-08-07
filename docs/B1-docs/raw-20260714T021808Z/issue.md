@@ -2,6 +2,8 @@
 local_id: raw-20260714T021808Z
 kind: raw
 phase_state: absorbed
+platform_state: closed
+completed_at: '2026-08-07T06:00:00Z'
 absorbed_into: I-20260714T021808Z-A
 platform_ids:
   github:

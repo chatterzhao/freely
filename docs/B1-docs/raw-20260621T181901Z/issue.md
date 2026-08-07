@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260621T181901Z01Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 absorbed_into: batch-sync-20260621
 platform_ids:
   github:

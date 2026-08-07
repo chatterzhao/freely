@@ -1,7 +1,9 @@
 ---
 local_id: raw-20260627T084545Z45Z
 kind: raw
-- phase_state: absorbed
+phase_state: absorbed
+platform_state: closed
+completed_at: '2026-08-07T06:00:00Z'
 platform_ids:
   github:
     issue_id: '3585'

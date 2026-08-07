@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260502T000000Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 platform_ids: {}
 primary_platform: ""
 canonical_issue_path: ""

@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260503-fix-skill
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 absorbed_into: I-20260503T000000Z-B
 platform_ids:
   github:

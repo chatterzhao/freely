@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260513T120734Z34Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 source: governance-repair
 title: auto-materialize raw issue for promoted C-20260513T120734Z
 platform_ids:
