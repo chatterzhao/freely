@@ -2,8 +2,7 @@
 schema_version: '1'
 local_id: raw-20260807T074043Z
 kind: raw
-phase_state: absorbed
-absorbed_into: 'I-20260807T074043Z-A'
+phase_state: dropped
 absorbed_into: ''
 platform_ids:
   github:
@@ -27,8 +26,8 @@ session_refs: []
 platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
-closeout_note: ''
+completed_at: '2026-08-07T07:50:00Z'
+closeout_note: cleanup raw without canonical absorber (final cleanup)
 ---
 
 workflow_kind: fix
