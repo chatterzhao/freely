@@ -24,7 +24,9 @@ channel: github
 session_refs: []
 ---
 
-\n\n## Problem
+# fix: chat error message shell quoting bug at l6666
+
+## Problem
 freely script L6666 contains `<描述>` and `<详细描述>` characters in a shell string that bash interprets as file redirection operators, causing:
 ```
 line 6666: 描述: No such file or directory
