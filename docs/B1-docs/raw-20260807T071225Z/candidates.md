@@ -29,5 +29,6 @@ milestone: M-20260807T071225Z-A
   - summary: 根因明确（嵌套解析缺陷），方案兼容双格式
   - verdict: pass
 - promoted_issue_id: I-20260807T071225Z-A
+- promoted_issue_path: docs/B2-docs/ibm/scan-frontmatter/raw-20260807T071225Z/issues/I-20260807T071225Z-A.md
 - milestone: M-20260807T071225Z-A
 - session_refs: []
