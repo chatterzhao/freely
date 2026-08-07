@@ -577,3 +577,23 @@
 - milestone: M-20260807T071225Z-A
 - phase_state: in_dev
 - issue_path: docs/B2-docs/ibm/scan-frontmatter/raw-20260807T071225Z/issues/I-20260807T071225Z-A.md
+
+## M-20260807T105604Z-A
+- title: cleanup — 解除 .codex/config.toml 跟踪
+- status: active
+### candidate_issues
+1. `C-20260807T105604Z-A`
+- milestone: M-20260807T105604Z-A
+- status: promoted
+- promoted_issue_id: `I-20260807T105604Z-A`
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
+### committed_issues
+1. `I-20260807T105604Z-A`
+- milestone: M-20260807T105604Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
+### completed_issues
+1. `I-20260807T105604Z-A`
+- milestone: M-20260807T105604Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
