@@ -1,0 +1,14 @@
+$ git ls-files .codex
+(empty)
+
+$ git status --porcelain
+(empty)
+
+$ git status --porcelain | wc -l
+0
+
+$ git check-ignore -v .codex/config.toml
+.gitignore:78:.codex/	.codex/config.toml
+
+$ git status --ignored --short | rg '\.codex'
+!! .codex/

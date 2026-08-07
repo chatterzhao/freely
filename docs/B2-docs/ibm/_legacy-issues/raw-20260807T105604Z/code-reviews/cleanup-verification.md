@@ -1,5 +1,7 @@
 # Cleanup Verification — .codex/config.toml untrack
 
+- issue_id: I-20260807T105604Z-A
+- issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
 - raw_key: raw-20260807T105604Z
 - issue: I-20260807T105604Z-A
 - lane: premerge-integration (test-pre-merge-20260807T105604Z-codex-config-untrack)
