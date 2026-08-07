@@ -2,7 +2,7 @@
 local_id: raw-20260516T121409Z09Z
 kind: raw
 priority: P2
-- phase_state: dropped
+phase_state: dropped
 source: chat-inbox
 created_at: '2026-05-16T12:14:09Z'
 title: manager-agent.md 缺少巡逻模式行为规范，导致 Manager 面对 scan 数据只输出 stop_ai

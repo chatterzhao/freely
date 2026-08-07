@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260509T022152Z52Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 absorbed_into: I-20260509T022152Z-A
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17 04:47:25+00:00

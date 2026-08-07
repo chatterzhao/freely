@@ -2,7 +2,7 @@
 local_id: raw-20260519T004246Z46Z
 kind: raw
 priority: P0
-- phase_state: dropped
+phase_state: dropped
 source: feedback
 created_at: '2026-05-19T00:42:46Z'
 title: agent 文档致命修复：handoff 必填/互斥字段对齐 + 路径修正

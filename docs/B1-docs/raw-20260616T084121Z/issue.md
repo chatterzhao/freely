@@ -1,7 +1,10 @@
 ---
 local_id: raw-20260616T084121Z21Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
+platform_state: closed
+completed_at: '2026-08-07T06:00:00Z'
+closeout_note: legacy raw closeout (platform closed)
 platform_ids:
   github:
     issue_id: '2835'

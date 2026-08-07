@@ -5,7 +5,7 @@ priority: P2
 source: chat-inbox
 created_at: '2026-05-17T07:19:29Z'
 title: freely-package 版本号缺少时分，同天多次打包会覆盖
-- phase_state: dropped
+phase_state: dropped
 platform_ids:
   github:
     issue_id: '447'

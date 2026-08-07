@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-- phase_state: dropped
+phase_state: dropped
 source: feedback
 created_at: '2026-05-19T09:41:57Z'
 title: 'supervisor crash: bash rc=0'

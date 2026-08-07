@@ -2,18 +2,17 @@
 local_id: raw-20260503T091500Z00Z
 kind: raw
 priority: high
-- phase_state: dropped
+phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-- phase_state: dropped
 source: platform
 platform_ids:
   github:
-    issue_id: "180"
+    issue_id: '180'
     owner: chatterzhao
     repo: freely
-created_at: "2026-05-03T09:15:00Z"
-title: "feat: enforce test-pre-merge before develop merge"
+created_at: '2026-05-03T09:15:00Z'
+title: 'feat: enforce test-pre-merge before develop merge'
 platform_state: closed
 ---
 ## 问题

@@ -2,6 +2,8 @@
 local_id: raw-20260720T171146Z
 kind: raw
 phase_state: absorbed
+platform_state: closed
+completed_at: '2026-08-07T06:00:00Z'
 absorbed_into: I-20260720T120329Z-C
 parent_story: M-20260720T120329Z-A / I-20260720T120329Z-A,B,C
 github:

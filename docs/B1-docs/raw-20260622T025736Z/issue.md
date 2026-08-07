@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260622T025736Z36Z
 kind: raw
-- phase_state: dropped
+phase_state: dropped
 absorbed_into: I-20260622T025736Z-A
 platform_ids:
   github:
