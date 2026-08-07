@@ -6697,7 +6697,7 @@ _write_chat_to_issue() {
   else
     log_error "[chat] Local raw issue creation is no longer supported."
     log_error "[chat] All raw issues must be created on a configured platform via 'freely feedback':"
-    log_error "[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>""
+    log_error '[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"'
     log_error "[chat] Then create a worktree:"
     log_error "[chat]   freely wt-create --raw-key <returned-key> --source platform --kind fix --slug <slug>"
     return 1
