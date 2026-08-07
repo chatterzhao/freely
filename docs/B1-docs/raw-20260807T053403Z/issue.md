@@ -4,7 +4,6 @@ local_id: raw-20260807T053403Z
 kind: raw
 phase_state: absorbed
 absorbed_into: 'I-20260807T053403Z-A'
-absorbed_into: ''
 platform_ids:
   github:
     issue_id: '4084'
@@ -24,7 +23,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
 completed_at: ''
