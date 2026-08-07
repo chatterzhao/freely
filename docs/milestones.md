@@ -587,6 +587,11 @@
 - status: promoted
 - promoted_issue_id: I-20260807T114900Z-A
 - promoted_issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
+### committed_issues
+1. `I-20260807T114900Z-A`
+- milestone: M-20260807T114900Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
 
 ## M-20260807T105604Z-A
 - title: cleanup — 解除 .codex/config.toml 跟踪
