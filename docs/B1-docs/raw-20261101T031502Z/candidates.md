@@ -14,13 +14,13 @@ milestone: M-20261101T031502Z-A
 - title: 交付 Super-agent 对比研究、概念全量对照与协作方向立项
 - status: promoted
 - decision_reason: 研究本身是一个有边界的交付：需要区分文章主张/原型实现/Freely 现状，逐项评估路由、交接、缓存与 harness 抽象，并把可推进方向登记为 candidate。它不实现任何候选，因此不能复用后续实现 issue 的载体。
-- next_action: 合并 I-20261101T031502Z-A 并收口；三个 needs_research candidate 由后续独立 issue 承接。
+- next_action: 合并 I-20261101T031502Z-A 并收口；四个 needs_research candidate 由后续独立 issue 承接。
 - revisit_trigger: 若研究结论被新证据推翻（例如 DSH 发布带 ACP 的版本、或 Freely 已完成 HarnessPort），重开研究并更新结论。
 - acceptance_criteria:
   - 研究覆盖七个比较维度与七处结构性差异
   - 概念全量对照覆盖领域对象、机制、运行时与观测面，并标出同名不同义
   - 两张 archify 对比图可打开、可读
-  - 三个后续方向以 needs_research candidate 登记，带 next_action/revisit_trigger
+  - 四个后续方向以 needs_research candidate 登记，带 next_action/revisit_trigger
   - `governance-merge-gate --range develop..HEAD` 通过
 - promotion_gate: 研究文档 + 概念对照 + 两张图 + 四个 candidate 合并，门禁通过
 - open_questions: []
@@ -38,9 +38,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 Worker 对已完成工单后续线程的 follow-up ownership 与 handback
-- status: proposed
+- status: needs_research
 - decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。结论：需要实现一个轻量 ownership 账本，而不是继续研究概念。
-- next_action: 新增 `followup_owners` 轻量账本（thread_key、ticket_key、owned_until、reason）与 three 个 CLI：claim/release/handback；scan 在开新工单前查账本；Manager 只处理无 owner 的消息。先在 test 工位用真实 PR/issue 评论回放验证，再改 scan。
+- next_action: 先做五类后续消息的行为盘点 + handoff envelope/ownership 协议草案；确认 A2A task/message/owner 的存储边界；修 `session/new|fork` 丢 message 的已知 bug 后，再做真实 PR/issue 评论回放；通过 acceptance review 才 promote。
 - revisit_trigger: 出现同一 PR/Issue 的后续评论被重复开单、被漏接，或 Manager 因中转 follow-up 出现上下文丢失/重复委派时，立即重启本 candidate；若连续两个里程碑未出现该类事件，可降级为观察项。
 - acceptance_criteria:
   - 五类后续消息各自有明确的 owner 判定规则，且能回答“这条消息现在归谁”
@@ -55,8 +55,8 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 基于 Super-agent `002/003`、`prompts/subscriptions.md` 与 Freely `a2a/*`、`agents/*`、`scan-lifecycle-design.md` 对照，确认缺口真实存在
-  - verdict: pass
+  - summary: 新证据显示 Freely 的 A2A 是 task 行而非 message/artifact 历史，且首次 new/fork 交接会丢 message；缺口比原判断更深，尚未达到 promotion gate
+  - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-B
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
@@ -66,9 +66,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 Manager 的类型化 report/attention、批量路由与 prompt 前缀契约
-- status: proposed
+- status: needs_research
 - decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约。结论：按 P1 实现，不再停留在度量。
-- next_action: P1-1 在 `a2a_task.py` 增加 `--report-state` 六态与 `--attention` JSON（question/target/action），A2A server 原样存储；P1-2 增加稳定 relay key 去重；P1-3 把 Manager prompt 拆成 stable_prefix / volatile_tail 两段并在日志标记；P1-4 用 `harness-status` 的 cache 指标做前后对照。
+- next_action: 先写 report 六态 / attention / ownership 的字段契约，并给出与现有 A2A state 的映射；补 prompt manifest（stable/semi/dynamic 段）与 cache/usage 基线；契约和基线通过 acceptance review 后再实现。
 - revisit_trigger: Manager 单轮上下文接近 rotation 阈值、同一轮处理超过 3 个工单导致漏派/错派、或 cache 命中率连续下降且 prompt_bytes 上升时，重启本 candidate；若度量显示路由开销占比很低，则降级为观察项。
 - acceptance_criteria:
   - 给出 Manager 每轮 patrol 的上下文成本基线（字符/token/文档数）与 cache hit/miss 基线
@@ -84,39 +84,69 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 基于 DSH `src/app/tools/main.ts`、`src/app/notices.ts`、`src/app/prompts.ts` 与 Freely `agents/manager-agent.md`、`three-loop`、`run-acp-prompt.py` 对照，确认实现级差距成立
-  - verdict: pass
+  - summary: `context-cache.md` 证明 Freely 已有 STABLE/SEMI/DYNAMIC 排序但无 manifest/校验，cache 仍多为估算；字段契约与基线未完成，不能 promote
+  - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-C
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
-## C-20261101T031502Z-D: 实现 HarnessPort 能力探测与按角色选择
+## C-20261101T031502Z-D: HarnessPort 与角色级 harness 选择（Freely 主应用）
 
 - candidate_format_version: v2
-- title: 实现 HarnessPort：能力探测、按角色选择与 DSH adapter 边界
-- status: proposed
-- decision_reason: Freely 今天通过 ACP 适配多 CLI，但契约是隐式的：session/fork/resume、工具策略、skills、usage/cache 的差异靠代码分支兜底；DSH 原型没有 ACP 服务端，只有 Cordis 插件面，且 `engines.dsh` 钉版本。结论：先实现能力探测与缓存观测（P0 已落地 `freely harness-status`），再抽 HarnessPort 接口，不直接写 DSH adapter。
-- next_action: P1 把 `harness-status` 的 CAPABILITIES 表提升为 `HarnessPort` 的 capability contract，并让 `run-acp-prompt.py` 在启动前调用 probe；P2 增加 per-role harness 选择与 fallback；P3 做 DSH adapter spike（Cordis in-process vs 子进程），并确认插件只外溢 gates/worktree/issue。
-- revisit_trigger: 新增第二个 harness 需要修改 runtime 多处、出现 harness 能力差异导致的静默失败、或团队要求把 gates/worktree 外溢成 DSH 插件时，立即重启本 candidate。
+- title: 实现 HarnessPort 与角色级 harness 选择（Freely 主应用）
+- status: needs_research
+- decision_reason: 三角色已经能通过 `agent-table.toml` 的 `{role}_slot` 分 harness，但缺少统一 HarnessPort、角色级配置/探测、UI/CLI/TUI 入口；DSH 不再作为 harness adapter（另立 C-E）。
+- next_action: 先补 HarnessPort 接口草案 + RoleHarnessConfig 映射（`{role}_slot`、adapter 约束、model 缺口），再用 `harness-status` 做 per-role probe；通过 acceptance review 后再 promote。
+- revisit_trigger: 新增 harness 需要改 runtime 多处、角色级选择出现静默降级，或 UI/CLI 开始各自写 `agent-table.toml` 时，立即重启本 candidate。
 - acceptance_criteria:
-  - 产出一张 ACP CLI 能力矩阵，标注“有/无/降级/需探测”
-  - HarnessPort 接口覆盖 probe、session 生命周期、prompt/stream、interrupt、usage/cache、工具与 skills 能力
-  - 支持按角色（Manager/Worker/Reviewer）选择 harness，并有 capability probe 与 fallback
-  - DSH adapter 有可行性结论（in-process/子进程、session 映射、工具/权限、cache 语义）
-  - 明确 DSH 插件只做 gates/worktree/issue 工具外溢，不再起 Router/Ticket
-- promotion_gate: 能力矩阵 + 接口草案通过 Reviewer 审查 + 至少一个非 ACP 基座的 spike 结论 + 插件边界评审通过
+  - HarnessPort 覆盖 probe、session 生命周期、prompt/resume/interrupt、usage/cache、工具与 skills
+  - 三角色可分别选 harness；配置只写 `agent-table.toml` 的 `{role}_slot`
+  - per-role probe 区分 native/degraded/unknown，缺失时 fail-closed
+  - UI/CLI/TUI 共用同一 JSON 后端，不各自写文件
+  - 明确 DSH 插件不在本 candidate；见 C-E
+- promotion_gate: 接口草案 + RoleHarnessConfig 设计 + 至少一个非默认 harness 的 probe 证据 + acceptance review
 - open_questions:
-  - DSH adapter 走 Cordis in-process 还是子进程桥，哪个可维护性更好
-  - 按角色选 harness 的最小配置面是什么，是否要暴露到 CLI/TUI
-  - cache/usage 语义在不同 harness 间如何统一，缺失时如何标注
-  - 插件外溢时，授权与状态所有权归谁
+  - 是否引入 `{role}_adapter`，还是永远全 ACP
+  - 角色级 model/effort 放 agent-table 还是 slot 配置
+  - 运行中 Manager 轮换如何不打断当前 patrol
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 基于 DSH `package.json`/`cordis.patch.yml`（Cordis bundle、无 ACP）与 Freely `run-acp-prompt.py`、`session-lifecycle-protocol.md`、`AGENT_AI_TOOL` 配置对照，确认“基座可切换”需要显式端口而非配置开关
-  - verdict: pass
+  - summary: `harness-selection.md`/`deployment-forms.md` 给出角色级选择与配置落点，但接口/探测/UI 后端尚未定稿，不能 promote
+  - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-D
+- promoted_issue_path: pending://needs-b2-materialization
+- milestone: M-20261101T031502Z-A
+- session_refs: []
+
+## C-20261101T031502Z-E: `@freely/dsh-freely` Freely-host 插件
+
+- candidate_format_version: v2
+- title: 实现 `@freely/dsh-freely`：Freely 保留 loop，DSH 只做 harness
+- status: needs_research
+- decision_reason: DSH 主插件可注入 `agents/sessionController/tools/skills/systemPrompt` 等服务，因此可以让 Freely 保留 Manager/Worker/Reviewer、A2A、scan、gates、worktree、PR，只把 harness 换成 DSH；这不是 ACP adapter，也不是 DSH-host 治理插件。
+- next_action: 先做 P0/P1 spike：插件骨架 + bridge + Manager session；验证首次 `session.new` 能收到 task+role prompt、handoff 不丢、gate 能阻断；再决定是否 P2/P3。
+- revisit_trigger: DSH 服务 API 不稳定、插件无法注入 session/tools/skills，或必须同时启用 DSH Router/Ticket 才能工作时，回到方案 C（不做）。
+- acceptance_criteria:
+  - 插件注入所需 DSH services，且不加载 `dsh-superagent`
+  - Manager/Worker/Reviewer 使用独立 DSH preset/session
+  - 首次 session 收到 task message + role prompt；handoff envelope append-only
+  - 一个真实 issue 从 Manager 到 PR，全程无 ACP
+  - gate exit code 能阻断；usage 能区分 reported/estimated
+- promotion_gate: P0/P1 spike 通过 + 独立 acceptance review + 明确 DSH 服务 API 稳定性结论
+- open_questions:
+  - DSH 服务 API 是否对第三方插件稳定开放
+  - 配置权威在 DSH settings 还是 `.freely/harness.toml`
+  - DSH 单仓/单 host 下多项目怎么办
+  - Python runtime 子进程生命周期如何管理
+- acceptance_reviews:
+  - reviewer: session-self
+  - mode: desk-research
+  - summary: 插件架构与 DSH service 注入面已有代码级依据，但尚无 spike；不能 promote
+  - verdict: needs_more_research
+- depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D
+- promoted_issue_id: pending://C-20261101T031502Z-E
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []

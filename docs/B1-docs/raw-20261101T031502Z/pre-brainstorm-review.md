@@ -85,3 +85,16 @@ DSH 相关不进入本轮 candidate：
 - `pretests-gate` 通过。
 - 交付图静态 SVG 可渲染，图例/后缀已清理。
 - 独立评审报告已落盘（见上）。
+
+## 7. 2026-11-01 二次复审：新证据推翻“可进入 candidate”
+
+在 `agent-handoff.md`、`deployment-forms.md`、`harness-selection.md`、`dsh-freely-plugin-design.md` 完成后，对 C-B/C/C-D 的 promotion readiness 重审：
+
+- **C-B**：A2A 实际是 task 行，不是 message/artifact 历史；`acp_session_connect` 在 new/fork 丢 message；原 acceptance “五类消息 owner + 真实回放”未做。→ `needs_research`。
+- **C-C**：Freely 已有 STABLE/SEMI/DYNAMIC 排序，但无 manifest/校验；report/attention 字段契约与基线未做。→ `needs_research`。
+- **C-D**：原 candidate 把“DSH adapter”混进 HarnessPort；新研究拆成 C-D（HarnessPort/角色级选择）与 C-E（Freely-host 插件）。→ `needs_research`。
+- **C-E**：插件架构有代码级依据（DSH 注入 services），但无 P0/P1 spike。→ `needs_research`。
+
+二次 verdict：**needs_more_research**，不是 promote。下一步按 C-B/C 的行为盘点与协议草案、C-D 的接口/探测、C-E 的 P0/P1 spike 分别补证据，再走 acceptance review。
+
+这与第一次 `pass-with-gaps` 不矛盾：第一次评的是“研究包是否足以起草 candidate”；第二次评的是“candidate 是否能进入 B2”。结论是：可以起草，但不能 promote。

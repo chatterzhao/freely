@@ -17,6 +17,9 @@
 4. `C-20261101T031502Z-D`
 - milestone: M-20261101T031502Z-A
 - status: needs_research
+5. `C-20261101T031502Z-E`
+- milestone: M-20261101T031502Z-A
+- status: needs_research
 ### completed_issues
 1. `I-20261101T031502Z-A`
 - milestone: M-20261101T031502Z-A
