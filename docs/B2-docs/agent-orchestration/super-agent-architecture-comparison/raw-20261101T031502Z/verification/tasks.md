@@ -17,6 +17,7 @@
 | T10 | 实现 P0：能力矩阵 + 角色读取 + 二进制探针 + cache 聚合 | `harness_status.py`、`bin/harness-status`、`freely harness-status` | done |
 | T11 | 写 5 项单测（角色/能力、cache 去重、require 失败、缺表、未知工具） | `scripts/tests/test-harness-status.py` | done |
 | T12 | 在 test 工位跑单测与 CLI 验收 | 2 条新证据日志 | done |
+| T13 | 重写 README + archify 总览图 | `README.md`、`docs/assets/freely-architecture.*` | done |
 
 ## 后续（不在本 issue 内）
 

@@ -139,6 +139,25 @@
 - status: passed
 - red_how: 实现前入口不存在；实现后 JSON 可解析
 
+### acceptance-8
+- id: AT-008
+- requirement: README 的本地链接全部存在，且总览图 SVG/HTML 非空
+- acceptance_target: 对外文档不出现死链
+- testing_layer: end-to-end
+- target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
+- required_evidence: 输出 ok
+- evidence_level: real_env
+- artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-8.log
+- test_command: python3 -c "import pathlib,re; s=pathlib.Path('README.md').read_text(); ps=[p for p in re.findall(r'\]\(([^)]+)\)', s) if not p.startswith(('http','#'))]; missing=[p for p in ps if not pathlib.Path(p).exists()]; assert not missing, missing; assert pathlib.Path('docs/assets/freely-architecture.svg').stat().st_size>0; assert pathlib.Path('docs/assets/freely-architecture.html').stat().st_size>0; print('ok')"
+- expected_output: ok
+- expected_RED_output: README 死链或图缺失时 AssertionError
+- actual_RED_output: 初稿 skill 路径不存在时被检查出来
+- actual_output: ok
+- evidence_file: verification/test-evidence/acceptance-8.log
+- red-green-status: green
+- status: passed
+- red_how: 先跑链接检查；修正 `.claude/skills` 路径后通过
+
 ## Unit
 
 - acceptance_target: 本次为文档/研究交付，无运行时代码单元

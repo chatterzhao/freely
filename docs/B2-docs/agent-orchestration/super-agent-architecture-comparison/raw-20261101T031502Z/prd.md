@@ -30,6 +30,7 @@ Freely 当前以 Manager / Worker / Reviewer 三角色、A2A Task、文档驱动
 6. **Harness/插件边界**：ACP、A2A、MCP、Cordis 插件各自连接谁；DSH 没有 ACP 服务端的事实；三种集成模式的优先级；可外溢为 DSH 插件的 Freely 能力清单。
 7. **候选登记**：`C-A` 作为研究+P0 交付本身 promote 到本 issue；`C-B/C/D` 是 `proposed` 的下一阶段任务（follow-up ownership、路由/交接/cache 契约、HarnessPort）。
 8. **P0 实现**：新增 `harness_status.py` + `bin/harness-status` + `freely harness-status`，输出角色 harness 能力矩阵、二进制健康、`[CACHE]` 聚合；`--require` 可让缺 fork/usage 的配置失败。
+9. **对外架构说明**：重写根 `README.md`，用 archify 总览图解释 Freely 是什么、怎么运转、边界在哪。
 
 ## 非目标
 
@@ -50,6 +51,7 @@ Freely 当前以 Manager / Worker / Reviewer 三角色、A2A Task、文档驱动
 | 两张图可读 | `super-agent-vs-freely-collaboration.*`、`freely-harness-port-boundary.*` |
 | P0 单测 | `verification/test-evidence/acceptance-6.log` |
 | P0 CLI | `verification/test-evidence/acceptance-7.log` |
+| README 链接/图 | `verification/test-evidence/acceptance-8.log` |
 | 治理门禁 | `verification/test-evidence/acceptance-5.log` |
 
 ## 风险与边界
