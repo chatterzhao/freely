@@ -50,7 +50,7 @@ export async function apply(ctx) { ... }
 
 ## Handoff
 
-P1 不实现 handoff envelope；handoff/A2A 由上游 C-B 负责，后继 slice 见 successor raw `20261101T124657Z`。
+P1 不实现 handoff envelope；handoff/A2A 由上游 C-B 负责，后继 slice 见 successor issue GitHub #4115 / Gitee IKS3AV。
 
 ## 非目标
 
@@ -63,4 +63,4 @@ P1 不实现 handoff envelope；handoff/A2A 由上游 C-B 负责，后继 slice 
 - 插件被 DSH web profile 加载；三角色 preset 创建成功；白名单生效。
 - `freely_status` 返回 fleet 输出。
 - P1 验收：插件加载、三 preset/白名单/persona、bridge、gate exit 透传。
-- 真实 issue→PR 由 successor raw `20261101T124657Z` 承接；未跑前不宣称插件产品完成。
+- 真实 issue→PR 由 successor issue GitHub #4115 / Gitee IKS3AV 承接；未跑前不宣称插件产品完成。

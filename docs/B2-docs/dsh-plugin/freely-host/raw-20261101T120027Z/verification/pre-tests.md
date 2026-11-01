@@ -1,6 +1,6 @@
 # pre-tests：@freely/dsh-freely P1
 
-> P1 只验收打包插件；issue→PR 由 successor raw `20261101T124657Z` 承接。
+> P1 只验收打包插件；issue→PR 由 successor issue GitHub #4115 / Gitee IKS3AV 承接。
 
 ## Unit
 - acceptance_target: plugin apply/session/tools/bridge
@@ -82,11 +82,11 @@
 ## End-to-End
 - acceptance_target: P1 不做完整 issue→PR
 - testing_layer: end_to_end
-- target_environment: successor raw 20261101T124657Z
+- target_environment: successor issue GitHub #4115 / Gitee IKS3AV
 - required_evidence: successor raw E2E
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
-- not_applicable_explanation: P1 只交打包插件；issue→PR 依赖 C-B/C-D 上游，已开 successor raw 20261101T124657Z。
+- not_applicable_explanation: P1 只交打包插件；issue→PR 依赖 C-B/C-D 上游，已开 successor issue GitHub #4115 / Gitee IKS3AV。
 - replacement_evidence: test-evidence/runtime-load.md
 
 ## Real-Environment
