@@ -134,6 +134,7 @@ B2 实现验收（不在 B1 gate）：
 - P1 tool whitelist：`agent.ctx.tools.restrict` 后实测 manager/reviewer=`glob,grep,read`，worker=`edit,glob,grep,read,write`；白名单隔离成立。
 - P1 role prompt：三个 preset 各挂 `dsh-persona`，prefix 分别为 Freely Manager/Worker/Reviewer。
 - B1 已关闭：Worker/Reviewer preset 独立生成、工具白名单、persona/role prompt。
+- P1 worker E2E：worker session 在 `/tmp/freely-e2e` 写出 `DONE.txt` 并 commit `fa9c06e`，`worker_status=idle`；证明 Worker 工具链/消息消费，不是 issue→PR。
 - B2 未做：handoff envelope v1 落库、a2a-exit、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
 
 ### 2.5 DSH 服务 API 稳定性结论
