@@ -75,6 +75,7 @@ progress, next_action, completion_summary, evidence_paths, worker_prompts_csv
 - Reviewer 2 轮 changes_requested；3 轮回 Manager/blocked。
 - completed 工单 lease 内归原 Worker；过期回 Manager。
 - 人 stop 优先，owner=human。
+- 真实线程 fixture：`chatterzhao/freely#4070` 两条真实评论 → 同一 Task/owner，未产生第二个 Task。
 
 这是协议自洽验证，不是 runtime E2E；E2E 在 B2 验收。
 

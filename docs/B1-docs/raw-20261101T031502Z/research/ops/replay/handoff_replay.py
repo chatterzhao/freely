@@ -100,6 +100,24 @@ def main():
     t3 = p.create("T-4", "github:o/r#4")
     p.assign("T-4", "worker-4")
     out["human_stop"] = p.followup("T-4", "owner", now=5, stopped=True)
+    # Real thread fixture: two real comments on chatterzhao/freely#4070 must
+    # stay on one task/one owner, not create a second task.
+    t5 = p.create("T-4070", "github:chatterzhao/freely#4070")
+    p.assign("T-4070", "worker-4070")
+    real_comments = [
+        ("IC_kwDOSIGLwc8AAAABLGREcA", "2026-07-21T22:35:54Z"),
+        ("IC_kwDOSIGLwc8AAAABLGcLBQ", "2026-07-21T22:57:11Z"),
+    ]
+    for cid, _ in real_comments:
+        r = p.followup("T-4070", "chatterzhao", now=5)
+        assert r["action"] == "direct"
+        t5.messages.append(cid)
+    out["real_thread"] = {
+        "thread_key": t5.thread_key,
+        "owner": t5.owner,
+        "messages": t5.messages,
+        "task_count": len([x for x in p.tasks.values() if x.thread_key == t5.thread_key]),
+    }
     out["handoffs"] = p.handoffs
     print(out)
     assert out["new_request_owner"] == "worker-1"
@@ -111,6 +129,9 @@ def main():
     assert out["completed_followup_before_expiry"]["action"] == "lease_owner"
     assert out["completed_followup_after_expiry"]["action"] == "handback_expired"
     assert out["human_stop"]["owner"] == "human"
+    assert out["real_thread"]["task_count"] == 1
+    assert out["real_thread"]["owner"] == "worker-4070"
+    assert len(out["real_thread"]["messages"]) == 2
     print("handoff replay: OK")
 
 
