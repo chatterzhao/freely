@@ -90,6 +90,98 @@ Cache 日志：
 
 结论：Freely 有排序，没有 manifest/校验；cache 不可回归。应加：段名/顺序/hash、usage_reported/cache_reported、prefix hash。
 
+## 3.1 Report / Attention / 批量决策 schema
+
+### Report
+
+```json
+{
+  "report_state": "progress|waiting|ready|blocked|failed|dropped",
+  "summary": "一句话进展",
+  "next_action": "下一步",
+  "evidence_paths": ["docs/...", "test/..."],
+  "attention": {
+    "needed": true,
+    "question": "只问一个问题",
+    "target_role": "manager|worker|reviewer|human",
+    "target_session": "session-id-or-null",
+    "human_action": "需要人做什么",
+    "for_trigger_id": "event-id"
+  }
+}
+```
+
+规则：
+
+- `attention.needed=false` 时其余 attention 字段为空；true 时只能有一个问题。
+- `report_state` 六态；`dropped` 表示不做/丢弃，不是失败。
+- `summary` 不替代 evidence；verdict 必须是 artifact。
+- `target_role` 与 `target_session` 至少一个；human action 必须可执行。
+
+### A2A 映射
+
+| report_state | A2A state/字段 | 说明 |
+| --- | --- | --- |
+| progress | `working` + progress | 不新增行；更新进度 |
+| waiting | `input-required` + reason | 缺输入，不结束 |
+| ready | `submitted`/`completed` 候选 | 等 Reviewer/Manager |
+| blocked | `input-required` + reason=blocked | 需人/上游 |
+| failed | `failed` + reason | 可重试 |
+| dropped | `canceled` + reason | 不做 |
+
+持久化：优先放 `handoff_messages.parts[].data`；A2A 旧字段做兼容镜像，不把 JSON 塞进 `message` 文本。
+
+### 批量决策
+
+```json
+{
+  "decisions": [
+    {"trigger_id": "event-1", "decision": "accept|stop|ignore|unavailable", "reason": "..."},
+    {"trigger_id": "event-2", "decision": "ignore", "reason": "duplicate"}
+  ]
+}
+```
+
+- 一条失败不影响其他；每条有 reason。
+- `accept` 必须带 candidate/issue 目标；`stop` 必须带停谁；`ignore` 必须去重/不处理理由。
+- 以 `trigger_id` 幂等；重复决策只生效一次。
+
+## 3.2 Prompt manifest
+
+固定段名/顺序；每段记录 `bytes`、`sha256`、`kind`（stable/semi/dynamic）、`source`。
+
+| # | 段 | kind | 说明 |
+| --- | --- | --- | --- |
+| 1 | `agent_role` | stable | 角色定义 |
+| 2 | `bootstrap` | stable | intent/constitution 路径、任务 |
+| 3 | `fleet` | semi | 工位/分支状态 |
+| 4 | `exit_contract` | stable | resume 时跳过 |
+| 5 | `scan` | dynamic | scan summary |
+| 6 | `chat` | dynamic | unconsumed chats |
+| 7 | `continuation` | dynamic | 续跑 |
+| 8 | `context_warning` | dynamic | 上下文告警 |
+| 9 | `checkpoint` | dynamic | 检查点 |
+| 10 | `thread_history` | dynamic | Manager only |
+| 11 | `session_handoff` | dynamic | 最后 |
+
+规则：
+
+- 前 4 段是 prefix；5-11 是 tail。tail 变化不能改变 prefix 字节。
+- 每次 prompt 写 `prompt_manifest` 日志；`prefix_hash` 用于 cache 对照。
+- 不要把 fleet/scan/chat 插到 prefix；不要把 Policy/LAWS 放尾部（会破坏 prefix 且授权应在前）。
+- 角色不同 manifest 可不同，但段名/顺序固定。
+
+### usage/cache 三态
+
+| 字段 | 值 | 说明 |
+| --- | --- | --- |
+| `usage_source` | reported/estimated/absent | reported=provider usage；estimated=bytes//4；absent=无 |
+| `cache_source` | reported/estimated/absent | reported=cache 字段；estimated=推断；absent=无 |
+| `prefix_hash` | sha256 | 前 4 段 |
+| `cache_hit_tokens`/`cache_miss_tokens` | int/null | 只有 reported 才算命中率 |
+
+没有 `usage_source=reported` 时，禁止把 `hit=0` 当“缓存没命中”；只能报“未知”。
+
 ## 4. 注意力度量：当前没有基线
 
 现有数据（主项目）：
