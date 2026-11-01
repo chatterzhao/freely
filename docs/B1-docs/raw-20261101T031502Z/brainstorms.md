@@ -16,7 +16,7 @@ created_at: 2026-11-01
 - 研究对象二：配套研究原型 [`deepseek-ai/dsh-superagent-prototype`](https://github.com/deepseek-ai/dsh-superagent-prototype)（MIT，TypeScript）。本地快照为 `main` 分支，克隆于 2026-11-01。
 - 研究范围：
   - 文章要点：原文未直接获取，通过[智东西报道](https://www.zhidx.com/p/606311.html)与[博客园拆解](https://www.cnblogs.com/itech/p/23508901)交叉核对；两篇均按原文结构复述，本文只在两者一致时作为“文章主张”引用。
-  - 原型 `docs/000`–`docs/008` 九篇设计文档（约 2,091 行）。
+  - 原型 `docs/000-philosophy.md` 至 `docs/008-cookbook.md` 九篇设计文档（约 2,091 行）。
   - 原型 `prompts/` 15 个提示词、`skills/` 2 个技能文件。
   - 原型 `src/core`、`src/executor`、`src/app`、`src/sources` 的关键实现与 `package.json`、`cordis.patch.yml`。
 - Freely 侧事实来源：`PROJECT_INTENT.md`、`CONSTITUTION.md`、`LAWS.md`、`docs/system/workspace/three-loop-capability-lifecycle.md`、`docs/system/workspace/session-lifecycle-protocol.md`、`docs/system/workspace/a2a/*`、`docs/system/workspace/agents/*`、`docs/system/workspace/scan-lifecycle-design.md` 与当前 runtime 代码。
@@ -67,7 +67,7 @@ created_at: 2026-11-01
 
 | 文章模块 | 原型状态 | 证据与边界 |
 | --- | --- | --- |
-| 双层架构 | 已实现 | `docs/007` 的 `Sessions`/`DshExecutor`：主 Session 用 `dsh-superagent-router`，每个 Ticket 一个 `worker-<ticket id>` Session 与独立目录 |
+| 双层架构 | 已实现 | `docs/007-architecture.md` 的 `Sessions`/`DshExecutor`：主 Session 用 `dsh-superagent-router`，每个 Ticket 一个 `worker-<ticket id>` Session 与独立目录 |
 | 事件驱动 | 已实现 | `Source`/`Trigger`/`Thread`/`Eval` 领域模型；`002-authorization.md` 的 gate（代码）与 assessment（模型）两层；准入表与 `off`/`observe`/`auto` 三档 |
 | 订阅与直通 | 已实现 | `Subscription` 多对多；订阅消息绕过 gate、不授予新权限；`handback` 与 `followupOwners` 控制归属 |
 | Inline & Spill / 链式召回 | 已实现 | `orchestrator_read` 资源分页；评估窗口首 5 条 + 前后各 5 条；文本默认 4,000 字符、列表默认 20 条；对象 ID 内联形成引用图 |
