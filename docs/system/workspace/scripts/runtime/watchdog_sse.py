@@ -261,7 +261,7 @@ def _build_review_task_message(raw_key: str, from_agent: str, reason: InputRequi
         f"raw_key: {raw_key}\n"
         f"审查阶段: {stage}\n"
         f"原因: {reason.value}\n"
-        f"请根据 Skill 指令进行审查，完成后调 a2a-exit 声明 verdict。"
+        f"请根据 Skill 指令进行审查，完成后执行 `a2a-exit --state completed --summary '<verdict-json>' --role reviewer`。"
     )
 
 

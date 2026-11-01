@@ -19,12 +19,14 @@ def load():
 
 
 class ScanEventsTest(unittest.TestCase):
-    def test_summary_has_unread_and_sources(self):
+    def test_collect_reads_inbox(self):
         m = load()
         with tempfile.TemporaryDirectory() as tmp:
-            store = m.EventStore(pathlib.Path(tmp) / "events.db")
-            store.ingest([m.normalize("issue_comment", {"id": "c1", "issue_number": 1, "author": {"login": "a"}, "body": "b", "created_at": "2026-01-01T00:00:00Z"}, repo="o/r")])
-            summary = store.summary()
+            root = pathlib.Path(tmp)
+            inbox = root / ".freely" / "run" / "discussion-events.json"
+            inbox.parent.mkdir(parents=True)
+            inbox.write_text('[{"source":"issue_comment","repo":"o/r","raw":{"id":"c1","issue_number":1,"author":{"login":"a"},"body":"b","created_at":"2026-01-01T00:00:00Z"}}]')
+            summary = m.collect(root)
             self.assertEqual(summary["unread"], 1)
             self.assertIn("issue_comment", summary["by_source"])
             self.assertEqual(len(summary["latest"]), 1)

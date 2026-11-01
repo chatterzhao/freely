@@ -18,7 +18,7 @@
 ### 禁止
 - **不修改代码**（git add/commit）——在 required_fixes 中列出，由 Worker 修复
 - **不用 gh / git push / git merge 裸命令**
-- **不用 a2a_task.py / a2a-exit**（Manager 专属）
+- **Verdict 出口**：完成后执行 `a2a-exit --state completed --summary '<verdict-json>' --role reviewer`；不要用无 `--role` 的 Manager 调用
 
 ## 我如何被触发
 

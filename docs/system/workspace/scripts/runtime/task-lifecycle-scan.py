@@ -35,6 +35,11 @@ sys.path.insert(0, str(_LIFECYCLE_DIR))
 from raw_metadata_contract import MetadataValidationError, normalize, validate
 from agent_identity_value import first_agent_id
 
+try:
+    from discussion_events import collect as collect_discussion_events
+except Exception:  # keep scan usable if the new module is unavailable
+    collect_discussion_events = None
+
 
 def _bound_worker_agent_id(row: dict | None) -> str:
     """Read the worker identity through the shared wire-value codec."""
@@ -1164,6 +1169,7 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="{current_head}"
         "scan_version": "lifecycle-v3",
         "head_changed": head_changed,
         "_timing": {k: round(v, 3) for k, v in timer.marks.items()},
+        "events": (collect_discussion_events(project) if collect_discussion_events else {"unread": 0, "by_source": {}, "latest": []}),
         "summary": {
             "total": len(batched_items),
             "ready": ready_count,

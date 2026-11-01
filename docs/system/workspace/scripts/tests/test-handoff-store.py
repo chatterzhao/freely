@@ -58,6 +58,20 @@ class HandoffStoreTest(unittest.TestCase):
         self.assertEqual(self.store.reviewer_fail("T1", 2)["action"], "changes_requested")
         self.assertEqual(self.store.reviewer_fail("T1", 3)["action"], "handback_manager")
 
+    def test_additive_migration_keeps_legacy(self):
+        db = pathlib.Path(self.tmp.name) / "handoff.db"
+        import sqlite3
+        con = sqlite3.connect(db)
+        con.execute("CREATE TABLE IF NOT EXISTS a2a_tasks (task_id TEXT, state TEXT, message TEXT)")
+        con.execute("INSERT INTO a2a_tasks VALUES ('legacy-1','completed','old')")
+        con.commit()
+        con.close()
+        self.store = self.m.HandoffStore(db)
+        self.store.create("T-new", "github:o/r#2")
+        con = sqlite3.connect(db)
+        self.assertEqual(con.execute("SELECT COUNT(*) FROM a2a_tasks").fetchone()[0], 1)
+        self.assertEqual(con.execute("SELECT COUNT(*) FROM delegation_tasks").fetchone()[0], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
