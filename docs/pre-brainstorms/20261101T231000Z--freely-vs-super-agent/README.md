@@ -27,6 +27,7 @@ created_at: 2026-11-01
 | [tdd-policy.md](tdd-policy.md) | TDD 强制边界、按改动面分级、全 not_applicable 风险 | 初稿 |
 | [attention-metrics.md](attention-metrics.md) | 注意力指标、现有数据采样、最小埋点 | 初稿 |
 | [context-cache.md](context-cache.md) | prompt 顺序、ACP 传输、cache 日志、prefix hash 建议 | 初稿 |
+| [observability.md](observability.md) | live/fleet/harness 实测、DSH panel/health 对比、只读面 fail-closed | 初稿 |
 | [harness-port.md](harness-port.md) | HarnessPort 接口、ACP 四家、DSH adapter 三种模式 | 初稿 |
 | [readme-architecture-audit.md](readme-architecture-audit.md) | README 图为什么改、主图/辅图取舍 | 初稿 |
 
