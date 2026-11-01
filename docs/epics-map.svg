@@ -699,8 +699,6 @@
   <text x="65" y="4221" fill="#333">agent-dispatch-fix</text>
   <rect id="story-agent-role-cleanup" x="55" y="4228" width="690" height="18" fill="#fff" stroke="#283593" stroke-width="1" rx="2"/>
   <text x="65" y="4241" fill="#333">agent-role-cleanup</text>
-  <rect id="story-super-agent-architecture-comparison" x="55" y="4266" width="690" height="18" fill="#fff" stroke="#283593" stroke-width="1" rx="2"/>
-  <text x="65" y="4279" fill="#333">super-agent-architecture-comparison</text>
   <rect id="epic-config-toml-complete" x="35" y="4284" width="730" height="30" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
   <text x="50" y="4300" font-size="14" font-weight="bold" fill="#616161">config-toml-complete</text>
   <rect id="epic-platform" x="35" y="4318" width="730" height="48" fill="#e1f5fe" stroke="#0277bd" stroke-width="2" rx="4"/>
