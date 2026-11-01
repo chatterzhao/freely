@@ -28,7 +28,7 @@ test('apply creates manager session and restricts tools', async () => {
   const { ctx, calls } = fakeCtx()
   await apply(ctx, { freelyRoot: '/tmp/freely' })
   assert.equal(calls.create[0].agentPreset, 'freely-manager')
-  assert.deepEqual(calls.restrict[0].allow, ['read', 'grep', 'glob'])
+  assert.deepEqual(calls.restrict[0].allow, ['read', 'grep', 'glob', 'freely_status', 'freely_worker_start', 'freely_reviewer_start', 'freely_gate'])
   assert.equal(calls.tools[0].name, 'freely_status')
 })
 
