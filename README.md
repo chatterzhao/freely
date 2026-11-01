@@ -21,13 +21,39 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 
 ## 它长什么样
 
-| 层 | 组成 | 作用 |
+| 平面 | 组成 | 回答什么问题 |
 | --- | --- | --- |
-| 宿主壳 | CLI、TUI、GUI | 同一套 core 的不同入口；命令、状态、人工插话 |
-| Freely core | runtime、three-loop、scan、A2A、门禁 | 调度、路由、状态、审计；不把业务语义绑在某个 shell 上 |
-| 角色 | Manager、Worker、Reviewer | 常驻调度者、隔离执行者、独立审查者 |
-| 执行基座 | worktree + AI harness（ACP） | 每个 issue 独立工位；Claude Code / Codex / OpenCode / Cline 等可切换 |
-| 外部界面 | GitHub / Gitee | issue、PR、review、CI；人类真实工作发生的地方 |
+| 界面面 | GitHub/Gitee issue/comment、`freely chat`/discuss、CLI（主入口）/TUI/GUI（Tauri probe） | 人从哪里进来、从哪里看结果 |
+| 规格面（SDD） | Intent/Constitution/LAWS、raw issue、B1 brainstorm/candidate、B2 PRD/pre-tests/tasks、code-review | 做什么、为什么、怎么验、边界在哪 |
+| 控制面 | scan、Manager、three-loop、A2A、gates、watchdog、freely-db | 现在轮到谁、下一步是什么、能不能过 |
+| 执行面（TDD） | Worker、Reviewer、dev/test worktree、RED/GREEN、commands/scripts/skills | 实际怎么干、怎么验证 |
+| 基座面 | ACP harness（Claude/Codex/OpenCode/Cline）、GitHub/Gitee | 用什么执行、外部世界在哪 |
+
+### 两条硬约束：SDD 与 TDD
+
+**SDD：文档是状态，也是规格。**
+
+- 平台只是对外界面；AI 永远不直接读平台，`scan` 把 issue/comment 下载到本地 `docs/B1-docs/`，`issue-sync` 是本地→平台的唯一出口。
+- B1 先把问题收敛为 candidate；B2 再物化为 I-* + PRD + pre-tests + tasks。没有规格与验收，不进入实现。
+- Manager 读 scan 得到 `stage/next_action`；Worker 读 issue/PRD/pre-tests 得到任务与验收；Reviewer 读产物做独立判断。
+
+**TDD：先证明失败，再证明通过。**
+
+- B2 先写 pre-tests；dev 工位先跑 RED（证明未实现/可复现），再实现。
+- 在 `test-pre-merge` 工位跑 GREEN；测试证据是 PR 与 merge 的前提。
+- Reviewer 独立审查，不站在 Manager 或 Worker 一边。
+
+这不是“提示词里建议写文档/写测试”，而是 runtime、skill、command、gate 一起强制的交付方式。
+
+### 工具面：命令、脚本、skill、MCP、harness 各做什么
+
+| 名字 | 职责 | 不是什么 |
+| --- | --- | --- |
+| command | 封装多步治理动作（feedback/wt-create/pr-*/wt-close） | 不是普通 `git` 糖；绕过会触发门禁 |
+| script | 确定性执行 scan、状态搬运、gate、恢复 | 不做价值判断 |
+| skill | 把流程、角色、门禁知识编码给 agent 加载 | 不是权限，改 skill 改不了 gate |
+| MCP | 由底层 AI CLI 提供/启用；Freely 目前传 `mcpServers: []`，不编排 MCP | 不是 Freely 的编排层，也不是权限边界 |
+| harness（ACP） | 真正跑模型会话的执行提供层 | 不是 Freely 的宿主，可替换 |
 
 ## 它是怎么运转的
 
@@ -63,7 +89,7 @@ issue / chat / 治理漂移
 - macOS / Linux，`bash`、`git`
 - Python 3.11+（runtime 与 `freely-db`）
 - 一个支持 ACP 的 AI CLI：Claude Code、Codex、OpenCode 或 Cline
-- Node.js 20+（仅 TUI/GUI 构建需要）
+- Node.js 20+（仅 TUI/GUI 构建需要；GUI 仍是 Tauri probe）
 
 ### 初始化一个项目
 
@@ -154,12 +180,14 @@ freely feedback \
 
 ## 设计原则
 
-1. **一个项目一个 supervisor**：Manager 常驻，Worker/Reviewer 按需派生；不靠人肉轮询。
-2. **状态有唯一真源**：issue、milestone、`phase_state`、A2A task、测试证据各司其职。
-3. **工位隔离**：每个 issue 独立 worktree；`develop`/`main` 只接受门禁合并。
-4. **证据优先**：测试要有命令与输出，review 要有 verdict，合并要有 gate 记录。
-5. **基座可替换**：AI harness 是执行层，不是 Freely 的宿主；优先换 harness，不把 core 绑死在某一家 CLI。
-6. **禁止绕过**：`--no-verify`、`--force`、`--admin` 一律拦截；门禁误判就修门禁，不绕门禁。
+1. **文档是真相**：平台只是界面；本地 docs 定义规格、状态与验收，scan/sync 是边界桥。
+2. **TDD 是验收**：先 RED 再实现，GREEN 在 test 工位跑；测试证据不是可选项。
+3. **一个项目一个 supervisor**：Manager 常驻，Worker/Reviewer 按需派生；不靠人肉轮询。
+4. **状态有唯一真源**：issue、milestone、`phase_state`、A2A task、测试证据各司其职。
+5. **工位隔离**：每个 issue 独立 worktree；`develop`/`main` 只接受门禁合并。
+6. **证据优先**：测试要有命令与输出，review 要有 verdict，合并要有 gate 记录。
+7. **基座可替换**：AI harness 是执行层，不是 Freely 的宿主；优先换 harness，不把 core 绑死在某一家 CLI。
+8. **禁止绕过**：`--no-verify`、`--force`、`--admin` 一律拦截；门禁误判就修门禁，不绕门禁。
 
 ## 可观测性
 
@@ -194,6 +222,7 @@ docs/assets/                 README 架构图
 - 当前主路径是 ACP harness；DSH 等宿主需要 adapter，不会假装“加个配置就能换”。
 - 自主模式默认开启，但人类仍可通过 `chat`、`stop`、PR review、merge gate 介入。
 - 多项目通过 fleet 管理，每个项目有独立 runtime 与工位。
+- GUI 目前是 Tauri probe（`src-tauri/`），不是完整产品面；CLI 是主入口。
 
 ## 深入阅读
 
