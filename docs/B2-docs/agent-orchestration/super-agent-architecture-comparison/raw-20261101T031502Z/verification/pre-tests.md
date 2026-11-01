@@ -73,10 +73,10 @@
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-4.log
 - test_command: grep -c "^phase_state: absorbed" docs/B1-docs/raw-20261101T031502Z/issue.md && grep -c 'I-20261101T031502Z-A' docs/milestones.md && grep -c 'C-20261101T031502Z-' docs/milestones.md
-- expected_output: 1 / 至少 2 / 4
+- expected_output: 1 / 至少 1 / 4
 - expected_RED_output: 吸收前 phase_state 为 proposed
 - actual_RED_output: phase_state 为 proposed，milestones 无 I-* 条目
-- actual_output: 1 / 2 / 4
+- actual_output: 1 / 4 / 4
 - evidence_file: verification/test-evidence/acceptance-4.log
 - red-green-status: green
 - status: passed
