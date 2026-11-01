@@ -27,22 +27,22 @@
 
 ### acceptance-2
 - id: AT-002
-- requirement: 三个后续 candidate 为 needs_research，四个 candidate 均带 next_action / revisit_trigger
+- requirement: 四个 candidate 均为 promoted/proposed，且带 next_action / revisit_trigger
 - acceptance_target: candidate 不伪造 promote，可被后续 scan 发现
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: 输出 3 / 4 / 4
+- required_evidence: 输出 4 / 4 / 4
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-2.log
-- test_command: grep -c '^- status: needs_research' docs/B1-docs/raw-20261101T031502Z/candidates.md && grep -c '^- next_action:' docs/B1-docs/raw-20261101T031502Z/candidates.md && grep -c '^- revisit_trigger:' docs/B1-docs/raw-20261101T031502Z/candidates.md
-- expected_output: 3 然后 4 然后 4
-- expected_RED_output: 任一计数不等于 3/4/4
-- actual_RED_output: 初稿两个 candidate 且缺 revisit_trigger 时计数为 0
-- actual_output: 3 / 4 / 4
+- test_command: grep -cE '^- status: (promoted|proposed)$' docs/B1-docs/raw-20261101T031502Z/candidates.md && grep -c '^- next_action:' docs/B1-docs/raw-20261101T031502Z/candidates.md && grep -c '^- revisit_trigger:' docs/B1-docs/raw-20261101T031502Z/candidates.md
+- expected_output: 4 然后 4 然后 4
+- expected_RED_output: 任一计数不等于 4/4/4
+- actual_RED_output: 初稿只有 needs_research 且缺 revisit_trigger 时计数不足
+- actual_output: 4 / 4 / 4
 - evidence_file: verification/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
-- red_how: 草稿缺字段/缺 candidate 时计数不足；补齐后达到 3
+- red_how: 草稿缺字段或状态未收敛时计数不足；补齐后达到 4
 
 ### acceptance-3
 - id: AT-003
@@ -100,6 +100,44 @@
 - red-green-status: green
 - status: passed
 - red_how: raw 未 absorbed、I-* 未物化时门禁失败；补齐后通过
+
+### acceptance-6
+- id: AT-006
+- requirement: P0 harness-status 的 5 项单测全部通过
+- acceptance_target: 能力矩阵、cache 聚合、require 失败、缺表、未知工具都有回归
+- testing_layer: unit
+- target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
+- required_evidence: 输出 Ran 5 tests 与 OK，退出 0
+- evidence_level: real_env
+- artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-6.log
+- test_command: python3 docs/system/workspace/scripts/tests/test-harness-status.py
+- expected_output: Ran 5 tests 然后 OK
+- expected_RED_output: harness_status.py 不存在时 ImportError/FileNotFoundError
+- actual_RED_output: 实现前脚本不存在，测试文件全部失败
+- actual_output: Ran 5 tests / OK
+- evidence_file: verification/test-evidence/acceptance-6.log
+- red-green-status: green
+- status: passed
+- red_how: 先写测试，脚本不存在时 5 项失败；实现后 5 项通过
+
+### acceptance-7
+- id: AT-007
+- requirement: CLI 能输出合法 JSON，且包含 adapter/cache/roles/required 结构
+- acceptance_target: `freely harness-status` 可被脚本消费
+- testing_layer: integration
+- target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
+- required_evidence: 输出 ok
+- evidence_level: real_env
+- artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-7.log
+- test_command: ./bin/harness-status --project . --json | python3 -c "import json,sys; d=json.load(sys.stdin); assert {'adapter','cache','roles','required'} <= set(d); print('ok')"
+- expected_output: ok
+- expected_RED_output: bin/harness-status 不存在或输出非 JSON
+- actual_RED_output: 实现前入口不存在
+- actual_output: ok
+- evidence_file: verification/test-evidence/acceptance-7.log
+- red-green-status: green
+- status: passed
+- red_how: 实现前入口不存在；实现后 JSON 可解析
 
 ## Unit
 

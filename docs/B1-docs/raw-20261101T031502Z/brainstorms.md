@@ -352,6 +352,9 @@ Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）�
 
 [打开交互式版本](freely-harness-port-boundary.html)（archify）。图中三层优先级：先做 Freely 内的 HarnessPort；再把 DSH 作为 adapter；最后才考虑把 gates/worktree/issue 外溢成 DSH 工具插件。
 
+P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude 有 fork+usage，OpenCode 有 fork 但 usage 不完整，Cline 无 fork/usage；最近 50 个 cycle 的 21 条 cache 记录 hit=0/miss=0，说明当前 adapter 根本没有上报缓存字段——这比“命中率低”更严重，是**不可观测**。
+
+
 ## 5. 七处结构性差异及影响
 
 ### D1 授权在运行时数据里 vs 在流程门禁里
@@ -455,21 +458,34 @@ Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）�
 
 - **不整体迁移 Super-agent 架构，也不把 Freely 搬进 DSH。** 两者目标不同：Super-agent 优化“团队被打扰的次数”，Freely 优化“项目从问题到合并的自治闭环”。
 - **保留 Freely 的三个差异优势**：文档驱动的 B1/B2 治理、独立 Reviewer、多项目 fleet。
-- **优先做 HarnessPort 抽象**：先把 ACP 适配器正式化为可探测、可降级、可按角色选择的基座端口，再谈 DSH adapter；DSH 插件只做工具级外溢。
-- **吸收三个协作 primitive**：
-  1. 后续线程的 follow-up ownership 与 handback；
-  2. 结构化 Attention + 类型化 report/relay 幂等键；
-  3. 路由批处理与逐条拒绝。
-- **把“路由层注意力预算 + prompt/cache 契约”作为研究项**：先度量，再改 prompt 段序与 fork 策略。
+- **P0 已实现 Harness 能力探针与缓存观测**：`freely harness-status` 已能回答“每个角色用什么 harness、能不能 fork/resume、usage/cache 是否上报、最近 cycle 的命中情况”。这是 HarnessPort 的第一个可运行切片，不是纸面设计。
+- **P1 起必须改代码，不再“继续研究”**：
+  1. follow-up ownership 轻量账本 + claim/release/handback；
+  2. `a2a_task` 类型化 report/attention + 稳定 relay key；
+  3. Manager prompt 的 stable_prefix / volatile_tail 契约。
+- **P2/P3 才做 HarnessPort 接口与 DSH adapter**：先让 ACP 适配器统一能力契约，再谈 DSH；DSH 插件只做 gates/worktree/issue 工具外溢。
 - **明确不做**：per-ticket Mandate 运行时、默认 observe、单仓绑定、移除 Reviewer、事件溯源重写、双 Router 插件。
 
 ## 9. Candidate
 
-- `C-20261101T031502Z-A`：交付本次对比研究、概念全量对照与方向立项（promoted → `I-20261101T031502Z-A`）。
-- `C-20261101T031502Z-B`：定义 Worker 对已完成工单后续线程的 follow-up ownership 与 handback 协议（needs_research）。
-- `C-20261101T031502Z-C`：度量并约束 Manager 路由/交接成本，建立类型化 report/attention 与 prompt/cache 契约（needs_research）。
-- `C-20261101T031502Z-D`：把 agent harness 抽象为可切换基座（HarnessPort），并划清 DSH adapter / DSH 插件边界（needs_research）。
+- `C-20261101T031502Z-A`：交付本次对比研究、概念全量对照、P0 `harness-status` 实现与方向立项（promoted → `I-20261101T031502Z-A`）。
+- `C-20261101T031502Z-B`：实现 follow-up ownership 轻量账本与 handback（proposed，P1）。
+- `C-20261101T031502Z-C`：实现类型化 report/attention、批量路由与 prompt 前缀契约（proposed，P1）。
+- `C-20261101T031502Z-D`：实现 HarnessPort 能力契约与按角色选择，之后再评估 DSH adapter（proposed，P1–P3；P0 已落地）。
 - milestone：`M-20261101T031502Z-A`。
+
+## 10. 任务拆分：需要实现/重构什么
+
+| 优先级 | 任务 | 具体改动 | 验收 |
+| --- | --- | --- | --- |
+| P0（已完成） | Harness 能力探针 + 缓存观测 | 新增 `harness_status.py`、`bin/harness-status`、`freely harness-status`；能力矩阵、按角色读取 agent-table、二进制探针、`[CACHE]` 聚合 | 单测 5 项通过；主项目实测输出角色/能力/cache；`--require fork` 对 Codex/Cline 返回 3 |
+| P1-1 | follow-up ownership | 新表 `followup_owners`（thread_key/ticket_key/owned_until/reason）+ claim/release/handback CLI；scan 开单前查账本 | 真实 PR 评论回放：同一线程不重复开单；越界消息只 handback 一次 |
+| P1-2 | 类型化交接 | `a2a_task.py --report-state` 六态；`--attention` JSON（question/target/action）；A2A server 原样存；稳定 relay key | 六态可查询；重复 report 不重复投递；attention 路由回原会话 |
+| P1-3 | prompt 缓存契约 | Manager prompt 拆 stable_prefix/volatile_tail；日志标注两段 bytes；Policy/settings 固定在尾部 | `harness-status` 对照显示 prefix 稳定；volatile 变化不影响前缀字节 |
+| P2 | HarnessPort 接口 | 把能力矩阵提升为 contract；`run-acp-prompt.py` 启动前 probe + fallback；per-role harness 选择 | 缺 fork 的 harness 自动降级；能力缺失给出明确错误 |
+| P3 | DSH adapter / 插件 | 先 spike Cordis in-process vs 子进程；只做 gates/worktree/issue 工具外溢 | spike 结论 + 插件不启动第二套 Router/Ticket |
+
+依赖关系：P1-2 依赖 P1-1 的 owner 语义；P1-3 独立可先做；P2 依赖 P0 的能力矩阵；P3 必须在 P2 之后。
 
 ## Appendix: 证据索引
 

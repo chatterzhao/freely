@@ -34,13 +34,13 @@ milestone: M-20261101T031502Z-A
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
-## C-20261101T031502Z-B: 已完成工单的 follow-up ownership 与 handback 协议
+## C-20261101T031502Z-B: 实现 follow-up ownership 与 handback
 
 - candidate_format_version: v2
-- title: 定义 Worker 对已完成工单后续线程的 follow-up ownership 与 handback 协议
-- status: needs_research
-- decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。该缺口在 agent 协作层，且已被 `concept-map.md` 逐条确认，不是叫法差异。
-- next_action: 先做行为盘点（不改代码）：枚举 PR comment、review、CI、issue comment、chat 插话五类后续消息当前落到 scan 还是 intake；定义 owner 判定、handback 结构、幂等键、超时释放与人工 stop 的优先级；产出协议草案与 pre-tests 设计，再决定是否进入 B2。
+- title: 实现 Worker 对已完成工单后续线程的 follow-up ownership 与 handback
+- status: proposed
+- decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。结论：需要实现一个轻量 ownership 账本，而不是继续研究概念。
+- next_action: 新增 `followup_owners` 轻量账本（thread_key、ticket_key、owned_until、reason）与 three 个 CLI：claim/release/handback；scan 在开新工单前查账本；Manager 只处理无 owner 的消息。先在 test 工位用真实 PR/issue 评论回放验证，再改 scan。
 - revisit_trigger: 出现同一 PR/Issue 的后续评论被重复开单、被漏接，或 Manager 因中转 follow-up 出现上下文丢失/重复委派时，立即重启本 candidate；若连续两个里程碑未出现该类事件，可降级为观察项。
 - acceptance_criteria:
   - 五类后续消息各自有明确的 owner 判定规则，且能回答“这条消息现在归谁”
@@ -62,13 +62,13 @@ milestone: M-20261101T031502Z-A
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
-## C-20261101T031502Z-C: Manager 路由/交接质量与 prompt/cache 契约
+## C-20261101T031502Z-C: 实现类型化 report/attention 与 prompt 前缀契约
 
 - candidate_format_version: v2
-- title: 度量并约束 Manager 的路由/交接成本，建立类型化 report/attention 与 prompt 前缀契约
-- status: needs_research
-- decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约，长期是单点瓶颈。
-- next_action: 先度量（不改代码）：统计 Manager 每轮 patrol 注入的 scan/A2A/文档引用体积、读实现的次数、转为 Worker 的指令比例、`[CACHE]` 命中率与 prompt_bytes；再设计批量路由/逐条拒绝、`report` 六态与 `attention` 字段、稳定 relay key、prompt 稳定前缀/可变尾部；用度量与对照数据决定改 prompt/skill 还是改 runtime。
+- title: 实现 Manager 的类型化 report/attention、批量路由与 prompt 前缀契约
+- status: proposed
+- decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约。结论：按 P1 实现，不再停留在度量。
+- next_action: P1-1 在 `a2a_task.py` 增加 `--report-state` 六态与 `--attention` JSON（question/target/action），A2A server 原样存储；P1-2 增加稳定 relay key 去重；P1-3 把 Manager prompt 拆成 stable_prefix / volatile_tail 两段并在日志标记；P1-4 用 `harness-status` 的 cache 指标做前后对照。
 - revisit_trigger: Manager 单轮上下文接近 rotation 阈值、同一轮处理超过 3 个工单导致漏派/错派、或 cache 命中率连续下降且 prompt_bytes 上升时，重启本 candidate；若度量显示路由开销占比很低，则降级为观察项。
 - acceptance_criteria:
   - 给出 Manager 每轮 patrol 的上下文成本基线（字符/token/文档数）与 cache hit/miss 基线
@@ -91,13 +91,13 @@ milestone: M-20261101T031502Z-A
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
-## C-20261101T031502Z-D: 把 agent harness 抽象为可切换基座（HarnessPort）
+## C-20261101T031502Z-D: 实现 HarnessPort 能力探测与按角色选择
 
 - candidate_format_version: v2
-- title: 定义 HarnessPort，把 agent harness 变成可探测、可降级、可按角色选择的基座，并划清 DSH adapter/插件边界
-- status: needs_research
-- decision_reason: Freely 今天通过 ACP 适配多 CLI，但契约是隐式的：session/fork/resume、工具策略、skills、usage/cache 的差异靠代码分支兜底；DSH 原型没有 ACP 服务端，只有 Cordis 插件面，且 `engines.dsh` 钉版本。要把 harness 当可切换基座，必须先有显式能力契约；要让 DSH 成为其中一个基座，必须写 adapter，而不是加一个配置项。
-- next_action: 先做能力盘点（不改代码）：列出当前 ACP adapter 对 Claude/Codex/OpenCode/Cline 的 session/fork/resume、stream、interrupt、tools、skills、usage/cache 支持矩阵；定义 HarnessPort 接口（probe、start、prompt、resume/fork、interrupt、usage、capabilities）与 per-role 选择/fallback；做 DSH adapter 可行性 spike（Cordis in-process vs 子进程桥）；给出“一个 loop 一个 owner”的插件边界。
+- title: 实现 HarnessPort：能力探测、按角色选择与 DSH adapter 边界
+- status: proposed
+- decision_reason: Freely 今天通过 ACP 适配多 CLI，但契约是隐式的：session/fork/resume、工具策略、skills、usage/cache 的差异靠代码分支兜底；DSH 原型没有 ACP 服务端，只有 Cordis 插件面，且 `engines.dsh` 钉版本。结论：先实现能力探测与缓存观测（P0 已落地 `freely harness-status`），再抽 HarnessPort 接口，不直接写 DSH adapter。
+- next_action: P1 把 `harness-status` 的 CAPABILITIES 表提升为 `HarnessPort` 的 capability contract，并让 `run-acp-prompt.py` 在启动前调用 probe；P2 增加 per-role harness 选择与 fallback；P3 做 DSH adapter spike（Cordis in-process vs 子进程），并确认插件只外溢 gates/worktree/issue。
 - revisit_trigger: 新增第二个 harness 需要修改 runtime 多处、出现 harness 能力差异导致的静默失败、或团队要求把 gates/worktree 外溢成 DSH 插件时，立即重启本 candidate。
 - acceptance_criteria:
   - 产出一张 ACP CLI 能力矩阵，标注“有/无/降级/需探测”

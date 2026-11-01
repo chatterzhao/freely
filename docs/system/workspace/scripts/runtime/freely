@@ -944,6 +944,7 @@ Usage:
   freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
   freely develop-push status [--project <abs_path>]
@@ -26764,6 +26765,7 @@ main() {
     task-source-scan) cmd_task_source_scan "$@" ;;
     issue-sync) cmd_issue_sync "$@" ;;
     raw-issue-pull) cmd_raw_issue_pull "$@" ;;
+    harness-status) exec "$SELF_ROOT/bin/harness-status" "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
