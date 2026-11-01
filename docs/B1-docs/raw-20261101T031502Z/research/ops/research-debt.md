@@ -12,7 +12,7 @@ created_at: 2026-11-01
 
 | Candidate | 研究缺口 | 实现/验证缺口 | 关闭证据 | 当前状态 |
 | --- | --- | --- | --- | --- |
-| C-F 讨论入口 | 六类来源的 event schema、actor/event_id、scan/事件流选型 | platform-adapter 字段、真实 issue 评论/PR review 回放 | `intake.md` + 回放日志 | needs_research |
+| C-F 讨论入口 | ✅ `intake.md` 六类 schema/准入/选型；✅ 真实 issue/PR/CI 回放 | platform-adapter 方法、events 表、scan 读取 | `intake.md` + `replay/intake_replay.py` 输出 | needs_research（实现待 B2） |
 | C-B ownership/handoff | 五类后续消息的“现状行为 vs 目标行为”矩阵 | new/fork 丢 message 修复、handoff 表/回放 | `handoff.md` 行为矩阵 + 回放 | needs_research |
 | C-C report/attention/prompt | report/attention JSON schema、A2A 映射、prompt manifest | usage/cache 基线、真实 patrol 对照 | schema + manifest + 基线日志 | needs_research |
 | C-D HarnessPort | 接口签名、RoleHarnessConfig、per-role probe 语义 | 角色级选择/探测实现 | contract + probe 输出 | needs_research |
