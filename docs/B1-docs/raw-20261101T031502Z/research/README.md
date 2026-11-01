@@ -18,7 +18,7 @@ created_at: 2026-11-01
 | 类别 | 回答什么 | 文档 |
 | --- | --- | --- |
 | **A. 对比研究** | Super-agent 与 Freely 的重叠意图、概念映射、逐项判定、失效模式 | [comparison/overlap-comparison.md](comparison/overlap-comparison.md)、[concept-map.md](comparison/concept-map.md)、[intent-alignment.md](comparison/intent-alignment.md)、[failure-modes.md](comparison/failure-modes.md) |
-| **B. Freely 交付/运行时** | Freely 自身怎么交付：B1/B2、SDD/TDD、三角色、交接协议、状态/准入/缓存/TDD 契约 | [delivery/delivery-model.md](delivery/delivery-model.md)、[handoff.md](delivery/handoff.md)、[runtime-contracts.md](delivery/runtime-contracts.md) |
+| **B. Freely 交付/运行时** | Freely 自身怎么交付：B1/B2、SDD/TDD、三角色、交接协议、状态/准入/缓存/TDD 契约 | [delivery/delivery-model.md](delivery/delivery-model.md)、[intake.md](delivery/intake.md)、[handoff.md](delivery/handoff.md)、[runtime-contracts.md](delivery/runtime-contracts.md) |
 | **C. Harness 策略** | harness 可插拔、两种部署形态、角色级选择 UI/CLI/配置 | [harness/harness-strategy.md](harness/harness-strategy.md)、[harness-selection.md](harness/harness-selection.md) |
 | **D. DSH 插件（相邻课题）** | Freely 是否/如何作为 DSH 插件；与 Super-agent 插件形态的关系 | [dsh-plugin/README.md](dsh-plugin/README.md)、[dsh-freely-plugin-design.md](dsh-plugin/dsh-freely-plugin-design.md) |
 | **E. 运维/证据** | 目录归位、遗留目录、既有门禁缺陷、研究债台账 | [ops/docs-directory-audit.md](ops/docs-directory-audit.md)、[research-debt.md](ops/research-debt.md)、[decisions.md](ops/decisions.md)、[replay/README.md](ops/replay/README.md) |
