@@ -8,7 +8,7 @@
 - target_environment: node --test + fake ctx
 - required_evidence: test log
 - blocker_taxonomy: execution_pending_or_failed
-1. 运行 `node --test plugins/dsh-freely/test/plugin.test.mjs`。
+1. 运行 `node --test packaging/dsh-freely/test/plugin.test.mjs`。
 
 ### acceptance-1：插件加载与 inject
 - id: DE-1
@@ -19,8 +19,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - actual_output: pass
 - evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T031502Z/verification/test-evidence/plugin.log
 - expected_output: pass
@@ -35,8 +35,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - actual_output: pass
 - evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T031502Z/verification/test-evidence/plugin.log
 - expected_output: pass
@@ -51,8 +51,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - actual_output: pass
 - evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T031502Z/verification/test-evidence/plugin.log
 - expected_output: pass
@@ -64,7 +64,7 @@
 - target_environment: web profile + dsh 0.2.1-rc.5
 - required_evidence: load log
 - blocker_taxonomy: execution_pending_or_failed
-1. `dsh plugin --profile freely-web-spike add plugins/dsh-freely`
+1. `dsh plugin --profile freely-web-spike add packaging/dsh-freely`
 2. `dsh --profile freely-web-spike`，断言 `[dsh-freely] loaded`。
 
 ### acceptance-4：host 加载
@@ -76,7 +76,7 @@
 - evidence_level: integration
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/cordis.patch.yml
+- artifact_ref: packaging/dsh-freely/cordis.patch.yml
 - test_command: dsh --profile freely-web-spike
 - expected_output: loaded
 - actual_output: pending
@@ -117,8 +117,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
 - actual_output: pending
 
@@ -131,8 +131,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
 - actual_output: pending
 
@@ -145,8 +145,8 @@
 - evidence_level: mock
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/index.js
-- test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
+- artifact_ref: packaging/dsh-freely/index.js
+- test_command: node --test packaging/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
 - actual_output: pending
 
@@ -159,7 +159,7 @@
 - evidence_level: integration
 - status: passed
 - red-green-status: green
-- artifact_ref: plugins/dsh-freely/cordis.patch.yml
+- artifact_ref: packaging/dsh-freely/cordis.patch.yml
 - test_command: dsh --profile freely-web-spike
 - expected_output: loaded
 - actual_output: pending

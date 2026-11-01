@@ -7,7 +7,7 @@
 ## 包结构
 
 ```
-plugins/dsh-freely/
+packaging/dsh-freely/
   package.json          # name, type module, dsh.bundle.patch
   cordis.patch.yml      # insert plugin + 三角色 preset
   index.js              # name/inject/apply, FreelyBridge, tools
