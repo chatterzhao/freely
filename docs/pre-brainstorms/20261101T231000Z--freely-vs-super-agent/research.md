@@ -329,10 +329,10 @@ DSH：
 
 不是所有结论都能从文档推出来，这一轮做了四个实测：
 
-1. **`freely task-source-scan --json` 的 stage 与 next_action 会误判历史吸收项。**
-   本工位扫描返回 4 个 item，全部标成 `收口`，但 next_action 仍是 `wt-create --raw-key ...` / 进入 B1；同一个 raw key 还出现两次（dev/test 工位各一次）。同时 `platform_health=degraded`，原因是 `No module named 'platform_adapter'`。
-   这说明“docs 是真相”目前还缺少一致的对账：absorbed/completed 的 raw 没有被稳定解析到 I-*，worktree 维度也没有去重。扫描环境的 import 失败进一步放大了不确定性。
-   但要注意：当前 fleet 里已有一个专门修 `scan-platform-adapter-import` 的工位（`fix-raw-20260807T114900Z-scan-platform-adapter-import`），说明 `platform_adapter` 缺失是已知在修的问题，不能直接归因于架构设计。需要在那个修复合并后重跑同一组 scan，才能判断 stage 误判是独立缺陷还是 import 失败的连带结果。
+1. **`freely task-source-scan --json` 的 station 与 next_action 不一致，且 worktree 维度重复。**
+   本工位扫描返回 4 个 item，全部标成 `收口`：对应 3 个 raw key 的 dev/test 工位尚未清理，同一 raw 因两个工位各出现一次。这个“收口”本身是合理的（worktree not cleaned），但 next_action 仍是 `wt-create --raw-key ...` / 进入 B1，和 station 不匹配。同时 `platform_health=degraded`，原因是 `No module named 'platform_adapter'`。
+   结论不是“scan 完全误判”，而是：**scan 能识别 worktree 未清理，但 next_action 渲染没有跟 station 对齐，也没有按 raw key 去重。** 这属于“文档状态 → 动作”的转换层缺陷。
+   注意：fleet 里已有专门修 `scan-platform-adapter-import` 的工位（`fix-raw-20260807T114900Z-scan-platform-adapter-import`），`platform_adapter` 缺失是已知在修问题，不能归因于架构设计；需修复后复测。
 
    另外，CLI usage 里列了 `freely task-scan`，实际 dispatch 报 `unknown command: task-scan`；这是文档/命令面与 runtime 的不一致，属于可观测的漂移样本。
 
