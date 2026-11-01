@@ -308,6 +308,9 @@ DSH：
 1. **`freely task-source-scan --json` 的 stage 与 next_action 会误判历史吸收项。**
    本工位扫描返回 4 个 item，全部标成 `收口`，但 next_action 仍是 `wt-create --raw-key ...` / 进入 B1；同一个 raw key 还出现两次（dev/test 工位各一次）。同时 `platform_health=degraded`，原因是 `No module named 'platform_adapter'`。
    这说明“docs 是真相”目前还缺少一致的对账：absorbed/completed 的 raw 没有被稳定解析到 I-*，worktree 维度也没有去重。扫描环境的 import 失败进一步放大了不确定性。
+   但要注意：当前 fleet 里已有一个专门修 `scan-platform-adapter-import` 的工位（`fix-raw-20260807T114900Z-scan-platform-adapter-import`），说明 `platform_adapter` 缺失是已知在修的问题，不能直接归因于架构设计。需要在那个修复合并后重跑同一组 scan，才能判断 stage 误判是独立缺陷还是 import 失败的连带结果。
+
+   另外，CLI usage 里列了 `freely task-scan`，实际 dispatch 报 `unknown command: task-scan`；这是文档/命令面与 runtime 的不一致，属于可观测的漂移样本。
 
 2. **TDD 证据不均匀。**
    当前 `docs/B2-docs/**/pre-tests.md` 共 431 份，其中 327 份出现 `not_applicable`，247 份没有 `test_command`。这不能直接判为“TDD 失败”（很多是历史 schema 或 docs-only 变更），但说明“TDD 是强制验收”在历史资产里并不均匀；新门禁只覆盖新产物，不能把历史绿当成整体绿。
