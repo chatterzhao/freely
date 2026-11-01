@@ -48,6 +48,7 @@ milestone: M-20261101T031502Z-A
   - 已停止/已关闭工单不会被后续消息自动复活，除非满足显式条件
   - 协议草案给出幂等键与超时释放规则，可用 pre-tests 验证
 - promotion_gate: 行为盘点完成 + 协议草案通过 Reviewer 审查 + 至少一个真实后续线程场景的端到端演练通过
+- depends_on: C-20261101T031502Z-F
 - open_questions:
   - follow-up ownership 应落在 A2A task 元数据还是独立的轻量账本
   - 线程订阅的边界是“同一 PR/Issue”还是“同一 raw issue 关联的所有线程”
@@ -77,6 +78,7 @@ milestone: M-20261101T031502Z-A
   - `report` 至少覆盖 progress/waiting/ready/blocked/failed/dropped 六态，`attention` 含问题、目标会话、所需动作
   - 交接 relay 有稳定幂等键；prompt 明确“稳定前缀 / 可变尾部”，并给出 cache 对照数据
 - promotion_gate: 基线度量完成 + 协议/字段设计通过 Reviewer 审查 + 一个真实 patrol 周期的前后对照
+- depends_on: C-20261101T031502Z-B
 - open_questions:
   - 上下文成本以字符、token 还是文档数为口径
   - 六态 report 与现有 A2A state 如何映射而不破坏兼容
@@ -145,7 +147,7 @@ milestone: M-20261101T031502Z-A
   - mode: desk-research
   - summary: 插件架构与 DSH service 注入面已有代码级依据，但尚无 spike；不能 promote
   - verdict: needs_more_research
-- depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D
+- depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
 - promoted_issue_id: pending://C-20261101T031502Z-E
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
@@ -175,7 +177,6 @@ milestone: M-20261101T031502Z-A
   - mode: code-path review
   - summary: scan 无 comment 处理、pull 只写 body、PR review/CI 无入口；缺口成立，但没有回放证据
   - verdict: needs_more_research
-- depends_on: C-20261101T031502Z-B
 - promoted_issue_id: pending://C-20261101T031502Z-F
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
