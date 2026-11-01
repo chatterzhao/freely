@@ -325,6 +325,13 @@ DSH：
 
 判定：**Freely 的“可替换基座”方向更对；DSH 的“单宿主深度”更强。** 优先级应是 Freely 内 HarnessPort 正式化，再谈 DSH adapter；DSH 插件只做工具外溢，不做第二套 Router/Ticket。
 
+进一步看 DSH 的集成面：原型提供的 `scripts/dsh-superagent` 通过 management HTTP API（`/orchestrator/api/state`）做健康/设置管理，不提供“任意 prompt 的 Session API”。DSH 的 Session/Agent 是 Cordis 进程内对象，不是 ACP 端点。因此 DSH adapter 的现实路径不是“子进程 + ACP”，而是：
+
+1. **DSH 插件/桥进程**：在 DSH 宿主内注册一个 Freely 可见的 endpoint，接收 prompt、开 Session、回 usage/stopReason；
+2. 或 **Freely 侧 Node bridge**：用 DSH SDK 起一个受控 Session，再把 JSON-RPC 暴露给 Python runtime。
+
+两条都比 ACP 适配器重，且要解决“谁拥有 Router/Ticket”的冲突。结论：**DSH 是宿主，不是可插拔 harness；除非只做工具级插件，否则不应把 DSH 当 ACP CLI 对待。**
+
 ### 7.8 实证检查（2026-11-01，本工位）
 
 不是所有结论都能从文档推出来，这一轮做了四个实测：
