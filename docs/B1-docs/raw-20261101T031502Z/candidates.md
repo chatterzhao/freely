@@ -22,7 +22,7 @@ milestone: M-20261101T031502Z-A
   - 两张 archify 对比图可打开、可读
   - 三个后续方向以 needs_research candidate 登记，带 next_action/revisit_trigger
   - `governance-merge-gate --range develop..HEAD` 通过
-- promotion_gate: 研究文档 + 概念对照 + 两张图 + 三个 candidate 合并，门禁通过
+- promotion_gate: 研究文档 + 概念对照 + 两张图 + 四个 candidate 合并，门禁通过
 - open_questions: []
 - acceptance_reviews:
   - reviewer: session-self

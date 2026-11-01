@@ -55,7 +55,7 @@ Freely 当前以 Manager / Worker / Reviewer 三角色、A2A Task、文档驱动
 - 原型只做静态阅读，未运行真实 GitHub 仓库；因此“已实现”只表示代码/文档存在。
 - 架构图是拓扑对比，不表达全部时序；`report`、`SSE`、`verdict` 等回流在文字与图注中说明。
 - DSH adapter 的可行性只做设计判断，不在本 issue 写代码；in-process/子进程的选择留给 C-C 的 spike。
-- 三个 candidate 仍是研究项；若后续行为盘点/度量证明缺口不存在，应按 `revisit_trigger` 降级或丢弃。
+- 三个后续 candidate 仍是研究项；若后续行为盘点/度量证明缺口不存在，应按 `revisit_trigger` 降级或丢弃。
 
 ## Dev-Loop Handoff
 

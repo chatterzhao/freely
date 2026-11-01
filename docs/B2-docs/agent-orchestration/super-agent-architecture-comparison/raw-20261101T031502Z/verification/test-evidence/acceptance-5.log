@@ -1,18 +1,1 @@
-[FAIL] develop merge governance gate blocked.
-
-── 需要阅读的 Skill ──
-  skill:freely-doc-B2_IBM-execution §门禁常见坑速查 (2 个错误)
-
-── B2_IBM 相关错误 (2) ──
-  - docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/code-reviews/implementation-decision-note.md points to owner issue 'missing', but that issue cannot be resolved. Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate.
-  - I-20261101T031502Z-A in docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md is already in phase 'in_verification', but its source candidate C-20261101T031502Z-A still says 'needs_research'. Update the candidate to the promoted/materialized state instead of leaving upstream status stale.
-
-Allowed candidate statuses before merge:
-- needs_research (还需要继续研究；可停在 milestone candidate_issues，但必须有 next_action 和 revisit_trigger)
-- blocked (当前 pre-brainstorm 已识别阻塞；可停在 milestone candidate_issues，但必须写清 blocker 后的下一步)
-- promoted (不允许停在当前环；必须已经 materialize 成一个或多个 I-{issue-id}*)
-- absorbed (允许不新开独立 issue，但必须指向吸收它的 canonical owner issue)
-- dropped (允许不进入下一环，但必须写清不再推进的原因)
-
-不要对着错误逐条改字段。
-先看上面「需要阅读的 Skill」——加载对应的 skill 按规范流程修正。
+Develop merge governance gate passed.
