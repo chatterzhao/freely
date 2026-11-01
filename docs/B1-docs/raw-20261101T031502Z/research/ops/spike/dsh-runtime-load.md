@@ -33,3 +33,18 @@ Verified:
 - Session creation + `agent.steer(msg)` still does not prove Agent consumption (no model turn).
 
 Still unverified: Worker/Reviewer presets, Agent consumption/role prompt, gate blocking E2E, full issue→PR.
+
+## 2026-11-01 P1 consumption + gate
+
+Fourth spike: steer wakes the Agent; after 5s:
+
+```
+[freely-spike] status=running events=tool/call,job/registered,job/settled,tool/result,step/end,step/start
+[freely-spike] bridge_exit=0 out="gate_exit=1\n"
+```
+
+Verified:
+
+- The Agent is no longer idle after `steer`; Session events include `step/start`, `tool/call`, `tool/result`, `step/end`. This is real consumption, not just queueing.
+- The plugin can run `bin/pretests-gate` with a missing issue and observe non-zero (`gate_exit=1`); gate blocking is real.
+- Still unverified: three independent presets/tool whitelists, Python bridge full handoff, real issue→PR.

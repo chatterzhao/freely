@@ -123,7 +123,9 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 - 反例：`headless` profile 缺这两个服务，插件停在 `pending (waiting for services...)`，不能假设所有 profile 都支持。
 - 后续 P1 partial：插件在 web profile 真实创建 Session，`sessionController.create/resolveAgent` 成功，`agent.steer(msg)` 不抛错；但 inbox 计数不可见、无模型 turn，不能证明 Agent 消费消息。
 - P1 bridge：插件通过 `ctx.subprocess` 真跑 `bin/freely fleet-status`，`bridge_exit=0` 并读到 stdout；Python/CLI bridge 可行。
-- 仍未验证：Worker/Reviewer preset、Agent 实际消费/role prompt、gate 阻断 E2E、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
+- P1 consumption：`steer` 后 Agent `status=running`，Session events 有 `step/start,tool/call,tool/result,step/end`；消息真实被消费。
+- P1 gate：插件跑 `pretests-gate` 对缺失 issue 得到 `gate_exit=1`，阻断真实。
+- 仍未验证：Worker/Reviewer preset 独立生成/工具白名单、role prompt、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
 
 ## 3. Harness RPC
 
