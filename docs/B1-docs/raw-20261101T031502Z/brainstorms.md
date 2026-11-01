@@ -352,7 +352,7 @@ Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）�
 
 [打开交互式版本](freely-harness-port-boundary.html)（archify）。图中三层优先级：先做 Freely 内的 HarnessPort；再把 DSH 作为 adapter；最后才考虑把 gates/worktree/issue 外溢成 DSH 工具插件。
 
-P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude 有 fork+usage，OpenCode 有 fork 但 usage 不完整，Cline 无 fork/usage；最近 50 个 cycle 的 21 条 cache 记录 hit=0/miss=0，说明当前 adapter 根本没有上报缓存字段——这比“命中率低”更严重，是**不可观测**。
+P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude 有 fork+usage，OpenCode 有 fork 但 usage 不完整，Cline 无 fork/usage；最近 50 个 cycle 的 21 条 cache 记录 hit=0/miss=0，说明当前 adapter 根本没有上报缓存字段——这比“命中率低”更严重，是**不可观测**。用 `--require fork` 实测当前主项目直接 fail：reviewer 用的 Cline 不支持 fork，要么换 reviewer slot，要么接受 reviewer 冷启动；这是可执行的配置结论，不是“待研究”。
 
 
 ## 5. 七处结构性差异及影响
