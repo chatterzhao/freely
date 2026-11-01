@@ -1,13 +1,13 @@
 ---
 pre_brainstorm_id: PB-20261101T231000Z
-phase_state: in_progress
+phase_state: completed
 topic: Freely vs DeepSeek Super-agent
 created_at: 2026-11-01
 ---
 
 # 预头脑风暴索引：Freely vs Super-agent
 
-> 状态：in_progress。研究没结束前不 promote、不写实现。这里是入口；每篇文档只负责一个面，避免把结论埋在大文件里。
+> 状态：completed（研究阶段）。本阶段不 promote、不写实现；下面的“未解”是下一阶段的设计决策，不是未研究的面。每篇文档只负责一个面，避免把结论埋在大文件里。
 
 ## 一句话结论
 
