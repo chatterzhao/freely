@@ -16,7 +16,7 @@ created_at: 2026-11-01
 | C-B ownership/handoff | ✅ 五类现状/目标矩阵；✅ 协议 v0；✅ 状态机回放 | new/fork 丢 message 修复、handoff 表/真实回放 | `handoff.md` §2.1 + `handoff_replay.py` | promoted → B2 |
 | C-C report/attention/prompt | ✅ schema/A2A 映射/manifest；✅ prefix/cache 回放；✅ 可观测性基线 | 真实 patrol 对照 | `runtime-contracts.md` §3.1-3.2 + `prompt_manifest.py` | promoted → B2 |
 | C-D HarnessPort | ✅ Protocol/RoleConfig/JSON 契约；✅ 主项目三角色 probe 输出 | 角色级选择/`--role` 实现 | `harness-strategy.md` §1.1-1.5 | promoted → B2 |
-| C-E DSH 插件 | ✅ 服务注入/插件骨架静态 spike；✅ create/resolveAgent API 编译验证 | 真实 host 加载、Python bridge、首次 session、gate E2E | `dsh-freely-plugin-design.md` §2.4 + `spike/dsh-plugin-contract.ts` | needs_research（runtime spike 未跑） |
+| C-E DSH 插件 | ✅ 服务注入/插件骨架静态 spike；✅ create/resolveAgent API 编译验证 | 真实 host 加载、Python bridge、首次 session、gate E2E | `dsh-freely-plugin-design.md` §2.4 + `spike/dsh-plugin-contract.ts` + `spike/dsh-runtime-load.log` | needs_research（session/bridge/gate E2E 未跑） |
 
 ## 1. 研究关闭明细
 

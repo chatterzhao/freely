@@ -114,6 +114,15 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 
 结论：**C-E 的研究问题（插件形态/服务注入是否可行）已关闭；运行/E2E 是 B2 实现验收。**
 
+### 2.4.1 Runtime load spike（2026-11-01）
+
+- 新建 DSH profile `freely-web-spike`，从 `web` 模板复制，安装本地 `@freely/dsh-freely-spike`。
+- `dsh --profile freely-web-spike` 启动输出：
+  `[freely-spike] loaded services sessionController=function workspaceRegistry=function`
+- 证明确实：第三方插件被 DSH host 加载；`inject` 的 `sessionController/workspaceRegistry` 可用；web host 能启动。
+- 反例：`headless` profile 缺这两个服务，插件停在 `pending (waiting for services...)`，不能假设所有 profile 都支持。
+- 仍未验证：创建/提示 session、Python bridge、gate E2E、真实 issue→PR。见 `spike/dsh-runtime-load.log`。
+
 ## 3. Harness RPC
 
 `FreelyBridgeServer` 暴露给 Python runtime：
