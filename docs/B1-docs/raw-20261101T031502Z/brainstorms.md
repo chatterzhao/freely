@@ -544,3 +544,5 @@ B1 不是“写完文档就 promote”。每个 candidate 的循环是：
 | 两种部署形态 | `deployment-forms.md` |
 | 角色级 harness 选择 | `harness-selection.md` |
 | DSH 插件设计 | `dsh-freely-plugin-design.md` |
+| 主意图逐条对齐 | `intent-alignment.md` |
+| 讨论入口缺口 | `intent-alignment.md` §4.1 |
