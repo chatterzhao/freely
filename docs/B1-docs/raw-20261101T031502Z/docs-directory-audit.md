@@ -37,6 +37,17 @@ created_at: 2026-11-01
 | `docs/B1-docs/.scan-state` | runtime 扫描状态（未跟踪） | 不是文档目录 | 不提交，不迁移 |
 | `docs/B1-docs/raw-20260701T030358Z/issue.md` | 历史 metadata 异常 | `local_id`/`absorbed_into` 多了 `58Z`，phase=`dropped` 且无 B2 I-*；review 仍属该 raw | **只记录，不顺手改**；如影响 scan，单独开 issue 修 metadata |
 
+### 2.1 B1 内仍存在的非 canonical 目录
+
+| 路径 | 性质 | 判断 |
+| --- | --- | --- |
+| `docs/B1-docs/raw-20260303T000000Z/` | 旧 pre-brainstorm 命名（无 issue.md），被 4 处历史文档引用 | 不重命名；重命名需 path rewrite issue |
+| `docs/B1-docs/raw-20260503-0000/`、`raw-20260503/`、`raw-20260503-1235/`、`raw-20260501/` | 旧日期格式 | 历史只读，不搬 |
+| `docs/B1-docs/raw-MIGRATED/` | 显式迁移归档 | 保留 |
+| `docs/B1-docs/raw-20260710T171329Z/code-reviews` | 已迁到 B2；B1 下不再有 code-reviews | 已修复 |
+
+`governance-check` 仍会报 5 个**仓库既有**缺陷：missing `protected-branch-breakglass-receipts.md`、missing `docs/B1-docs/{README.md,INDEX.md,CONVERGENCE.md}`、legacy `raw-20260303T000000Z` 命名。它们不是本轮引入的，不能靠改本轮文档绕过；需要单独治理 issue。
+
 ## 3. 规范（新文档）
 
 1. B1 预研、candidate、对比研究：`docs/B1-docs/raw-{key}/`。
