@@ -126,15 +126,15 @@ B2 的代价：丢掉 DSH 的 Router/Ticket/Thread 编排；多项目仍受 DSH 
 
 ## 4. 判定矩阵
 
-| 目标 | A: DSH adapter | B: Freely 插件 | C: 不做 |
-| --- | --- | --- | --- |
-| 用 DSH 模型/Session | 可以 | 可以（DSH 内） | 不可以 |
-| 保留 Super-agent 运行时 | **丢大部分** | 保留 | N/A |
-| 保留 Freely 交付治理 | 保留 | 保留 | 保留 |
-| 保留 Freely 调度/three-loop | 保留 | **丢** | 保留 |
-| 双宿主冲突 | 高 | 中 | 无 |
-| 工程成本 | 高 | 中高 | 低 |
-| 战略价值 | 低（把 DSH 当 CLI） | 高（Freely 治理进入 DSH） | 中 |
+| 目标 | A: DSH adapter | B1: DSH-host 治理插件 | B2: Freely-host 插件 | C: 不做 |
+| --- | --- | --- | --- | --- |
+| 用 DSH 模型/Session | 可以 | 可以（DSH 内） | 可以（DSH 内） | 不可以 |
+| 保留 Super-agent 运行时 | **丢大部分** | 保留 | 丢（DSH Router/Ticket 不用） | N/A |
+| 保留 Freely 交付治理 | 保留 | 保留 | 保留 | 保留 |
+| 保留 Freely 调度/three-loop | 保留 | **丢** | 保留 | 保留 |
+| 双宿主冲突 | 高 | 中 | 中 | 无 |
+| 工程成本 | 高 | 中高 | 高（bridge/runtime） | 低 |
+| 战略价值 | 低（把 DSH 当 CLI） | 高（治理进 DSH） | 高（全能力 + DSH harness） | 中 |
 
 ## 5. 建议
 
