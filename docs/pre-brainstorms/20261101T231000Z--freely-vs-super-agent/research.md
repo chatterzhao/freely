@@ -409,6 +409,28 @@ DSH：
 
 README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位视图，不是跨项目调度台”。
 
+### 7.13 注意力度量：两边都在谈，但都没有可复现指标
+
+“人的注意力上移”是两边的共同目标，但都没有给出可复核的注意力指标。
+
+可用的原始数据：
+
+- Freely：`chats`（人插话）、A2A `input-required`（agent 求人）、PR review/comment（外部）、Manager continuity/汇报、scan `needs_human`。
+- Super-agent：Decision/reason、Report/Attention、Panel 操作、IM 消息长度/次数。
+
+可设计的指标（建议，不是现状）：
+
+| 指标 | 定义 | 说明 |
+| --- | --- | --- |
+| 人工动作数/issue | 人发出的 chat/issue comment/PR review/approval 次数 | 越低越好，但要把“必要决策”单列 |
+| 人工决策时延 | 从 attention 发出到人回复的时间 | 衡量打断质量，不是越少越好 |
+| 打断精度 | agent 主动消息中“人必须行动”的比例 | 低精度=噪音 |
+| 升级率 | 每 issue 的 input-required/blocked 次数 | 高=agent 不能自决 |
+| 返工率 | 人 review 后要求修改的比例 | 高=agent 自检不足 |
+| 漏报率 | 人不得不主动补 issue/评论的比例 | 高=agent 发现不足 |
+
+结论：**目前无法用数据证明“Freely 更省注意力”或“Super-agent 更省注意力”。** 只能说 Super-agent 在设计上更克制（默认沉默、消息长度限制），Freely 在入口上更宽（主动汇报、chat/issue/PR 多渠道）。下一轮如果要比较，应先定义并采样这组指标，而不是继续争论“自治程度”。
+
 ## 8. Freely 明确不如 Super-agent 的地方
 
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。
