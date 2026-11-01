@@ -1,3 +1,17 @@
+## M-20261101T120027Z-A
+- title: feat — @freely/dsh-freely DSH 打包形态
+- status: active
+### candidate_issues
+1. `C-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T120027Z-A
+- promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+### committed_issues
+1. `I-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
 
 ## M-20260717T090202Z-A
 - title: fix — peak 口径限定为死亡记录（PEAK=3 误报回归）
