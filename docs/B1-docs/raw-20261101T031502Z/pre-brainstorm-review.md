@@ -107,6 +107,7 @@ DSH 相关不进入本轮 candidate：
 | C-C report/attention/prompt | `delegation-protocol.md`、`context-cache.md` | 六态/attention/ownership 字段草案、STABLE/SEMI/DYNAMIC 事实 | prompt manifest/校验、cache/usage 基线、真实 patrol 对照 | 补 manifest/基线 → 对照 → acceptance review |
 | C-D HarnessPort/角色选择 | `harness-selection.md`、`deployment-forms.md` | 角色级配置落点、UI/CLI 后端、能力 probe 方向 | HarnessPort/RoleHarnessConfig 接口草案、per-role probe 证据 | 接口草案 → probe → acceptance review |
 | C-E DSH 插件 | `dsh-freely-plugin-design.md`、`dsh-adapter-decision.md` | Freely-host 插件架构、服务注入面、验收标准 | P0/P1 spike（首次 session 消息、handoff、gate） | spike → acceptance review |
+| C-F 讨论入口 | `intent-alignment.md`、`agent-handoff.md` | scan 只处理 body、无 PR review/CI 入口的直接证据 | 六类来源事件 schema、真实 issue 评论/PR review 回放 | 来源盘点 → 回放 → acceptance review |
 
 这张表就是 loop 的检查点：任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。
 

@@ -467,7 +467,7 @@ P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-st
   2. `acp_session_connect()` 在 `session/new|fork` 路径不发送传入 message；首次 Reviewer 交接、Worker 死亡后的 fail 反馈可能丢消息。
   3. Reviewer 契约矛盾：agent 文档禁止 `a2a-exit`，watchdog 消息却要求调 `a2a-exit`，skill 又要求 JSON verdict。
   4. DSH 主插件可注入 `agents/sessionController/tools/skills/systemPrompt`；因此“Freely 保留 loop、DSH 只做 harness”的 Freely-host 插件在代码层可行，但需要 spike。
-- **下一跳不是实现，是 B1 acceptance review**：
+- **下一跳不是实现，是 B1 acceptance review；优先级按主意图：讨论入口 C-F → 交接 C-B/C → Harness C-D → DSH C-E。**
   - C-B：先做五类后续消息行为盘点 + handoff envelope/ownership 协议草案；修 new/fork 丢 message 的已知 bug 后再回放。
   - C-C：先写 report 六态/attention/ownership 字段契约 + prompt manifest/基线，不直接改 A2A。
   - C-D：先定 HarnessPort/RoleHarnessConfig 与 per-role probe/配置落点，不做 DSH adapter。
@@ -482,7 +482,7 @@ B1 不是“写完文档就 promote”。每个 candidate 的循环是：
      → 满足 promotion_gate → 独立 acceptance review → B2
 ```
 
-当前 4 个 candidate 的 readiness matrix 在 `pre-brainstorm-review.md` §7.1；任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。这是本轮从“准备实现”退回“继续预研”的原因。
+当前 5 个 candidate 的 readiness matrix 在 `pre-brainstorm-review.md` §7.1；任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。主意图优先级：C-F 讨论入口 → C-B/C 交接 → C-D harness → C-E 插件。这是本轮从“准备实现”退回“继续预研”的原因。
 
 ## 9. Candidate
 
@@ -491,6 +491,7 @@ B1 不是“写完文档就 promote”。每个 candidate 的循环是：
 - `C-20261101T031502Z-C`：类型化 report/attention、批量路由与 prompt 前缀契约（needs_research；先补字段契约 + prompt manifest/基线）。
 - `C-20261101T031502Z-D`：HarnessPort 与角色级 harness 选择（Freely 主应用，needs_research；先补接口/配置/探测）。
 - `C-20261101T031502Z-E`：`@freely/dsh-freely` Freely-host 插件（needs_research；先做 P0/P1 spike）。
+- `C-20261101T031502Z-F`：讨论入口（issue comment/PR review/CI）（needs_research；先做来源盘点 + 真实回放）。
 - milestone：`M-20261101T031502Z-A`。
 
 ## 10. 任务拆分：未来实现路线（未批准，不得直接开工）
