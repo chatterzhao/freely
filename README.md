@@ -4,7 +4,7 @@
 
 Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。目标是让人只在需要决策或验收时出现。
 
-> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [attention-metrics](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/attention-metrics.md)）。
+> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [attention-metrics](docs/B1-docs/raw-20261101T031502Z/attention-metrics.md)）。
 
 [![交付闭环](docs/assets/freely-delivery-loop.svg)](docs/assets/freely-delivery-loop.html)
 
@@ -261,12 +261,13 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [命令参考](docs/system/workspace/commands.md)：封装命令与绕过禁令
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
-- [预头脑风暴索引](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/README.md)：研究地图、关键事实、未解问题
-- [逐项判定总表](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/synthesis.md)：问题/方案/谁更优/为什么/代价
-- [Freely 交付闭环概念模型](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
-- [Super-agent 对比研究](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/research.md)：理念/架构/实现/场景对比
-- [文章映射与 Reviewer 纠偏](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应
-- [失效模式对比](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
+- [预头脑风暴索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、未解问题
+- [逐项判定总表](docs/B1-docs/raw-20261101T031502Z/synthesis.md)：问题/方案/谁更优/为什么/代价
+- [Freely 交付闭环概念模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
+- [Super-agent 对比研究](docs/B1-docs/raw-20261101T031502Z/research.md)：理念/架构/实现/场景对比
+- [文章映射与 Reviewer 纠偏](docs/B1-docs/raw-20261101T031502Z/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应
+- [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
+- [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
 
 ## 参与开发
 

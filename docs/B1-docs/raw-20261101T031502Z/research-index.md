@@ -17,7 +17,7 @@ created_at: 2026-11-01
 
 | 文档 | 回答什么 | 状态 |
 | --- | --- | --- |
-| [b1-review.md](b1-review.md) | 独立 B1 评审：verdict、findings、是否进入 candidate | completed |
+| [pre-brainstorm-review.md](pre-brainstorm-review.md) | 独立 B1 评审：verdict、findings、是否进入 candidate | completed |
 | [synthesis.md](synthesis.md) | 逐项判定：问题/方案/谁更优/为什么/代价；adopt/adapt/reject | 初稿 |
 | [delivery-model.md](delivery-model.md) | B1/B2、SDD/TDD、三角色、阶段评审/PR 评审、3 loop + 2 门禁、工具层 | 初稿 |
 | [research.md](research.md) | 理念、五平面、逐维对比、场景判定、实证、取舍 | 初稿 |
@@ -32,6 +32,7 @@ created_at: 2026-11-01
 | [harness-port.md](harness-port.md) | HarnessPort 接口、ACP 四家、DSH adapter 三种模式 | 初稿 |
 | [dsh-adapter-decision.md](dsh-adapter-decision.md) | DSH adapter 会阉割什么；反向 @freely/dsh-freely 插件评估 | 初稿 |
 | [readme-architecture-audit.md](readme-architecture-audit.md) | README 图为什么改、主图/辅图取舍 | 初稿 |
+| [docs-directory-audit.md](docs-directory-audit.md) | 预研目录归位、遗留目录审计与规则 | completed |
 
 ## 关键事实（可复核）
 

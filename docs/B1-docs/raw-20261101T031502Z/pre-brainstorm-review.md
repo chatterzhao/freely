@@ -23,7 +23,7 @@ created_at: 2026-11-01
 
 ## 1. 评审范围
 
-- 预研文档：`README.md`、`synthesis.md`、`delivery-model.md`、`research.md`、`super-agent-article.md`
+- 预研文档：`research-index.md`、`synthesis.md`、`delivery-model.md`、`research.md`、`super-agent-article.md`
 - 分面：`failure-modes.md`、`event-admission.md`、`state-authority.md`、`tdd-policy.md`、`attention-metrics.md`、`context-cache.md`、`observability.md`、`harness-port.md`、`dsh-adapter-decision.md`
 - 根 `README.md` 与 `docs/assets/freely-delivery-loop.{svg,html}`
 - 抽查代码：`pretests-gate`、`pr-merge-guarded`、`run-acp-prompt.py`、主项目 `[CACHE]`

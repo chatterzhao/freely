@@ -9,6 +9,8 @@ created_at: 2026-11-01
 
 # B1_IBM: DeepSeek Super-agent 架构与 Freely agent 协作模型对比研究
 
+> **补充研究入口（2026-11-01）**：本文件是最初的 B1 收敛记录；后续对文章映射、Reviewer 阶段评审、SDD/TDD 交付闭环、DSH adapter 取舍的补充研究见同目录 [`research-index.md`](research-index.md)。若本文件与补充研究冲突，以 `research-index.md` 及其子文档为准。
+
 ## Input
 
 - raw issue：`raw-20261101T031502Z`（GitHub #4110 / Gitee IKS0MD）。
