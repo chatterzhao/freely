@@ -141,9 +141,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 `@freely/dsh-freely`：Freely 保留 loop，DSH 只做 harness
-- status: promoted
-- decision_reason: DSH 主插件可注入 `agents/sessionController/tools/skills/systemPrompt` 等服务，因此可以让 Freely 保留 Manager/Worker/Reviewer、A2A、scan、gates、worktree、PR，只把 harness 换成 DSH；这不是 ACP adapter，也不是 DSH-host 治理插件。
-- next_action: B2 物化 I-20261101T031502Z-E；实现 Freely-host 插件 P1：handoff envelope v1、Worker session/worktree/tools、Reviewer verdict、gate 链、真实 issue→PR。
+- status: dropped
+- decision_reason: DSH 插件是 Freely 的打包形态，不是 Super-agent 对比 candidate；拆到独立 raw-20261101T120027Z 走 B1/B2/PR。
+- next_action: scope 已拆到独立 raw-20261101T120027Z；本 candidate 不再由 Super-agent raw 承接。
 - revisit_trigger: DSH 服务 API 不稳定、插件无法注入 session/tools/skills，或必须同时启用 DSH Router/Ticket 才能工作时，回到方案 C（不做）。
 - acceptance_criteria:
   - 插件注入所需 DSH services，且不加载 `dsh-superagent`
@@ -163,8 +163,6 @@ milestone: M-20261101T031502Z-A
   - summary: DSH 0.2.1-rc.5 web profile 真加载；session/subprocess/tools 可用；消费/gate/三 preset/白名单/persona 已验；API 稳定性 pin/profile 矩阵已补，判 pass
   - verdict: pass
 - depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
-- promoted_issue_id: I-20261101T031502Z-E
-- promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
