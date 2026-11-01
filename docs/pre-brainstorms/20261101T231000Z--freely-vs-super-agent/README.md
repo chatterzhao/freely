@@ -65,3 +65,9 @@ created_at: 2026-11-01
 - 不在本阶段 promote candidate、不写新实现。
 - 不把 Super-agent 的领域模型整体搬进 Freely。
 - 不把当前仓库的 issue/phase/工位状态画进产品架构。
+
+## 交付状态
+
+- 本阶段只提交研究文档，不合并、不保留 PR。
+- GitHub PR #4111、Gitee PR #33 均已关闭。
+- 研究提交在 `feature/raw-20261101T031502Z-super-agent-collab-study` 分支；下一步是 B1 预研达标评审，不是 merge。
