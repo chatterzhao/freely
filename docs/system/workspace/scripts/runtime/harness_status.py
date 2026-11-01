@@ -230,6 +230,25 @@ def check_required(roles: list[dict], required: list[str]) -> dict:
     return {"capabilities": required, "status": "fail" if missing else "pass", "missing": missing}
 
 
+REQUIREMENTS = {"manager": ["resume", "tools", "skills"], "worker": ["session_new", "tools", "skills"], "reviewer": ["resume", "tools", "skills"]}
+
+def role_requirements(role: dict) -> dict:
+    caps = role.get("capabilities", {})
+    required = REQUIREMENTS.get(role.get("role", ""), [])
+    degraded, missing = [], []
+    for cap in required:
+        value = caps.get(cap)
+        if value in (True, "native"):
+            continue
+        if value == "degraded":
+            degraded.append(cap)
+        else:
+            missing.append(cap)
+    for cap, value in caps.items():
+        if value == "degraded" and cap not in degraded:
+            degraded.append(cap)
+    return {"requirements": required, "satisfied": not missing, "degraded": degraded, "missing": missing}
+
 def render_text(data: dict) -> str:
     lines = [f"Harness status: {data['project']}", f"adapter: {data['adapter'] or '(unset)'}", ""]
     if data["roles"]:
@@ -273,6 +292,7 @@ def main() -> int:
     parser.add_argument("--project", default="", help="Project root (default: current directory).")
     parser.add_argument("--json", action="store_true", help="Emit JSON.")
     parser.add_argument("--require", default="", help="Comma-separated capabilities every role must support; exits 3 on failure.")
+    parser.add_argument("--role", default="", help="Only report this role.")
     parser.add_argument("--cache-window", type=int, default=50, help="Recent cycle logs to inspect (default 50).")
     parser.add_argument("--strict", action="store_true", help="Exit 3 when a configured harness is unknown, missing, or direct-only.")
     args = parser.parse_args()
@@ -288,6 +308,13 @@ def main() -> int:
         warnings.append("config.toml missing or unreadable; using defaults")
     adapter = str(config.get("AGENT_AI_TOOL_ADAPTER", "") or "").strip()
     roles = [enrich_role(role, registry, config, warnings) for role in read_roles(project, registry, warnings)]
+    if args.role:
+        roles = [r for r in roles if r.get("role") == args.role]
+        if not roles:
+            print(f"unknown role: {args.role}", file=sys.stderr)
+            return 2
+    for role in roles:
+        role.update(role_requirements(role))
     required = [item.strip() for item in args.require.split(",") if item.strip()]
     data = {
         "project": str(project),

@@ -133,7 +133,7 @@ milestone: M-20261101T031502Z-A
   - summary: Protocol/RoleConfig/三角色 probe 通过；--role/apply/UI 归 b2_acceptance
   - verdict: pass
 - promoted_issue_id: I-20261101T031502Z-D
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 

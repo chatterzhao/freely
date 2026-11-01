@@ -22,7 +22,7 @@
 - milestone: M-20261101T031502Z-A
 - status: promoted
 - promoted_issue_id: I-20261101T031502Z-D
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
 5. `C-20261101T031502Z-E`
 - milestone: M-20261101T031502Z-A
 - status: needs_research
@@ -40,6 +40,10 @@
 - milestone: M-20261101T031502Z-A
 - phase_state: in_verification
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
+3. `I-20261101T031502Z-D`
+- milestone: M-20261101T031502Z-A
+- phase_state: in_verification
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
 
 ### completed_issues
 1. `I-20261101T031502Z-A`
