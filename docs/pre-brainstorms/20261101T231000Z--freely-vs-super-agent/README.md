@@ -17,6 +17,7 @@ created_at: 2026-11-01
 
 | 文档 | 回答什么 | 状态 |
 | --- | --- | --- |
+| [b1-review.md](b1-review.md) | 独立 B1 评审：verdict、findings、是否进入 candidate | completed |
 | [synthesis.md](synthesis.md) | 逐项判定：问题/方案/谁更优/为什么/代价；adopt/adapt/reject | 初稿 |
 | [delivery-model.md](delivery-model.md) | B1/B2、SDD/TDD、三角色、阶段评审/PR 评审、3 loop + 2 门禁、工具层 | 初稿 |
 | [research.md](research.md) | 理念、五平面、逐维对比、场景判定、实证、取舍 | 初稿 |
@@ -70,4 +71,4 @@ created_at: 2026-11-01
 
 - 本阶段只提交研究文档，不合并、不保留 PR。
 - GitHub PR #4111、Gitee PR #33 均已关闭。
-- 研究提交在 `feature/raw-20261101T031502Z-super-agent-collab-study` 分支；下一步是 B1 预研达标评审，不是 merge。
+- 研究提交在 `feature/raw-20261101T031502Z-super-agent-collab-study` 分支；B1 独立评审 verdict=`pass-with-gaps`，可起草 candidate，不 merge。
