@@ -62,3 +62,8 @@ Fifth spike: profile patch defines `freely-manager/worker/reviewer` presets; plu
 Verified: three independently named presets can create three sessions.
 
 Not verified: tools/tool whitelist (presets are empty in this spike), role prompt injection, real issue→PR.
+[freely-spike] preset=freely-manager role=manager created=true
+[freely-spike] preset=freely-worker role=worker created=true
+[freely-spike] preset=freely-reviewer role=reviewer created=true
+dsh web: http://127.0.0.1:3080/?token=2XsOSgQzLe2_EckqihyreuZAYEnSlyjzaSoN0rs7Eg0
+dsh web: opening the default browser; pass --no-open to disable
