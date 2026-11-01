@@ -1,6 +1,6 @@
 ---
 audit_id: DEBT-20261101T031502Z
-phase_state: in_progress
+phase_state: research_closed
 created_at: 2026-11-01
 ---
 
@@ -20,6 +20,8 @@ created_at: 2026-11-01
 
 ## 1. C-F 讨论入口
 
+> 研究债已关闭；下列 acceptance 的运行时部分转 B2 `b2_acceptance`。
+
 acceptance：
 
 1. 六类来源都有入口、event_id、thread_key、actor、去重规则。
@@ -37,6 +39,8 @@ acceptance：
 
 ## 2. C-B ownership/handoff
 
+> 研究债已关闭；运行时 E2E 转 B2 `b2_acceptance`。
+
 acceptance：
 
 1. 五类后续消息 owner 规则可回答“归谁”。
@@ -52,6 +56,8 @@ acceptance：
 - 需要回放：同一 PR 两条评论、跨工单评论、人 stop、Worker 死亡后 fail 反馈。
 
 ## 3. C-C report/attention/prompt
+
+> 研究债已关闭；真实 patrol 对照转 B2 `b2_acceptance`。
 
 acceptance：
 
@@ -71,6 +77,8 @@ acceptance：
 
 ## 4. C-D HarnessPort
 
+> 研究债已关闭；角色级实现转 B2 `b2_acceptance`。
+
 acceptance：
 
 1. ACP CLI 能力矩阵（有/无/降级/需探测）。
@@ -88,6 +96,8 @@ acceptance：
 - DSH 可行性已结论“不做 adapter、做 Freely-host 插件”，但服务 API 是否稳定仍未 spike。
 
 ## 5. C-E DSH 插件
+
+> 静态契约已过；runtime P0/P1 spike 仍是 B1 未关闭项，不 promote。
 
 acceptance：
 

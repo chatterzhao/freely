@@ -105,6 +105,10 @@ completed 不可回退；新工作新 issue
 - 配置真源 DSH settings；`.freely/harness.toml` 只镜像。
 - 先 spike（静态契约已过），再 P0/P1；不先产品化。
 
+## ADR-010 B1 promotion gate
+
+见 [gate-repair.md](gate-repair.md)：B1 gate 只收研究证据；运行时验收进 `b2_acceptance`。
+
 ## 关闭证据
 
 - 本文是 B2 的设计输入；实现后逐条回填测试/日志。
