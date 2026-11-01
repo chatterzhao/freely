@@ -18,20 +18,20 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-01T12:00:27Z'
-updated_at: '2026-11-01T12:00:31Z'
+updated_at: '2026-11-01T12:24:44Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: 2026-11-01T12:00:00Z
+completed_at: 2026-11-01 12:00:00+00:00
 closeout_note: ''
 ---
-workflow_kind: feature
-
 # feat: @freely/dsh-freely DSH 打包形态
+
+workflow_kind: feature
 
 ## 背景
 
