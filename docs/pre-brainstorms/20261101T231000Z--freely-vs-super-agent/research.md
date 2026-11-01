@@ -249,7 +249,13 @@ DSH 没有这一层：Ticket 有授权与执行，但没有“为什么做、怎
 
 代价：文档多、更新慢、容易漂移；对 tiny task 过重。收益：长期可审计、可交接、可让新 agent 快速接手。
 
-判定：**Freely 的 SDD 明显优于 DSH 的空缺；但需要治理文档漂移与开销。** 不能为了“轻”而退回 Ticket-only。
+但“文档驱动”也要分层看：
+
+- **状态层**：scan 确实从 docs/phase_state/milestone 推导 next_action；这一层是文档驱动。
+- **执行层**：Manager/Worker 的 prompt 主要是 agent 定义 + 任务/scan + skill；PRD/pre-tests 不会自动注入，靠 skill 要求 agent 去读。也就是说，文档是“规格与验收的真相”，但不是每一轮 prompt 的自动上下文。
+- **门禁层**：IBM gate 在 PR/merge 时检查文档存在与格式，不检查实现是否真的按 PRD 做；文档可以在实现后补。它是“合并前必须齐”，不是“写代码前必须读”。
+
+判定：**Freely 的 SDD 明显优于 DSH 的空缺；但它是“状态 + 门禁”驱动，不是“每步 prompt 自动文档驱动”。** 需要治理文档漂移、backfill 与开销。不能为了“轻”退回 Ticket-only。
 
 ### 7.4 TDD：Freely 的第二个强差异
 
