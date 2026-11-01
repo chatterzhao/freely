@@ -75,6 +75,11 @@ Manager --派工--> Worker --阶段产物--> Reviewer --fail--> Worker
 
 关键：Reviewer 不是只在最后出现。Worker 完成 B1/B2/RED/dev/test 任一阶段后，可 `a2a-exit input-required --reason needs-review:<stage>`；watchdog_sse 检测后 fork/new 一个独立 Reviewer session 审查该阶段。PR 前再由 `pr-review-guarded` 起另一个 Reviewer 做四问 review。两条路径都以 verdict/required_fixes 回到 Worker/Manager。
 
+但两者的强制力不同：
+
+- **阶段评审是反馈环，不是硬门禁**：watchdog 把 verdict/required_fixes 通过 `session/prompt` 发给 Worker，Worker 按 skill 处理；没有代码检查“B1 未 pass 就不能进 B2”。它依赖 Reviewer/Worker 的纪律与 A2A 状态。
+- **PR 评审是硬门禁**：`pr-merge-guarded` 会找 `docs/B2-docs/**/pr-review-raw-<key>.md`，缺失直接拒绝合并。这是“review 真的卡住 merge”的地方。
+
 责任边界：
 
 - Manager 拥有“现在做什么/下一步”。
