@@ -98,6 +98,12 @@ created_at: 2026-11-01
 
 ## 4. 逐维比较
 
+### 协作拓扑对比图
+
+![Super-agent 与 Freely 协作拓扑对比](super-agent-vs-freely-collaboration.svg)
+
+[打开交互式版本](super-agent-vs-freely-collaboration.html)（archify 生成，支持主题切换、搜索、聚焦和导出）。图中只画主路径；`report`、`SSE`、`verdict` 等回流见下方文字说明。
+
 ### 4.1 设计公理与默认姿态
 
 | 维度 | Super-agent | Freely |

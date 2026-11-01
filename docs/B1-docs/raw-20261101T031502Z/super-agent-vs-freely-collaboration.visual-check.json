@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "visual-check",
+  "status": "skipped",
+  "visualReview": "pending",
+  "artifact": {
+    "path": "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261101T031502Z-super-agent-collab-study/docs/B1-docs/raw-20261101T031502Z/super-agent-vs-freely-collaboration.html",
+    "sha256": "af03b6bdc8e2c371e041a150bade8d6535c71751d5a944678ab060df163a0e30",
+    "bytes": 718604
+  },
+  "state": {
+    "detail": "read",
+    "motion": "still"
+  },
+  "chrome": {
+    "status": "unavailable",
+    "executable": null
+  },
+  "diagnostics": [
+    {
+      "code": "viewer/chrome-unavailable",
+      "severity": "warning",
+      "message": "Chrome or Chromium is unavailable. Set ARCHIFY_CHROME to its executable path.",
+      "subject": {
+        "artifact": "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261101T031502Z-super-agent-collab-study/docs/B1-docs/raw-20261101T031502Z/super-agent-vs-freely-collaboration.html"
+      },
+      "evidence": {
+        "executable": null
+      },
+      "supportedFixes": [
+        "set ARCHIFY_CHROME to a Chrome or Chromium executable and rerun visual-check"
+      ]
+    }
+  ],
+  "containment": {
+    "status": "skipped",
+    "viewports": []
+  },
+  "readability": {
+    "status": "skipped",
+    "minimumProjectedNodeTextPx": 6,
+    "viewports": []
+  },
+  "viewerChrome": {
+    "status": "skipped",
+    "viewports": []
+  },
+  "captures": {
+    "status": "skipped",
+    "screenshots": [],
+    "contactSheet": null
+  },
+  "sidecars": {
+    "receipt": "super-agent-vs-freely-collaboration.visual-check.json",
+    "contactSheet": "super-agent-vs-freely-collaboration.visual-check.html"
+  },
+  "error": "Chrome or Chromium is unavailable. Set ARCHIFY_CHROME to its executable path."
+}
