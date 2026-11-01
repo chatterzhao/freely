@@ -391,6 +391,11 @@ def main():
     t_start = time.time()
     prompt_path = Path(args.prompt_file)
     prompt_text = prompt_path.read_text(encoding="utf-8")
+    try:
+        from prompt_manifest import record_manifest
+        record_manifest(Path(args.cwd), prompt_text, session_id=getattr(args, "session_id", ""))
+    except Exception as _manifest_error:
+        print(f"[manifest] skipped: {_manifest_error}", file=sys.stderr)
     cwd = str(Path(args.cwd))
 
     # ── Transport selection ──────────────────────────────────────

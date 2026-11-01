@@ -99,7 +99,7 @@ milestone: M-20261101T031502Z-A
   - summary: schema/manifest/可观测性基线/fixture 通过；真实 patrol 对照归 b2_acceptance
   - verdict: pass
 - promoted_issue_id: I-20261101T031502Z-C
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 

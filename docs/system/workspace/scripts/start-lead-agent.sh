@@ -384,6 +384,7 @@ DELTA
 fi
 
 cat <<EOF
+<!-- FREELY_SEGMENT:bootstrap -->
 你现在进入 Freely 的首跳闭环。
 
 读取约定：

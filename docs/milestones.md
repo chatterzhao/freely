@@ -17,7 +17,7 @@
 - milestone: M-20261101T031502Z-A
 - status: promoted
 - promoted_issue_id: I-20261101T031502Z-C
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
 4. `C-20261101T031502Z-D`
 - milestone: M-20261101T031502Z-A
 - status: promoted
@@ -44,6 +44,10 @@
 - milestone: M-20261101T031502Z-A
 - phase_state: in_verification
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+4. `I-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- phase_state: in_verification
+- issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
 
 ### completed_issues
 1. `I-20261101T031502Z-A`
