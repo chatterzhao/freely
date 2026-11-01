@@ -167,4 +167,4 @@
 - **Freely 不是“缺一半”**：输入、执行、评审、门禁、多项目这些面都有，只是叫法与聚合方式不同。
 - **Freely 真正缺的是“运行时协作对象”**：Trigger、Thread、Ticket、Mandate、Report、Attention、Disposition、Subscription 这一组，在 Freely 里被拆成 issue 文档、A2A task、工位、日志和提示词。
 - **Freely 的强项不在这些对象上**：它的强项是生命周期与治理证据。用 Super-agent 的对象模型替换 Freely 的文档模型，会丢掉可审计性；反过来，只补对象而不补文档，会丢掉治理。
-- **最值得补的映射**：把“消息归属/交接/注意力”做成轻量运行时对象（C-A/B），把“harness 能力”做成显式端口（C-C），而不是复制整套 Trigger/Ticket/Mandate。
+- **最值得补的映射**：把“消息归属/交接/注意力”做成轻量运行时对象（C-B/C），把“harness 能力”做成显式端口（C-D），而不是复制整套 Trigger/Ticket/Mandate。
