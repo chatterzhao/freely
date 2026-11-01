@@ -115,8 +115,8 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: mock
-- status: pending
-- red-green-status: pending
+- status: passed
+- red-green-status: green
 - artifact_ref: plugins/dsh-freely/index.js
 - test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
@@ -129,8 +129,8 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: mock
-- status: pending
-- red-green-status: pending
+- status: passed
+- red-green-status: green
 - artifact_ref: plugins/dsh-freely/index.js
 - test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
@@ -143,8 +143,8 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: mock
-- status: pending
-- red-green-status: pending
+- status: passed
+- red-green-status: green
 - artifact_ref: plugins/dsh-freely/index.js
 - test_command: node --test plugins/dsh-freely/test/plugin.test.mjs
 - expected_output: pass
@@ -157,8 +157,8 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pending
-- red-green-status: pending
+- status: passed
+- red-green-status: green
 - artifact_ref: plugins/dsh-freely/cordis.patch.yml
 - test_command: dsh --profile freely-web-spike
 - expected_output: loaded
