@@ -24,7 +24,7 @@ export async function apply(ctx) { ... }
 
 流程：
 
-1. 读 config：`freelyRoot`、`profile`、`roles`。
+1. 读 config：`freelyRoot`（默认 process.cwd()）。
 2. 确保 manager session（preset `freely-manager`）；创建 worker/reviewer 时由 Freely runtime 触发（P1 只建 manager）。
 3. 对每个 session 调 `agent.ctx.tools.restrict({allow})`。
 4. 注册工具 `freely_status`：`ctx.subprocess` 跑 `bin/freely fleet-status --project <root>`，返回 stdout。
@@ -35,7 +35,7 @@ export async function apply(ctx) { ... }
 `cordis.patch.yml` 定义：
 
 - `freely-manager`：persona Manager；tools `read,grep,glob`。
-- `freely-worker`：persona Worker；tools `read,write,edit,bash,grep,glob`。
+- `freely-worker`：persona Worker；tools `read,write,edit,grep,glob`。
 - `freely-reviewer`：persona Reviewer；tools `read,grep,glob`。
 
 ## 工具白名单
@@ -45,13 +45,12 @@ export async function apply(ctx) { ... }
 ## Bridge
 
 - `FreelyBridge.status()` → `bin/freely fleet-status`。
-- `FreelyBridge.scan()` → `bin/freely task-source-scan`。
-- 输出限 64KB；超时 30s；失败返回结构化 error，不抛到模型。
+- 输出限 64KB；timeoutMs 透传 subprocess；失败返回 `{ok:false, stderr}`，不抛到模型。
 - 不通过 shell 拼接参数；argv 显式。
 
 ## Handoff
 
-P1 只提供 `freely_status`；handoff envelope v1 由 Freely `handoff_store`/CLI 负责，插件不复制状态。
+P1 不实现 handoff envelope；handoff/A2A 由上游 C-B 负责，后继 slice 见 successor raw `20261101T124657Z`。
 
 ## 非目标
 
@@ -64,4 +63,4 @@ P1 只提供 `freely_status`；handoff envelope v1 由 Freely `handoff_store`/CL
 - 插件被 DSH web profile 加载；三角色 preset 创建成功；白名单生效。
 - `freely_status` 返回 fleet 输出。
 - P1 验收：插件加载、三 preset/白名单/persona、bridge、gate exit 透传。
-- 真实 issue→PR 另开 slice；未跑前不宣称插件产品完成。
+- 真实 issue→PR 由 successor raw `20261101T124657Z` 承接；未跑前不宣称插件产品完成。
