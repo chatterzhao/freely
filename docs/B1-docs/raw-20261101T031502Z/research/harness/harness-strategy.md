@@ -29,6 +29,128 @@ created_at: 2026-11-01
 
 能力不是布尔：`fork` 至少 native/degraded/unsupported/unknown；`usage` 至少 reported/estimated/absent。布尔会把“尝试后降级”误报成“支持”。
 
+## 1.1 HarnessPort 可实现接口
+
+```python
+from typing import Literal, Protocol
+from dataclasses import dataclass
+
+Cap = Literal["native", "degraded", "unsupported", "unknown"]
+
+@dataclass(frozen=True)
+class Capabilities:
+    session: Cap
+    fork: Cap
+    resume: Cap
+    stream: Cap
+    interrupt: Cap
+    tools: Cap
+    skills: Cap
+    usage: Cap          # reported/estimated/absent
+    cache: Cap          # reported/estimated/absent
+    mcp: Cap
+    subagent: Cap
+
+@dataclass(frozen=True)
+class Health:
+    ok: bool
+    binary: str | None
+    version: str | None
+    acp: bool
+    error: str | None
+
+class HarnessPort(Protocol):
+    id: str
+    def probe(self) -> Health: ...
+    def capabilities(self) -> Capabilities: ...
+    def start(self, role: str, cwd: str, tools: list[str], skills: list[str]) -> "Session": ...
+    def prompt(self, session: "Session", text: str, *, manifest: dict | None = None) -> "TurnResult": ...
+    def resume(self, session_id: str) -> "Session": ...
+    def fork(self, session_id: str) -> "Session": ...
+    def interrupt(self, session: "Session") -> None: ...
+    def usage(self, session: "Session") -> "Usage": ...
+    def close(self, session: "Session") -> None: ...
+```
+
+约束：
+
+- `fork=degraded` 表示允许尝试，失败后 new；调用方要知道“不是原生”。
+- `usage/cache=absent` 时返回 null，不返回 0。
+- `probe` 必须可单独调用；UI 列表不启动 session。
+- `prompt` 返回 stopReason、usage、session_id；错误不吞。
+
+## 1.2 RoleHarnessConfig
+
+归一化视图（不是新配置文件）：
+
+```json
+{
+  "role": "manager",
+  "tool": "claude",
+  "slot": "claude-apikey-ds-flash-auto",
+  "adapter": "acp",
+  "model": null,
+  "preset": null,
+  "source": "agent-table",
+  "capabilities": {"fork": "native", "resume": "native", "usage": "reported"},
+  "health": {"ok": true, "acp": true}
+}
+```
+
+映射：
+
+- Freely 主应用：`role` + `{role}_slot` + 全局 `AGENT_AI_TOOL_ADAPTER`；tool 从 slot 前缀推断；model 目前未知。
+- DSH 插件：`role` + `{role}_preset` + `{role}_model`；source=DSH settings。
+- 写回：主应用只改 `{role}_slot`；插件只改 DSH settings；`.freely/harness.toml` 只镜像。
+- 不把 `adapter` 写进 agent-table，直到支持 `{role}_adapter`。
+
+## 1.3 Per-role probe
+
+`freely harness status --role reviewer --json` 输出：
+
+```json
+{
+  "role": "reviewer",
+  "slot": "cline-account-ds-flash-free-auto",
+  "tool": "cline",
+  "health": {"ok": true, "binary": "...", "acp": true, "version": "..."},
+  "capabilities": {"session": "native", "fork": "degraded", "resume": "native", "usage": "absent"},
+  "requirements": {"fork": "optional", "usage": "optional"},
+  "satisfied": true,
+  "degraded": ["fork"],
+  "reason": "fork degraded: fallback to new + context pack"
+}
+```
+
+- `requirements` 由角色决定：Manager 要 resume/skills；Worker 要 tools/skills；Reviewer 要 fork/resume + 只读。
+- `satisfied=false` 时 `set` 拒绝；`degraded` 允许但显式提示。
+- `--strict` 把 degraded 也当失败；`--allow-degraded` 才允许。
+
+## 1.4 统一 harness JSON 契约
+
+```
+GET  /harness/roles
+GET  /harness/candidates?role=worker
+POST /harness/apply  {role, tool, slot, model?}
+POST /harness/validate {role, tool, slot}
+```
+
+返回：
+
+```json
+{
+  "ok": true,
+  "diff": {"worker_slot": ["old", "new"]},
+  "requires_restart": ["worker"],
+  "audit_id": "...",
+  "error": null
+}
+```
+
+- UI/CLI/TUI 都调这个 contract；不各自写 TOML。
+- `apply` 前 validate；失败不落盘；写前备份/写后重读。
+- 运行中的 session 不重启；返回 `requires_restart`。
+
 ## 2. 四家 ACP CLI 的事实
 
 | 能力 | Claude | Codex | OpenCode | Cline |
