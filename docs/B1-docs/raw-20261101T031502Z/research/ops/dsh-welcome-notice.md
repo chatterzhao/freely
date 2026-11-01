@@ -98,3 +98,24 @@ DSH 把欢迎声明确认状态存在 profile 的 `cordis.patch.yml`：
 - 这是 **对已安装包的本地 patch**，DSH 升级/重装会覆盖；升级后要重打，或等官方 fix。
 - 不要同时改源码 clone 的同一文件；源码开发用 `pnpm dsh`，与安装版分开。
 - 修复后仍需一次“新会话 → 继续”让 write 落盘；之后 profile patch 里应有 `welcomeNoticeVersion: 2026-09-28.1`。
+
+## 2026-11-01 再次复发：先确认进程
+
+补丁生效后仍报同样文案，检查发现 **`:3082` 没有监听、没有任何 `dsh --profile` 进程**。浏览器里的旧页面连的是已死实例，保存必然失败。
+
+先查：
+
+```bash
+lsof -nP -iTCP:3082 -sTCP:LISTEN
+ps aux | grep '[d]sh .*--profile'
+```
+
+没有进程时重启：
+
+```bash
+cd <project-root>
+nohup dsh --profile superagent > /tmp/dsh-superagent-live.log 2>&1 &
+grep 'dsh web' /tmp/dsh-superagent-live.log
+```
+
+用日志里的**新 token URL** 打开，而不是刷新旧 tab。旧 token 属于死实例。
