@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4400" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4600" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="147" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -719,4 +719,8 @@
   <text x="50" y="4498" font-size="14" font-weight="bold" fill="#455a64">command-wrapper</text>
   <rect id="story-metadata-lifecycle" x="55" y="4508" width="690" height="18" fill="#fff" stroke="#455a64" stroke-width="1" rx="2"/>
   <text x="65" y="4521" fill="#333">metadata-lifecycle</text>
+  <rect id="epic-dsh-plugin" x="35" y="4530" width="730" height="48" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
+  <text x="50" y="4546" font-size="14" font-weight="bold" fill="#00695c">dsh-plugin</text>
+  <rect id="story-freely-host" x="55" y="4552" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4565" fill="#333">freely-host</text>
 </svg>
