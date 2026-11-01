@@ -473,6 +473,17 @@ P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-st
   - C-D：先定 HarnessPort/RoleHarnessConfig 与 per-role probe/配置落点，不做 DSH adapter。
   - C-E：先做 `@freely/dsh-freely` P0/P1 spike，验证 DSH services、首次 session 消息、handoff、gate。
 - **明确不做**：per-ticket Mandate 运行时、默认 observe、单仓绑定、移除 Reviewer、事件溯源重写、双 Router/双 Ticket。
+### 8.1 预研 loop
+
+B1 不是“写完文档就 promote”。每个 candidate 的循环是：
+
+```
+研究 → 按 acceptance_criteria 自检 → 缺口 → 回研究
+     → 满足 promotion_gate → 独立 acceptance review → B2
+```
+
+当前 4 个 candidate 的 readiness matrix 在 `pre-brainstorm-review.md` §7.1；任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。这是本轮从“准备实现”退回“继续预研”的原因。
+
 ## 9. Candidate
 
 - `C-20261101T031502Z-A`：对比研究、概念全量对照、P0 `harness-status` 与方向立项（promoted → `I-20261101T031502Z-A`）。
