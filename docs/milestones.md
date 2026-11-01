@@ -34,19 +34,19 @@
 ### committed_issues
 1. `I-20261101T031502Z-F`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
 2. `I-20261101T031502Z-B`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
 3. `I-20261101T031502Z-D`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
 4. `I-20261101T031502Z-C`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
 
 ### completed_issues

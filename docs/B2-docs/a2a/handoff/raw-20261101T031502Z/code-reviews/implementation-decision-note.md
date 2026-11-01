@@ -1,3 +1,12 @@
+---
+issue_id: I-20261101T031502Z-F
+issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+phase_state: completed
+---
+
+- issue_id: I-20261101T031502Z-F
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+
 # Implementation Decision Note
 
 ## decision

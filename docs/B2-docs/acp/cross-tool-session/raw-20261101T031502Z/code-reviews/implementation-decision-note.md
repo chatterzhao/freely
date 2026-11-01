@@ -1,3 +1,12 @@
+---
+issue_id: I-20261101T031502Z-D
+issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+phase_state: completed
+---
+
+- issue_id: I-20261101T031502Z-D
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+
 # Implementation Decision Note
 
 ## decision

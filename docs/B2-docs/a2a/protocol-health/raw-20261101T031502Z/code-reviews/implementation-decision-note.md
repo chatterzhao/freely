@@ -1,3 +1,12 @@
+---
+issue_id: I-20261101T031502Z-C
+issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+phase_state: completed
+---
+
+- issue_id: I-20261101T031502Z-C
+- issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+
 # Implementation Decision Note
 
 ## decision
