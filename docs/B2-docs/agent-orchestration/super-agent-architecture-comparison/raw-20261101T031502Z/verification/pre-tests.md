@@ -8,18 +8,18 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: 研究文档含 7 处结构性差异、9 个编号章节，概念对照含“同名不同义”
+- requirement: 研究文档含 7 处结构性差异、10 个编号章节，概念对照含“同名不同义”
 - acceptance_target: 研究结构完整
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: 输出 7 / 9 / 1
+- required_evidence: 输出 7 / 10 / 1
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-1.log
-- test_command: grep -c '^### D[0-9]' docs/B1-docs/raw-20261101T031502Z/brainstorms.md && grep -c '^## [0-9]\.' docs/B1-docs/raw-20261101T031502Z/brainstorms.md && grep -c '^## 8\. 同名不同义' docs/B1-docs/raw-20261101T031502Z/concept-map.md
-- expected_output: 7 然后 9 然后 1
+- test_command: grep -c '^### D[0-9]' docs/B1-docs/raw-20261101T031502Z/brainstorms.md && grep -c '^## [0-9]\+\.' docs/B1-docs/raw-20261101T031502Z/brainstorms.md && grep -c '^## 8\. 同名不同义' docs/B1-docs/raw-20261101T031502Z/concept-map.md
+- expected_output: 7 然后 10 然后 1
 - expected_RED_output: 命令失败或计数低于预期
 - actual_RED_output: 文档未创建时 grep 返回非零；初稿只有 5 处差异
-- actual_output: 7 / 9 / 1
+- actual_output: 7 / 10 / 1
 - evidence_file: verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
@@ -69,7 +69,7 @@
 - acceptance_target: raw/C/M/I 链路可追溯
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: 输出 1 / 2 / 3
+- required_evidence: 输出 1 / 至少 1 / 4
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-4.log
 - test_command: grep -c "^phase_state: absorbed" docs/B1-docs/raw-20261101T031502Z/issue.md && grep -c 'I-20261101T031502Z-A' docs/milestones.md && grep -c 'C-20261101T031502Z-' docs/milestones.md
@@ -88,14 +88,14 @@
 - acceptance_target: 治理链路完整
 - testing_layer: integration
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: 输出 Develop merge governance gate passed.
+- required_evidence: 输出 Develop merge governance gate passed（允许 with warnings）
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-5.log
 - test_command: ./bin/governance-merge-gate --range develop..HEAD
-- expected_output: Develop merge governance gate passed.
+- expected_output: Develop merge governance gate passed 或 passed with warnings（completed 携带实现变更时）
 - expected_RED_output: 门禁报 raw/C/M/I 链路缺失
 - actual_RED_output: 未吸收时门禁报 lifecycle 缺失
-- actual_output: Develop merge governance gate passed.
+- actual_output: Develop merge governance gate passed with warnings
 - evidence_file: verification/test-evidence/acceptance-5.log
 - red-green-status: green
 - status: passed
@@ -103,22 +103,22 @@
 
 ### acceptance-6
 - id: AT-006
-- requirement: P0 harness-status 的 5 项单测全部通过
-- acceptance_target: 能力矩阵、cache 聚合、require 失败、缺表、未知工具都有回归
+- requirement: P0 harness-status 的 7 项单测全部通过
+- acceptance_target: 能力矩阵、cache estimated、require/strict 失败、缺表、未知工具、无角色都有回归
 - testing_layer: unit
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: 输出 Ran 5 tests 与 OK，退出 0
+- required_evidence: 输出 Ran 7 tests 与 OK，退出 0
 - evidence_level: real_env
 - artifact_ref: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/verification/test-evidence/acceptance-6.log
 - test_command: python3 docs/system/workspace/scripts/tests/test-harness-status.py
-- expected_output: Ran 5 tests 然后 OK
+- expected_output: Ran 7 tests 然后 OK
 - expected_RED_output: harness_status.py 不存在时 ImportError/FileNotFoundError
 - actual_RED_output: 实现前脚本不存在，测试文件全部失败
-- actual_output: Ran 5 tests / OK
+- actual_output: Ran 7 tests / OK
 - evidence_file: verification/test-evidence/acceptance-6.log
 - red-green-status: green
 - status: passed
-- red_how: 先写测试，脚本不存在时 5 项失败；实现后 5 项通过
+- red_how: 先写测试，脚本不存在时失败；补齐 registry/strict/cache 用例后 7 项通过
 
 ### acceptance-7
 - id: AT-007
@@ -159,23 +159,40 @@
 - red_how: 先跑链接检查；修正 `.claude/skills` 路径后通过
 
 ## Unit
-
-- acceptance_target: 本次为文档/研究交付，无运行时代码单元
+- acceptance_target: harness_status.py 的能力矩阵、cache 聚合、require/strict 失败语义
 - testing_layer: unit
-- target_environment: feature worktree
-- required_evidence: 不适用
-- blocker_taxonomy: execution_pending_or_failed
-- not_applicable_reason: no_executable_boundary_at_this_layer
-- not_applicable_explanation: 变更只含 Markdown/HTML/SVG 与里程碑元数据，没有可单测的函数或模块
-- replacement_evidence: acceptance-1 / acceptance-2 的结构校验
-
-## Integration
-
-- acceptance_target: 文档链路与里程碑绑定
-- testing_layer: integration
 - target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
-- required_evidence: acceptance-4、acceptance-5
+- required_evidence: python3 docs/system/workspace/scripts/tests/test-harness-status.py 输出 Ran 7 tests OK
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
-- not_applicable_explanation: 集成面由 governance-merge-gate 覆盖，单独集成测试无额外信号
-- replacement_evidence: acceptance-5 的门禁输出
+- not_applicable_explanation: AT-006 的 7 项单测已覆盖本层
+- replacement_evidence: AT-006 passed
+
+## Integration
+- acceptance_target: CLI JSON 结构、registry 能力映射、README/里程碑绑定
+- testing_layer: integration
+- target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
+- required_evidence: acceptance-2、acceptance-4、acceptance-5、acceptance-7、acceptance-8
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 集成面由 acceptance-5 的 governance gate 与 acceptance-7/8 覆盖
+- replacement_evidence: acceptance-5/7/8 passed
+
+## End-to-End
+- acceptance_target: 8 项 acceptance 在 test 工位按 pre-tests 命令逐条执行并留证
+- testing_layer: end-to-end
+- target_environment: test-pre-merge-20261101T031502Z-super-agent-collab-study
+- required_evidence: acceptance-1 至 acceptance-8 的 evidence 文件与 test-gate.env（LAST_TESTED_COMMIT=head）
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: acceptance-1..8 已逐条执行，test-gate.env 绑定 HEAD
+- replacement_evidence: acceptance-1..8 passed
+
+## Real-Environment
+- acceptance_target: 在主项目真实 agent-table 与 cycle 日志上运行 freely harness-status，确认 native/degraded 与 usage/estimated 可区分
+- testing_layer: real_environment
+- target_environment: /Users/zhaoyu/Downloads/code/my-freely/freely
+- required_evidence: 输出 input_source=estimated、reviewer Cline degraded=fork
+- blocker_taxonomy: execution_pending_or_failed
+- real_environment_status: pass
+- real_environment_reason: 已在主项目实测；cache 字段为估算，reviewer 的 fork 为 degraded

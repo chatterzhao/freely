@@ -285,8 +285,8 @@ Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一�
 | 人工问题 | 结构化 Attention，问题路由回提问所在会话，重复问题复用请求 ID | `input-required` + reason 枚举，主要面向 Reviewer/Manager 路由 | 两者目标不同：DSH 面向“人”，Freely 面向“角色” |
 | 越界消息 | Worker `handback` 一次，带理由；`followupOwners` 决定谁还拥有消息 | Worker 上报 `input-required`，Manager 判断重派/新开 | DSH 的消息级归属更细；Freely 是任务级归属 |
 | follow-up 归属 | 订阅 Thread 的消息直达 Ticket 的 Worker；人消息可复活已结束 Ticket；bot/CI 不复活 | 无平台线程订阅；后续消息回到 intake/scan 或由 Manager 主动 prompt | Freely 缺一个“这条消息归谁”的运行时事实 |
-| 缓存复用 | Router 与 Worker 各自 Session；Worker 冷启动，不继承 Router 上下文 | Worker/Reviewer fork Manager session，继承治理上下文，首轮约 80% 命中 | Freely 跨角色复用更强；DSH 隔离更干净 |
-| 缓存度量 | 原型无 cache hit/miss 日志或聚合 | `run-acp-prompt.py` 记录 `[CACHE] cache_hit/cache_miss` | Freely 可度量；DSH 只能看 provider |
+| 缓存复用 | Router 与 Worker 各自 Session；Worker 冷启动，不继承 Router 上下文 | Worker/Reviewer fork Manager session，继承治理上下文；文档声称首轮约 80% 命中，但 provider usage 未上报，无法独立验证 | Freely 跨角色复用更强；DSH 隔离更干净 |
+| 缓存度量 | 原型无 cache hit/miss 日志或聚合 | `run-acp-prompt.py` 记录 `[CACHE]`；但 input 常由 `prompt_bytes // 4` 估算，hit/miss 常为 0 | Freely 有观测入口；真实命中率仍依赖 provider usage |
 | Prompt 稳定性 | 固定段序，Policy 放最后；覆盖记录 base 版本；每次请求绑定 revision | 角色定义 + 运行时状态拼接；scan/fleet/checkpoint 追加；无显式前缀契约 | DSH 的 prefix 纪律更适合 prompt cache |
 | 故障恢复 | effect 队列 + 恢复提示 + 未读 Input 重投 | supervisor/watchdog + continuation + session resume | 两者都强，语义不同 |
 | 工具面约束 | Router/Worker preset 明确工具清单；Router 禁 sleep/长等待 | AI CLI 自带工具面；靠 skill/提示词约束 | DSH 的“工具面即契约”更硬 |
@@ -294,7 +294,7 @@ Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一�
 实现质量结论：
 
 - **DSH 强在“把协作语义写进 schema 和状态机”**：gate、route batch、report/attention、handback、幂等 key 都有代码落点。它不靠提示词“希望模型这么做”。
-- **Freely 强在“把交付语义写进生命周期”**：阶段、门禁、独立 Reviewer、多项目 fleet 都有真实产物和检查点；cache 度量也比 DSH 原型完整。
+- **Freely 强在“把交付语义写进生命周期”**：阶段、门禁、独立 Reviewer、多项目 fleet 都有真实产物和检查点；cache 观测入口比 DSH 原型完整，但目前多为估算，不能当真实命中率。
 - **Freely 最弱的三处**：事件级准入/幂等、结构化交接载荷、prompt 前缀契约。这三处恰好是 DSH 实现最扎实的地方。
 - **DSH 最弱的三处**：单仓/单机、Worker 冷启动与无 cache 度量、Cordis 插件锁定。Freely 不能为了抄路由而把这些代价一起搬进来。
 
@@ -352,7 +352,7 @@ Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）�
 
 [打开交互式版本](freely-harness-port-boundary.html)（archify）。图中三层优先级：先做 Freely 内的 HarnessPort；再把 DSH 作为 adapter；最后才考虑把 gates/worktree/issue 外溢成 DSH 工具插件。
 
-P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude 有 fork+usage，OpenCode 有 fork 但 usage 不完整，Cline 无 fork/usage；最近 50 个 cycle 的 21 条 cache 记录 hit=0/miss=0，说明当前 adapter 根本没有上报缓存字段——这比“命中率低”更严重，是**不可观测**。用 `--require fork` 实测当前主项目直接 fail：reviewer 用的 Cline 不支持 fork，要么换 reviewer slot，要么接受 reviewer 冷启动；这是可执行的配置结论，不是“待研究”。
+P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude/OpenCode 是 native fork，Codex/Cline 是 `degraded=fork`（运行时会尝试 fork 再降级 session/new）；能力矩阵读取 `tool-registry.toml`，不再手写第二份表。最近 50 个 cycle 的 21 条 cache 记录 `input_source=estimated`、hit=0/miss=0：当前 adapter 没有 provider usage，`input` 是 `prompt_bytes // 4` 的估算，不能当真实命中率。用 `--require fork` 实测当前主项目直接 fail：reviewer 的 Cline 是 degraded，要么换 reviewer slot，要么接受冷启动；这是可执行的配置结论，不是“待研究”。
 
 
 ## 5. 七处结构性差异及影响
@@ -458,7 +458,7 @@ P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-st
 
 - **不整体迁移 Super-agent 架构，也不把 Freely 搬进 DSH。** 两者目标不同：Super-agent 优化“团队被打扰的次数”，Freely 优化“项目从问题到合并的自治闭环”。
 - **保留 Freely 的三个差异优势**：文档驱动的 B1/B2 治理、独立 Reviewer、多项目 fleet。
-- **P0 已实现 Harness 能力探针与缓存观测**：`freely harness-status` 已能回答“每个角色用什么 harness、能不能 fork/resume、usage/cache 是否上报、最近 cycle 的命中情况”。这是 HarnessPort 的第一个可运行切片，不是纸面设计。
+- **P0 已实现 Harness 能力探针与缓存观测**：`freely harness-status` 已能回答“每个角色用什么 harness、fork 是 native/degraded、ACP 二进制是否可解析、cache 数据是 usage 还是 estimated”。这是 HarnessPort 的第一个可运行切片，不是纸面设计。
 - **P1 起必须改代码，不再“继续研究”**：
   1. follow-up ownership 轻量账本 + claim/release/handback；
   2. `a2a_task` 类型化 report/attention + 稳定 relay key；
@@ -478,7 +478,7 @@ P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-st
 
 | 优先级 | 任务 | 具体改动 | 验收 |
 | --- | --- | --- | --- |
-| P0（已完成） | Harness 能力探针 + 缓存观测 | 新增 `harness_status.py`、`bin/harness-status`、`freely harness-status`；能力矩阵、按角色读取 agent-table、二进制探针、`[CACHE]` 聚合 | 单测 5 项通过；主项目实测输出角色/能力/cache；`--require fork` 对 Codex/Cline 返回 3 |
+| P0（已完成） | Harness 能力探针 + 缓存观测 | 新增 `harness_status.py`、`bin/harness-status`、`freely harness-status`；能力矩阵、按角色读取 agent-table、二进制探针、`[CACHE]` 聚合 | 单测 7 项通过；主项目实测输出角色/能力/cache；`--require fork` 对 Codex/Cline 返回 3 |
 | P1-1 | follow-up ownership | 新表 `followup_owners`（thread_key/ticket_key/owned_until/reason）+ claim/release/handback CLI；scan 开单前查账本 | 真实 PR 评论回放：同一线程不重复开单；越界消息只 handback 一次 |
 | P1-2 | 类型化交接 | `a2a_task.py --report-state` 六态；`--attention` JSON（question/target/action）；A2A server 原样存；稳定 relay key | 六态可查询；重复 report 不重复投递；attention 路由回原会话 |
 | P1-3 | prompt 缓存契约 | Manager prompt 拆 stable_prefix/volatile_tail；日志标注两段 bytes；Policy/settings 固定在尾部 | `harness-status` 对照显示 prefix 稳定；volatile 变化不影响前缀字节 |
