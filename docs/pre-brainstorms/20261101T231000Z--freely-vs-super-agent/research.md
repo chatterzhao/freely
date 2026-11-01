@@ -33,10 +33,10 @@ created_at: 2026-11-01
 **没有全局更优的系统，只有对问题匹配度更高的系统。**
 
 - **Super-agent 更优的地方**：事件级准入、注意力纪律、消息级交接（report/attention/handback/ownership）、prompt 前缀缓存纪律、单仓库内的响应速度。它把“不要打扰人”和“每条事件凭什么被处理”做成了运行时事实。
-- **Freely 更优的地方**：规格驱动（SDD）、测试驱动（TDD）、独立 Reviewer、PR/merge 治理、多项目 fleet、harness 可替换。它把“这件事该怎么做、怎么验、凭什么合并”做成了文档与门禁事实。
+- **Freely 更优的地方**：规格驱动（SDD）、测试驱动（TDD，且有边界）、独立 Reviewer、PR/merge 治理、项目登记/独立 runtime、harness 可替换。它把“这件事该怎么做、怎么验、凭什么合并”做成了文档与门禁事实。
 - **Freely 的弱点是“运行时协作对象”不足**：没有 Trigger/Ticket/Mandate/Report/Attention/Disposition 这一层，消息归属、交接载荷、准入强度都偏粗。
 - **Super-agent 的弱点是“交付治理”不足**：没有 B1/B2 规格层、没有 TDD 门禁、没有独立 Reviewer、只服务一个仓库，原型还缺 watchdog/存算分离。
-- **对 Freely 的正确策略**：保留“文档是真相、TDD 是验收、Reviewer 是独立角色、门禁是合并前提”这四个差异优势；只借 Super-agent 的五个运行时 primitive，不整体迁移它的领域模型。
+- **对 Freely 的正确策略**：保留“文档是规格/生命周期真相、TDD 是终态验收、Reviewer 是独立角色、门禁是合并前提”这四个差异优势；只借 Super-agent 的五个运行时 primitive，不整体迁移它的领域模型。
 
 一句话：**Super-agent 是“团队助手的注意力预算系统”，Freely 是“项目所有者的交付治理系统”。** 前者优化“少打扰”，后者优化“可交付、可审计地闭环”。两者重叠在 agent 协作层，不在产品目标层。
 
@@ -93,7 +93,7 @@ Ticket → Assignment → Executor Session → Report/Attention → Router
 
 ```
 issue / chat / 治理漂移
-  → raw issue（平台副本，本地唯一真相）
+  → raw issue（平台副本，本地规格/生命周期真相）
   → B1_IBM：brainstorm → candidate → milestone
   → B2_IBM：I-* issue → PRD → pre-tests → tasks → code-review
   → dev-loop：RED → 实现 → test-GREEN
@@ -110,7 +110,7 @@ issue / chat / 治理漂移
 - **角色分离**：Manager 调度、Worker 执行、Reviewer 独立审查；Reviewer 不站在任何一方。
 - **worktree 隔离**：每个 issue 一个 dev 工位 + 一个可丢弃 test 工位。
 
-这套设计非常适合：**长期运行、多项目、需要规格与审计、交付物要能被人类复核**。
+这套设计非常适合：**长期运行、需要规格与审计、交付物要能被人类复核**；多项目有 registry/独立 runtime，但跨项目统一调度仍不成熟。
 
 ### 3.3 两者不是同一根轴
 
@@ -122,7 +122,7 @@ issue / chat / 治理漂移
 | 授权载体 | Mandate + Policy 版本 | 宪法/法律 + 角色 + 阶段 + 门禁 |
 | 交付单元 | Ticket | issue + worktree + PR |
 | 质量闸门 | 外部 review/CI + 人 | TDD + 独立 Reviewer + PR/merge gate |
-| 适用边界 | 一个仓库、一个团队 | 多项目、长期治理 |
+| 适用边界 | 一个仓库、一个团队 | 单项目长期治理；多项目有登记，统一调度未成熟 |
 
 所以“Freely 应该更像 Super-agent”是错的；“Freely 应该吸收 Super-agent 的运行时协作 primitive”才是对的。
 
@@ -189,8 +189,8 @@ issue / chat / 治理漂移
 | 人插话 | IM/GitHub；回原会话 | issue/comment/chat；discuss | 平手；Freely 入口更多，Super-agent 归属更清 |
 | 事件准入 | 代码 gate + 模型 assessment | 无 per-event gate；Manager 判断 | **Super-agent 更优** |
 | 授权 | Mandate + Policy 版本 + 重校验 | 宪法/法律 + 角色 + 阶段 + 门禁 | **分层不同**：单事件 Super-agent 强；合并治理 Freely 强 |
-| SDD | 无规格层 | B1/B2/PRD/pre-tests/tasks/code-review | **Freely 明显更优** |
-| TDD | 无 | RED/GREEN/test-pre-merge/pretests gate | **Freely 明显更优** |
+| SDD | 无规格层 | B1/B2/PRD/pre-tests/tasks/code-review | **Freely 更优**（文档是规格/状态，不是每步 prompt 自动注入） |
+| TDD | 无 | RED/GREEN/test-pre-merge/pretests gate | **Freely 更优**（GREEN 硬、RED 流程、全 not_applicable 仅 skill 约束） |
 | 交接 | 六态 report + attention + handback + ownership | A2A state + summary/evidence + Reviewer verdict | **Super-agent 消息级更优；Freely 阶段级更完整** |
 | 路由 | 代码 gate + 1–20 批量决策 + 逐条拒绝 | scan 推导 stage + Manager 派工 | **Super-agent 运行时更硬；Freely 生命周期更准** |
 | 上下文 | Inline/Spill + 链式召回 + 前缀稳定 | 文档长期记忆 + session fork/resume | **分裂**：DSH 单会话更精；Freely 跨会话/跨项目更久 |
@@ -199,14 +199,14 @@ issue / chat / 治理漂移
 | 失败恢复 | effect 队列 + 恢复提示 + 未读 Input | supervisor/watchdog/continuation + gate 对账 | **分裂**：外部副作用 DSH 强；进程/工位 Freely 强 |
 | 可观测 | 单写 DB + health board + panel | 文档 + CLI status + DB + 审计 | **分裂**：实时 DSH 强；审计 Freely 强 |
 | Harness | 绑定 Cordis/DSH，无 ACP | ACP 多 CLI 可替换 | **Freely 更优**（但契约仍是隐式） |
-| 规模 | 单仓单团队 | 多项目 fleet | **Freely 更广，DSH 更深** |
+| 规模 | 单仓单团队 | 项目登记 + 多工位；跨项目统一调度未成熟 | **Freely 更广但有边界，DSH 更深** |
 
 ### 6.1 按场景判定：谁更优秀取决于问题
 
 | 场景 | 更优 | 为什么 |
 | --- | --- | --- |
 | 一个仓库、一个团队、事件很多、怕打扰 | Super-agent | 代码 gate + observe + 订阅直通 + 注意力纪律 |
-| 多项目、长周期、要规格与审计 | Freely | SDD + TDD + Reviewer + PR/merge 门禁 + fleet |
+| 单/多项目、长周期、要规格与审计 | Freely | SDD + TDD + Reviewer + PR/merge 门禁；多项目靠 registry/独立 runtime |
 | 一条明确的 bug，今天就要修 | Super-agent | 无 B1/B2/PRD 开销，直接 Ticket→Worker |
 | 一条模糊需求，需要先收敛边界 | Freely | B1 brainstorm/candidate 强制先想清楚 |
 | PR 里后续讨论很多，怕漏接 | Super-agent | Thread 订阅 + followupOwners + handback |
