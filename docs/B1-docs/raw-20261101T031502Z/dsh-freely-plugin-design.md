@@ -63,7 +63,11 @@ DeepSeek Harness process (Cordis)
 
 Freely 的 Manager/scan/gates/A2A/worktree 是 20K 行 bash/Python，短期内重写成 TypeScript 不现实，也会引入大量行为回归。插件只做 **harness provider + bridge + panel**；Python runtime 继续拥有 loop。这样“全部非 harness 能力”原样保留，只替换 harness 调用点。
 
-### 2.2 Plugin 注入的服务
+### 2.2 不加载 `dsh-superagent`
+
+B2 只加载 `@freely/dsh-freely`，**不加载 `dsh-superagent`**。这样 DSH 只提供核心 harness services（agents/sessionController/tools/skills/...），不会同时出现 DSH Router/Ticket 与 Freely Manager/A2A 两套 loop。
+
+### 2.3 Plugin 注入的服务
 
 参考 `dsh-superagent` 的主插件：
 
