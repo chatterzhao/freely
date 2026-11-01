@@ -10,19 +10,27 @@
 - promoted_issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
 2. `C-20261101T031502Z-B`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-B
+- promoted_issue_path: pending://needs-b2-materialization
 3. `C-20261101T031502Z-C`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-C
+- promoted_issue_path: pending://needs-b2-materialization
 4. `C-20261101T031502Z-D`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-D
+- promoted_issue_path: pending://needs-b2-materialization
 5. `C-20261101T031502Z-E`
 - milestone: M-20261101T031502Z-A
 - status: needs_research
 6. `C-20261101T031502Z-F`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-F
+- promoted_issue_path: pending://needs-b2-materialization
 ### completed_issues
 1. `I-20261101T031502Z-A`
 - milestone: M-20261101T031502Z-A

@@ -1,6 +1,6 @@
 ---
 analysis_id: HARNESS-20261101T031502Z
-phase_state: in_progress
+phase_state: research_closed
 created_at: 2026-11-01
 ---
 

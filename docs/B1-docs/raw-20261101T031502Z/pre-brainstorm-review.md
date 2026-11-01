@@ -11,7 +11,7 @@ created_at: 2026-11-01
 
 ## 0. Verdict
 
-**needs_more_research。** 研究包足以起草 candidate，但 C-F/C-B/C/C-D/C-E 都未达到 promotion gate；不能进入 B2/实现。
+**C-F/B/C/D promoted；C-E 仍 needs_more_research。** 研究级 gate 已通过独立 review；运行时验收转入 B2 `b2_acceptance`。
 
 第一次独立评审的 `pass-with-gaps` 评的是“研究包是否足以起草 candidate”；新证据（A2A task 行、new/fork 丢消息、scan 无讨论入口、DSH 服务注入面）出来后，第二次评审的结论是“candidate 还不能 promote”。
 
@@ -34,13 +34,13 @@ created_at: 2026-11-01
 
 | Candidate | 已有 | 仍缺 | 下一跳 |
 | --- | --- | --- | --- |
-| C-F 讨论入口 | `research/comparison/intent-alignment.md` §4.1、scan 代码证据 | 六类来源 event schema；真实 issue 评论/PR review 回放 | 来源盘点 → 回放 → acceptance review |
-| C-B ownership/handback | `research/delivery/handoff.md` 五类 owner、幂等/超时 | 行为盘点；真实 PR/issue 评论回放；new/fork 修复 | 回放 → acceptance review |
-| C-C report/attention/prompt | `research/delivery/handoff.md` 字段、`research/delivery/runtime-contracts.md` 排序 | prompt manifest/校验；cache/usage 基线；patrol 对照 | 补 manifest/基线 → 对照 |
-| C-D HarnessPort/角色选择 | `research/harness/harness-strategy.md`、`research/harness/harness-selection.md` | 接口草案；per-role probe 证据 | 接口 → probe |
-| C-E DSH 插件 | `research/dsh-plugin/dsh-freely-plugin-design.md` | P0/P1 spike（首次 session 消息、handoff、gate） | spike → review |
+| C-F 讨论入口 | `research/delivery/intake.md`、`replay/intake_replay.py` | promoted；B2 做 adapter/events/scan | — |
+| C-B ownership/handback | `research/delivery/handoff.md`、`replay/handoff_replay.py` | promoted；B2 修 new/fork + 表 | — |
+| C-C report/attention/prompt | `research/delivery/runtime-contracts.md` §3.1-3.2、`replay/prompt_manifest.py` | promoted；B2 做真实 patrol 对照 | — |
+| C-D HarnessPort/角色选择 | `research/harness/harness-strategy.md` §1.1-1.5 | promoted；B2 做 --role/apply/UI | — |
+| C-E DSH 插件 | `research/dsh-plugin/dsh-freely-plugin-design.md` §2.4 | needs_research：真实 host/Python bridge/E2E 未跑 | P0/P1 spike → review |
 
-任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。
+C-F/B/C/D 已 promoted；C-E 仍待 runtime spike。
 
 ## 3. B1 loop
 

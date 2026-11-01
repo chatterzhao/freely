@@ -38,9 +38,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 Worker 对已完成工单后续线程的 follow-up ownership 与 handback
-- status: needs_research
+- status: promoted
 - decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。新研究进一步确认 A2A task 行没有 message/owner 历史，且 new/fork 会丢 message。结论：需要 delegation/ownership 协议，不是给 task 行加字段。
-- next_action: 研究已收口（五类矩阵 + protocol v0 + 状态机/真实线程回放）；待独立 acceptance review；B2 修 new/fork 丢 message、落 handoff 表并做 runtime 回放。
+- next_action: B2 物化 I-20261101T031502Z-B；实现 research 文档中的 b2_acceptance，TDD 验收。
 - revisit_trigger: 出现同一 PR/Issue 的后续评论被重复开单、被漏接，或 Manager 因中转 follow-up 出现上下文丢失/重复委派时，立即重启本 candidate；若连续两个里程碑未出现该类事件，可降级为观察项。
 - acceptance_criteria:
   - 五类后续消息各自有明确的 owner 判定规则，且能回答“这条消息现在归谁”
@@ -59,11 +59,11 @@ milestone: M-20261101T031502Z-A
   - 线程订阅的边界是“同一 PR/Issue”还是“同一 raw issue 关联的所有线程”
   - 与人工 stop、wt-close 的优先级如何排序
 - acceptance_reviews:
-  - reviewer: session-self
-  - mode: desk-research
-  - summary: 五类矩阵、protocol v0、状态机与真实 issue #4070 线程回放已完成；运行时 new/fork/表仍待 B2；研究 gate 待独立 review
-  - verdict: needs_more_research
-- promoted_issue_id: pending://C-20261101T031502Z-B
+  - reviewer: subagent:374f59ad-0e64-473b-9759-31c4bd86a54f
+  - mode: subagent
+  - summary: 五类矩阵/protocol v0/状态机+真实 #4070 线程回放通过；runtime new/fork/表归 b2_acceptance
+  - verdict: pass
+- promoted_issue_id: I-20261101T031502Z-B
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
@@ -72,9 +72,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 Manager 的类型化 report/attention、批量路由与 prompt 前缀契约
-- status: needs_research
+- status: promoted
 - decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约。结论：按 P1 实现，不再停留在度量。
-- next_action: 研究已收口（report/attention/批量决策 schema + manifest + 可观测性基线 + fixture）；待独立 acceptance review；真实 patrol 对照留 B2。
+- next_action: B2 物化 I-20261101T031502Z-C；实现 research 文档中的 b2_acceptance，TDD 验收。
 - revisit_trigger: Manager 单轮上下文接近 rotation 阈值、同一轮处理超过 3 个工单导致漏派/错派、或 cache 命中率连续下降且 prompt_bytes 上升时，重启本 candidate；若度量显示路由开销占比很低，则降级为观察项。
 - acceptance_criteria:
   - 给出 Manager 每轮 patrol 的上下文成本基线（字符/token/文档数）与 cache hit/miss 基线
@@ -94,11 +94,11 @@ milestone: M-20261101T031502Z-A
   - 六态 report 与现有 A2A state 如何映射而不破坏兼容
   - prompt 前缀契约由 runtime 还是 agent/skill 层强制
 - acceptance_reviews:
-  - reviewer: session-self
-  - mode: desk-research
-  - summary: report/attention/批量决策 schema、11 段 manifest、prefix/cache 三态回放、可观测性基线已完成；真实 patrol 对照留 B2；研究 gate 待独立 review
-  - verdict: needs_more_research
-- promoted_issue_id: pending://C-20261101T031502Z-C
+  - reviewer: subagent:7492ac67-3a43-4b14-a8e7-709eca2238f0
+  - mode: subagent
+  - summary: schema/manifest/可观测性基线/fixture 通过；真实 patrol 对照归 b2_acceptance
+  - verdict: pass
+- promoted_issue_id: I-20261101T031502Z-C
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
@@ -107,9 +107,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 HarnessPort 与角色级 harness 选择（Freely 主应用）
-- status: needs_research
+- status: promoted
 - decision_reason: 三角色已经能通过 `agent-table.toml` 的 `{role}_slot` 分 harness，但缺少统一 HarnessPort、角色级配置/探测、UI/CLI/TUI 入口；DSH 不再作为 harness adapter（另立 C-E）。
-- next_action: 研究已收口（HarnessPort Protocol + RoleHarnessConfig + 三角色 probe + JSON 契约）；待独立 acceptance review；B2 实现 `--role`/apply/validate 与 UI/CLI 后端。
+- next_action: B2 物化 I-20261101T031502Z-D；实现 research 文档中的 b2_acceptance，TDD 验收。
 - revisit_trigger: 新增 harness 需要改 runtime 多处、角色级选择出现静默降级，或 UI/CLI 开始各自写 `agent-table.toml` 时，立即重启本 candidate。
 - acceptance_criteria:
   - HarnessPort 覆盖 probe、session 生命周期、prompt/resume/interrupt、usage/cache、工具与 skills
@@ -128,11 +128,11 @@ milestone: M-20261101T031502Z-A
   - 角色级 model/effort 放 agent-table 还是 slot 配置
   - 运行中 Manager 轮换如何不打断当前 patrol
 - acceptance_reviews:
-  - reviewer: session-self
-  - mode: desk-research
-  - summary: HarnessPort Protocol、RoleHarnessConfig、三角色 probe 输出（reviewer fork degraded）已落；实现 `--role`/apply/UI 留 B2；研究 gate 待独立 review
-  - verdict: needs_more_research
-- promoted_issue_id: pending://C-20261101T031502Z-D
+  - reviewer: subagent:7492ac67-3a43-4b14-a8e7-709eca2238f0
+  - mode: subagent
+  - summary: Protocol/RoleConfig/三角色 probe 通过；--role/apply/UI 归 b2_acceptance
+  - verdict: pass
+- promoted_issue_id: I-20261101T031502Z-D
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
@@ -172,9 +172,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 让 scan/事件流真正监控 issue 讨论、PR review 评论与 CI 结果
-- status: needs_research
+- status: promoted
 - decision_reason: 主意图明确要求 scan 持续监控 issue、issue 讨论、chat。当前 `task-lifecycle-scan.py` 只处理 open issue 与 body；`pull_raw_issue` 只写 body；`fetch_issue` 虽带 comments 但未被消费；PR review/CI 完全没有入口。这不是 ownership 问题，而是“事件根本没进来”。
-- next_action: 研究已收口（六类 schema + 真实 issue/PR/CI 回放）；待独立 acceptance review；B2 做 adapter/events 表/scan 读取。
+- next_action: B2 物化 I-20261101T031502Z-F；实现 research 文档中的 b2_acceptance，TDD 验收。
 - revisit_trigger: 出现“人在 issue/PR 里回复了但 Freely 没反应”、同一讨论重复开单、或 CI 失败没有进入 Manager 时，立即重启本 candidate。
 - acceptance_criteria:
   - 六类来源都有明确入口、event_id、thread_key、actor 与去重规则
@@ -193,11 +193,11 @@ milestone: M-20261101T031502Z-A
   - 平台 event id 与 thread_key 如何统一
   - 与现有 chat 入口的优先级/去重
 - acceptance_reviews:
-  - reviewer: session-self
-  - mode: code-path review
-  - summary: 六类 schema、准入、选型与真实 issue/PR/CI 回放已完成；adapter/events/scan 读取留 B2；研究 gate 待独立 review
-  - verdict: needs_more_research
-- promoted_issue_id: pending://C-20261101T031502Z-F
+  - reviewer: subagent:374f59ad-0e64-473b-9759-31c4bd86a54f
+  - mode: subagent
+  - summary: 六类 schema/准入/选型 + 真实 issue/PR/CI 回放通过；adapter/events/scan 归 b2_acceptance
+  - verdict: pass
+- promoted_issue_id: I-20261101T031502Z-F
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []

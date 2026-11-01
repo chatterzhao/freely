@@ -42,14 +42,14 @@ Super-agent 是 DSH 的一个插件（`dsh-superagent`），不是 DSH core。�
 
 | Candidate | 状态 | 下一跳 |
 | --- | --- | --- |
-| C-A 对比研究+P0 | promoted | 保留 |
-| **C-F 讨论入口** | needs_research | 第一优先：issue comment/PR review/CI + 事件准入 |
-| C-B ownership/handback | needs_research | 行为盘点 + 真实回放；协议 v0 已有 |
-| C-C report/attention/prompt | needs_research | prompt manifest/基线 + patrol 对照 |
-| C-D HarnessPort/角色选择 | needs_research | 接口草案 + per-role probe |
-| C-E DSH 插件 | needs_research | P0/P1 spike；依赖 B/D/F |
+| C-A 对比研究+P0 | promoted | 已收口 |
+| **C-F 讨论入口** | promoted | B2：adapter/events/scan |
+| C-B ownership/handback | promoted | B2：new/fork 修复 + handoff 表 |
+| C-C report/attention/prompt | promoted | B2：真实 patrol 对照 |
+| C-D HarnessPort/角色选择 | promoted | B2：--role/apply/UI |
+| C-E DSH 插件 | needs_research | runtime spike 未跑；依赖 B/D/F |
 
-优先级：**C-F → C-B/C → C-D → C-E**。任一 readiness gap 未关闭，不 promote。
+优先级：**C-F → C-B/C → C-D → C-E**。C-F/B/C/D 已 promote；C-E 仍待 runtime spike。
 
 ## 证据
 

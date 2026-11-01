@@ -84,12 +84,12 @@ Freely 多出来的 SDD/TDD、B1/B2、Reviewer、PR/merge gate、worktree、多�
 
 | Candidate | 状态 | 下一跳 |
 | --- | --- | --- |
-| C-A 对比研究+P0 | promoted | 保留 |
-| C-F 讨论入口 | needs_research | 六类来源 schema + 真实 issue 评论/PR review 回放 |
-| C-B ownership/handback | needs_research | 五类消息行为盘点 + 真实回放；协议 v0 已有 |
-| C-C report/attention/prompt | needs_research | prompt manifest/基线 + patrol 对照 |
-| C-D HarnessPort/角色选择 | needs_research | 接口草案 + per-role probe |
-| C-E DSH 插件 | needs_research | P0/P1 spike；依赖 B/D/F |
+| C-A 对比研究+P0 | promoted | 已收口 |
+| C-F 讨论入口 | promoted | B2：adapter/events/scan |
+| C-B ownership/handback | promoted | B2：new/fork 修复 + handoff 表 |
+| C-C report/attention/prompt | promoted | B2：真实 patrol 对照 |
+| C-D HarnessPort/角色选择 | promoted | B2：--role/apply/UI |
+| C-E DSH 插件 | needs_research | runtime spike；依赖 B/D/F |
 
 Milestone：`M-20261101T031502Z-A`。Readiness matrix 见 [`pre-brainstorm-review.md`](pre-brainstorm-review.md)。
 
