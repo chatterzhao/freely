@@ -30,6 +30,8 @@ completed_at: ''
 closeout_note: ''
 ---
 
+# docs: Super-agent 架构与 Freely agent 协作模型对比研究
+
 workflow_kind: feature
 
 ## 背景
