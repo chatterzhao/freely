@@ -18,102 +18,21 @@ created_at: 2026-11-01
 | C-D HarnessPort | ✅ Protocol/RoleConfig/JSON 契约；✅ 主项目三角色 probe 输出 | 角色级选择/`--role` 实现 | `harness-strategy.md` §1.1-1.5 | needs_research（实现待 B2） |
 | C-E DSH 插件 | ✅ 服务注入/插件骨架静态 spike；✅ create/resolveAgent API 编译验证 | 真实 host 加载、Python bridge、首次 session、gate E2E | `dsh-freely-plugin-design.md` §2.4 + `spike/dsh-plugin-contract.ts` | needs_research（实现待 B2） |
 
-## 1. C-F 讨论入口
+## 1. 研究关闭明细
 
-> 研究债已关闭；下列 acceptance 的运行时部分转 B2 `b2_acceptance`。
+| Candidate | 已关闭的研究债（证据） | 剩余 B2 债 |
+| --- | --- | --- |
+| C-F | 六类来源/event schema/准入/scan-vs-events 选型：`intake.md` §1-§6；真实 issue #4070 comment、`cli/cli#14879` PR review/CI 形状 + 幂等：`replay/intake_replay.py`（10→5，dedupe_ok） | adapter 方法、events 表、scan/queue 读取、runtime 回放 |
+| C-B | 五类现状/目标矩阵：`handoff.md` §2.1；protocol v0：§6；状态机 + 真实 #4070 两条评论回放：`replay/handoff_replay.py` | new/fork 发 message + 角色 prompt、handoff 表、runtime E2E |
+| C-C | report/attention/批量决策 schema + A2A 映射：`runtime-contracts.md` §3.1；11 段 manifest/三态：§3.2；prefix/cache 回放：`replay/prompt_manifest.py`；可观测性基线：21 条全 estimated、hit_rate=null | A2A 字段落库、manifest 日志、真实 patrol 对照 |
+| C-D | HarnessPort Protocol、RoleHarnessConfig、per-role probe/JSON 契约：`harness-strategy.md` §1.1-§1.4；主项目三角色 probe（reviewer fork degraded）：§1.5 | `--role`、apply/validate、UI/CLI 后端、运行中 session 处理 |
+| C-E | DSH 插件静态契约 spike：`dsh-freely-plugin-design.md` §2.4；`spike/dsh-plugin-contract.ts` 在 DSH 类型环境编译通过 | 真实 host 加载、Python bridge、首次 session、gate/usage E2E |
 
-acceptance：
+## 2. 研究债关闭规则
 
-1. 六类来源都有入口、event_id、thread_key、actor、去重规则。
-2. issue comment/PR review 进入 Manager 的 scan/queue。
-3. CI 结果能进入，不依赖人转述。
-4. 同一事件重复拉取不产生重复任务。
-
-研究缺口：
-
-- 六类来源具体是：issue body、issue comment、PR review comment、PR review（approve/request changes）、CI check、chat。
-- 每类当前可用字段不同：`fetch_issue` 有 comments 但只有 body；`list_open_issue_records` 只有 number/title/body/state；PR review/CI 无 adapter 方法。
-- 需要决定：扩展 scan 轮询，还是新增 events 表/事件流；推荐“scan 保留生命周期 + events 表存增量事件 + event_id 去重”。
-- 需要明确 actor 来源：GitHub `author.login`/`authorAssociation`；Gitee 对应字段；chat `author`。
-- 需要真实回放：一个 issue comment、一个 PR review、一个 CI fail。
-
-## 2. C-B ownership/handoff
-
-> 研究债已关闭；运行时 E2E 转 B2 `b2_acceptance`。
-
-acceptance：
-
-1. 五类后续消息 owner 规则可回答“归谁”。
-2. 越界消息 handback 一次，带理由/目标。
-3. 已停止/关闭工单不被自动复活。
-4. 幂等键/超时释放可验证。
-
-研究缺口：
-
-- `handoff.md` 有目标规则，但没有“现状行为 vs 目标行为”矩阵；需要逐类列：新建请求、活跃 Thread 后续、已完成 Thread 后续、跨工单、人 stop。
-- 需要确认当前 scan/Manager 对每类消息的实际行为（漏接/重复/新开单）。
-- new/fork 丢 message 是已确认 bug；修复方案要写到函数级（new/fork 后显式 prompt + 角色定义）。
-- 需要回放：同一 PR 两条评论、跨工单评论、人 stop、Worker 死亡后 fail 反馈。
-
-## 3. C-C report/attention/prompt
-
-> 研究债已关闭；真实 patrol 对照转 B2 `b2_acceptance`。
-
-acceptance：
-
-1. Manager 每轮上下文成本基线（字符/token/文档数）与 cache hit/miss 基线。
-2. Manager 可读/不可读边界可检查。
-3. 路由支持批量决策 + 单条拒绝，拒绝原因可追溯。
-4. report 六态、attention 含问题/目标/动作。
-5. relay 幂等键；prompt 稳定前缀/可变尾部，有 cache 对照。
-
-研究缺口：
-
-- report/attention 目前只有散文，需要 JSON schema 与 A2A 字段映射（message data vs task row）。
-- 批量决策/逐条拒绝没有协议；需要定义 Manager 输出结构（accept/stop/ignore/unavailable + reason）。
-- prompt 有 STABLE/SEMI/DYNAMIC 顺序，但没有 manifest（段名/顺序/hash/bytes）；需要固定段名并记录。
-- 没有 usage/cache 基线；21 条日志全是 estimated，不能当命中率。需要先建立“reported/estimated/absent”三态。
-- 真实 patrol 对照需要运行 Manager（实现/测试阶段），研究阶段先给采样方案。
-
-## 4. C-D HarnessPort
-
-> 研究债已关闭；角色级实现转 B2 `b2_acceptance`。
-
-acceptance：
-
-1. ACP CLI 能力矩阵（有/无/降级/需探测）。
-2. HarnessPort 覆盖 probe/session/prompt/interrupt/usage/cache/tools/skills。
-3. 三角色可选 harness，有 probe/fallback。
-4. DSH 可行性结论。
-5. 明确 DSH 插件边界。
-
-研究缺口：
-
-- `harness-strategy.md` 有能力矩阵和原则，但没有可实现的接口签名/类型。
-- RoleHarnessConfig 只有字段名，没有 schema（role/tool/slot/adapter/model/preset）。
-- per-role probe 没有输出样例；`harness-status --role` 未实现。
-- UI/CLI 后端只有命令草案，没有 JSON contract。
-- DSH 可行性已结论“不做 adapter、做 Freely-host 插件”，但服务 API 是否稳定仍未 spike。
-
-## 5. C-E DSH 插件
-
-> 静态契约已过；runtime P0/P1 spike 仍是 B1 未关闭项，不 promote。
-
-acceptance：
-
-1. 插件注入所需 DSH services，不加载 dsh-superagent。
-2. Manager/Worker/Reviewer 独立 DSH preset/session。
-3. 首次 session 收到 task+role prompt；handoff append-only。
-4. 一个真实 issue 从 Manager 到 PR，全程无 ACP。
-5. gate exit code 阻断；usage reported/estimated。
-
-研究缺口：
-
-- DSH 服务注入面有代码依据（`src/index.ts` 的 inject），但没有实际插件骨架验证。
-- `sessionController` 的 create/prompt/stop API 需要 spike 验证；fork 不存在，需 context pack。
-- Python runtime 与 plugin 的 bridge 协议只有设计，没有最小 echo/spike。
-- 首次 session 消息丢失 bug 未修；C-E 依赖 C-B。
-- 真实 issue E2E 是实现阶段验收，不是纯研究。
+- 每行“已关闭”必须有文档/脚本/日志链接；没有就保持 needs_research。
+- “剩余 B2 债”不是研究债，进入 B2 的 `b2_acceptance`；B1 promotion gate 不再要求 runtime E2E。
+- C-E 的 runtime P0/P1 spike 仍是 B1 未关闭项：插件能否真实加载/调用是可行性，不是实现验收；没跑不 promote。
 
 ## 6. 跨切面债
 
