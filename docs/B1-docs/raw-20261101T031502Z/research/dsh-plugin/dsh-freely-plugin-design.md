@@ -104,15 +104,20 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 - 编译验证了：`inject` 的服务名（`sessionController`/`workspaceRegistry` 等）存在；`resolveAgent`/`create({sessionId, workspaceId, agentPreset})` 可用；插件可以以 `name`/`inject`/`apply` 形态被 DSH 加载。
 - DSH `Sessions.ensure` 的真实实现是：`sessionController.resolveAgent` → 未找到则 `workspaceRegistry.create` + `sessionController.create({agentPreset})` → `resolveAgent`；消息通过 `AgentDelivery.send`，不是 `session/new` 带 message。这与 Freely ACP 的丢消息 bug 不同。
 
-仍未验证（属于 B2 实现验收，不是研究缺口）：
+B1 已关闭（见 §2.4.1 / §2.5）：
 
 - DSH host 实际启动并加载第三方插件；
-- Python runtime ↔ plugin bridge；
-- 首次 session 收到 task+role prompt 的端到端；
-- gate 阻断/usage 上报；
-- 真实 issue 到 PR 无 ACP。
+- Session 创建、Agent 消费消息、subprocess bridge、gate exit=1；
+- 三角色 preset/工具白名单/persona。
 
-结论：**C-E 的研究问题（插件形态/服务注入是否可行）已关闭；运行/E2E 是 B2 实现验收。**
+B2 实现验收（不在 B1 gate）：
+
+- Python runtime ↔ plugin 的 handoff envelope v1 落库；
+- a2a-exit/Reviewer verdict 不覆盖 Worker summary；
+- 真实 issue 到 PR 无 ACP；
+- usage 上报。
+
+结论：**C-E 的研究问题（插件形态/服务注入/骨架）已关闭；handoff 落库与真实 E2E 是 B2 实现验收。**
 
 ### 2.4.1 Runtime load spike（2026-11-01）
 
@@ -128,7 +133,21 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 - P1 preset：profile patch 定义 `freely-manager/worker/reviewer`，三个 preset 各自创建 Session 成功。
 - P1 tool whitelist：`agent.ctx.tools.restrict` 后实测 manager/reviewer=`glob,grep,read`，worker=`edit,glob,grep,read,write`；白名单隔离成立。
 - P1 role prompt：三个 preset 各挂 `dsh-persona`，prefix 分别为 Freely Manager/Worker/Reviewer。
-- 仍未验证：Worker/Reviewer preset 独立生成/工具白名单、role prompt、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
+- B1 已关闭：Worker/Reviewer preset 独立生成、工具白名单、persona/role prompt。
+- B2 未做：handoff envelope v1 落库、a2a-exit、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
+
+### 2.5 DSH 服务 API 稳定性结论
+
+- **pin 版本**：本 spike 运行 `dsh 0.2.1-rc.5`；原型 `package.json` engines 为 `^0.2.1-alpha.2`，插件 peer 依赖同系。结论只对该 pin 负责，不承诺跨 minor。
+- **profile 支持矩阵**：
+  | profile | 结果 |
+  | --- | --- |
+  | `web` | 通过：插件加载、`sessionController/workspaceRegistry/subprocess/tools` 可用 |
+  | `headless` | 失败：缺 `sessionController/workspaceRegistry`，插件进入 `pending (waiting for services...)` |
+  | `desktop/tui` | 未测，不假设 |
+- **最小稳定面**：`sessionController`（resolve/create/inspect）、`workspaceRegistry.create`、`subprocess.resolveExecutable/spawn`、`tools.schemas/restrict`。其余 `agents/sessionPersistence/permissionPresets/systemPrompt/skills/llm/webServer` 只在原型/类型层出现，未逐一 runtime 验证。
+- **性质**：这是 **pinned private API**，不是 DSH 对第三方承诺的公开稳定 ABI；插件必须 feature-detect（缺服务时 fail-closed/pending），不能跨版本硬依赖。
+- **结论**：web profile 可作为 B2 P1 的宿主基线；headless 不支持；升级 DSH 必须重跑本 spike。
 
 ## 3. Harness RPC
 
@@ -225,8 +244,8 @@ handoff_messages
 
 | 阶段 | 内容 | 验收 |
 | --- | --- | --- |
-| P0 | 插件骨架 + bridge + Manager session（只读 scan） | DSH 内 Manager 能读 scan 并 a2a-exit |
-| P1 | Worker session + worktree + tools + handoff envelope v1 | 一个 issue 从派工到 commit，消息不丢 |
+| P0 | 插件骨架 + bridge + Manager session（只读 scan） | B1：插件加载/服务注入/Manager session；a2a-exit 留 B2 |
+| P1 | Worker session + worktree + tools + handoff envelope v1 | B1：session/tools/preset 隔离；envelope 落库/issue→commit 留 B2 |
 | P2 | Reviewer session + verdict + gates | fail→Worker 修复；pass→PR |
 | P3 | Panel + 真实 issue E2E | 人能看见 attention/gate/角色 |
 | P4 | Source 统一/多项目 | 不与 Freely scan 重复 intake |
@@ -257,10 +276,11 @@ handoff_messages
 
 `@freely/dsh-freely` 应该是 **Freely-host 插件**：DSH 提供 Session/Agent/模型/工具，Freely 保留 Manager/Worker/Reviewer/A2A/scan/gates/worktree/PR。它不是 ACP adapter，也不是“DSH 拥有 loop、Freely 只做工具”的治理插件。
 
-先做 P0/P1 spike，验证三件事：
+P0/P1 B1 spike 已通过：插件加载、`sessionController/workspaceRegistry/subprocess/tools` 注入、Session 创建、消息消费、三角色 preset/工具白名单/persona、gate exit=1。B2 仍需完成：
 
-1. 插件能否稳定注入 `sessionController/tools/skills`；
-2. 首次 `session.new` 能否可靠收到 task message + role prompt；
-3. handoff envelope 能否让 Reviewer/Worker 在不 fork 的情况下拿到足够上下文。
+1. handoff envelope v1 落库（append-only，Reviewer verdict 不覆盖 Worker summary）；
+2. a2a-exit/role prompt 的真实消息链路；
+3. 真实 issue 从派工到 PR 无 ACP；
+4. usage 上报。
 
-这三件事不过，就不应继续全量插件化。
+这些 B2 项不过，不宣称插件产品完成。
