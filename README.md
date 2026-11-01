@@ -270,6 +270,8 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
 - [Agent 交接研究](docs/B1-docs/raw-20261101T031502Z/agent-handoff.md)：Manager/Worker/Reviewer 交接缺陷与 A2A/AHP/ACP 边界
 - [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
+- [两种部署形态](docs/B1-docs/raw-20261101T031502Z/deployment-forms.md)：Freely 主应用 vs DSH 插件
+- [角色级 harness 选择](docs/B1-docs/raw-20261101T031502Z/harness-selection.md)：UI/CLI/TUI 与配置落点
 
 ## 参与开发
 

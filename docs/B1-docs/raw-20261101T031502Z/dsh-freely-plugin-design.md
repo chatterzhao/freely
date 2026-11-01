@@ -117,6 +117,16 @@ export const inject = [
 - 同一角色跨轮次可 `session.prompt` 复用；换模型/换 preset 时新建 session + context pack。
 - Reviewer 必须是独立 Session/preset，不能复用 Worker session。
 
+### 4.1 角色级 harness/model 选择
+
+插件形态下，UI 的“角色 tab”选的是 **DSH preset + model**，不是外部 ACP CLI：
+
+- Manager：`freely-manager` preset + manager model。
+- Worker：`freely-worker` preset + worker model。
+- Reviewer：`freely-reviewer` preset + reviewer model。
+
+配置真源是 DSH settings/KV；`.freely/harness.toml` 只做只读镜像/导出。不要复用 `agent-table.toml` 的 `{role}_slot`（那是外部 CLI 概念）。详见 `harness-selection.md` 与 `deployment-forms.md`。
+
 ## 5. 交接：从 task 行升级为 Handoff Envelope
 
 `@freely/dsh-freely` 不应把 DSH Session 当 A2A task 行用。建议在 Freely 侧新增 append-only：

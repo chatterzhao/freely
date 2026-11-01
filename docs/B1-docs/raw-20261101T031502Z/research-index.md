@@ -32,6 +32,8 @@ created_at: 2026-11-01
 | [harness-port.md](harness-port.md) | HarnessPort 接口、ACP 四家、DSH adapter 三种模式 | 初稿 |
 | [dsh-adapter-decision.md](dsh-adapter-decision.md) | DSH adapter 会阉割什么；B1/B2 两种插件形态 | 初稿 |
 | [dsh-freely-plugin-design.md](dsh-freely-plugin-design.md) | Freely-host 插件架构、handoff envelope、迁移/验收 | 初稿 |
+| [deployment-forms.md](deployment-forms.md) | Freely 主应用 vs DSH 插件：谁拥有 loop、角色选择、配置真源 | 初稿 |
+| [harness-selection.md](harness-selection.md) | 三角色 harness 选择 UI/CLI/TUI、写 agent-table 还是 DSH settings | 初稿 |
 | [agent-handoff.md](agent-handoff.md) | Manager/Worker/Reviewer 交接缺陷、A2A/AHP/ACP、DSH delegation 对照 | 初稿 |
 | [readme-architecture-audit.md](readme-architecture-audit.md) | README 图为什么改、主图/辅图取舍 | 初稿 |
 | [docs-directory-audit.md](docs-directory-audit.md) | 预研目录归位、遗留目录审计与规则 | completed |
