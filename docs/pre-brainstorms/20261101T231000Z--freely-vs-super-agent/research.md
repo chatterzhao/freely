@@ -521,5 +521,6 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | 状态权威/单写者/派生规则 | 同目录 `state-authority.md` |
 | TDD 的强制边界与分级 | 同目录 `tdd-policy.md` |
 | 注意力度量的采样与基线 | 同目录 `attention-metrics.md` |
+| prompt 顺序与 cache 语义 | 同目录 `context-cache.md` |
 | 文章映射与 Reviewer 误读 | 同目录 `super-agent-article.md` |
 | Freely 交付闭环/角色/循环 | 同目录 `delivery-model.md` |
