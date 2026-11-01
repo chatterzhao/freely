@@ -26,7 +26,7 @@ created_at: 2026-11-01
 | --- | --- | --- |
 | 规格面（SDD） | Freely 的第一真相是 docs，不是 DB：Intent/Constitution/LAWS、B1/B2、PRD/pre-tests/tasks | 看起来像 prompt-driven，而不是 document-driven |
 | TDD | pre-tests → RED → 实现 → GREEN → test-pre-merge 证据 | 看起来像“Worker 写完就算”，没有验收闭环 |
-| scan / platform 隔离 | 平台只是界面；scan 下载、sync 上传，本地 docs 是唯一真相 | 容易误解为 AI 直接读 GitHub/Gitee |
+| scan / platform 隔离 | 平台只是界面；scan 下载、sync 上传，本地 docs 是规格/生命周期真相 | 容易误解为 AI 直接读 GitHub/Gitee |
 | 工具面 | command/script/skill/MCP 各有职责，不是同一层 | 容易把 skill 当权限、把 command 当 git 糖 |
 | harness 的位置 | ACP harness 是执行提供层，可替换，不是宿主 | 容易误解为 Freely 绑定某个 AI CLI |
 | 人的插话入口 | issue/comment、chat、PR review 是三种不同入口 | 容易只画成“CLI” |
