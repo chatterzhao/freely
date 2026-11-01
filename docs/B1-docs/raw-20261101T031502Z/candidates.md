@@ -160,7 +160,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 静态契约 + web host 加载 + Session 创建/steer + Agent 消费（status=running, step/tool events）+ subprocess bridge + gate exit=1 已过；三角色 preset/工具白名单/真实 issue→PR 未跑
+  - summary: 静态契约 + web host 加载 + Session 创建/steer + Agent 消费 + subprocess bridge + gate exit=1 + 三角色 preset 独立创建已过；工具白名单/role prompt/真实 issue→PR 未跑
   - verdict: needs_more_research
 - depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
 - promoted_issue_id: pending://C-20261101T031502Z-E

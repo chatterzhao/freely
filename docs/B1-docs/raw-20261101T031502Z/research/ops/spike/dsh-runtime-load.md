@@ -48,3 +48,17 @@ Verified:
 - The Agent is no longer idle after `steer`; Session events include `step/start`, `tool/call`, `tool/result`, `step/end`. This is real consumption, not just queueing.
 - The plugin can run `bin/pretests-gate` with a missing issue and observe non-zero (`gate_exit=1`); gate blocking is real.
 - Still unverified: three independent presets/tool whitelists, Python bridge full handoff, real issue→PR.
+
+## 2026-11-01 preset isolation
+
+Fifth spike: profile patch defines `freely-manager/worker/reviewer` presets; plugin creates one session per preset:
+
+```
+[freely-spike] preset=freely-manager role=manager created=true
+[freely-spike] preset=freely-worker role=worker created=true
+[freely-spike] preset=freely-reviewer role=reviewer created=true
+```
+
+Verified: three independently named presets can create three sessions.
+
+Not verified: tools/tool whitelist (presets are empty in this spike), role prompt injection, real issue→PR.
