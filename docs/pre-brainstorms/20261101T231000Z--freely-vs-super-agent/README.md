@@ -48,6 +48,7 @@ created_at: 2026-11-01
 12. **多项目有 registry，但无统一调度台**：`~/.freely/projects.tsv` 真实存在；`fleet-status` 只是本项目工位视图。
 13. **scan 有实测缺陷**：station=收口但 next_action=wt-create/B1；同一 raw 因 dev/test 工位重复；platform_adapter 缺失已有在修工位。
 14. **注意力度量缺失**：chats=0、reviews 表空、input-required 4 条；现有数据不足以证明谁更省注意力。
+15. **DSH 不做 harness adapter**：那会把 Router/Thread/Mandate 阉割成执行器；插件现实形态是 Source + skill + `freely` CLI，不是全套能力原样插件化。
 
 ## 还没研究透
 
