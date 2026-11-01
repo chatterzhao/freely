@@ -52,6 +52,27 @@ Freely 多出来的能力不拿来证明“谁更强”；Super-agent 的个人�
 
 所以 Freely 的比较对象不是“Super-agent 全部”，而是它的 **事件/分派/交接/持久/上下文** 这一段。
 
+## 2.1 逐项判定表
+
+| 维度 | Super-agent | Freely | 判定 | 为什么/代价 |
+| --- | --- | --- | --- | --- |
+| 注意力 | 默认沉默、结构化 attention、IM 100 词 | Manager 主动汇报、scan needs_human、多入口 | DSH 更优 | Freely 没有消息预算；DSH 可能漏报 |
+| 主动发现 | 规则+推断候选、observe/auto、投机 | scan + 治理漂移 + runtime 异常 | Freely 更广，DSH 更稳 | Freely 误报；DSH 依赖事件源 |
+| 人插话 | IM/GitHub、Thread 订阅、回原会话 | issue/comment、chat、PR review | 分裂 | DSH 归属/直通；Freely 入口多但 PR review 未闭环 |
+| 事件准入 | 代码 gate + assessment + 准入表 | 无 per-event gate | DSH 更优 | Freely 浪费上下文/越权；DSH gate 维护成本 |
+| 授权 | Policy 版本 + Mandate + 重校验 | 宪法/法律 + 角色 + phase + gates | 分层不同 | 单事件 DSH 强；合并治理 Freely 强 |
+| SDD | 无规格层 | B1/B2/PRD/pre-tests/tasks | Freely 更优 | 文档多、易漂移、小任务过重 |
+| TDD | 无 TDD | RED/GREEN/test-pre-merge/pretests gate | Freely 更优 | GREEN 硬、RED 软；全 not_applicable 仅 skill |
+| 交接 | Report 六态 + attention + handback + ownership | A2A state + summary/evidence + verdict | DSH 消息级更优 | Freely 后续讨论丢失/重复；DSH 模型复杂 |
+| 路由 | 代码 gate + 1–20 批处理 + 逐条拒绝 | scan stage + Manager 派工 | 分裂 | DSH 吞吐/幂等；Freely 生命周期更准 |
+| 上下文 | Inline/Spill + Chain of Recall | docs 长期记忆 + session fork/resume + prompt 排序 | 分裂 | DSH 单会话精；Freely 跨天长；Freely 排序无 manifest |
+| 缓存 | 段序固定、Policy 置尾、无指标 | fork/resume + `[CACHE]`，input 多估算 | 都不足 | DSH 不可见；Freely 数据不可信 |
+| 并发 | Worker slot + 人优先槽位 + Thread 共享 | worktree + test 工位 + worker pool | 仓库内 DSH 细；跨项目 Freely 广 | DSH 单仓；Freely 工位成本 |
+| 失败恢复 | effect 队列 + 恢复提示 + 未读重投 | supervisor/watchdog/continuation + gate 对账 | 分裂 | DSH 外部副作用强；Freely 进程/工位强 |
+| 可观测 | 单写 DB + health + panel + Decision | docs 证据 + CLI + DB + verdict | 分裂 | DSH 实时；Freely 审计；Freely 只读面 fail-closed |
+| Harness | 绑定 Cordis/DSH，无 ACP | ACP 多 CLI + HarnessPort | Freely 更优 | DSH 换宿主=重写；Freely 契约未显式 |
+| 规模 | 单仓单团队 | 项目 registry + 多工位 | Freely 更广但有边界 | 跨项目调度未产品化 |
+
 ## 3. 叫法不同，问题相同：概念对照
 
 | Super-agent | Freely | 是否同一问题 | 差异 |
@@ -153,7 +174,7 @@ Freely 多出来的能力不拿来证明“谁更强”；Super-agent 的个人�
 - 没有 per-message id/append-only；task 行 update 覆盖。
 - 没有“这条消息归谁”的 owner 字段。
 
-**判定**：**DSH 更强**。Freely 的 delegation-protocol v0 已给出 envelope/ownership，但未实现。
+**判定**：**DSH 更强**。Freely 的 `handoff.md` v0 已给出 envelope/ownership，但未实现。
 
 ### 4.6 授权：DSH 运行时准入，Freely 流程治理
 
@@ -231,10 +252,19 @@ Freely 多出来的能力不拿来证明“谁更强”；Super-agent 的个人�
 | P0 | Thread/ownership/handback | C-B：followup_owners + handoff envelope + unread | 不做事件溯源重写 |
 | P1 | Report 六态 + Attention | C-C：A2A report/attention 字段；单问题、目标会话 | 不做 Mandate 全量 |
 | P1 | 批量路由 + 幂等 | Manager 批量决策；accept key | 不把 Manager 缩成纯 Router |
-| P1 | prompt manifest + usage | C-C/context-cache：STABLE/SEMI/DYNAMIC + usage_reported | 不把 cache 当命中率 |
+| P1 | prompt manifest + usage | C-C/`runtime-contracts.md`：STABLE/SEMI/DYNAMIC + usage_reported | 不把 cache 当命中率 |
 | P2 | 语义 Watchdog | 轻量 supervisor reviewer 看 Worker 进展/方向 | 不照搬云端 Watchdog |
 | P2 | Assignment/Report 分离 | A2A task/executor 状态分离 | 不重写全部领域模型 |
 | P3 | Harness 角色选择 | C-D：per-role slot + probe | 不先做 DSH adapter |
+
+### 7.1 明确不吸收
+
+- 默认 observe / 默认不做：与 Freely“项目所有者”冲突。
+- 单仓/单机：与多项目 registry 冲突。
+- 移除 Reviewer：削弱质量分离。
+- 事件溯源重写：治理证据在文档与平台，不在事件流。
+- 双 Router/Ticket：插件化最大陷阱。
+- 完整 Mandate/云端/BYOM/投机执行/异步 ReAct：不是 Freely 当前主意图的必要条件，先不做。
 
 ## 8. 评审结论
 

@@ -2,9 +2,11 @@
 
 **一个文档驱动（SDD）、测试驱动（TDD）的项目循环运行器。目标态：AI 是项目所有者，人负责定意图和验收。**
 
+Freely 是一个 LLM(AI)主动，自主，持久，连续的code harness。LLM（AI）通过scan持续监控issue或issue讨论或freely chat 插话讨论，遵循项目意图、宪法、法律、门禁、tool、skill、mcp自己维护好规格文档和测试文档，然后遵循SDD（规格驱动开发），TDD（测试驱动开发）理念持续项目开发
+
 Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。目标是让人只在需要决策或验收时出现。
 
-> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [attention-metrics](docs/B1-docs/raw-20261101T031502Z/attention-metrics.md)）。
+> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [runtime-contracts](docs/B1-docs/raw-20261101T031502Z/runtime-contracts.md)）。
 
 [![交付闭环](docs/assets/freely-delivery-loop.svg)](docs/assets/freely-delivery-loop.html)
 
@@ -262,18 +264,18 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
 - [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、未解问题
-- [逐项判定总表](docs/B1-docs/raw-20261101T031502Z/synthesis.md)：问题/方案/谁更优/为什么/代价
+- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：概念映射、逐项判定、吸收清单
 - [Freely 交付闭环概念模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
-- [Super-agent 对比研究](docs/B1-docs/raw-20261101T031502Z/research.md)：理念/架构/实现/场景对比
-- [文章映射与 Reviewer 纠偏](docs/B1-docs/raw-20261101T031502Z/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应
+- [主意图对齐](docs/B1-docs/raw-20261101T031502Z/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
+- [概念全量对照](docs/B1-docs/raw-20261101T031502Z/concept-map.md)：Super-agent 概念 → Freely 对应物、同名不同义
 - [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
 - [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
-- [Agent 交接研究](docs/B1-docs/raw-20261101T031502Z/agent-handoff.md)：Manager/Worker/Reviewer 交接缺陷与 A2A/AHP/ACP 边界
-- [Delegation Protocol v0](docs/B1-docs/raw-20261101T031502Z/delegation-protocol.md)：handoff envelope、ownership、幂等/超时
+- [交接与协议](docs/B1-docs/raw-20261101T031502Z/handoff.md)：交接缺陷、delegation protocol、ownership/handback
+- [运行时契约](docs/B1-docs/raw-20261101T031502Z/runtime-contracts.md)：状态权威、准入、prompt/cache、注意力、可观测、TDD
 - [主意图对齐评审](docs/B1-docs/raw-20261101T031502Z/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
 - [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：只比重叠部分的概念映射、评审与吸收清单
 - [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
-- [两种部署形态](docs/B1-docs/raw-20261101T031502Z/deployment-forms.md)：Freely 主应用 vs DSH 插件
+- [Harness 策略](docs/B1-docs/raw-20261101T031502Z/harness-strategy.md)：HarnessPort、两种部署形态、DSH A/B1/B2/C
 - [角色级 harness 选择](docs/B1-docs/raw-20261101T031502Z/harness-selection.md)：UI/CLI/TUI 与配置落点
 
 ## 参与开发

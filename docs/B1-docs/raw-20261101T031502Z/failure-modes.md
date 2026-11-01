@@ -46,7 +46,7 @@ Super-agent：
 Freely：
 
 - 平台 issue 由 scan 下载；chat 由 `chats` 表进 Manager prompt。
-- PR review comment/CI 反馈没有自动入口（见 `research.md` 7.11）。
+- PR review comment/CI 反馈没有自动入口（见 `intent-alignment.md` §4.1）。
 - 风险：**入口缺失 + scan 降级**。平台 adapter 缺失时 scan 只能 degraded，本地 docs 仍可读，但新请求可能进不来。
 
 判定：Super-agent 的“漏”是**判定层漏**（有记录但没人看）；Freely 的“漏”是**入口层漏**（根本没进入 runtime）。前者可用抽样/指标补，后者需要补入口与 ownership。

@@ -110,9 +110,9 @@ created_at: 2026-11-01
 
 ### 协作拓扑对比图
 
-![Super-agent 与 Freely 协作拓扑对比](super-agent-vs-freely-collaboration.svg)
+![Super-agent 与 Freely 重叠意图与吸收点](super-agent-freely-overlap.svg)
 
-[打开交互式版本](super-agent-vs-freely-collaboration.html)（archify 生成，支持主题切换、搜索、聚焦和导出）。图中只画主路径；`report`、`SSE`、`verdict` 等回流见下方文字说明。
+[打开交互式版本](super-agent-freely-overlap.html)（archify）。图中左列是 Super-agent 的重叠概念，右列是 Freely 对应实现；红色虚线是 Freely 当前缺口。
 
 ### 4.1 设计公理与默认姿态
 
@@ -350,9 +350,7 @@ Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）�
 - 配置面应支持 **按角色选 harness**（Manager/Worker/Reviewer 可不同），类似截图里的 Runtime 选择器；每个 harness 有 capability probe 与 fallback，而不是全局单值。
 - DSH 是“一个可选基座 + 一个可选插件宿主”，不是 Freely 的替代品。优先级是“Freely 应用内可切换”，不是“把 Freely 搬进 DSH”。
 
-![Freely HarnessPort 与 DSH 插件边界](freely-harness-port-boundary.svg)
-
-[打开交互式版本](freely-harness-port-boundary.html)（archify）。图中三层优先级：先做 Freely 内的 HarnessPort；再把 DSH 作为 adapter；最后才考虑把 gates/worktree/issue 外溢成 DSH 工具插件。
+HarnessPort、两种部署形态与 DSH A/B1/B2/C 判定见 [`harness-strategy.md`](harness-strategy.md)；角色级选择见 [`harness-selection.md`](harness-selection.md)。
 
 P0 已经落地一个可运行切片：`freely harness-status`（`bin/harness-status` → `docs/system/workspace/scripts/runtime/harness_status.py`）。它按角色读取 `agent-table.toml`，推断工具族，输出 session/fork/resume/usage/cache 能力矩阵与二进制健康，并聚合 `cycle-*.log` 里的 `[CACHE]` 行。实测主项目输出显示：Claude/OpenCode 是 native fork，Codex/Cline 是 `degraded=fork`（运行时会尝试 fork 再降级 session/new）；能力矩阵读取 `tool-registry.toml`，不再手写第二份表。最近 50 个 cycle 的 21 条 cache 记录 `input_source=estimated`、hit=0/miss=0：当前 adapter 没有 provider usage，`input` 是 `prompt_bytes // 4` 的估算，不能当真实命中率。用 `--require fork` 实测当前主项目直接 fail：reviewer 的 Cline 是 degraded，要么换 reviewer slot，要么接受冷启动；这是可执行的配置结论，不是“待研究”。
 
@@ -538,10 +536,9 @@ B1 不是“写完文档就 promote”。每个 candidate 的循环是：
 | 插件/宿主绑定 | 原型 `package.json`、`cordis.patch.yml` |
 | Freely ACP 会话/usage/cache | `docs/system/workspace/scripts/runtime/run-acp-prompt.py` |
 | Freely harness 选择面 | `AGENT_AI_TOOL` 配置、`docs/system/workspace/session-lifecycle-protocol.md` |
-| 协作拓扑对比图 | `super-agent-vs-freely-collaboration.html` / `.svg` |
-| HarnessPort 与插件边界图 | `freely-harness-port-boundary.html` / `.svg` |
-| 交接缺陷/A2A/AHP/ACP | `agent-handoff.md` |
-| 两种部署形态 | `deployment-forms.md` |
+| 重叠意图与吸收图 | `super-agent-freely-overlap.html` / `.svg` |
+| 交接缺陷/协议 | `handoff.md` |
+| Harness 策略/部署形态 | `harness-strategy.md` |
 | 角色级 harness 选择 | `harness-selection.md` |
 | DSH 插件设计 | `dsh-freely-plugin-design.md` |
 | 主意图逐条对齐 | `intent-alignment.md` |

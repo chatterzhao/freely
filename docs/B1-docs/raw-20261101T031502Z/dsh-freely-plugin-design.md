@@ -125,7 +125,7 @@ export const inject = [
 - Worker：`freely-worker` preset + worker model。
 - Reviewer：`freely-reviewer` preset + reviewer model。
 
-配置真源是 DSH settings/KV；`.freely/harness.toml` 只做只读镜像/导出。不要复用 `agent-table.toml` 的 `{role}_slot`（那是外部 CLI 概念）。详见 `harness-selection.md` 与 `deployment-forms.md`。
+配置真源是 DSH settings/KV；`.freely/harness.toml` 只做只读镜像/导出。不要复用 `agent-table.toml` 的 `{role}_slot`（那是外部 CLI 概念）。详见 `harness-selection.md` 与 `harness-strategy.md`。
 
 ## 5. 交接：从 task 行升级为 Handoff Envelope
 
