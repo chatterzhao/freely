@@ -27,8 +27,12 @@ platform_state: open
 promoted_children: []
 source_candidate: ''
 completed_at: 2026-11-01T12:00:00Z
-closeout_note: P1 packaging scope absorbed into I-20261101T120027Z-A; issue→PR is a later slice.
+closeout_note: ''
 ---
+
+workflow_kind: feature
+
+# feat: @freely/dsh-freely DSH 打包形态
 
 workflow_kind: feature
 
