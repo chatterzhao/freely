@@ -40,14 +40,19 @@ milestone: M-20261101T031502Z-A
 - title: 实现 Worker 对已完成工单后续线程的 follow-up ownership 与 handback
 - status: needs_research
 - decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。新研究进一步确认 A2A task 行没有 message/owner 历史，且 new/fork 会丢 message。结论：需要 delegation/ownership 协议，不是给 task 行加字段。
-- next_action: 协议 v0 已落 `research/delivery/handoff.md`（envelope/ownership/handback/幂等/超时）；下一步做五类后续消息行为盘点 + 真实 PR/issue 评论回放；通过 acceptance review 才 promote。
+- next_action: 研究已收口（五类矩阵 + protocol v0 + 状态机/真实线程回放）；待独立 acceptance review；B2 修 new/fork 丢 message、落 handoff 表并做 runtime 回放。
 - revisit_trigger: 出现同一 PR/Issue 的后续评论被重复开单、被漏接，或 Manager 因中转 follow-up 出现上下文丢失/重复委派时，立即重启本 candidate；若连续两个里程碑未出现该类事件，可降级为观察项。
 - acceptance_criteria:
   - 五类后续消息各自有明确的 owner 判定规则，且能回答“这条消息现在归谁”
   - 越界消息只能 handback 一次，并携带理由与目标工单，不产生重复任务
   - 已停止/已关闭工单不会被后续消息自动复活，除非满足显式条件
   - 协议草案给出幂等键与超时释放规则，可用 pre-tests 验证
-- promotion_gate: 行为盘点完成 + 协议草案通过 Reviewer 审查 + 至少一个真实后续线程场景的端到端演练通过
+- promotion_gate: 五类行为矩阵 + protocol v0 + 状态机/真实线程回放 + 独立 acceptance review
+- b2_acceptance:
+  - `session/new|fork` 后显式发送 task message + 角色 prompt
+  - `delegation_tasks/handoffs/handoff_messages` 落库
+  - 真实 PR/issue 评论回放：同线程不重复开单，跨线程 handback 一次
+  - 人 stop/Worker 死亡/Reviewer 3 轮的 runtime 行为符合协议
 - depends_on: C-20261101T031502Z-F
 - open_questions:
   - follow-up ownership 应落在 A2A task 元数据还是独立的轻量账本
@@ -56,7 +61,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 新证据显示 Freely 的 A2A 是 task 行而非 message/artifact 历史，且首次 new/fork 交接会丢 message；缺口比原判断更深，尚未达到 promotion gate
+  - summary: 五类矩阵、protocol v0、状态机与真实 issue #4070 线程回放已完成；运行时 new/fork/表仍待 B2；研究 gate 待独立 review
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-B
 - promoted_issue_path: pending://needs-b2-materialization
@@ -69,7 +74,7 @@ milestone: M-20261101T031502Z-A
 - title: 实现 Manager 的类型化 report/attention、批量路由与 prompt 前缀契约
 - status: needs_research
 - decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约。结论：按 P1 实现，不再停留在度量。
-- next_action: 字段契约已在 `research/delivery/handoff.md` §6 起草；下一步补 prompt manifest（stable/semi/dynamic 段）与 cache/usage 基线，并做真实 patrol 前后对照；通过 acceptance review 后再实现。
+- next_action: 研究已收口（report/attention/批量决策 schema + manifest + 可观测性基线 + fixture）；待独立 acceptance review；真实 patrol 对照留 B2。
 - revisit_trigger: Manager 单轮上下文接近 rotation 阈值、同一轮处理超过 3 个工单导致漏派/错派、或 cache 命中率连续下降且 prompt_bytes 上升时，重启本 candidate；若度量显示路由开销占比很低，则降级为观察项。
 - acceptance_criteria:
   - 给出 Manager 每轮 patrol 的上下文成本基线（字符/token/文档数）与 cache hit/miss 基线
@@ -77,7 +82,12 @@ milestone: M-20261101T031502Z-A
   - 路由至少支持“批量决策 + 单条拒绝”，且拒绝原因可追溯
   - `report` 至少覆盖 progress/waiting/ready/blocked/failed/dropped 六态，`attention` 含问题、目标会话、所需动作
   - 交接 relay 有稳定幂等键；prompt 明确“稳定前缀 / 可变尾部”，并给出 cache 对照数据
-- promotion_gate: 基线度量完成 + 协议/字段设计通过 Reviewer 审查 + 一个真实 patrol 周期的前后对照
+- promotion_gate: report/attention/批量决策 schema + prompt manifest + 可观测性基线 + fixture 回放 + 独立 acceptance review
+- b2_acceptance:
+  - A2A 能存 report 六态/attention/批量决策
+  - prompt manifest 落日志，prefix hash 稳定
+  - 一个真实 patrol 周期的前后对照
+  - usage/cache 至少能区分 reported/estimated/absent
 - depends_on: C-20261101T031502Z-B
 - open_questions:
   - 上下文成本以字符、token 还是文档数为口径
@@ -86,7 +96,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: `research/delivery/runtime-contracts.md` 证明 Freely 已有 STABLE/SEMI/DYNAMIC 排序但无 manifest/校验，cache 仍多为估算；字段契约与基线未完成，不能 promote
+  - summary: report/attention/批量决策 schema、11 段 manifest、prefix/cache 三态回放、可观测性基线已完成；真实 patrol 对照留 B2；研究 gate 待独立 review
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-C
 - promoted_issue_path: pending://needs-b2-materialization
@@ -99,7 +109,7 @@ milestone: M-20261101T031502Z-A
 - title: 实现 HarnessPort 与角色级 harness 选择（Freely 主应用）
 - status: needs_research
 - decision_reason: 三角色已经能通过 `agent-table.toml` 的 `{role}_slot` 分 harness，但缺少统一 HarnessPort、角色级配置/探测、UI/CLI/TUI 入口；DSH 不再作为 harness adapter（另立 C-E）。
-- next_action: 先补 HarnessPort 接口草案 + RoleHarnessConfig 映射（`{role}_slot`、adapter 约束、model 缺口），再用 `harness-status` 做 per-role probe；通过 acceptance review 后再 promote。
+- next_action: 研究已收口（HarnessPort Protocol + RoleHarnessConfig + 三角色 probe + JSON 契约）；待独立 acceptance review；B2 实现 `--role`/apply/validate 与 UI/CLI 后端。
 - revisit_trigger: 新增 harness 需要改 runtime 多处、角色级选择出现静默降级，或 UI/CLI 开始各自写 `agent-table.toml` 时，立即重启本 candidate。
 - acceptance_criteria:
   - HarnessPort 覆盖 probe、session 生命周期、prompt/resume/interrupt、usage/cache、工具与 skills
@@ -107,7 +117,12 @@ milestone: M-20261101T031502Z-A
   - per-role probe 区分 native/degraded/unknown，缺失时 fail-closed
   - UI/CLI/TUI 共用同一 JSON 后端，不各自写文件
   - 明确 DSH 插件不在本 candidate；见 C-E
-- promotion_gate: 接口草案 + RoleHarnessConfig 设计 + 至少一个非默认 harness 的 probe 证据 + acceptance review
+- promotion_gate: HarnessPort Protocol + RoleHarnessConfig + 三角色 probe 输出（含 reviewer fork degraded）+ 独立 acceptance review
+- b2_acceptance:
+  - `harness-status --role` 与 requirements/satisfied/degraded 输出
+  - `harness apply/validate` 只写 `{role}_slot`，失败不落盘
+  - UI/CLI/TUI 共用 JSON 后端
+  - 运行中 session 不重启，返回 requires_restart
 - open_questions:
   - 是否引入 `{role}_adapter`，还是永远全 ACP
   - 角色级 model/effort 放 agent-table 还是 slot 配置
@@ -115,7 +130,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: `research/harness/harness-selection.md`/`research/harness/harness-strategy.md` 给出角色级选择与配置落点，但接口/探测/UI 后端尚未定稿，不能 promote
+  - summary: HarnessPort Protocol、RoleHarnessConfig、三角色 probe 输出（reviewer fork degraded）已落；实现 `--role`/apply/UI 留 B2；研究 gate 待独立 review
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-D
 - promoted_issue_path: pending://needs-b2-materialization
@@ -145,7 +160,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 插件架构与 DSH service 注入面已有代码级依据，但尚无 spike；不能 promote
+  - summary: 静态插件契约 spike 已过（typecheck + 最小插件编译）；真实 host/Python bridge/首次 session/gate E2E 未跑，不能 promote
   - verdict: needs_more_research
 - depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
 - promoted_issue_id: pending://C-20261101T031502Z-E
@@ -159,14 +174,19 @@ milestone: M-20261101T031502Z-A
 - title: 让 scan/事件流真正监控 issue 讨论、PR review 评论与 CI 结果
 - status: needs_research
 - decision_reason: 主意图明确要求 scan 持续监控 issue、issue 讨论、chat。当前 `task-lifecycle-scan.py` 只处理 open issue 与 body；`pull_raw_issue` 只写 body；`fetch_issue` 虽带 comments 但未被消费；PR review/CI 完全没有入口。这不是 ownership 问题，而是“事件根本没进来”。
-- next_action: 先做来源盘点（issue body/issue comment/PR review comment/PR review/CI/chat）与事件 schema（source/event_id/thread_key/actor/body）；用真实 issue 评论与 PR review 回放，确认 scan/Manager 能看到；再决定走 scan 还是 DSH 式 Source/Trigger。
+- next_action: 研究已收口（六类 schema + 真实 issue/PR/CI 回放）；待独立 acceptance review；B2 做 adapter/events 表/scan 读取。
 - revisit_trigger: 出现“人在 issue/PR 里回复了但 Freely 没反应”、同一讨论重复开单、或 CI 失败没有进入 Manager 时，立即重启本 candidate。
 - acceptance_criteria:
   - 六类来源都有明确入口、event_id、thread_key、actor 与去重规则
   - issue comment/PR review 评论能进入 Manager 的 scan/queue，不需要人再开 chat
   - CI 结果能作为事件进入，不依赖人转述
   - 同一事件重复拉取不产生重复任务
-- promotion_gate: 来源/事件 schema + 至少一个真实 issue 评论与一个 PR review 的回放 + acceptance review
+- promotion_gate: 六类来源 schema/准入/选型 + 真实 issue 评论/PR review/CI 回放 + 独立 acceptance review
+- b2_acceptance:
+  - platform-adapter 补 comment/review/CI 方法，events 表落库
+  - scan/Manager 能消费 issue comment/PR review/CI
+  - 同一 event_id 重复拉取不产生重复任务
+  - 真实 issue 评论 + PR review 的 runtime 回放
 - open_questions:
   - 入口放 scan 还是独立 Source/Trigger 层
   - 评论/评审是否要完整历史，还是只取增量
@@ -175,7 +195,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: code-path review
-  - summary: scan 无 comment 处理、pull 只写 body、PR review/CI 无入口；缺口成立，但没有回放证据
+  - summary: 六类 schema、准入、选型与真实 issue/PR/CI 回放已完成；adapter/events/scan 读取留 B2；研究 gate 待独立 review
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-F
 - promoted_issue_path: pending://needs-b2-materialization
