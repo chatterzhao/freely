@@ -3,7 +3,7 @@ b1_id: B1-20261101T031502Z
 phase_state: completed
 source_raw: raw-20261101T031502Z
 source_url: https://github.com/chatterzhao/freely/issues/4110
-produced_candidate: C-20261101T031502Z-A, C-20261101T031502Z-B
+produced_candidate: C-20261101T031502Z-A, C-20261101T031502Z-B, C-20261101T031502Z-C, C-20261101T031502Z-D
 created_at: 2026-11-01
 ---
 
@@ -42,12 +42,14 @@ created_at: 2026-11-01
 
 ## Problem
 
-要回答的不是“谁更强”，而是四个具体问题：
+要回答的不是“谁更强”，而是六个具体问题：
 
 1. Super-agent 的五个模块各自解决什么协作问题，原型真正落地了哪几个？
 2. Freely 现在用什么机制解决同一批问题，哪些是等价物、哪些是空缺？
 3. 两边在 **agent 协作** 上的结构性差异是什么，各自付出什么代价？
-4. 对 Freely 而言，哪些可以借用、哪些必须改造、哪些不应照搬？
+4. 在路由、交接、缓存命中这些具体实现上，谁做得更扎实，差在哪里？
+5. Harness 抽象与插件边界：Freely 应把 agent harness 当可切换基座，还是把自己做成 DSH 插件？两者能否并存？
+6. 对 Freely 而言，哪些可以借用、哪些必须改造、哪些不应照搬？
 
 非目标：不复现文章实验，不评价模型能力，不把“文章愿景”当成“原型现状”，也不把 Freely 的治理流程简单判为优于或劣于对方的运行时机制。
 
@@ -78,8 +80,12 @@ created_at: 2026-11-01
 | 通用多仓 | 未实现 | README 与 `006-deployment.md` 明确只服务一个 GitHub 仓库，且不支持 GitHub Enterprise Server |
 | 独立 Reviewer 角色 | 未实现 | 原型没有 reviewer 角色；自动审查机器人被当作“可错的外部输入”，由 Worker 自行评估，最多三轮 |
 | 文档/设计阶段（B1/B2 类） | 未实现 | Ticket 直接进入 Worker 调查与实现；没有独立的设计产物与设计评审环 |
+| 集成形态 | 深度绑定 DSH | 以 Cordis bundle 发布（`dsh.bundle.patch`），peer 依赖 `@deepseek-ai/dsh-*`，`engines.dsh` 钉版本；**没有 ACP 服务端** |
+| 会话与缓存 | 每 Ticket 独立 Session | `promptVersion` 绑定、Policy 置尾；原型没有 cache hit/miss 指标；Worker 不继承 Router 上下文 |
 
 结论：**文章是架构论文，原型是它的一个可运行子集。** 把五个模块都当成“DeepSeek 已经这么做”会误判；反过来，把原型没做当成“文章错了”也会误判。比较时必须区分“设计意图”与“落地证据”。
+
+还有一个容易漏掉的事实：**原型的工程形态是“DSH 宿主里的一个 bundle”，不是可被别家 runtime 直接调用的服务。** 这决定了后面“Freely 把 DSH 当基座”不能只靠配置，必须走 adapter；反过来“Freely 做成 DSH 插件”也不是免费换壳。
 
 ## 3. Freely 的对应结构
 
@@ -95,6 +101,8 @@ created_at: 2026-11-01
 | 监督 | supervisor heartbeat、`watchdog_sse.py`、continuation、Loop Guard L0–L3、restart storm 信号 | `three-loop` 运行时监督面 |
 | 多项目 | fleet 级 `live-status`/`fleet-status`，每项目独立 runtime | `PROJECT_INTENT.md`、runtime CLI |
 | 人机入口 | `freely chat`、intake、discuss、scan 的 `needs_human` | runtime 命令与 intake 表 |
+
+但“对应”不等于“同名”。例如 Super-agent 的 Router 只路由，Freely 的 Manager 还负责巡逻、派工、纠偏与收口；Super-agent 的 Ticket 是一个聚合对象，Freely 的“工单”由 issue 文档 + 工位 + A2A task 三者共同表达。为避免逐项漏看，全部概念（含 Disposition、Input、Strength、Assignment、Effects、Outbox、Health 等）的逐条映射见 [concept-map.md](concept-map.md)；该文另列了“同名不同义”“Freely 有而 Super-agent 没有”“Super-agent 有而 Freely 没有”三张表。
 
 ## 4. 逐维比较
 
@@ -264,7 +272,87 @@ Super-agent 的并发是“事件级并发”，Freely 的并发是“交付级�
 
 Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一个能力/流程/项目”。前者更轻，后者更重，但覆盖的组织面不同。
 
-## 5. 五处结构性差异及影响
+### 4.12 实现质量评估：路由、交接、缓存
+
+理念相同不代表实现同质。下面按“可观察的机制”逐项比较，评价只看实现是否把语义做扎实，不看宣传。
+
+| 子问题 | Super-agent 的实现 | Freely 的实现 | 评价 |
+| --- | --- | --- | --- |
+| 事件准入 | 代码 gate 先判发送者/来源/准入表/机器人，再交给模型 assessment；无关事件不进入模型 | scan + Manager 判断；没有 per-event 的确定性准入层 | DSH 更省、更可判定；Freely 更依赖 Manager 纪律 |
+| 路由批处理 | `orchestrator_route` 一次 1–20 条，逐条校验、逐条事务、单条失败不影响其他条 | Manager 逐条 `a2a-exit`；无批量决策工具 | DSH 的批处理是真实实现，不是提示词约定 |
+| 路由幂等 | accept 以 trigger ID 幂等；同一次调用内重复决策被识别；note ≤30 词、ack ≤100 词由 schema 限制 | 靠 `a2a_task list --raw-key` 查询防重复；无事件级幂等账本 | DSH 更硬；Freely 的幂等是“查一下”而非“记一笔” |
+| 交接状态 | `progress/waiting/ready/blocked/failed/dropped` 六态；`human_action` 单问题；report relay 用稳定 key 去重 | A2A `submitted/working/input-required/completed/failed/canceled`；summary/evidence 为自由文本 | Freely 的状态机适合阶段路由；DSH 的 report/attention 更适合人机交接 |
+| 人工问题 | 结构化 Attention，问题路由回提问所在会话，重复问题复用请求 ID | `input-required` + reason 枚举，主要面向 Reviewer/Manager 路由 | 两者目标不同：DSH 面向“人”，Freely 面向“角色” |
+| 越界消息 | Worker `handback` 一次，带理由；`followupOwners` 决定谁还拥有消息 | Worker 上报 `input-required`，Manager 判断重派/新开 | DSH 的消息级归属更细；Freely 是任务级归属 |
+| follow-up 归属 | 订阅 Thread 的消息直达 Ticket 的 Worker；人消息可复活已结束 Ticket；bot/CI 不复活 | 无平台线程订阅；后续消息回到 intake/scan 或由 Manager 主动 prompt | Freely 缺一个“这条消息归谁”的运行时事实 |
+| 缓存复用 | Router 与 Worker 各自 Session；Worker 冷启动，不继承 Router 上下文 | Worker/Reviewer fork Manager session，继承治理上下文，首轮约 80% 命中 | Freely 跨角色复用更强；DSH 隔离更干净 |
+| 缓存度量 | 原型无 cache hit/miss 日志或聚合 | `run-acp-prompt.py` 记录 `[CACHE] cache_hit/cache_miss` | Freely 可度量；DSH 只能看 provider |
+| Prompt 稳定性 | 固定段序，Policy 放最后；覆盖记录 base 版本；每次请求绑定 revision | 角色定义 + 运行时状态拼接；scan/fleet/checkpoint 追加；无显式前缀契约 | DSH 的 prefix 纪律更适合 prompt cache |
+| 故障恢复 | effect 队列 + 恢复提示 + 未读 Input 重投 | supervisor/watchdog + continuation + session resume | 两者都强，语义不同 |
+| 工具面约束 | Router/Worker preset 明确工具清单；Router 禁 sleep/长等待 | AI CLI 自带工具面；靠 skill/提示词约束 | DSH 的“工具面即契约”更硬 |
+
+实现质量结论：
+
+- **DSH 强在“把协作语义写进 schema 和状态机”**：gate、route batch、report/attention、handback、幂等 key 都有代码落点。它不靠提示词“希望模型这么做”。
+- **Freely 强在“把交付语义写进生命周期”**：阶段、门禁、独立 Reviewer、多项目 fleet 都有真实产物和检查点；cache 度量也比 DSH 原型完整。
+- **Freely 最弱的三处**：事件级准入/幂等、结构化交接载荷、prompt 前缀契约。这三处恰好是 DSH 实现最扎实的地方。
+- **DSH 最弱的三处**：单仓/单机、Worker 冷启动与无 cache 度量、Cordis 插件锁定。Freely 不能为了抄路由而把这些代价一起搬进来。
+
+### 4.13 Harness 抽象、ACP/A2A 与插件边界
+
+这是两边最容易被误读的一层。先把协议分开：
+
+| 协议/接口 | 连接谁 | 现状 |
+| --- | --- | --- |
+| ACP（Agent Client Protocol） | Freely runtime ↔ 外部 AI CLI（Claude/Codex/OpenCode/Cline） | Freely 已用；session/new、prompt、resume、fork、stopReason、usage |
+| A2A | Freely Manager ↔ Worker ↔ Reviewer | Freely 已用；Task 状态 + SSE |
+| MCP | Agent ↔ 工具/资源 | 两者都可接；不是编排协议 |
+| DSH Cordis plugin | DSH host ↔ 插件/bundle | DSH 原型的唯一扩展面；没有 ACP 入口 |
+| Freely CLI/skill | Freely runtime ↔ 角色/工位 | Freely 的流程契约面 |
+
+关键事实：**DSH 原型没有 ACP 服务端**，它的集成面是进程内 Cordis 插件（`dsh.bundle.patch` + `@deepseek-ai/*` peer 依赖）。因此“把 DSH 当 Freely 的一个可切换 harness”不能只加一个配置项，必须写一个 DSH adapter（Cordis/SDK 桥或子进程桥）；反过来，“把 Freely 做成 DSH 插件”也不是换一个 adapter，而是把 Freely 的状态机搬进 DSH。
+
+Harness 能力矩阵（Freely 选基座时必须逐项探测，不能假设）：
+
+| 能力 | ACP CLI | DSH host | Freely 是否需要 |
+| --- | --- | --- | --- |
+| session new / resume | 有，工具差异大 | 有（SDK） | 必需 |
+| session fork | Claude/OpenCode 有；Codex/Cline 降级为 new | 有（SDK 层） | 可选，缺失时降级 |
+| prompt / stream / stopReason | 有 | 有 | 必需 |
+| interrupt / stop | 有 | 有 | 必需 |
+| 工具白名单 / 权限模式 | 各 CLI 不同 | preset 明确 | 必需 |
+| skills / prompt 注入 | 各 CLI 不同 | 插件 + prompt | 必需 |
+| usage / cache 指标 | 部分有 | 原型未暴露 | 必需，缺失时估算并标注 |
+| subagent | 部分有 | 有 | 可选 |
+| MCP | 部分有 | 有 | 可选 |
+| 持久化会话 | CLI JSONL | DSH session | 必需 |
+
+三种集成模式，优先级从高到低：
+
+1. **Freely core + HarnessPort + ACP adapter（现状的正式化）**：Freely 拥有 three-loop、A2A、scan、门禁；harness 只负责“跑一个 session”。这是当前事实，只缺显式接口和能力探测。
+2. **Freely core + DSH adapter**：把 DSH 作为可切换基座之一，通过 Cordis/SDK 或子进程桥接 session/prompt/usage；Freely 仍然拥有路由与状态。适合“想要 DSH 的 session/tool 生态，但不想把治理交给 DSH”的场景。
+3. **DSH host + Freely governance plugin**：只有当 DSH 已经拥有 loop 时，才把 Freely 的“门禁/工位/issue”做成 DSH 工具插件；不能让插件再起一套 Router/Ticket。适合“团队已经在 DSH 里工作，只想借用 Freely 的治理检查”。
+
+可外溢为 DSH 插件的 Freely 能力（按价值排序）：
+
+- `freely-gates`：`pr-create-guarded` / `pr-review-guarded` / `pr-merge-guarded --dry-run` 的工具化，让 DSH Worker 在提交前跑门禁。
+- `freely-worktree`：`wt-create` / `wt-close` 的工具化，让 DSH Ticket 有独立工位与清理语义。
+- `freely-issue`：raw issue / milestone / scan 的 Source 插件，把 Freely 的生命周期暴露成 DSH 的 Trigger。
+- `freely-review`：Reviewer 的审查工具化；但只在 DSH 愿意把 verdict 当权威时才有意义。
+
+不应外溢的：three-loop 调度、A2A 角色状态机、Manager 的 scan 路由。它们和 DSH 的 Engine/Ticket 是同一层，放进去就是双 Router。
+
+对 Freely 的产品含义：
+
+- Freely 应该把 `AGENT_AI_TOOL`/ACP 适配器正式收敛成 **HarnessPort**：能力探测、session 生命周期、prompt/stream、usage/cache、工具策略、失败降级。
+- 配置面应支持 **按角色选 harness**（Manager/Worker/Reviewer 可不同），类似截图里的 Runtime 选择器；每个 harness 有 capability probe 与 fallback，而不是全局单值。
+- DSH 是“一个可选基座 + 一个可选插件宿主”，不是 Freely 的替代品。优先级是“Freely 应用内可切换”，不是“把 Freely 搬进 DSH”。
+
+![Freely HarnessPort 与 DSH 插件边界](freely-harness-port-boundary.svg)
+
+[打开交互式版本](freely-harness-port-boundary.html)（archify）。图中三层优先级：先做 Freely 内的 HarnessPort；再把 DSH 作为 adapter；最后才考虑把 gates/worktree/issue 外溢成 DSH 工具插件。
+
+## 5. 七处结构性差异及影响
 
 ### D1 授权在运行时数据里 vs 在流程门禁里
 
@@ -296,23 +384,40 @@ Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一�
 - 影响：Super-agent 可以把“一个团队一个仓库”的边界写死，从而把授权与上下文做深；Freely 必须处理租户、项目、工位、平台身份的多层隔离，协调成本更高。
 - 对 Freely 的含义：不能直接移植“单 Router + 单库”的简化假设；任何借鉴都要先回答多项目下的身份与状态归属。
 
+### D6 基座绑定 vs harness-agnostic
+
+- 事实：DSH 原型的全部能力长在 Cordis/DSH API 上；Freely 通过 ACP 适配多 CLI，但适配器契约是隐式的。DSH 没有 ACP 服务端，Freely 没有 DSH adapter。
+- 影响：DSH 在自家宿主里可以做深（Session、工具 preset、面板、插件），但换宿主就要重写；Freely 天然可换 CLI，但每个 CLI 的能力差异靠代码分支兜底，缺少统一能力探测。
+- 对 Freely 的含义：把 harness 抽象成显式端口，优先级高于做 DSH 插件。否则“可切换基座”只是口头承诺；插件化会先遇到两边状态机争夺所有权的问题。
+
+### D7 缓存纪律：prefix 稳定 vs fork 复用
+
+- 事实：DSH 的 prompt 段序固定、Policy 最后、覆盖带 base 版本，天然保护 prefix cache；但 Router/Worker 各自冷启动，原型没有 cache 指标。Freely 的 session resume/fork 复用强、有 `[CACHE]` 度量，但 prompt 由角色定义 + 运行时状态拼接，没有显式前缀契约，fork 还会把无关上下文带进 Worker。
+- 影响：DSH 的缓存收益是“稳定但不可见”；Freely 的缓存收益是“可见但不可控”。两者都可能出现“命中率很高但上下文不对”的情况，只是原因不同。
+- 对 Freely 的含义：短期先度量（按角色、launch_kind、prompt_bytes 分组），中期把 prompt 分成“稳定前缀 / 可变尾部”，长期把 fork 从“复制 Manager 全部上下文”改为“带治理摘要的最小继承”。
+
 ## 6. 双方代价与未解问题
 
 ### Super-agent 的代价
 
 - **信任边界在 OS 层**：Executor 以 operator 账号免审批跑命令，文档明说“这些 wrapper 和目录只是默认值，不是安全边界”；`007` 的 open questions 也承认 Trigger 字段可信度与部署隔离未定。
-- **单 Router 仍是单点**：文章承认规模扩大后如何切分、Worker 何时直接通信、跨月长程记忆都未定。
+- **单 Router 仍是单点**：文章承认规模扩大后如何切分、Worker 何时直接通信、跨月长程记忆都未定；批处理只是把积压摊薄，不改变单 Session 的上限。
+- **Worker 冷启动、缓存不可见**：Router 与 Worker 各自 Session，Worker 不继承 Router 上下文；原型没有 cache hit/miss 指标，无法判断“省了没有”。
+- **插件面锁定**：能力长在 Cordis/DSH API 上，`engines.dsh` 钉版本；换宿主不是配置问题，是重写问题。
 - **单仓限制**：README 与部署文档把范围钉死在一个仓库，扩到多仓要先回答组织授权问题。
 - **漏判不可见**：默认 `observe` + “不确定就安静忽略”，被漏掉的请求只留一条 Decision，缺少抽样复核流程。
 - **原型缺口**：watchdog、投机执行、存算分离、异步 ReAct 主路径都未落地；文章数字来自合成负载，不能当生产结论。
 
 ### Freely 的代价
 
-- **Manager 是注意力与上下文瓶颈**：scan、A2A 状态、文档、人工插话都匯聚到 Manager；它既要路由又要判断，容易上下文膨胀。
+- **Manager 是注意力与上下文瓶颈**：scan、A2A 状态、文档、人工插话都汇聚到 Manager；它既要路由又要判断，容易上下文膨胀。
 - **文档状态会漂移**：`phase_state`、milestone、scan、平台 issue 多源并存，需要持续对账。
 - **后续线程连续性弱**：PR/Issue 上的后续讨论没有明确 owner，容易重新开单或漏接。
 - **授权依据分散**：谁在什么规则下批准了这次改动，散落在 issue、review、PR、聊天里，缺少结构化凭证。
 - **A2A 是任务状态协议，不是事件总线**：它擅长“任务到哪一步”，不擅长“同一线程又来了什么”。
+- **HarnessPort 是隐式的**：ACP 适配器能跑，但能力差异靠分支兜底，没有统一 probe/fallback；DSH 没有 adapter。
+- **缓存“可见但不可控”**：有 `[CACHE]` 日志，但 prompt 没有稳定前缀契约，fork 继承的是 Manager 全量上下文，命中率高不等于上下文对。
+- **双编排风险**：若把 Freely 做成 DSH 插件又保留 three-loop，会出现两套 Router/Ticket 争夺同一工单；必须先定“一个 loop 一个 owner”。
 
 ### 共同未解问题
 
@@ -321,38 +426,49 @@ Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一�
 - 长程记忆：Super-agent 靠 ID 链式召回，Freely 靠文档；都缺少可验证的“跨月记忆正确性”。
 - 跨实例协作：Super-agent 文章提出 A2A 但原型未实现；Freely 的 A2A 目前以同项目为主。
 - 注意力度量：两边都谈“减少人的注意力”，但都没有可复现的注意力成本指标。
+- Harness 能力标准化：ACP 只覆盖 session/prompt，不覆盖工具策略、skills、usage 语义；DSH 的插件协议是私有的。谁先定义稳定的 harness capability contract，谁就更容易做“可切换基座”。
 
 ## 7. 可借鉴 / 可适配 / 不照搬
 
-| 判断 | 机制 | 理由 |
+| 判断 | 机制 | 实现层面的理由 |
 | --- | --- | --- |
-| 可借鉴 | 结构化 Attention：一个问题、一个目标会话、明确“人能做什么” | Freely 的 `input-required` 目前偏“阶段/角色路由”，对人的可执行性不如前者 |
-| 可借鉴 | 越界消息 handback：带理由交回，且只交回一次 | 能补 Freely 后续线程归属不清的问题，避免 Manager 反复中转 |
-| 可借鉴 | 路由层纪律：Router 不读实现细节、不下实现指令 | Freely Manager 已经有类似职责边界，但缺少可检查的“不读代码”约束 |
-| 可借鉴 | accept 幂等键 + disposition 记录 | Freely 的重复委派靠查询，缺少事件级幂等账本 |
+| 可借鉴 | 结构化 Attention：一个问题、目标会话、可执行动作 | DSH 用 `human_action` + 稳定 request id 把“人要不要动作”做成字段；Freely 的 `input-required` 主要面向角色路由 |
+| 可借鉴 | 越界消息 handback：带理由、只交回一次 | 补 Freely 后续线程归属不清；DSH 用 `followupOwners` + `handback` 做成运行时事实 |
+| 可借鉴 | 路由批处理 + 逐条拒绝 | `orchestrator_route` 1–20 条、单条失败不影响其他；Freely 目前逐条 `a2a-exit`，没有批量语义 |
+| 可借鉴 | 事件级幂等键 | accept 以 trigger ID 幂等，report/attention relay 用稳定 key；Freely 靠查询防重复，重试可能重复 |
+| 可借鉴 | Prompt 段序与 Policy 置尾 | DSH 的 prompt 顺序保护 prefix cache；Freely 的 scan/fleet/checkpoint 追加在尾部，但无显式契约 |
+| 可借鉴 | 工具面即契约 | Router/Worker preset 明确工具清单；Freely 靠提示词约束，硬约束弱 |
 | 可适配 | 订阅直通 | 不做事件总线，先做“同一工单线程的 follow-up ownership”，范围可控 |
 | 可适配 | Policy 版本 | 不作为运行时 Mandate，可作为 issue/PR 元数据记录“依据哪版规则批准” |
 | 可适配 | 批处理 | Manager patrol 已有批处理语义，可显式化并度量，而不是照搬 Router Session |
+| 可适配 | Harness 选择器 | 借鉴 DSH Runtime picker 的 UX，按角色选 harness，但必须配 capability probe 与 fallback |
+| 可适配 | DSH adapter | 通过 Cordis/SDK 或子进程桥接，把 DSH 作为 `HarnessPort` 的一个实现；不让 DSH 接管 three-loop |
+| 可适配 | Freely governance 作为 DSH 工具插件 | 只外溢 `freely-gates` / `freely-worktree` / `freely-issue` 这类工具；不外溢 Router/Ticket |
 | 不照搬 | 默认 observe / 默认不做 | 与 Freely “自主项目所有者”的产品目标冲突 |
 | 不照搬 | 单仓/单机假设 | 与 Freely 多项目 fleet 冲突 |
 | 不照搬 | 移除独立 Reviewer | 会削弱 Freely 的质量分离与可追责性 |
 | 不照搬 | 11 个领域概念全量迁移 | 成本高、与 Freely 文档驱动生命周期不匹配 |
 | 不照搬 | 事件溯源式重写 | Freely 的治理证据在文档与平台，不在单一事件库 |
+| 不照搬 | 双 Router / 双 Ticket | 插件化时最容易犯的错：两套状态机争夺同一工单，必须一个 loop 一个 owner |
 
 ## 8. Decision
 
-- **不整体迁移 Super-agent 架构。** 两者产品目标不同：Super-agent 优化“团队被打扰的次数”，Freely 优化“项目从问题到合并的自治闭环”。把 Freely 改成 observe-first 会直接违背 `PROJECT_INTENT.md`。
-- **保留 Freely 的三个差异优势**：文档驱动的 B1/B2 治理、独立 Reviewer、多项目 fleet。这三项恰是 Super-agent 原型没有或不做的。
-- **优先吸收两个协作 primitive**：
-  1. 后续线程的 follow-up ownership 与 handback 协议；
-  2. 结构化 Attention（单问题 + 目标会话 + 可执行动作）。
-- **把“路由层注意力预算”作为研究项**：Manager 不读实现细节、批处理 scan、显式度量上下文成本；先度量再改。
-- **明确不做**：per-ticket Mandate 运行时、默认 observe、单仓绑定、移除 Reviewer、事件溯源重写。
+- **不整体迁移 Super-agent 架构，也不把 Freely 搬进 DSH。** 两者目标不同：Super-agent 优化“团队被打扰的次数”，Freely 优化“项目从问题到合并的自治闭环”。
+- **保留 Freely 的三个差异优势**：文档驱动的 B1/B2 治理、独立 Reviewer、多项目 fleet。
+- **优先做 HarnessPort 抽象**：先把 ACP 适配器正式化为可探测、可降级、可按角色选择的基座端口，再谈 DSH adapter；DSH 插件只做工具级外溢。
+- **吸收三个协作 primitive**：
+  1. 后续线程的 follow-up ownership 与 handback；
+  2. 结构化 Attention + 类型化 report/relay 幂等键；
+  3. 路由批处理与逐条拒绝。
+- **把“路由层注意力预算 + prompt/cache 契约”作为研究项**：先度量，再改 prompt 段序与 fork 策略。
+- **明确不做**：per-ticket Mandate 运行时、默认 observe、单仓绑定、移除 Reviewer、事件溯源重写、双 Router 插件。
 
 ## 9. Candidate
 
-- `C-20261101T031502Z-A`：定义 Worker 对已完成工单后续线程的 follow-up ownership 与 handback 协议（needs_research）。
-- `C-20261101T031502Z-B`：Manager 路由层注意力预算与结构化下派（needs_research）。
+- `C-20261101T031502Z-A`：交付本次对比研究、概念全量对照与方向立项（promoted → `I-20261101T031502Z-A`）。
+- `C-20261101T031502Z-B`：定义 Worker 对已完成工单后续线程的 follow-up ownership 与 handback 协议（needs_research）。
+- `C-20261101T031502Z-C`：度量并约束 Manager 路由/交接成本，建立类型化 report/attention 与 prompt/cache 契约（needs_research）。
+- `C-20261101T031502Z-D`：把 agent harness 抽象为可切换基座（HarnessPort），并划清 DSH adapter / DSH 插件边界（needs_research）。
 - milestone：`M-20261101T031502Z-A`。
 
 ## Appendix: 证据索引
@@ -375,3 +491,13 @@ Super-agent 的扩展是“加一个事件源”；Freely 的扩展是“加一�
 | Freely 三 loop 与 gate | `docs/system/workspace/three-loop-capability-lifecycle.md` |
 | Freely scan 阶段 | `docs/system/workspace/scan-lifecycle-design.md` |
 | Freely 运行时监督面 | `docs/system/workspace/three-loop-capability-lifecycle.md` §Runtime 监督面机制真源 |
+| 概念全量映射与同名不同义 | 本文目录 `concept-map.md` |
+| 路由批处理、逐条拒绝、accept 幂等 | 原型 `src/app/tools/main.ts` |
+| 六态 report、attention、relay 幂等 key | 原型 `src/app/notices.ts`、`src/executor/dsh.ts` |
+| worker slot 与人优先槽位 | 原型 `src/executor/dsh.ts` |
+| prompt 段序、Policy 置尾、revision | 原型 `src/app/prompts.ts`、`docs/004-prompts.md` |
+| 插件/宿主绑定 | 原型 `package.json`、`cordis.patch.yml` |
+| Freely ACP 会话/usage/cache | `docs/system/workspace/scripts/runtime/run-acp-prompt.py` |
+| Freely harness 选择面 | `AGENT_AI_TOOL` 配置、`docs/system/workspace/session-lifecycle-protocol.md` |
+| 协作拓扑对比图 | `super-agent-vs-freely-collaboration.html` / `.svg` |
+| HarnessPort 与插件边界图 | `freely-harness-port-boundary.html` / `.svg` |

@@ -5,8 +5,16 @@
 ### candidate_issues
 1. `C-20261101T031502Z-A`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-A
+- promoted_issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
 2. `C-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- status: needs_research
+3. `C-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- status: needs_research
+4. `C-20261101T031502Z-D`
 - milestone: M-20261101T031502Z-A
 - status: needs_research
 ### committed_issues

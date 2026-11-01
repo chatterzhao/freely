@@ -1,4 +1,4 @@
-# Tasks: Super-agent 架构对比研究与方向立项
+# Tasks: Super-agent 架构对比、实现质量评估与方向立项
 
 - issue_id: I-20261101T031502Z-A
 - owner: I-20261101T031502Z-A
@@ -8,12 +8,15 @@
 | T1 | 读取文章要点与原型 9 篇设计文档、prompts、核心 src | 事实清单与证据分级 | done |
 | T2 | 读取 Freely 三角色、A2A、three-loop、scan、session 协议 | Freely 现状清单 | done |
 | T3 | 逐维比较并识别结构性差异 | `brainstorms.md` §4–§5 | done |
-| T4 | 给出可借鉴/可适配/不照搬判断 | `brainstorms.md` §7–§8 | done |
-| T5 | 登记两个 needs_research candidate 并绑定 milestone | `candidates.md`、`milestones.md` | done |
-| T6 | 用 archify 生成协作拓扑对比图 | `.html` + `.svg` | done |
-| T7 | 写 PRD / pre-tests / IDN 并跑门禁 | 本目录产物 + 证据日志 | done |
+| T4 | 评估路由、交接、缓存的实现质量 | `brainstorms.md` §4.12 | done |
+| T5 | 建立 Super-agent → Freely 全量概念映射 | `concept-map.md` | done |
+| T6 | 评估 harness 抽象、ACP/A2A/插件边界 | `brainstorms.md` §4.13 | done |
+| T7 | 登记三个 needs_research candidate 并绑定 milestone | `candidates.md`、`milestones.md` | done |
+| T8 | 用 archify 生成协作拓扑图与 HarnessPort 边界图 | 两张 `.html` + `.svg` | done |
+| T9 | 写 PRD / pre-tests / IDN 并跑门禁 | 本目录产物 + 证据日志 | done |
 
 ## 后续（不在本 issue 内）
 
-- C-A follow-up ownership：先做五类后续消息的行为盘点，再决定是否进入 B2。
-- C-B Manager 注意力预算：先度量 patrol 上下文成本，再决定是否改 prompt/skill。
+- C-B follow-up ownership：先做五类后续消息的行为盘点，再决定是否进入 B2。
+- C-C 路由/交接/cache：先做 patrol 成本与 cache 基线，再决定改 prompt/skill 还是 runtime。
+- C-D HarnessPort：先做 ACP 能力矩阵与 DSH adapter spike，再决定接口与插件边界。
