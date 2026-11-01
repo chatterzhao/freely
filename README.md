@@ -41,7 +41,7 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 | PR 评审 | Reviewer（`pr-review-guarded`） | PR diff、pre-tests、证据 | 四问 verdict | 3 轮不过 escalate |
 | 收口 | Manager + gates | PR、test-gate、review verdict | merge、phase 更新、closeout | pr-merge-guarded / wt-close |
 
-这张表的顺序就是 README 主图的顺序；`Manager` 只拥有“下一步”，`Worker` 拥有“怎么实现”，`Reviewer` 拥有“是否达标”。Reviewer 不是只在最后出现：B1/B2/RED/dev/test 每个阶段都可 `needs-review`，PR 前还有 `pr-review-guarded` 的四问 review。
+这张表的顺序就是 README 主图的顺序；`Manager` 只拥有“下一步”，`Worker` 拥有“怎么实现”，`Reviewer` 拥有“是否达标”。Reviewer 不是只在最后出现：B1/B2/RED/dev/test 每个阶段都可 `needs-review`，PR 前还有 `pr-review-guarded` 的四问 review。阶段评审是反馈环，PR review 才是硬合并门禁。
 
 ### 两条硬约束：SDD 与 TDD
 
