@@ -31,9 +31,10 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 
 ### 两条硬约束：SDD 与 TDD
 
-**SDD：文档是状态，也是规格。**
+**SDD：文档是规格与生命周期的真相。**
 
 - 平台只是对外界面；AI 永远不直接读平台，`scan` 把 issue/comment 下载到本地 `docs/B1-docs/`，`issue-sync` 是本地→平台的唯一出口。
+- “谁在做”看 A2A，“代码/工位在不在”看 git，“测试有没有在 HEAD 跑”看 test-gate；文档负责规格与生命周期。
 - B1 先把问题收敛为 candidate；B2 再物化为 I-* + PRD + pre-tests + tasks。没有规格与验收，不进入实现。
 - Manager 读 scan 得到 `stage/next_action`；Worker 读 issue/PRD/pre-tests 得到任务与验收；Reviewer 读产物做独立判断。
 
@@ -180,7 +181,7 @@ freely feedback \
 
 ## 设计原则
 
-1. **文档是真相**：平台只是界面；本地 docs 定义规格、状态与验收，scan/sync 是边界桥。
+1. **文档是规格与生命周期的真相**：平台只是界面；执行中的“谁在做”以 A2A 为准，环境以 git/worktree 为准，scan 只做对账与派生。
 2. **TDD 是验收**：先 RED 再实现，GREEN 在 test 工位跑；测试证据不是可选项。
 3. **一个项目一个 supervisor**：Manager 常驻，Worker/Reviewer 按需派生；不靠人肉轮询。
 4. **状态有唯一真源**：issue、milestone、`phase_state`、A2A task、测试证据各司其职。

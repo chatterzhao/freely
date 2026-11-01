@@ -359,6 +359,27 @@ DSH：
 
 这不是一个字段 bug，而是“文档作为状态机”缺少 schema/单写者契约的证据。Super-agent 的 Ticket 状态由 Engine 唯一写；Freely 的 phase 由多个脚本各写一段。前者状态更可靠但绑定运行时；后者可审计但容易漂移。Freely 要补的不是更多文档，而是**状态 schema + 单写者/派生规则**。
 
+### 7.10 状态权威不是“一份真相”，而是“分域真相”
+
+“docs 是唯一真相”这个说法不够准确。读 `task-lifecycle-scan.py` 的设计原则和实现后，Freely 实际是**分域真相 + scan 对账**：
+
+| 问题 | 权威源 | 谁写 | 说明 |
+| --- | --- | --- | --- |
+| 做什么、为什么、怎么验、边界 | docs（Intent/Constitution/LAWS、B1/B2、PRD/pre-tests） | B1/B2、人、Worker | 规格与生命周期的真相 |
+| 现在有没有 agent 在做 | A2A `sessions`/`a2a_tasks` | runtime/A2A server | scan 明确写“A2A is the arbiter of in progress”；活跃会话不被扫描 |
+| 生命周期到哪一步 | issue `phase_state` + milestone | wt-create、pr-review、pr-merge | 多写者，容易漂移 |
+| 代码/工位是否存在 | git worktree/branch | git、wt-create/wt-close | 环境真相 |
+| 测试是否在 HEAD 跑过 | `.freely/run/test-gate.env` + evidence | daemon stop、test-lane | 证据真相 |
+| 对外平台状态 | GitHub/Gitee | issue-sync/platform-adapter | 对外副本；AI 只读本地复制 |
+| 下一步是什么 | scan 的 stage/next_action | scan 派生 | 派生视图，不是权威源 |
+
+这与 Super-agent 的“单写者 DB”是根本差异：
+
+- DSH：Engine 是 Trigger/Ticket/Decision 的唯一写者，状态在一个地方，查询精确；代价是绑定运行时。
+- Freely：不同问题有不同权威源，文档可审计、A2A 实时、git 可验证；代价是**必须持续对账**，否则 phase/scan/milestone 会互相矛盾。
+
+所以 Freely 的问题不是“文档不够多”，而是**缺少一张权威矩阵 + 派生规则**：哪个字段由谁写、哪些是派生、冲突时谁赢。这比再加一个 gate 更根本。
+
 ## 8. Freely 明确不如 Super-agent 的地方
 
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。
