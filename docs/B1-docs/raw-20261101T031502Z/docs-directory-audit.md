@@ -11,6 +11,7 @@ created_at: 2026-11-01
 - **`docs/pre-brainstorms/` 是废弃遗留目录**，本轮已删除；研究文档已迁到 `docs/B1-docs/raw-20261101T031502Z/`。
 - 原 `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/` 的 `brainstorms.md`/`candidates.md` 已迁到它对应的 `docs/B1-docs/raw-20260720T055358Z/`。
 - 顶层 docs 目录现在只剩：`assets/`、`B1-docs/`、`B2-docs/`、`system/`，以及 `CONSTITUTION.md`、`LAWS.md`、`PROJECT_INTENT.md`、`milestones.md`、`epics-map.svg`。
+- 仓库根目录 `code-reviews/` 也是遗留目录；本轮已移除。
 - 仍存在两类“看起来像遗留”的目录，但性质不同：一类是显式归档（`_legacy`），一类是历史路径仍被引用，不能直接搬。
 
 ## 1. 本轮修复
@@ -21,6 +22,7 @@ created_at: 2026-11-01
 | `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/brainstorms.md` | `docs/B1-docs/raw-20260720T055358Z/brainstorms.md` | 历史 B1 文档归位 |
 | `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/candidates.md` | `docs/B1-docs/raw-20260720T055358Z/candidates.md` | 历史 B1 文档归位 |
 | `docs/pre-brainstorms/` | 删除 | 已空，废弃目录移除 |
+| `code-reviews/pr-review-raw-20260701T030358Z.md` | `docs/B1-docs/raw-20260701T030358Z/code-reviews/pr-review-raw-20260701T030358Z.md` | B1-only issue（无 B2 I-*）的 PR 评审归 B1 raw 的 `code-reviews/`；根目录 `code-reviews/` 删除 |
 
 ## 2. 仍需保留/单独处理的历史目录
 
@@ -36,12 +38,15 @@ created_at: 2026-11-01
 
 1. B1 预研、candidate、对比研究：`docs/B1-docs/raw-{key}/`。
 2. 支持性研究放同目录，命名避免 `README.md`/`b1-review.md` 这类会被误认为 B1 标准产物的名字；索引用 `research-index.md`，评审用 `pre-brainstorm-review.md`。
-3. B2 只用 `docs/B2-docs/{epic}/{story}/raw-{key}/`。
-4. 不再新建 `docs/pre-brainstorms/`、`docs/epics/`、`docs/progress/`、`docs/recovery/`。
-5. 历史归档只读；路径迁移必须单独 issue + 引用重写，不做“顺手搬”。
+3. B2 只用 `docs/B2-docs/{epic}/{story}/raw-{key}/`；评审放该 raw 的 `code-reviews/`。
+4. B1-only（没有 B2 I-*）的 PR 评审放 `docs/B1-docs/raw-{key}/code-reviews/`；不要放仓库根 `code-reviews/`。
+5. 不再新建 `docs/pre-brainstorms/`、`docs/epics/`、`docs/progress/`、`docs/recovery/`。
+6. 历史归档只读；路径迁移必须单独 issue + 引用重写，不做“顺手搬”。
 
 ## 4. 验证
 
 - `find docs -mindepth 1 -maxdepth 1 -type d` 只剩 `assets`、`B1-docs`、`B2-docs`、`system`。
 - `docs/pre-brainstorms/` 不存在。
 - 根 README 链接全部指向新路径。
+- 仓库根 `code-reviews/` 不存在；20260701T030358Z 的 review 在 B1 raw 的 `code-reviews/`。
+- 依据：merge commit `5b65f7bbe` 只改了 B1 `docs/issues/raw-20260701T030358Z/issue.md` 与根 review；没有 B2 I-*，所以不能凭空造 B2 story。
