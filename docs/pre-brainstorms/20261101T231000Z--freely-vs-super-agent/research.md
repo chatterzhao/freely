@@ -436,7 +436,7 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | 返工率 | 人 review 后要求修改的比例 | 高=agent 自检不足 |
 | 漏报率 | 人不得不主动补 issue/评论的比例 | 高=agent 发现不足 |
 
-结论：**目前无法用数据证明“Freely 更省注意力”或“Super-agent 更省注意力”。** 只能说 Super-agent 在设计上更克制（默认沉默、消息长度限制），Freely 在入口上更宽（主动汇报、chat/issue/PR 多渠道）。下一轮如果要比较，应先定义并采样这组指标，而不是继续争论“自治程度”。
+结论：**目前无法用数据证明“Freely 更省注意力”或“Super-agent 更省注意力”。** 具体采样与基线见 `attention-metrics.md`。 只能说 Super-agent 在设计上更克制（默认沉默、消息长度限制），Freely 在入口上更宽（主动汇报、chat/issue/PR 多渠道）。下一轮如果要比较，应先定义并采样这组指标，而不是继续争论“自治程度”。
 
 ## 8. Freely 明确不如 Super-agent 的地方
 
@@ -511,3 +511,4 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | 事件准入的放置与数据前提 | 同目录 `event-admission.md` |
 | 状态权威/单写者/派生规则 | 同目录 `state-authority.md` |
 | TDD 的强制边界与分级 | 同目录 `tdd-policy.md` |
+| 注意力度量的采样与基线 | 同目录 `attention-metrics.md` |
