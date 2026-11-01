@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261101T031502Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261101T031502Z-A
 platform_ids:
   github:
     issue_id: '4110'
