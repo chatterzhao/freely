@@ -64,6 +64,23 @@ created_at: 2026-11-01
 - `platforms` 与 `interfaces` 分开：平台是外部工作界面，interfaces 是 Freely 的入口抽象。
 - 不把 A2A 画成中心：A2A 是协调协议，不是真相源；真相在 docs。
 
+## 4.1 最终取舍：主图用交付闭环，五平面做分层辅图
+
+只画五平面仍然回答不了“B1/B2 产出什么、谁读、怎么循环”。所以 README 主图改为**交付闭环**：
+
+```
+人 → issue/chat → B1-IBM → B2-IBM → SDD/TDD 文档
+   → Manager 派工 → Worker 按文档实现 → Reviewer 独立验收
+   → PR/merge/closeout → 回到 auto-loop
+```
+
+五平面图保留为“系统分层”辅图：
+
+- 主图回答“交付怎么走、角色在哪”。
+- 辅图回答“系统由哪些面组成、runtime/tools/harness 在哪”。
+
+这样既不把 B1/B2 误画成 runtime 组件，也不让五平面图替代交付语义。
+
 ## 5. 仍需在后续轮次确认的问题
 
 1. **已确认**：GUI 目前是 Tauri probe（`src-tauri/` 只暴露 probe bridge），README 已改为“CLI 主入口 / TUI / GUI（Tauri probe）”。

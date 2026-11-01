@@ -1,4 +1,4 @@
-<svg viewBox="0 0 1210 888" role="img" lang="zh-CN" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+<svg viewBox="0 0 1180 868" role="img" lang="zh-CN" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
 <defs><style><![CDATA[
     
     :root,
@@ -4715,7 +4715,7 @@
       svg [data-node-id], svg [data-edge-from], svg [data-detail], svg [data-detail-anchor], svg [data-legend-hit], svg { transition: none !important; }
     }
   ]]></style></defs>
-<rect width="1210" height="888" fill="#020617"/>
+<rect width="1180" height="868" fill="#020617"/>
 
         <title id="archify-diagram-title">Freely 交付主脊：B1/B2 生成 SDD/TDD 文档，三角色按文档闭环</title>
         <desc id="archify-diagram-description">由 Archify 生成的架构图。</desc>
@@ -4743,8 +4743,6 @@
 
         <!-- Boundaries (behind everything) -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="规格生成（SDD / TDD）" x="180" y="180" width="690" height="214" rx="12" class="c-region" stroke-width="1"/>
-
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="交付执行与收口" x="70" y="390" width="1100" height="430" rx="12" class="c-region" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
         <path data-edge-from="human" data-edge-to="interfaces" data-edge-label="issue / chat" data-edge-key="0" data-edge-id="human-if" data-composition-points="605,82;605,96;560,96;560,110" d="M 605 82 L 605 89 Q 605 96 598 96 L 567 96 Q 560 96 560 103 L 560 110" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
@@ -4825,8 +4823,8 @@
         <text data-detail="context" x="610" y="356" class="t-muted" font-size="9" text-anchor="middle">SDD: PRD/spec · TDD: pre-tests/tasks</text>
         </g>
 
-        <g id="node-scan" data-node-id="scan" data-node-label="scan" tabindex="0" role="button" aria-label="聚焦scan，issue/chat/PR/CI → stage, 交付执行与收口" aria-pressed="false" data-node-kind="backend" data-node-sublabel="issue/chat/PR/CI → stage" data-node-context="交付执行与收口">
-          <title>scan · issue/chat/PR/CI → stage · 交付执行与收口</title>
+        <g id="node-scan" data-node-id="scan" data-node-label="scan" tabindex="0" role="button" aria-label="聚焦scan，issue/chat/PR/CI → stage, 架构组件" aria-pressed="false" data-node-kind="backend" data-node-sublabel="issue/chat/PR/CI → stage" data-node-context="架构组件">
+          <title>scan · issue/chat/PR/CI → stage · 架构组件</title>
           <rect x="100" y="420" width="190" height="60" rx="6" class="c-mask"/>
           <rect x="100" y="420" width="190" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(106 426) scale(0.6875)">
@@ -4836,8 +4834,8 @@
         <text data-detail="context" x="195" y="464" class="t-muted" font-size="9" text-anchor="middle">issue/chat/PR/CI → stage</text>
         </g>
 
-        <g id="node-manager" data-node-id="manager" data-node-label="Manager" tabindex="0" role="button" aria-label="聚焦Manager，scan docs · dispatch · closeout, 交付执行与收口" aria-pressed="false" data-node-kind="backend" data-node-sublabel="scan docs · dispatch · closeout" data-node-context="交付执行与收口">
-          <title>Manager · scan docs · dispatch · closeout · 交付执行与收口</title>
+        <g id="node-manager" data-node-id="manager" data-node-label="Manager" tabindex="0" role="button" aria-label="聚焦Manager，scan docs · dispatch · closeout, 架构组件" aria-pressed="false" data-node-kind="backend" data-node-sublabel="scan docs · dispatch · closeout" data-node-context="架构组件">
+          <title>Manager · scan docs · dispatch · closeout · 架构组件</title>
           <rect x="370" y="420" width="220" height="60" rx="6" class="c-mask"/>
           <rect x="370" y="420" width="220" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(376 426) scale(0.6875)">
@@ -4847,8 +4845,8 @@
         <text data-detail="context" x="480" y="464" class="t-muted" font-size="9" text-anchor="middle">scan docs · dispatch · closeout</text>
         </g>
 
-        <g id="node-gates" data-node-id="gates" data-node-label="Gates" tabindex="0" role="button" aria-label="聚焦Gates，IBM · TDD · PR · merge, 交付执行与收口" aria-pressed="false" data-node-kind="security" data-node-sublabel="IBM · TDD · PR · merge" data-node-context="交付执行与收口">
-          <title>Gates · IBM · TDD · PR · merge · 交付执行与收口</title>
+        <g id="node-gates" data-node-id="gates" data-node-label="Gates" tabindex="0" role="button" aria-label="聚焦Gates，IBM · TDD · PR · merge, 架构组件" aria-pressed="false" data-node-kind="security" data-node-sublabel="IBM · TDD · PR · merge" data-node-context="架构组件">
+          <title>Gates · IBM · TDD · PR · merge · 架构组件</title>
           <rect x="720" y="420" width="200" height="60" rx="6" class="c-mask"/>
           <rect x="720" y="420" width="200" height="60" rx="6" class="c-security" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(726 426) scale(0.6875)">
@@ -4859,8 +4857,8 @@
         <text data-detail="context" x="820" y="464" class="t-muted" font-size="9" text-anchor="middle">IBM · TDD · PR · merge</text>
         </g>
 
-        <g id="node-worker" data-node-id="worker" data-node-label="Worker" tabindex="0" role="button" aria-label="聚焦Worker，读 I-*/PRD/pre-tests · RED→GREEN, 交付执行与收口" aria-pressed="false" data-node-kind="backend" data-node-sublabel="读 I-*/PRD/pre-tests · RED→GREEN" data-node-context="交付执行与收口">
-          <title>Worker · 读 I-*/PRD/pre-tests · RED→GREEN · 交付执行与收口</title>
+        <g id="node-worker" data-node-id="worker" data-node-label="Worker" tabindex="0" role="button" aria-label="聚焦Worker，读 I-*/PRD/pre-tests · RED→GREEN, 架构组件" aria-pressed="false" data-node-kind="backend" data-node-sublabel="读 I-*/PRD/pre-tests · RED→GREEN" data-node-context="架构组件">
+          <title>Worker · 读 I-*/PRD/pre-tests · RED→GREEN · 架构组件</title>
           <rect x="160" y="530" width="200" height="60" rx="6" class="c-mask"/>
           <rect x="160" y="530" width="200" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(166 536) scale(0.6875)">
@@ -4870,8 +4868,8 @@
         <text data-detail="context" x="260" y="574" class="t-muted" font-size="9" text-anchor="middle">读 I-*/PRD/pre-tests · RED→GREEN</text>
         </g>
 
-        <g id="node-reviewer" data-node-id="reviewer" data-node-label="Reviewer" tabindex="0" role="button" aria-label="聚焦Reviewer，按文档审 diff/证据 · verdict, 交付执行与收口" aria-pressed="false" data-node-kind="security" data-node-sublabel="按文档审 diff/证据 · verdict" data-node-context="交付执行与收口">
-          <title>Reviewer · 按文档审 diff/证据 · verdict · 交付执行与收口</title>
+        <g id="node-reviewer" data-node-id="reviewer" data-node-label="Reviewer" tabindex="0" role="button" aria-label="聚焦Reviewer，按文档审 diff/证据 · verdict, 架构组件" aria-pressed="false" data-node-kind="security" data-node-sublabel="按文档审 diff/证据 · verdict" data-node-context="架构组件">
+          <title>Reviewer · 按文档审 diff/证据 · verdict · 架构组件</title>
           <rect x="450" y="530" width="190" height="60" rx="6" class="c-mask"/>
           <rect x="450" y="530" width="190" height="60" rx="6" class="c-security" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(456 536) scale(0.6875)">
@@ -4882,8 +4880,8 @@
         <text data-detail="context" x="545" y="574" class="t-muted" font-size="9" text-anchor="middle">按文档审 diff/证据 · verdict</text>
         </g>
 
-        <g id="node-pr" data-node-id="pr" data-node-label="PR → merge → closeout" tabindex="0" role="button" aria-label="聚焦PR → merge → closeout，交付终点, 交付执行与收口" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="交付终点" data-node-context="交付执行与收口">
-          <title>PR → merge → closeout · 交付终点 · 交付执行与收口</title>
+        <g id="node-pr" data-node-id="pr" data-node-label="PR → merge → closeout" tabindex="0" role="button" aria-label="聚焦PR → merge → closeout，交付终点, 架构组件" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="交付终点" data-node-context="架构组件">
+          <title>PR → merge → closeout · 交付终点 · 架构组件</title>
           <rect x="725" y="530" width="190" height="60" rx="6" class="c-mask"/>
           <rect x="725" y="530" width="190" height="60" rx="6" class="c-frontend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(731 536) scale(0.6875)">
@@ -4896,8 +4894,8 @@
         <text data-detail="context" x="820" y="574" class="t-muted" font-size="9" text-anchor="middle">交付终点</text>
         </g>
 
-        <g id="node-tools" data-node-id="tools" data-node-label="Commands · Scripts · Skills" tabindex="0" role="button" aria-label="聚焦Commands · Scripts · Skills，工具面（MCP 由 harness 决定）, 交付执行与收口" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="工具面（MCP 由 harness 决定）" data-node-context="交付执行与收口">
-          <title>Commands · Scripts · Skills · 工具面（MCP 由 harness 决定） · 交付执行与收口</title>
+        <g id="node-tools" data-node-id="tools" data-node-label="Commands · Scripts · Skills" tabindex="0" role="button" aria-label="聚焦Commands · Scripts · Skills，工具面（MCP 由 harness 决定）, 架构组件" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="工具面（MCP 由 harness 决定）" data-node-context="架构组件">
+          <title>Commands · Scripts · Skills · 工具面（MCP 由 harness 决定） · 架构组件</title>
           <rect x="160" y="640" width="260" height="60" rx="6" class="c-mask"/>
           <rect x="160" y="640" width="260" height="60" rx="6" class="c-messagebus" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(166 646) scale(0.6875)">
@@ -4910,8 +4908,8 @@
         <text data-detail="context" x="290" y="684" class="t-muted" font-size="9" text-anchor="middle">工具面（MCP 由 harness 决定）</text>
         </g>
 
-        <g id="node-harness" data-node-id="harness" data-node-label="AI harness (ACP)" tabindex="0" role="button" aria-label="聚焦AI harness (ACP)，Claude/Codex/OpenCode/Cline, 交付执行与收口" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="Claude/Codex/OpenCode/Cline" data-node-context="交付执行与收口">
-          <title>AI harness (ACP) · Claude/Codex/OpenCode/Cline · 交付执行与收口</title>
+        <g id="node-harness" data-node-id="harness" data-node-label="AI harness (ACP)" tabindex="0" role="button" aria-label="聚焦AI harness (ACP)，Claude/Codex/OpenCode/Cline, 架构组件" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="Claude/Codex/OpenCode/Cline" data-node-context="架构组件">
+          <title>AI harness (ACP) · Claude/Codex/OpenCode/Cline · 架构组件</title>
           <rect x="450" y="640" width="240" height="60" rx="6" class="c-mask"/>
           <rect x="450" y="640" width="240" height="60" rx="6" class="c-cloud" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(456 646) scale(0.6875)">
@@ -4921,8 +4919,8 @@
         <text data-detail="context" x="570" y="684" class="t-muted" font-size="9" text-anchor="middle">Claude/Codex/OpenCode/Cline</text>
         </g>
 
-        <g id="node-platforms" data-node-id="platforms" data-node-label="GitHub / Gitee" tabindex="0" role="button" aria-label="聚焦GitHub / Gitee，issue · PR · CI, 交付执行与收口" aria-pressed="false" data-node-kind="external" data-node-sublabel="issue · PR · CI" data-node-context="交付执行与收口">
-          <title>GitHub / Gitee · issue · PR · CI · 交付执行与收口</title>
+        <g id="node-platforms" data-node-id="platforms" data-node-label="GitHub / Gitee" tabindex="0" role="button" aria-label="聚焦GitHub / Gitee，issue · PR · CI, 架构组件" aria-pressed="false" data-node-kind="external" data-node-sublabel="issue · PR · CI" data-node-context="架构组件">
+          <title>GitHub / Gitee · issue · PR · CI · 架构组件</title>
           <rect x="900" y="740" width="240" height="60" rx="6" class="c-mask"/>
           <rect x="900" y="740" width="240" height="60" rx="6" class="c-external" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(906 746) scale(0.6875)">
@@ -4994,37 +4992,32 @@
           <text data-boundary-label="" text-anchor="start" x="188" y="203" class="t-cloud" font-size="9" font-weight="600">规格生成（SDD / TDD）</text>
         </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="交付执行与收口">
-          <rect data-graph-role="structural-frame-label-mask" x="74" y="400" width="85.6" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" text-anchor="start" x="78" y="413" class="t-cloud" font-size="9" font-weight="600">交付执行与收口</text>
-        </g>
-
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="40" y="852" class="t-primary" font-size="12" font-weight="650">图例</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="前端" data-legend-x="40" data-legend-baseline="872" data-legend-width="63">
-            <rect x="40" y="863" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="872" class="t-muted" font-size="10" font-weight="500">前端</text>
+          <text x="40" y="832" class="t-primary" font-size="12" font-weight="650">图例</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="前端" data-legend-x="40" data-legend-baseline="852" data-legend-width="63">
+            <rect x="40" y="843" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="852" class="t-muted" font-size="10" font-weight="500">前端</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="后端" data-legend-x="125" data-legend-baseline="872" data-legend-width="63">
-            <rect x="125" y="863" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="147" y="872" class="t-muted" font-size="10" font-weight="500">后端</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="后端" data-legend-x="125" data-legend-baseline="852" data-legend-width="63">
+            <rect x="125" y="843" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="147" y="852" class="t-muted" font-size="10" font-weight="500">后端</text>
           </g>
-          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="云服务" data-legend-x="210" data-legend-baseline="872" data-legend-width="73">
-            <rect x="210" y="863" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
-            <text x="232" y="872" class="t-muted" font-size="10" font-weight="500">云服务</text>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="云服务" data-legend-x="210" data-legend-baseline="852" data-legend-width="73">
+            <rect x="210" y="843" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="232" y="852" class="t-muted" font-size="10" font-weight="500">云服务</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="安全" data-legend-x="305" data-legend-baseline="872" data-legend-width="63">
-            <rect x="305" y="863" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="327" y="872" class="t-muted" font-size="10" font-weight="500">安全</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="安全" data-legend-x="305" data-legend-baseline="852" data-legend-width="63">
+            <rect x="305" y="843" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="327" y="852" class="t-muted" font-size="10" font-weight="500">安全</text>
           </g>
-          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="消息总线" data-legend-x="390" data-legend-baseline="872" data-legend-width="83">
-            <rect x="390" y="863" width="16" height="10" rx="2.5" class="c-messagebus" stroke-width="1"/>
-            <text x="412" y="872" class="t-muted" font-size="10" font-weight="500">消息总线</text>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="消息总线" data-legend-x="390" data-legend-baseline="852" data-legend-width="83">
+            <rect x="390" y="843" width="16" height="10" rx="2.5" class="c-messagebus" stroke-width="1"/>
+            <text x="412" y="852" class="t-muted" font-size="10" font-weight="500">消息总线</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="外部系统" data-legend-x="495" data-legend-baseline="872" data-legend-width="83">
-            <rect x="495" y="863" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="517" y="872" class="t-muted" font-size="10" font-weight="500">外部系统</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="外部系统" data-legend-x="495" data-legend-baseline="852" data-legend-width="83">
+            <rect x="495" y="843" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="517" y="852" class="t-muted" font-size="10" font-weight="500">外部系统</text>
           </g>
         </g>
       </svg>
