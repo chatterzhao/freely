@@ -261,7 +261,7 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [命令参考](docs/system/workspace/commands.md)：封装命令与绕过禁令
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
-- [预头脑风暴索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、未解问题
+- [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、未解问题
 - [逐项判定总表](docs/B1-docs/raw-20261101T031502Z/synthesis.md)：问题/方案/谁更优/为什么/代价
 - [Freely 交付闭环概念模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
 - [Super-agent 对比研究](docs/B1-docs/raw-20261101T031502Z/research.md)：理念/架构/实现/场景对比
