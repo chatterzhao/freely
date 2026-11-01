@@ -323,6 +323,18 @@ DSH：
 
 这些实测是下一轮设计（事件准入、ownership、TDD 适用范围、HarnessPort）的事实基础，不是实现任务。
 
+### 7.9 治理格式分裂：同一个 I-* 被两个门禁用两种方式解析
+
+这一轮修 I-* 时发现一个结构性问题：
+
+- `pretests-gate` 的 `phase_state()` 只认正文 bullet：`^- phase_state:`。I-* 若只有 YAML frontmatter，完成门禁会读不到 phase，静默放行。
+- `pr-merge-guarded` 的 `_update_issue_phase` 和 issue sync 只读 YAML frontmatter：`split('---',2)` 后 `yaml.safe_load`。I-* 若只有 bullet，`kind`/`phase_state` 为空，merge 时不会同步/关闭 issue。
+- 结果是：**同一个 I-* 必须同时写 YAML frontmatter 和正文 bullet**，两个门禁才都能读到。B2 skill 里提到“frontmatter 与正文 bullet 都要写”，但这不是一个显式 schema，也没有一个校验器同时检查两者一致。
+
+`phase_state` 的写入者也不止一个：`wt-create` 会把 raw 改回 `proposed`，`pr-review-guarded` 把 `done_b2_ibm` 改成 `completed`，`pr-merge-guarded` 在 merge 前改 `absorbed`/`in_verification`，`wt-close` 只检查、不改。**没有单一写者，也没有“谁有权改哪个 phase”的显式表。**
+
+这不是一个字段 bug，而是“文档作为状态机”缺少 schema/单写者契约的证据。Super-agent 的 Ticket 状态由 Engine 唯一写；Freely 的 phase 由多个脚本各写一段。前者状态更可靠但绑定运行时；后者可审计但容易漂移。Freely 要补的不是更多文档，而是**状态 schema + 单写者/派生规则**。
+
 ## 8. Freely 明确不如 Super-agent 的地方
 
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。
