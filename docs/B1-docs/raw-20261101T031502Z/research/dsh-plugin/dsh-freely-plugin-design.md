@@ -121,7 +121,8 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
   `[freely-spike] loaded services sessionController=function workspaceRegistry=function`
 - 证明确实：第三方插件被 DSH host 加载；`inject` 的 `sessionController/workspaceRegistry` 可用；web host 能启动。
 - 反例：`headless` profile 缺这两个服务，插件停在 `pending (waiting for services...)`，不能假设所有 profile 都支持。
-- 仍未验证：创建/提示 session、Python bridge、gate E2E、真实 issue→PR。见 `spike/dsh-runtime-load.log`。
+- 后续 P1 partial：插件在 web profile 真实创建 Session，`sessionController.create/resolveAgent` 成功，`agent.steer(msg)` 不抛错；但 inbox 计数不可见、无模型 turn，不能证明 Agent 消费消息。
+- 仍未验证：Agent 实际消费、Python bridge、gate E2E、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
 
 ## 3. Harness RPC
 
