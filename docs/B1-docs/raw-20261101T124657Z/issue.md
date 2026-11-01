@@ -12,7 +12,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKS3AV
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-01T12:46:57Z'
