@@ -348,7 +348,7 @@
 ## Real-Environment
 
 - real_environment_status: pass
-- real_environment_reason: temp project 写 discussion-events.json 和 freely.db，真实文件系统/SQLite 跑 collect 去重；见 test-evidence/real-environment.log。完整 scan 在 test-premerge 复验。
+- real_environment_reason: test-pre-merge 工位真实运行 task-lifecycle-scan.py（fixture #4070），events.unread=1、by_source.issue_comment=1；见 test-evidence/real-environment.log。
 
 ## RED Evidence（2026-11-01）
 

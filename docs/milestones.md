@@ -34,11 +34,11 @@
 ### committed_issues
 1. `I-20261101T031502Z-F`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_dev
+- phase_state: in_verification
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
 2. `I-20261101T031502Z-B`
 - milestone: M-20261101T031502Z-A
-- phase_state: in_dev
+- phase_state: in_verification
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
 
 ### completed_issues
