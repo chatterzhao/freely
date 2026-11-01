@@ -15,6 +15,8 @@ created_at: 2026-11-01
 # 预头脑风暴：Freely 与 DeepSeek Super-agent 到底在解决什么问题
 
 > 这不是“功能清单对比”，也不是给 Freely 找背书。它要回答的是：两个系统各自把什么当作第一性问题、用什么机制解、在哪个问题上更优、代价是什么。研究没走完之前，不 promote、不写实现。
+>
+> 本文取代 `docs/B1-docs/raw-20261101T031502Z/brainstorms.md` 的对比框架；B1 文档保留 P0 `harness-status` 的实现记录与任务拆分，但凡涉及“Freely 是什么、谁更优”的判断，以本文为准。
 
 ## 0. 要回答的五个问题
 
@@ -298,6 +300,25 @@ DSH：
 - 但绑定 DSH，`engines.dsh` 钉版本；没有 ACP 服务端；换宿主是重写。
 
 判定：**Freely 的“可替换基座”方向更对；DSH 的“单宿主深度”更强。** 优先级应是 Freely 内 HarnessPort 正式化，再谈 DSH adapter；DSH 插件只做工具外溢，不做第二套 Router/Ticket。
+
+### 7.8 实证检查（2026-11-01，本工位）
+
+不是所有结论都能从文档推出来，这一轮做了四个实测：
+
+1. **`freely task-source-scan --json` 的 stage 与 next_action 会误判历史吸收项。**
+   本工位扫描返回 4 个 item，全部标成 `收口`，但 next_action 仍是 `wt-create --raw-key ...` / 进入 B1；同一个 raw key 还出现两次（dev/test 工位各一次）。同时 `platform_health=degraded`，原因是 `No module named 'platform_adapter'`。
+   这说明“docs 是真相”目前还缺少一致的对账：absorbed/completed 的 raw 没有被稳定解析到 I-*，worktree 维度也没有去重。扫描环境的 import 失败进一步放大了不确定性。
+
+2. **TDD 证据不均匀。**
+   当前 `docs/B2-docs/**/pre-tests.md` 共 431 份，其中 327 份出现 `not_applicable`，247 份没有 `test_command`。这不能直接判为“TDD 失败”（很多是历史 schema 或 docs-only 变更），但说明“TDD 是强制验收”在历史资产里并不均匀；新门禁只覆盖新产物，不能把历史绿当成整体绿。
+
+3. **缓存是估算，不是实测。**
+   主项目最近 50 个 cycle 的 21 条 `[CACHE]` 全部满足 `input == prompt_bytes // 4`，`hit/miss=0`；`harness-status` 现在会标 `input_source=estimated`。所以“Freely 的 cache 可观测”只对“是否上报”成立，对“命中率”不成立。
+
+4. **Reviewer 的 fork 是降级，不是 native。**
+   `freely harness-status --require fork` 在主项目失败：reviewer 用的 Cline 是 `degraded=fork`。这不是“Reviewer 不能工作”，而是“Reviewer 首轮必须冷启动或走 session/new”，与文档里“fork 继承治理上下文”的默认叙事有差距。
+
+这些实测是下一轮设计（事件准入、ownership、TDD 适用范围、HarnessPort）的事实基础，不是实现任务。
 
 ## 8. Freely 明确不如 Super-agent 的地方
 
