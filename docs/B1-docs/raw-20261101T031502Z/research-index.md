@@ -35,6 +35,7 @@ created_at: 2026-11-01
 | [deployment-forms.md](deployment-forms.md) | Freely 主应用 vs DSH 插件：谁拥有 loop、角色选择、配置真源 | 初稿 |
 | [harness-selection.md](harness-selection.md) | 三角色 harness 选择 UI/CLI/TUI、写 agent-table 还是 DSH settings | 初稿 |
 | [agent-handoff.md](agent-handoff.md) | Manager/Worker/Reviewer 交接缺陷、A2A/AHP/ACP、DSH delegation 对照 | 初稿 |
+| [delegation-protocol.md](delegation-protocol.md) | Handoff envelope、五类消息 ownership、幂等/超时、A2A/DSH 映射 | draft |
 | [readme-architecture-audit.md](readme-architecture-audit.md) | README 图为什么改、主图/辅图取舍 | 初稿 |
 | [docs-directory-audit.md](docs-directory-audit.md) | 预研目录归位、遗留目录审计与规则 | completed |
 
