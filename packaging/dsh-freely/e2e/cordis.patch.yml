@@ -8,7 +8,7 @@
       config:
         repo: /tmp/freely-dsh-e2e
         project: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261101T124657Z-dsh-freely-e2e
-        issue: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+        issue: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
     - id: freely-e2e-worker-preset
       name: '@deepseek-ai/dsh-agent-preset'
       config:
@@ -52,6 +52,19 @@
             name: '@deepseek-ai/dsh-persona'
             config:
               prefix: 'You are the Freely E2E Reviewer. Read only; reply exact verdict.'
+          - id: e2e-reviewer-shell
+            name: cordis:group
+            group: true
+            isolate:
+              shell: true
+            config:
+              - id: e2e-reviewer-bash-sandbox
+                name: '@deepseek-ai/dsh-bash-sandbox'
+                config:
+                  timeoutMs: 30000
+                  maxTimeoutMs: 30000
+              - id: e2e-reviewer-bash
+                name: '@deepseek-ai/dsh-tool-bash'
           - id: e2e-reviewer-fs
             name: '@deepseek-ai/dsh-tool-fs'
           - id: e2e-reviewer-search

@@ -1,5 +1,5 @@
 /** Deterministic DSH E2E driver for @freely/dsh-freely. Test-only. */
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 export const name = 'dsh-freely-e2e'
@@ -42,7 +42,11 @@ async function git(ctx, repo, args) {
 export async function apply(ctx, config = {}) {
   const repo = config.repo
   if (!repo) throw new Error('e2e config.repo required')
+  await rm(join(repo, 'DONE.txt'), { force: true })
+  await rm(join(repo, 'VERDICT.txt'), { force: true })
+  await rm(join(repo, 'result.json'), { force: true })
   const workspace = await ctx.workspaceRegistry.create(repo)
+  const before = await git(ctx, repo, ['rev-parse', 'HEAD'])
 
   const workerTask = config.workerTask || `In ${repo}, create DONE.txt containing ok, then run git add DONE.txt and git commit -m e2e in that directory. Do not ask.`
   const workerSid = `e2e-worker-${Date.now()}`
@@ -54,14 +58,15 @@ export async function apply(ctx, config = {}) {
   await waitIdle(ctx, workerSid, config.timeoutMs || 60000)
 
   const log = await git(ctx, repo, ['log', '-1', '--oneline'])
-  const committed = log.ok && /e2e/.test(log.stdout)
+  const after = await git(ctx, repo, ['rev-parse', 'HEAD'])
+  const committed = before.ok && after.ok && before.stdout.trim() !== after.stdout.trim() && /e2e/.test(log.stdout)
 
   const reviewerSid = `e2e-reviewer-${Date.now()}`
   await ctx.sessionController.create({ sessionId: reviewerSid, workspaceId: workspace.id, agentPreset: 'freely-e2e-reviewer' })
   const rf = await ctx.sessionController.resolveAgent(reviewerSid)
   if ('error' in rf) throw rf.error
-  rf.agent.ctx.tools.restrict({ allow: ['read', 'write', 'grep', 'glob'] })
-  rf.agent.steer({ id: `msg-r-${Date.now()}`, role: 'user', content: [{ type: 'text', text: `Review ${repo}: run git log -1 --oneline and git show --stat HEAD; if DONE.txt exists, write VERDICT.txt containing pass and reply exactly VERDICT: pass.` }], source: { kind: 'user' } })
+  rf.agent.ctx.tools.restrict({ allow: ['read', 'write', 'bash', 'grep', 'glob'] })
+  rf.agent.steer({ id: `msg-r-${Date.now()}`, role: 'user', content: [{ type: 'text', text: `Review ${repo}: run git log -1 --oneline and git show --stat HEAD; if DONE.txt exists and the diff is only DONE.txt, write VERDICT.txt containing pass and reply exactly VERDICT: pass.` }], source: { kind: 'user' } })
   await waitIdle(ctx, reviewerSid, config.timeoutMs || 60000)
 
   let reviewerVerdict = null
@@ -78,4 +83,5 @@ export async function apply(ctx, config = {}) {
   const result = { repo, workerSessionId: workerSid, reviewerSessionId: reviewerSid, committed, commit: log.stdout.trim(), reviewerVerdict, gateExitCode: gate.exitCode, gateOk: gate.ok }
   await writeFile(join(repo, 'result.json'), JSON.stringify(result, null, 2))
   console.log(`[dsh-freely-e2e] ${JSON.stringify(result)}`)
+  if (!committed || reviewerVerdict !== 'pass' || !gate.ok) throw new Error(`e2e failed: ${JSON.stringify(result)}`)
 }

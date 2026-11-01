@@ -20,8 +20,8 @@
 - artifact_ref: packaging/dsh-freely/e2e/driver.js
 - test_command: node --test packaging/dsh-freely/e2e/test/driver.test.mjs
 - expected_output: pass
-- actual_output: 1 test pass
-- evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/driver.log
+- actual_output: 1 test pass (driver.md)
+- evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/driver.md
 
 ## Integration
 - acceptance_target: 真实 DSH web profile 跑 E2E
@@ -43,7 +43,7 @@
 - artifact_ref: packaging/dsh-freely/e2e/driver.js
 - test_command: dsh --profile freely-e2e
 - expected_output: committed=true
-- actual_output: committed=true, reviewerVerdict=pass, gateExitCode=0
+- actual_output: committed=true, reviewerVerdict=pass, gateExitCode=0 (slice I-A)
 - evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/e2e-result.json
 
 ## End-to-End
@@ -73,8 +73,8 @@
 - artifact_ref: packaging/dsh-freely/e2e/driver.js
 - test_command: node --test packaging/dsh-freely/e2e/test/driver.test.mjs
 - expected_output: pass
-- actual_output: 1 test pass
-- evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/driver.log
+- actual_output: 1 test pass (driver.md)
+- evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/driver.md
 ### acceptance-2
 - id: DE-2
 - requirement: 真实 Worker commit
@@ -87,5 +87,5 @@
 - artifact_ref: packaging/dsh-freely/e2e/driver.js
 - test_command: dsh --profile freely-e2e
 - expected_output: committed=true
-- actual_output: committed=true, reviewerVerdict=pass, gateExitCode=0
+- actual_output: committed=true, reviewerVerdict=pass, gateExitCode=0 (slice I-A)
 - evidence_file: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/verification/test-evidence/e2e-result.json
