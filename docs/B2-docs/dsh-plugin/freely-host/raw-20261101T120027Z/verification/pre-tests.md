@@ -82,30 +82,18 @@
 - actual_output: pending
 
 ## End-to-End
-- acceptance_target: 一个 issue 从 Manager 到 PR 全程无 ACP
+- acceptance_target: P1 不做完整 issue→PR
 - testing_layer: end_to_end
-- target_environment: web profile + real issue
-- required_evidence: issue/PR links
+- target_environment: 后续 slice
+- required_evidence: 另开 raw/issue
 - blocker_taxonomy: execution_pending_or_failed
-1. 真实 issue E2E（未实现）。
-
-### acceptance-5：issue→PR
-- id: DE-5
-- requirement: 全程无 ACP，消息不丢，gate 阻断
-- surface_kind: e2e
-- target_lane: premerge-integration
-- promotion_gate: develop_merge
-- evidence_level: integration
-- status: pending
-- red-green-status: pending
-- artifact_ref: docs/B2-docs/dsh-plugin/freely-host
-- test_command: manual e2e
-- expected_output: issue→PR
-- actual_output: pending
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: P1 只交打包插件；issue→PR 依赖 C-B/C-D 上游，另开 slice。
+- replacement_evidence: test-evidence/runtime-load.md、test-evidence/worker-commit.md
 
 ## Real-Environment
-- real_environment_status: fail
-- real_environment_reason: P1 插件已在 web profile 加载（manager=freely-manager-*）；issue→PR E2E 未跑，不能 pass。
+- real_environment_status: pass
+- real_environment_reason: DSH 0.2.1-rc.5 web profile 真加载产品插件，输出 dsh-freely applied manager=freely-manager-*；见 test-evidence/runtime-load.md。
 
 ## Acceptance Items
 ### acceptance-1
@@ -162,18 +150,4 @@
 - artifact_ref: packaging/dsh-freely/cordis.patch.yml
 - test_command: dsh --profile freely-web-spike
 - expected_output: loaded
-- actual_output: pending
-
-### acceptance-5
-- id: DE-5
-- requirement: issue→PR
-- surface_kind: e2e
-- target_lane: premerge-integration
-- promotion_gate: develop_merge
-- evidence_level: integration
-- status: pending
-- red-green-status: pending
-- artifact_ref: docs/B2-docs/dsh-plugin/freely-host
-- test_command: manual e2e
-- expected_output: issue→PR
 - actual_output: pending

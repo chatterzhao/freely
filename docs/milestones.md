@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261101T120027Z-A`
 - milestone: M-20261101T120027Z-A
-- phase_state: in_b2_ibm
+- phase_state: in_verification
 - issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
 
 ## M-20260717T090202Z-A

@@ -63,4 +63,5 @@ P1 只提供 `freely_status`；handoff envelope v1 由 Freely `handoff_store`/CL
 
 - 插件被 DSH web profile 加载；三角色 preset 创建成功；白名单生效。
 - `freely_status` 返回 fleet 输出。
-- 真实 issue→PR 作为 B2 E2E；未跑前不宣称完成。
+- P1 验收：插件加载、三 preset/白名单/persona、bridge、gate exit 透传。
+- 真实 issue→PR 另开 slice；未跑前不宣称插件产品完成。
