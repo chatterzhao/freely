@@ -21,7 +21,10 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
+
+# feat: dsh-freely issue→PR E2E slice
 
 raw_key: raw-20261101T124657Z
 
