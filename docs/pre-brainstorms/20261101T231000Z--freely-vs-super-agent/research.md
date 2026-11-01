@@ -155,7 +155,7 @@ issue / chat / 治理漂移
 - **runtime/script**：确定性调度、scan、状态搬运、gate 执行；不做价值判断。
 - **skill**：把流程、角色、门禁知识编码成 agent 可加载的指令；不是权限。
 - **command**：封装多步治理动作（feedback/wt-create/pr-*/wt-close）；不是普通 CLI 糖。
-- **MCP**：agent 与外部工具/资源的连接；不是 agent 间编排。
+- **MCP**：agent 与外部工具/资源的连接；不是 agent 间编排。当前 `run-acp-prompt.py` 对 ACP 会话传 `mcpServers: []`，Freely 不编排 MCP；是否可用取决于底层 AI CLI 自己的配置。
 - **agent harness（ACP）**：真正跑模型会话的执行提供层；可替换，不是 Freely 的宿主。
 - **A2A**：Manager/Worker/Reviewer 的任务协调；不是文档真相源。
 - **gate**：对文档/测试/PR/merge 的硬检查；不是提示词建议。
