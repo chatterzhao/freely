@@ -380,6 +380,22 @@ DSH：
 
 所以 Freely 的问题不是“文档不够多”，而是**缺少一张权威矩阵 + 派生规则**：哪个字段由谁写、哪些是派生、冲突时谁赢。这比再加一个 gate 更根本。
 
+### 7.11 人插话入口：四条路，只有两条是真正闭环的
+
+| 入口 | 实际路径 | 谁处理 | 是否闭环 | 差距 |
+| --- | --- | --- | --- | --- |
+| 新建 issue/comment | platform-adapter → scan → 本地 `docs/B1-docs/` | Manager → B1 | 新建 issue 闭环；comment 取决于 pull/scan 是否刷新 | 没有 per-comment 事件与归属 |
+| IM / `freely chat` | `freely chat` → `freely.db chats` → Manager prompt 的 chat snapshot | Manager | 闭环 | 不直达 Worker；靠 Manager 二次路由 |
+| PR review comment / CI 反馈 | 不在 platform-adapter 的 review-comment 读取面；GitHub review 是外部 merge gate | 人 / GitHub | 不闭环 | 后续讨论可能没人拥有；这是最大缺口 |
+| CLI/会话内插话 | `a2a_task.py prompt` / 人直接进 executor session | Manager 或 Worker | 部分 | 不是普通人的入口，偏运维 |
+
+对照 Super-agent：
+
+- IM/GitHub 消息都是 Trigger；订阅 Thread 的消息直达 Ticket 的 Worker；人消息可复活已结束 Ticket；handback 决定归属。
+- Freely 的 chat 入口是完整的，但 issue comment 与 PR review 没有“消息级 ownership”；后者甚至没有进入 runtime 的自动路径。
+
+结论：**Freely 的“人插话”在入口数量上不输，但在“后续消息归属”上明显弱于 Super-agent。** 这不是再加一个 CLI 能解决的，需要 ownership 账本或订阅层。
+
 ## 8. Freely 明确不如 Super-agent 的地方
 
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。
