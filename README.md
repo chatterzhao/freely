@@ -213,10 +213,10 @@ freely feedback \
 freely live-status      # 当前项目运行态
 freely fleet-status     # 本项目所有工位/分支
 freely baseline-status  # 基线与漂移
-freely harness-status   # 每个角色用什么 harness、支持 fork/resume/usage 吗、最近 cache 情况
+freely harness-status   # 每个角色用什么 harness、fork 是 native/degraded、最近 cache 情况
 ```
 
-`harness-status` 是只读探针：它不启动会话，只回答“当前配置能不能干这件事”。例如 `--require fork` 会在 Reviewer 使用不支持 fork 的 CLI 时直接失败，避免运行时才发现降级。
+`harness-status` 是只读探针：它不启动会话，只回答“当前配置能不能干这件事”。例如 `--require fork` 会在 Reviewer 的 CLI 只能 `degraded` fork（尝试后回退 session/new）时直接失败，避免运行时才发现降级。
 
 ## 仓库结构
 

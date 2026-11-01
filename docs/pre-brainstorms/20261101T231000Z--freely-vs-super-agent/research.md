@@ -164,6 +164,15 @@ issue / chat / 治理漂移
 
 这八者混在一起，就会得到一张“看起来什么都画了、实际什么都没说清”的架构图。
 
+### 4.2 SDD/TDD 在交付链里的准确位置
+
+- **B1-IBM** 收敛“问题规格”：为什么做、值不值得、边界、优先级 → candidate。
+- **B2-IBM** 生成“实现规格 + 验收规格”：I-*、PRD、pre-tests、tasks → SDD/TDD 合同。
+- **Worker** 按合同实现，先 RED 再 GREEN；**Reviewer** 按合同独立验收；**Manager** 只派工/收口。
+- **PR/merge** 是交付终点，不是“代码写完”；文档、测试、review verdict 都是合并前提。
+
+所以 SDD/TDD 不是 B1/B2 之外的另外两个阶段，而是 B1/B2 产出的两类合同。详见 `delivery-model.md`。
+
 ## 5. Super-agent 的真实架构：五个模块与原型边界
 
 | 模块 | 文章主张 | 原型实现 |
