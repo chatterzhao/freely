@@ -263,20 +263,19 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [命令参考](docs/system/workspace/commands.md)：封装命令与绕过禁令
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
-- [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、未解问题
-- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：概念映射、逐项判定、吸收清单
-- [Freely 交付闭环概念模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
+- [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、B1 状态
+- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：只比重叠部分的概念映射、逐项判定、吸收清单
 - [主意图对齐](docs/B1-docs/raw-20261101T031502Z/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
 - [概念全量对照](docs/B1-docs/raw-20261101T031502Z/concept-map.md)：Super-agent 概念 → Freely 对应物、同名不同义
-- [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
-- [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
+- [交付闭环模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
 - [交接与协议](docs/B1-docs/raw-20261101T031502Z/handoff.md)：交接缺陷、delegation protocol、ownership/handback
 - [运行时契约](docs/B1-docs/raw-20261101T031502Z/runtime-contracts.md)：状态权威、准入、prompt/cache、注意力、可观测、TDD
-- [主意图对齐评审](docs/B1-docs/raw-20261101T031502Z/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
-- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：只比重叠部分的概念映射、评审与吸收清单
-- [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
 - [Harness 策略](docs/B1-docs/raw-20261101T031502Z/harness-strategy.md)：HarnessPort、两种部署形态、DSH A/B1/B2/C
 - [角色级 harness 选择](docs/B1-docs/raw-20261101T031502Z/harness-selection.md)：UI/CLI/TUI 与配置落点
+- [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
+- [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
+- [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
+
 
 ## 参与开发
 
