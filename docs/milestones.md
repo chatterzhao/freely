@@ -1,4 +1,15 @@
 
+## M-20261101T031502Z-A
+- title: research — Super-agent 架构与 Freely agent 协作模型对比
+- status: active
+### candidate_issues
+1. `C-20261101T031502Z-A`
+- milestone: M-20261101T031502Z-A
+- status: needs_research
+2. `C-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- status: needs_research
+
 ## M-20260717T090202Z-A
 - title: fix — peak 口径限定为死亡记录（PEAK=3 误报回归）
 - status: active
