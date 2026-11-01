@@ -384,10 +384,12 @@ DELTA
 fi
 
 cat <<EOF
-<!-- FREELY_SEGMENT:bootstrap -->
+<!-- FREELY_SEGMENT:agent_role -->
 你现在进入 Freely 的首跳闭环。
 
+<!-- FREELY_SEGMENT:bootstrap -->
 读取约定：
+
 - skill:<name> 优先通过 Skill 工具加载（skills 已通过 deploy-skills 部署到工具目录）。若当前 CLI 无 Skill 工具，回退读取 workspace/skills/<name>/SKILL.md。
 - workspace/skills/README.md 是技能索引，用于浏览可用技能列表。
 - 对大型文档不要整文件硬读。尤其 docs/milestones.md，先用 patrol seed、rg、标题定位或分段读取，按命中的 issue / progress / queue 做定点核对。
@@ -451,6 +453,7 @@ ${execution_rule_16_escaped}
 ${execution_rule_17_escaped}
 ${manager_artifact_rule_escaped}
 
+<!-- FREELY_SEGMENT:fleet -->
 运行上下文：
 - PROJECT_ROOT=$project
 - WORKSPACE_ROOT=$workspace_root
@@ -467,6 +470,7 @@ ${manager_artifact_rule_escaped}
 - AI_CAPABILITY_CODEX_APPROVAL_POLICY=${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}
 - AI_CAPABILITY_CODEX_CWD_MODE=${AI_CAPABILITY_CODEX_CWD_MODE:-}
 
+<!-- FREELY_SEGMENT:context_warning -->
 工作区治理提醒（非强制阻断，但必须纳入判断）：
 - current_worktree_state: ${current_clean_state}
 - current_project_dirty_entries: ${current_dirty_entries}
