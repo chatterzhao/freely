@@ -9,7 +9,7 @@ created_at: 2026-11-01
 
 # B1_IBM: Super-agent 与 Freely code harness 对比研究
 
-> 最终研究包入口：[`research-index.md`](research-index.md)。本文只保留 B1 决策记录；详细对比、协议、运行时契约、harness 策略分别在最终文档中。
+> 最终研究包入口：[`research/README.md`](research/README.md)。本文只保留 B1 决策记录；详细对比、协议、运行时契约、harness 策略分别在最终文档中。
 
 ## 1. Input
 
@@ -114,12 +114,12 @@ Milestone：`M-20261101T031502Z-A`。Readiness matrix 见 [`pre-brainstorm-revie
 
 ## 10. 证据
 
-- [`overlap-comparison.md`](overlap-comparison.md)：只比重叠意图、逐项判定、吸收清单。
-- [`intent-alignment.md`](intent-alignment.md)：主意图逐条对齐、优秀/部分/缺口/拖后腿。
-- [`concept-map.md`](concept-map.md)：全量概念映射、同名不同义。
-- [`delivery-model.md`](delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁。
-- [`handoff.md`](handoff.md)：交接缺陷 + delegation protocol v0。
-- [`runtime-contracts.md`](runtime-contracts.md)：状态、准入、prompt/cache、注意力、可观测、TDD。
-- [`harness-strategy.md`](harness-strategy.md)、[`harness-selection.md`](harness-selection.md)、[`dsh-freely-plugin-design.md`](dsh-freely-plugin-design.md)：harness 策略/选择/插件。
-- [`failure-modes.md`](failure-modes.md)、[`pre-brainstorm-review.md`](pre-brainstorm-review.md)、[`docs-directory-audit.md`](docs-directory-audit.md)。
-- 图：[`super-agent-freely-overlap.html`](super-agent-freely-overlap.html) / `.svg`。
+- [`overlap-comparison.md`](research/comparison/overlap-comparison.md)：只比重叠意图、逐项判定、吸收清单。
+- [`intent-alignment.md`](research/comparison/intent-alignment.md)：主意图逐条对齐、优秀/部分/缺口/拖后腿。
+- [`concept-map.md`](research/comparison/concept-map.md)：全量概念映射、同名不同义。
+- [`delivery-model.md`](research/delivery/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁。
+- [`handoff.md`](research/delivery/handoff.md)：交接缺陷 + delegation protocol v0。
+- [`runtime-contracts.md`](research/delivery/runtime-contracts.md)：状态、准入、prompt/cache、注意力、可观测、TDD。
+- [`harness-strategy.md`](research/harness/harness-strategy.md)、[`harness-selection.md`](research/harness/harness-selection.md)、[`dsh-freely-plugin-design.md`](research/dsh-plugin/dsh-freely-plugin-design.md)：harness 策略/选择/插件。
+- [`failure-modes.md`](research/comparison/failure-modes.md)、[`pre-brainstorm-review.md`](pre-brainstorm-review.md)、[`docs-directory-audit.md`](research/ops/docs-directory-audit.md)。
+- 图：[`super-agent-freely-overlap.html`](research/assets/super-agent-freely-overlap.html) / `.svg`。

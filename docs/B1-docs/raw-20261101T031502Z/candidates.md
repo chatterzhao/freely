@@ -40,7 +40,7 @@ milestone: M-20261101T031502Z-A
 - title: 实现 Worker 对已完成工单后续线程的 follow-up ownership 与 handback
 - status: needs_research
 - decision_reason: Super-agent 用 `Subscription` + `followupOwners` + `handback` 把“同一 Thread 的后续消息归谁处理”做成运行时事实；Freely 的 Worker 没有平台线程订阅，PR/Issue 后续讨论只能经 Manager/A2A 或重新进入 intake，容易出现重复开单、漏接或上下文断档。新研究进一步确认 A2A task 行没有 message/owner 历史，且 new/fork 会丢 message。结论：需要 delegation/ownership 协议，不是给 task 行加字段。
-- next_action: 协议 v0 已落 `handoff.md`（envelope/ownership/handback/幂等/超时）；下一步做五类后续消息行为盘点 + 真实 PR/issue 评论回放；通过 acceptance review 才 promote。
+- next_action: 协议 v0 已落 `research/delivery/handoff.md`（envelope/ownership/handback/幂等/超时）；下一步做五类后续消息行为盘点 + 真实 PR/issue 评论回放；通过 acceptance review 才 promote。
 - revisit_trigger: 出现同一 PR/Issue 的后续评论被重复开单、被漏接，或 Manager 因中转 follow-up 出现上下文丢失/重复委派时，立即重启本 candidate；若连续两个里程碑未出现该类事件，可降级为观察项。
 - acceptance_criteria:
   - 五类后续消息各自有明确的 owner 判定规则，且能回答“这条消息现在归谁”
@@ -69,7 +69,7 @@ milestone: M-20261101T031502Z-A
 - title: 实现 Manager 的类型化 report/attention、批量路由与 prompt 前缀契约
 - status: needs_research
 - decision_reason: 逐项实现对比显示，DSH 在路由批处理、逐条拒绝、accept 幂等、六态 report、结构化 attention、稳定 relay key、Policy 置尾保护 prefix cache 上都有代码落点；Freely 的 Manager 同时承担 scan、派工、纠偏、收口与人工插话，缺少批量决策、类型化交接与显式 prompt 前缀契约。结论：按 P1 实现，不再停留在度量。
-- next_action: 字段契约已在 `handoff.md` §6 起草；下一步补 prompt manifest（stable/semi/dynamic 段）与 cache/usage 基线，并做真实 patrol 前后对照；通过 acceptance review 后再实现。
+- next_action: 字段契约已在 `research/delivery/handoff.md` §6 起草；下一步补 prompt manifest（stable/semi/dynamic 段）与 cache/usage 基线，并做真实 patrol 前后对照；通过 acceptance review 后再实现。
 - revisit_trigger: Manager 单轮上下文接近 rotation 阈值、同一轮处理超过 3 个工单导致漏派/错派、或 cache 命中率连续下降且 prompt_bytes 上升时，重启本 candidate；若度量显示路由开销占比很低，则降级为观察项。
 - acceptance_criteria:
   - 给出 Manager 每轮 patrol 的上下文成本基线（字符/token/文档数）与 cache hit/miss 基线
@@ -86,7 +86,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: `runtime-contracts.md` 证明 Freely 已有 STABLE/SEMI/DYNAMIC 排序但无 manifest/校验，cache 仍多为估算；字段契约与基线未完成，不能 promote
+  - summary: `research/delivery/runtime-contracts.md` 证明 Freely 已有 STABLE/SEMI/DYNAMIC 排序但无 manifest/校验，cache 仍多为估算；字段契约与基线未完成，不能 promote
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-C
 - promoted_issue_path: pending://needs-b2-materialization
@@ -115,7 +115,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: `harness-selection.md`/`harness-strategy.md` 给出角色级选择与配置落点，但接口/探测/UI 后端尚未定稿，不能 promote
+  - summary: `research/harness/harness-selection.md`/`research/harness/harness-strategy.md` 给出角色级选择与配置落点，但接口/探测/UI 后端尚未定稿，不能 promote
   - verdict: needs_more_research
 - promoted_issue_id: pending://C-20261101T031502Z-D
 - promoted_issue_path: pending://needs-b2-materialization

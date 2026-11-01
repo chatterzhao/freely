@@ -174,7 +174,7 @@ Freely 多出来的能力不拿来证明“谁更强”；Super-agent 的个人�
 - 没有 per-message id/append-only；task 行 update 覆盖。
 - 没有“这条消息归谁”的 owner 字段。
 
-**判定**：**DSH 更强**。Freely 的 `handoff.md` v0 已给出 envelope/ownership，但未实现。
+**判定**：**DSH 更强**。Freely 的 `handoff.md` v0 已给出（见 `../delivery/handoff.md`） envelope/ownership，但未实现。
 
 ### 4.6 授权：DSH 运行时准入，Freely 流程治理
 
@@ -252,7 +252,7 @@ Freely 多出来的能力不拿来证明“谁更强”；Super-agent 的个人�
 | P0 | Thread/ownership/handback | C-B：followup_owners + handoff envelope + unread | 不做事件溯源重写 |
 | P1 | Report 六态 + Attention | C-C：A2A report/attention 字段；单问题、目标会话 | 不做 Mandate 全量 |
 | P1 | 批量路由 + 幂等 | Manager 批量决策；accept key | 不把 Manager 缩成纯 Router |
-| P1 | prompt manifest + usage | C-C/`runtime-contracts.md`：STABLE/SEMI/DYNAMIC + usage_reported | 不把 cache 当命中率 |
+| P1 | prompt manifest + usage | C-C：`runtime-contracts.md`（`../delivery/runtime-contracts.md`）的 STABLE/SEMI/DYNAMIC + usage_reported | 不把 cache 当命中率 |
 | P2 | 语义 Watchdog | 轻量 supervisor reviewer 看 Worker 进展/方向 | 不照搬云端 Watchdog |
 | P2 | Assignment/Report 分离 | A2A task/executor 状态分离 | 不重写全部领域模型 |
 | P3 | Harness 角色选择 | C-D：per-role slot + probe | 不先做 DSH adapter |

@@ -6,7 +6,7 @@ Freely 是一个 LLM(AI)主动，自主，持久，连续的code harness。LLM�
 
 Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。目标是让人只在需要决策或验收时出现。
 
-> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [runtime-contracts](docs/B1-docs/raw-20261101T031502Z/runtime-contracts.md)）。
+> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [runtime-contracts](docs/B1-docs/raw-20261101T031502Z/research/delivery/runtime-contracts.md)）。
 
 [![交付闭环](docs/assets/freely-delivery-loop.svg)](docs/assets/freely-delivery-loop.html)
 
@@ -263,18 +263,18 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [命令参考](docs/system/workspace/commands.md)：封装命令与绕过禁令
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
-- [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research-index.md)：研究地图、关键事实、B1 状态
-- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/overlap-comparison.md)：只比重叠部分的概念映射、逐项判定、吸收清单
-- [主意图对齐](docs/B1-docs/raw-20261101T031502Z/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
-- [概念全量对照](docs/B1-docs/raw-20261101T031502Z/concept-map.md)：Super-agent 概念 → Freely 对应物、同名不同义
-- [交付闭环模型](docs/B1-docs/raw-20261101T031502Z/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
-- [交接与协议](docs/B1-docs/raw-20261101T031502Z/handoff.md)：交接缺陷、delegation protocol、ownership/handback
-- [运行时契约](docs/B1-docs/raw-20261101T031502Z/runtime-contracts.md)：状态权威、准入、prompt/cache、注意力、可观测、TDD
-- [Harness 策略](docs/B1-docs/raw-20261101T031502Z/harness-strategy.md)：HarnessPort、两种部署形态、DSH A/B1/B2/C
-- [角色级 harness 选择](docs/B1-docs/raw-20261101T031502Z/harness-selection.md)：UI/CLI/TUI 与配置落点
-- [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
-- [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
-- [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
+- [B1 预研索引](docs/B1-docs/raw-20261101T031502Z/research/README.md)：研究地图、关键事实、B1 状态
+- [重叠意图对照](docs/B1-docs/raw-20261101T031502Z/research/comparison/overlap-comparison.md)：只比重叠部分的概念映射、逐项判定、吸收清单
+- [主意图对齐](docs/B1-docs/raw-20261101T031502Z/research/comparison/intent-alignment.md)：主动/自主/持久/连续、SDD/TDD、scan 讨论入口
+- [概念全量对照](docs/B1-docs/raw-20261101T031502Z/research/comparison/concept-map.md)：Super-agent 概念 → Freely 对应物、同名不同义
+- [交付闭环模型](docs/B1-docs/raw-20261101T031502Z/research/delivery/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
+- [交接与协议](docs/B1-docs/raw-20261101T031502Z/research/delivery/handoff.md)：交接缺陷、delegation protocol、ownership/handback
+- [运行时契约](docs/B1-docs/raw-20261101T031502Z/research/delivery/runtime-contracts.md)：状态权威、准入、prompt/cache、注意力、可观测、TDD
+- [Harness 策略](docs/B1-docs/raw-20261101T031502Z/research/harness/harness-strategy.md)：HarnessPort、两种部署形态、DSH A/B1/B2/C
+- [角色级 harness 选择](docs/B1-docs/raw-20261101T031502Z/research/harness/harness-selection.md)：UI/CLI/TUI 与配置落点
+- [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/research/dsh-plugin/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
+- [失效模式对比](docs/B1-docs/raw-20261101T031502Z/research/comparison/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
+- [文档目录审计](docs/B1-docs/raw-20261101T031502Z/research/ops/docs-directory-audit.md)：预研归位、遗留目录与规范
 
 
 ## 参与开发

@@ -19,12 +19,12 @@ created_at: 2026-11-01
 
 | 问题 | 处理 |
 | --- | --- |
-| DSH 路线表述矛盾 | README 改为“不做 adapter；方向是 @freely/dsh-freely 插件”；`harness-strategy.md` 区分 A/B1/B2/C |
+| DSH 路线表述矛盾 | README 改为“不做 adapter；方向是 @freely/dsh-freely 插件”；`research/harness/harness-strategy.md` 区分 A/B1/B2/C |
 | 循环口径不一致 | 统一为“3 常驻 loop + 2 段交付门禁” |
 | “AI 是项目所有者”是收益断言 | 改为“目标态”；注意力度量无基线 |
 | 图例模板残留 | 重叠图/交付图改为实际分类，删除“架构组件”后缀 |
 | DSH 缺 SHA/URL | 补 `6337fc8...` 与 repo URL |
-| 量化事实缺复现命令 | `runtime-contracts.md` 保留数据与命令 |
+| 量化事实缺复现命令 | `research/delivery/runtime-contracts.md` 保留数据与命令 |
 | issue-sync “唯一出口”过强 | 改为“出站统一走封装命令” |
 | scan 未标派生视图 | README 标注“派生、不写回” |
 | 四问/四层/六维混用 | 阶段评审=四层；PR 评审=四问 |
@@ -34,11 +34,11 @@ created_at: 2026-11-01
 
 | Candidate | 已有 | 仍缺 | 下一跳 |
 | --- | --- | --- | --- |
-| C-F 讨论入口 | `intent-alignment.md` §4.1、scan 代码证据 | 六类来源 event schema；真实 issue 评论/PR review 回放 | 来源盘点 → 回放 → acceptance review |
-| C-B ownership/handback | `handoff.md` 五类 owner、幂等/超时 | 行为盘点；真实 PR/issue 评论回放；new/fork 修复 | 回放 → acceptance review |
-| C-C report/attention/prompt | `handoff.md` 字段、`runtime-contracts.md` 排序 | prompt manifest/校验；cache/usage 基线；patrol 对照 | 补 manifest/基线 → 对照 |
-| C-D HarnessPort/角色选择 | `harness-strategy.md`、`harness-selection.md` | 接口草案；per-role probe 证据 | 接口 → probe |
-| C-E DSH 插件 | `dsh-freely-plugin-design.md` | P0/P1 spike（首次 session 消息、handoff、gate） | spike → review |
+| C-F 讨论入口 | `research/comparison/intent-alignment.md` §4.1、scan 代码证据 | 六类来源 event schema；真实 issue 评论/PR review 回放 | 来源盘点 → 回放 → acceptance review |
+| C-B ownership/handback | `research/delivery/handoff.md` 五类 owner、幂等/超时 | 行为盘点；真实 PR/issue 评论回放；new/fork 修复 | 回放 → acceptance review |
+| C-C report/attention/prompt | `research/delivery/handoff.md` 字段、`research/delivery/runtime-contracts.md` 排序 | prompt manifest/校验；cache/usage 基线；patrol 对照 | 补 manifest/基线 → 对照 |
+| C-D HarnessPort/角色选择 | `research/harness/harness-strategy.md`、`research/harness/harness-selection.md` | 接口草案；per-role probe 证据 | 接口 → probe |
+| C-E DSH 插件 | `research/dsh-plugin/dsh-freely-plugin-design.md` | P0/P1 spike（首次 session 消息、handoff、gate） | spike → review |
 
 任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。
 
@@ -56,4 +56,4 @@ created_at: 2026-11-01
 - candidates/milestone 状态一致（A promoted；B/C/D/E/F needs_research）。
 - README/文档链接 0 缺失。
 - `pretests-gate` 通过。
-- 已知仓库既有 `governance-check` 5 个缺陷，见 `docs-directory-audit.md`；不是本轮引入，未绕过。
+- 已知仓库既有 `governance-check` 5 个缺陷，见 `research/ops/docs-directory-audit.md`；不是本轮引入，未绕过。

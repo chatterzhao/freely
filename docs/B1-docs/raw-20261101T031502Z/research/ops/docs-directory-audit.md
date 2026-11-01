@@ -19,7 +19,7 @@ created_at: 2026-11-01
 
 | 原路径 | 新路径 | 动作 |
 | --- | --- | --- |
-| `docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/*` | `docs/B1-docs/raw-20261101T031502Z/*` | 16 个文件迁入 B1 raw 目录；`README.md`→`research-index.md`，`b1-review.md`→`pre-brainstorm-review.md` |
+| `docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/*` | `docs/B1-docs/raw-20261101T031502Z/*` | 16 个文件迁入 B1 raw；后续再按 research/ 分类；`README.md`→`research/README.md`，`b1-review.md`→`pre-brainstorm-review.md` |
 | `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/brainstorms.md` | `docs/B1-docs/raw-20260720T055358Z/brainstorms.md` | 历史 B1 文档归位 |
 | `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/candidates.md` | `docs/B1-docs/raw-20260720T055358Z/candidates.md` | 历史 B1 文档归位 |
 | `docs/pre-brainstorms/` | 删除 | 已空，废弃目录移除 |
@@ -51,7 +51,7 @@ created_at: 2026-11-01
 ## 3. 规范（新文档）
 
 1. B1 预研、candidate、对比研究：`docs/B1-docs/raw-{key}/`。
-2. 支持性研究放同目录，命名避免 `README.md`/`b1-review.md` 这类会被误认为 B1 标准产物的名字；索引用 `research-index.md`，评审用 `pre-brainstorm-review.md`。
+2. B1 根只放 `issue.md`、`brainstorms.md`、`candidates.md`、`pre-brainstorm-review.md`；支持性研究放 `research/{comparison,delivery,harness,dsh-plugin,ops,assets}/`，索引用 `research/README.md`。
 3. B2 只用 `docs/B2-docs/{epic}/{story}/raw-{key}/`；所有 PR review 放该 raw 的 `code-reviews/`。
 4. B1 **只放** brainstorms/candidates/研究；B1 下不允许 `code-reviews/`。没有 active B2 story 的 legacy review，放 `docs/B2-docs/ibm/_legacy-issues/raw-{key}/code-reviews/`。
 5. 不再新建 `docs/pre-brainstorms/`、`docs/epics/`、`docs/progress/`、`docs/recovery/`。
