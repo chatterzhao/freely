@@ -151,6 +151,22 @@ POST /harness/validate {role, tool, slot}
 - `apply` 前 validate；失败不落盘；写前备份/写后重读。
 - 运行中的 session 不重启；返回 `requires_restart`。
 
+### 1.5 现有 probe 输出（主项目，2026-11-01）
+
+`./bin/harness-status --project /Users/zhaoyu/Downloads/code/my-freely/freely --json`：
+
+| role | slot | tool | fork | usage | binary |
+| --- | --- | --- | --- | --- | --- |
+| manager | claude-apikey-ds-flash-auto | claude | native | unknown | ok |
+| worker | opencode-apikey-ds-flash-auto | opencode | native | unknown | ok |
+| reviewer | cline-account-ds-flash-free-auto | cline | degraded | unknown | ok |
+
+说明：
+
+- 现有 probe 已能按角色给出 slot/tool/capability/binary；缺 `--role` 过滤和 `requirements/satisfied` 字段。
+- Reviewer 的 fork=degraded，是真实降级；不能当 native。
+- usage/cache 全是 unknown；`harness-status` 的 cache 21 条全 estimated，不能算命中率。
+
 ## 2. 四家 ACP CLI 的事实
 
 | 能力 | Claude | Codex | OpenCode | Cline |

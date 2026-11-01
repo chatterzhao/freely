@@ -182,6 +182,12 @@ Cache 日志：
 
 没有 `usage_source=reported` 时，禁止把 `hit=0` 当“缓存没命中”；只能报“未知”。
 
+回放：`research/ops/replay/prompt_manifest.py`。
+
+- 11 段 manifest；前 4 段（agent_role/bootstrap/fleet/exit_contract）prefix hash 在 tail 变化时不变。
+- `cache_reported` 才计算 hit rate（fixture 80/20 → 0.8）；estimated/absent 返回 `null + unknown`。
+- 主项目 `harness-status` 当前 21 条 cache 全部 `estimated`，`cache_reported=false`，`hit_rate=null`。这是**可观测性基线**，不是性能基线。
+
 ## 4. 注意力度量：当前没有基线
 
 现有数据（主项目）：
