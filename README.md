@@ -245,7 +245,7 @@ docs/assets/                 README 交付闭环 + 五平面图
 
 - Freely 是**活跃开发中的治理型 runtime**，不是“装完就无人值守”的成品；首次接入需要配置 AI CLI、平台凭据与项目宪法。
 - 它**不替代** Claude Code / Codex / OpenCode 等 harness；它负责编排、隔离、门禁与审计。
-- 当前主路径是 ACP harness；DSH 等宿主需要 adapter，不会假装“加个配置就能换”。
+- 当前主路径是 ACP harness；DSH **不做 harness adapter**——那会把 DSH 的 Router/Thread/Mandate 阉割成执行器。若要进 DSH 生态，方向是 `@freely/dsh-freely` 治理插件（单独立项评估）。
 - 自主模式默认开启，但人类仍可通过 `chat`、`stop`、PR review、merge gate 介入。
 - 多项目通过全局 `~/.freely/projects.tsv` 登记，每个项目有独立 runtime 与工位；`fleet-status` 目前是“本项目工位视图”，不是跨项目统一调度台。
 - GUI 目前是 Tauri probe（`src-tauri/`），不是完整产品面；CLI 是主入口。
