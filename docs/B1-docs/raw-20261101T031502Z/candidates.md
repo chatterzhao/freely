@@ -150,3 +150,33 @@ milestone: M-20261101T031502Z-A
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
+
+## C-20261101T031502Z-F: 讨论入口：issue comment / PR review / CI 进入 scan 或事件流
+
+- candidate_format_version: v2
+- title: 让 scan/事件流真正监控 issue 讨论、PR review 评论与 CI 结果
+- status: needs_research
+- decision_reason: 主意图明确要求 scan 持续监控 issue、issue 讨论、chat。当前 `task-lifecycle-scan.py` 只处理 open issue 与 body；`pull_raw_issue` 只写 body；`fetch_issue` 虽带 comments 但未被消费；PR review/CI 完全没有入口。这不是 ownership 问题，而是“事件根本没进来”。
+- next_action: 先做来源盘点（issue body/issue comment/PR review comment/PR review/CI/chat）与事件 schema（source/event_id/thread_key/actor/body）；用真实 issue 评论与 PR review 回放，确认 scan/Manager 能看到；再决定走 scan 还是 DSH 式 Source/Trigger。
+- revisit_trigger: 出现“人在 issue/PR 里回复了但 Freely 没反应”、同一讨论重复开单、或 CI 失败没有进入 Manager 时，立即重启本 candidate。
+- acceptance_criteria:
+  - 六类来源都有明确入口、event_id、thread_key、actor 与去重规则
+  - issue comment/PR review 评论能进入 Manager 的 scan/queue，不需要人再开 chat
+  - CI 结果能作为事件进入，不依赖人转述
+  - 同一事件重复拉取不产生重复任务
+- promotion_gate: 来源/事件 schema + 至少一个真实 issue 评论与一个 PR review 的回放 + acceptance review
+- open_questions:
+  - 入口放 scan 还是独立 Source/Trigger 层
+  - 评论/评审是否要完整历史，还是只取增量
+  - 平台 event id 与 thread_key 如何统一
+  - 与现有 chat 入口的优先级/去重
+- acceptance_reviews:
+  - reviewer: session-self
+  - mode: code-path review
+  - summary: scan 无 comment 处理、pull 只写 body、PR review/CI 无入口；缺口成立，但没有回放证据
+  - verdict: needs_more_research
+- depends_on: C-20261101T031502Z-B
+- promoted_issue_id: pending://C-20261101T031502Z-F
+- promoted_issue_path: pending://needs-b2-materialization
+- milestone: M-20261101T031502Z-A
+- session_refs: []
