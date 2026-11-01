@@ -109,13 +109,13 @@ acceptance：
 
 | 债 | 说明 | 关闭方式 |
 | --- | --- | --- |
-| I-* canonical 格式 | YAML vs bullet 双写 | 选 YAML；parser 修改或脚本生成 bullet |
-| phase 单写者 | wt-create/pr-review/pr-merge 各写 | transition 表 + 显式命令 |
-| TDD `change_surface` | 未定义字段/校验 | schema + gate 规则 |
-| 注意力度量 | 无基线 | 最小埋点 + 采样 |
-| MCP | `mcpServers: []` | 明确“不编排”或接 harness MCP |
-| 语义 Watchdog | 只有进程/SSE | 定义轻量 supervisor reviewer 范围 |
-| raw issue absorbed | C-B~F 在 absorbed raw 下 | 确认 promote 路径或新 raw |
+| I-* canonical 格式 | YAML vs bullet 双写 | ✅ ADR-001：YAML canonical，bullet 投影 |
+| phase 单写者 | wt-create/pr-review/pr-merge 各写 | ✅ ADR-002：phase transition 命令 + 转移表 |
+| TDD `change_surface` | 未定义字段/校验 | ✅ ADR-003：面级最低证据 |
+| 注意力度量 | 无基线 | ✅ ADR-007：先埋点，后算指标 |
+| MCP | `mcpServers: []` | ✅ ADR-004：harness 拥有，Freely 传递 |
+| 语义 Watchdog | 只有进程/SSE | ✅ ADR-005：Manager 调用的轻量 reviewer |
+| raw issue absorbed | C-B~F 在 absorbed raw 下 | ✅ ADR-006：直接 promote，不重开 raw |
 
 ## 7. 关闭顺序
 
