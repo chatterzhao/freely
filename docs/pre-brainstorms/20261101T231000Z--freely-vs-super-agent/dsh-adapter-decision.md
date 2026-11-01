@@ -134,7 +134,25 @@ created_at: 2026-11-01
 3. **方案 C 是默认**：除非 DSH 生态有明确用户/模型收益，否则不值得为它维护双宿主。
 4. 如果 spike 证明 DSH 的 Router/Ticket 不能承接 Freely 的 B1/B2/TDD，那么答案不是“写 adapter”，而是“不集成”。
 
-## 6. 未解
+## 6. 何时重新评估
+
+**方案 A（DSH 作为 harness）只在以下条件同时满足时重开：**
+
+1. DSH 暴露稳定的 Session API（开/发/停/usage/stopReason），或提供 ACP 服务端；
+2. DSH 明确允许 Freely 拥有 Router/Ticket，不要求双写；
+3. 有真实用户需求“必须用 DSH 模型/preset”，而不是“架构看起来更强”；
+4. 能接受 DSH 的 Router/Thread/Mandate 被旁路。
+
+**方案 B（插件）的 spike 验收：**
+
+1. 在 DSH 内跑一个真实 Ticket，从 issue 到 PR；
+2. 用 `freely` CLI 卡住至少一个 gate（证明 exit code 能阻断）；
+3. DSH 的 Thread/Attention 能承接 Freely 的阶段消息；
+4. 测量“Freely 能力落地比例”和“DSH 上下文成本”，再决定是否产品化。
+
+没有这组证据，不做全量插件，更不做 adapter。
+
+## 7. 未解
 
 - DSH 插件 API 是否能暴露同步工具调用（gate 需要阻塞等待）？
 - DSH Ticket 能否承载 B1/B2 两级文档，还是需要外挂 docs？
