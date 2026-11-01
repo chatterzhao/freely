@@ -24,7 +24,7 @@ created_at: 2026-11-01
 | `docs/pre-brainstorms/20260720T055358Z--wt-create-silent-exit/candidates.md` | `docs/B1-docs/raw-20260720T055358Z/candidates.md` | 历史 B1 文档归位 |
 | `docs/pre-brainstorms/` | 删除 | 已空，废弃目录移除 |
 | `code-reviews/pr-review-raw-20260701T030358Z.md` | `docs/B2-docs/ibm/_legacy-issues/raw-20260701T030358Z/code-reviews/pr-review-raw-20260701T030358Z.md` | 无 active B2 story 的 legacy review，归 B2 `_legacy-issues` 的 raw；根目录 `code-reviews/` 删除 |
-| `docs/B1-docs/raw-20260710T171329Z/code-reviews/pr-review-raw-20260710T171329Z.md` | `docs/B2-docs/config/test-gate/env/raw-20260710T171329Z/code-reviews/pr-review-raw-20260710T171329Z.md` | B1 误放；对应 B2 issue 已存在，review 归该 raw 的 `code-reviews/` |
+| `docs/B1-docs/raw-20260710T171329Z/code-reviews/pr-review-raw-20260710T171329Z.md` | `docs/B2-docs/config/test-gate/raw-20260710T171329Z/code-reviews/pr-review-raw-20260710T171329Z.md` | B1 误放；对应 B2 issue 已存在，review 归该 raw 的 `code-reviews/` |
 
 ## 2. 仍需保留/单独处理的历史目录
 
@@ -33,7 +33,7 @@ created_at: 2026-11-01
 | `docs/B2-docs/ibm/_legacy/` | 显式归档（2.5M） | 有意保留的历史迁移归档 | 不搬；如要清理，单独开 issue |
 | `docs/B2-docs/ibm/_legacy-issues/` | 显式归档（2.0M） | 旧 I-* issue 归档 | 不搬；新 issue 不再写入 |
 | `docs/B2-docs/config-toml-complete/` | 顶层旧 story 残留（仅 1 个 review 文件） | 内容已归档到 `_legacy/raw-MIGRATED-config-toml-complete`，但历史 issue 的 `verification_artifact_dir` 仍指向它 | **冻结**；不要直接搬，先做路径重写 issue |
-| `docs/B2-docs/config/test-gate/env/raw-20260710T171329Z/` | 比 canonical 多一层 `env` | 自身引用一致，但不符合 `{epic}/{story}/raw-*` 深度 | **标记**；不搬，等 owner 确认是否 story 分组 |
+| `docs/B2-docs/config/test-gate/raw-20260710T171329Z/` | canonical 深度 | 原 `env/` 层已移除，符合 `{epic}/{story}/raw-*` | 已迁移；引用同步 |
 | `docs/B1-docs/.scan-state` | runtime 扫描状态（未跟踪） | 不是文档目录 | 不提交，不迁移 |
 | `docs/B1-docs/raw-20260701T030358Z/issue.md` | 历史 metadata 异常 | `local_id`/`absorbed_into` 多了 `58Z`，phase=`dropped` 且无 B2 I-*；review 仍属该 raw | **只记录，不顺手改**；如影响 scan，单独开 issue 修 metadata |
 
@@ -64,5 +64,5 @@ created_at: 2026-11-01
 - 根 README 链接全部指向新路径。
 - 仓库根 `code-reviews/` 不存在。
 - `find docs/B1-docs -type d -name code-reviews` 为空。
-- 20260701T030358Z 的 review 在 B2 `_legacy-issues/raw-20260701T030358Z/code-reviews/`；20260710T171329Z 的 review 在 B2 `config/test-gate/env/raw-20260710T171329Z/code-reviews/`。
+- 20260701T030358Z 的 review 在 B2 `_legacy-issues/raw-20260701T030358Z/code-reviews/`；20260710T171329Z 的 review 在 B2 `config/test-gate/raw-20260710T171329Z/code-reviews/`。
 - 依据：20260710 有对应 I-*；20260701 无 active B2 story，只能进 `_legacy-issues`，不能进 B1，也不凭空造 story。
