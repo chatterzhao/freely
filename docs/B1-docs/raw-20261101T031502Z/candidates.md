@@ -64,7 +64,7 @@ milestone: M-20261101T031502Z-A
   - summary: 五类矩阵/protocol v0/状态机+真实 #4070 线程回放通过；runtime new/fork/表归 b2_acceptance
   - verdict: pass
 - promoted_issue_id: I-20261101T031502Z-B
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
 - milestone: M-20261101T031502Z-A
 - session_refs: []
 
@@ -198,6 +198,6 @@ milestone: M-20261101T031502Z-A
   - summary: 六类 schema/准入/选型 + 真实 issue/PR/CI 回放通过；adapter/events/scan 归 b2_acceptance
   - verdict: pass
 - promoted_issue_id: I-20261101T031502Z-F
-- promoted_issue_path: pending://needs-b2-materialization
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
 - milestone: M-20261101T031502Z-A
 - session_refs: []
