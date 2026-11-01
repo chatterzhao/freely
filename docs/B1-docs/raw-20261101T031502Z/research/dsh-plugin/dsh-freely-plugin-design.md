@@ -122,7 +122,8 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 - 证明确实：第三方插件被 DSH host 加载；`inject` 的 `sessionController/workspaceRegistry` 可用；web host 能启动。
 - 反例：`headless` profile 缺这两个服务，插件停在 `pending (waiting for services...)`，不能假设所有 profile 都支持。
 - 后续 P1 partial：插件在 web profile 真实创建 Session，`sessionController.create/resolveAgent` 成功，`agent.steer(msg)` 不抛错；但 inbox 计数不可见、无模型 turn，不能证明 Agent 消费消息。
-- 仍未验证：Agent 实际消费、Python bridge、gate E2E、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
+- P1 bridge：插件通过 `ctx.subprocess` 真跑 `bin/freely fleet-status`，`bridge_exit=0` 并读到 stdout；Python/CLI bridge 可行。
+- 仍未验证：Worker/Reviewer preset、Agent 实际消费/role prompt、gate 阻断 E2E、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
 
 ## 3. Harness RPC
 

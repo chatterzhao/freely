@@ -17,3 +17,19 @@ Interpretation:
 - `agent.inbox` exposes projections/session/dispatch, not nextTurn/nextStep counters; `queued=0` is not proof of delivery.
 - No model turn was run; no proof that the Agent consumed the message.
 - Python bridge and gate E2E still unverified.
+
+## 2026-11-01 P1 bridge
+
+Third spike: plugin injects `subprocess`, creates a Session, steers a message, then spawns the Freely CLI:
+
+```
+[freely-spike] session=freely-spike-1793531657323 bridge_exit=0 out="  ▸ freely [dev] ..."
+```
+
+Verified:
+
+- `ctx.subprocess.resolveExecutable('bash')` + `spawn(...)` works inside the DSH plugin.
+- The plugin can call `bin/freely fleet-status` in the Freely worktree and read stdout.
+- Session creation + `agent.steer(msg)` still does not prove Agent consumption (no model turn).
+
+Still unverified: Worker/Reviewer presets, Agent consumption/role prompt, gate blocking E2E, full issue→PR.

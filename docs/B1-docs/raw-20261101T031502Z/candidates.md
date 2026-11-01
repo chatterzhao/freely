@@ -160,7 +160,7 @@ milestone: M-20261101T031502Z-A
 - acceptance_reviews:
   - reviewer: session-self
   - mode: desk-research
-  - summary: 静态契约 + DSH web host 真加载 + 真实 Session 创建/steer 已过；Agent 消费/Python bridge/gate E2E 未跑，不能 promote
+  - summary: 静态契约 + DSH web host 真加载 + Session 创建/steer + ctx.subprocess 跑 Freely CLI（exit=0）已过；Agent 消费/preset/gate E2E 未跑
   - verdict: needs_more_research
 - depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
 - promoted_issue_id: pending://C-20261101T031502Z-E
