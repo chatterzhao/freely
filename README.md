@@ -33,14 +33,15 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 
 | 阶段 | 主体 | 读什么 | 产出 | 门禁/循环 |
 | --- | --- | --- | --- | --- |
-| B1-IBM | Worker（doc-loop） | issue/chat、Intent/Constitution/LAWS、验收 | `brainstorms.md`、`candidates.md`、milestone candidate | B1 skill + scan/wt-create |
-| B2-IBM | Worker（doc-loop） | candidate、实现面、验收标准 | `I-*.md`、`prd.md`、`pre-tests.md`、`tasks.md` | B2 skill + pretests-gate |
+| B1-IBM | Worker（doc-loop） | issue/chat、Intent/Constitution/LAWS、验收 | `brainstorms.md`、`candidates.md`、milestone candidate | B1 skill；Reviewer `needs-review:b1` |
+| B2-IBM | Worker（doc-loop） | candidate、实现面、验收标准 | `I-*.md`、`prd.md`、`pre-tests.md`、`tasks.md` | B2 skill；Reviewer `needs-review:b2`；pretests-gate |
 | 派工 | Manager（auto-loop） | scan、milestone、phase、A2A、fleet | A2A task / 工位 | 不读代码、不下实现指令 |
-| 实现 | Worker（dev-loop） | I-*、PRD、pre-tests、tasks | 代码、测试、证据、commit | RED→GREEN、test-lane |
-| 评审 | Reviewer | PRD、pre-tests、diff、测试证据 | verdict、required fixes | fail→Worker；pass→PR |
+| 实现 | Worker（dev-loop） | I-*、PRD、pre-tests、tasks | 代码、测试、证据、commit | Reviewer `needs-review:red/dev/test`；test-lane |
+| 阶段评审 | Reviewer（watchdog 触发，独立 session） | 每阶段产物、diff、测试证据 | verdict、required fixes | fail→Worker；pass→下一阶段 |
+| PR 评审 | Reviewer（`pr-review-guarded`） | PR diff、pre-tests、证据 | 四问 verdict | 3 轮不过 escalate |
 | 收口 | Manager + gates | PR、test-gate、review verdict | merge、phase 更新、closeout | pr-merge-guarded / wt-close |
 
-这张表的顺序就是 README 主图的顺序；`Manager` 只拥有“下一步”，`Worker` 拥有“怎么实现”，`Reviewer` 拥有“是否达标”。
+这张表的顺序就是 README 主图的顺序；`Manager` 只拥有“下一步”，`Worker` 拥有“怎么实现”，`Reviewer` 拥有“是否达标”。Reviewer 不是只在最后出现：B1/B2/RED/dev/test 每个阶段都可 `needs-review`，PR 前还有 `pr-review-guarded` 的四问 review。
 
 ### 两条硬约束：SDD 与 TDD
 
