@@ -1,3 +1,18 @@
+## M-20261101T124657Z-A
+- title: feat — dsh-freely issue→PR E2E slice
+- status: active
+### candidate_issues
+1. `C-20261101T124657Z-A`
+- milestone: M-20261101T124657Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T124657Z-A
+- promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
+### committed_issues
+1. `I-20261101T124657Z-A`
+- milestone: M-20261101T124657Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
+
 ## M-20261101T120027Z-A
 - title: feat — @freely/dsh-freely DSH 打包形态
 - status: active
