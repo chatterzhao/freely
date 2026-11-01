@@ -11,13 +11,13 @@
 - target_environment: develop
 - required_evidence: git ls-files 确认文件不在 git 索引中
 - evidence_level: real_env
-- artifact_ref: docs/B2-docs/config/test-gate/env/raw-20260710T171329Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/config/test-gate/raw-20260710T171329Z/verification/test-evidence/acceptance-1.log
 - test_command: git ls-files --cached .freely/run/test-gate.env && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL (文件仍在追踪)
 - actual_RED_output: git ls-files 返回文件路径，确认文件被追踪
 - actual_output: git ls-files 返回空，文件已去追踪
-- evidence_file: docs/B2-docs/config/test-gate/env/raw-20260710T171329Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/config/test-gate/raw-20260710T171329Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: definition_missing
