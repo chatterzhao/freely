@@ -33,6 +33,7 @@ created_at: 2026-11-01
 | `docs/B2-docs/config-toml-complete/` | 顶层旧 story 残留（仅 1 个 review 文件） | 内容已归档到 `_legacy/raw-MIGRATED-config-toml-complete`，但历史 issue 的 `verification_artifact_dir` 仍指向它 | **冻结**；不要直接搬，先做路径重写 issue |
 | `docs/B2-docs/config/test-gate/env/raw-20260710T171329Z/` | 比 canonical 多一层 `env` | 自身引用一致，但不符合 `{epic}/{story}/raw-*` 深度 | **标记**；不搬，等 owner 确认是否 story 分组 |
 | `docs/B1-docs/.scan-state` | runtime 扫描状态（未跟踪） | 不是文档目录 | 不提交，不迁移 |
+| `docs/B1-docs/raw-20260701T030358Z/issue.md` | 历史 metadata 异常 | `local_id`/`absorbed_into` 多了 `58Z`，phase=`dropped` 且无 B2 I-*；review 仍属该 raw | **只记录，不顺手改**；如影响 scan，单独开 issue 修 metadata |
 
 ## 3. 规范（新文档）
 
