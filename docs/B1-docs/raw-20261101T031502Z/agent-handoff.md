@@ -110,6 +110,11 @@ Super-agent 的 delegation 不是“远程 A2A”，而是**同一个 runtime �
 
 结论：**Freely 的 Manager/Worker/Reviewer 更接近 DSH 的 Router/Worker，不是 AHP/ACP；A2A 是跨 Agent 的任务协议，不是团队内部交接的完整模型。** 可以继续用 A2A 作为外部线格式，但内部应有一层 delegation contract。
 
+补充 AHP 的定位：AHP 是“N 个 client ↔ 一个 host 的 session 状态同步”，核心是 channels、immutable state tree、action 序列、write-ahead reconciliation、断线重连；它明确不管 agent 实现、模型路由、工具定义，也不管 agent-to-agent 通信（官方 “What AHP Does Not Do”）。因此 AHP 适合 Freely 的 **多端 panel/观察面**，不适合 Manager/Worker/Reviewer 的任务交接。
+
+ACP 的定位：单 client ↔ 单 agent 的初始化、prompt、流式更新、工具调用、权限；它是 Freely 的 harness 传输层，不是 delegation 层。
+
+
 ## 7. 建议的最小修法（研究结论，不是实现）
 
 ### 7.1 先修确定的 bug
