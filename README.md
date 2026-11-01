@@ -260,6 +260,7 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [Agent 角色](docs/system/workspace/agents/)：Manager / Worker / Reviewer
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
 - [预头脑风暴索引](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/README.md)：研究地图、关键事实、未解问题
+- [逐项判定总表](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/synthesis.md)：问题/方案/谁更优/为什么/代价
 - [Freely 交付闭环概念模型](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/delivery-model.md)：B1/B2、SDD/TDD、三角色、四个循环
 - [Super-agent 对比研究](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/research.md)：理念/架构/实现/场景对比
 - [文章映射与 Reviewer 纠偏](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应

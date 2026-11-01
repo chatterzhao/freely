@@ -17,6 +17,7 @@ created_at: 2026-11-01
 
 | 文档 | 回答什么 | 状态 |
 | --- | --- | --- |
+| [synthesis.md](synthesis.md) | 逐项判定：问题/方案/谁更优/为什么/代价；adopt/adapt/reject | 初稿 |
 | [delivery-model.md](delivery-model.md) | B1/B2、SDD/TDD、三角色、阶段评审/PR 评审、四个循环、工具层 | 初稿 |
 | [research.md](research.md) | 理念、五平面、逐维对比、场景判定、实证、取舍 | 初稿 |
 | [super-agent-article.md](super-agent-article.md) | IT之家文章四特征/五模块、Router/Worker/Reviewer 映射纠偏 | 初稿 |
