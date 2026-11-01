@@ -32,9 +32,9 @@ milestone: M-20261101T124657Z-A
   - Reviewer verdict 的机器可判定格式
   - Worker/Reviewer 是否能在同一 DSH profile 同时挂载
 - acceptance_reviews:
-  - reviewer: pending (B2 后)
+  - reviewer: subagent:14247d38-8cb6-484c-960e-93a66ac8044f
   - mode: subagent
-  - summary: B1 边界收敛；E2E 只做确定性链路，不重做 P1。
+  - summary: 确定性 driver；真实 DSH committed/verdict/gate 0；修 blocker 后复评 pass。
   - verdict: pass
 - promoted_issue_id: I-20261101T124657Z-A
 - promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md

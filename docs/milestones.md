@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261101T124657Z-A`
 - milestone: M-20261101T124657Z-A
-- phase_state: in_verification
+- phase_state: completed
 - issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
 
 ## M-20261101T120027Z-A
