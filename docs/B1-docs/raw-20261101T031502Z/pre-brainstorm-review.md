@@ -28,7 +28,7 @@ created_at: 2026-11-01
 | issue-sync “唯一出口”过强 | 改为“出站统一走封装命令” |
 | scan 未标派生视图 | README 标注“派生、不写回” |
 | 四问/四层/六维混用 | 阶段评审=四层；PR 评审=四问 |
-| 过程稿重复 | 合并为 16 份结论文档；删除 research/synthesis/article/harness-port/deployment/adapter/handoff 旧稿 |
+| 过程稿重复 | 合并为 16 份结论文档；删除 research/synthesis/article/harness-port/deployment/adapter 等重复过程稿 |
 
 ## 2. Readiness matrix
 

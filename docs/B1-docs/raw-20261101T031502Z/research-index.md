@@ -7,7 +7,7 @@ created_at: 2026-11-01
 
 # B1 预研索引：Freely vs Super-agent
 
-> 研究阶段已完成。本阶段不 promote、不写实现；B1 candidate 状态与缺口见 `candidates.md` / `pre-brainstorm-review.md`。
+> 研究包整理完成；B1 loop 仍在 `needs_research`，不 promote、不写实现。candidate 状态与缺口见 `candidates.md` / `pre-brainstorm-review.md`。
 
 ## 一句话结论
 
@@ -40,6 +40,8 @@ created_at: 2026-11-01
 | [pre-brainstorm-review.md](pre-brainstorm-review.md) | 独立评审、readiness matrix、B1 loop |
 | [docs-directory-audit.md](docs-directory-audit.md) | 文档目录归位、遗留目录、既有门禁缺陷 |
 | [super-agent-freely-overlap.html](super-agent-freely-overlap.html) | 重叠意图与吸收点架构图（SVG 同目录） |
+
+B1 标准产物：`issue.md`、`brainstorms.md`、`candidates.md`。
 
 ## 关键事实（可复核）
 
