@@ -540,6 +540,7 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | Manager/Worker/Reviewer 交接缺陷 | 同目录 `agent-handoff.md` |
 | 交接协议 v0 | 同目录 `delegation-protocol.md` |
 | 主意图逐条对齐 | 同目录 `intent-alignment.md` |
+| 重叠意图对照与吸收 | 同目录 `overlap-comparison.md`、`super-agent-freely-overlap.html` |
 | Freely-host 插件设计 | 同目录 `dsh-freely-plugin-design.md` |
 | 两种部署形态与角色级 harness 选择 | 同目录 `deployment-forms.md`、`harness-selection.md` |
 | 文章映射与 Reviewer 误读 | 同目录 `super-agent-article.md` |

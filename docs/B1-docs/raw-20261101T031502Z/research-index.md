@@ -22,6 +22,7 @@ created_at: 2026-11-01
 | [delivery-model.md](delivery-model.md) | B1/B2、SDD/TDD、三角色、阶段评审/PR 评审、3 loop + 2 门禁、工具层 | 初稿 |
 | [research.md](research.md) | 理念、五平面、逐维对比、场景判定、实证、取舍 | 初稿 |
 | [intent-alignment.md](intent-alignment.md) | 主意图逐条对齐：优秀/部分/缺口/拖后腿 | 初稿 |
+| [overlap-comparison.md](overlap-comparison.md) | 只比重叠意图：概念映射、逐项评审、吸收清单 | 初稿 |
 | [super-agent-article.md](super-agent-article.md) | IT之家文章四特征/五模块、Router/Worker/Reviewer 映射纠偏 | 初稿 |
 | [failure-modes.md](failure-modes.md) | 漏单、重复、越权、交接丢失、缓存误判、文档漂移 | 初稿 |
 | [event-admission.md](event-admission.md) | 事件准入放哪层、平台 actor 数据缺口 | 初稿 |
