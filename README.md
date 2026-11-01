@@ -39,7 +39,7 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 
 **TDD：先证明失败，再证明通过。**
 
-- B2 先写 pre-tests；dev 工位先跑 RED（证明未实现/可复现），再实现。
+- B2 先写 pre-tests；dev 工位按 skill 先跑 RED（证明未实现/可复现），再实现。RED 是流程约束，GREEN/证据是门禁强制。
 - 在 `test-pre-merge` 工位跑 GREEN；测试证据是 PR 与 merge 的前提。
 - Reviewer 独立审查，不站在 Manager 或 Worker 一边。
 

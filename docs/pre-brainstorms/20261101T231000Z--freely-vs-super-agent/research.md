@@ -260,7 +260,9 @@ Freely 的 pre-tests 是验收合同：
 
 DSH 没有 TDD：Worker 自己决定测试，CI 是外部；没有“先 RED 再实现”的强制环。
 
-判定：**Freely 明显更优**，尤其对“AI 写代码容易自证”的问题。代价是流程重、慢；对 docs-only/极小改动需要允许 not_applicable，但不能把它变成默认免检。
+但 Freely 的实现也要看清：`pretests-gate` 强制的是**终态** `red-green-status=green` 或合法的 `not_applicable`；它并不检查 `actual_RED_output` 是否真实，也不检查提交顺序是否“先 RED 后实现”。RED 阶段由 `freely-test-RED-execution` skill 驱动，是流程约束，不是独立的 runtime gate。所以 Freely 的 TDD 更准确的说法是“**流程 + 终态证据门禁**”，不是“每个提交都机器证明先 RED”。
+
+判定：**Freely 明显优于 DSH 的空白**，尤其对“AI 写代码容易自证”的问题；但不要把它吹成完全硬保证。代价是流程重、慢；对 docs-only/极小改动允许 not_applicable，但不能变成默认免检。
 
 ### 7.5 上下文与缓存：DSH 纪律好，Freely 记忆长
 
