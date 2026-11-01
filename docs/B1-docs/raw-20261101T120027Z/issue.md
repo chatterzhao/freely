@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261101T120027Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261101T120027Z-A
 platform_ids:
   github:
     issue_id: '4112'
@@ -26,8 +26,8 @@ session_refs: []
 platform_state: open
 promoted_children: []
 source_candidate: ''
-completed_at: ''
-closeout_note: ''
+completed_at: 2026-11-01T12:00:00Z
+closeout_note: P1 packaging scope absorbed into I-20261101T120027Z-A; issue→PR is a later slice.
 ---
 
 workflow_kind: feature
