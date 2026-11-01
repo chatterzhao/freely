@@ -282,7 +282,7 @@ Freely 的 pre-tests 是验收合同：
 
 DSH 没有 TDD：Worker 自己决定测试，CI 是外部；没有“先 RED 再实现”的强制环。
 
-但 Freely 的实现也要看清：`pretests-gate` 强制的是**终态** `red-green-status=green` 或合法的 `not_applicable`；它并不检查 `actual_RED_output` 是否真实，也不检查提交顺序是否“先 RED 后实现”。RED 阶段由 `freely-test-RED-execution` skill 驱动，是流程约束，不是独立的 runtime gate。所以 Freely 的 TDD 更准确的说法是“**流程 + 终态证据门禁**”，不是“每个提交都机器证明先 RED”。
+但 Freely 的实现也要看清：`pretests-gate` 强制的是**终态** `red-green-status=green` 或合法的 `not_applicable`；它并不检查 `actual_RED_output` 是否真实，也不检查提交顺序是否“先 RED 后实现”。RED 阶段由 `freely-test-RED-execution` skill 驱动，是流程约束，不是独立的 runtime gate。更关键的是：**“全部 acceptance 都是 not_applicable 就是糊弄”只写在 `freely-test-execution` skill 里，`pretests-gate` 没有“至少一个真实 test_command/pass”的硬检查**；只要每个 not_applicable 都带合法 reason/replacement_evidence，代码门禁仍可放行。所以 Freely 的 TDD 更准确的说法是“**流程 + 终态证据门禁**”，不是“每个提交都机器证明先 RED”，也不是“全 not_applicable 一定被拦”。
 
 判定：**Freely 明显优于 DSH 的空白**，尤其对“AI 写代码容易自证”的问题；但不要把它吹成完全硬保证。代价是流程重、慢；对 docs-only/极小改动允许 not_applicable，但不能变成默认免检。
 
