@@ -14,15 +14,15 @@ milestone: M-20261101T031502Z-A
 - title: 交付 Super-agent 对比研究、概念全量对照与协作方向立项
 - status: promoted
 - decision_reason: 研究本身是一个有边界的交付：需要区分文章主张/原型实现/Freely 现状，逐项评估路由、交接、缓存与 harness 抽象，并把可推进方向登记为 candidate。它不实现任何候选，因此不能复用后续实现 issue 的载体。
-- next_action: 合并 I-20261101T031502Z-A 并收口；四个 needs_research candidate 由后续独立 issue 承接。
+- next_action: 合并 I-20261101T031502Z-A 并收口；五个 needs_research candidate 由后续独立 issue 承接。
 - revisit_trigger: 若研究结论被新证据推翻（例如 DSH 发布带 ACP 的版本、或 Freely 已完成 HarnessPort），重开研究并更新结论。
 - acceptance_criteria:
   - 研究覆盖七个比较维度与七处结构性差异
   - 概念全量对照覆盖领域对象、机制、运行时与观测面，并标出同名不同义
-  - 两张 archify 对比图可打开、可读
-  - 四个后续方向以 needs_research candidate 登记，带 next_action/revisit_trigger
+  - 重叠意图 archify 图可打开、可读；概念对照表完整
+  - 五个后续方向以 needs_research candidate 登记，带 next_action/revisit_trigger
   - `governance-merge-gate --range develop..HEAD` 通过
-- promotion_gate: 研究文档 + 概念对照 + 两张图 + 四个 candidate 合并，门禁通过
+- promotion_gate: 研究文档 + 概念对照 + 重叠图 + 五个 candidate 合并，门禁通过
 - open_questions: []
 - acceptance_reviews:
   - reviewer: session-self
