@@ -92,6 +92,20 @@ created_at: 2026-11-01
 - Freely 不能再声称“完整 three-loop”；在 DSH 内它是治理插件，不是项目所有者。
 - 多项目/跨仓仍受 DSH 单仓限制。
 
+### 2.4 插件 API 的现实：DSH 不是通用“工具插件”宿主
+
+读 `docs/007-architecture.md` 和 `docs/008-cookbook.md` 后要修正一个预期：
+
+- DSH 的插件入口主要是 **Source 插件**（`SourceKind` + `SourceContext` + `orchestrator` service），负责把外部消息变成 Trigger。
+- 主 Session 的工具集是 `src/app/tools/main.ts` 内建的 14 个工具；没有看到“第三方插件任意注册工具”的公开接口。
+- 因此 `@freely/dsh-freely` 最现实的形态不是“把 gates 注册成 DSH tools”，而是：
+  1. **Source 插件**：把 Freely 的 issue/PR/CI/文档事件变成 DSH Trigger；
+  2. **skill/prompt**：告诉 DSH Worker 用 `freely` CLI 跑 B1/B2、gate、worktree、TDD；
+  3. **bash 调用**：DSH Worker 本来就有 `bash` 工具，可以直接执行 `freely ...`，用 exit code 卡门禁。
+- 这能保留 DSH 的 Router/Ticket/Thread/Attention，也能让 Freely 的 gate/worktree/TDD 以 CLI 形式落地；但“Freely 作为一等工具”做不到，除非改 DSH core。
+
+这进一步说明：**插件路线的可行形态是“Source + skill + CLI”，不是“Freely 全套能力原样插件化”。** 如果目标是“Freely 能力全部落地”，插件路线也会阉割掉 Freely 的 Manager/A2A/three-loop；只是它保留的是 DSH 的运行时，而不是把 DSH 阉割成执行器。
+
 ## 3. 方案 C：不做 DSH 集成
 
 - 保持 ACP 四家 CLI；DSH 只作为“另一个可参考的架构”，不进入代码。
