@@ -16,7 +16,7 @@ created_at: 2026-11-01
 | C-B ownership/handoff | ✅ `handoff.md` §2.1 五类现状/目标矩阵；✅ 协议 v0 | new/fork 丢 message 修复、handoff 表/真实回放 | 行为矩阵 + 回放日志（B2） | needs_research（实现待 B2） |
 | C-C report/attention/prompt | ✅ report/attention/批量决策 schema；✅ A2A 映射；✅ prompt manifest/三态 | usage/cache 基线、真实 patrol 对照 | `runtime-contracts.md` §3.1-3.2 + 基线日志（B2） | needs_research（测量待 B2） |
 | C-D HarnessPort | ✅ HarnessPort Protocol；✅ RoleHarnessConfig；✅ per-role probe/JSON 契约 | 角色级选择/探测实现 | `harness-strategy.md` §1.1-1.4 + probe 输出（B2） | needs_research（实现待 B2） |
-| C-E DSH 插件 | 服务 API 可用性、插件骨架/桥协议 | P0/P1 spike、首次 session 消息、gate 阻断 | spike 报告 + 代码 | needs_research |
+| C-E DSH 插件 | ✅ 服务注入/插件骨架静态 spike；✅ create/resolveAgent API 编译验证 | 真实 host 加载、Python bridge、首次 session、gate E2E | `dsh-freely-plugin-design.md` §2.4 + `spike/dsh-plugin-contract.ts` | needs_research（实现待 B2） |
 
 ## 1. C-F 讨论入口
 

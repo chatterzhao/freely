@@ -89,6 +89,31 @@ export const inject = [
 
 > 这些服务是 DSH 主插件实际注入的；第三方插件能否稳定拿到，需要 spike 验证。若不允许，退化为“Source + skill + CLI”，但那就不是 A 形态。
 
+## 2.4 Spike 证据（2026-11-01）
+
+已在本地 DSH 原型上做**静态插件契约 spike**，不是完整 runtime E2E：
+
+- DSH 原型 `pnpm install --offline` + `pnpm typecheck` 通过。
+- 最小插件 `research/ops/spike/dsh-plugin-contract.ts` 在 DSH 类型环境下编译通过：
+
+```
+pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext \
+  --target es2022 --skipLibCheck --strict --types node spike-freely-plugin.ts
+```
+
+- 编译验证了：`inject` 的服务名（`sessionController`/`workspaceRegistry` 等）存在；`resolveAgent`/`create({sessionId, workspaceId, agentPreset})` 可用；插件可以以 `name`/`inject`/`apply` 形态被 DSH 加载。
+- DSH `Sessions.ensure` 的真实实现是：`sessionController.resolveAgent` → 未找到则 `workspaceRegistry.create` + `sessionController.create({agentPreset})` → `resolveAgent`；消息通过 `AgentDelivery.send`，不是 `session/new` 带 message。这与 Freely ACP 的丢消息 bug 不同。
+
+仍未验证（属于 B2 实现验收，不是研究缺口）：
+
+- DSH host 实际启动并加载第三方插件；
+- Python runtime ↔ plugin bridge；
+- 首次 session 收到 task+role prompt 的端到端；
+- gate 阻断/usage 上报；
+- 真实 issue 到 PR 无 ACP。
+
+结论：**C-E 的研究问题（插件形态/服务注入是否可行）已关闭；运行/E2E 是 B2 实现验收。**
+
 ## 3. Harness RPC
 
 `FreelyBridgeServer` 暴露给 Python runtime：
