@@ -1,3 +1,17 @@
+## M-20261101T120027Z-A
+- title: feat — @freely/dsh-freely DSH 打包形态
+- status: active
+### candidate_issues
+1. `C-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T120027Z-A
+- promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+### committed_issues
+1. `I-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
 
 ## M-20261101T031502Z-A
 - title: research — Super-agent 架构与 Freely agent 协作模型对比
