@@ -65,7 +65,20 @@ progress, next_action, completion_summary, evidence_paths, worker_prompts_csv
 - `acp_session_connect` 在 new/fork 不发送 message；`acp-bridge.session_new` 不注入角色 prompt。
 - `watchdog_sse._build_review_task_message` 与 `reviewer-agent.md`/`freely-tdd-review` 三处 verdict 契约不一致。
 
-### 2.1.2 回放场景（B2 验收）
+### 2.1.2 回放结果（2026-11-01）
+
+已跑只读状态机 `research/ops/replay/handoff_replay.py`：
+
+- new→worker 拥有；active follow-up 直达 worker。
+- 跨工单 handback 一次，第二次拒绝。
+- Worker 死亡：Task 保持 working，owner 回 Manager，带 recovery。
+- Reviewer 2 轮 changes_requested；3 轮回 Manager/blocked。
+- completed 工单 lease 内归原 Worker；过期回 Manager。
+- 人 stop 优先，owner=human。
+
+这是协议自洽验证，不是 runtime E2E；E2E 在 B2 验收。
+
+### 2.1.3 E2E 场景（B2 验收）
 
 1. issue #4070 两条真实评论 → 同一 thread，不新开 issue。
 2. 关闭 issue 后的评论 → 不自动复活；按 lease/handback 处理。

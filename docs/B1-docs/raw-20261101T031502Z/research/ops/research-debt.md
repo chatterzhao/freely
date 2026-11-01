@@ -13,7 +13,7 @@ created_at: 2026-11-01
 | Candidate | 研究缺口 | 实现/验证缺口 | 关闭证据 | 当前状态 |
 | --- | --- | --- | --- | --- |
 | C-F 讨论入口 | ✅ `intake.md` 六类 schema/准入/选型；✅ 真实 issue/PR/CI 回放 | platform-adapter 方法、events 表、scan 读取 | `intake.md` + `replay/intake_replay.py` 输出 | needs_research（实现待 B2） |
-| C-B ownership/handoff | ✅ `handoff.md` §2.1 五类现状/目标矩阵；✅ 协议 v0 | new/fork 丢 message 修复、handoff 表/真实回放 | 行为矩阵 + 回放日志（B2） | needs_research（实现待 B2） |
+| C-B ownership/handoff | ✅ 五类现状/目标矩阵；✅ 协议 v0；✅ 状态机回放 | new/fork 丢 message 修复、handoff 表/真实回放 | `handoff.md` §2.1 + `handoff_replay.py` | needs_research（实现待 B2） |
 | C-C report/attention/prompt | ✅ report/attention/批量决策 schema；✅ A2A 映射；✅ prompt manifest/三态 | usage/cache 基线、真实 patrol 对照 | `runtime-contracts.md` §3.1-3.2 + 基线日志（B2） | needs_research（测量待 B2） |
 | C-D HarnessPort | ✅ HarnessPort Protocol；✅ RoleHarnessConfig；✅ per-role probe/JSON 契约 | 角色级选择/探测实现 | `harness-strategy.md` §1.1-1.4 + probe 输出（B2） | needs_research（实现待 B2） |
 | C-E DSH 插件 | ✅ 服务注入/插件骨架静态 spike；✅ create/resolveAgent API 编译验证 | 真实 host 加载、Python bridge、首次 session、gate E2E | `dsh-freely-plugin-design.md` §2.4 + `spike/dsh-plugin-contract.ts` | needs_research（实现待 B2） |
