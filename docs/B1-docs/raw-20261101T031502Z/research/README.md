@@ -21,7 +21,7 @@ created_at: 2026-11-01
 | **B. Freely 交付/运行时** | Freely 自身怎么交付：B1/B2、SDD/TDD、三角色、交接协议、状态/准入/缓存/TDD 契约 | [delivery/delivery-model.md](delivery/delivery-model.md)、[handoff.md](delivery/handoff.md)、[runtime-contracts.md](delivery/runtime-contracts.md) |
 | **C. Harness 策略** | harness 可插拔、两种部署形态、角色级选择 UI/CLI/配置 | [harness/harness-strategy.md](harness/harness-strategy.md)、[harness-selection.md](harness/harness-selection.md) |
 | **D. DSH 插件（相邻课题）** | Freely 是否/如何作为 DSH 插件；与 Super-agent 插件形态的关系 | [dsh-plugin/README.md](dsh-plugin/README.md)、[dsh-freely-plugin-design.md](dsh-plugin/dsh-freely-plugin-design.md) |
-| **E. 运维/证据** | 目录归位、遗留目录、既有门禁缺陷、研究债台账 | [ops/docs-directory-audit.md](ops/docs-directory-audit.md)、[research-debt.md](ops/research-debt.md)、[decisions.md](ops/decisions.md) |
+| **E. 运维/证据** | 目录归位、遗留目录、既有门禁缺陷、研究债台账 | [ops/docs-directory-audit.md](ops/docs-directory-audit.md)、[research-debt.md](ops/research-debt.md)、[decisions.md](ops/decisions.md)、[replay/README.md](ops/replay/README.md) |
 | 图 | 重叠意图与吸收点 | [assets/super-agent-freely-overlap.html](assets/super-agent-freely-overlap.html)（SVG 同目录） |
 
 ### 为什么 DSH 插件单独一类
