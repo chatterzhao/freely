@@ -29,6 +29,7 @@ created_at: 2026-11-01
 | [context-cache.md](context-cache.md) | prompt 顺序、ACP 传输、cache 日志、prefix hash 建议 | 初稿 |
 | [observability.md](observability.md) | live/fleet/harness 实测、DSH panel/health 对比、只读面 fail-closed | 初稿 |
 | [harness-port.md](harness-port.md) | HarnessPort 接口、ACP 四家、DSH adapter 三种模式 | 初稿 |
+| [dsh-adapter-decision.md](dsh-adapter-decision.md) | DSH adapter 会阉割什么；反向 @freely/dsh-freely 插件评估 | 初稿 |
 | [readme-architecture-audit.md](readme-architecture-audit.md) | README 图为什么改、主图/辅图取舍 | 初稿 |
 
 ## 关键事实（可复核）

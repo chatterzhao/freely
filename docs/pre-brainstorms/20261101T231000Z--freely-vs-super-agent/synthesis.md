@@ -42,7 +42,7 @@ created_at: 2026-11-01
 | 12 | 并发 | 多任务并行不互相踩 | Worker slot + 人优先槽位 + Thread 共享 | 每 issue worktree + test 工位 + worker pool | **仓库内 DSH 细；跨项目 Freely 广** | DSH 事件级调度细；Freely 环境隔离强 | DSH 单仓；Freely 工位/分支管理成本 |
 | 13 | 失败恢复 | 死机/卡住/跑偏能回来 | effect 队列 + 恢复提示 + 未读 Input 重投 + Watchdog（文章） | supervisor/watchdog/continuation + session resume + gate 对账 | **分裂** | DSH 外部副作用强；Freely 进程/工位恢复强 | DSH 原型 watchdog 未落地；Freely 无通用 effect 队列 |
 | 14 | 可观测 | 出了事能查 | 单写 DB + health board + panel + Decision/reason | docs 证据 + CLI status + DB + review verdict | **分裂** | DSH 实时性强；Freely 审计性强 | DSH 文档弱；Freely 实时性弱、数据分散 |
-| 15 | Harness | 换模型/CLI 是否重写 | 绑定 Cordis/DSH；深度集成；无 ACP | ACP 多 CLI；HarnessPort 方向；契约未显式 | **Freely 更优** | 可替换基座；DSH 换宿主=重写 | Freely 能力差异靠分支兜底；DSH 无 ACP |
+| 15 | Harness | 换模型/CLI 是否重写 | 绑定 Cordis/DSH；深度集成；无 ACP | ACP 多 CLI；HarnessPort 方向；契约未显式 | **Freely 更优（但 DSH adapter 不做）** | 可替换基座；DSH 换宿主=重写；DSH adapter 会把 DSH 阉割成执行器 | Freely 能力差异靠分支兜底；DSH 无 ACP；双宿主冲突 |
 | 16 | 规模/移植 | 单仓还是多项目 | 单仓单团队；云端/本地 daemon | 项目 registry + 独立 runtime + 多工位；跨项目调度未产品化 | **Freely 更广但有边界** | Freely 可多项目登记；DSH 单仓更深 | Freely 跨项目视图未成熟；DSH 扩展难 |
 
 ## 2. 最佳组合（按需求）
@@ -67,7 +67,7 @@ created_at: 2026-11-01
 | **adopt** | 把已有 STABLE/SEMI-STABLE/DYNAMIC 排序显式化 + usage/estimated | 让 cache 可校验、可回归 |
 | **adapt** | Thread 订阅直通 | 先做“同一工单线程 ownership”，不做事件总线 |
 | **adapt** | Policy 版本 | 记录“依据哪版规则批准”，不做运行时 Mandate |
-| **adapt** | DSH adapter | 作为 HarnessPort 的一个实现；不让 DSH 接管 three-loop |
+| **adapt** | DSH 集成 | 只做 `@freely/dsh-freely` 插件 spike；不做 DSH-as-harness adapter |
 | **adapt** | Freely 工具作为 DSH 插件 | 只外溢 gates/worktree/issue，不起第二套调度 |
 | **reject** | 默认 observe / 默认不做 | 与 Freely“项目所有者”目标冲突 |
 | **reject** | 单仓/单机假设 | 与多项目 registry 冲突 |
