@@ -67,3 +67,8 @@ Not verified: tools/tool whitelist (presets are empty in this spike), role promp
 [freely-spike] preset=freely-reviewer role=reviewer created=true
 dsh web: http://127.0.0.1:3080/?token=2XsOSgQzLe2_EckqihyreuZAYEnSlyjzaSoN0rs7Eg0
 dsh web: opening the default browser; pass --no-open to disable
+[freely-spike] preset=freely-manager role=manager tools=glob,grep,read
+[freely-spike] preset=freely-worker role=worker tools=edit,glob,grep,read,write
+[freely-spike] preset=freely-reviewer role=reviewer tools=glob,grep,read
+dsh web: http://127.0.0.1:3080/?token=-ki_3rBacEUF5WgNRSxZ1CnlcfKUWq0n1sVbgHwV_Jg
+dsh web: opening the default browser; pass --no-open to disable

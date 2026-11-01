@@ -125,7 +125,9 @@ pnpm exec tsc --ignoreConfig --noEmit --moduleResolution bundler --module esnext
 - P1 bridge：插件通过 `ctx.subprocess` 真跑 `bin/freely fleet-status`，`bridge_exit=0` 并读到 stdout；Python/CLI bridge 可行。
 - P1 consumption：`steer` 后 Agent `status=running`，Session events 有 `step/start,tool/call,tool/result,step/end`；消息真实被消费。
 - P1 gate：插件跑 `pretests-gate` 对缺失 issue 得到 `gate_exit=1`，阻断真实。
-- P1 preset：profile patch 定义 `freely-manager/worker/reviewer`，三个 preset 各自创建 Session 成功；工具白名单仍为空，未验证隔离。
+- P1 preset：profile patch 定义 `freely-manager/worker/reviewer`，三个 preset 各自创建 Session 成功。
+- P1 tool whitelist：`agent.ctx.tools.restrict` 后实测 manager/reviewer=`glob,grep,read`，worker=`edit,glob,grep,read,write`；白名单隔离成立。
+- P1 role prompt：三个 preset 各挂 `dsh-persona`，prefix 分别为 Freely Manager/Worker/Reviewer。
 - 仍未验证：Worker/Reviewer preset 独立生成/工具白名单、role prompt、真实 issue→PR。见 `spike/dsh-runtime-load.md`。
 
 ## 3. Harness RPC
