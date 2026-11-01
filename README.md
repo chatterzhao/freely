@@ -1,12 +1,12 @@
 # Freely
 
-**一个自主的项目循环运行器：AI 是项目所有者，人负责定意图和验收。**
+**一个文档驱动（SDD）、测试驱动（TDD）的项目循环运行器：AI 是项目所有者，人负责定意图和验收。**
 
-Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它把 `issue → 调研 → 设计 → 实现 → 测试 → PR → 合并 → 收口` 做成一个持续运行的闭环：AI 自己发现下一步、自己在隔离工位里干活、自己跑门禁，人类只在需要决策或验收时出现。
+Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。人只在需要决策或验收时出现。
 
-[![架构图](docs/assets/freely-architecture.svg)](docs/assets/freely-architecture.html)
+[![交付闭环](docs/assets/freely-delivery-loop.svg)](docs/assets/freely-delivery-loop.html)
 
-> 图中五层：界面面 → 规格面（SDD）→ 控制面 → 执行面（TDD）→ 基座面。交互版：[docs/assets/freely-architecture.html](docs/assets/freely-architecture.html)（支持主题切换、搜索、聚焦与导出）
+> 交付主脊：B1/B2 生成 SDD/TDD 文档 → Manager/Worker/Reviewer 按文档执行 → PR 收口。交互版：[freely-delivery-loop.html](docs/assets/freely-delivery-loop.html)；系统五平面见 [freely-architecture.html](docs/assets/freely-architecture.html)。
 
 ## 为什么需要它
 
@@ -29,6 +29,19 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 | 执行面（TDD） | Worker、Reviewer、dev/test worktree、RED/GREEN、commands/scripts/skills | 实际怎么干、怎么验证 |
 | 基座面 | ACP harness（Claude/Codex/OpenCode/Cline）、GitHub/Gitee | 用什么执行、外部世界在哪 |
 
+### 交付主脊：谁在什么时候做什么
+
+| 阶段 | 主体 | 读什么 | 产出 | 门禁/循环 |
+| --- | --- | --- | --- | --- |
+| B1-IBM | Worker（doc-loop） | issue/chat、Intent/Constitution/LAWS、验收 | `brainstorms.md`、`candidates.md`、milestone candidate | B1 skill + scan/wt-create |
+| B2-IBM | Worker（doc-loop） | candidate、实现面、验收标准 | `I-*.md`、`prd.md`、`pre-tests.md`、`tasks.md` | B2 skill + pretests-gate |
+| 派工 | Manager（auto-loop） | scan、milestone、phase、A2A、fleet | A2A task / 工位 | 不读代码、不下实现指令 |
+| 实现 | Worker（dev-loop） | I-*、PRD、pre-tests、tasks | 代码、测试、证据、commit | RED→GREEN、test-lane |
+| 评审 | Reviewer | PRD、pre-tests、diff、测试证据 | verdict、required fixes | fail→Worker；pass→PR |
+| 收口 | Manager + gates | PR、test-gate、review verdict | merge、phase 更新、closeout | pr-merge-guarded / wt-close |
+
+这张表的顺序就是 README 主图的顺序；`Manager` 只拥有“下一步”，`Worker` 拥有“怎么实现”，`Reviewer` 拥有“是否达标”。
+
 ### 两条硬约束：SDD 与 TDD
 
 **SDD：文档是规格与生命周期的真相。**
@@ -44,6 +57,8 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 - 在 `test-pre-merge` 工位跑 GREEN；测试证据（或带理由的 not_applicable）是 PR 与 merge 的前提。
 - 全部 not_applicable 是否合理由 review/skill 判断，gate 只检查理由与替代证据；不要把它当成默认免检。
 - Reviewer 独立审查，不站在 Manager 或 Worker 一边。
+
+**B1/B2 与 SDD/TDD 不是同义词**：B1 收敛“问题规格”（为什么做、边界、优先级），B2 产出“实现规格 + 验收规格”（PRD、pre-tests、tasks）。PRD 是 SDD 的合同，pre-tests 是 TDD 的合同；Worker 按合同实现，Reviewer 按合同验收。
 
 这不是“提示词里建议写文档/写测试”，而是 runtime、skill、command、gate 一起强制的交付方式。
 
@@ -64,23 +79,24 @@ issue / chat / 治理漂移
         │
         ▼
    auto-loop（Manager）
-   巡检 → 判断 → 建 raw issue → 建工位 → 派工 → 收口
+   巡检 → 判断 → 建 raw issue / 工位 → 派工 → 收口
         │
         ├── doc-loop（Worker）
-        │     B1 预研 → candidate → B2 PRD / pre-tests / tasks
+        │     B1 预研 → candidate → B2 I-*/PRD/pre-tests/tasks
         │
-        └── dev-loop（Worker）
-              RED → 实现 → test-GREEN → 独立 review → PR
-                                      │
-                                      ▼
-                          pr-create / pr-review / pr-merge / wt-close
+        ├── dev-loop（Worker）
+        │     RED → 实现 → test-GREEN → commit
+        │
+        └── delivery gate（Reviewer + gates）
+              review verdict → PR → merge → closeout
 ```
 
-三个 loop 的分工：
+三个 loop + 一段交付门禁：
 
 - **auto-loop**：唯一调度中枢。决定“现在做什么、派给谁、什么时候收口”。
-- **doc-loop**：先把问题收敛成可执行的 issue，再写清验收与测试方案。
-- **dev-loop**：在独立 worktree 里按 pre-tests 实现，在 `test-pre-merge` 工位验证，最后由 Reviewer 审查。
+- **doc-loop**：B1 收敛问题，B2 生成 SDD/TDD 合同；它不是“写文档”，是生成可执行的规格与验收。
+- **dev-loop**：Worker 按合同在独立 worktree 实现，在 `test-pre-merge` 工位验证。
+- **delivery gate**：Reviewer 独立审查，PR/merge/closeout 门禁执行；它不是第四个常驻 loop，而是 dev-loop 完成后的交付段。
 
 验证不是“agent 说完成了”，而是**门禁 + 证据**：B1/B2 文档、RED/GREEN 记录、独立 review verdict、PR gate、merge gate、closeout。
 
@@ -214,8 +230,15 @@ docs/
   B1-docs/                   预研、candidate、对比研究
   B2-docs/                   正式 issue、PRD、pre-tests、code-review
 src/                         TUI/GUI
-docs/assets/                 README 架构图
+docs/assets/                 README 交付闭环 + 五平面图
 ```
+
+### Dogfooding 与目录边界
+
+- 本仓库正在用同一套 B1/B2、SDD/TDD 开发 Freely 自己；这是 dogfooding，不是架构组件。
+- `docs/B1-docs/`、`docs/B2-docs/`、`docs/milestones.md` 是本仓库的**自开发过程产物**，不属于 runtime。
+- `docs/system/`、`bin/`、`src/` 是 **Freely 产品能力**，会被 runtime/agent/skill/CLI 长期消费。
+- README 主图描述的是**产品交付闭环**，不是当前仓库的 issue 列表或工位状态。
 
 ## 边界与现状
 
