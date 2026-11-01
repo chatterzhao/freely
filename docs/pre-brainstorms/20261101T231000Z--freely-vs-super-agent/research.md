@@ -407,7 +407,7 @@ DSH：
 - **项目登记/独立 runtime**：真实存在，是 Freely 相对 DSH 的差异。
 - **跨项目统一调度与注意力视图**：目前不是产品面，不能把它当成已完成能力写进 README。
 
-READM 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位视图，不是跨项目调度台”。
+README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位视图，不是跨项目调度台”。
 
 ## 8. Freely 明确不如 Super-agent 的地方
 
