@@ -201,6 +201,22 @@ issue / chat / 治理漂移
 | Harness | 绑定 Cordis/DSH，无 ACP | ACP 多 CLI 可替换 | **Freely 更优**（但契约仍是隐式） |
 | 规模 | 单仓单团队 | 多项目 fleet | **Freely 更广，DSH 更深** |
 
+### 6.1 按场景判定：谁更优秀取决于问题
+
+| 场景 | 更优 | 为什么 |
+| --- | --- | --- |
+| 一个仓库、一个团队、事件很多、怕打扰 | Super-agent | 代码 gate + observe + 订阅直通 + 注意力纪律 |
+| 多项目、长周期、要规格与审计 | Freely | SDD + TDD + Reviewer + PR/merge 门禁 + fleet |
+| 一条明确的 bug，今天就要修 | Super-agent | 无 B1/B2/PRD 开销，直接 Ticket→Worker |
+| 一条模糊需求，需要先收敛边界 | Freely | B1 brainstorm/candidate 强制先想清楚 |
+| PR 里后续讨论很多，怕漏接 | Super-agent | Thread 订阅 + followupOwners + handback |
+| 合并前要证明测试真的跑过 | Freely | pre-tests + test-pre-merge + pretests gate |
+| 团队要换 AI CLI / 不被一家 harness 锁定 | Freely | ACP 多 CLI；DSH 绑定 Cordis |
+| 需要单仓库内极低延迟的多事件调度 | Super-agent | 单 Router 批处理 + 订阅直通 |
+| 需要跨项目调度与人机审计 | Freely | fleet + 文档证据链 |
+
+结论：**如果问题是“团队助手的注意力与事件响应”，Super-agent 的方案更合适；如果问题是“项目所有者的交付治理”，Freely 的方案更合适。** 两者可以组合，但必须定“一个 loop 一个 owner”。
+
 ## 7. 深水区
 
 ### 7.1 路由与准入：DSH 赢在“先判后做”，Freely 赢在“知道现在该做什么”
