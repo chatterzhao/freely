@@ -4,6 +4,7 @@ phase_state: in_progress
 topic: IT之家 Super-agent 解读与 Freely 概念映射
 created_at: 2026-11-01
 source: https://m.ithome.com/html/1020615.htm
+prototype: https://github.com/deepseek-ai/dsh-superagent-prototype @ 6337fc823ce20251c8de8085948165c81aaa701e
 ---
 
 # 先把文章读准：Router/Worker/Reviewer 不是一一对应

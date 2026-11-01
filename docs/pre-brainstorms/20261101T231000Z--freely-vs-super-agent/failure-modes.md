@@ -28,7 +28,7 @@ created_at: 2026-11-01
 | 缓存误判 | 前缀稳定但无 cache 指标 | 有 `[CACHE]` 但 input 常为估算，hit/miss=0 | 分裂/都不足 |
 | 外部副作用重复 | effect 队列 + 重试/退避；恢复提示先核对 | platform-adapter/issue-sync；无通用 effect 队列 | Super-agent |
 | 文档/状态漂移 | 无文档层；Engine 单写 DB | phase 多写者、I-* 双解析、scan station/next_action 不一致 | Freely 风险更高 |
-| Reviewer 走形式 | 无内建 Reviewer（不是“走形式”，是缺失） | 独立 Reviewer + 四层/六维；但 review gate 依赖 agent 身份 | Freely |
+| Reviewer 走形式 | 无内建 Reviewer（不是“走形式”，是缺失） | 独立 Reviewer：阶段四层 + PR 四问；但 PR review gate 依赖 agent 身份 | Freely |
 | TDD 被绕过 | 无 TDD | GREEN 硬门禁；RED 流程；全 not_applicable 仅 skill 约束 | Freely（但没有想象中硬） |
 | harness 能力不匹配 | 绑定 DSH，不存在“换 harness”问题 | ACP 多 CLI；能力靠分支兜底，缺 probe | Freely（方向对，契约弱） |
 | 平台不可用 | Source 报错，Ticket/Policy 仍在本地 | scan platform_health degraded；本地 docs 仍在 | 平手（都可降级） |
@@ -174,7 +174,7 @@ Freely：
 
 Super-agent：没有内建 Reviewer；Worker 自审 + 外部自动 bot（可错输入，最多三轮）。不是“走形式”，是**角色缺失**。
 
-Freely：独立 Reviewer + 四层/六维审查 + verdict；但 review gate 依赖 `agent_working` 身份，手工工位会 fail-closed。
+Freely：独立 Reviewer 做阶段四层审查（Clean&Sync/质量/完整度/安全），PR 前做四问（RED/GREEN/ADEQUACY/REFACTOR）；但 PR review gate 依赖 `agent_working` 身份，手工工位会 fail-closed。
 
 判定：Freely 更强；风险在“Reviewer 是否真的独立/有证据”，不是“有没有角色”。
 

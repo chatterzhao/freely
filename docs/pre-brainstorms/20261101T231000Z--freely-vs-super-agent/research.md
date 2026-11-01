@@ -3,8 +3,8 @@ pre_brainstorm_id: PB-20261101T231000Z
 phase_state: in_progress
 topic: Freely vs DeepSeek Super-agent
 sources:
-  - DeepSeek Harness article (2026-10-31)，经智东西/博客园两篇按原文结构复述的报道交叉核对
-  - deepseek-ai/dsh-superagent-prototype（2026-11-01 main 快照）
+  - DeepSeek Harness article (2026-10-31)；IT之家 https://m.ithome.com/html/1020615.htm；智东西/博客园按原文结构复述的报道交叉核对（二手，未见原始论文）
+  - https://github.com/deepseek-ai/dsh-superagent-prototype @ 6337fc823ce20251c8de8085948165c81aaa701e（2026-11-01 快照）
   - Freely docs/PROJECT_INTENT.md、CONSTITUTION.md、LAWS.md
   - Freely docs/system/workspace/three-loop-capability-lifecycle.md、ibm-framework.md、scan-lifecycle-design.md
   - Freely docs/system/workspace/a2a/*、agents/*、tools.md、commands.md、acp-session-architecture.md
@@ -360,6 +360,19 @@ DSH：
 
 4. **Reviewer 的 fork 是降级，不是 native。**
    `freely harness-status --require fork` 在主项目失败：reviewer 用的 Cline 是 `degraded=fork`。这不是“Reviewer 不能工作”，而是“Reviewer 首轮必须冷启动或走 session/new”，与文档里“fork 继承治理上下文”的默认叙事有差距。
+
+复现命令：
+
+```bash
+# pre-tests 资产
+find docs/B2-docs -name pre-tests.md | wc -l
+grep -rl not_applicable docs/B2-docs --include=pre-tests.md | wc -l
+grep -rL "test_command:" docs/B2-docs --include=pre-tests.md | wc -l
+# A2A 状态
+sqlite3 .freely/freely.db "select state,count(*) from a2a_tasks group by 1;"
+# cache/能力
+./bin/harness-status --project <main> --json
+```
 
 这些实测是下一轮设计（事件准入、ownership、TDD 适用范围、HarnessPort）的事实基础，不是实现任务。
 

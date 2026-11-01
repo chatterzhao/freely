@@ -5,7 +5,7 @@ topic: Freely 交付闭环的概念模型
 created_at: 2026-11-01
 ---
 
-# Freely 到底怎么交付：B1/B2、SDD/TDD、三角色、四个循环
+# Freely 到底怎么交付：B1/B2、SDD/TDD、三角色、3 loop + 2 交付门禁
 
 ## 0. 为什么要单独写
 
@@ -87,17 +87,17 @@ Manager --派工--> Worker --阶段产物--> Reviewer --fail--> Worker
 - Reviewer 拥有“是否达标”。
 - 三者不能互相替代；Reviewer 的独立性是 Freely 的质量差异，不是 Super-agent 的对应角色。
 
-## 4. 四个循环
+## 4. 三个常驻 loop + 两段交付门禁
 
-| 循环 | 触发 | 主体 | 产物 | 结束条件 |
-| --- | --- | --- | --- | --- |
-| auto-loop | 常驻/scan | Manager | 派工、收口、raw issue | 无待办/需人 |
-| doc-loop | 新 raw issue/candidate | Worker（B1/B2 skill） | brainstorm/candidate/PRD/pre-tests/tasks | B2 完成、可进入 dev |
-| dev-loop | 已派工 issue | Worker | 代码、测试、commit | RED→GREEN、可提 PR |
-| stage review loop | 阶段完成 needs-review | Reviewer（watchdog 触发） | 阶段 verdict、required fixes | pass→下一阶段；fail→Worker |
-| PR review/delivery loop | PR 创建 | Reviewer（pr-review-guarded）+ gates | 四问 verdict、merge、closeout | 合并/关闭 |
+| 类型 | 名称 | 触发 | 主体 | 产物 | 结束条件 |
+| --- | --- | --- | --- | --- | --- |
+| 常驻 loop | auto-loop | 常驻/scan | Manager | 派工、收口、raw issue | 无待办/需人 |
+| 常驻 loop | doc-loop | 新 raw issue/candidate | Worker（B1/B2 skill） | brainstorm/candidate/PRD/pre-tests/tasks | B2 完成、可进入 dev |
+| 常驻 loop | dev-loop | 已派工 issue | Worker | 代码、测试、commit | RED→GREEN、可提 PR |
+| 交付门禁 | stage review | 阶段完成 needs-review | Reviewer（watchdog 触发） | 阶段 verdict、required fixes | pass→下一阶段；fail→Worker |
+| 交付门禁 | PR review | PR 创建 | Reviewer（pr-review-guarded）+ gates | 四问 verdict、merge、closeout | 合并/关闭 |
 
-四个循环不是串行瀑布：doc-loop 可以在 dev-loop 前，也可以在 review 发现规格缺口时回流；review fail 回到 dev-loop；merge 后 auto-loop 收口。
+三个常驻 loop 不是串行瀑布：doc-loop 可以在 dev-loop 前，也可以在 review 发现规格缺口时回流；review fail 回到 dev-loop；merge 后 auto-loop 收口。两段交付门禁不是常驻 loop，而是 dev-loop 完成后的交付段。
 
 ## 5. 谁实现：scripts / skills / commands / MCP / harness
 
@@ -159,5 +159,5 @@ Manager --派工--> Worker --阶段产物--> Reviewer --fail--> Worker
 - B1/B2 的产物是否要 schema 化（candidate/PRD/pre-tests 字段）？
 - Manager 是否应该读 PRD 摘要，还是只读 scan/issue 状态？
 - Reviewer 的 verdict 是否要结构化（pass/fail + required fixes + evidence）？
-- 四个循环的 handoff 是否要消息级 ownership？
+- 三个常驻 loop 与两段交付门禁的 handoff 是否要消息级 ownership？
 - SDD/TDD 文档在 merge 后是否要归档/索引，供后续 issue 复用？

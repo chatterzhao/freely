@@ -1,8 +1,10 @@
 # Freely
 
-**一个文档驱动（SDD）、测试驱动（TDD）的项目循环运行器：AI 是项目所有者，人负责定意图和验收。**
+**一个文档驱动（SDD）、测试驱动（TDD）的项目循环运行器。目标态：AI 是项目所有者，人负责定意图和验收。**
 
-Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。人只在需要决策或验收时出现。
+Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO 列表的执行器。它用 B1-IBM 把 issue/chat 收敛成 candidate，用 B2-IBM 生成 I-* + PRD + pre-tests + tasks（SDD/TDD 合同）；Manager 按 scan/文档派工，Worker 按合同用 agent harness 实现并跑 RED→GREEN，Reviewer 独立验收；最后经 PR/merge gates 合并、收口。目标是让人只在需要决策或验收时出现。
+
+> 这是目标态，不是已量化事实：当前还没有“注意力成本/打断精度”的基线（见 [attention-metrics](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/attention-metrics.md)）。
 
 [![交付闭环](docs/assets/freely-delivery-loop.svg)](docs/assets/freely-delivery-loop.html)
 
@@ -25,7 +27,7 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 | --- | --- | --- |
 | 界面面 | GitHub/Gitee issue/comment、`freely chat`/discuss、CLI（主入口）/TUI/GUI（Tauri probe） | 人从哪里进来、从哪里看结果 |
 | 规格面（SDD） | Intent/Constitution/LAWS、raw issue、B1 brainstorm/candidate、B2 PRD/pre-tests/tasks、code-review | 做什么、为什么、怎么验、边界在哪 |
-| 控制面 | scan、Manager、three-loop、A2A、gates、watchdog、freely-db | 现在轮到谁、下一步是什么、能不能过 |
+| 控制面 | scan（派生视图，不写回）、Manager、three-loop、A2A、gates、watchdog、freely-db | 现在轮到谁、下一步是什么、能不能过 |
 | 执行面（TDD） | Worker、Reviewer、dev/test worktree、RED/GREEN、commands/scripts/skills | 实际怎么干、怎么验证 |
 | 基座面 | ACP harness（Claude/Codex/OpenCode/Cline）、GitHub/Gitee | 用什么执行、外部世界在哪 |
 
@@ -47,7 +49,7 @@ Freely 的答案是：把“项目意图、宪法、门禁、工位、评审、�
 
 **SDD：文档是规格与生命周期的真相。**
 
-- 平台只是对外界面；AI 永远不直接读平台，`scan` 把 issue/comment 下载到本地 `docs/B1-docs/`，`issue-sync` 是本地→平台的唯一出口。
+- 平台只是对外界面；AI 永远不直接读平台，`scan` 把 issue/comment 下载到本地 `docs/B1-docs/`，出站写平台统一走封装命令（`issue-sync` / `platform-adapter`），不直接调 `gh`/Gitee API。
 - “谁在做”看 A2A，“代码/工位在不在”看 git，“测试有没有在 HEAD 跑”看 test-gate；文档负责规格与生命周期。
 - B1 先把问题收敛为 candidate；B2 再物化为 I-* + PRD + pre-tests + tasks。没有规格与验收，不进入实现。
 - Manager 读 scan 得到 `stage/next_action`；Worker 读 issue/PRD/pre-tests 得到任务与验收；Reviewer 读产物做独立判断。
@@ -92,7 +94,7 @@ issue / chat / 治理漂移
               review verdict → PR → merge → closeout
 ```
 
-三个 loop + 一段交付门禁：
+三个常驻 loop + 两段交付门禁：
 
 - **auto-loop**：唯一调度中枢。决定“现在做什么、派给谁、什么时候收口”。
 - **doc-loop**：B1 收敛问题，B2 生成 SDD/TDD 合同；它不是“写文档”，是生成可执行的规格与验收。
@@ -261,7 +263,7 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [A2A 协议](docs/system/workspace/a2a/)：角色间任务与状态
 - [预头脑风暴索引](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/README.md)：研究地图、关键事实、未解问题
 - [逐项判定总表](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/synthesis.md)：问题/方案/谁更优/为什么/代价
-- [Freely 交付闭环概念模型](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/delivery-model.md)：B1/B2、SDD/TDD、三角色、四个循环
+- [Freely 交付闭环概念模型](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/delivery-model.md)：B1/B2、SDD/TDD、三角色、3 loop + 2 门禁
 - [Super-agent 对比研究](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/research.md)：理念/架构/实现/场景对比
 - [文章映射与 Reviewer 纠偏](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应
 - [失效模式对比](docs/pre-brainstorms/20261101T231000Z--freely-vs-super-agent/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
