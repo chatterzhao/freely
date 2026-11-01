@@ -25,7 +25,9 @@
 - promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
 5. `C-20261101T031502Z-E`
 - milestone: M-20261101T031502Z-A
-- status: needs_research
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-E
+- promoted_issue_path: pending://needs-b2-materialization
 6. `C-20261101T031502Z-F`
 - milestone: M-20261101T031502Z-A
 - status: promoted

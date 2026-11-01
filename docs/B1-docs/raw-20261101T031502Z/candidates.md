@@ -141,9 +141,9 @@ milestone: M-20261101T031502Z-A
 
 - candidate_format_version: v2
 - title: 实现 `@freely/dsh-freely`：Freely 保留 loop，DSH 只做 harness
-- status: needs_research
+- status: promoted
 - decision_reason: DSH 主插件可注入 `agents/sessionController/tools/skills/systemPrompt` 等服务，因此可以让 Freely 保留 Manager/Worker/Reviewer、A2A、scan、gates、worktree、PR，只把 harness 换成 DSH；这不是 ACP adapter，也不是 DSH-host 治理插件。
-- next_action: 先做 P0/P1 spike：插件骨架 + bridge + Manager session；验证首次 `session.new` 能收到 task+role prompt、handoff 不丢、gate 能阻断；再决定是否 P2/P3。
+- next_action: B2 物化 I-20261101T031502Z-E；实现 Freely-host 插件 P1：handoff envelope v1、Worker session/worktree/tools、Reviewer verdict、gate 链、真实 issue→PR。
 - revisit_trigger: DSH 服务 API 不稳定、插件无法注入 session/tools/skills，或必须同时启用 DSH Router/Ticket 才能工作时，回到方案 C（不做）。
 - acceptance_criteria:
   - 插件注入所需 DSH services，且不加载 `dsh-superagent`
@@ -158,12 +158,12 @@ milestone: M-20261101T031502Z-A
   - DSH 单仓/单 host 下多项目怎么办
   - Python runtime 子进程生命周期如何管理
 - acceptance_reviews:
-  - reviewer: session-self
-  - mode: desk-research
-  - summary: 静态契约 + web host 加载 + Session 创建/steer + Agent 消费 + subprocess bridge + gate exit=1 + 三角色 preset/工具白名单/persona 已过；真实 issue→PR 未跑
-  - verdict: needs_more_research
+  - reviewer: subagent:67b0fffb-4111-44f7-a1c4-f071446af710
+  - mode: subagent
+  - summary: DSH 0.2.1-rc.5 web profile 真加载；session/subprocess/tools 可用；消费/gate/三 preset/白名单/persona 已验；API 稳定性 pin/profile 矩阵已补，判 pass
+  - verdict: pass
 - depends_on: C-20261101T031502Z-B, C-20261101T031502Z-D, C-20261101T031502Z-F
-- promoted_issue_id: pending://C-20261101T031502Z-E
+- promoted_issue_id: I-20261101T031502Z-E
 - promoted_issue_path: pending://needs-b2-materialization
 - milestone: M-20261101T031502Z-A
 - session_refs: []
