@@ -45,6 +45,36 @@ progress, next_action, completion_summary, evidence_paths, worker_prompts_csv
 
 结论：不是 A2A 协议实现，而是“A2A 命名的本地任务总线”。
 
+## 2.1 五类后续消息：现状 vs 目标
+
+| 场景 | 当前实际行为 | 目标 owner | 缺口 |
+| --- | --- | --- | --- |
+| 新建请求 | scan 拉 open issue/body → Manager → B1 | Manager 直到分配 | 无 per-event 准入；同一 issue 可能重复开单 |
+| 活跃工单的 Thread 后续 | issue comment 不进 scan；chat 进 Manager prompt；PR review 无入口 | 当前 Worker（thread_key 直达） | **主要漏接点**；Manager 靠轮询/人转述 |
+| 已完成工单的 Thread 后续 | issue 已 close；`freely` 对 closed issue 新评论有 gate 拦截；无 owner | 原 Worker lease → 超时/越界 handback Manager | 没有 lease/复活规则；容易新开单或完全忽略 |
+| 跨工单消息 | 无检测；靠人/Manager 发现 | 当前 Worker 只能 handback 一次，带目标/理由 | 没有目标校验；可能广播/重复 |
+| 人的 stop | `freely stop`/`wt-close` 停 runtime/工位；chat 停止请求进 Manager prompt | Manager/人优先；Worker 不能自行恢复 | 没有事件级 stop；Worker 可能继续跑 |
+| Worker 死亡 | supervisor/A2A failed；新 session 可能收不到 fail message | Task 保持 working；新 Assignment 带 recovery note | `session/new|fork` 丢 message（已确认 bug） |
+| Reviewer 反馈 | watchdog 要求 `a2a-exit`；agent 文档禁止；skill 要 JSON verdict | Reviewer 拥有 verdict；Worker 拥有 fix；3 轮回 Manager | 契约矛盾，verdict 落点不唯一 |
+
+### 2.1.1 现状证据
+
+- `task-lifecycle-scan.py` 没有 `comments`/`comment` 处理。
+- `platform-adapter.fetch_issue` 返回 comments 但只有 body；`list_open_issue_records` 只有 number/title/body/state。
+- `freely` 对 closed issue 新评论有 gate（#3302），但没有“谁来读这条评论”的 owner。
+- `acp_session_connect` 在 new/fork 不发送 message；`acp-bridge.session_new` 不注入角色 prompt。
+- `watchdog_sse._build_review_task_message` 与 `reviewer-agent.md`/`freely-tdd-review` 三处 verdict 契约不一致。
+
+### 2.1.2 回放场景（B2 验收）
+
+1. issue #4070 两条真实评论 → 同一 thread，不新开 issue。
+2. 关闭 issue 后的评论 → 不自动复活；按 lease/handback 处理。
+3. 同一 PR 两条 review comment → 同一 owner，不重复。
+4. 跨工单评论 → handback 一次，目标正确。
+5. 人 stop → Worker 停止，Task canceled。
+6. Worker 死亡 → fail 反馈进新 session，消息不丢。
+7. Reviewer 3 轮 fail → handback Manager，不无限循环。
+
 ## 3. 跨 harness 交接的确定 bug
 
 `agent_working.acp_session_connect()`：
