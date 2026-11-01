@@ -396,6 +396,19 @@ DSH：
 
 结论：**Freely 的“人插话”在入口数量上不输，但在“后续消息归属”上明显弱于 Super-agent。** 这不是再加一个 CLI 能解决的，需要 ownership 账本或订阅层。
 
+### 7.12 多项目 fleet 的实测边界
+
+- `~/.freely/projects.tsv` 真实存在，包含大量项目登记；Freely 确实有跨项目 registry。
+- 但 `freely fleet-status --project <one>` 只列“这个 project 的 worktree 列表”（develop、feature、fix、test-pre-merge），不是跨项目总览。
+- 没有看到统一的“所有项目的 health/任务/注意力”视图；跨项目操作更多是运维脚本层（`restart --all-projects` 等）。
+
+所以“多项目 fleet”要分两层说：
+
+- **项目登记/独立 runtime**：真实存在，是 Freely 相对 DSH 的差异。
+- **跨项目统一调度与注意力视图**：目前不是产品面，不能把它当成已完成能力写进 README。
+
+READM 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位视图，不是跨项目调度台”。
+
 ## 8. Freely 明确不如 Super-agent 的地方
 
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。

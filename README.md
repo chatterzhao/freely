@@ -120,7 +120,7 @@ freely start --project "$PWD" --task-mode auto
 
 ```bash
 freely live-status  --project "$PWD"
-freely fleet-status --project "$PWD"   # 多项目/多工位
+freely fleet-status --project "$PWD"   # 本项目所有工位/分支
 freely daemon logs  --project "$PWD" --follow
 ```
 
@@ -194,7 +194,7 @@ freely feedback \
 
 ```bash
 freely live-status      # 当前项目运行态
-freely fleet-status     # 所有项目/工位
+freely fleet-status     # 本项目所有工位/分支
 freely baseline-status  # 基线与漂移
 freely harness-status   # 每个角色用什么 harness、支持 fork/resume/usage 吗、最近 cache 情况
 ```
@@ -222,7 +222,7 @@ docs/assets/                 README 架构图
 - 它**不替代** Claude Code / Codex / OpenCode 等 harness；它负责编排、隔离、门禁与审计。
 - 当前主路径是 ACP harness；DSH 等宿主需要 adapter，不会假装“加个配置就能换”。
 - 自主模式默认开启，但人类仍可通过 `chat`、`stop`、PR review、merge gate 介入。
-- 多项目通过 fleet 管理，每个项目有独立 runtime 与工位。
+- 多项目通过全局 `~/.freely/projects.tsv` 登记，每个项目有独立 runtime 与工位；`fleet-status` 目前是“本项目工位视图”，不是跨项目统一调度台。
 - GUI 目前是 Tauri probe（`src-tauri/`），不是完整产品面；CLI 是主入口。
 
 ## 深入阅读
