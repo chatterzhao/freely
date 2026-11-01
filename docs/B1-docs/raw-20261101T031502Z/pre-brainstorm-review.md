@@ -98,3 +98,15 @@ DSH 相关不进入本轮 candidate：
 二次 verdict：**needs_more_research**，不是 promote。下一步按 C-B/C 的行为盘点与协议草案、C-D 的接口/探测、C-E 的 P0/P1 spike 分别补证据，再走 acceptance review。
 
 这与第一次 `pass-with-gaps` 不矛盾：第一次评的是“研究包是否足以起草 candidate”；第二次评的是“candidate 是否能进入 B2”。结论是：可以起草，但不能 promote。
+
+### 7.1 Candidate readiness matrix（2026-11-01）
+
+| Candidate | 已有研究 | 已满足 | 仍缺 | 下一跳 |
+| --- | --- | --- | --- | --- |
+| C-B ownership/handback | `agent-handoff.md`、`delegation-protocol.md` | 五类消息 owner 规则、handback 一次、幂等/超时草案 | 五类消息行为盘点、真实 PR/issue 评论回放 | 行为盘点 → 回放 → acceptance review |
+| C-C report/attention/prompt | `delegation-protocol.md`、`context-cache.md` | 六态/attention/ownership 字段草案、STABLE/SEMI/DYNAMIC 事实 | prompt manifest/校验、cache/usage 基线、真实 patrol 对照 | 补 manifest/基线 → 对照 → acceptance review |
+| C-D HarnessPort/角色选择 | `harness-selection.md`、`deployment-forms.md` | 角色级配置落点、UI/CLI 后端、能力 probe 方向 | HarnessPort/RoleHarnessConfig 接口草案、per-role probe 证据 | 接口草案 → probe → acceptance review |
+| C-E DSH 插件 | `dsh-freely-plugin-design.md`、`dsh-adapter-decision.md` | Freely-host 插件架构、服务注入面、验收标准 | P0/P1 spike（首次 session 消息、handoff、gate） | spike → acceptance review |
+
+这张表就是 loop 的检查点：任一“仍缺”未关闭，status 保持 `needs_research`，不得 promote。
+
