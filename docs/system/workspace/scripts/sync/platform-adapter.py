@@ -135,6 +135,10 @@ class PlatformHandler(ABC):
         return False, "not implemented"
     def list_open_issues(self) -> dict[str, str]: return {}
     def list_open_issue_records(self) -> dict[str, dict]: return {}
+    def list_issue_comments(self, issue_number: str) -> list[dict]: return []
+    def list_pr_reviews(self, pr_number: str) -> list[dict]: return []
+    def list_pr_review_comments(self, pr_number: str) -> list[dict]: return []
+    def list_ci_checks(self, pr_number: str) -> list[dict]: return []
 
 # ══════════════════════════════════════════════
 # Registry
@@ -358,6 +362,62 @@ class GitHubHandler(PlatformHandler):
             return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
         except Exception:
             return {}
+
+    def _gh_json(self, args: list[str], timeout: int = 30):
+        repo = self._repo()
+        if not repo:
+            return None
+        r = subprocess.run(["gh", *args, "--repo", repo], capture_output=True, text=True, timeout=timeout)
+        if r.returncode != 0 or not r.stdout.strip():
+            return None
+        try:
+            return json.loads(r.stdout)
+        except Exception:
+            return None
+
+    def list_issue_comments(self, issue_number: str) -> list[dict]:
+        data = self._gh_json(["issue", "view", str(issue_number), "--json", "comments"])
+        out = []
+        for c in (data or {}).get("comments", []) or []:
+            out.append({"id": c.get("id"), "author": c.get("author") or {},
+                        "association": c.get("authorAssociation", ""),
+                        "body": c.get("body", ""), "created_at": c.get("createdAt", "")})
+        return out
+
+    def list_pr_reviews(self, pr_number: str) -> list[dict]:
+        data = self._gh_json(["pr", "view", str(pr_number), "--json", "reviews"])
+        out = []
+        for r in (data or {}).get("reviews", []) or []:
+            out.append({"id": r.get("id"), "author": r.get("author") or {},
+                        "state": r.get("state", ""), "body": r.get("body", ""),
+                        "submitted_at": r.get("submittedAt", ""), "commit": r.get("commit", {})})
+        return out
+
+    def list_pr_review_comments(self, pr_number: str) -> list[dict]:
+        repo = self._repo()
+        if not repo:
+            return []
+        r = subprocess.run(["gh", "api", f"repos/{repo}/pulls/{pr_number}/comments", "--paginate"],
+                           capture_output=True, text=True, timeout=30)
+        if r.returncode != 0 or not r.stdout.strip():
+            return []
+        try:
+            rows = json.loads(r.stdout)
+        except Exception:
+            return []
+        return [{"id": c.get("id"), "author": c.get("user") or {}, "body": c.get("body", ""),
+                 "path": c.get("path", ""), "line": c.get("line"), "created_at": c.get("created_at", "")}
+                for c in rows or []]
+
+    def list_ci_checks(self, pr_number: str) -> list[dict]:
+        data = self._gh_json(["pr", "checks", str(pr_number), "--json", "name,state,bucket,link"])
+        out = []
+        for c in data or []:
+            link = c.get("link", "")
+            cid = link.rstrip("/").split("/")[-1] if link else c.get("name", "")
+            out.append({"id": cid, "name": c.get("name", ""), "state": c.get("state", ""),
+                        "conclusion": c.get("state", ""), "link": link})
+        return out
 
 # ══════════════════════════════════════════════
 # Gitee Handler

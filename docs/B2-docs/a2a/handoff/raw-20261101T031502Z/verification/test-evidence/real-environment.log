@@ -1,0 +1,31 @@
+{
+  "unread": 1,
+  "by_source": {
+    "issue_comment": 1
+  },
+  "latest": [
+    {
+      "event_id": "issue_comment:IC_kwDOSIGLwc8AAAABLGREcA",
+      "source": "issue_comment",
+      "source_event_id": "IC_kwDOSIGLwc8AAAABLGREcA",
+      "thread_key": "github:chatterzhao/freely#4070",
+      "subject_kind": "issue",
+      "subject_id": "4070",
+      "raw_key": "",
+      "actor_login": "chatterzhao",
+      "actor_id": "",
+      "actor_association": "",
+      "actor_is_bot": 0,
+      "kind": "comment.created",
+      "body_ref": null,
+      "body_preview": "real",
+      "created_at": "2026-07-21T22:35:54Z",
+      "addressed": 1,
+      "strength": "explicit",
+      "disposition": "accept",
+      "disposition_reason": "explicit_addressed",
+      "dedupe_hash": "eb8676bc682a6640178ae46dc270ce92a66f6e9c47c0752d140a3fea8da8743e",
+      "read_at": null
+    }
+  ]
+}

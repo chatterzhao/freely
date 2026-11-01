@@ -173,3 +173,9 @@ submitted → working → input-required → working → ... → completed
 
 three-loop 总图与 semantics 的唯一细节真源是 `docs/system/workspace/three-loop-capability-lifecycle.md`；本 agent 定义 Manager 角色职责，不平行维护总图。
 - Manager 放弃：`failed`
+
+## 类型化交接
+
+- 每轮收口用 `a2a-report record` 写 `report_state`（六态）与 `attention`（单问题/目标角色）。
+- 批量候选用 `a2a-decide decide --decisions-json` 记录 accept/stop/ignore/unavailable + reason；trigger_id 幂等。
+- 不再把 JSON 塞进自由文本 summary；`a2a-report list` 可查。

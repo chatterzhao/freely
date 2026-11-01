@@ -13,6 +13,62 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
 
+## M-20261101T031502Z-A
+- title: research — Super-agent 架构与 Freely agent 协作模型对比
+- status: active
+### candidate_issues
+1. `C-20261101T031502Z-A`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-A
+- promoted_issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
+2. `C-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-B
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
+3. `C-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-C
+- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+4. `C-20261101T031502Z-D`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-D
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+5. `C-20261101T031502Z-E`
+- milestone: M-20261101T031502Z-A
+- status: dropped
+6. `C-20261101T031502Z-F`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-F
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+### committed_issues
+1. `I-20261101T031502Z-F`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+2. `I-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
+3. `I-20261101T031502Z-D`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+4. `I-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+
+### completed_issues
+1. `I-20261101T031502Z-A`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
+
 ## M-20260717T090202Z-A
 - title: fix — peak 口径限定为死亡记录（PEAK=3 误报回归）
 - status: active

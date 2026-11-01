@@ -1,0 +1,8 @@
+.../opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py:873: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107742960>
+  def is_dir(self, *, follow_symlinks=True):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.
+----------------------------------------------------------------------
+Ran 4 tests in 0.061s
+
+OK

@@ -1,0 +1,15 @@
+{
+  "reports": [
+    {
+      "report_id": "a16386bf-9263-4771-89e6-efcd8c400512",
+      "task_id": "T",
+      "role": "worker",
+      "report_state": "ready",
+      "summary": "ok",
+      "next_action": "",
+      "attention_json": null,
+      "created_at": "2026-11-01T11:07:38Z",
+      "attention": null
+    }
+  ]
+}
