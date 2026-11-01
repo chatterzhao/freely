@@ -34,8 +34,6 @@ workflow_kind: feature
 
 # feat: @freely/dsh-freely DSH 打包形态
 
-workflow_kind: feature
-
 ## 背景
 
 `@freely/dsh-freely` 是 Freely 的 DSH 打包形态，不是 Super-agent 对比研究的 candidate。
