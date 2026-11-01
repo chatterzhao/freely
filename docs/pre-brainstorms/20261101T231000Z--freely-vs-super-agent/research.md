@@ -509,3 +509,5 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | Freely A2A | `docs/system/workspace/a2a/*` |
 | 失效模式与残余风险 | 同目录 `failure-modes.md` |
 | 事件准入的放置与数据前提 | 同目录 `event-admission.md` |
+| 状态权威/单写者/派生规则 | 同目录 `state-authority.md` |
+| TDD 的强制边界与分级 | 同目录 `tdd-policy.md` |
