@@ -202,7 +202,7 @@ issue / chat / 治理漂移
 | TDD | 无 | RED/GREEN/test-pre-merge/pretests gate | **Freely 更优**（GREEN 硬、RED 流程、全 not_applicable 仅 skill 约束） |
 | 交接 | 六态 report + attention + handback + ownership | A2A state + summary/evidence + Reviewer verdict | **Super-agent 消息级更优；Freely 阶段级更完整** |
 | 路由 | 代码 gate + 1–20 批量决策 + 逐条拒绝 | scan 推导 stage + Manager 派工 | **Super-agent 运行时更硬；Freely 生命周期更准** |
-| 上下文 | Inline/Spill + 链式召回 + 前缀稳定 | 文档长期记忆 + session fork/resume | **分裂**：DSH 单会话更精；Freely 跨会话/跨项目更久 |
+| 上下文 | Inline/Spill + 链式召回 + 前缀稳定 | 文档长期记忆 + session fork/resume；prompt 有 STABLE/SEMI-STABLE/DYNAMIC 排序 | **分裂**：DSH 单会话更精；Freely 跨会话/跨项目更久 |
 | 缓存 | 段序固定、Policy 置尾；无 cache 指标 | fork/resume；有 `[CACHE]` 但多为估算 | **分裂**：DSH 纪律好，Freely 可观测但不可控 |
 | 并发 | Worker slot + 人优先槽位 + Thread 共享 | worktree 隔离 + worker pool + fleet | **仓库内 DSH 细；跨项目 Freely 广** |
 | 失败恢复 | effect 队列 + 恢复提示 + 未读 Input | supervisor/watchdog/continuation + gate 对账 | **分裂**：外部副作用 DSH 强；进程/工位 Freely 强 |
@@ -309,7 +309,7 @@ Freely：
 - 但 prompt 是“角色定义 + 运行时状态”拼接；scan/fleet/checkpoint 追加在尾部；没有 stable_prefix/volatile_tail 契约。
 - `[CACHE]` 日志有，但 input 常是 `prompt_bytes//4` 估算，hit/miss 常为 0；不能当真实命中率。
 
-判定：**单会话上下文纪律 DSH 更优；跨会话/跨项目长期记忆 Freely 更优。** Freely 应把 prompt 拆成稳定前缀/可变尾部，并区分 usage/estimated。
+判定：**单会话上下文纪律 DSH 更优；跨会话/跨项目长期记忆 Freely 更优。** 但“Freely 没有稳定前缀”这个说法不准确：`start-lead-agent.sh`/`freely` 已经把 prompt 分成 STABLE（角色/退出合同）、SEMI-STABLE（fleet）、DYNAMIC（scan/intake/alert）并放在尾部，还有 `fresh_with_handoff` 的 handoff-only 小 prompt。问题不是“没有排序”，而是**排序只是注释约定，没有显式契约/校验；cache 仍不可测**。
 
 ### 7.6 授权：不是谁“更安全”，而是防守点不同
 
@@ -452,7 +452,7 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 1. **事件级准入**：没有代码 gate；Manager 可能被长上下文说服。
 2. **消息级交接**：没有 report 六态/attention/ownership/handback。
 3. **注意力纪律**：Manager 主动汇报多；缺少“默认沉默”的硬约束。
-4. **prompt 前缀纪律**：没有 stable prefix 契约；cache 多为估算。
+4. **prompt 前缀纪律**：有 STABLE/SEMI-STABLE/DYNAMIC 的粗粒度排序，但没有显式契约/校验；cache 多为估算。
 5. **外部副作用幂等**：没有 effect 队列/统一 receipt。
 6. **文档漂移**：docs/phase_state/milestone/scan 多源，需持续对账。
 7. **文档开销**：SDD/TDD 对 tiny task 过重。
@@ -474,7 +474,7 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | 必须学 | 事件准入 + 决策强度 | 补 Freely 最弱的运行时防守；但不复制 Mandate 全量 |
 | 必须学 | 消息级 report/attention/ownership/handback | 补 follow-up 丢失/重复开单 |
 | 必须学 | 路由批处理 + 逐条拒绝 + 幂等键 | Manager 上下文与吞吐的现实解 |
-| 必须学 | prompt 稳定前缀/可变尾部 + usage/estimated | 让 cache 可度量、可回归 |
+| 必须学 | 把已有 STABLE/SEMI-STABLE/DYNAMIC 排序显式化 + usage/estimated | 让 cache 可校验、可回归 |
 | 可适配 | Thread 订阅直通 | 先做“同一工单线程 ownership”，不做事件总线 |
 | 可适配 | Policy 版本 | 记录“依据哪版规则批准”，不做运行时 Mandate |
 | 可适配 | DSH adapter | 作为 HarnessPort 的一个实现；不让 DSH 接管 three-loop |

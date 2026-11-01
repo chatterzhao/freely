@@ -125,7 +125,7 @@ Super-agent：
 Freely：
 
 - Worker/Reviewer fork Manager session；文档长期记忆；session resume。
-- 风险：**fork 把无关上下文带进 Worker**；prompt 拼接运行时状态，无可控前缀；文档可能过期。
+- 风险：**fork 把无关上下文带进 Worker**；prompt 有 STABLE/SEMI-STABLE/DYNAMIC 排序，但只是注释约定，改动可能破坏顺序；文档可能过期。
 
 判定：单会话隔离 Super-agent 更强；跨会话/跨项目长期记忆 Freely 更强。两者都需要“上下文预算/契约”。
 
@@ -141,7 +141,7 @@ Freely：
 - `[CACHE]` 日志；但 input 常为 `prompt_bytes//4` 估算，hit/miss=0；fork/resume 策略没有前后对照。
 - 风险：**以为命中了，其实上下文不对**；指标是假的。
 
-判定：都不足。Freely 有观测入口但数据不可信；Super-agent 有纪律但不可见。优先补“usage vs estimated + 稳定前缀”。
+判定：都不足。Freely 有排序与观测入口，但数据不可信、顺序无校验；Super-agent 有纪律但不可见。优先补“usage vs estimated + 排序校验”。
 
 ### 2.8 外部副作用重复
 

@@ -37,7 +37,7 @@ created_at: 2026-11-01
 | 7 | TDD | 怎么证明真的做了 | 无 TDD；Worker 自测 + 外部 CI | pre-tests；RED→实现→GREEN；test-pre-merge；pretests gate | **Freely 更优** | 有终态证据门禁；DSH 无强制 | GREEN 硬、RED 软；全 not_applicable 仅 skill 约束；流程重 |
 | 8 | 交接 | 阶段之间/后续消息归谁 | Report 六态 + attention + handback + followupOwners + relay key | A2A state + summary/evidence；SSE 广播；Reviewer verdict | **Super-agent 消息级更优** | 有 ownership/幂等/单问题 attention；Freely 只有任务级 | Freely 后续讨论丢失/重复；DSH 模型复杂 |
 | 9 | 路由 | 下一步做什么、派给谁 | 代码 gate + 1–20 批量决策 + 逐条拒绝 | scan 推导 stage/next_action + Manager 派工 | **分裂** | DSH 事件吞吐/幂等强；Freely 生命周期 stage 更准 | Freely 无批量/幂等；DSH 不懂 B1/B2/TDD |
-| 10 | 上下文 | 跨会话/跨任务不丢 | Inline/Spill + Chain of Recall；每 Ticket 独立 Session | 文档长期记忆 + session resume/fork + worktree | **分裂** | DSH 单会话更精；Freely 跨天/跨项目更久 | DSH 长程记忆未解；Freely prompt 拼接无稳定前缀 |
+| 10 | 上下文 | 跨会话/跨任务不丢 | Inline/Spill + Chain of Recall；每 Ticket 独立 Session | 文档长期记忆 + session resume/fork + worktree；prompt 有 STABLE/SEMI/DYNAMIC 排序 | **分裂** | DSH 单会话更精；Freely 跨天/跨项目更久 | DSH 长程记忆未解；Freely 排序只是注释、无校验 |
 | 11 | 缓存 | 能否复用前缀、命中多少 | 段序固定、Policy 置尾、revision 绑定；无 cache 指标 | fork/resume；`[CACHE]` 日志；input 常估算 | **都不足** | DSH 有纪律但不可见；Freely 有入口但数据不可信 | DSH 冷启动；Freely 以为命中实际没有 |
 | 12 | 并发 | 多任务并行不互相踩 | Worker slot + 人优先槽位 + Thread 共享 | 每 issue worktree + test 工位 + worker pool | **仓库内 DSH 细；跨项目 Freely 广** | DSH 事件级调度细；Freely 环境隔离强 | DSH 单仓；Freely 工位/分支管理成本 |
 | 13 | 失败恢复 | 死机/卡住/跑偏能回来 | effect 队列 + 恢复提示 + 未读 Input 重投 + Watchdog（文章） | supervisor/watchdog/continuation + session resume + gate 对账 | **分裂** | DSH 外部副作用强；Freely 进程/工位恢复强 | DSH 原型 watchdog 未落地；Freely 无通用 effect 队列 |
@@ -64,7 +64,7 @@ created_at: 2026-11-01
 | **adopt** | 事件准入（权威判断，不是价值判断） | 补 Freely 最弱的运行时边界；但先补平台 actor/event 数据 |
 | **adopt** | 消息级 report/attention/ownership/handback | 补后续讨论丢失/重复开单 |
 | **adopt** | 路由批处理 + 逐条拒绝 + 幂等键 | Manager 上下文与吞吐的现实解 |
-| **adopt** | prompt 稳定前缀/可变尾部 + usage/estimated | 让 cache 可度量、可回归 |
+| **adopt** | 把已有 STABLE/SEMI-STABLE/DYNAMIC 排序显式化 + usage/estimated | 让 cache 可校验、可回归 |
 | **adapt** | Thread 订阅直通 | 先做“同一工单线程 ownership”，不做事件总线 |
 | **adapt** | Policy 版本 | 记录“依据哪版规则批准”，不做运行时 Mandate |
 | **adapt** | DSH adapter | 作为 HarnessPort 的一个实现；不让 DSH 接管 three-loop |
@@ -87,7 +87,7 @@ created_at: 2026-11-01
 
 **在“团队助手的注意力与事件响应”问题上，Super-agent 的方案更合适；在“项目所有者的交付治理”问题上，Freely 的方案更合适。**
 
-Freely 不应变成 Super-agent；应保留 SDD/TDD/Reviewer/gates 四个差异优势，只借 Super-agent 的五个运行时 primitive（admission、report/attention/ownership、批量路由+幂等、稳定前缀+usage、effect 队列/恢复提示）。
+Freely 不应变成 Super-agent；应保留 SDD/TDD/Reviewer/gates 四个差异优势，只借 Super-agent 的五个运行时 primitive（admission、report/attention/ownership、批量路由+幂等、前缀排序显式化+usage、effect 队列/恢复提示）。
 
 ## 6. 证据等级
 
