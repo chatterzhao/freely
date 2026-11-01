@@ -69,3 +69,32 @@ DSH 把欢迎声明确认状态存在 profile 的 `cordis.patch.yml`：
 3. 有 → 备份、删 block、重启单实例、新会话点继续。
 4. 无但还失败 → 查 `settings/describe` 是否缺 `ui-settings-general`、profile writer lock、home patch/CLI overlay。
 5. 仍失败 → 提 Discussions（官方无 issues），附版本/profile/`settings/describe`/日志。
+
+## 2026-11-01 复发与永久修复
+
+现象：移除 block、重启、点“继续”后弹窗关闭；但 DSH 把 `welcomeNoticeVersion` 写回 profile patch，下一次启动又出现同样的“暂时无法保存确认状态”。
+
+结论：**删 block 只是一次性绕过**。只要已有 `ui-settings-general` 的 volatile block，`config-editor.edit()` 的 compose read-back 就又会失败。
+
+按官方 #7959 的建议做 document-faithful read-back：
+
+- 文件：
+  `~/Library/pnpm/global/v11/05005a99cef1205815f96623dea15603c939a0254347f3a04ff5a027501b500d/node_modules/.pnpm/@deepseek-ai+dsh-config-editor@0.2.1-rc.5_33bfdbb9f88875707e13cfc2bc9d2f4c/node_modules/@deepseek-ai/dsh-config-editor/lib/index.js`
+- 备份：同目录 `index.js.bak-YYYYMMDD-HHMMSS`
+- 把原来的：
+  ```js
+  flatten(composeEntries([patches])).find(row => row.id === entry.options.id)?.config
+  ```
+  改成按实际写入的 document 读取：
+  ```js
+  const persistedRows = yaml.load(String(document), { schema: entryListSchema });
+  const persisted = flatten(persistedRows).filter(row => row.id === entry.options.id && row.insert === undefined).at(-1);
+  persisted?.config ?? {}
+  ```
+- `node --check` 通过后，重启单个 `superagent` 实例。
+
+注意：
+
+- 这是 **对已安装包的本地 patch**，DSH 升级/重装会覆盖；升级后要重打，或等官方 fix。
+- 不要同时改源码 clone 的同一文件；源码开发用 `pnpm dsh`，与安装版分开。
+- 修复后仍需一次“新会话 → 继续”让 write 落盘；之后 profile patch 里应有 `welcomeNoticeVersion: 2026-09-28.1`。
