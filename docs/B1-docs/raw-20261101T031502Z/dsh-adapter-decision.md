@@ -16,7 +16,8 @@ created_at: 2026-11-01
 两条路的本质区别：
 
 - **DSH adapter**：Freely 拥有 loop，DSH 只当执行器 → 阉割 DSH。
-- **DSH 插件**：DSH 拥有 loop，Freely 只当治理工具 → 阉割 Freely 的调度层，但保留差异能力。
+- **DSH-host 治理插件（B1）**：DSH 拥有 loop，Freely 只当治理工具 → 阉割 Freely 的调度层，但保留差异能力。
+- **Freely-host 插件（B2）**：Freely 拥有 loop，DSH 只当 harness → 保留全部 Freely 非 harness 能力，禁用 DSH Router/Ticket。
 
 ## 1. 方案 A：DSH 作为 Freely harness
 
@@ -56,7 +57,7 @@ created_at: 2026-11-01
 - 所有权冲突：DSH 的 Router/Ticket 与 Freely Manager/issue 不能同时拥有。
 - 能力探测/降级复杂：DSH 没有 ACP capability 契约。
 
-## 2. 方案 B：`@freely/dsh-freely` 插件
+## 2. 方案 B1：DSH 拥有 loop 的治理插件
 
 ### 2.1 角色反转
 
@@ -104,7 +105,18 @@ created_at: 2026-11-01
   3. **bash 调用**：DSH Worker 本来就有 `bash` 工具，可以直接执行 `freely ...`，用 exit code 卡门禁。
 - 这能保留 DSH 的 Router/Ticket/Thread/Attention，也能让 Freely 的 gate/worktree/TDD 以 CLI 形式落地；但“Freely 作为一等工具”做不到，除非改 DSH core。
 
-这进一步说明：**插件路线的可行形态是“Source + skill + CLI”，不是“Freely 全套能力原样插件化”。** 如果目标是“Freely 能力全部落地”，插件路线也会阉割掉 Freely 的 Manager/A2A/three-loop；只是它保留的是 DSH 的运行时，而不是把 DSH 阉割成执行器。
+这进一步说明：**B1 的可行形态是“Source + skill + CLI”**，不是“Freely 全套能力原样插件化”。如果目标是“Freely 能力全部落地”，不要选 B1；选 B2（Freely-host 插件）。B1 保留的是 DSH 的运行时，不是 Freely 的 loop。
+
+### 2.5 方案 B2：Freely-host 插件（推荐用于“全部能力”）
+
+B2 与 B1 相反：
+
+- Freely 继续拥有 Manager/Worker/Reviewer、A2A、scan、gates、worktree、PR/issue sync。
+- DSH 只提供 Session/Agent、模型、preset、tools、permissions、subagent、usage、持久化。
+- `@freely/dsh-freely` 注入 `agents/sessionController/tools/skills/systemPrompt` 等服务，起一个 bridge 给 Python runtime；runtime 用 bridge 替代 `run-acp-prompt.py`/`acp-bridge.py`。
+- **DSH Router/Ticket 禁用**，避免双 ownership。
+
+B2 的代价：丢掉 DSH 的 Router/Ticket/Thread 编排；多项目仍受 DSH 单仓限制；依赖 DSH 服务 API 稳定性。详细设计见 `dsh-freely-plugin-design.md`。
 
 ## 3. 方案 C：不做 DSH 集成
 
@@ -127,28 +139,37 @@ created_at: 2026-11-01
 ## 5. 建议
 
 1. **现在不做方案 A。** 它不是“DSH 集成”，是把 DSH 阉割成执行器；投入大、战略价值低。
-2. **如果要做 DSH，先做方案 B 的 spike**：`@freely/dsh-freely` 只暴露 3 个工具（gate、worktree、tdd），在 DSH 内跑一个真实 Ticket，测量：
+2. **如果目标是“除 harness 外全部能力”，做 B2（Freely-host）的 spike**；如果只想把 Freely 治理工具塞进 DSH，才做 B1。B1 的 3 工具 spike 测量：
    - DSH 的 Router/Ticket/Attention 是否真的能承接 Freely 的交付语义；
    - Freely 的 gate 是否能独立于 Manager/three-loop 工作；
    - 哪些 Freely 能力必须依赖 A2A/scan，无法插件化。
-3. **方案 C 是默认**：除非 DSH 生态有明确用户/模型收益，否则不值得为它维护双宿主。
-4. 如果 spike 证明 DSH 的 Router/Ticket 不能承接 Freely 的 B1/B2/TDD，那么答案不是“写 adapter”，而是“不集成”。
+3. **B2 的 spike 验收**见 `dsh-freely-plugin-design.md` §9：首次 session 能收到 task+role prompt、handoff 不丢、gate 能阻断、无 ACP。
+4. **方案 C 是默认**：除非 DSH 生态有明确用户/模型收益，否则不值得为它维护双宿主。
+5. 如果 B2 证明 DSH 服务 API 不能稳定支撑 Freely 的 loop，那么答案不是“写 adapter”，而是“不集成”。
 
 ## 6. 何时重新评估
 
-**方案 A（DSH 作为 harness）只在以下条件同时满足时重开：**
+**方案 B2（Freely-host 插件）只在以下条件同时满足时重开：**
 
-1. DSH 暴露稳定的 Session API（开/发/停/usage/stopReason），或提供 ACP 服务端；
-2. DSH 明确允许 Freely 拥有 Router/Ticket，不要求双写；
+1. DSH 插件能稳定注入 `agents/sessionController/tools/skills/systemPrompt`（或等价 API）；
+2. DSH 允许 Freely 拥有 loop，且 Router/Ticket 可以禁用，不要求双写；
 3. 有真实用户需求“必须用 DSH 模型/preset”，而不是“架构看起来更强”；
-4. 能接受 DSH 的 Router/Thread/Mandate 被旁路。
+4. 能接受 DSH 的 Router/Thread 编排不被使用。
 
-**方案 B（插件）的 spike 验收：**
+**方案 B2 的 spike 验收**（详见 `dsh-freely-plugin-design.md` §9）：
+
+1. 首次 `session.new` 后，Worker/Reviewer 能收到 task message + role prompt；
+2. 一个真实 issue 从 Manager 到 PR，全程无 ACP；
+3. handoff envelope append-only，Reviewer verdict 不覆盖 Worker summary；
+4. gate exit code 能阻断下一步；
+5. 测量 DSH 服务 API 稳定性与上下文成本。
+
+**方案 B1（DSH-host 治理插件）的 spike 验收：**
 
 1. 在 DSH 内跑一个真实 Ticket，从 issue 到 PR；
-2. 用 `freely` CLI 卡住至少一个 gate（证明 exit code 能阻断）；
+2. 用 `freely` CLI 卡住至少一个 gate；
 3. DSH 的 Thread/Attention 能承接 Freely 的阶段消息；
-4. 测量“Freely 能力落地比例”和“DSH 上下文成本”，再决定是否产品化。
+4. 测量“Freely 能力落地比例”和“DSH 上下文成本”。
 
 没有这组证据，不做全量插件，更不做 adapter。
 
