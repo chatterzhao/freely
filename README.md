@@ -6,7 +6,7 @@ Freely 不是“帮你写一段代码”的聊天工具，也不是固定 TODO �
 
 [![架构图](docs/assets/freely-architecture.svg)](docs/assets/freely-architecture.html)
 
-> 交互版：[docs/assets/freely-architecture.html](docs/assets/freely-architecture.html)（支持主题切换、搜索、聚焦与导出）
+> 图中五层：界面面 → 规格面（SDD）→ 控制面 → 执行面（TDD）→ 基座面。交互版：[docs/assets/freely-architecture.html](docs/assets/freely-architecture.html)（支持主题切换、搜索、聚焦与导出）
 
 ## 为什么需要它
 
