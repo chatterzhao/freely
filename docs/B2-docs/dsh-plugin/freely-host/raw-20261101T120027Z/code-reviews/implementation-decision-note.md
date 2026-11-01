@@ -1,3 +1,12 @@
+---
+issue_id: I-20261101T120027Z-A
+issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+phase_state: completed
+---
+
+- issue_id: I-20261101T120027Z-A
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+
 # Implementation Decision Note
 
 ## decision
