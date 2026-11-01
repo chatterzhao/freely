@@ -537,5 +537,7 @@ README 已改为“全局 projects.tsv 登记；fleet-status 是本项目工位�
 | prompt 顺序与 cache 语义 | 同目录 `context-cache.md` |
 | 可观测性实测与对比 | 同目录 `observability.md` |
 | DSH adapter vs @freely/dsh-freely 插件 | 同目录 `dsh-adapter-decision.md` |
+| Manager/Worker/Reviewer 交接缺陷 | 同目录 `agent-handoff.md` |
+| Freely-host 插件设计 | 同目录 `dsh-freely-plugin-design.md` |
 | 文章映射与 Reviewer 误读 | 同目录 `super-agent-article.md` |
 | Freely 交付闭环/角色/循环 | 同目录 `delivery-model.md` |

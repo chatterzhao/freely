@@ -268,6 +268,8 @@ docs/assets/                 README 交付闭环 + 五平面图
 - [文章映射与 Reviewer 纠偏](docs/B1-docs/raw-20261101T031502Z/super-agent-article.md)：Router/Worker/Reviewer 不是一一对应
 - [失效模式对比](docs/B1-docs/raw-20261101T031502Z/failure-modes.md)：漏单、重复、越权、交接丢失、缓存误判等
 - [文档目录审计](docs/B1-docs/raw-20261101T031502Z/docs-directory-audit.md)：预研归位、遗留目录与规范
+- [Agent 交接研究](docs/B1-docs/raw-20261101T031502Z/agent-handoff.md)：Manager/Worker/Reviewer 交接缺陷与 A2A/AHP/ACP 边界
+- [@freely/dsh-freely 插件设计](docs/B1-docs/raw-20261101T031502Z/dsh-freely-plugin-design.md)：Freely 保留 loop，DSH 只做 harness
 
 ## 参与开发
 
