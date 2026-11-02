@@ -11,6 +11,7 @@ import json
 import os
 import re
 import socket
+import sys
 from typing import Optional
 
 from raw_key_canon import canonicalize_raw_key, try_canonicalize_raw_key
@@ -167,7 +168,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
                 print(f"[acp-session] {role}/{agent_id} resume failed: {e}, "
                       f"falling back to new", file=sys.stderr)
                 return _do_new(project, raw_key, role, agent_id, slot, base_tool,
-                               reason=f"resume failed: {e}")
+                               reason=f"resume failed: {e}", message=message)
 
     mgr_row = agent_list_by_raw_key(project, "__manager__")
     mgr_slot = mgr_row.get("slot", "") if mgr_row else ""
@@ -191,7 +192,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
         print(f"[acp-session] {role}/{agent_id} cross-tool "
               f"({base_tool} vs {mgr_base}), using new", file=sys.stderr)
 
-    return _do_new(project, raw_key, role, agent_id, slot, base_tool)
+    return _do_new(project, raw_key, role, agent_id, slot, base_tool, message=message)
 
 
 def _prompt_after_connect(project: str, base_tool: str, session_id: str, role: str,
@@ -220,7 +221,7 @@ def _session_id_from_result(result: dict) -> str:
     return session_id.strip()
 
 
-def _do_new(project, raw_key, role, agent_id, slot, base_tool, reason=""):
+def _do_new(project, raw_key, role, agent_id, slot, base_tool, reason="", message=None):
     result = _acp_bridge_call(project, base_tool, "session/new",
                               {"role": role, "agentId": agent_id})
     sid = _session_id_from_result(result)

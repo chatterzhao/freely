@@ -428,9 +428,26 @@ def _handle_message_delivery(project: str, data: dict):
 
 # ── C12: Agent crash detection ────────────────────────────────────────────────
 
+def _session_state(project: str, role: str, agent_id: str, session_id: str) -> str:
+    """Classify a session via ACP session/ping: alive / dead / unknown.
+
+    `unknown` (bridge unreachable, or an error unrelated to the session) must
+    not clear a binding: a transient bridge outage is not proof of death.
+    """
+    slot = _get_agent_slot(project, role, agent_id)
+    base_tool = slot.split("-", 1)[0] if slot else ""
+    result = _acp_rpc(project, "session/ping", {"sessionId": session_id}, base_tool=base_tool)
+    if not isinstance(result, dict):
+        return "unknown"
+    error = result.get("error")
+    if error:
+        text = json.dumps(error, ensure_ascii=False).lower()
+        return "dead" if "session" in text else "unknown"
+    return "alive" if "result" in result else "unknown"
+
+
 def _check_agent_liveness(project: str):
-    """C12: Scan agent_working for dead agent processes and mark them."""
-    import subprocess
+    """C12: Scan agent_working for dead agent sessions and mark them."""
     try:
         from agent_working import _db_rpc
         result = _db_rpc(project, "agent_working.get_all", {})
@@ -446,20 +463,21 @@ def _check_agent_liveness(project: str):
                 if not session_id:
                     continue
                 try:
-                    result = subprocess.run(
-                        ["pgrep", "-f", session_id],
-                        capture_output=True, text=True, timeout=3
-                    )
-                    if result.returncode != 0:
-                        _log(f"DEAD {role}: {agent_id} session={session_id} for {raw_key}")
-                        try:
-                            _db_rpc(project, "agent_working.upsert", {
-                                "raw_key": raw_key,
-                                "col": f"{role}_id",
-                                "val": agent_id,
-                            })
-                        except Exception:
-                            pass
+                    state = _session_state(project, role, agent_id, session_id)
+                    if state == "unknown":
+                        _log(f"UNKNOWN {role}: {agent_id} session={session_id} for {raw_key}")
+                        continue
+                    if state == "alive":
+                        continue
+                    _log(f"DEAD {role}: {agent_id} session={session_id} for {raw_key}")
+                    try:
+                        _db_rpc(project, "agent_working.upsert", {
+                            "raw_key": raw_key,
+                            "col": f"{role}_id",
+                            "val": agent_id,
+                        })
+                    except Exception:
+                        pass
                 except Exception as e:
                     _log(f"liveness check error for {agent_id}: {e}")
 

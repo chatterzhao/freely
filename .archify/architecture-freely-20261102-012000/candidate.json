@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Freely 运行架构：项目空间、工位与门禁",
+    "subtitle": "一次交付从 issue 到 merge 的主链，以及它依赖的三处状态真相",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "docs/B1-docs/raw-20261101T140415Z/research/architecture/freely-runtime-architecture.html"
+  },
+  "components": [
+    {
+      "id": "scan",
+      "type": "backend",
+      "label": "scan",
+      "sublabel": "读 open issue + phase_state",
+      "tag": "每轮全量",
+      "pos": [
+        240,
+        60
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "a2a",
+      "type": "database",
+      "label": "A2A 任务库",
+      "sublabel": "a2a_tasks · 回报即写库",
+      "pos": [
+        450,
+        60
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "watchdog",
+      "type": "backend",
+      "label": "watchdog_sse",
+      "sublabel": "input-required 路由",
+      "tag": "内存 SSE · 不重放",
+      "pos": [
+        860,
+        60
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "owner",
+      "type": "external",
+      "label": "项目所有者",
+      "sublabel": "提需求 · 验收",
+      "pos": [
+        30,
+        200
+      ],
+      "size": [
+        120,
+        64
+      ]
+    },
+    {
+      "id": "channel",
+      "type": "external",
+      "label": "Issue 通道",
+      "sublabel": "GitHub / Gitee",
+      "tag": "正式入口",
+      "pos": [
+        230,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "manager",
+      "type": "backend",
+      "label": "Manager 席位",
+      "sublabel": "每项目一个常驻会话",
+      "tag": "调度 + 判口",
+      "pos": [
+        450,
+        200
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "wtcreate",
+      "type": "backend",
+      "label": "wt-create",
+      "sublabel": "建 dev + test 双工位",
+      "pos": [
+        650,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "dev",
+      "type": "backend",
+      "label": "feature worktree",
+      "sublabel": "Worker 执行 · 独立分支",
+      "tag": "dev 工位",
+      "pos": [
+        850,
+        200
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "test",
+      "type": "backend",
+      "label": "test 工位",
+      "sublabel": "pre-merge · 端到端验证",
+      "pos": [
+        650,
+        330
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "gates",
+      "type": "security",
+      "label": "merge 门禁",
+      "sublabel": "pr-create → review → merge",
+      "tag": "git hook 强制",
+      "pos": [
+        850,
+        330
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "platform",
+      "type": "external",
+      "label": "GitHub + Gitee",
+      "sublabel": "PR / issue 双平台",
+      "pos": [
+        1050,
+        330
+      ],
+      "size": [
+        150,
+        64
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "owner-channel",
+      "from": "owner",
+      "to": "channel",
+      "label": "提需求",
+      "labelDy": -12
+    },
+    {
+      "id": "channel-scan",
+      "from": "channel",
+      "to": "scan",
+      "label": "拉 open issue",
+      "labelDx": 10
+    },
+    {
+      "id": "scan-manager",
+      "from": "scan",
+      "to": "manager",
+      "label": "站点 / 下一步"
+    },
+    {
+      "id": "manager-wtcreate",
+      "from": "manager",
+      "to": "wtcreate",
+      "label": "建工位",
+      "labelDy": -12
+    },
+    {
+      "id": "manager-a2a",
+      "from": "manager",
+      "to": "a2a",
+      "label": "a2a-exit 委派",
+      "labelDx": 10
+    },
+    {
+      "id": "a2a-watchdog",
+      "from": "a2a",
+      "to": "watchdog",
+      "label": "SSE 事件",
+      "labelDy": -12
+    },
+    {
+      "id": "watchdog-dev",
+      "from": "watchdog",
+      "to": "dev",
+      "label": "session/prompt 路由",
+      "labelAt": [
+        952,
+        148
+      ]
+    },
+    {
+      "id": "wtcreate-dev",
+      "from": "wtcreate",
+      "to": "dev",
+      "label": "dev 工位",
+      "labelDy": -12
+    },
+    {
+      "id": "dev-test",
+      "from": "dev",
+      "to": "test",
+      "label": "merge / cherry-pick",
+      "labelDx": 8,
+      "labelDy": 10
+    },
+    {
+      "id": "dev-gates",
+      "from": "dev",
+      "to": "gates",
+      "label": "pr-create / review",
+      "labelAt": [
+        948,
+        296
+      ]
+    },
+    {
+      "id": "test-gates",
+      "from": "test",
+      "to": "gates",
+      "label": "验证通过",
+      "labelDy": -12
+    },
+    {
+      "id": "gates-platform",
+      "from": "gates",
+      "to": "platform",
+      "label": "push / PR",
+      "labelAt": [
+        1008,
+        406
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "结构性优势",
+      "items": [
+        "门禁在宿主机：.githooks 自校验 core.hooksPath，agent 绕不过",
+        "工位隔离：dev 与 test 是两条独立分支，验证不过不进 develop",
+        "证据落在 git 与 PR，不靠会话记忆，换模型不失忆"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "结构性弱点",
+      "items": [
+        "三处真相：docs 前页 / freely.db / git，靠 raw_key 约定拼接",
+        "scan 每轮全量读 open issue，没有游标与事件去重",
+        "worker_01..10 是可复用席位，绑定会随会话漂移"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "交接断点（已定位）",
+      "items": [
+        "A2A 只写库 + 内存 SSE，断线不重放，没有 outbox 与回执",
+        "_do_new 引用未定义 message，跨工具或 resume 失败必抛",
+        "pgrep -f session_id 判活，误标 DEAD 后直接清会话绑定"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "一条隐含约定",
+      "items": [
+        "raw issue ↔ worktree 靠目录名子串匹配（raw_key in name），不是外键",
+        "命名一旦漂移，scan 与派工都会找不到位置"
+      ]
+    }
+  ]
+}
