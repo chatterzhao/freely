@@ -30,9 +30,9 @@ completed_at: '2026-11-02T09:45:41Z'
 closeout_note: ''
 ---
 
-workflow_kind: feature
-
 # docs: super-agent 架构研究补全（react/事件/ownership/示例项目）
+
+workflow_kind: feature
 
 ## 背景
 
