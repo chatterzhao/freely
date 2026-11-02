@@ -27,7 +27,9 @@ import sys
 from pathlib import Path
 
 ROLES = ("worker", "manager", "reviewer")
-RAW_KEY = re.compile(r"raw-(\d{8}T\d{4,6}Z)(?:-|$)")
+# dev branches are `fix/raw-<KEY>-<slug>`; the test lane is
+# `test-pre-merge-<KEY>-<slug>` (no `raw-` prefix).
+RAW_KEY = re.compile(r"(?:^|[-/])(?:raw-)?(\d{8}T\d{4,6}Z)(?:-|$)")
 
 
 def _runtime(project: str) -> Path:

@@ -88,6 +88,18 @@ class OwnerLaneClaimTests(unittest.TestCase):
         self.assertEqual(result["reason"], "not_a_worktree")
         self.assertEqual(self.writes, [])
 
+    def test_test_lane_branch_without_raw_prefix_still_resolves(self):
+        result = self.subject.claim(
+            project="/repo",
+            path=PATH,
+            rows=[],
+            managers=["manager_01"],
+            worktrees={PATH: "test-pre-merge-20261102T103231Z-owner-lane-daemon-identity"},
+            write=self._write,
+        )
+        self.assertTrue(result["created"], result)
+        self.assertEqual(result["raw_key"], "20261102T103231Z")
+
     def test_branch_without_raw_key_is_not_guessed(self):
         result = self.subject.claim(
             project="/repo",
