@@ -107,7 +107,7 @@
 - expected_output: rc=0 且 supervisor_pid 存在；stop 后 TEST_STATUS=completed
 - expected_RED_output: ERROR unable to resolve agent identity … agent_working has no entry
 - actual_RED_output: ERROR unable to resolve agent identity for <test worktree>: agent_working has no entry；随后 AGENT_AI_TOOL not set
-- actual_output: rc=0，supervisor_pid=91429；stop 后 TEST_STATUS=completed，LAST_TESTED_COMMIT=9d1dbe8e74e450760c089cdb2abab67abb5fbab6
+- actual_output: 两次真实运行均 rc=0（supervisor_pid 91429 / 2844）；第二次在合并后 HEAD c7c7da18dcd808ac310893d607c7b8dc9a2019d9 上由 daemon stop 写入 TEST_STATUS=completed 与同一 commit
 - evidence_file: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/verification/test-evidence/daemon-start-owner-lane.log
 - red-green-status: green
 - status: passed
