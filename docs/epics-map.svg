@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4660" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4680" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="147" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -723,8 +723,10 @@
   <text x="50" y="4546" font-size="14" font-weight="bold" fill="#00695c">dsh-plugin</text>
   <rect id="story-freely-host" x="55" y="4552" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="4565" fill="#333">freely-host</text>
-  <rect id="epic-worktree-lifecycle" x="35" y="4580" width="730" height="48" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
+  <rect id="epic-worktree-lifecycle" x="35" y="4580" width="730" height="72" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
   <text x="50" y="4596" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
   <rect id="story-owner-lane" x="55" y="4606" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
   <text x="65" y="4619" fill="#333">owner-lane</text>
+  <rect id="story-worktree-seed" x="55" y="4626" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4639" fill="#333">worktree-seed</text>
 </svg>
