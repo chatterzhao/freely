@@ -1,3 +1,20 @@
+## M-20261102T103231Z-A
+- title: fix — owner lane 显式认领 manager 身份
+- status: active
+### candidate_issues
+1. `C-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T103231Z-A
+2. `C-20261102T103231Z-B`
+- milestone: M-20261102T103231Z-A
+- status: needs_research
+### committed_issues
+1. `I-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/issues/I-20261102T103231Z-A.md
+
 ## M-20261102T113816Z-A
 - title: fix — raw 副本观测三态化（unknown ≠ missing）与债账本
 - status: active
