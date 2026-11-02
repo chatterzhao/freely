@@ -1,0 +1,5 @@
+  ▸ freely [dev]
+project: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity
+daemon_status: running
+supervisor_pid: 91429
+launcher_log: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity/.freely/logs/daemon-launch.log

@@ -360,6 +360,23 @@ for r in rows:
 " 2>/dev/null || true)
   fi
 
+  # Owner lane: a worktree created by the owner has no agent_working row,
+  # because rows are written when a manager dispatches a worker.  Claiming is
+  # explicit, narrow and auditable (see runtime/owner_lane.py): it only fills a
+  # missing row, only for the single configured manager, and only for a path
+  # git reports as a worktree of this project.
+  if [[ -z "$_my_id" && "$_current_path" != "$project" ]]; then
+    local _owner_lane="${project}/docs/system/workspace/scripts/runtime/owner_lane.py"
+    if [[ -f "$_owner_lane" ]]; then
+      local _claim=""
+      _claim=$(python3 "$_owner_lane" claim --project "$project" --path "$_current_path" --json 2>/dev/null || true)
+      if [[ -n "$_claim" ]]; then
+        _my_id=$(printf '%s' "$_claim" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("agent_id") or "")' 2>/dev/null || true)
+        [[ -n "$_my_id" ]] && log_info "owner-lane claim: $_current_path → $_my_id (agent_working had no entry)"
+      fi
+    fi
+  fi
+
   # Identity resolution: agent_working only. agent-id.env is retired.
   # Failure to resolve = refuse to proceed (no silent fallback to manager_01).
   if [[ -z "$_my_id" ]]; then
