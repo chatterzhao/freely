@@ -271,12 +271,23 @@ freely_wt_assert_strict_root
 
 if [[ "$using_new" -eq 1 ]]; then
   echo "wt-create: verifying configured raw replicas..." >&2
-  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+  _replica_receipt="$(mktemp -t freely-replica-receipt.XXXXXX)"
+  if ! FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
     "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" \
-    --project "$ROOT_DIR" --raw-key "$raw_key" || {
+    --project "$ROOT_DIR" --raw-key "$raw_key" --allow-degraded > "$_replica_receipt"; then
+      cat "$_replica_receipt" >&2
+      rm -f "$_replica_receipt"
       echo "拒绝创建工位: configured raw replicas are inconsistent or unavailable" >&2
       exit 1
-    }
+  fi
+  # An unreadable platform is debt, not a fact: record it so it can be settled.
+  _debt_count=$(python3 "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/sync-debt.py" \
+    --root "$ROOT_DIR" record --receipt "$_replica_receipt" 2>/dev/null \
+    | python3 -c 'import sys,json; print(json.load(sys.stdin).get("recorded", 0))' 2>/dev/null || echo 0)
+  if [[ "${_debt_count:-0}" != "0" ]]; then
+    echo "wt-create: 有平台读取失败，已记入待对账（sync-debt list 查看）；工位创建继续" >&2
+  fi
+  rm -f "$_replica_receipt"
 fi
 
 # ── Validate base exists ─────────────────────────────────

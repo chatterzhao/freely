@@ -60,12 +60,20 @@ def canonical_projection(record: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def reconcile(
-    *, raw_key: str, configured_platforms: Iterable[str], replicas: Mapping[str, Mapping[str, Any]], local: Mapping[str, Any] | None = None,
+    *, raw_key: str, configured_platforms: Iterable[str], replicas: Mapping[str, Mapping[str, Any]],
+    local: Mapping[str, Any] | None = None, allow_degraded: bool = False,
 ) -> dict[str, Any]:
-    """Create a deterministic, write-free receipt for one raw key."""
+    """Create a deterministic, write-free receipt for one raw key.
+
+    Facts block: a readable platform that has no replica (`missing`), an
+    ambiguous match, or two readable replicas that disagree.  Ignorance does
+    not: a platform we could not read (`unknown`) is reported as `degraded`,
+    and only `allow_degraded` lets a caller proceed on a partial observation.
+    """
     key = normalize_raw_key(raw_key)
     platforms = tuple(dict.fromkeys(str(item).strip() for item in configured_platforms if str(item).strip()))
     diagnostics: list[dict[str, str]] = []
+    degraded: list[dict[str, str]] = []
     observations: dict[str, dict[str, Any]] = {}
     baseline: dict[str, Any] | None = None
 
@@ -77,6 +85,14 @@ def reconcile(
             diagnostics.append({"scope": platform, "code": "missing_replica", "detail": "configured platform has no raw replica"})
             continue
         status = str(replica.get("status", "ok")).lower()
+        if status in {"unknown", "error", "unreachable"}:
+            degraded.append({
+                "scope": platform,
+                "code": "unknown",
+                "reason": str(replica.get("reason") or "unreadable"),
+                "detail": str(replica.get("error") or replica.get("reason") or "platform could not be read"),
+            })
+            continue
         if status != "ok":
             diagnostics.append({"scope": platform, "code": status, "detail": str(replica.get("error", "unresolved replica"))})
             continue
@@ -97,10 +113,29 @@ def reconcile(
         elif baseline and local_projection["fingerprint"] != baseline["fingerprint"]:
             diagnostics.append({"scope": "local", "code": "content_diverged", "detail": "local canonical content differs from platforms"})
 
+    blocked_by_facts = bool(diagnostics)
+    unreadable = bool(degraded)
+    # Nothing readable means no baseline: we cannot compare, so we cannot allow.
+    ok = not blocked_by_facts and baseline is not None and (allow_degraded or not unreadable)
+    if blocked_by_facts or baseline is None or (unreadable and not allow_degraded):
+        decision = "block"
+    elif unreadable:
+        decision = "allow_degraded"
+    else:
+        decision = "allow"
+    debt = (
+        [{"platform": item["scope"], "reason": item["detail"], "raw_key": key} for item in degraded]
+        if decision == "allow_degraded"
+        else []
+    )
+
     return {
         "raw_key": key,
         "configured_platforms": list(platforms),
-        "ok": not diagnostics and bool(baseline),
+        "ok": ok,
+        "decision": decision,
         "diagnostics": diagnostics,
+        "degraded": degraded,
+        "debt": debt,
         "observations": observations,
     }
