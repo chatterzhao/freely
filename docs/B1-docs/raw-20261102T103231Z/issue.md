@@ -18,7 +18,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-02T10:32:32Z'
-updated_at: '2026-11-02T12:43:29Z'
+updated_at: '2026-11-02T13:02:45Z'
 intake_id: ''
 author: platform
 channel: github
