@@ -731,6 +731,10 @@ fi
     [[ -f "$_src_freely/freely.db" ]] && cp "$_src_freely/freely.db" "$_dst_freely/freely.db" 2>/dev/null || true
     # Copy a2a_task.db (if separate from freely.db)
     [[ -f "$_src_freely/a2a_task.db" ]] && cp "$_src_freely/a2a_task.db" "$_dst_freely/a2a_task.db" 2>/dev/null || true
+    # Agent table: role → slot mapping.  The daemon in this worktree resolves
+    # AGENT_AI_TOOL from it; without the file every lane fails at slot lookup
+    # with "AGENT_AI_TOOL not set", even when the identity was resolved.
+    [[ -f "$_src_freely/agent-table.toml" ]] && cp "$_src_freely/agent-table.toml" "$_dst_freely/agent-table.toml" 2>/dev/null || true
     # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
     # Do NOT copy: logs/ (test worktree should have own logs)
     # config.toml is already synced by sync-tooling
