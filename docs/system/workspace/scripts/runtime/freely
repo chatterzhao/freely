@@ -365,15 +365,25 @@ for r in rows:
   # explicit, narrow and auditable (see runtime/owner_lane.py): it only fills a
   # missing row, only for the single configured manager, and only for a path
   # git reports as a worktree of this project.
-  if [[ -z "$_my_id" && "$_current_path" != "$project" ]]; then
+  #
+  # No path comparison here: inside a worktree `pwd` equals the project
+  # argument, and an earlier `!=` guard made this branch unreachable while the
+  # failure looked identical to the unfixed behaviour.  Every unsafe case is
+  # already refused by claim() itself.
+  if [[ -z "$_my_id" ]]; then
     local _owner_lane="${project}/docs/system/workspace/scripts/runtime/owner_lane.py"
     if [[ -f "$_owner_lane" ]]; then
-      local _claim=""
-      _claim=$(python3 "$_owner_lane" claim --project "$project" --path "$_current_path" --json 2>/dev/null || true)
+      local _claim="" _claim_err=""
+      _claim_err="$(mktemp -t freely-owner-lane.XXXXXX)"
+      _claim=$(python3 "$_owner_lane" claim --project "$project" --path "$_current_path" --json 2>"$_claim_err" || true)
       if [[ -n "$_claim" ]]; then
         _my_id=$(printf '%s' "$_claim" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("agent_id") or "")' 2>/dev/null || true)
-        [[ -n "$_my_id" ]] && log_info "owner-lane claim: $_current_path → $_my_id (agent_working had no entry)"
+        [[ -n "$_my_id" ]] && log_info "owner-lane claim: $_current_path → $_my_id"
       fi
+      if [[ -z "$_my_id" && -s "$_claim_err" ]]; then
+        log_error "owner-lane claim skipped: $(tail -1 "$_claim_err")"
+      fi
+      rm -f "$_claim_err"
     fi
   fi
 
@@ -8712,6 +8722,9 @@ print(h)" 2>/dev/null || true)
 
   # Start daemon in foreground mode, background it
   log_info "starting freely-db daemon for $project"
+  # A fresh worktree has no .freely/run yet: the daemon owns this directory and
+  # must create it, otherwise the very first start fails before it can log.
+  mkdir -p "$project/.freely/run"
   _rotate_log "$project/.freely/run/db-daemon.log"
 
   python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &

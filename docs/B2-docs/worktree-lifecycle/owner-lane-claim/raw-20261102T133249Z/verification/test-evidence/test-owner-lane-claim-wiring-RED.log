@@ -1,0 +1,35 @@
+F.F
+======================================================================
+FAIL: test_claim_failure_reason_is_not_swallowed (__main__.ClaimWiringTests.test_claim_failure_reason_is_not_swallowed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard/docs/system/workspace/scripts/tests/test-owner-lane-claim-wiring.py", line 53, in test_claim_failure_reason_is_not_swallowed
+    self.assertFalse(
+    ~~~~~~~~~~~~~~~~^
+        any("2>/dev/null" in line for line in claim_lines),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "claim stderr must stay visible so failures carry a reason",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: True is not false : claim stderr must stay visible so failures carry a reason
+
+======================================================================
+FAIL: test_no_path_inequality_guard_hides_the_claim (__main__.ClaimWiringTests.test_no_path_inequality_guard_hides_the_claim)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard/docs/system/workspace/scripts/tests/test-owner-lane-claim-wiring.py", line 44, in test_no_path_inequality_guard_hides_the_claim
+    self.assertIsNone(
+    ~~~~~~~~~~~~~~~~~^
+        re.search(pattern, block),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "path-inequality guard is back; it is always false inside a worktree",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: <re.Match object; span=(1249, 1276), match='_current_path" != "$project'> is not None : path-inequality guard is back; it is always false inside a worktree
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.020s
+
+FAILED (failures=2)
