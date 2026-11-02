@@ -12,7 +12,12 @@
 ### committed_issues
 1. `I-20261102T103231Z-A`
 - milestone: M-20261102T103231Z-A
-- phase_state: in_b2_ibm
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/issues/I-20261102T103231Z-A.md
+### completed_issues
+1. `I-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- completed_at: 2026-11-02T12:41:08Z
 - issue_path: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/issues/I-20261102T103231Z-A.md
 
 ## M-20261102T113816Z-A

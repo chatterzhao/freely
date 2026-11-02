@@ -26,9 +26,11 @@ session_refs: []
 platform_state: open
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-02T12:41:08Z'
 closeout_note: ''
 ---
+
+# [RAW-20261102T103231Z] fix: owner-lane 工位 daemon 启动要求 agent_working 绑定
 
 workflow_kind: fix
 
