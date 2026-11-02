@@ -101,6 +101,15 @@ class OwnerLaneClaimTests(unittest.TestCase):
         self.assertEqual(result["reason"], "raw_key_unresolved")
         self.assertEqual(self.writes, [])
 
+    def test_agent_table_is_read_from_freely_home(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as root:
+            worktree = Path(root) / "wt"
+            (worktree / ".freely").mkdir(parents=True)
+            (worktree / ".freely" / "config.toml").write_text('FREELY_HOME = "/repo/main"\n')
+            self.assertEqual(self.subject._home(str(worktree)), "/repo/main")
+            self.assertEqual(self.subject._home("/nonexistent/project"), "/nonexistent/project")
+
 
 if __name__ == "__main__":
     unittest.main()

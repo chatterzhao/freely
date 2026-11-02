@@ -41,12 +41,32 @@ def _rows(project: str) -> list:
     return _db_rpc(project, "agent_working.get_all", {}).get("rows", []) or []
 
 
+def _home(project: str) -> str:
+    """The project that owns agent-table.toml.
+
+    A `wt-create` worktree carries only `.freely/config.toml`; the agent table
+    lives at FREELY_HOME.  Reading the table from the worktree would report
+    "no manager configured", which is not the same as "ambiguous manager".
+    """
+    config = Path(project) / ".freely" / "config.toml"
+    if config.is_file():
+        try:
+            match = re.search(r'^\s*FREELY_HOME\s*=\s*"([^"]+)"', config.read_text(), re.MULTILINE)
+        except OSError:
+            match = None
+        if match:
+            return match.group(1)
+    return project
+
+
 def _managers(project: str) -> list:
-    query = Path(project) / "bin" / "agent-table-query"
-    if not query.is_file():
+    home = _home(project)
+    table = Path(home) / ".freely" / "agent-table.toml"
+    query = Path(home) / "bin" / "agent-table-query"
+    if not table.is_file() or not query.is_file():
         return []
     result = subprocess.run(
-        [str(query), "--project", project, "--list", "manager"],
+        [str(query), "--project", home, "--list", "manager"],
         capture_output=True, text=True,
     )
     if result.returncode != 0:
