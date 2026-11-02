@@ -1,3 +1,6 @@
+- issue_id: I-20261102T113816Z-A
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/issues/I-20261102T113816Z-A.md
+
 ## Implementation Decision Note
 
 - issue: I-20261102T113816Z-A

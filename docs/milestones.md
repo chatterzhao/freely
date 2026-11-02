@@ -14,6 +14,11 @@
 - milestone: M-20261102T113816Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/issues/I-20261102T113816Z-A.md
+### completed_issues
+1. `I-20261102T113816Z-A`
+- milestone: M-20261102T113816Z-A
+- completed_at: 2026-11-02T11:48:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/issues/I-20261102T113816Z-A.md
 
 ## M-20261102T103216Z-A
 - title: fix — 受控调用方显式标记（不依赖 ps）
