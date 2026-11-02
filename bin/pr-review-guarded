@@ -290,9 +290,26 @@ if row:
         print(wid)
 " 2>/dev/null || true)
 fi
+_identity_kind="worker"
 if [[ -z "$_my_worker_id" ]]; then
-  echo "ERROR: cannot resolve worker_id from agent_working for branch $review_branch (fail-closed)" >&2
+  # Owner lane: an owner-operated worktree has no delegated worker binding.
+  # Fall back to the project manager so the guarded closeout stays reachable;
+  # the review itself runs in manual mode because there is no worker session.
+  _owner_id=$("$ROOT_DIR/bin/agent-table-query" --project "$ROOT_DIR" --list manager 2>/dev/null | head -1 || true)
+  if [[ -n "$_owner_id" ]]; then
+    _my_worker_id="$_owner_id"
+    _identity_kind="owner"
+  fi
+fi
+if [[ -z "$_my_worker_id" ]]; then
+  echo "ERROR: cannot resolve reviewer identity from agent_working or agent-table for branch $review_branch (fail-closed)" >&2
   exit 1
+fi
+
+if [[ "$_identity_kind" == "owner" ]]; then
+  # No delegated worker session exists; do not call freely-review as a worker.
+  _acp_available=0
+  _acp_unavailable_reason="owner lane: no delegated worker session"
 fi
 
 # Only try freely-review or raw ACP if bridge is actually available
