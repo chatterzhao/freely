@@ -1,0 +1,30 @@
+{
+  "raw_key": "20261102T113816Z",
+  "configured_platforms": [
+    "github",
+    "ghost"
+  ],
+  "ok": false,
+  "decision": "block",
+  "diagnostics": [],
+  "degraded": [
+    {
+      "scope": "ghost",
+      "code": "unknown",
+      "reason": "transport_unavailable",
+      "detail": "configured platform unavailable"
+    }
+  ],
+  "debt": [],
+  "observations": {
+    "github": {
+      "raw_key": "20261102T113816Z",
+      "title": "fix: raw 副本门禁把读取抖动当成平台不可用（unknown/missing 未区分、无重试）",
+      "body": "workflow_kind: fix ## 现象 同一 raw、同一内容，连续三次运行 raw-reconciliation-gate：通过 / 失败 / 通过。失败时诊断为 github error（configured platform unavailable 或 raw replica fetch failed）。wt-create 因此 fail-closed，偶发无法建工位。 ## 证据 - gh repo view --json nameWithOwner 连测 10 次，失败 3 次（出口代理间歇 502）。 - 三次 gate 运行结果：ok=True / ok=False(github:error) / ok=True，内容未变。 - 现有实现：discover_raw_replicas 对 transport 异常直接写 status=error；reconcile 把任何非 ok 都当阻塞事实；全程无重试。 ## 根因 观测层把三件事混为一谈：平台确实没有副本（missing）、平台读不到（unknown）、平台内容不一致（diverged）。读不到被当成不可用事实，于是网络抖动等于内容违规。 ## 影响 门禁在内容合规时也会失败，操作者只能反复重跑直到通过——这比放宽门禁更危险，因为它训练所有人忽略红色。wt-create / 后续 lifecycle 都受影响。 ## 方案 1. adapter：transport 失败重试 2 次（短退避）；仍失败则 status=unknown（带 reason），搜索成功且 0 命中才是 missing。 2. reconcile：事实类诊断（missing/ambiguous/diverged/raw_key_mismatch）继续阻塞；unknown 进入 degraded 列表，默认仍阻塞（保持规范不变），新增 allow_degraded 才放行。 3. gate：新增 --allow-degraded，输出 decision 与 debt；gate 保持只读。 4. 调用方（wt-create）在 allow_degraded 放行时把 debt 记入本机账本，供后续对账。 ## 验收 1. 全部平台可读且一致 → decision=allow。 2. 一个平台 unknown、其余一致 → 默认 block；--allow-degraded 时 decision=allow_degraded 且 debt 列出该平台。 3. 一个平台 missing（可读、确实没有）→ 永远 block，即使 --allow-degraded。 4. reconcile 对 transport 异常连续三次失败后稳定返回 unknown，不再返回 error。 5. 既有 test-raw-reconciliation.py 全部通过（默认语义不变）。",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "fingerprint": "45018a16388c41b084673f22504c1ea8c83425ebf0e424481a39e9042dd71b2f"
+    }
+  }
+}

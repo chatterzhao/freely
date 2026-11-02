@@ -1,0 +1,18 @@
+{
+  "raw_key": "19990101T000000Z",
+  "configured_platforms": [
+    "github"
+  ],
+  "ok": false,
+  "decision": "block",
+  "diagnostics": [
+    {
+      "scope": "github",
+      "code": "missing",
+      "detail": "raw replica not found"
+    }
+  ],
+  "degraded": [],
+  "debt": [],
+  "observations": {}
+}
