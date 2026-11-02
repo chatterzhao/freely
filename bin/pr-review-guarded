@@ -296,6 +296,14 @@ if [[ -z "$_my_worker_id" ]]; then
   # Fall back to the project manager so the guarded closeout stays reachable;
   # the review itself runs in manual mode because there is no worker session.
   _owner_id=$("$ROOT_DIR/bin/agent-table-query" --project "$ROOT_DIR" --list manager 2>/dev/null | head -1 || true)
+  if [[ -z "$_owner_id" ]]; then
+    # A worktree may not carry .freely/agent-table.toml; the owner identity
+    # lives with FREELY_HOME, so resolve it there before failing closed.
+    _freely_home=$(sed -n 's/^FREELY_HOME = "\(.*\)"/\1/p' "$ROOT_DIR/.freely/config.toml" 2>/dev/null | head -1 || true)
+    if [[ -n "$_freely_home" && -f "$_freely_home/.freely/agent-table.toml" ]]; then
+      _owner_id=$("$ROOT_DIR/bin/agent-table-query" --project "$_freely_home" --list manager 2>/dev/null | head -1 || true)
+    fi
+  fi
   if [[ -n "$_owner_id" ]]; then
     _my_worker_id="$_owner_id"
     _identity_kind="owner"
