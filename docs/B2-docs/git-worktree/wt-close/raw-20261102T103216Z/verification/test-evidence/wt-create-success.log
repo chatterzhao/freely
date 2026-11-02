@@ -1,0 +1,81 @@
+  ▸ freely [dev]
+wt-create: verifying configured raw replicas...
+{
+  "raw_key": "20261102T103216Z",
+  "configured_platforms": [
+    "github",
+    "gitee"
+  ],
+  "ok": true,
+  "diagnostics": [],
+  "observations": {
+    "github": {
+      "raw_key": "20261102T103216Z",
+      "title": "fix: pre-push 在 ps 不可用时误拦 wt-close 的远程分支删除",
+      "body": "workflow_kind: fix ## 现象 raw-20261101T140415Z 收口时，wt-close 删除 GitHub/Gitee 远程分支均失败，hook 输出 [HOOK] 远程分支删除被拦截。 ## 根因 .githooks/pre-push.sh 用 ps -o args= 遍历父进程识别 wt-close；本机沙箱禁止 ps（/bin/ps: Operation not permitted），识别失败即 fail-closed，连 wt-close 自己也被拦。 ## 影响 每次 wt-close 都遗留远程分支；PR 关闭但分支残留，fleet 状态与平台不一致。 ## 修复方案 wt-close 在调用 git push --delete 前设置显式标记（如 FREELY_ALLOW_REMOTE_BRANCH_DELETE=1），hook 仅在该标记存在时放行；直接 push --delete 仍拦截。 ## 验收 1. wt-close 能删除双平台远程分支。 2. 裸 git push --delete 仍被 hook 拦截。",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "fingerprint": "def9193e3002cdcc3756ac8448586d9fd66359fb81c911541b273a430b7ad9e8"
+    },
+    "gitee": {
+      "raw_key": "20261102T103216Z",
+      "title": "fix: pre-push 在 ps 不可用时误拦 wt-close 的远程分支删除",
+      "body": "workflow_kind: fix ## 现象 raw-20261101T140415Z 收口时，wt-close 删除 GitHub/Gitee 远程分支均失败，hook 输出 [HOOK] 远程分支删除被拦截。 ## 根因 .githooks/pre-push.sh 用 ps -o args= 遍历父进程识别 wt-close；本机沙箱禁止 ps（/bin/ps: Operation not permitted），识别失败即 fail-closed，连 wt-close 自己也被拦。 ## 影响 每次 wt-close 都遗留远程分支；PR 关闭但分支残留，fleet 状态与平台不一致。 ## 修复方案 wt-close 在调用 git push --delete 前设置显式标记（如 FREELY_ALLOW_REMOTE_BRANCH_DELETE=1），hook 仅在该标记存在时放行；直接 push --delete 仍拦截。 ## 验收 1. wt-close 能删除双平台远程分支。 2. 裸 git push --delete 仍被 hook 拦截。",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "fingerprint": "def9193e3002cdcc3756ac8448586d9fd66359fb81c911541b273a430b7ad9e8"
+    }
+  }
+}
+Scan file missing raw-key 20261102T103216Z, running scan once...
+=== Syncing local develop ===
+  develop updated to 95713df8f
+=== Step 1/2: Creating fix worktree ===
+Preparing worktree (new branch 'fix/raw-20261102T103216Z-pre-push-ps-fallback')
+HEAD is now at 95713df8f Merge branch 'feature/raw-20261101T140415Z-super-agent-arch-research' into develop
+  fix: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T103216Z-pre-push-ps-fallback (base: develop)
+
+=== Pulling raw issue from inside fix worktree ===
+pull: materialized raw-20261102T103216Z from platform
+
+=== Step 2/2: Creating test-pre-merge worktree (for testing) ===
+Preparing worktree (new branch 'test-pre-merge-20261102T103216Z-pre-push-ps-fallback')
+Updating files:  95% (6759/7100)Updating files:  96% (6816/7100)Updating files:  97% (6887/7100)Updating files:  98% (6958/7100)Updating files:  99% (7029/7100)Updating files: 100% (7100/7100)Updating files: 100% (7100/7100), done.
+HEAD is now at 95713df8f Merge branch 'feature/raw-20261101T140415Z-super-agent-arch-research' into develop
+  test-pre-merge: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103216Z-pre-push-ps-fallback (base: fix/raw-20261102T103216Z-pre-push-ps-fallback)
+  test-pre-merge: initialized test-gate.env (not_tested)
+  test-pre-merge: cloned .freely state from develop
+
+╔══════════════════════════════════════════════════════════╗
+║  Worktrees created                                      ║
+╠══════════════════════════════════════════════════════════╣
+║  fix worktree:     /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T103216Z-pre-push-ps-fallback
+║  branch:          fix/raw-20261102T103216Z-pre-push-ps-fallback
+║  base:            develop
+║  skill:           docs/system/workspace/skills/freely-workflow-guarded-execution/SKILL.md
+║  source:          platform
+║                                                        ║
+║  test-pre-merge (testing): /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103216Z-pre-push-ps-fallback
+║  branch:          test-pre-merge-20261102T103216Z-pre-push-ps-fallback
+║  base:            fix/raw-20261102T103216Z-pre-push-ps-fallback
+╠══════════════════════════════════════════════════════════╣
+║  Merge chain:                                           ║
+║    fix/raw-20261102T103216Z-pre-push-ps-fallback → develop
+║                                                        ║
+║  test-pre-merge 是丢弃的测试沙箱，不参与合并链             ║
+╚══════════════════════════════════════════════════════════╝
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  请遵循 skill:freely-workflow-guarded-execution 开展工作                        │
+│                                                          │
+│  进入 fix 工位开发:                                  │
+│    cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T103216Z-pre-push-ps-fallback                                        │
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103216Z-pre-push-ps-fallback                                         │
+│                                                          │
+│  请阅读 skill:freely-workflow-guarded-execution                                 │
+│  按其规范流程的完整步骤执行。                                 │
+│  Skill 是流程的唯一权威来源——不依赖本提示的摘要。              │
+└──────────────────────────────────────────────────────────┘

@@ -1,0 +1,21 @@
+AT-001 FAIL: rc=1
+[HOOK] Branch creation blocked: 'fix/raw-20261102T103216Z-marker-test'
+
+  fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
+  完整开发流程（详见 AGENTS.md §核心开发流程）：
+
+  阶段2: 创建 raw issue → freely feedback --repo <user/repo> --title '...' --body '...'
+  阶段3: 创建工位   → freely wt-create --raw-key <key> --source <platform|chat-inbox|local> \
+                          --skill <freely-workflow-guarded-execution|freely-workflow-guarded-execution> --slug <slug>
+AT-001b PASS: no marker blocks
+AT-002 FAIL: still blocked
+[HOOK] 远程分支删除被拦截。
+
+  删除远程分支必须通过 wt-close 收口。
+  直接执行 git push --delete 是违规操作。
+
+  Usage: freely wt-close <branch>
+
+  这是硬性门禁，无法绕过。
+AT-002b PASS: no marker blocks delete
+AT-003 PASS: real wt-create succeeded without ps

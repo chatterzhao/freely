@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# RED/GREEN: sanctioned callers pass via explicit markers even when ps is denied.
+set -uo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT"
+Z="0000000000000000000000000000000000000000"
+S="1111111111111111111111111111111111111111"
+REF_HOOK="docs/system/workspace/hooks/reference-transaction.sh"
+PUSH_HOOK="docs/system/workspace/hooks/pre-push.sh"
+EVID="docs/B2-docs/git-worktree/wt-close/raw-20261102T103216Z/verification/test-evidence"
+fail=0
+
+_out=$(printf '%s %s refs/heads/fix/raw-20261102T103216Z-marker-test\n' "$Z" "$S" | FREELY_WT_CREATE=1 bash "$REF_HOOK" prepared 2>&1); _rc=$?
+if [[ $_rc -eq 0 ]]; then echo "AT-001 PASS: marker allows managed branch"; else echo "AT-001 FAIL: rc=$_rc"; echo "$_out"; fail=1; fi
+
+_out=$(printf '%s %s refs/heads/fix/raw-20261102T103216Z-marker-test\n' "$Z" "$S" | bash "$REF_HOOK" prepared 2>&1); _rc=$?
+if [[ $_rc -ne 0 ]] && echo "$_out" | grep -q "Branch creation blocked"; then echo "AT-001b PASS: no marker blocks"; else echo "AT-001b FAIL: rc=$_rc"; fail=1; fi
+
+_out=$(printf '(delete) %s refs/heads/fix/raw-20261102T103216Z-marker-test %s\n' "$Z" "$S" | FREELY_ALLOW_REMOTE_BRANCH_DELETE=1 bash "$PUSH_HOOK" 2>&1); _rc=$?
+if ! echo "$_out" | grep -q "远程分支删除被拦截"; then echo "AT-002 PASS: marker allows remote delete"; else echo "AT-002 FAIL: still blocked"; echo "$_out"; fail=1; fi
+
+_out=$(printf '(delete) %s refs/heads/fix/raw-20261102T103216Z-marker-test %s\n' "$Z" "$S" | bash "$PUSH_HOOK" 2>&1); _rc=$?
+if [[ $_rc -ne 0 ]] && echo "$_out" | grep -q "远程分支删除被拦截"; then echo "AT-002b PASS: no marker blocks delete"; else echo "AT-002b FAIL: rc=$_rc"; fail=1; fi
+
+if [[ -f "$EVID/wt-create-success.log" ]] && grep -q "Creating fix worktree" "$EVID/wt-create-success.log" && ! grep -q "Branch creation blocked" "$EVID/wt-create-success.log"; then
+  echo "AT-003 PASS: real wt-create succeeded without ps"
+else
+  echo "AT-003 FAIL: missing or blocked wt-create evidence"; fail=1
+fi
+
+exit "$fail"

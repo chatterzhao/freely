@@ -1,3 +1,17 @@
+## M-20261102T103216Z-A
+- title: fix — 受控调用方显式标记（不依赖 ps）
+- status: active
+### candidate_issues
+1. `C-20261102T103216Z-A`
+- milestone: M-20261102T103216Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T103216Z-A
+### committed_issues
+1. `I-20261102T103216Z-A`
+- milestone: M-20261102T103216Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/git-worktree/wt-close/raw-20261102T103216Z/issues/I-20261102T103216Z-A.md
+
 ## M-20261101T140415Z-A
 - title: research — Super-agent 交接运行时可靠性与研究收口
 - status: active

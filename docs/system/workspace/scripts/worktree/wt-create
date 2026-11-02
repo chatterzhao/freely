@@ -645,7 +645,7 @@ _create_worktree() {
 
   mkdir -p "$(freely_wt_root_dir)"
 
-  git worktree add -b "$branch" "$target_path" "$base_branch"
+  FREELY_WT_CREATE=1 git worktree add -b "$branch" "$target_path" "$base_branch"
 
   _materialize_chat_if_needed "$branch" "$target_path" || return 1
 
