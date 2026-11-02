@@ -32,6 +32,8 @@ closeout_note: ''
 
 workflow_kind: feature
 
+# docs: super-agent 架构研究补全（react/事件/ownership/示例项目）
+
 ## 背景
 
 上一轮 Super-agent 对比研究把 ReAct 只当成一句“Async ReAct，不吸收”，没有按意图分析经典 ReAct Loop、异步 ReAct、事件准入、Thread/ownership、上下文组织、Watchdog、部署形态与示例项目。
