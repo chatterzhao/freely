@@ -12,6 +12,7 @@
 - `raw_reconciliation.py::reconcile`：`unknown` 进 `degraded`，默认阻塞；新增 `allow_degraded` 后放行并输出 `debt`。
 - `raw-reconciliation-gate.py`：新增 `--allow-degraded`，输出 `decision` 与 `debt`；**仍只读**。
 - `wt-create`：以 `allow_degraded` 调用；`decision=allow_degraded` 时把债写入 `.freely/state/sync-debt.json`。
+- `worktree-common.sh::freely_wt_assert_raw_reconciled_readonly`（PR / 合并 / 收口共用）：保持严格语义，但在 receipt 不含事实类诊断时最多重试 3 次。事实不因重试改变，抖动会。
 - `sync-debt.py`：`record` / `list` / `clear` 三个纯文件操作。
 
 ## Invariants

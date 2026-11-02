@@ -26,6 +26,7 @@
 3. `raw-reconciliation-gate.py`：新增 `--allow-degraded`；gate 仍只读。
 4. `sync-debt.py`：`.freely/state/sync-debt.json` 的 record / list / clear；条目含 raw_key、platform、reason、since、last_seen、attempts。
 5. `wt-create`：以 `--allow-degraded` 调用；有债时写账本并打印提示，工位继续创建。
+6. `worktree-common.sh`：PR / 合并 / 收口共用同一入口，保持严格语义，但对“非事实类失败”最多重试 3 次；判定读 `diagnostics` 数组而不是正文——正文里出现 missing 这个词不代表诊断。
 
 ### 对既有断言的处理
 
