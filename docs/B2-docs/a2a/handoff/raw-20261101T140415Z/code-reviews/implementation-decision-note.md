@@ -1,7 +1,7 @@
 - issue_id: I-20261101T140415Z-A
 - issue_path: docs/B2-docs/a2a/handoff/raw-20261101T140415Z/issues/I-20261101T140415Z-A.md
 
-# Implementation Decision Note
+## Implementation Decision Note
 
 - decision: 采用“最小修复 + 三态存活判定”：给 `_do_new` 补 `message` 参数并统一首条消息发送，把 `_check_agent_liveness` 的 `pgrep` 换成 ACP `session/ping` 三态；新增 `test-handoff-runtime.py` 覆盖两条路径。持久 outbox 与信封留给 C-B。
 - why_this: `_do_new` 的 `NameError` 是跨工具交接的必现异常，且被 `watchdog_run` 吞成一次 SSE 重连，导致交接静默丢失；`pgrep` 判活误杀健康会话又把交接推入同一路径。两处改动小、可单测、能立即降低交接失败率，是后续协议的前置。

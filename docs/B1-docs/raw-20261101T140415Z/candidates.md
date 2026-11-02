@@ -32,6 +32,7 @@ milestone: M-20261101T140415Z-A
   - summary: 代码路径已核对：`agent_working.py:223-232`、`watchdog_sse.py:120-140/450`、`a2a_server.py:598`（内存 Queue 不重放）；两个缺陷可在单测中稳定复现
   - verdict: pass
 - promoted_issue_id: I-20261101T140415Z-A
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T140415Z/issues/I-20261101T140415Z-A.md
 - milestone: M-20261101T140415Z-A
 - session_refs: []
 
