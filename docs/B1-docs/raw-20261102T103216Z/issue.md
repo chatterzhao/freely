@@ -30,9 +30,9 @@ completed_at: ''
 closeout_note: ''
 ---
 
-workflow_kind: fix
-
 # [RAW-20261102T103216Z] fix: pre-push 在 ps 不可用时误拦 wt-close 的远程分支删除
+
+workflow_kind: fix
 
 ## 现象
 raw-20261101T140415Z 收口时，wt-close 删除 GitHub/Gitee 远程分支均失败，hook 输出 [HOOK] 远程分支删除被拦截。
