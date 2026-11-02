@@ -66,6 +66,27 @@
 - status: passed
 - blocker: execution_pending_or_failed
 
+### acceptance-4
+- id: AT-004
+- requirement: pr-review-guarded 在无 worker 绑定的 owner lane 回退到 manager 身份并进入人工审查，不 fail-closed
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- testing_layer: integration
+- target_environment: owner-operated feature worktree
+- required_evidence: pr-review-guarded 输出日志
+- evidence_level: integration
+- artifact_ref: bin/pr-review-guarded
+- test_command: ./bin/pr-review-guarded feature/raw-20261101T140415Z-super-agent-arch-research
+- expected_output: 输出含“人工审查”，不含“cannot resolve reviewer identity”
+- expected_RED_output: ERROR: cannot resolve reviewer identity from agent_working or agent-table
+- actual_RED_output: ERROR: cannot resolve reviewer identity from agent_working or agent-table
+- actual_output: 进入人工审查（ACP 不可用），未 fail-closed
+- evidence_file: docs/B2-docs/a2a/handoff/raw-20261101T140415Z/verification/test-evidence/owner-lane-review.log
+- red-green-status: green
+- status: passed
+- blocker: execution_pending_or_failed
+
 ## Unit
 - acceptance_target: _do_new 首条消息与 _session_state 三态
 - testing_layer: unit
