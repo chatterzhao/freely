@@ -30,7 +30,7 @@ completed_at: '2026-11-02T13:11:27Z'
 closeout_note: ''
 ---
 
-# [RAW-20261102T130721Z] feat: 工作树种子清单（worktree seed）
+# [RAW-20261102T130721Z] feat: 工作树种子清单（worktree seed）——声明式复制未跟踪的本地配置
 
 workflow_kind: feature
 
