@@ -18,12 +18,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-02T10:32:17Z'
-updated_at: '2026-11-02T10:32:22Z'
+updated_at: '2026-11-02T10:48:05Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
 completed_at: '2026-11-02T10:47:58Z'
