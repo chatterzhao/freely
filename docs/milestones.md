@@ -1,3 +1,25 @@
+## M-20261102T130721Z-A
+- title: feat — 声明式工作树种子清单
+- status: active
+### candidate_issues
+1. `C-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T130721Z-A
+2. `C-20261102T130721Z-B`
+- milestone: M-20261102T130721Z-A
+- status: needs_research
+### committed_issues
+1. `I-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261102T130721Z/issues/I-20261102T130721Z-A.md
+### completed_issues
+1. `I-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- completed_at: 2026-11-02T13:11:27Z
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261102T130721Z/issues/I-20261102T130721Z-A.md
+
 ## M-20261102T103231Z-A
 - title: fix — owner lane 显式认领 manager 身份
 - status: active
