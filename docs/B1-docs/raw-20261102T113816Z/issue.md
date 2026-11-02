@@ -30,6 +30,8 @@ completed_at: '2026-11-02T11:51:20Z'
 closeout_note: ''
 ---
 
+# [RAW-20261102T113816Z] fix: raw 副本门禁把读取抖动当成平台不可用（unknown/missing 未区分、无重试）
+
 workflow_kind: fix
 
 ## 现象
