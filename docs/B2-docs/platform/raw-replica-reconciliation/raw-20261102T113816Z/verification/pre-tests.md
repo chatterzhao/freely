@@ -112,3 +112,25 @@
 - red-green-status: green
 - status: passed
 - blocker: ""
+
+### acceptance-6
+- id: AT-006
+- requirement: 债账本可重复记录、累加 attempts、保留 since，并能按 raw+platform 精确清除
+- acceptance_target: 异步对账所需的最小持久语义成立
+- surface_kind: unit
+- target_lane: dev-unit
+- promotion_gate: develop_merge
+- testing_layer: unit
+- target_environment: feature/raw-20261102T113816Z-replica-gate-unknown-vs-missing
+- required_evidence: temp 目录内 sync-debt.json 的 entry 字段
+- evidence_level: unit
+- artifact_ref: docs/system/workspace/scripts/lifecycle/sync-debt.py
+- test_command: python3 docs/system/workspace/scripts/tests/test-raw-replica-degraded.py
+- expected_output: OK
+- expected_RED_output: FileNotFoundError: sync-debt.py 不存在
+- actual_RED_output: FileNotFoundError: sync-debt.py 不存在（首轮 RED 日志已记录该文件缺失）
+- actual_output: OK —— attempts 1→2，since 保持不变，reason 取最新，clear 只删匹配条目
+- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/verification/test-evidence/test-raw-replica-degraded.log
+- red-green-status: green
+- status: passed
+- blocker: ""

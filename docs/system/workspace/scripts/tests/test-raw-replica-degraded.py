@@ -160,6 +160,39 @@ class DecisionTests(unittest.TestCase):
         self.assertFalse(receipt["ok"], receipt)
         self.assertEqual(receipt["decision"], "block")
 
+class SyncDebtTests(unittest.TestCase):
+    """The ledger is the only trace of an unreadable platform: it must persist."""
+
+    def setUp(self):
+        import tempfile
+        self.subject = _load("sync_debt_under_test", ROOT / "docs/system/workspace/scripts/lifecycle/sync-debt.py")
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.dir.name) / "sync-debt.json"
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def test_record_is_idempotent_and_counts_attempts(self):
+        first = self.subject.record(
+            [{"raw_key": "20261102T113816Z", "platform": "github", "reason": "502"}], self.path
+        )
+        second = self.subject.record(
+            [{"raw_key": "20261102T113816Z", "platform": "github", "reason": "timeout"}], self.path
+        )
+        self.assertEqual(len(first["entries"]), 1)
+        entry = second["entries"]["20261102T113816Z::github"]
+        self.assertEqual(entry["attempts"], 2)
+        self.assertEqual(entry["reason"], "timeout")
+        self.assertEqual(entry["since"], first["entries"]["20261102T113816Z::github"]["since"])
+
+    def test_clear_removes_only_matching_entries(self):
+        self.subject.record([
+            {"raw_key": "A", "platform": "github", "reason": "x"},
+            {"raw_key": "A", "platform": "gitee", "reason": "y"},
+        ], self.path)
+        remaining = self.subject.clear("A", "github", self.path)
+        self.assertEqual(sorted(remaining["entries"]), ["A::gitee"])
+
 
 if __name__ == "__main__":
     unittest.main()
