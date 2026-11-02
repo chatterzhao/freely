@@ -1,3 +1,15 @@
+## M-20261101T140415Z-A
+- title: research — Super-agent 交接运行时可靠性与研究收口
+- status: active
+### candidate_issues
+1. `C-20261101T140415Z-A`
+- milestone: M-20261101T140415Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T140415Z-A
+2. `C-20261101T140415Z-B`
+- milestone: M-20261101T140415Z-A
+- status: needs_research
+
 ## M-20261101T124657Z-A
 - title: feat — dsh-freely issue→PR E2E slice
 - status: active
