@@ -1,3 +1,205 @@
+## M-20261102T133249Z-A
+- title: fix — 认领判定下沉，去掉路径守卫
+- status: active
+### candidate_issues
+1. `C-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T133249Z-A
+### committed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+### completed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- completed_at: 2026-11-02T13:38:14Z
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+
+## M-20261102T130721Z-A
+- title: feat — 声明式工作树种子清单
+- status: active
+### candidate_issues
+1. `C-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T130721Z-A
+2. `C-20261102T130721Z-B`
+- milestone: M-20261102T130721Z-A
+- status: needs_research
+### committed_issues
+1. `I-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261102T130721Z/issues/I-20261102T130721Z-A.md
+### completed_issues
+1. `I-20261102T130721Z-A`
+- milestone: M-20261102T130721Z-A
+- completed_at: 2026-11-02T13:11:27Z
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261102T130721Z/issues/I-20261102T130721Z-A.md
+
+## M-20261102T103231Z-A
+- title: fix — owner lane 显式认领 manager 身份
+- status: active
+### candidate_issues
+1. `C-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T103231Z-A
+2. `C-20261102T103231Z-B`
+- milestone: M-20261102T103231Z-A
+- status: needs_research
+### committed_issues
+1. `I-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/issues/I-20261102T103231Z-A.md
+### completed_issues
+1. `I-20261102T103231Z-A`
+- milestone: M-20261102T103231Z-A
+- completed_at: 2026-11-02T12:41:08Z
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane/raw-20261102T103231Z/issues/I-20261102T103231Z-A.md
+
+## M-20261102T113816Z-A
+- title: fix — raw 副本观测三态化（unknown ≠ missing）与债账本
+- status: active
+### candidate_issues
+1. `C-20261102T113816Z-A`
+- milestone: M-20261102T113816Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T113816Z-A
+2. `C-20261102T113816Z-B`
+- milestone: M-20261102T113816Z-A
+- status: needs_research
+### committed_issues
+1. `I-20261102T113816Z-A`
+- milestone: M-20261102T113816Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/issues/I-20261102T113816Z-A.md
+### completed_issues
+1. `I-20261102T113816Z-A`
+- milestone: M-20261102T113816Z-A
+- completed_at: 2026-11-02T11:48:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261102T113816Z/issues/I-20261102T113816Z-A.md
+
+## M-20261102T103216Z-A
+- title: fix — 受控调用方显式标记（不依赖 ps）
+- status: active
+### candidate_issues
+1. `C-20261102T103216Z-A`
+- milestone: M-20261102T103216Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T103216Z-A
+### committed_issues
+1. `I-20261102T103216Z-A`
+- milestone: M-20261102T103216Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/git-worktree/wt-close/raw-20261102T103216Z/issues/I-20261102T103216Z-A.md
+
+## M-20261101T140415Z-A
+- title: research — Super-agent 交接运行时可靠性与研究收口
+- status: active
+### candidate_issues
+1. `C-20261101T140415Z-A`
+- milestone: M-20261101T140415Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T140415Z-A
+2. `C-20261101T140415Z-B`
+- milestone: M-20261101T140415Z-A
+- status: needs_research
+
+### committed_issues
+1. `I-20261101T140415Z-A`
+- milestone: M-20261101T140415Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T140415Z/issues/I-20261101T140415Z-A.md
+
+## M-20261101T124657Z-A
+- title: feat — dsh-freely issue→PR E2E slice
+- status: active
+### candidate_issues
+1. `C-20261101T124657Z-A`
+- milestone: M-20261101T124657Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T124657Z-A
+- promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
+### committed_issues
+1. `I-20261101T124657Z-A`
+- milestone: M-20261101T124657Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
+
+## M-20261101T120027Z-A
+- title: feat — @freely/dsh-freely DSH 打包形态
+- status: active
+### candidate_issues
+1. `C-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T120027Z-A
+- promoted_issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+### committed_issues
+1. `I-20261101T120027Z-A`
+- milestone: M-20261101T120027Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T120027Z/issues/I-20261101T120027Z-A.md
+
+## M-20261101T031502Z-A
+- title: research — Super-agent 架构与 Freely agent 协作模型对比
+- status: active
+### candidate_issues
+1. `C-20261101T031502Z-A`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-A
+- promoted_issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
+2. `C-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-B
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
+3. `C-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-C
+- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+4. `C-20261101T031502Z-D`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-D
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+5. `C-20261101T031502Z-E`
+- milestone: M-20261101T031502Z-A
+- status: dropped
+6. `C-20261101T031502Z-F`
+- milestone: M-20261101T031502Z-A
+- status: promoted
+- promoted_issue_id: I-20261101T031502Z-F
+- promoted_issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+### committed_issues
+1. `I-20261101T031502Z-F`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-F.md
+2. `I-20261101T031502Z-B`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/handoff/raw-20261101T031502Z/issues/I-20261101T031502Z-B.md
+3. `I-20261101T031502Z-D`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261101T031502Z/issues/I-20261101T031502Z-D.md
+4. `I-20261101T031502Z-C`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/protocol-health/raw-20261101T031502Z/issues/I-20261101T031502Z-C.md
+
+### completed_issues
+1. `I-20261101T031502Z-A`
+- milestone: M-20261101T031502Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/agent-orchestration/super-agent-architecture-comparison/raw-20261101T031502Z/issues/I-20261101T031502Z-A.md
 
 ## M-20260717T090202Z-A
 - title: fix — peak 口径限定为死亡记录（PEAK=3 误报回归）

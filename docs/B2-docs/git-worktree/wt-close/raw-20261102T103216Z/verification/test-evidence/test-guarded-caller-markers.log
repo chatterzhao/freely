@@ -1,0 +1,5 @@
+AT-001 PASS: marker allows managed branch
+AT-001b PASS: no marker blocks
+AT-002 PASS: marker allows remote delete
+AT-002b PASS: no marker blocks delete
+AT-003 PASS: real wt-create succeeded without ps

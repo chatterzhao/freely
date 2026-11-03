@@ -1,0 +1,10 @@
+{
+  "name": "@freely/dsh-freely-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "driver.js",
+  "exports": { ".": "./driver.js", "./package.json": "./package.json" },
+  "files": ["driver.js", "cordis.patch.yml"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}

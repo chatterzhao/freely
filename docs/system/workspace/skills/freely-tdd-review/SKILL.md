@@ -175,6 +175,8 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 
 任一层 fail → overall verdict = fail。必须写清楚失败理由和修复建议，不能只说"不达标"。
 
+完成后执行 `a2a-exit --state completed --summary '<verdict-json>' --role reviewer`，把 Overall Verdict 的 JSON 作为 summary。
+
 ## 与门禁的分工
 
 | 门禁 | 本审查 |

@@ -42,7 +42,11 @@ class RawReconciliationTests(unittest.TestCase):
             replicas={"github": self.record, "gitee": {"status": "error", "error": "timeout"}},
         )
         self.assertFalse(receipt["ok"])
-        self.assertEqual(receipt["diagnostics"][0]["code"], "error")
+        self.assertEqual(receipt["decision"], "block")
+        # Unreadable is not a content fact: it is reported as degraded, and the
+        # default receipt still refuses to allow the operation.
+        self.assertEqual([item["scope"] for item in receipt["degraded"]], ["gitee"])
+        self.assertNotIn("gitee", receipt["observations"])
 
     def test_blocks_divergent_local_or_platform_content(self):
         changed = {**self.record, "body": "different scope"}

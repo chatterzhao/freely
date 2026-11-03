@@ -9,6 +9,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   # Remote branch deletion (git push --delete): only allowed via wt-close.
   # git sends all-zero local_sha for delete operations.
   if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    [[ "${FREELY_ALLOW_REMOTE_BRANCH_DELETE:-}" == "1" ]] && continue
     # Walk process ancestry to check if wt-close is in the parent chain
     _pid=$PPID
     _is_wt_close=0

@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "借鉴 Super-agent 后的交接回路",
+    "subtitle": "把“一句话交接”换成：信封 → 持久队列 → 独占所有者 → 回执",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "docs/B1-docs/raw-20261101T140415Z/research/architecture/super-agent-handoff-loop.html"
+  },
+  "lanes": [
+    {
+      "id": "trigger",
+      "label": "触发侧"
+    },
+    {
+      "id": "relay",
+      "label": "交接层"
+    },
+    {
+      "id": "owner",
+      "label": "所有者"
+    },
+    {
+      "id": "guard",
+      "label": "兜底",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "envelope",
+      "label": "写信封",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "queue",
+      "label": "入队 + 选主",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "deliver",
+      "label": "投递 + 回执",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "evt",
+    "envelope",
+    "outbox",
+    "pick",
+    "deliver",
+    "ack"
+  ],
+  "nodes": [
+    {
+      "id": "evt",
+      "lane": "trigger",
+      "col": 0,
+      "type": "backend",
+      "label": "a2a-exit 事件",
+      "sublabel": "input-required / completed",
+      "width": 156
+    },
+    {
+      "id": "envelope",
+      "lane": "relay",
+      "col": 1,
+      "type": "backend",
+      "label": "交接信封",
+      "sublabel": "report / attention",
+      "tag": "原文转发，不改写",
+      "width": 168
+    },
+    {
+      "id": "outbox",
+      "lane": "relay",
+      "col": 2,
+      "type": "database",
+      "label": "持久 outbox",
+      "sublabel": "seq · status · attempts",
+      "tag": "先存后发",
+      "width": 168
+    },
+    {
+      "id": "pick",
+      "lane": "owner",
+      "col": 3,
+      "type": "backend",
+      "label": "选所有者",
+      "sublabel": "assignment / ticket",
+      "tag": "池只给容量",
+      "width": 160
+    },
+    {
+      "id": "deliver",
+      "lane": "owner",
+      "col": 4,
+      "type": "backend",
+      "label": "投递",
+      "sublabel": "session/prompt",
+      "width": 150
+    },
+    {
+      "id": "ack",
+      "lane": "owner",
+      "col": 5,
+      "type": "backend",
+      "label": "回执 + 结案",
+      "sublabel": "ack ≤100 词 · handback 一次",
+      "width": 176
+    },
+    {
+      "id": "later",
+      "lane": "guard",
+      "col": 2,
+      "type": "backend",
+      "label": "Later：无空闲",
+      "sublabel": "推迟而不算失败",
+      "width": 150
+    },
+    {
+      "id": "backoff",
+      "lane": "guard",
+      "col": 4,
+      "type": "backend",
+      "label": "退避重试",
+      "sublabel": "2s → 60s",
+      "width": 140
+    },
+    {
+      "id": "health",
+      "lane": "guard",
+      "col": 5,
+      "type": "security",
+      "label": "健康项",
+      "sublabel": "连续 3 次失败上报",
+      "width": 156
+    }
+  ],
+  "edges": [
+    {
+      "id": "evt-envelope",
+      "from": "evt",
+      "to": "envelope",
+      "label": "写结构化回报"
+    },
+    {
+      "id": "envelope-outbox",
+      "from": "envelope",
+      "to": "outbox",
+      "label": "入队"
+    },
+    {
+      "id": "outbox-pick",
+      "from": "outbox",
+      "to": "pick",
+      "label": "按 owner 路由"
+    },
+    {
+      "id": "pick-deliver",
+      "from": "pick",
+      "to": "deliver",
+      "label": "占 slot"
+    },
+    {
+      "id": "deliver-ack",
+      "from": "deliver",
+      "to": "ack",
+      "label": "对方 ack"
+    },
+    {
+      "id": "deliver-backoff",
+      "from": "deliver",
+      "to": "backoff",
+      "label": "投递失败",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "backoff-deliver",
+      "from": "backoff",
+      "to": "deliver",
+      "label": "重试",
+      "role": "return",
+      "variant": "dashed"
+    },
+    {
+      "id": "pick-later",
+      "from": "pick",
+      "to": "later",
+      "label": "无 slot",
+      "role": "branch"
+    },
+    {
+      "id": "later-pick",
+      "from": "later",
+      "to": "pick",
+      "label": "稍后再选",
+      "role": "return",
+      "variant": "dashed"
+    },
+    {
+      "id": "backoff-health",
+      "from": "backoff",
+      "to": "health",
+      "label": "三次失败",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "信封里必须有的",
+      "items": [
+        "工单卡 + 原始 Trigger 引用，不让接收方重新猜",
+        "状态 + ≤600 字摘要 + 超长部分的读指针",
+        "问题只放一个，原样转发，不改写"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "队列语义",
+      "items": [
+        "pending / sent / failed 三态可见，能查“投递未达”",
+        "同一工单 + 同一会话内保序",
+        "无空闲 slot 用 Later，不消耗失败次数"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "owner 语义",
+      "items": [
+        "工单自持 session，席位只当容量，不承载身份",
+        "handback 只允许一次；别人还持有则返回 queued:false",
+        "回执一次，避免“反复交接”变成反复确认"
+      ]
+    }
+  ]
+}

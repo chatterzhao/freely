@@ -288,5 +288,40 @@ freely_wt_assert_raw_reconciled_readonly() {
   _script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
   local _gate="$_script_root/lifecycle/raw-reconciliation-gate.py"
   [[ -f "$_gate" ]] || { echo "[raw-reconciliation] gate script missing: $_gate" >&2; return 1; }
-  FREELY_PROJECT_ROOT="$_project" python3 "$_gate" --project "$_project" --raw-key "$_raw_key" --require-local
+  # A transport blip is not a verdict.  Retry only while the receipt carries no
+  # fact-level diagnostic: `missing`/`diverged`/`ambiguous` never improve with
+  # another attempt, so we fail fast on those and retry on `unknown` alone.
+  # Classification reads the diagnostics array, never the raw body text: the
+  # body itself may legitimately contain the words "missing" or "diverged".
+  local _attempt _receipt _verdict
+  for _attempt in 1 2 3; do
+    _receipt="$(mktemp -t freely-replica-assert.XXXXXX)"
+    if FREELY_PROJECT_ROOT="$_project" python3 "$_gate" --project "$_project" --raw-key "$_raw_key" --require-local > "$_receipt" 2>&1; then
+      rm -f "$_receipt"
+      return 0
+    fi
+    _verdict=$(python3 - "$_receipt" <<'PY'
+import json, sys
+facts = {"missing", "missing_replica", "content_diverged", "ambiguous",
+         "raw_key_mismatch", "no_configured_platforms"}
+try:
+    with open(sys.argv[1]) as stream:
+        receipt = json.load(stream)
+except Exception:
+    print("facts")
+else:
+    codes = {item.get("code") for item in (receipt.get("diagnostics") or []) if isinstance(item, dict)}
+    print("facts" if codes & facts else "retry")
+PY
+)
+    if [[ "$_verdict" == "facts" ]]; then
+      cat "$_receipt" >&2
+      rm -f "$_receipt"
+      return 1
+    fi
+    [[ "$_attempt" -lt 3 ]] && sleep 1
+  done
+  cat "$_receipt" >&2
+  rm -f "$_receipt"
+  return 1
 }

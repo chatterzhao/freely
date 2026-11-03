@@ -32,7 +32,8 @@ Usage:
   # -> {"github": {"issue_id": "42", ...}, "gitee": {"issue_id": "17", ...}}
 """
 from __future__ import annotations
-import json, os, re, subprocess, sys
+import concurrent.futures
+import json, os, random, re, subprocess, sys, time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -135,6 +136,10 @@ class PlatformHandler(ABC):
         return False, "not implemented"
     def list_open_issues(self) -> dict[str, str]: return {}
     def list_open_issue_records(self) -> dict[str, dict]: return {}
+    def list_issue_comments(self, issue_number: str) -> list[dict]: return []
+    def list_pr_reviews(self, pr_number: str) -> list[dict]: return []
+    def list_pr_review_comments(self, pr_number: str) -> list[dict]: return []
+    def list_ci_checks(self, pr_number: str) -> list[dict]: return []
 
 # ══════════════════════════════════════════════
 # Registry
@@ -358,6 +363,62 @@ class GitHubHandler(PlatformHandler):
             return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
         except Exception:
             return {}
+
+    def _gh_json(self, args: list[str], timeout: int = 30):
+        repo = self._repo()
+        if not repo:
+            return None
+        r = subprocess.run(["gh", *args, "--repo", repo], capture_output=True, text=True, timeout=timeout)
+        if r.returncode != 0 or not r.stdout.strip():
+            return None
+        try:
+            return json.loads(r.stdout)
+        except Exception:
+            return None
+
+    def list_issue_comments(self, issue_number: str) -> list[dict]:
+        data = self._gh_json(["issue", "view", str(issue_number), "--json", "comments"])
+        out = []
+        for c in (data or {}).get("comments", []) or []:
+            out.append({"id": c.get("id"), "author": c.get("author") or {},
+                        "association": c.get("authorAssociation", ""),
+                        "body": c.get("body", ""), "created_at": c.get("createdAt", "")})
+        return out
+
+    def list_pr_reviews(self, pr_number: str) -> list[dict]:
+        data = self._gh_json(["pr", "view", str(pr_number), "--json", "reviews"])
+        out = []
+        for r in (data or {}).get("reviews", []) or []:
+            out.append({"id": r.get("id"), "author": r.get("author") or {},
+                        "state": r.get("state", ""), "body": r.get("body", ""),
+                        "submitted_at": r.get("submittedAt", ""), "commit": r.get("commit", {})})
+        return out
+
+    def list_pr_review_comments(self, pr_number: str) -> list[dict]:
+        repo = self._repo()
+        if not repo:
+            return []
+        r = subprocess.run(["gh", "api", f"repos/{repo}/pulls/{pr_number}/comments", "--paginate"],
+                           capture_output=True, text=True, timeout=30)
+        if r.returncode != 0 or not r.stdout.strip():
+            return []
+        try:
+            rows = json.loads(r.stdout)
+        except Exception:
+            return []
+        return [{"id": c.get("id"), "author": c.get("user") or {}, "body": c.get("body", ""),
+                 "path": c.get("path", ""), "line": c.get("line"), "created_at": c.get("created_at", "")}
+                for c in rows or []]
+
+    def list_ci_checks(self, pr_number: str) -> list[dict]:
+        data = self._gh_json(["pr", "checks", str(pr_number), "--json", "name,state,bucket,link"])
+        out = []
+        for c in data or []:
+            link = c.get("link", "")
+            cid = link.rstrip("/").split("/")[-1] if link else c.get("name", "")
+            out.append({"id": cid, "name": c.get("name", ""), "state": c.get("state", ""),
+                        "conclusion": c.get("state", ""), "link": link})
+        return out
 
 # ══════════════════════════════════════════════
 # Gitee Handler
@@ -707,36 +768,87 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     return h.fetch_issue(issue_number) if h else {}
 
 
+# ── Bounded, jittered reads ──
+#
+# A transport failure is not an observation: the platform may be fine and the
+# path to it may not.  We retry a few times with jittered backoff before we
+# report `unknown`, and we never retry terminal answers (auth / not found),
+# because retrying those only adds latency and hides the real cause.
+
+_READ_ATTEMPTS = 3
+_READ_BACKOFF = (0.5, 1.5)
+_TERMINAL_MARKERS = ("authentication", "bad credentials", "401 unauthorized", "not found", "404")
+
+
+def _retryable(message: str) -> bool:
+    lowered = (message or "").lower()
+    return not any(marker in lowered for marker in _TERMINAL_MARKERS)
+
+
+def _retry_read(operation, attempts: int | None = None):
+    """Run one transport read, retrying transient failures. Returns (value, error)."""
+    budget = attempts or _READ_ATTEMPTS
+    last = ""
+    for index in range(budget):
+        try:
+            value = operation()
+        except Exception as exc:  # transport exceptions are not observations
+            last = (str(exc) or exc.__class__.__name__)[:200]
+        else:
+            if value is not None:
+                return value, ""
+            last = last or "empty response"
+        if index + 1 >= budget or not _retryable(last):
+            break
+        time.sleep(_READ_BACKOFF[min(index, len(_READ_BACKOFF) - 1)] + random.uniform(0, 0.15))
+    return None, last or "unreadable"
+
+
+def _discover_one(platform: str, raw_key: str) -> dict:
+    """Read a single platform replica. Uncertainty is `unknown`, never `missing`."""
+    handler = _handler_for(platform)
+    if handler is None:
+        handler, _ = _retry_read(lambda: _handler_for(platform))
+    if handler is None:
+        return {"status": "unknown", "reason": "transport_unavailable",
+                "error": "configured platform unavailable"}
+
+    found, error = _retry_read(lambda: handler.search_raw_issue(raw_key))
+    if not isinstance(found, dict):
+        return {"status": "unknown", "reason": "search_unreadable", "error": error or "raw search failed"}
+    matches = found.get("matches")
+    if not isinstance(matches, list):
+        return {"status": "unknown", "reason": "search_unreadable", "error": "raw search returned no match set"}
+    if not matches:
+        return {"status": "missing", "reason": "absent", "error": "raw replica not found"}
+    if len(matches) != 1:
+        return {"status": "ambiguous", "reason": "duplicate_matches",
+                "error": f"raw key resolved to {len(matches)} replicas"}
+
+    issue = matches[0] if isinstance(matches[0], dict) else {}
+    issue_id = str(issue.get("issue_number", issue.get("issue_id", "")) or "")
+    if not issue_id:
+        return {"status": "unknown", "reason": "fetch_unreadable", "error": "raw replica fetch failed"}
+    details, error = _retry_read(lambda: handler.fetch_issue(issue_id))
+    if not isinstance(details, dict) or not details:
+        return {"status": "unknown", "reason": "fetch_unreadable", "error": error or "raw replica fetch failed"}
+    return {
+        "status": "ok", "raw_key": f"raw-{raw_key}", "issue_id": issue_id,
+        "url": issue.get("url", ""), **details,
+    }
+
+
 def discover_raw_replicas(raw_key: str) -> dict[str, dict]:
-    """Read every configured platform once; never convert uncertainty into absence."""
-    records: dict[str, dict] = {}
-    for platform in configured_platforms():
-        handler = _handler_for(platform)
-        if not handler:
-            records[platform] = {"status": "error", "error": "configured platform unavailable"}
-            continue
-        found = _safe(handler.search_raw_issue, raw_key)
-        matches = found.get("matches") if isinstance(found, dict) else None
-        if not isinstance(matches, list):
-            records[platform] = {"status": "error", "error": "raw search failed"}
-            continue
-        if not matches:
-            records[platform] = {"status": "missing", "error": "raw replica not found"}
-            continue
-        if len(matches) != 1:
-            records[platform] = {"status": "ambiguous", "error": f"raw key resolved to {len(matches)} replicas"}
-            continue
-        issue = matches[0] if isinstance(matches[0], dict) else {}
-        issue_id = str(issue.get("issue_number", issue.get("issue_id", "")) or "")
-        details = _safe(handler.fetch_issue, issue_id) if issue_id else {}
-        if not issue_id or not isinstance(details, dict) or not details:
-            records[platform] = {"status": "error", "error": "raw replica fetch failed"}
-            continue
-        records[platform] = {
-            "status": "ok", "raw_key": f"raw-{raw_key}", "issue_id": issue_id,
-            "url": issue.get("url", ""), **details,
-        }
-    return records
+    """Read every configured platform once; never convert uncertainty into absence.
+
+    Platforms are read concurrently so one slow path cannot delay the others.
+    """
+    platforms = configured_platforms()
+    if len(platforms) <= 1:
+        return {platform: _discover_one(platform, raw_key) for platform in platforms}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(platforms))) as pool:
+        futures = {platform: pool.submit(_discover_one, platform, raw_key) for platform in platforms}
+        return {platform: futures[platform].result() for platform in platforms}
 
 def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
     h = _handler_for(platform)

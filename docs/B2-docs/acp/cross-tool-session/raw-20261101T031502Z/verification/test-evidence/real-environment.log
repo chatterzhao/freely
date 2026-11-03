@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "role": "reviewer",
+  "slot": "cline-account-ds-flash-free-auto",
+  "tool": "cline",
+  "capabilities": {
+    "session_new": true,
+    "resume": true,
+    "fork": "degraded",
+    "tools": true,
+    "skills": true,
+    "usage": "unknown",
+    "cache": "unknown",
+    "mcp": "unknown"
+  },
+  "health": {
+    "ok": true,
+    "binary": "/Users/zhaoyu/.nvm/versions/node/v22.19.0/bin/cline",
+    "acp": true,
+    "error": null
+  },
+  "requirements": [
+    "resume",
+    "tools",
+    "skills"
+  ],
+  "satisfied": true,
+  "degraded": [
+    "fork"
+  ],
+  "errors": []
+}

@@ -271,12 +271,23 @@ freely_wt_assert_strict_root
 
 if [[ "$using_new" -eq 1 ]]; then
   echo "wt-create: verifying configured raw replicas..." >&2
-  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+  _replica_receipt="$(mktemp -t freely-replica-receipt.XXXXXX)"
+  if ! FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
     "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" \
-    --project "$ROOT_DIR" --raw-key "$raw_key" || {
+    --project "$ROOT_DIR" --raw-key "$raw_key" --allow-degraded > "$_replica_receipt"; then
+      cat "$_replica_receipt" >&2
+      rm -f "$_replica_receipt"
       echo "拒绝创建工位: configured raw replicas are inconsistent or unavailable" >&2
       exit 1
-    }
+  fi
+  # An unreadable platform is debt, not a fact: record it so it can be settled.
+  _debt_count=$(python3 "$ROOT_DIR/docs/system/workspace/scripts/lifecycle/sync-debt.py" \
+    --root "$ROOT_DIR" record --receipt "$_replica_receipt" 2>/dev/null \
+    | python3 -c 'import sys,json; print(json.load(sys.stdin).get("recorded", 0))' 2>/dev/null || echo 0)
+  if [[ "${_debt_count:-0}" != "0" ]]; then
+    echo "wt-create: 有平台读取失败，已记入待对账（sync-debt list 查看）；工位创建继续" >&2
+  fi
+  rm -f "$_replica_receipt"
 fi
 
 # ── Validate base exists ─────────────────────────────────
@@ -640,12 +651,35 @@ except: pass
 
 # ── Create worktree helper ───────────────────────────────
 
+# Apply the project's declarative seeds to a freshly created worktree.
+# The manifest lives in the repo, so a project can list whatever gitignored
+# files it needs without touching this script.
+_seed_worktree() {
+  local target_path="$1" out
+  local seeder="$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree_seed.py"
+  [[ -f "$seeder" ]] || return 0
+  # Source of truth is the main project tree, not this worktree: the gitignored
+  # files we are seeding do not exist here yet (that is the whole point).
+  local seed_root="$ROOT_DIR" home
+  if [[ -f "$ROOT_DIR/.freely/config.toml" ]]; then
+    home=$(sed -n 's/^[[:space:]]*FREELY_HOME[[:space:]]*=[[:space:]]*"\(.*\)"/\1/p' \
+      "$ROOT_DIR/.freely/config.toml" 2>/dev/null | head -1)
+    [[ -n "$home" && -d "$home" ]] && seed_root="$home"
+  fi
+  if ! out=$(python3 "$seeder" apply --project "$seed_root" --target "$target_path" 2>&1); then
+    printf '%s\n' "$out" >&2
+    return 1
+  fi
+  # Keep the summary, drop the per-file "skipped" noise on re-runs.
+  printf '%s\n' "$out" | grep -v '^\[wt-seed\] skipped:' || true
+}
+
 _create_worktree() {
   local branch="$1" target_path="$2" base_branch="$3"
 
   mkdir -p "$(freely_wt_root_dir)"
 
-  git worktree add -b "$branch" "$target_path" "$base_branch"
+  FREELY_WT_CREATE=1 git worktree add -b "$branch" "$target_path" "$base_branch"
 
   _materialize_chat_if_needed "$branch" "$target_path" || return 1
 
@@ -711,6 +745,18 @@ fi
   _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch"
   echo "  test-pre-merge: $tp_target (base: $dev_branch)"
 
+  # Declarative seeds: gitignored-but-required files the checkout cannot carry.
+  # The list is project data (docs/system/workspace/worktree-seed.toml); this is
+  # the only call site, so nothing else has to learn about individual files.
+  if ! _seed_worktree "$fix_target" || ! _seed_worktree "$tp_target"; then
+    echo "拒绝创建工位: worktree seed failed" >&2
+    git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+    return 1
+  fi
+
   # Clone .freely runtime state from develop so test worktree can run daemon
   _src_freely="$ROOT_DIR/.freely"
   _dst_freely="$tp_target/.freely"
@@ -720,6 +766,7 @@ fi
     [[ -f "$_src_freely/freely.db" ]] && cp "$_src_freely/freely.db" "$_dst_freely/freely.db" 2>/dev/null || true
     # Copy a2a_task.db (if separate from freely.db)
     [[ -f "$_src_freely/a2a_task.db" ]] && cp "$_src_freely/a2a_task.db" "$_dst_freely/a2a_task.db" 2>/dev/null || true
+    # agent-table.toml is handled by the declarative seed step above.
     # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
     # Do NOT copy: logs/ (test worktree should have own logs)
     # config.toml is already synced by sync-tooling
