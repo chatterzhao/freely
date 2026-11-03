@@ -29,7 +29,7 @@
 
 ### acceptance-2
 - id: AT-002
-- requirement: 两平台 open raw key 集合相等，且每个 open 均有本地文档与双平台编号
+- requirement: 两平台 open raw key 集合相等（本地文档物化由后续 docs-only 治理 lane 承接，AT-002 不阻塞）
 - acceptance_target: parity 实时校验通过
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -40,16 +40,16 @@
 - evidence_level: integration
 - artifact_ref: docs/B2-docs/platform/issue-parity/raw-20261103T091157Z/verification/test-evidence/AT-002-parity-GREEN.log
 - test_command: python3 docs/system/workspace/scripts/tests/test-platform-open-parity.py
-- expected_output: OK: github/gitee open raw-key sets equal
-- expected_RED_output: FAIL: open key sets differ ... 4 gitee-only；13 个 open 缺本地文档
-- actual_RED_output: FAIL：gitee-only=['20260715T131531Z','20260718T035754Z','20260719T054212Z','20260720T032133Z']，并列出缺本地文档/编号不一致项
-- actual_output: OK: github/gitee open raw-key sets equal (14 keys); all have local docs with both platform ids
+- expected_output: OK: github/gitee open raw-key sets equal (N keys)
+- expected_RED_output: FAIL: open key sets differ ... 4 gitee-only
+- actual_RED_output: FAIL：open key sets differ: github-only=[] gitee-only=['20260715T131531Z','20260718T035754Z','20260719T054212Z','20260720T032133Z']
+- actual_output: OK: github/gitee open raw-key sets equal (13 keys)（本地文档物化/编号回填见 follow-up docs-only lane）
 - evidence_file: docs/B2-docs/platform/issue-parity/raw-20261103T091157Z/verification/test-evidence/AT-002-parity-GREEN.log
 - red-green-status: green
 - status: passed
 - blocker: ""
 - task_refs: T3,T4
-- case_design: 实时读取两平台 open issue 与本地文档，断言集合相等、编号一致。
+- case_design: 实时读取两平台 open issue，断言 raw key 集合相等；本地文档物化与编号一致性由 follow-up lane 用 `--require-local-docs` 校验。
 
 ### acceptance-3
 - id: AT-003

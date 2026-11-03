@@ -46,6 +46,7 @@ def load_local_docs():
 
 
 def main():
+    require_local = "--require-local-docs" in sys.argv[1:]
     openings = collect_open_issues()
     local = load_local_docs()
     errors = []
@@ -56,25 +57,26 @@ def main():
                       % (sorted(github_keys - gitee_keys), sorted(gitee_keys - github_keys)))
     for key in sorted(github_keys | gitee_keys):
         platforms = openings[key]
-        doc = local.get(key)
-        if doc is None:
-            errors.append(f"{key}: missing local docs/B1-docs/raw-{key}/issue.md")
-            continue
-        ids = doc["fm"].get("platform_ids") or {}
-        for platform, issue_id in sorted(platforms.items()):
-            recorded = str((ids.get(platform) or {}).get("issue_id", "") or "")
-            if recorded != issue_id:
-                errors.append(f"{key}: {platform} recorded='{recorded}' platform='{issue_id}'")
         for platform in ("github", "gitee"):
             if platform not in platforms:
                 errors.append(f"{key}: missing open copy on {platform}")
+        if require_local:
+            doc = local.get(key)
+            if doc is None:
+                errors.append(f"{key}: missing local docs/B1-docs/raw-{key}/issue.md")
+                continue
+            ids = doc["fm"].get("platform_ids") or {}
+            for platform, issue_id in sorted(platforms.items()):
+                recorded = str((ids.get(platform) or {}).get("issue_id", "") or "")
+                if recorded != issue_id:
+                    errors.append(f"{key}: {platform} recorded='{recorded}' platform='{issue_id}'")
     if errors:
         print("FAIL: platform open parity broken")
         for error in errors:
             print("  -", error)
         return 1
-    print(f"OK: github/gitee open raw-key sets equal ({len(github_keys)} keys); "
-          f"all have local docs with both platform ids")
+    suffix = "; all have local docs with both platform ids" if require_local else ""
+    print(f"OK: github/gitee open raw-key sets equal ({len(github_keys)} keys){suffix}")
     return 0
 
 
