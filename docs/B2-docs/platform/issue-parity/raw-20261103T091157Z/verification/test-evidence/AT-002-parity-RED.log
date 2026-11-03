@@ -1,0 +1,9 @@
+FAIL: platform open parity broken
+  - open key sets differ: github-only=[] gitee-only=['20260715T131531Z', '20260718T035754Z', '20260719T054212Z', '20260720T032133Z']
+  - 20260715T131531Z: gitee recorded='IKSNPK' platform='IK1ATI'
+  - 20260715T131531Z: missing open copy on github
+  - 20260718T035754Z: gitee recorded='' platform='IK1WAE'
+  - 20260718T035754Z: missing open copy on github
+  - 20260719T054212Z: missing local docs/B1-docs/raw-20260719T054212Z/issue.md
+  - 20260720T032133Z: gitee recorded='' platform='IK28CK'
+  - 20260720T032133Z: missing open copy on github

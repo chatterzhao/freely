@@ -1,3 +1,24 @@
+## M-20261103T091157Z-A
+- title: chore — 双平台 open issue 对齐与本地 raw 元数据回填
+- status: active
+### candidate_issues
+1. `C-20261103T091157Z-A`
+- milestone: M-20261103T091157Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T091157Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261103T091157Z/issues/I-20261103T091157Z-A.md
+### committed_issues
+1. `I-20261103T091157Z-A`
+- milestone: M-20261103T091157Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261103T091157Z/issues/I-20261103T091157Z-A.md
+
+### completed_issues
+1. `I-20261103T091157Z-A`
+- milestone: M-20261103T091157Z-A
+- completed_at: 2026-11-03T01:40:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261103T091157Z/issues/I-20261103T091157Z-A.md
+
 ## M-20261102T130603Z-A
 - title: fix — 平台 handler 探活缓存/重试/结构化失败
 - status: active
