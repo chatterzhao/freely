@@ -8,6 +8,10 @@ platform_ids:
     issue_id: IK2DZE
     url: https://gitee.com/zhaoquan/freely/issues/IK2DZE
     synced_at: ''
+  github:
+    issue_id: '4062'
+    url: https://github.com/chatterzhao/freely/issues/4062
+    synced_at: ''
 primary_platform: gitee
 canonical_issue_path: ''
 last_synced_comment_at: {}
