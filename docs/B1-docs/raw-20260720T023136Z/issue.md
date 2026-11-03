@@ -54,3 +54,8 @@ Reproduced every Manager cycle when worker chat tries local raw issue creation (
 
 拆解为以下任务:
 1. [I-20260720T023136Z-A](will-be-updated)
+
+#### resolution-20260807T121137Z
+- status: adopted
+- reason: 系统 promote_finalized 事件，仅记录 raw issue 已拆解为 I-20260720T023136Z-A，无需人工决策；该 I-issue 已在本工位实现并验证。
+- resolved_by: manager_01
