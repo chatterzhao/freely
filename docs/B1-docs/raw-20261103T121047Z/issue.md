@@ -29,7 +29,7 @@ source_candidate: ''
 completed_at: '2026-11-03T12:30:00Z'
 closeout_note: ''
 ---
-# pr-merge-guarded 批量 issue-sync 误关闭非本 lane open issue
+# fix: pr-merge-guarded 批量 issue-sync 误关闭非本 lane 的 open raw issue
 
 
 workflow_kind: fix
