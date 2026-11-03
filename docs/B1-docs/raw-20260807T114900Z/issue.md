@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20260807T114900Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20260807T114900Z-A
 platform_ids:
   github:
     issue_id: '4107'
@@ -29,6 +29,8 @@ source_candidate: ''
 completed_at: ''
 closeout_note: ''
 ---
+# fix: scan platform_adapter import broken, #3380 phantom-closed
+
 
 workflow_kind: fix
 
