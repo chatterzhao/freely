@@ -508,27 +508,37 @@ class GiteeHandler(PlatformHandler):
         return None
 
     def search_raw_issue(self, raw_key):
-        r = self._run("list", "--state", "all", "--per-page", "50")
-        if r.returncode != 0:
-            return None
-        try:
-            issues = json.loads(r.stdout)
-        except Exception:
-            return None
+        # Gitee has no server-side raw-key search: enumerate every page and
+        # match locally.  A single page silently hides older replicas, which
+        # breaks identity resolution and platform parity for historical issues.
         needle = f"raw-{raw_key}".lower()
         matches = {}
-        for issue in issues:
-            title = issue.get("title", "") or ""
-            body = issue.get("body", "") or ""
-            if needle not in title.lower() and needle not in body.lower():
-                continue
-            issue_id = str(issue.get("number", issue.get("id", "")) or "")
-            if issue_id:
-                matches[issue_id] = {
-                    "issue_number": issue_id,
-                    "title": title,
-                    "url": issue.get("html_url", issue.get("url", "")),
-                }
+        page = 1
+        while page <= 20:
+            r = self._run("list", "--state", "all", "--per-page", "100", "--page", str(page))
+            if r.returncode != 0:
+                return None
+            try:
+                issues = json.loads(r.stdout)
+            except Exception:
+                return None
+            if not isinstance(issues, list):
+                return None
+            for issue in issues:
+                title = issue.get("title", "") or ""
+                body = issue.get("body", "") or ""
+                if needle not in title.lower() and needle not in body.lower():
+                    continue
+                issue_id = str(issue.get("number", issue.get("id", "")) or "")
+                if issue_id:
+                    matches[issue_id] = {
+                        "issue_number": issue_id,
+                        "title": title,
+                        "url": issue.get("html_url", issue.get("url", "")),
+                    }
+            if len(issues) < 100:
+                break
+            page += 1
         candidates = list(matches.values())
         if len(candidates) == 1:
             return {**candidates[0], "matches": candidates}
