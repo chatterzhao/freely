@@ -7,6 +7,15 @@ created_at: 2026-07-18 03:57:54+00:00
 author: zhaoquan
 channel: freely-workflow-guarded-execution
 platform_state: closed
+platform_ids:
+  github:
+    issue_id: '3990'
+    url: https://github.com/chatterzhao/freely/issues/3990
+    synced_at: ''
+  gitee:
+    issue_id: IK1WAE
+    url: https://gitee.com/zhaoquan/freely/issues/IK1WAE
+    synced_at: ''
 ---
 
 ## 根因

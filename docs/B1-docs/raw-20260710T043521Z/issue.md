@@ -8,6 +8,10 @@ platform_ids:
     issue_id: IK04AI
     url: https://gitee.com/zhaoquan/freely/issues/IK04AI
     synced_at: ''
+  github:
+    issue_id: '3863'
+    url: https://github.com/chatterzhao/freely/issues/3863
+    synced_at: ''
 primary_platform: gitee
 canonical_issue_path: ''
 last_synced_comment_at: {}
