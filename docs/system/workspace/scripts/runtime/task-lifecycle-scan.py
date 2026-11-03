@@ -25,6 +25,7 @@ Usage:
   python3 task-lifecycle-scan.py <project_root> [--json]
 """
 
+import importlib.util
 import json, os, re, sqlite3, subprocess, sys, time
 import yaml
 from pathlib import Path
@@ -443,13 +444,38 @@ def list_all_worktrees(project: Path) -> list[dict]:
 
 
 # ── Platform access (via platform-adapter, no hardcoding) ───────────
+# The module file is named platform-adapter.py — the hyphen is a deliberate
+# convention (avoids clashing with an installed `platform_adapter` package),
+# but it is not a legal Python identifier, so `import platform_adapter`
+# always raises ModuleNotFoundError. Load the real file explicitly via
+# importlib and register it under the module name 'platform_adapter'.
+
+_PA_MODULE = None
+_PA_PROJECT = None
+
+
+def _get_pa(project: Path):
+    """Cached loader for docs/system/workspace/scripts/sync/platform-adapter.py.
+
+    Returns the loaded module. Cached per project because scan may be invoked
+    against different project roots within one process.
+    """
+    global _PA_MODULE, _PA_PROJECT
+    sync_dir = project / "docs" / "system" / "workspace" / "scripts" / "sync"
+    if _PA_MODULE is None or _PA_PROJECT != project:
+        spec = importlib.util.spec_from_file_location(
+            "platform_adapter", str(sync_dir / "platform-adapter.py")
+        )
+        _PA_MODULE = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_PA_MODULE)
+        _PA_PROJECT = project
+    return _PA_MODULE
+
 
 def _detect_platforms(project: Path) -> list[str]:
     """Detect configured platforms from config.toml, fallback to git remotes."""
     try:
-        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import configured_platforms
-        platforms = configured_platforms()
+        platforms = _get_pa(project).configured_platforms()
         if platforms:
             return platforms
     except Exception:
@@ -498,9 +524,7 @@ def extract_platform_ids(text: str) -> dict[str, str]:
 
 def get_platform_open_issues(project: Path) -> dict[str, dict]:
     try:
-        sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
-        from platform_adapter import list_open_issue_records
-        return list_open_issue_records()
+        return _get_pa(project).list_open_issue_records()
     except Exception as exc:
         return {"__degraded__": {"platform": "adapter", "error": str(exc)[:200]}}
 
@@ -543,14 +567,13 @@ def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -
     states: dict[str, str] = {num: "OPEN" for num in open_issues}
 
     platforms = _detect_platforms(project)
-    sys.path.insert(0, str(project / "docs" / "system" / "workspace" / "scripts" / "sync"))
     try:
-        from platform_adapter import _handlers, _safe
-        for h in _handlers():
+        pa = _get_pa(project)
+        for h in pa._handlers():
             if h.name not in platforms:
                 continue
             try:
-                closed = _safe(h.list_closed_issues) or {}
+                closed = pa._safe(h.list_closed_issues) or {}
                 for num in closed:
                     if num not in states:
                         states[num] = "CLOSED"
