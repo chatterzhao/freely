@@ -150,14 +150,45 @@ _registry: list[PlatformHandler] = []
 def register(handler: PlatformHandler):
     _registry.append(handler)
 
+# Successful probe results are cached for the life of the process: detection is a
+# network read (e.g. `gh repo view`), and one PR flow asks for the same handler
+# several times.  Failures are never cached so a later call can recover.
+_HANDLER_PROBE_CACHE: dict[str, PlatformHandler] = {}
+
+
+def _probe_handler(platform: str) -> Optional[PlatformHandler]:
+    cached = _HANDLER_PROBE_CACHE.get(platform)
+    if cached is not None:
+        return cached
+    for handler in _registry:
+        if handler.name != platform:
+            continue
+        value, _error = _retry_read(lambda: True if handler.detect() else None)
+        if value:
+            _HANDLER_PROBE_CACHE[platform] = handler
+            return handler
+        return None
+    return None
+
+
 def _handlers() -> list[PlatformHandler]:
-    return [h for h in _registry if h.detect()]
+    return [h for h in _registry if _probe_handler(h.name) is h]
+
 
 def _handler_for(platform: str) -> Optional[PlatformHandler]:
-    for h in _registry:
-        if h.name == platform and h.detect():
-            return h
-    return None
+    return _probe_handler(platform)
+
+
+def _ensure_handler(platform: str):
+    """Resolve a handler for an execution step, failing closed with a receipt."""
+    handler = _handler_for(platform)
+    if handler is None:
+        return None, {
+            "status": "error",
+            "stage": "execute",
+            "error": f"platform handler unavailable: {platform}",
+        }
+    return handler, None
 
 # ══════════════════════════════════════════════
 # GitHub Handler
@@ -843,8 +874,6 @@ def _discover_one(platform: str, raw_key: str) -> dict:
     """Read a single platform replica. Uncertainty is `unknown`, never `missing`."""
     handler = _handler_for(platform)
     if handler is None:
-        handler, _ = _retry_read(lambda: _handler_for(platform))
-    if handler is None:
         return {"status": "unknown", "reason": "transport_unavailable",
                 "error": "configured platform unavailable"}
 
@@ -978,8 +1007,12 @@ def guarded_pr_update(
     results = {}
     for item in plan["actions"]:
         platform = item["platform"]
-        handler = _handler_for(platform)
         result = dict(observations[platform])
+        handler, handler_error = _ensure_handler(platform)
+        if handler is None:
+            result.update({"branch_state": "unsupported", "pr_state": "error", **handler_error})
+            results[platform] = result
+            continue
         if item["action"] == "push_then_ensure_pr":
             pushed = handler.push_branch(branch)
             if pushed.get("status") != "pushed":

@@ -1,3 +1,24 @@
+## M-20261102T130603Z-A
+- title: fix — 平台 handler 探活缓存/重试/结构化失败
+- status: active
+### candidate_issues
+1. `C-20261102T130603Z-A`
+- milestone: M-20261102T130603Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T130603Z-A
+- promoted_issue_path: docs/B2-docs/platform/platform-handler-probe/raw-20261102T130603Z/issues/I-20261102T130603Z-A.md
+### committed_issues
+1. `I-20261102T130603Z-A`
+- milestone: M-20261102T130603Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/platform-handler-probe/raw-20261102T130603Z/issues/I-20261102T130603Z-A.md
+
+### completed_issues
+1. `I-20261102T130603Z-A`
+- milestone: M-20261102T130603Z-A
+- completed_at: 2026-11-03T06:25:00Z
+- issue_path: docs/B2-docs/platform/platform-handler-probe/raw-20261102T130603Z/issues/I-20261102T130603Z-A.md
+
 ## M-20261103T055554Z-A
 - title: fix — raw replica 身份解析按 [RAW-key] 标题前缀
 - status: active
