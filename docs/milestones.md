@@ -1,3 +1,22 @@
+## M-20261102T133249Z-A
+- title: fix — 认领判定下沉，去掉路径守卫
+- status: active
+### candidate_issues
+1. `C-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T133249Z-A
+### committed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+### completed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- completed_at: 2026-11-02T13:38:14Z
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+
 ## M-20261102T130721Z-A
 - title: feat — 声明式工作树种子清单
 - status: active

@@ -1,0 +1,10 @@
+  ▸ freely [dev]
+[2026-11-02T13:36:30Z] [INFO] starting freely-db daemon for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard
+[2026-11-02T13:36:30Z] [INFO] freely-db daemon ready (PID 20969)
+[2026-11-02T13:36:31Z] [INFO] starting A2A server for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard (mode=unix)
+[2026-11-02T13:36:32Z] [WARN] A2A server process (PID 21031) died during startup
+[2026-11-02T13:36:32Z] [WARN] A2A server start timed out after 15s (check A2A log, DB size, or zombie PIDs)
+project: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard
+daemon_status: running
+supervisor_pid: 22653
+launcher_log: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T133249Z-owner-lane-claim-guard/.freely/logs/daemon-launch.log

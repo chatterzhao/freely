@@ -122,6 +122,32 @@ class OwnerLaneClaimTests(unittest.TestCase):
             self.assertEqual(self.subject._home(str(worktree)), "/repo/main")
             self.assertEqual(self.subject._home("/nonexistent/project"), "/nonexistent/project")
 
+    def test_project_equal_to_path_claims_when_branch_has_a_raw_key(self):
+        """Inside a worktree, `pwd` and the project argument are the same path."""
+        result = self.subject.claim(
+            project=PATH,
+            path=PATH,
+            rows=[],
+            managers=["manager_01"],
+            worktrees={PATH: BRANCH},
+            write=self._write,
+        )
+        self.assertTrue(result["created"], result)
+        self.assertEqual(result["agent_id"], "manager_01")
+
+    def test_project_root_on_develop_is_never_claimed(self):
+        result = self.subject.claim(
+            project=PATH,
+            path=PATH,
+            rows=[],
+            managers=["manager_01"],
+            worktrees={PATH: "develop"},
+            write=self._write,
+        )
+        self.assertIsNone(result["agent_id"])
+        self.assertEqual(result["reason"], "raw_key_unresolved")
+        self.assertEqual(self.writes, [])
+
 
 if __name__ == "__main__":
     unittest.main()
