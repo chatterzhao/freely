@@ -373,27 +373,67 @@ class GitHubHandler(PlatformHandler):
         except Exception as e:
             return False, f"Failed to assign on GitHub: {e}"
 
-    def list_open_issues(self):
+    def _open_issue_records_via_rest(self):
+        """Open issues via the REST endpoint.
+
+        `gh issue list --json` goes through GraphQL, which intermittently
+        answers 504.  REST is independent and stays available, so it is the
+        fallback instead of returning {} (which callers read as "no open
+        issues" and misdiagnose platform parity/scan).
+        """
         repo = self._repo()
-        if not repo: return {}
+        if not repo:
+            return {}
         try:
-            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
-                               "--json", "number,state"], capture_output=True, text=True, timeout=30)
-            return {str(i["number"]): i.get("state", "OPEN") for i in json.loads(r.stdout)} if r.returncode == 0 and r.stdout.strip() else {}
+            r = subprocess.run(["gh", "api", "--paginate", "--slurp",
+                                f"repos/{repo}/issues?state=open&per_page=100"],
+                               capture_output=True, text=True, timeout=30)
+            if r.returncode != 0 or not r.stdout.strip():
+                return {}
+            pages = json.loads(r.stdout)
         except Exception:
             return {}
+        records = {}
+        page_list = pages if isinstance(pages, list) else [pages]
+        for page in page_list:
+            if not isinstance(page, list):
+                continue
+            for issue in page:
+                if "pull_request" in issue:
+                    continue
+                number = str(issue.get("number", ""))
+                if not number:
+                    continue
+                records[number] = {
+                    "platform": self.name,
+                    "title": issue.get("title", "") or "",
+                    "body": issue.get("body", "") or "",
+                    "state": (issue.get("state", "open") or "open").upper(),
+                }
+        return records
+
+    def list_open_issues(self):
+        records = self.list_open_issue_records()
+        return {number: record.get("state", "OPEN") for number, record in records.items()}
 
     def list_open_issue_records(self):
         repo = self._repo()
         if not repo:
             return {}
-        try:
-            r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200", "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
-            if r.returncode != 0:
-                return {}
-            return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
-        except Exception:
-            return {}
+        for attempt in range(2):
+            try:
+                r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
+                                    "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
+                if r.returncode == 0 and r.stdout.strip():
+                    return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""),
+                                                   "body": issue.get("body", ""),
+                                                   "state": issue.get("state", "OPEN")}
+                            for issue in json.loads(r.stdout or "[]")}
+            except Exception:
+                pass
+            if attempt == 0:
+                time.sleep(0.3)
+        return self._open_issue_records_via_rest()
 
     def _gh_json(self, args: list[str], timeout: int = 30):
         repo = self._repo()
