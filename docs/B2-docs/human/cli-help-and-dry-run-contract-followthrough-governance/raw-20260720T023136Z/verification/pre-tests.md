@@ -5,7 +5,7 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: bash 语法检查通过，且 L6700 字符串不再含被解释为重定向的裸 `<`/`>`
+- requirement: bash 语法检查通过，且 L6700 字符串不再含被解释为重定向的裸尖括号
 - acceptance_target: 修复后 `bash -n` 对目标行所在脚本通过；grep 确认修复后的 log_error 参数以单引号包裹（无裸尖括号）
 - testing_layer: unit
 - target_environment: test-pre-merge-20260720T023136Z-chat-help-quoting
@@ -30,7 +30,7 @@
 
 ### acceptance-2
 - id: AT-002
-- requirement: 模拟执行修复后的 log_error 行输出完整帮助文本，无 `No such file` 报错
+- requirement: 模拟执行修复后的 log_error 行输出完整帮助文本，无 No such file 报错
 - acceptance_target: 消息含 `freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"` 字面量且 exit 0
 - testing_layer: unit
 - target_environment: test-pre-merge-20260720T023136Z-chat-help-quoting
@@ -84,6 +84,8 @@
 - target_environment: feature worktree + test-pre-merge-20260720T023136Z-chat-help-quoting
 - required_evidence: AT-001/AT-002/AT-003 全绿
 - blocker_taxonomy: execution_pending_or_failed
+1. 在 test-pre-merge 工位执行 AT-001 的 test_command（bash -n + grep 单引号包裹）。
+2. 执行 AT-002 / AT-003 的模拟渲染断言，确认输出完整且 EXIT=0。
 
 ## Integration
 - acceptance_target: 该 log_error 行位于 chat 命令错误分支，属单点字符串修复，无跨模块协作面
@@ -93,7 +95,7 @@
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 本次改动是单个字符串字面量，不触达模块间数据流/状态变更；整个脚本 bash -n 通过 + AT-001 已覆盖语法集成面
-- replacement_evidence: 全脚本 `bash -n docs/system/workspace/scripts/runtime/freely` 通过
+- replacement_evidence: 全脚本 bash -n docs/system/workspace/scripts/runtime/freely 通过
 
 ## End-to-End
 - acceptance_target: 用户视角的 chat help 错误提示完整可读
