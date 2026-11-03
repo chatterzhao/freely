@@ -13,6 +13,12 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/platform/issue-parity/raw-20261103T111400Z/issues/I-20261103T111400Z-A.md
 
+### completed_issues
+1. `I-20261103T111400Z-A`
+- milestone: M-20261103T111400Z-A
+- completed_at: 2026-11-03T12:00:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261103T111400Z/issues/I-20261103T111400Z-A.md
+
 ## M-20261103T091157Z-A
 - title: chore — 双平台 open issue 对齐与本地 raw 元数据回填
 - status: active
