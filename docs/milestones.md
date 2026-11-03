@@ -19,6 +19,46 @@
 - completed_at: 2026-11-03T06:25:00Z
 - issue_path: docs/B2-docs/platform/platform-handler-probe/raw-20261102T130603Z/issues/I-20261102T130603Z-A.md
 
+## M-20261103T055554Z-A
+- title: fix — raw replica 身份解析按 [RAW-key] 标题前缀
+- status: active
+### candidate_issues
+1. `C-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T055554Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+### committed_issues
+1. `I-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+
+### completed_issues
+1. `I-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- completed_at: 2026-11-03T06:05:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+
+## M-20261102T133249Z-A
+- title: fix — 认领判定下沉，去掉路径守卫
+- status: active
+### candidate_issues
+1. `C-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- status: promoted
+- promoted_issue_id: I-20261102T133249Z-A
+### committed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+### completed_issues
+1. `I-20261102T133249Z-A`
+- milestone: M-20261102T133249Z-A
+- completed_at: 2026-11-02T13:38:14Z
+- issue_path: docs/B2-docs/worktree-lifecycle/owner-lane-claim/raw-20261102T133249Z/issues/I-20261102T133249Z-A.md
+
 ## M-20261102T130721Z-A
 - title: feat — 声明式工作树种子清单
 - status: active
@@ -782,6 +822,27 @@
 - phase_state: in_dev
 - issue_path: docs/B2-docs/ibm/scan-frontmatter/raw-20260807T071225Z/issues/I-20260807T071225Z-A.md
 
+## M-20260807T114900Z-A
+- title: fix — task-lifecycle-scan platform_adapter import 断裂（importlib loader）
+- status: active
+### candidate_issues
+1. `C-20260807T114900Z-A`
+- milestone: M-20260807T114900Z-A
+- status: promoted
+- promoted_issue_id: I-20260807T114900Z-A
+- promoted_issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
+### committed_issues
+1. `I-20260807T114900Z-A`
+- milestone: M-20260807T114900Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
+
+### completed_issues
+1. `I-20260807T114900Z-A`
+- milestone: M-20260807T114900Z-A
+- completed_at: 2026-11-03T06:10:00Z
+- issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
+
 ## M-20260807T105604Z-A
 - title: cleanup — 解除 .codex/config.toml 跟踪
 - status: active
@@ -801,3 +862,24 @@
 - milestone: M-20260807T105604Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
+
+## M-20260720T023136Z-A
+- title: fix — chat help 错误信息 shell 引号嵌套修复
+- status: active
+### candidate_issues
+1. `C-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- status: promoted
+- promoted_issue_id: I-20260720T023136Z-A
+- promoted_issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+### committed_issues
+1. `I-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+
+### completed_issues
+1. `I-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- completed_at: 2026-11-03T05:44:47Z
+- issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md

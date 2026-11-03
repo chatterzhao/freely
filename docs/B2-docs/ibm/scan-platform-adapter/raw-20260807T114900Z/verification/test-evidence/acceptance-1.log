@@ -1,0 +1,13 @@
+{
+  "platform_health": "ok",
+  "total": 109,
+  "by_category": {
+    "1_not_started": 106,
+    "2_document_misaligned": 2,
+    "3_binding_unavailable": 1
+  },
+  "by_station": {
+    "B1_proposed": 40,
+    "收口": 69
+  }
+}
