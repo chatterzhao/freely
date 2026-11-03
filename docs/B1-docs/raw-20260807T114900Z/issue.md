@@ -18,15 +18,15 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-08-07T11:49:00Z'
-updated_at: '2026-08-07T11:49:25Z'
+updated_at: '2026-11-03T06:11:46Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-03T06:12:00Z'
 closeout_note: ''
 ---
 # fix: scan platform_adapter import broken, #3380 phantom-closed
