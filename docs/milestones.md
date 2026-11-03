@@ -10,7 +10,13 @@
 ### committed_issues
 1. `I-20261103T121047Z-A`
 - milestone: M-20261103T121047Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261103T121047Z/issues/I-20261103T121047Z-A.md
+
+### completed_issues
+1. `I-20261103T121047Z-A`
+- milestone: M-20261103T121047Z-A
+- completed_at: 2026-11-03T12:30:00Z
 - issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261103T121047Z/issues/I-20261103T121047Z-A.md
 
 ## M-20261103T111400Z-A

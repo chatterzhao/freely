@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T121047Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T121047Z-A
 platform_ids:
   github:
     issue_id: '4142'
@@ -18,17 +18,19 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-03T12:10:47Z'
-updated_at: '2026-11-03T12:10:52Z'
+updated_at: '2026-11-03T12:25:49Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-03T12:30:00Z'
 closeout_note: ''
 ---
+# pr-merge-guarded 批量 issue-sync 误关闭非本 lane open issue
+
 
 workflow_kind: fix
 

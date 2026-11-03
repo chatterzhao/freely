@@ -1,7 +1,7 @@
 ---
 issue_id: I-20261103T121047Z-A
 issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261103T121047Z/issues/I-20261103T121047Z-A.md
-phase_state: done_b2_ibm
+phase_state: completed
 ---
 
 - issue_id: I-20261103T121047Z-A
