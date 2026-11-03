@@ -24,10 +24,10 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-03T06:05:00Z'
 closeout_note: ''
 ---
 # fix: raw replica 搜索需按 [RAW-key] 标题前缀精确匹配
