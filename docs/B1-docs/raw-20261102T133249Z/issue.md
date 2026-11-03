@@ -30,7 +30,7 @@ completed_at: '2026-11-02T13:38:14Z'
 closeout_note: ''
 ---
 
-# [RAW-20261102T133249Z] fix: owner-lane 认领被当前路径不等于项目的守卫挡住
+# [RAW-20261102T133249Z] fix: owner-lane 认领被 "当前路径≠项目" 守卫挡住，daemon 内从未执行
 
 workflow_kind: fix
 
