@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4232" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4250" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="170" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -427,12 +427,14 @@
   <text x="50" y="4088" font-size="14" font-weight="bold" fill="#f57f17">skills</text>
   <rect id="story-skill-yaml-frontmatter" x="55" y="4098" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
   <text x="65" y="4111" fill="#333">skill-yaml-frontmatter</text>
-  <rect id="epic-worktree-lifecycle" x="35" y="4124" width="730" height="80" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
+  <rect id="epic-worktree-lifecycle" x="35" y="4124" width="730" height="98" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
   <text x="50" y="4140" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
-  <rect id="story-owner-lane" x="55" y="4150" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4163" fill="#333">owner-lane</text>
-  <rect id="story-owner-lane-claim" x="55" y="4168" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4181" fill="#333">owner-lane-claim</text>
-  <rect id="story-worktree-seed" x="55" y="4186" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4199" fill="#333">worktree-seed</text>
+  <rect id="story-merge-guard-issue-sync-scope" x="55" y="4150" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4163" fill="#333">merge-guard-issue-sync-scope</text>
+  <rect id="story-owner-lane" x="55" y="4168" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4181" fill="#333">owner-lane</text>
+  <rect id="story-owner-lane-claim" x="55" y="4186" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4199" fill="#333">owner-lane-claim</text>
+  <rect id="story-worktree-seed" x="55" y="4204" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4217" fill="#333">worktree-seed</text>
 </svg>

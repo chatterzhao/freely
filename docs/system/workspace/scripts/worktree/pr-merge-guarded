@@ -487,6 +487,15 @@ _sync_issues_changed_in_merge() {
   changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "docs/B1-docs" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/B1-docs/||' | sed 's|/issue\.md$||' | sort -u || true)
   [[ -n "$changed_issues" ]] || return 0
 
+  # Only the lane's own raw issue may be advanced/closed by merge sync.  A diff
+  # can legitimately touch other raw docs (platform parity materialization or
+  # platform_ids backfill); those are governance data, not this lane's lifecycle.
+  # Closing them here mass-closed unrelated open issues (2026-11-03 incident).
+  if [[ -n "$_raw_key" ]]; then
+    changed_issues=$(printf '%s\n' "$changed_issues" | python3 "$PROJECT_ROOT/docs/system/workspace/scripts/worktree/issue-sync-scope.py" --raw-key "$_raw_key")
+  fi
+  [[ -n "$changed_issues" ]] || return 0
+
   for local_id in $changed_issues; do
     local issue_file="$issues_dir/$local_id/issue.md"
     [[ -f "$issue_file" ]] || continue
