@@ -29,6 +29,8 @@ source_candidate: ''
 completed_at: '2026-11-03T04:00:00Z'
 closeout_note: ''
 ---
+# chore: 物化 open raw 文档并回填历史 platform_ids
+
 
 workflow_kind: fix
 
