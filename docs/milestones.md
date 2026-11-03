@@ -812,5 +812,11 @@
 ### committed_issues
 1. `I-20260720T023136Z-A`
 - milestone: M-20260720T023136Z-A
-- phase_state: in_dev
+- phase_state: completed
+- issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+
+### completed_issues
+1. `I-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- completed_at: 2026-11-03T05:44:47Z
 - issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
