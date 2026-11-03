@@ -799,3 +799,24 @@
 - milestone: M-20260807T105604Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/ibm/_legacy-issues/raw-20260807T105604Z/issues/I-20260807T105604Z-A.md
+
+## M-20260720T023136Z-A
+- title: fix — chat help 错误信息 shell 引号嵌套修复
+- status: active
+### candidate_issues
+1. `C-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- status: promoted
+- promoted_issue_id: I-20260720T023136Z-A
+- promoted_issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+### committed_issues
+1. `I-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+
+### completed_issues
+1. `I-20260720T023136Z-A`
+- milestone: M-20260720T023136Z-A
+- completed_at: 2026-11-03T05:44:47Z
+- issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
