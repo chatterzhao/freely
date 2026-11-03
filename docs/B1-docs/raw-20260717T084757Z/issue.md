@@ -8,10 +8,6 @@ platform_ids:
     issue_id: IK1RJV
     url: https://gitee.com/zhaoquan/freely/issues/IK1RJV
     synced_at: ''
-  github:
-    issue_id: '3967'
-    url: https://github.com/chatterzhao/freely/issues/3967
-    synced_at: ''
 primary_platform: gitee
 canonical_issue_path: ''
 last_synced_comment_at: {}

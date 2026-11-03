@@ -7,11 +7,7 @@ absorbed_into: I-20260612T000223Z-A
 source: platform
 created_at: '2026-06-12T00:02:23Z'
 title: A2A 协议替换 Freely Handoff 架构重构
-platform_ids:
-  github:
-    issue_id: '2553'
-    url: https://github.com/chatterzhao/freely/issues/2553
-    synced_at: ''
+platform_ids: {}
 primary_platform: github
 updated_at: '2026-06-17T00:23:40Z'
 platform_state: closed

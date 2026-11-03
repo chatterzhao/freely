@@ -8,10 +8,6 @@ platform_ids:
     issue_id: '3885'
     url: https://github.com/chatterzhao/freely/issues/3885
     synced_at: ''
-  gitee:
-    issue_id: IK0D5J
-    url: https://gitee.com/zhaoquan/freely/issues/IK0D5J
-    synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}

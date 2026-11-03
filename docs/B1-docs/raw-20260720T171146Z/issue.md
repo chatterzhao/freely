@@ -24,15 +24,6 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_ids:
-  github:
-    issue_id: '4068'
-    url: https://github.com/chatterzhao/freely/issues/4068
-    synced_at: ''
-  gitee:
-    issue_id: IK2FO8
-    url: https://gitee.com/zhaoquan/freely/issues/IK2FO8
-    synced_at: ''
 ---
 
 

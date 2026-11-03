@@ -8,10 +8,6 @@ platform_ids:
     issue_id: '3600'
     url: https://github.com/chatterzhao/freely/issues/3600
     synced_at: ''
-  gitee:
-    issue_id: IJXB8N
-    url: https://gitee.com/zhaoquan/freely/issues/IJXB8N
-    synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
