@@ -258,6 +258,16 @@ def cmd_close(args: argparse.Namespace) -> object:
     )
 
 
+def reopen_request(repo: str, number: str) -> tuple[str, dict]:
+    """Gitee reopen uses the same legacy path/body shape as close.
+
+    PATCH /repos/{owner}/{repo}/issues/{number} with bare {"state": "open"}
+    answers 404 "project or enterprise"; the working form is
+    /repos/{owner}/issues/{number} with the repo name in the body.
+    """
+    return repo_path_post(repo, f"/{number}"), {"repo": repo_name(repo), "state": "open"}
+
+
 def cmd_reopen(args: argparse.Namespace) -> object:
     repo = detect_repo(args.repo)
     if args.comment:
@@ -267,10 +277,11 @@ def cmd_reopen(args: argparse.Namespace) -> object:
             body={"body": args.comment},
             auth_required=True,
         )
+    path, body = reopen_request(repo, args.number)
     return api_request(
         method="PATCH",
-        path=repo_path(repo, f"/{args.number}"),
-        body={"state": "open"},
+        path=path,
+        body=body,
         auth_required=True,
     )
 

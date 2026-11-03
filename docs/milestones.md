@@ -1,3 +1,18 @@
+## M-20261103T121047Z-A
+- title: fix — pr-merge-guarded 批量 issue-sync 误关闭非本 lane open issue
+- status: active
+### candidate_issues
+1. `C-20261103T121047Z-A`
+- milestone: M-20261103T121047Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T121047Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261103T121047Z/issues/I-20261103T121047Z-A.md
+### committed_issues
+1. `I-20261103T121047Z-A`
+- milestone: M-20261103T121047Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261103T121047Z/issues/I-20261103T121047Z-A.md
+
 ## M-20261103T111400Z-A
 - title: chore — 物化 open raw 文档并回填历史 platform_ids
 - status: active
