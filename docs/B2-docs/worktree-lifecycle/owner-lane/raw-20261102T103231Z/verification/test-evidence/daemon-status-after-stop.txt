@@ -1,0 +1,4 @@
+  ▸ freely [dev]
+control_plane: daemon
+[2026-11-02T12:40:38Z] [ERROR] unable to resolve agent identity for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity: agent_working has no entry
+[2026-11-02T12:40:38Z] [ERROR] agent-table: unable to resolve agent identity (agent_working empty) — fail-closed

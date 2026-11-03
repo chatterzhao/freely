@@ -1,0 +1,25 @@
+# Worktree seeds — paths that `git worktree add` does NOT bring along.
+#
+# Everything listed here is applied to each new worktree (dev and test) right
+# after creation.  Use it for gitignored-but-required local config, never for
+# dependencies or build output.
+#
+#   path      relative to the project root; absolute paths and `..` are rejected
+#   mode      copy (default, isolated) | link (symlink, follows the source)
+#   required  true  -> a missing source fails worktree creation with the path
+#             false -> warn and continue
+
+version = 1
+
+# Role -> tool slot mapping.  Linked, not copied: `freely` rewrites this file
+# when it switches a slot, and a copy would silently drift from the main tree.
+[[seed]]
+path = ".freely/agent-table.toml"
+mode = "link"
+required = true
+
+# Local environment overrides, if the project keeps any.
+[[seed]]
+path = ".env"
+mode = "copy"
+required = false

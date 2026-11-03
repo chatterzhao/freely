@@ -1,0 +1,10 @@
+  ▸ freely [dev]
+[2026-11-02T12:37:46Z] [INFO] starting freely-db daemon for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity
+[2026-11-02T12:37:47Z] [INFO] freely-db daemon ready (PID 84411)
+[2026-11-02T12:37:47Z] [INFO] starting A2A server for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity (mode=unix)
+[2026-11-02T12:37:48Z] [WARN] A2A server process (PID 84489) died during startup
+[2026-11-02T12:37:48Z] [WARN] A2A server start timed out after 15s (check A2A log, DB size, or zombie PIDs)
+[2026-11-02T12:37:59Z] [ERROR] daemon start did not materialize a live supervisor for project: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity
+[2026-11-02T12:37:59Z] [ERROR] see: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity/.freely/logs/daemon-launch.log
+[2026-11-02T12:37:59Z] [ERROR] unable to resolve agent identity for /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20261102T103231Z-owner-lane-daemon-identity: agent_working has no entry
+[2026-11-02T12:37:59Z] [ERROR] agent-table: unable to resolve agent identity (agent_working empty) — fail-closed

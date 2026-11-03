@@ -48,6 +48,11 @@ def main() -> int:
     parser.add_argument("--project", required=True)
     parser.add_argument("--raw-key", required=True)
     parser.add_argument("--require-local", action="store_true")
+    parser.add_argument(
+        "--allow-degraded",
+        action="store_true",
+        help="permit unreadable replicas, recording them as debt; facts still block",
+    )
     args = parser.parse_args()
     project = Path(args.project).resolve()
     os.environ.setdefault("FREELY_PROJECT_ROOT", str(project))
@@ -60,6 +65,7 @@ def main() -> int:
         configured_platforms=adapter.configured_platforms(),
         replicas=replicas,
         local=local if args.require_local else None,
+        allow_degraded=args.allow_degraded,
     )
     if args.require_local and local is None:
         receipt["ok"] = False

@@ -11,6 +11,7 @@ import json
 import os
 import re
 import socket
+import sys
 from typing import Optional
 
 from raw_key_canon import canonicalize_raw_key, try_canonicalize_raw_key
@@ -137,6 +138,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
                                   {"role": role, "agentId": agent_id})
         sid = _session_id_from_result(result)
         acp_session_register(project, raw_key, role, agent_id, sid, slot)
+        _prompt_after_connect(project, base_tool, sid, role, message)
         print(f"[acp-session] {role}/{agent_id} using new (force_new)", file=sys.stderr)
         return sid, "new"
 
@@ -166,7 +168,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
                 print(f"[acp-session] {role}/{agent_id} resume failed: {e}, "
                       f"falling back to new", file=sys.stderr)
                 return _do_new(project, raw_key, role, agent_id, slot, base_tool,
-                               reason=f"resume failed: {e}")
+                               reason=f"resume failed: {e}", message=message)
 
     mgr_row = agent_list_by_raw_key(project, "__manager__")
     mgr_slot = mgr_row.get("slot", "") if mgr_row else ""
@@ -181,6 +183,7 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
                 sid = result.get("sessionId", "") if isinstance(result, dict) else ""
                 if sid:
                     acp_session_register(project, raw_key, role, agent_id, sid, slot)
+                    _prompt_after_connect(project, base_tool, sid, role, message)
                     return sid, "fork"
         except Exception as e:
             print(f"[acp-session] {role}/{agent_id} fork failed: {e}, "
@@ -189,7 +192,22 @@ def acp_session_connect(project: str, raw_key: str, role: str, agent_id: str,
         print(f"[acp-session] {role}/{agent_id} cross-tool "
               f"({base_tool} vs {mgr_base}), using new", file=sys.stderr)
 
-    return _do_new(project, raw_key, role, agent_id, slot, base_tool)
+    return _do_new(project, raw_key, role, agent_id, slot, base_tool, message=message)
+
+
+def _prompt_after_connect(project: str, base_tool: str, session_id: str, role: str,
+                          message: str | None) -> None:
+    """Send the handoff message after session/new|fork.
+
+    ACP's session/new and session/fork do not accept a message; without this
+    prompt the first Worker/Reviewer turn starts empty. Role marker is minimal;
+    the full role definition still comes from the prompt file/preset.
+    """
+    if not message:
+        return
+    prompt = message if "[role:" in message else f"[role:{role}]\n{message}"
+    _acp_bridge_call(project, base_tool, "session/prompt",
+                     {"sessionId": session_id, "prompt": prompt})
 
 
 def _session_id_from_result(result: dict) -> str:
@@ -203,11 +221,12 @@ def _session_id_from_result(result: dict) -> str:
     return session_id.strip()
 
 
-def _do_new(project, raw_key, role, agent_id, slot, base_tool, reason=""):
+def _do_new(project, raw_key, role, agent_id, slot, base_tool, reason="", message=None):
     result = _acp_bridge_call(project, base_tool, "session/new",
                               {"role": role, "agentId": agent_id})
     sid = _session_id_from_result(result)
     acp_session_register(project, raw_key, role, agent_id, sid, slot)
+    _prompt_after_connect(project, base_tool, sid, role, message)
     label = reason or "no-session"
     print(f"[acp-session] {role}/{agent_id} using new ({label})", file=sys.stderr)
     return sid, "new"

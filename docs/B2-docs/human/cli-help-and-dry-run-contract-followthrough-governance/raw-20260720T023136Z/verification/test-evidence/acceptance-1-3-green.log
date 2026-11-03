@@ -1,0 +1,14 @@
+=== AT-001 GREEN: bash -n + grep ===
+bash -n OK (exit 0)
+6700:    log_error '[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"'
+
+=== AT-002 GREEN: simulate fixed log_error ===
+[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"
+EXIT=0
+
+=== AT-003 GREEN: fragment grep ===
+pattern [fix|feat: <描述>]: HIT
+pattern [<详细描述>]: HIT
+pattern [--kind fix --body]: HIT
+--- full output ---
+[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"

@@ -31,6 +31,7 @@ wt_managed_branch_ref() {
 }
 
 _caller_is_wt_create() {
+  [[ "${FREELY_WT_CREATE:-}" == "1" ]] && return 0
   # Walk process ancestry: check if wt-create is in the parent chain.
   # git worktree add runs git-under-hook → this hook → check if any ancestor is wt-create.
   local pid ppid cmd
@@ -55,6 +56,7 @@ _caller_is_wt_create() {
 }
 
 _caller_is_wt_close() {
+  [[ "${FREELY_WT_CLOSE:-}" == "1" ]] && return 0
   # Walk process ancestry: check if wt-close is in the parent chain.
   local pid ppid cmd
   pid=$PPID

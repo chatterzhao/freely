@@ -1,0 +1,73 @@
+- insert:
+    - id: webserver
+      config:
+        host: 127.0.0.1
+        port: 3081
+    - id: dsh-freely-e2e
+      name: '@freely/dsh-freely-e2e'
+      config:
+        repo: /tmp/freely-dsh-e2e
+        project: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261101T124657Z-dsh-freely-e2e
+        issue: docs/B2-docs/dsh-plugin/freely-host/raw-20261101T124657Z/issues/I-20261101T124657Z-A.md
+    - id: freely-e2e-worker-preset
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: freely-e2e-worker
+        name: Freely E2E Worker
+        description: E2E worker; write/edit/bash
+        order: 93
+        plugins:
+          - id: e2e-worker-persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: 'You are the Freely E2E Worker. Execute the task exactly; commit when asked.'
+          - id: e2e-worker-shell
+            name: cordis:group
+            group: true
+            isolate:
+              shell: true
+            config:
+              - id: e2e-worker-bash-sandbox
+                name: '@deepseek-ai/dsh-bash-sandbox'
+                config:
+                  timeoutMs: 30000
+                  maxTimeoutMs: 30000
+              - id: e2e-worker-bash
+                name: '@deepseek-ai/dsh-tool-bash'
+          - id: e2e-worker-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: e2e-worker-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+    - id: freely-e2e-reviewer-preset
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: freely-e2e-reviewer
+        name: Freely E2E Reviewer
+        description: E2E reviewer; read-only
+        order: 94
+        plugins:
+          - id: e2e-reviewer-persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: 'You are the Freely E2E Reviewer. Read only; reply exact verdict.'
+          - id: e2e-reviewer-shell
+            name: cordis:group
+            group: true
+            isolate:
+              shell: true
+            config:
+              - id: e2e-reviewer-bash-sandbox
+                name: '@deepseek-ai/dsh-bash-sandbox'
+                config:
+                  timeoutMs: 30000
+                  maxTimeoutMs: 30000
+              - id: e2e-reviewer-bash
+                name: '@deepseek-ai/dsh-tool-bash'
+          - id: e2e-reviewer-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: e2e-reviewer-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false

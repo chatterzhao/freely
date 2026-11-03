@@ -1,0 +1,86 @@
+EEEEE.FF
+======================================================================
+ERROR: test_all_unknown_blocks_even_when_degraded (__main__.DecisionTests.test_all_unknown_blocks_even_when_degraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 151, in test_all_unknown_blocks_even_when_degraded
+    receipt = self.subject.reconcile(
+        raw_key="20261102T113816Z",
+    ...<5 lines>...
+        allow_degraded=True,
+    )
+TypeError: reconcile() got an unexpected keyword argument 'allow_degraded'
+
+======================================================================
+ERROR: test_divergence_still_blocks_even_when_degraded (__main__.DecisionTests.test_divergence_still_blocks_even_when_degraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 141, in test_divergence_still_blocks_even_when_degraded
+    receipt = self.subject.reconcile(
+        raw_key="20261102T113816Z",
+    ...<2 lines>...
+        allow_degraded=True,
+    )
+TypeError: reconcile() got an unexpected keyword argument 'allow_degraded'
+
+======================================================================
+ERROR: test_missing_still_blocks_even_when_degraded (__main__.DecisionTests.test_missing_still_blocks_even_when_degraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 130, in test_missing_still_blocks_even_when_degraded
+    receipt = self.subject.reconcile(
+        raw_key="20261102T113816Z",
+    ...<2 lines>...
+        allow_degraded=True,
+    )
+TypeError: reconcile() got an unexpected keyword argument 'allow_degraded'
+
+======================================================================
+ERROR: test_unknown_allows_with_debt_when_degraded (__main__.DecisionTests.test_unknown_allows_with_debt_when_degraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 118, in test_unknown_allows_with_debt_when_degraded
+    receipt = self.subject.reconcile(
+        raw_key="20261102T113816Z",
+    ...<2 lines>...
+        allow_degraded=True,
+    )
+TypeError: reconcile() got an unexpected keyword argument 'allow_degraded'
+
+======================================================================
+ERROR: test_unknown_blocks_by_default (__main__.DecisionTests.test_unknown_blocks_by_default)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 115, in test_unknown_blocks_by_default
+    self.assertEqual(receipt["decision"], "block")
+                     ~~~~~~~^^^^^^^^^^^^
+KeyError: 'decision'
+
+======================================================================
+FAIL: test_transport_failure_is_unknown_not_error (__main__.ObservationTests.test_transport_failure_is_unknown_not_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 82, in test_transport_failure_is_unknown_not_error
+    self.assertEqual(record["status"], "unknown", record)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error' != 'unknown'
+- error
++ unknown
+ : {'status': 'error', 'error': 'raw search failed'}
+
+======================================================================
+FAIL: test_transport_retry_recovers_without_reporting_degraded (__main__.ObservationTests.test_transport_retry_recovers_without_reporting_degraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T113816Z-replica-gate-unknown-vs-missing/docs/system/workspace/scripts/tests/test-raw-replica-degraded.py", line 89, in test_transport_retry_recovers_without_reporting_degraded
+    self.assertEqual(record["status"], "ok", record)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error' != 'ok'
+- error
++ ok
+ : {'status': 'error', 'error': 'raw search failed'}
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.097s
+
+FAILED (failures=2, errors=5)

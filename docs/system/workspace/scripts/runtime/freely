@@ -360,6 +360,33 @@ for r in rows:
 " 2>/dev/null || true)
   fi
 
+  # Owner lane: a worktree created by the owner has no agent_working row,
+  # because rows are written when a manager dispatches a worker.  Claiming is
+  # explicit, narrow and auditable (see runtime/owner_lane.py): it only fills a
+  # missing row, only for the single configured manager, and only for a path
+  # git reports as a worktree of this project.
+  #
+  # No path comparison here: inside a worktree `pwd` equals the project
+  # argument, and an earlier `!=` guard made this branch unreachable while the
+  # failure looked identical to the unfixed behaviour.  Every unsafe case is
+  # already refused by claim() itself.
+  if [[ -z "$_my_id" ]]; then
+    local _owner_lane="${project}/docs/system/workspace/scripts/runtime/owner_lane.py"
+    if [[ -f "$_owner_lane" ]]; then
+      local _claim="" _claim_err=""
+      _claim_err="$(mktemp -t freely-owner-lane.XXXXXX)"
+      _claim=$(python3 "$_owner_lane" claim --project "$project" --path "$_current_path" --json 2>"$_claim_err" || true)
+      if [[ -n "$_claim" ]]; then
+        _my_id=$(printf '%s' "$_claim" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("agent_id") or "")' 2>/dev/null || true)
+        [[ -n "$_my_id" ]] && log_info "owner-lane claim: $_current_path → $_my_id"
+      fi
+      if [[ -z "$_my_id" && -s "$_claim_err" ]]; then
+        log_error "owner-lane claim skipped: $(tail -1 "$_claim_err")"
+      fi
+      rm -f "$_claim_err"
+    fi
+  fi
+
   # Identity resolution: agent_working only. agent-id.env is retired.
   # Failure to resolve = refuse to proceed (no silent fallback to manager_01).
   if [[ -z "$_my_id" ]]; then
@@ -944,6 +971,7 @@ Usage:
   freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
   freely develop-push status [--project <abs_path>]
@@ -6697,7 +6725,7 @@ _write_chat_to_issue() {
   else
     log_error "[chat] Local raw issue creation is no longer supported."
     log_error "[chat] All raw issues must be created on a configured platform via 'freely feedback':"
-    log_error "[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>""
+    log_error '[chat]   freely feedback --title "fix|feat: <描述>" --kind fix --body "<详细描述>"'
     log_error "[chat] Then create a worktree:"
     log_error "[chat]   freely wt-create --raw-key <returned-key> --source platform --kind fix --slug <slug>"
     return 1
@@ -8694,6 +8722,9 @@ print(h)" 2>/dev/null || true)
 
   # Start daemon in foreground mode, background it
   log_info "starting freely-db daemon for $project"
+  # A fresh worktree has no .freely/run yet: the daemon owns this directory and
+  # must create it, otherwise the very first start fails before it can log.
+  mkdir -p "$project/.freely/run"
   _rotate_log "$project/.freely/run/db-daemon.log"
 
   python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &
@@ -26764,6 +26795,7 @@ main() {
     task-source-scan) cmd_task_source_scan "$@" ;;
     issue-sync) cmd_issue_sync "$@" ;;
     raw-issue-pull) cmd_raw_issue_pull "$@" ;;
+    harness-status) exec "$SELF_ROOT/bin/harness-status" "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
