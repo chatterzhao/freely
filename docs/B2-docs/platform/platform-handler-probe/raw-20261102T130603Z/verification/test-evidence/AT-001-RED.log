@@ -1,0 +1,41 @@
+EEEE
+======================================================================
+ERROR: test_available_handler_passes_guard (__main__.HandlerProbeTests.test_available_handler_passes_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T130603Z-platform-handler-probe/docs/system/workspace/scripts/tests/test-platform-handler-probe.py", line 34, in setUp
+    pa._HANDLER_PROBE_CACHE.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_HANDLER_PROBE_CACHE'
+
+======================================================================
+ERROR: test_probe_retries_transient_failure (__main__.HandlerProbeTests.test_probe_retries_transient_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T130603Z-platform-handler-probe/docs/system/workspace/scripts/tests/test-platform-handler-probe.py", line 34, in setUp
+    pa._HANDLER_PROBE_CACHE.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_HANDLER_PROBE_CACHE'
+
+======================================================================
+ERROR: test_successful_probe_is_cached (__main__.HandlerProbeTests.test_successful_probe_is_cached)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T130603Z-platform-handler-probe/docs/system/workspace/scripts/tests/test-platform-handler-probe.py", line 34, in setUp
+    pa._HANDLER_PROBE_CACHE.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_HANDLER_PROBE_CACHE'
+
+======================================================================
+ERROR: test_unavailable_handler_returns_structured_error (__main__.HandlerProbeTests.test_unavailable_handler_returns_structured_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261102T130603Z-platform-handler-probe/docs/system/workspace/scripts/tests/test-platform-handler-probe.py", line 34, in setUp
+    pa._HANDLER_PROBE_CACHE.clear()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_HANDLER_PROBE_CACHE'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+FAILED (errors=4)
