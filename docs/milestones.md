@@ -10,7 +10,13 @@
 ### committed_issues
 1. `I-20261103T055554Z-A`
 - milestone: M-20261103T055554Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+
+### completed_issues
+1. `I-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- completed_at: 2026-11-03T06:05:00Z
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
 
 ## M-20261102T133249Z-A
