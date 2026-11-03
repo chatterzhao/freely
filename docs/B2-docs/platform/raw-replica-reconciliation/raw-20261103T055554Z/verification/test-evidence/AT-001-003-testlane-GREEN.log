@@ -1,0 +1,6 @@
+[test-lane] lane=premerge-integration branch=test-pre-merge-20261103T055554Z-replica-search-prefix command=python3
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

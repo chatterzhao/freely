@@ -1,0 +1,3 @@
+[test-lane] lane=premerge-integration branch=test-pre-merge-20261103T055554Z-replica-search-prefix command=python3
+gitee=ok title=[RAW-20260807T114900Z] fix: scan platform_adapter import broken, #3380 phantom-closed
+github=ok title=[RAW-20260807T114900Z] fix: scan platform_adapter import broken, #3380 phantom-closed

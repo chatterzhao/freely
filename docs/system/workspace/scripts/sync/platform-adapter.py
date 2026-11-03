@@ -677,15 +677,50 @@ def _issue_id(reference: object) -> str:
     return value if value and value != "?" else ""
 
 
+
+_RAW_TITLE_IDENTITY = re.compile(r"^\[raw-([0-9]{8}T[0-9]{4,6}Z)\]", re.IGNORECASE)
+
+
+def _resolve_raw_identity(matches, raw_key: str):
+    """Resolve one canonical raw replica identity from search matches.
+
+    Identity is the issue title prefix ``[RAW-<key>]``; a body reference from
+    another issue is not an identity declaration.  Prefer a unique
+    title-prefix match, keep several genuine identities fail-closed as
+    ``ambiguous``, and preserve the historical single-match fallback for
+    legacy issues that do not carry the canonical prefix.
+    """
+    key = str(raw_key or "").strip().lower()
+    candidates = [match for match in matches if isinstance(match, dict)]
+    prefixed = []
+    for match in candidates:
+        title = str(match.get("title") or "").strip()
+        found = _RAW_TITLE_IDENTITY.match(title)
+        if found and found.group(1).lower() == key:
+            prefixed.append(match)
+    if len(prefixed) == 1:
+        return prefixed[0], ""
+    if len(prefixed) > 1:
+        return None, f"raw key {raw_key} is ambiguous: {len(prefixed)} canonical title matches"
+    if len(candidates) == 1:
+        return candidates[0], ""
+    if not candidates:
+        return None, f"raw key {raw_key} not found"
+    return None, f"raw key {raw_key} is ambiguous: {len(candidates)} matches"
+
+
 def _unique_raw_issue(handler: PlatformHandler, raw_key: str) -> tuple[str, str]:
     found = _safe(handler.search_raw_issue, raw_key)
     if not isinstance(found, dict):
         return "", f"raw key {raw_key} not found"
     matches = found.get("matches")
     if matches is not None:
-        if not isinstance(matches, list) or len(matches) != 1:
-            return "", f"raw key {raw_key} did not resolve uniquely"
-        found = matches[0] if isinstance(matches[0], dict) else {}
+        if not isinstance(matches, list):
+            return "", f"raw key {raw_key} not found"
+        match, error = _resolve_raw_identity(matches, raw_key)
+        if match is None:
+            return "", error
+        found = match
     issue_id = str(found.get("issue_number", found.get("issue_id", "")) or "").strip()
     if not issue_id or issue_id == "?":
         return "", f"raw key {raw_key} did not resolve uniquely"
@@ -819,13 +854,11 @@ def _discover_one(platform: str, raw_key: str) -> dict:
     matches = found.get("matches")
     if not isinstance(matches, list):
         return {"status": "unknown", "reason": "search_unreadable", "error": "raw search returned no match set"}
-    if not matches:
-        return {"status": "missing", "reason": "absent", "error": "raw replica not found"}
-    if len(matches) != 1:
-        return {"status": "ambiguous", "reason": "duplicate_matches",
-                "error": f"raw key resolved to {len(matches)} replicas"}
-
-    issue = matches[0] if isinstance(matches[0], dict) else {}
+    issue, identity_error = _resolve_raw_identity(matches, raw_key)
+    if issue is None:
+        if "not found" in identity_error:
+            return {"status": "missing", "reason": "absent", "error": identity_error}
+        return {"status": "ambiguous", "reason": "duplicate_matches", "error": identity_error}
     issue_id = str(issue.get("issue_number", issue.get("issue_id", "")) or "")
     if not issue_id:
         return {"status": "unknown", "reason": "fetch_unreadable", "error": "raw replica fetch failed"}

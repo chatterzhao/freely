@@ -1,0 +1,41 @@
+EEEE
+======================================================================
+ERROR: test_fallback_single_body_match (__main__.RawIdentityTests.test_fallback_single_body_match)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T055554Z-replica-search-prefix/docs/system/workspace/scripts/tests/test-platform-adapter-raw-identity.py", line 36, in test_fallback_single_body_match
+    match, error = pa._resolve_raw_identity(matches, "20260807T114900Z")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_resolve_raw_identity'
+
+======================================================================
+ERROR: test_multiple_title_prefix_matches_remain_ambiguous (__main__.RawIdentityTests.test_multiple_title_prefix_matches_remain_ambiguous)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T055554Z-replica-search-prefix/docs/system/workspace/scripts/tests/test-platform-adapter-raw-identity.py", line 30, in test_multiple_title_prefix_matches_remain_ambiguous
+    match, error = pa._resolve_raw_identity(matches, "20260807T114900Z")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_resolve_raw_identity'
+
+======================================================================
+ERROR: test_no_match (__main__.RawIdentityTests.test_no_match)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T055554Z-replica-search-prefix/docs/system/workspace/scripts/tests/test-platform-adapter-raw-identity.py", line 41, in test_no_match
+    match, error = pa._resolve_raw_identity([], "20260807T114900Z")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_resolve_raw_identity'
+
+======================================================================
+ERROR: test_title_prefix_wins_over_body_reference (__main__.RawIdentityTests.test_title_prefix_wins_over_body_reference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T055554Z-replica-search-prefix/docs/system/workspace/scripts/tests/test-platform-adapter-raw-identity.py", line 21, in test_title_prefix_wins_over_body_reference
+    match, error = pa._resolve_raw_identity(matches, "20260807T114900Z")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'platform_adapter' has no attribute '_resolve_raw_identity'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+FAILED (errors=4)

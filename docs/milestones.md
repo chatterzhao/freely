@@ -1,3 +1,24 @@
+## M-20261103T055554Z-A
+- title: fix — raw replica 身份解析按 [RAW-key] 标题前缀
+- status: active
+### candidate_issues
+1. `C-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T055554Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+### committed_issues
+1. `I-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+
+### completed_issues
+1. `I-20261103T055554Z-A`
+- milestone: M-20261103T055554Z-A
+- completed_at: 2026-11-03T06:05:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T055554Z/issues/I-20261103T055554Z-A.md
+
 ## M-20261102T133249Z-A
 - title: fix — 认领判定下沉，去掉路径守卫
 - status: active
