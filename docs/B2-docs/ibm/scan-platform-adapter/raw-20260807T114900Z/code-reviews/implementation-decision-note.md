@@ -1,7 +1,7 @@
 ---
 issue_id: I-20260807T114900Z-A
 issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
-phase_state: in_dev
+phase_state: completed
 ---
 
 - issue_id: I-20260807T114900Z-A

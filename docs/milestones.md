@@ -813,7 +813,13 @@
 ### committed_issues
 1. `I-20260807T114900Z-A`
 - milestone: M-20260807T114900Z-A
-- phase_state: in_dev
+- phase_state: completed
+- issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
+
+### completed_issues
+1. `I-20260807T114900Z-A`
+- milestone: M-20260807T114900Z-A
+- completed_at: 2026-11-03T06:10:00Z
 - issue_path: docs/B2-docs/ibm/scan-platform-adapter/raw-20260807T114900Z/issues/I-20260807T114900Z-A.md
 
 ## M-20260807T105604Z-A
