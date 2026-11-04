@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# test-freely-package-output-guard
+#
+# RED 验收：`freely-package --output` 必须在 rm -rf 之前拒绝 /、$HOME、.. 等危险目标。
+# 危险目标不做真实执行（会破坏系统），改为「守卫存在 + 顺序 + 拒绝文案」静态断言；
+# 安全目标用临时目录真实打包，验证正常路径未被破坏。
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+SCRIPT="$ROOT_DIR/bin/freely-package"
+
+[[ -x "$SCRIPT" ]] || { echo "FAIL: $SCRIPT not executable"; exit 1; }
+
+fail=0
+
+# 1) 守卫函数必须存在
+guard_line="$(grep -nE 'refuse_dangerous_output|is_dangerous_output' "$SCRIPT" | head -1 | cut -d: -f1 || true)"
+if [[ -z "$guard_line" ]]; then
+  echo "FAIL: no dangerous-output guard found in $SCRIPT"
+  fail=1
+else
+  echo "OK: guard found at line $guard_line"
+fi
+
+# 2) 守卫必须在 rm -rf 之前执行
+rm_line="$(grep -n 'rm -rf "\$OUTPUT"' "$SCRIPT" | head -1 | cut -d: -f1 || true)"
+if [[ -z "$rm_line" ]]; then
+  echo "FAIL: cannot locate 'rm -rf \"\$OUTPUT\"'"
+  fail=1
+elif [[ -n "$guard_line" && "$guard_line" -ge "$rm_line" ]]; then
+  echo "FAIL: guard (line $guard_line) must run before rm (line $rm_line)"
+  fail=1
+else
+  echo "OK: guard precedes rm ($guard_line < $rm_line)"
+fi
+
+# 3) 必须显式覆盖 /、$HOME、.. 三类目标
+for pat in '"/"' '"\$HOME"' '\.\.'; do
+  if ! grep -qE "$pat" "$SCRIPT"; then
+    echo "FAIL: dangerous target pattern not handled: $pat"
+    fail=1
+  fi
+done
+
+# 4) 拒绝文案
+if ! grep -qE 'refus|dangerous output' "$SCRIPT"; then
+  echo "FAIL: no refusal message"
+  fail=1
+fi
+
+# 5) 安全目标必须仍可打包
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+set +e
+FREELY_PACKAGE_ALLOW_OUTSIDE=1 bash "$SCRIPT" --version 2026.11.03-stable --output "$TMP/out" >"$TMP/log" 2>&1
+rc=$?
+set -e
+if [[ "$rc" -ne 0 ]]; then
+  echo "FAIL: safe target rejected (rc=$rc)"
+  sed -n '1,20p' "$TMP/log"
+  fail=1
+else
+  echo "OK: safe target packaged to $TMP/out"
+fi
+
+[[ "$fail" -eq 0 ]] || { echo "RED: output guard missing or misplaced"; exit 1; }
+echo "PASS: output guard holds"

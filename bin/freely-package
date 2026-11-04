@@ -61,6 +61,36 @@ fi
 # 校验版本号格式
 validate_version "$VERSION"
 
+# ── 输出路径安全守卫 ──────────────────────────────────────
+# 必须在任何 rm -rf 之前执行：拒绝 /、$HOME、.. 等会删除仓库外内容的目标。
+refuse_dangerous_output() {
+  local raw="$1" abs
+  case "$raw" in
+    "/"|"."|".."|"$HOME"|"$HOME/")
+      echo "[ERROR] refusing dangerous output: $raw" >&2
+      return 1
+      ;;
+  esac
+  abs="$(cd "$(dirname "$raw")" 2>/dev/null && pwd -P)/$(basename "$raw")" || {
+    echo "[ERROR] cannot resolve output path: $raw" >&2
+    return 1
+  }
+  abs="${abs%/}"
+  case "$abs" in
+    ""|"/"|"$HOME")
+      echo "[ERROR] refusing dangerous output: $abs" >&2
+      return 1
+      ;;
+  esac
+  if [[ "$abs" != "$HOME/.freely/versions/"* && "${FREELY_PACKAGE_ALLOW_OUTSIDE:-0}" != "1" ]]; then
+    echo "[ERROR] output outside \$HOME/.freely/versions: $abs" >&2
+    echo "        set FREELY_PACKAGE_ALLOW_OUTSIDE=1 to override" >&2
+    return 1
+  fi
+  OUTPUT="$abs"
+}
+refuse_dangerous_output "$OUTPUT" || exit 1
+
 echo "[package] version: $VERSION"
 echo "[package] output: $OUTPUT"
 
