@@ -26,7 +26,7 @@ session_refs: []
 platform_state: open
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-04T08:20:00Z'
 closeout_note: ''
 ---
 

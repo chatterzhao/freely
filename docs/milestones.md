@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261104T074512Z-A`
 - milestone: M-20261104T074512Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/runtime/package-output-guard/raw-20261104T074512Z/issues/I-20261104T074512Z-A.md
 
 ## M-20261103T124003Z-A

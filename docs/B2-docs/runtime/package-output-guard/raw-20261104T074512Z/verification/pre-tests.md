@@ -5,7 +5,7 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: `--output` 指向 `/`、`$HOME`、`..` 或白名单外目录时，必须在 `rm -rf` 之前拒绝
+- requirement: --output 指向 /、$HOME、.. 或白名单外目录时，必须在 rm -rf 之前拒绝
 - acceptance_target: `refuse_dangerous_output()` 存在且在删除前执行
 - surface_kind: unit
 - target_lane: premerge-integration
@@ -49,7 +49,7 @@
 - acceptance_target: 下一次正式发布打包不受影响
 - testing_layer: end-to-end
 - target_environment: release packaging
-- required_evidence: 打包产物与 `.freely_version`
+- required_evidence: 打包产物与 .freely_version
 - blocker_taxonomy: covered_by_more_realistic_required_surface
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: 发布打包为低频人工流程，本次以安全路径实跑替代；下次 nightly 打包作为回归观察点。
