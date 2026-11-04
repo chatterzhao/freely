@@ -30,6 +30,8 @@ completed_at: ''
 closeout_note: ''
 ---
 
+# fix: freely-package --output 无路径守卫，可 rm -rf / 或 $home
+
 workflow_kind: fix
 
 ## 根因
