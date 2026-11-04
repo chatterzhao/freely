@@ -1,0 +1,7 @@
+FAIL: no dangerous-output guard found in /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261104T074512Z-package-output-guard/bin/freely-package
+OK: guard precedes rm ( < 68)
+FAIL: dangerous target pattern not handled: "/"
+FAIL: dangerous target pattern not handled: "\$HOME"
+FAIL: no refusal message
+OK: safe target packaged to /var/folders/4y/s0ffqqjx6y392zmmp6rpm5_c0000gn/T/tmp.Rb0XlV7r1N/out
+RED: output guard missing or misplaced

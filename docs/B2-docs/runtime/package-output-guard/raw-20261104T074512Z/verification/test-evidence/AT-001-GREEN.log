@@ -1,0 +1,4 @@
+OK: guard found at line 66
+OK: guard precedes rm (66 < 98)
+OK: safe target packaged to /var/folders/4y/s0ffqqjx6y392zmmp6rpm5_c0000gn/T/tmp.QJAsPAjNEy/out
+PASS: output guard holds
