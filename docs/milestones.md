@@ -1,3 +1,18 @@
+## M-20261104T074512Z-A
+- title: fix — freely-package --output 无路径守卫，可删除仓库外内容
+- status: active
+### candidate_issues
+1. `C-20261104T074512Z-A`
+- milestone: M-20261104T074512Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T074512Z-A
+- promoted_issue_path: docs/B2-docs/runtime/package-output-guard/raw-20261104T074512Z/issues/I-20261104T074512Z-A.md
+### committed_issues
+1. `I-20261104T074512Z-A`
+- milestone: M-20261104T074512Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/runtime/package-output-guard/raw-20261104T074512Z/issues/I-20261104T074512Z-A.md
+
 ## M-20261103T124003Z-A
 - title: fix — GitHub open 列表 GraphQL 504 时 REST 回退
 - status: active
