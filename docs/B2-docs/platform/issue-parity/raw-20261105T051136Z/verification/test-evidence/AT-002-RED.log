@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+    d = json.load(open('/tmp/freely-pull-contract.B6iSp2/stdout.txt'))
+  File "/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/lib/python3.13/json/__init__.py", line 298, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/lib/python3.13/json/decoder.py", line 348, in decode
+    raise JSONDecodeError("Extra data", s, end)
+json.decoder.JSONDecodeError: Extra data: line 2 column 1 (char 124)
+  [FAIL] raw-issue-pull stdout is a single parseable JSON document
+  [FAIL] issue-sync diagnostics stay on stderr
+RESULT: 0 passed, 2 failed

@@ -70,7 +70,9 @@ python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull 
 local_id="raw-${raw_key}"
 if [[ -f "$target/issue.md" ]]; then
   if [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
-    if ! "$ROOT_DIR/bin/issue-sync" create "$local_id"; then
+    # STDOUT must remain exactly one JSON document: wt-create parses it to
+    # verify the materialized identity. Route every diagnostic to STDERR.
+    if ! "$ROOT_DIR/bin/issue-sync" create "$local_id" >&2; then
       echo "[WARN] raw-issue-pull: issue-sync create failed for $local_id (platform title normalization may be incomplete)" >&2
     fi
   else

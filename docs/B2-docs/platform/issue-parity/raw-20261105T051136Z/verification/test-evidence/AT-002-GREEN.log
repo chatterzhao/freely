@@ -1,0 +1,17 @@
+GREEN — raw-20261105T051136Z / AT-002 (PR review finding)
+command: bash docs/system/workspace/scripts/tests/test-raw-key-drift all
+  [ok] empty title falls back
+  [ok] single-match legacy fallback preserved
+  [ok] created_at compat branch retained
+PASS: raw identity contract holds
+RESULT: 11 passed, 0 failed
+FULL_SUITE_EXIT=0
+
+Finding: removing the silent '2>/dev/null || true' from raw-issue-pull
+let issue-sync's multi-line stdout leak into the same stream that
+wt-create._pull_raw_issue() parses with json.load(sys.stdin) -> Extra data.
+Fix: route all issue-sync diagnostics to STDERR; wt-create captures and
+forwards STDERR, so STDOUT stays exactly one JSON document.
+
+AT-002 RED: json.decoder.JSONDecodeError: Extra data: line 2 column 1
+AT-002 GREEN: 2/2 pull checks pass; full suite 11 passed, 0 failed

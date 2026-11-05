@@ -10,6 +10,7 @@ phase_state: completed
 ## Implementation Decision Note
 
 - decision: 保留 `pull_raw_issue()` 的 `created_at` 反推兼容分支，但把推导值降为诊断信号；调用方 raw key 成为本地身份与落盘路径的唯一真源；平台标题改由新增纯模块 `sync/raw_title_contract.py` 构造为 `[RAW-<key>] <type>: ...` 并同步到所有 replica。`adapter` / `issue-sync` / `feedback edit` 三处共用该模块作为达标单一真源，`wt-create` 与 `raw-issue-pull` 补齐可观测性。
+- review_amendment: PR review 阶段在隔离仓库实测发现，去掉 `raw-issue-pull` 的 `2>/dev/null || true` 后，`issue-sync create` 的多行 stdout 混入 `raw-issue-pull` 的 stdout，而 `wt-create._pull_raw_issue()` 用 `json.load(sys.stdin)` 解析整段 stdout，会报 `Extra data` 并拒绝所有后续工位创建——这是本 PR 自身引入的 P0 回归。按 TDD 补 AT-002 先跑 RED，再把所有 `issue-sync` 诊断重定向到 stderr、`wt-create` 捕获并转发 stderr，使 stdout 恒为单个 JSON 文档；跑 GREEN 并把证据写入 AT-002-RED/GREEN.log。此项由独立人工审查发现，未靠门禁拦截。
 - why_this: 根因不是「反推」，而是反推被当成改写本地身份的授权、标题修正是 no-op、失败被两层静默吞掉。只删反推会删除用户明确要求保留的兼容能力并让无前缀历史 issue 无法开工位；只加校验不修动作则平台标题长期不达标、双平台 fingerprint 持续 diverged。抽出纯模块可让 bash 侧三处规则一致，且 `linked` 及其他 kind 的历史投影保持不变。
 - alternatives_considered: ①禁止 created_at 反推——直接退化，放弃；②只在 wt-create 层把漂移目录改名回来——frontmatter 与返回值已污染，平台标题仍不达标，放弃；③把达标规则做成 adapter CLI 子命令供 bash subprocess 调用——issue-sync sync 遍历数百 issue 时加载整个 adapter 开销大且 bash 侧不可单测，改用轻量纯模块；④让 raw-issue-pull 在 issue-sync create 失败时直接失败——会把「标题未归一化」升级成「无法开工位」，超出边界，改为可诊断告警。
 - boundary_non_goals: 不删 `_resolve_raw_identity()` 单条兜底、不改 `cmd_feedback` create 校验与前缀、不改 `_created_at_to_key()`、不改 `linked` 投影；不回写历史 issue 标题；不修 Q3 物化缺一级标题；不修平台读通道、raw replica reconciliation、scan 状态机；不改 bin shim 分层与打包白名单结构。

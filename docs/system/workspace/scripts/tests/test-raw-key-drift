@@ -134,9 +134,9 @@ static_checks() {
 }
 
 wtcreate_checks() {
-  local TMP KEY="20261105T051136Z" fn
+  local TMP KEY="20261105T051136Z" fn _saved_root="$ROOT_DIR"
   TMP="$(mktemp -d /tmp/freely-wtcreate-pull.XXXXXX)"
-  trap 'rm -rf "$TMP"' RETURN
+  trap 'rm -rf "$TMP"; rm -f /tmp/freely-raw-pull.*' RETURN
   mkdir -p "$TMP/bin" "$TMP/docs/B1-docs/raw-$KEY"
   cat > "$TMP/bin/raw-issue-pull" <<'FAKE'
 #!/usr/bin/env bash
@@ -162,14 +162,59 @@ FAKE
   printf '%s\n' '---' 'local_id: raw-'"$KEY" '---' > "$TMP/docs/B1-docs/raw-$KEY/issue.md"
   out="$(cd "$TMP" && _pull_raw_issue "$KEY" platform 2>&1)" && rc=0 || rc=$?
   check "matching local_id + existing file accepted" bash -c "[[ '$rc' -eq 0 ]]"
+  ROOT_DIR="$_saved_root"
+  export ROOT_DIR
+}
+
+pull_checks() {
+  # wt-create parses raw-issue-pull's STDOUT as a single JSON document.
+  # issue-sync diagnostics must never be appended to that stream.
+  local TMP KEY="20261105T051136Z"
+  TMP="$(mktemp -d /tmp/freely-pull-contract.XXXXXX)"
+  trap 'rm -rf "$TMP"' RETURN
+  mkdir -p "$TMP/bin" "$TMP/docs/system/workspace/scripts/sync"
+  cp "$ROOT_DIR/bin/raw-issue-pull" "$TMP/bin/raw-issue-pull"
+  chmod +x "$TMP/bin/raw-issue-pull"
+  cat > "$TMP/bin/issue-sync" <<'FAKE'
+#!/usr/bin/env bash
+echo "[issue-sync] skip create: already on GitHub"
+echo "[issue-sync] create complete"
+FAKE
+  chmod +x "$TMP/bin/issue-sync"
+  cat > "$TMP/docs/system/workspace/scripts/sync/platform-adapter.py" <<'FAKE'
+import json, pathlib, sys
+target = pathlib.Path(sys.argv[3])
+target.mkdir(parents=True, exist_ok=True)
+(target / "issue.md").write_text("---\nlocal_id: raw-" + sys.argv[2] + "\n---\n")
+print(json.dumps({"local_id": "raw-" + sys.argv[2], "path": str(target / "issue.md")}))
+FAKE
+  (
+    cd "$TMP" || exit 1
+    git init -q -b develop
+    git config user.name t
+    git config user.email t@t
+    echo x > seed
+    git add seed
+    git commit -q -m init
+    git checkout -q -b "fix/raw-$KEY-probe"
+    PROJECT_ROOT="$TMP" ./bin/raw-issue-pull --raw-key "$KEY" \
+      > "$TMP/stdout.txt" 2> "$TMP/stderr.txt"
+  ) || true
+  check "raw-issue-pull stdout is a single parseable JSON document" python3 -c "
+import json
+d = json.load(open('$TMP/stdout.txt'))
+assert d.get('local_id') == 'raw-$KEY', d
+"
+  check "issue-sync diagnostics stay on stderr" grep -q 'issue-sync' "$TMP/stderr.txt"
 }
 
 case "$MODE" in
   unit)     unit_checks ;;
   static)   static_checks ;;
   wtcreate) wtcreate_checks ;;
-  all)      unit_checks || true; static_checks || true; wtcreate_checks || true ;;
-  *) echo "usage: $0 [unit|static|wtcreate|all]" >&2; exit 2 ;;
+  pull)     pull_checks ;;
+  all)      unit_checks || true; static_checks || true; wtcreate_checks || true; pull_checks || true ;;
+  *) echo "usage: $0 [unit|static|wtcreate|pull|all]" >&2; exit 2 ;;
 esac
 
 echo "RESULT: $PASS passed, $FAIL failed"

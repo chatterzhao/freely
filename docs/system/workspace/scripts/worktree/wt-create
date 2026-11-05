@@ -460,11 +460,18 @@ _pull_raw_issue() {
   case "$source" in
     platform)
       if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
-        local result parsed_id
-        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>/dev/null) || {
+        local result parsed_id pull_err
+        pull_err="$(mktemp /tmp/freely-raw-pull.XXXXXX)"
+        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>"$pull_err") || {
+          if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
+          rm -f "$pull_err"
           echo "pull: raw-issue-pull failed for $expected_local_id" >&2
           return 1
         }
+        # Surface warnings (e.g. issue-sync normalization failure) without
+        # mixing them into the JSON document parsed below.
+        if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
+        rm -f "$pull_err"
         parsed_id=$(printf '%s' "$result" | python3 -c '
 import json, sys
 try:

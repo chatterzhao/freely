@@ -12,6 +12,7 @@
 - [x] T6: 跑 GREEN，写 AT-001-GREEN.log，更新 pre-tests.md 的 red-green-status 与 status 字段。
 - [x] T7: 退化审计：803 份真实 B1 issue.md 的新旧达标契约对比；14 个相关回归测试 + 2 个失败项的未修改 develop HEAD 基线对比；确认四处兼容能力未删、零新增失败。
 - [x] T8: 复用既有 story `platform/issue-parity`（无需改 epics-map.svg），`bin/check-epics-map` 校验对齐；补齐 B1/B2 治理文档、milestone、Implementation Decision Note，并现场补回物化 issue.md 的一级标题（Q3 现场规避）。
+- [x] T9: PR review 阶段实测发现「去掉静默吞错后 issue-sync 多行 stdout 污染 raw-issue-pull 的 JSON 输出，导致 wt-create 严格身份校验必然失败」。补 AT-002 隔离仓库测试先跑 RED，再把所有诊断导向 stderr、让 wt-create 转发 stderr，跑 GREEN 并记录证据。
 
 ## 验收关联
 
@@ -21,3 +22,4 @@
 | T4, T5 | AT-001 |
 | T6, T7 | AT-001 |
 | T8 | 门禁治理链 |
+| T9 | AT-002 |
