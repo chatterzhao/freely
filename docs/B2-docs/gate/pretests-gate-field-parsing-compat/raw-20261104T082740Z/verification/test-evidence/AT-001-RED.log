@@ -1,0 +1,18 @@
+  [FAIL] requirement keeps inline backticks: got '', want '`--output` 指向 `/` 时拒绝'
+  [FAIL] required_evidence keeps inline backticks: got '', want '打包产物与 `.freely_version`'
+  [FAIL] empty field absent from parse_fields: got True, want False
+  [FAIL] quote-style single quote: got "'docs/B2-docs/e/s/raw-K/verification/pre-tests.md'", want 'docs/B2-docs/e/s/raw-K/verification/pre-tests.md'
+  [FAIL] quote-style double quote: got '"docs/B2-docs/e/s/raw-K/verification/pre-tests.md"', want 'docs/B2-docs/e/s/raw-K/verification/pre-tests.md'
+  [FAIL] blocker_taxonomy with inline backticks counts: got False, want True
+  [FAIL] all 14 keys parsed with inline code: got 0, want 14
+RED: 7 assertion(s) failed
+  [ok] colon preserved
+  [ok] dollar preserved
+  [ok] empty value rejected
+  [ok] quote-style bare
+  [ok] quote-style backtick wrap
+  [ok] binding bare
+  [ok] binding single
+  [ok] binding double
+  [ok] binding backtick
+  [ok] blocker_taxonomy empty line counts

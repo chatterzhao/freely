@@ -1,0 +1,30 @@
+GREEN — raw-20261104T082740Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-pretests-gate-inline-code-fields all
+exit: 0
+
+  [ok] requirement keeps inline backticks
+  [ok] required_evidence keeps inline backticks
+  [ok] colon preserved
+  [ok] dollar preserved
+  [ok] empty value rejected
+  [ok] empty field absent from parse_fields
+  [ok] quote-style bare
+  [ok] quote-style single quote
+  [ok] quote-style double quote
+  [ok] quote-style backtick wrap
+  [ok] binding bare
+  [ok] binding single
+  [ok] binding double
+  [ok] binding backtick
+  [ok] blocker_taxonomy empty line counts
+  [ok] blocker_taxonomy with inline backticks counts
+  [ok] all 14 keys parsed with inline code
+PASS: inline-code field parsing contract holds
+  [info] gate exit=0 (isolated real git repo, end-to-end gate pass)
+RESULT: 3 passed, 0 failed
+
+Regression baseline comparison (develop HEAD b9a89fb08, unmodified gate vs modified gate):
+  9 gate-related legacy tests fail identically with BOTH versions (pre-existing
+  assertion drift, see #4151 "让测试证据链可验证并替换 CI 桩" — already covered,
+  no duplicate raw issue created).  The new AT-001 test is RED on baseline and
+  GREEN on the fix; no test regressed.

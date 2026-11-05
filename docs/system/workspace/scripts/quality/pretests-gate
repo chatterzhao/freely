@@ -155,18 +155,36 @@ def get_worktree_text(path: str) -> str:
     return target.read_text()
 
 
+def _field_line_value(text: str, key: str) -> tuple[bool, str]:
+    """Return (present, value) for a ``- key: value`` line.
+
+    The value is the whole rest of the line: Markdown inline-code backticks,
+    colons and ``$HOME`` are content, not delimiters.  Only a genuine pair of
+    wrapping quotes is stripped, preserving the #3957 quote-optional contract
+    (bare / 'single' / "double" / `backtick`).  A blank value is reported as
+    present-but-empty so callers can distinguish "missing" from "empty".
+
+    ``[ \\t]*`` (not ``\\s*``) is deliberate: ``\\s*`` spans newlines and used to
+    make an empty field swallow the *next* line's content.
+    """
+    match = re.search(rf"^- {re.escape(key)}:[ \t]*(.*)$", text, re.MULTILINE)
+    if not match:
+        return False, ""
+    value = match.group(1).strip()
+    if len(value) >= 2 and value[0] in "'\"`" and value[-1] == value[0]:
+        inner = value[1:-1]
+        if value[0] not in inner:
+            value = inner.strip()
+    return True, value
+
+
 def phase_state(text: str) -> str:
-    match = re.search(r"^- phase_state:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
-    return match.group(1).strip() if match else ""
+    return _field_line_value(text, "phase_state")[1]
 
 
 def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     def extract(field: str) -> str:
-        # Quote-optional: accept bare, 'single', "double", or `backtick` wrapped
-        # values — pr-review-guarded historically required quotes while this
-        # gate rejected them; both parsers now accept all four (#3957 lane).
-        match = re.search(rf"^- {re.escape(field)}:\s*['\"`]?([^'\"`\n]+)['\"`]?\s*$", text, re.MULTILINE)
-        return match.group(1).strip() if match else ""
+        return _field_line_value(text, field)[1]
 
     pre_tests_path = extract("pre_tests_path")
     verification_dir = extract("verification_artifact_dir")
@@ -204,9 +222,9 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
 
 
 def derive_tasks_path(issue_text: str, pre_tests_path: str) -> str:
-    match = re.search(r"^- tasks_path:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE)
-    if match:
-        return match.group(1).strip()
+    present, value = _field_line_value(issue_text, "tasks_path")
+    if present and value:
+        return value
     return str(Path(pre_tests_path).with_name("tasks.md"))
 
 
@@ -313,9 +331,11 @@ def parse_fields(section: str) -> dict[str, str]:
         "task_refs",
         "case_design",
     ):
-        match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
-        if match:
-            fields[key] = match.group(1).strip()
+        present, value = _field_line_value(section, key)
+        # A present-but-empty field is *missing*: the old ``\s*`` regex used to
+        # span the newline and silently adopt the next line's content instead.
+        if present and value:
+            fields[key] = value
     return fields
 
 
@@ -331,16 +351,14 @@ def section_has_test_tasks(section_text: str) -> bool:
 
 
 def parse_scalar(section_text: str, key: str) -> str:
-    match = re.search(rf"^- {re.escape(key)}:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE)
-    return match.group(1).strip() if match else ""
+    return _field_line_value(section_text, key)[1]
 
 
 def has_blocker_taxonomy(section_text: str) -> bool:
-    if re.search(r"^- blocker_taxonomy:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE):
-        return True
-    if re.search(r"^- blocker_taxonomy:\s*$", section_text, re.MULTILINE):
-        return True
-    return False
+    # Legacy semantics: an explicitly present field counts even when its value
+    # is empty; only a genuinely absent line fails.  Both former regex branches
+    # (value present / blank value) collapse into one "present" check.
+    return _field_line_value(section_text, "blocker_taxonomy")[0]
 
 
 def artifact_exists(path: str, source: str) -> bool:
@@ -367,7 +385,11 @@ def artifact_exists(path: str, source: str) -> bool:
 
 
 def issue_is_follow_on(issue_text: str) -> bool:
-    return bool(re.search(r"^- follow_on_to:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE))
+    # Preserve the original contract: a blank `follow_on_to:` is not a
+    # follow-on owner; only a non-empty binding triggers the stronger
+    # live-surface requirement.
+    present, value = _field_line_value(issue_text, "follow_on_to")
+    return bool(present and value)
 
 
 def issue_requires_stronger_live_surface(issue_text: str, pretests_text: str) -> bool:

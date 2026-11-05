@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+# Regression: pretests-gate field values are the whole rest of the line.
+# Markdown inline-code backticks, colons and $HOME are content, not delimiters.
+# The four quote styles introduced by #3957 must keep working (no regression).
+# Usage: test-pretests-gate-inline-code-fields [unit|e2e|all]
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+GATE="$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate"
+MODE="${1:-all}"
+PASS=0
+FAIL=0
+
+check() {
+  local name="$1"; shift
+  if "$@"; then PASS=$((PASS+1)); else
+    echo "  [FAIL] $name" >&2
+    FAIL=$((FAIL+1))
+  fi
+}
+
+unit_checks() {
+python3 - "$GATE" <<'PY'
+import sys
+gate_path = sys.argv[1]
+src = open(gate_path, encoding="utf-8").read()
+py = src.split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+defs = py.split("\nif issue_arg:", 1)[0]
+sys.argv = [gate_path, ".", "", "0", "0", "", ""]
+ns = {"__name__": "pretests_gate_under_test"}
+exec(compile(defs, gate_path, "exec"), ns)
+parse_fields = ns["parse_fields"]
+parse_scalar = ns["parse_scalar"]
+has_blocker = ns["has_blocker_taxonomy"]
+parse_binding = ns["parse_issue_binding"]
+
+fails = []
+def expect(label, got, want):
+    if got != want:
+        fails.append(f"{label}: got {got!r}, want {want!r}")
+    else:
+        print(f"  [ok] {label}")
+
+# 1. inline-code backtick inside a value (raw issue evidence 1)
+sec = "### acceptance-1\n- id: AT-001\n- requirement: `--output` 指向 `/` 时拒绝\n"
+expect("requirement keeps inline backticks",
+       parse_fields(sec).get("requirement", ""), "`--output` 指向 `/` 时拒绝")
+
+# 2. inline-code backtick in a chapter scalar (raw issue evidence 2)
+ch = "## End-to-End\n- required_evidence: 打包产物与 `.freely_version`\n"
+expect("required_evidence keeps inline backticks",
+       parse_scalar(ch, "required_evidence"), "打包产物与 `.freely_version`")
+
+# 3. colon inside value
+expect("colon preserved", parse_scalar("- requirement: 比值 a:b 通过\n", "requirement"), "比值 a:b 通过")
+
+# 4. dollar sign inside value
+expect("dollar preserved", parse_scalar("- requirement: 拒绝 $HOME 目标\n", "requirement"), "拒绝 $HOME 目标")
+
+# 5. empty value is still missing
+expect("empty value rejected", parse_scalar("- requirement:   \n", "requirement"), "")
+expect("empty field absent from parse_fields",
+       "requirement" in parse_fields("### a\n- requirement:\n- id: AT-001\n"), False)
+
+# 6-9. #3957 four quote styles must NOT regress
+bare = "- pre_tests_path: docs/B2-docs/e/s/raw-K/verification/pre-tests.md\n"
+for label, quoted in [
+    ("bare", bare),
+    ("single quote", "- pre_tests_path: 'docs/B2-docs/e/s/raw-K/verification/pre-tests.md'\n"),
+    ("double quote", '- pre_tests_path: "docs/B2-docs/e/s/raw-K/verification/pre-tests.md"\n'),
+    ("backtick wrap", "- pre_tests_path: `docs/B2-docs/e/s/raw-K/verification/pre-tests.md`\n"),
+]:
+    expect(f"quote-style {label}", parse_scalar(quoted, "pre_tests_path"),
+           "docs/B2-docs/e/s/raw-K/verification/pre-tests.md")
+
+# 10. parse_issue_binding keeps all four styles
+issue_tpl = ("# I-sample\n- phase_state: completed\n"
+             "- pre_tests_path: {v}\n"
+             "- verification_artifact_dir: docs/B2-docs/e/s/raw-K/code-reviews\n")
+for label, v in [("bare", "docs/B2-docs/e/s/raw-K/verification/pre-tests.md"),
+                 ("single", "'docs/B2-docs/e/s/raw-K/verification/pre-tests.md'"),
+                 ("double", '"docs/B2-docs/e/s/raw-K/verification/pre-tests.md"'),
+                 ("backtick", "`docs/B2-docs/e/s/raw-K/verification/pre-tests.md`")]:
+    got, _ = parse_binding("docs/B2-docs/e/s/raw-K/issues/I-sample.md", issue_tpl.format(v=v))
+    expect(f"binding {label}", got, "docs/B2-docs/e/s/raw-K/verification/pre-tests.md")
+
+# 11. has_blocker_taxonomy: empty line still counts (legacy semantics preserved)
+expect("blocker_taxonomy empty line counts", has_blocker("- blocker_taxonomy:\n"), True)
+expect("blocker_taxonomy with inline backticks counts",
+       has_blocker("- blocker_taxonomy: `execution_pending_or_failed` 与 `definition_missing`\n"), True)
+
+# 12. every parse_fields key tolerates inline code
+section = "\n".join(f"- {k}: 值含 `inline` 代码" for k in (
+    "id", "requirement", "evidence_level", "status", "artifact_ref",
+    "red-green-status", "not_applicable_reason", "not_applicable_explanation",
+    "replacement_evidence", "surface_kind", "target_lane", "promotion_gate",
+    "task_refs", "case_design"))
+fields = parse_fields(section)
+expect("all 14 keys parsed with inline code", len(fields), 14)
+
+if fails:
+    for f in fails: print(f"  [FAIL] {f}", file=sys.stderr)
+    print(f"RED: {len(fails)} assertion(s) failed", file=sys.stderr)
+    sys.exit(1)
+print("PASS: inline-code field parsing contract holds")
+PY
+}
+
+e2e_checks() {
+  local TMP REPO
+  TMP="$(mktemp -d /tmp/freely-gate-inline.XXXXXX)"
+  trap 'rm -rf "$TMP"' RETURN
+  REPO="$TMP/repo"
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" \
+           "$REPO/docs/B2-docs/e/s/raw-K/verification" \
+           "$REPO/docs/B2-docs/e/s/raw-K/issues" \
+           "$REPO/docs/B2-docs/e/s/raw-K/code-reviews"
+  cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
+  cp "$GATE" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+  chmod +x "$REPO/bin/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+
+  cat > "$REPO/docs/B2-docs/e/s/raw-K/issues/I-sample.md" <<'EOF'
+# I-sample: inline-code field parsing
+- issue_id: I-sample
+- phase_state: completed
+- pre_tests_path: docs/B2-docs/e/s/raw-K/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/e/s/raw-K/code-reviews
+EOF
+
+  cat > "$REPO/docs/B2-docs/e/s/raw-K/verification/tasks.md" <<'EOF'
+# Tasks: I-sample
+- [x] T1: unify field value parsing
+EOF
+
+  cat > "$REPO/docs/B2-docs/e/s/raw-K/verification/pre-tests.md" <<'EOF'
+# Pre-Tests: inline-code field parsing
+
+## Acceptance Items
+
+### acceptance-1
+- id: AT-001
+- requirement: `--output` 指向 `/` 时拒绝，且 `.freely_version` 存在
+- acceptance_target: 值含行内代码时字段仍被解析
+- surface_kind: unit
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- testing_layer: unit
+- target_environment: feature/sample
+- required_evidence: 打包产物与 `.freely_version`
+- evidence_level: integration
+- artifact_ref: docs/B2-docs/e/s/raw-K/code-reviews/r.md
+- test_command: bash test.sh
+- expected_output: PASS
+- expected_RED_output: RED
+- actual_RED_output: RED: field missing
+- actual_output: PASS
+- evidence_file: docs/B2-docs/e/s/raw-K/verification/test-evidence/AT-001-GREEN.log
+- red-green-status: green
+- status: passed
+- blocker: ""
+- task_refs: T1
+- case_design: 断言 `- requirement:` 与 `- required_evidence:` 的值含反引号时不被判缺失
+
+## Unit
+- acceptance_target: 解析正确性
+- testing_layer: unit
+- target_environment: feature/sample
+- required_evidence: AT-001
+- blocker_taxonomy: execution_pending_or_failed
+1. bash test.sh
+
+## Integration
+- acceptance_target: 门禁端到端
+- testing_layer: integration
+- target_environment: feature/sample
+- required_evidence: AT-001
+- blocker_taxonomy: execution_pending_or_failed
+1. bash test.sh
+
+## End-to-End
+- acceptance_target: 真实项目门禁
+- testing_layer: end-to-end
+- target_environment: feature/sample
+- required_evidence: 打包产物与 `.freely_version`
+- blocker_taxonomy: execution_pending_or_failed
+1. bash test.sh
+
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: 门禁在隔离的真实 git 仓库中执行，覆盖真实解析路径
+EOF
+
+  mkdir -p "$REPO/docs/B2-docs/e/s/raw-K/verification/test-evidence"
+  echo PASS > "$REPO/docs/B2-docs/e/s/raw-K/verification/test-evidence/AT-001-GREEN.log"
+  echo "# review" > "$REPO/docs/B2-docs/e/s/raw-K/code-reviews/r.md"
+  git -C "$REPO" add -A >/dev/null 2>&1 || true
+  git -C "$REPO" commit -q -m init
+
+  local out rc
+  out="$(cd "$REPO" && ./bin/pretests-gate --project "$REPO" \
+        --issue docs/B2-docs/e/s/raw-K/issues/I-sample.md 2>&1)" && rc=0 || rc=$?
+  echo "$out" > "$TMP/gate.out"
+
+  check "gate reports no missing requirement" \
+    bash -c "! grep -q 'missing requirement' \"$TMP/gate.out\""
+  check "gate reports no missing required_evidence" \
+    bash -c "! grep -q \"missing 'required_evidence'\" \"$TMP/gate.out\""
+  check "gate reports no missing section scalar due to inline code" \
+    bash -c "! grep -q 'pre_tests_missing.*missing' \"$TMP/gate.out\""
+  echo "  [info] gate exit=$rc; output kept at $TMP/gate.out" >&2
+}
+
+case "$MODE" in
+  unit) unit_checks ;;
+  e2e)  e2e_checks ;;
+  all)  unit_checks; e2e_checks ;;
+  *) echo "usage: $0 [unit|e2e|all]" >&2; exit 2 ;;
+esac
+
+echo "RESULT: $PASS passed, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]

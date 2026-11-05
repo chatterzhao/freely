@@ -1,3 +1,24 @@
+## M-20261104T082740Z-A
+- title: fix — pretests-gate 字段值解析统一化，兼容行内代码并修复空值跨行错读
+- status: active
+### candidate_issues
+1. `C-20261104T082740Z-A`
+- milestone: M-20261104T082740Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T082740Z-A
+- promoted_issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20261104T082740Z/issues/I-20261104T082740Z-A.md
+### committed_issues
+1. `I-20261104T082740Z-A`
+- milestone: M-20261104T082740Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20261104T082740Z/issues/I-20261104T082740Z-A.md
+### completed_issues
+1. `I-20261104T082740Z-A`
+- milestone: M-20261104T082740Z-A
+- phase_state: completed
+- completed_at: 2026-11-05T12:51:28Z
+- issue_path: docs/B2-docs/gate/pretests-gate-field-parsing-compat/raw-20261104T082740Z/issues/I-20261104T082740Z-A.md
+
 ## M-20261104T074512Z-A
 - title: fix — freely-package --output 无路径守卫，可删除仓库外内容
 - status: active
