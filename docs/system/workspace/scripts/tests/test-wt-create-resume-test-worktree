@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# Regression test: wt-create must recover from an interrupted run.
+# Usage: test-wt-create-resume-test-worktree [static|e2e|all]
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+MODE="${1:-all}"
+
+failures=0
+pass() { printf '[PASS] %s\n' "$1"; }
+fail() { printf '[FAIL] %s\n' "$1"; failures=$((failures + 1)); }
+check() {
+  local name="$1"; shift
+  if "$@" >/dev/null 2>&1; then pass "$name"; else fail "$name"; fi
+}
+
+static_checks() {
+  check "wt-create passes bash -n" bash -n "$WT_CREATE"
+  check "four-state resume machine present" grep -q 'resume_mode' "$WT_CREATE"
+  check "idempotent no-op branch present" grep -q '工位已存在，无需创建' "$WT_CREATE"
+  check "inconsistent-state rejection present" grep -q 'dev 分支缺失，状态不一致' "$WT_CREATE"
+  check "_init_test_worktree_state defined" grep -q '^_init_test_worktree_state()' "$WT_CREATE"
+
+  local calls
+  calls="$(grep -c '_init_test_worktree_state ' "$WT_CREATE" || true)"
+  if [[ "${calls:-0}" -ge 3 ]]; then
+    pass "initialisation helper reused by standard/resume/legacy paths (${calls} call sites)"
+  else
+    fail "initialisation helper reused by standard/resume/legacy paths (found ${calls:-0}, need >=3)"
+  fi
+
+  check "recovery path skips replica gate" grep -q '恢复模式无需重复校验平台' "$WT_CREATE"
+  check "fuzzy-match is bypassed in recovery mode" grep -q '恢复模式跳过 fuzzy-match' "$WT_CREATE"
+  check "legacy detects test-pre-merge branch names" grep -q 'legacy_test_pre_merge' "$WT_CREATE"
+  check "legacy derives dev branch as base" grep -q '_legacy_dev_base' "$WT_CREATE"
+  check "legacy refuses to fall back to develop" grep -q '不会回退到 develop' "$WT_CREATE"
+  check "usage documents re-run recovery" grep -q '可重跑恢复' "$WT_CREATE"
+
+  local gate_lines
+  gate_lines="$(grep -n 'TEST_STATUS="not_tested"' "$WT_CREATE" || true)"
+  if [[ -n "$gate_lines" ]]; then
+    pass "test-gate.env initialisation present"
+  else
+    fail "test-gate.env initialisation present"
+  fi
+}
+
+e2e_checks() {
+  local TMP REPO KEY SLUG DEV_BRANCH TEST_BRANCH DEV_WT TEST_WT
+  TMP="$(mktemp -d /tmp/freely-wt-resume.XXXXXX)"
+  REPO="$TMP/repo"
+  KEY="20261105T052000Z"
+  SLUG="resume-demo"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"
+  TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/dev-fixture"
+  TEST_WT=""
+
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" "$REPO/docs/B1-docs/raw-${KEY}" "$TMP/repo-worktrees"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
+  cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" worktree add -q "$DEV_WT" "$DEV_BRANCH"
+  printf -- '---\nphase_state: proposed\n---\n\n# fixture\n' > "$REPO/docs/B1-docs/raw-${KEY}/issue.md"
+
+  local run_cmd=(bash docs/system/workspace/scripts/worktree/wt-create --raw-key "$KEY" --source platform --kind fix --slug "$SLUG")
+
+  if ( cd "$REPO" && "${run_cmd[@]}" ) > "$TMP/run1.log" 2>&1; then
+    pass "re-run after Step 1 interruption exits 0"
+  else
+    fail "re-run after Step 1 interruption exits 0 (see $(cat "$TMP/run1.log" | tail -3))"
+  fi
+
+  if git -C "$REPO" show-ref --verify --quiet "refs/heads/${TEST_BRANCH}"; then
+    pass "missing test-pre-merge branch was provisioned"
+  else
+    fail "missing test-pre-merge branch was provisioned"
+  fi
+
+  TEST_WT="$(git -C "$REPO" worktree list --porcelain | awk -v b="refs/heads/${TEST_BRANCH}" '
+    $1=="worktree" { w=$2 }
+    $1=="branch" && $2==b { print w; exit }
+  ')"
+  if [[ -n "$TEST_WT" && -d "$TEST_WT" ]]; then
+    pass "test-pre-merge worktree directory exists"
+  else
+    fail "test-pre-merge worktree directory exists"
+  fi
+
+  if [[ -n "$TEST_WT" && -f "$TEST_WT/.freely/run/test-gate.env" ]] && \
+     grep -q 'TEST_STATUS="not_tested"' "$TEST_WT/.freely/run/test-gate.env"; then
+    pass "recovered test worktree is fully initialised (test-gate.env)"
+  else
+    fail "recovered test worktree is fully initialised (test-gate.env)"
+  fi
+
+  local before after
+  before="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  if ( cd "$REPO" && "${run_cmd[@]}" ) > "$TMP/run2.log" 2>&1; then
+    pass "second re-run is an idempotent no-op (exit 0)"
+  else
+    fail "second re-run is an idempotent no-op (exit 0)"
+  fi
+  if grep -q '工位已存在，无需创建' "$TMP/run2.log"; then
+    pass "second re-run reports existing worktrees"
+  else
+    fail "second re-run reports existing worktrees"
+  fi
+  after="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  if [[ "$before" == "$after" ]]; then
+    pass "second re-run creates no duplicate worktree (${before} -> ${after})"
+  else
+    fail "second re-run creates no duplicate worktree (${before} -> ${after})"
+  fi
+
+  rm -rf "$TMP"
+}
+
+case "$MODE" in
+  static) static_checks ;;
+  e2e) e2e_checks ;;
+  all) static_checks; e2e_checks ;;
+  *) echo "usage: $0 [static|e2e|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$failures" -eq 0 ]]; then
+  echo "PASS: wt-create resume contract holds"
+  exit 0
+fi
+echo "RED: resume contract missing or broken (${failures} assertion(s) failed)"
+exit 1

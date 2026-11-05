@@ -1,0 +1,9 @@
+[PASS] re-run after Step 1 interruption exits 0
+[PASS] missing test-pre-merge branch was provisioned
+[PASS] test-pre-merge worktree directory exists
+[PASS] recovered test worktree is fully initialised (test-gate.env)
+[PASS] second re-run is an idempotent no-op (exit 0)
+[PASS] second re-run reports existing worktrees
+[PASS] second re-run creates no duplicate worktree (3 -> 3)
+
+PASS: wt-create resume contract holds

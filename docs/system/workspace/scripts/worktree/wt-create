@@ -5,7 +5,11 @@ usage() {
   cat <<USAGE
 Usage:
   freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>]
-  freely wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
+  freely wt-create <branch> [--base <base-branch>]    (legacy: 传 test-pre-merge-* 分支名补建测试工位；纯文档、init develop、release 分支)
+
+  可重跑恢复：标准模式若在 Step 2 之前中断（dev 工位已建、test 工位缺失），
+  用完全相同的参数重跑本命令即可只补建 test 工位并完整初始化；
+  两个工位都存在时重跑为 no-op（退出码 0），不会产生重复工位。
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
@@ -269,7 +273,36 @@ cd "$ROOT_DIR"
 source "$ROOT_DIR/bin/worktree-common.sh"
 freely_wt_assert_strict_root
 
+# ── Pre-flight state detection (before any side effect) ─────
+# Standard mode is idempotent. Detect interruption residue here so the
+# replica gate below can be skipped for recovery: the dev worktree already
+# exists, so re-verifying configured platforms only adds latency and a new
+# failure mode to the very command that is supposed to recover.
+resume_mode=0
 if [[ "$using_new" -eq 1 ]]; then
+  _dev_exists=0; _test_exists=0
+  git show-ref --verify --quiet "refs/heads/$dev_branch" && _dev_exists=1 || true
+  git show-ref --verify --quiet "refs/heads/$test_pre_merge_branch" && _test_exists=1 || true
+
+  if [[ "$_dev_exists" -eq 1 && "$_test_exists" -eq 1 ]]; then
+    echo "wt-create: 工位已存在，无需创建 (idempotent no-op)" >&2
+    echo "  dev:  $(freely_wt_resolve_target_path "$dev_branch")" >&2
+    echo "  test: $(freely_wt_resolve_target_path "$test_pre_merge_branch")" >&2
+    exit 0
+  fi
+  if [[ "$_dev_exists" -eq 0 && "$_test_exists" -eq 1 ]]; then
+    echo "拒绝创建工位: test 工位分支已存在但 dev 分支缺失，状态不一致" >&2
+    echo "  请先清理残留的 test-pre-merge 分支/工位，再重建。" >&2
+    exit 1
+  fi
+  if [[ "$_dev_exists" -eq 1 ]]; then
+    resume_mode=1
+    echo "wt-create: 检测到中断残留 —— dev 工位已存在、test 工位缺失，进入恢复模式" >&2
+  fi
+fi
+
+# 恢复模式无需重复校验平台 raw replicas（工位与 raw issue 已在本地）。
+if [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 ]]; then
   echo "wt-create: verifying configured raw replicas..." >&2
   _replica_receipt="$(mktemp -t freely-replica-receipt.XXXXXX)"
   if ! FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
@@ -298,20 +331,23 @@ if ! git show-ref --verify --quiet "refs/heads/$base" && ! git rev-parse --verif
 fi
 
 # ── Validate branches don't already exist ────────────────
-
-for b in $test_pre_merge_branch $dev_branch; do
-  [[ -z "$b" ]] && continue
-  if git show-ref --verify --quiet "refs/heads/$b"; then
-    echo "Branch already exists: $b" >&2
+# Standard mode resolved its four-state machine in the pre-flight block
+# above; only legacy mode needs the classic "branch already exists" guard.
+if [[ "$using_new" -eq 0 ]]; then
+  if git show-ref --verify --quiet "refs/heads/$dev_branch"; then
+    echo "Branch already exists: $dev_branch" >&2
     exit 1
   fi
-done
+fi
 
 # ── Fuzzy-match: block if ANY branch/worktree exists for this raw_key ──
-_existing_branch=$(git branch | grep "raw-${raw_key}" | head -1 || true)
-_existing_wt=$(git worktree list 2>/dev/null | grep "raw-${raw_key}" | head -1 || true)
-if [[ -n "$_existing_branch" || -n "$_existing_wt" ]]; then
-  cat >&2 <<FUZZY_BLOCK
+# 恢复模式跳过 fuzzy-match：dev 分支本身就是预期的中断残留，
+# 若在这里阻断，重跑仍然会退回「Branch already exists」的死路。
+if [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 ]]; then
+  _existing_branch=$(git branch | grep "raw-${raw_key}" | head -1 || true)
+  _existing_wt=$(git worktree list 2>/dev/null | grep "raw-${raw_key}" | head -1 || true)
+  if [[ -n "$_existing_branch" || -n "$_existing_wt" ]]; then
+    cat >&2 <<FUZZY_BLOCK
 拒绝创建工位: raw-${raw_key} 已有工位/分支
 
   已有分支: ${_existing_branch:-无}
@@ -320,7 +356,8 @@ if [[ -n "$_existing_branch" || -n "$_existing_wt" ]]; then
   同一 raw_key 不允许创建多个工位。请使用已有工位继续工作，
   或先 wt-close 清理后再重建。
 FUZZY_BLOCK
-  exit 1
+    exit 1
+  fi
 fi
 
 # ── Raw issue state check ────────────────────────────────
@@ -689,6 +726,78 @@ _create_worktree() {
   fi
 }
 
+# ── Test worktree initialisation: single source of truth ─────────
+# Normal Step 2, interrupted-run recovery and the legacy test-pre-merge
+# 补建 path all converge here, so a recovered test worktree is equivalent
+# to a normally created one (seed / .freely state / test gate marker).
+_init_test_worktree_state() {
+  local tp_target="$1"
+  local _src_freely _dst_freely
+
+  if ! _seed_worktree "$tp_target"; then
+    echo "拒绝创建工位: worktree seed failed" >&2
+    return 1
+  fi
+
+  _src_freely="$ROOT_DIR/.freely"
+  _dst_freely="$tp_target/.freely"
+  if [[ -d "$_src_freely" && -d "$tp_target" ]]; then
+    mkdir -p "$_dst_freely"
+    [[ -f "$_src_freely/freely.db" ]] && cp "$_src_freely/freely.db" "$_dst_freely/freely.db" 2>/dev/null || true
+    [[ -f "$_src_freely/a2a_task.db" ]] && cp "$_src_freely/a2a_task.db" "$_dst_freely/a2a_task.db" 2>/dev/null || true
+    echo "  test-pre-merge: cloned .freely state from develop"
+  fi
+
+  # Always write the gate marker, even when the source .freely tree is
+  # absent (fresh checkout / minimal package). The daemon updates
+  # TEST_STATUS and LAST_TESTED_COMMIT; gates compare them against HEAD.
+  mkdir -p "$tp_target/.freely/run"
+  cat > "$tp_target/.freely/run/test-gate.env" <<'TEST_INIT'
+TEST_STATUS="not_tested"
+LAST_TESTED_AT="1970-01-01T00:00:00Z"
+LAST_TESTED_COMMIT=""
+TEST_INIT
+  echo "  test-pre-merge: initialized test-gate.env (not_tested)"
+  return 0
+}
+
+# ── Recovery: provision only the missing test-pre-merge worktree ──
+# Runs after the helpers are defined and before _require_issue_exists /
+# remote fetch. An interrupted run already owns its dev worktree and raw
+# issue, so re-validating platforms or syncing develop would reintroduce the
+# very network dependency that caused the interruption in the first place.
+if [[ "$resume_mode" -eq 1 ]]; then
+  tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
+  echo "=== 恢复模式: 补建缺失的 test-pre-merge 工位 ==="
+  if ! _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch"; then
+    echo "恢复失败: test 工位创建失败" >&2
+    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+    exit 1
+  fi
+  if ! _init_test_worktree_state "$tp_target"; then
+    echo "恢复失败: test 工位初始化失败" >&2
+    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+    exit 1
+  fi
+  _update_scan_state "$raw_key" "working" "$(freely_wt_resolve_target_path "$dev_branch")"
+  cat <<MSG
+
+╔══════════════════════════════════════════════════════════╗
+║  Worktrees recovered                                    ║
+╠══════════════════════════════════════════════════════════╣
+║  dev (kept):      $(freely_wt_resolve_target_path "$dev_branch")
+║  test (created):  $tp_target
+║  base:            $dev_branch
+║  raw key:         $raw_key
+╠══════════════════════════════════════════════════════════╣
+║  后续流程不变：cd 到 dev 工位继续 B1/B2/RED/GREEN          ║
+╚══════════════════════════════════════════════════════════╝
+MSG
+  exit 0
+fi
+
 # ── Pre-check: issue must exist ──────────────────────────
 
 _require_issue_exists "$dev_branch" || exit 1
@@ -745,10 +854,9 @@ fi
   _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch"
   echo "  test-pre-merge: $tp_target (base: $dev_branch)"
 
-  # Declarative seeds: gitignored-but-required files the checkout cannot carry.
-  # The list is project data (docs/system/workspace/worktree-seed.toml); this is
-  # the only call site, so nothing else has to learn about individual files.
-  if ! _seed_worktree "$fix_target" || ! _seed_worktree "$tp_target"; then
+  # Seed the dev worktree. The test worktree is seeded and fully initialised
+  # by the shared helper — same code path as recovery and legacy 补建.
+  if ! _seed_worktree "$fix_target"; then
     echo "拒绝创建工位: worktree seed failed" >&2
     git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
     git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
@@ -756,34 +864,13 @@ fi
     git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
     return 1
   fi
-
-  # Clone .freely runtime state from develop so test worktree can run daemon
-  _src_freely="$ROOT_DIR/.freely"
-  _dst_freely="$tp_target/.freely"
-  if [[ -d "$_src_freely" && -d "$tp_target" ]]; then
-    mkdir -p "$_dst_freely"
-    # Copy freely.db (runtime database with A2A tasks, sessions, scan data)
-    [[ -f "$_src_freely/freely.db" ]] && cp "$_src_freely/freely.db" "$_dst_freely/freely.db" 2>/dev/null || true
-    # Copy a2a_task.db (if separate from freely.db)
-    [[ -f "$_src_freely/a2a_task.db" ]] && cp "$_src_freely/a2a_task.db" "$_dst_freely/a2a_task.db" 2>/dev/null || true
-    # agent-table.toml is handled by the declarative seed step above.
-    # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
-    # Do NOT copy: logs/ (test worktree should have own logs)
-    # config.toml is already synced by sync-tooling
-
-    # Initialize test-gate.env — marks this test worktree as "not yet tested".
-    # The daemon updates TEST_STATUS and LAST_TESTED_COMMIT when it runs.
-    # The gate compares LAST_TESTED_COMMIT against HEAD to detect whether
-    # tests have been re-run after new commits.
-    mkdir -p "$tp_target/.freely/run"
-    cat > "$tp_target/.freely/run/test-gate.env" <<'TEST_INIT'
-TEST_STATUS="not_tested"
-LAST_TESTED_AT="1970-01-01T00:00:00Z"
-LAST_TESTED_COMMIT=""
-TEST_INIT
-    echo "  test-pre-merge: initialized test-gate.env (not_tested)"
-
-    echo "  test-pre-merge: cloned .freely state from develop"
+  if ! _init_test_worktree_state "$tp_target"; then
+    echo "拒绝创建工位: test worktree initialisation failed" >&2
+    git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+    return 1
   fi
 
   cat <<MSG
@@ -857,8 +944,35 @@ REMINDER
       ;;
   esac
 else
+  # legacy 补建：仅当传入分支名是 test-pre-merge-<raw-key>-<slug> 时，
+  # 才按完整测试工位规格创建。base 必须是对应 dev 分支，绝不回退到 develop，
+  # 否则补建出的工位基于错误基线，门禁无法验证该 lane 的改动。
+  legacy_test_pre_merge=0
+  _legacy_dev_base=""
+  if [[ "$dev_branch" == test-pre-merge-* ]]; then
+    legacy_test_pre_merge=1
+    _legacy_raw_key="$(printf '%s\n' "$dev_branch" | sed -E 's/^test-pre-merge-([0-9]{8}[-T][0-9]{4,6}Z?)-.*/\1/')"
+    if [[ -n "$_legacy_raw_key" && "$_legacy_raw_key" != "$dev_branch" ]]; then
+      _legacy_dev_base="$(git branch --format='%(refname:short)' | grep -E "^(fix|feature|hotfix)/raw-${_legacy_raw_key}-" | head -1 || true)"
+    fi
+    if [[ -z "$_legacy_dev_base" ]]; then
+      echo "拒绝补建: 找不到 raw-${_legacy_raw_key:-?} 对应的 dev 分支" >&2
+      echo "  legacy 补建必须以对应 fix/feature/hotfix 分支为 base，不会回退到 develop。" >&2
+      exit 1
+    fi
+    base="$_legacy_dev_base"
+  fi
+
   tp_target="$(freely_wt_resolve_target_path "$dev_branch")"
   _create_worktree "$dev_branch" "$tp_target" "$base"
+  if [[ "$legacy_test_pre_merge" -eq 1 ]]; then
+    if ! _init_test_worktree_state "$tp_target"; then
+      echo "拒绝补建: test 工位初始化失败" >&2
+      git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
+      exit 1
+    fi
+  fi
 
   cat <<MSG
 Created worktree:
@@ -870,8 +984,9 @@ Execution base:
 
   wt-create 标准模式: --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
     使用场景：从 raw issue 创建 fix|hotfix|feature + test-pre-merge 工位对，走完整 IBM 治理链路
+    可重跑恢复：Step 2 之前中断后用相同参数重跑，只补建缺失的 test 工位；双工位齐全时 no-op
   wt-create legacy 模式: <branch>
-    使用场景：已有 fix|hotfix|feature 开发工位但缺 test-pre-merge-<raw-key>-<slug> 时补建测试工位、
-              纯文档修改（无需测试+治理）、项目初始化创建 develop 分支、gitflow 发版创建 release 分支
+    使用场景：传入 test-pre-merge-<raw-key>-<slug> 分支名时补建测试工位（自动以对应 dev 分支为 base，
+              并执行 seed / .freely 状态 / test-gate.env 初始化）；纯文档修改、init develop、release 分支
 MSG
 fi
