@@ -55,7 +55,7 @@
 
 ### acceptance-3
 - id: AT-003
-- requirement: legacy 模式传入 `test-pre-merge-<key>-<slug>` 分支名时，命令必须真正可达并创建以对应 dev 分支为 base 的完整 test 工位；dev 分支缺失时拒绝且绝不回退 develop
+- requirement: legacy 模式传入 test-pre-merge-key-slug 形式的分支名时，命令必须真正可达并创建以对应 dev 分支为 base 的完整 test 工位；dev 分支缺失时拒绝且绝不回退 develop
 - acceptance_target: 帮助文本承诺的 legacy 补建能力真实可执行，不是不可达的 dead code
 - surface_kind: end_to_end
 - target_lane: premerge-integration
@@ -106,4 +106,4 @@
 
 ## Real-Environment
 - real_environment_status: pass
-- real_environment_reason: 本轮 wt-create 标准模式已在真实项目执行 1m57s 并成功创建 dev + test 双工位（含 seed 与 test-gate.env），可作为正常路径基线；恢复路径由 AT-002 的隔离真实 git 仓库覆盖；legacy 补建路径由 AT-003 的隔离真实 git 仓库覆盖，且修复前在同一形态的隔离仓库中实测复现了 `Missing required: --raw-key`（RED），修复后 8/8 断言通过（GREEN）。
+- real_environment_reason: 本轮 wt-create 标准模式已在真实项目执行 1m57s 并成功创建 dev + test 双工位（含 seed 与 test-gate.env），可作为正常路径基线；恢复路径由 AT-002 的隔离真实 git 仓库覆盖；legacy 补建路径由 AT-003 的隔离真实 git 仓库覆盖，且修复前在同一形态的隔离仓库中实测复现了 Missing required: --raw-key（RED），修复后 8/8 断言通过（GREEN）。

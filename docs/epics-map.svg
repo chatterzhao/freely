@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4286" width="800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 4304" width="800">
   <style>text { font-family: monospace; font-size: 11px; }</style>
   <rect id="epic-a2a" x="35" y="50" width="730" height="170" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
   <text x="50" y="66" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
@@ -349,7 +349,7 @@
   <text x="50" y="3354" font-size="14" font-weight="bold" fill="#7b1fa2">platform-sync</text>
   <rect id="story-close-merged" x="55" y="3364" width="690" height="18" fill="#fff" stroke="#7b1fa2" stroke-width="1" rx="2"/>
   <text x="65" y="3377" fill="#333">close-merged</text>
-  <rect id="epic-runtime" x="35" y="3390" width="730" height="692" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
+  <rect id="epic-runtime" x="35" y="3390" width="730" height="710" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
   <text x="50" y="3406" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
   <rect id="story-agent-identity-single-truth" x="55" y="3416" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="3429" fill="#333">agent-identity-single-truth</text>
@@ -425,20 +425,22 @@
   <text x="65" y="4059" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
   <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4064" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
   <text x="65" y="4077" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
-  <rect id="epic-skills" x="35" y="4090" width="730" height="44" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="4"/>
-  <text x="50" y="4106" font-size="14" font-weight="bold" fill="#f57f17">skills</text>
-  <rect id="story-skill-yaml-frontmatter" x="55" y="4116" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
-  <text x="65" y="4129" fill="#333">skill-yaml-frontmatter</text>
-  <rect id="epic-worktree-lifecycle" x="35" y="4142" width="730" height="116" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
-  <text x="50" y="4158" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
-  <rect id="story-merge-guard-issue-sync-scope" x="55" y="4168" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4181" fill="#333">merge-guard-issue-sync-scope</text>
-  <rect id="story-owner-lane" x="55" y="4186" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4199" fill="#333">owner-lane</text>
-  <rect id="story-owner-lane-claim" x="55" y="4204" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4217" fill="#333">owner-lane-claim</text>
-  <rect id="story-worktree-seed" x="55" y="4222" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4235" fill="#333">worktree-seed</text>
-  <rect id="story-wt-create-resume-test-worktree" x="55" y="4240" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4253" fill="#333">wt-create-resume-test-worktree</text>
+  <rect id="story-package-output-guard" x="55" y="4082" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4095" fill="#333">package-output-guard</text>
+  <rect id="epic-skills" x="35" y="4108" width="730" height="44" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="4"/>
+  <text x="50" y="4124" font-size="14" font-weight="bold" fill="#f57f17">skills</text>
+  <rect id="story-skill-yaml-frontmatter" x="55" y="4134" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
+  <text x="65" y="4147" fill="#333">skill-yaml-frontmatter</text>
+  <rect id="epic-worktree-lifecycle" x="35" y="4160" width="730" height="116" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
+  <text x="50" y="4176" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
+  <rect id="story-merge-guard-issue-sync-scope" x="55" y="4186" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4199" fill="#333">merge-guard-issue-sync-scope</text>
+  <rect id="story-owner-lane" x="55" y="4204" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4217" fill="#333">owner-lane</text>
+  <rect id="story-owner-lane-claim" x="55" y="4222" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4235" fill="#333">owner-lane-claim</text>
+  <rect id="story-worktree-seed" x="55" y="4240" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4253" fill="#333">worktree-seed</text>
+  <rect id="story-wt-create-resume-test-worktree" x="55" y="4258" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4271" fill="#333">wt-create-resume-test-worktree</text>
 </svg>
