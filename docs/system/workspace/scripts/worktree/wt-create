@@ -138,8 +138,27 @@ done
 
 # ── Validate new interface ───────────────────────────────
 
+# skill_path and base both carry non-empty defaults. Including skill_path in
+# the interface test made using_new unconditionally 1, so the entire legacy
+# branch below was unreachable and `wt-create <branch>` always died with
+# "Missing required: --raw-key" — despite usage promising test worktree 补建.
+# Detect the interface from flags the caller actually supplied instead.
+_new_flags_present=0
+if [[ -n "$raw_key" || -n "$source_val" || -n "$branch_kind" || -n "$slug" ]]; then
+  _new_flags_present=1
+fi
+if [[ -n "$legacy_branch" && "$_new_flags_present" -eq 1 ]]; then
+  echo "拒绝创建工位: legacy 分支名不能与 --raw-key/--source/--kind/--slug 混用" >&2
+  usage
+  exit 1
+fi
+if [[ -z "$legacy_branch" && "$_new_flags_present" -eq 0 ]]; then
+  usage
+  exit 1
+fi
+
 using_new=0
-if [[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]; then
+if [[ "$_new_flags_present" -eq 1 ]]; then
   if [[ -z "$raw_key" ]]; then
     echo "Missing required: --raw-key" >&2; usage; exit 1
   fi

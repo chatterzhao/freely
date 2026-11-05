@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Regression test: wt-create must recover from an interrupted run.
-# Usage: test-wt-create-resume-test-worktree [static|e2e|all]
+# Regression test: wt-create must recover from an interrupted run and honour
+# the legacy test-pre-merge 补建 promise advertised in its usage text.
+# Usage: test-wt-create-resume-test-worktree [static|e2e|legacy|all]
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
@@ -125,11 +126,107 @@ e2e_checks() {
   rm -rf "$TMP"
 }
 
+legacy_checks() {
+  local TMP REPO KEY SLUG DEV_BRANCH TEST_BRANCH DEV_WT TEST_WT
+  TMP="$(mktemp -d /tmp/freely-wt-legacy.XXXXXX)"
+  REPO="$TMP/repo"
+  KEY="20261105T053100Z"
+  SLUG="legacy-demo"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"
+  TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/dev-fixture"
+  TEST_WT=""
+
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" "$REPO/docs/B1-docs/raw-${KEY}" "$TMP/repo-worktrees"
+  cp "$WT_CREATE" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
+  cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init
+  printf -- '---\nphase_state: proposed\n---\n\n# fixture\n' > "$REPO/docs/B1-docs/raw-${KEY}/issue.md"
+
+  local run_cmd=(bash docs/system/workspace/scripts/worktree/wt-create "$TEST_BRANCH" --base develop)
+
+  # Without a matching dev branch, legacy 补建 must refuse instead of
+  # silently falling back to develop.
+  if ( cd "$REPO" && "${run_cmd[@]}" ) > "$TMP/reject.log" 2>&1; then
+    fail "legacy 补建 refuses when dev branch is missing"
+  else
+    pass "legacy 补建 refuses when dev branch is missing"
+  fi
+  if grep -q '不会回退到 develop' "$TMP/reject.log"; then
+    pass "legacy 补建 explicitly refuses develop fallback"
+  else
+    fail "legacy 补建 explicitly refuses develop fallback"
+  fi
+
+  # With the dev branch present, legacy 补建 must create a fully initialised
+  # test worktree based on that dev branch (not on develop).
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" worktree add -q "$DEV_WT" "$DEV_BRANCH"
+  printf 'dev-only\n' > "$DEV_WT/dev-only.txt"
+  git -C "$DEV_WT" add dev-only.txt
+  git -C "$DEV_WT" commit -q -m "dev-only baseline"
+
+  if ( cd "$REPO" && "${run_cmd[@]}" ) > "$TMP/run.log" 2>&1; then
+    pass "legacy 补建 test-pre-merge worktree exits 0"
+  else
+    fail "legacy 补建 test-pre-merge worktree exits 0 (see $(tail -1 "$TMP/run.log"))"
+  fi
+
+  if git -C "$REPO" show-ref --verify --quiet "refs/heads/${TEST_BRANCH}"; then
+    pass "legacy 补建 provisions the test-pre-merge branch"
+  else
+    fail "legacy 补建 provisions the test-pre-merge branch"
+  fi
+
+  TEST_WT="$(git -C "$REPO" worktree list --porcelain | awk -v b="refs/heads/${TEST_BRANCH}" '
+    $1=="worktree" { w=$2 }
+    $1=="branch" && $2==b { print w; exit }
+  ')"
+  if [[ -n "$TEST_WT" && -d "$TEST_WT" ]]; then
+    pass "legacy 补建 provisions the test-pre-merge worktree directory"
+  else
+    fail "legacy 补建 provisions the test-pre-merge worktree directory"
+  fi
+
+  if [[ -n "$TEST_WT" && -f "$TEST_WT/.freely/run/test-gate.env" ]] && \
+     grep -q 'TEST_STATUS="not_tested"' "$TEST_WT/.freely/run/test-gate.env"; then
+    pass "legacy 补建 fully initialises test-gate.env"
+  else
+    fail "legacy 补建 fully initialises test-gate.env"
+  fi
+
+  local dev_head test_head develop_head
+  dev_head="$(git -C "$REPO" rev-parse "$DEV_BRANCH")"
+  test_head="$(git -C "$REPO" rev-parse "$TEST_BRANCH" 2>/dev/null || true)"
+  develop_head="$(git -C "$REPO" rev-parse develop)"
+  if [[ -n "$test_head" && "$test_head" == "$dev_head" && "$dev_head" != "$develop_head" ]]; then
+    pass "legacy 补建 bases the test worktree on the dev branch, not develop"
+  else
+    fail "legacy 补建 bases the test worktree on the dev branch, not develop"
+  fi
+
+  if [[ -n "$TEST_WT" && -f "$TEST_WT/dev-only.txt" ]]; then
+    pass "legacy 补建 carries the dev-only baseline content"
+  else
+    fail "legacy 补建 carries the dev-only baseline content"
+  fi
+
+  rm -rf "$TMP"
+}
+
 case "$MODE" in
   static) static_checks ;;
   e2e) e2e_checks ;;
-  all) static_checks; e2e_checks ;;
-  *) echo "usage: $0 [static|e2e|all]" >&2; exit 2 ;;
+  legacy) legacy_checks ;;
+  all) static_checks; e2e_checks; legacy_checks ;;
+  *) echo "usage: $0 [static|e2e|legacy|all]" >&2; exit 2 ;;
 esac
 
 echo ""

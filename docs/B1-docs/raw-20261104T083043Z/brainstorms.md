@@ -34,6 +34,7 @@ created_at: 2026-11-05
 1. **幂等性缺失**：存在性检查把「部分成功」当作「重复创建」一律拒绝，没有区分「两个工位都在」与「只有 dev 在」这两种状态。
 2. **初始化逻辑内联**：test 工位的完整初始化（seed / 状态克隆 / gate 文件）只写在 Step 2 的内联代码块里，没有可复用入口，恢复路径无法复用。
 3. **帮助与实现不符**：usage :8 与 :874 声称 legacy 模式可「已有开发工位但缺 test-pre-merge 工位时补建测试工位」，但 :257-259 把 `test_pre_merge_branch` 置空，:859-861 的 legacy 分支只做一次裸 `_create_worktree "$dev_branch" "$tp_target" "$base"`，其中 `base` 默认是 `develop` 而不是对应的 dev 分支，也不会执行 seed 与 `test-gate.env` 初始化。
+4. **legacy 整体不可达（PR review 阶段实测补充）**：:141-142 的接口判定包含 `-n "$skill_path"`，而 `skill_path` 在参数解析开始就被赋了默认非空值，导致 `using_new` 恒为 1，legacy 分支一次都没有被执行过；`wt-create <branch>` 一律报 `Missing required: --raw-key` 并打印 usage。这解释了 raw issue「实测直接打印 usage」的证据，也说明第 3 点的补建代码若不先修接口判定就是 dead code。
 
 ## Brainstorm
 
@@ -61,6 +62,8 @@ created_at: 2026-11-05
 ## Decision: Option B
 
 选择 B，并在 legacy 分支中兑现帮助文本的承诺：当传入分支名匹配 `test-pre-merge-<raw-key>-<slug>` 时，推导 raw key、找到对应 dev 分支作为 base，并执行与标准模式相同的 `_init_test_worktree_state()`。这样「中断后重跑标准命令」与「显式 legacy 补建」两条路径都收敛到同一初始化真源。
+
+前置条件（由 PR review 独立审查发现并补齐）：必须先修接口判定，让位置分支名能进入 legacy 分支，否则上面这条路径不可达。修复按调用方实际传入的参数判定接口，并新增 AT-003 行为测试覆盖补建真实执行、dev 缺失时拒绝、base 不得回退 develop。
 
 不纳入本 PR 的边界：不修改 `platform-adapter.py` 的物化逻辑（key 漂移是独立缺陷，已另行记录）；不增加 trap 回滚；不改变 `wt-close` 行为；不调整超时策略。
 

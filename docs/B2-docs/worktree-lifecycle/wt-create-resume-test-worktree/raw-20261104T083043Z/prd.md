@@ -20,8 +20,17 @@
 - :302-308 与 :310-324 两道检查在部分成功时一律 exit 1。
 - test 工位初始化逻辑内联于 :748-787，无法被其他路径复用。
 - legacy 模式 :257-259 将 `test_pre_merge_branch` 置空，:859-861 仅裸建工位，base 为 `develop`。
+- 接口判定 :141-142 把**默认非空**的 `skill_path` 计入 `using_new`（`[[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]`），使该变量恒为 1。整个 legacy 分支因此不可达，`wt-create <branch>` 一律在参数校验处报 `Missing required: --raw-key` 并打印 usage——这才是「帮助声称可补建、实测直接打印 usage」的直接根因。只写补建代码而不修接口判定，补建代码就是 dead code。
 
 ## 实现方案
+
+### 0. 修复接口判定（legacy 可达的前提）
+
+不再用带默认值的变量判定接口，改为按调用方**实际传入**的参数判定：
+
+- 传入位置分支名 → legacy 模式；传入 `--raw-key/--source/--kind/--slug` 任一 → 标准模式；两者混用 → 报错；两者都无 → 打印 usage。
+- `skill_path`、`base` 有默认值，禁止参与接口判定。
+- 由 AT-003 行为测试守护：补建必须真实执行、以 dev 分支为 base、dev 缺失时拒绝且不回退 develop。
 
 ### 1. 抽出唯一初始化真源
 
@@ -71,7 +80,7 @@ usage 明确写出「标准模式可重跑恢复」「legacy 传 `test-pre-merge
 
 ## Dev-Loop Handoff
 
-- 测试先行：`docs/system/workspace/scripts/tests/test-wt-create-resume-test-worktree`，先 RED 后实现。
-- 证据落 `verification/test-evidence/AT-001-{RED,GREEN}.log`、`AT-002-{RED,GREEN}.log`。
+- 测试先行：`docs/system/workspace/scripts/tests/test-wt-create-resume-test-worktree`，先 RED 后实现；PR review 追加 AT-003 覆盖 legacy 真实行为。
+- 证据落 `verification/test-evidence/AT-001-{RED,GREEN}.log`、`AT-002-{RED,GREEN}.log`、`AT-003-{RED,GREEN}.log`。
 - 实现只改 `docs/system/workspace/scripts/worktree/wt-create` 一个运行时文件 + 新增一个测试文件 + 治理文档。
 - GREEN 后进入 test-pre-merge 工位执行 pre-tests，再走 PR 门禁。
