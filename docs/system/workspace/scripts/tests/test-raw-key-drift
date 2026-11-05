@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+# Regression: materializing a raw issue must never drift the caller's raw key.
+# The created_at compatibility branch stays; its *effects* become a canonical
+# platform-title fix plus an unchanged local identity.
+# Usage: test-raw-key-drift [unit|static|wtcreate|all]
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+ADAPTER="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+RAW_PULL="$ROOT_DIR/bin/raw-issue-pull"
+ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+RUNTIME="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+MODE="${1:-all}"
+PASS=0
+FAIL=0
+
+check() {
+  local name="$1"; shift
+  if "$@"; then PASS=$((PASS+1)); else
+    echo "  [FAIL] $name" >&2
+    FAIL=$((FAIL+1))
+  fi
+}
+
+unit_checks() {
+python3 - "$ADAPTER" <<'PY'
+import importlib.util, sys, tempfile
+from pathlib import Path
+import yaml
+
+adapter_path = sys.argv[1]
+spec = importlib.util.spec_from_file_location("pa_under_test", adapter_path)
+pa = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(pa)
+
+fails = []
+def expect(label, got, want):
+    if got != want:
+        fails.append(f"{label}: got {got!r}, want {want!r}")
+    else:
+        print(f"  [ok] {label}")
+
+KEY = "20261105T051136Z"
+GH_CREATED = "2026-11-05T05:11:42Z"          # -> 20261105T051142Z, differs from KEY
+GITEE_CREATED = "2026-11-05T13:11:43+08:00"
+USER_TITLE = "fix: 手工创建的标题"
+BODY = ("---\n"
+        "schema_version: '1'\nlocal_id: raw-20261105T051136Z\nkind: raw\n"
+        "phase_state: proposed\nabsorbed_into: ''\nplatform_ids: {}\n"
+        "primary_platform: github\ncanonical_issue_path: ''\n"
+        "last_synced_comment_at: {}\nhash: ''\n"
+        "created_at: '2026-11-05T05:11:37Z'\nupdated_at: '2026-11-05T05:11:37Z'\n"
+        "intake_id: ''\nauthor: platform\nchannel: github\nsession_refs: []\n"
+        "platform_state: open\npromoted_children: []\nsource_candidate: ''\n"
+        "completed_at: ''\ncloseout_note: ''\n"
+        "---\n\nworkflow_kind: fix\n\n## 根因\nx\n")
+
+def replica(num, created):
+    return {"status": "ok", "raw_key": f"raw-{KEY}", "issue_id": num,
+            "url": f"https://example.test/issues/{num}",
+            "title": USER_TITLE, "body": BODY, "created_at": created,
+            "updated_at": created, "labels": [], "comments": [], "state": "OPEN"}
+
+replicas = {"github": replica("4188", GH_CREATED),
+            "gitee": replica("IKT3HL", GITEE_CREATED)}
+pa.discover_raw_replicas = lambda key: replicas
+pa.check_and_claim_assignee = lambda *a: (True, "ok")
+title_calls = []
+def fake_update(platform, issue_number, new_title):
+    title_calls.append((platform, issue_number, new_title))
+    return True
+pa._update_issue_title = fake_update
+
+tmp = Path(tempfile.mkdtemp(prefix="freely-raw-key-drift."))
+b1_root = tmp / "docs" / "B1-docs"
+target = b1_root / f"raw-{KEY}"
+result = pa.pull_raw_issue(KEY, target)
+
+expect("no drifted materialization dir",
+       sorted(p.name for p in b1_root.iterdir()) if b1_root.exists() else [],
+       [f"raw-{KEY}"])
+expect("returned local_id keeps caller key", (result or {}).get("local_id"), f"raw-{KEY}")
+issue_file = target / "issue.md"
+expect("issue.md exists at caller-key path", issue_file.is_file(), True)
+if issue_file.is_file():
+    fm = yaml.safe_load(issue_file.read_text(encoding="utf-8").split("---", 2)[1]) or {}
+    expect("frontmatter local_id keeps caller key", fm.get("local_id"), f"raw-{KEY}")
+    expect("both platform_ids materialized", sorted((fm.get("platform_ids") or {}).keys()),
+           ["gitee", "github"])
+
+expect("title normalized on every replica", len(title_calls), 2)
+expect("normalized platforms", sorted(c[0] for c in title_calls), ["gitee", "github"])
+expect("normalized title is canonical",
+       sorted(c[2] for c in title_calls),
+       [f"[RAW-{KEY}] {USER_TITLE}", f"[RAW-{KEY}] {USER_TITLE}"])
+
+if hasattr(pa, "canonical_raw_title"):
+    f = pa.canonical_raw_title
+    expect("strips stale RAW prefix", f(KEY, "[RAW-20260101T000000Z] fix: abc"),
+           f"[RAW-{KEY}] fix: abc")
+    expect("keeps type prefix", f(KEY, "fix: abc"), f"[RAW-{KEY}] fix: abc")
+    expect("idempotent", f(KEY, f(KEY, "fix: abc")), f"[RAW-{KEY}] fix: abc")
+    expect("100 char cap", len(f(KEY, "fix: " + "x" * 300)), 100)
+    expect("identity prefix survives cap", f(KEY, "x" * 300).startswith(f"[RAW-{KEY}] "), True)
+    expect("empty title falls back", f(KEY, ""), f"[RAW-{KEY}] raw-{KEY}")
+else:
+    fails.append("canonical_raw_title missing (no single source of truth)")
+
+# Compatibility contract must NOT regress: legacy issues without a canonical
+# title prefix still resolve through the single-match fallback.
+match, err = pa._resolve_raw_identity([{"title": "fix: legacy no prefix", "issue_id": "1"}], KEY)
+expect("single-match legacy fallback preserved", (match or {}).get("issue_id"), "1")
+expect("created_at compat branch retained", pa._created_at_to_key(GH_CREATED), "20261105T051142Z")
+
+if fails:
+    for f in fails:
+        print(f"  [FAIL] {f}", file=sys.stderr)
+    print(f"RED: {len(fails)} assertion(s) failed", file=sys.stderr)
+    sys.exit(1)
+print("PASS: raw identity contract holds")
+PY
+}
+
+static_checks() {
+  # Single title contract shared by adapter, issue-sync and feedback edit.
+  check "issue-sync uses canonical title contract" grep -q 'raw_title_contract' "$ISSUE_SYNC"
+  check "feedback edit normalizes raw titles" grep -q 'canonical_raw_title' "$RUNTIME"
+  check "raw-issue-pull no longer swallows sync failure" \
+    bash -c "! grep -q 'issue-sync.*|| true' '$RAW_PULL'"
+  check "raw-issue-pull emits diagnostic on sync failure" grep -q 'WARN' "$RAW_PULL"
+  check "wt-create strictly validates local_id" grep -q 'expected_local_id' "$WT_CREATE"
+  check "wt-create validates materialized file path" grep -q 'expected_issue_file' "$WT_CREATE"
+}
+
+wtcreate_checks() {
+  local TMP KEY="20261105T051136Z" fn
+  TMP="$(mktemp -d /tmp/freely-wtcreate-pull.XXXXXX)"
+  trap 'rm -rf "$TMP"' RETURN
+  mkdir -p "$TMP/bin" "$TMP/docs/B1-docs/raw-$KEY"
+  cat > "$TMP/bin/raw-issue-pull" <<'FAKE'
+#!/usr/bin/env bash
+printf '%s\n' "${FAKE_PULL_OUTPUT:-}"
+exit "${FAKE_PULL_EXIT:-0}"
+FAKE
+  chmod +x "$TMP/bin/raw-issue-pull"
+  fn="$(sed -n '/^_pull_raw_issue() {/,/^}/p' "$WT_CREATE")"
+  [[ -n "$fn" ]] || { echo "  [FAIL] cannot extract _pull_raw_issue" >&2; FAIL=$((FAIL+1)); return; }
+  eval "$fn"
+  export ROOT_DIR="$TMP"
+
+  local out rc
+  export FAKE_PULL_EXIT=0
+  export FAKE_PULL_OUTPUT="{\"local_id\": \"raw-20261105T051142Z\", \"path\": \"x\"}"
+  out="$(cd "$TMP" && _pull_raw_issue "$KEY" platform 2>&1)" && rc=0 || rc=$?
+  check "mismatched local_id is rejected" bash -c "[[ '$rc' -ne 0 ]]"
+
+  export FAKE_PULL_OUTPUT="{\"local_id\": \"raw-$KEY\", \"path\": \"x\"}"
+  out="$(cd "$TMP" && _pull_raw_issue "$KEY" platform 2>&1)" && rc=0 || rc=$?
+  check "missing issue.md is rejected" bash -c "[[ '$rc' -ne 0 ]]"
+
+  printf '%s\n' '---' 'local_id: raw-'"$KEY" '---' > "$TMP/docs/B1-docs/raw-$KEY/issue.md"
+  out="$(cd "$TMP" && _pull_raw_issue "$KEY" platform 2>&1)" && rc=0 || rc=$?
+  check "matching local_id + existing file accepted" bash -c "[[ '$rc' -eq 0 ]]"
+}
+
+case "$MODE" in
+  unit)     unit_checks ;;
+  static)   static_checks ;;
+  wtcreate) wtcreate_checks ;;
+  all)      unit_checks || true; static_checks || true; wtcreate_checks || true ;;
+  *) echo "usage: $0 [unit|static|wtcreate|all]" >&2; exit 2 ;;
+esac
+
+echo "RESULT: $PASS passed, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]

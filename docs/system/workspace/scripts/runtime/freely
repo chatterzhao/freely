@@ -24966,6 +24966,20 @@ PYEOF
       ) || { log_error "failed to preserve raw metadata for edit"; return 1; }
     fi
 
+    # Keep raw platform titles conformant on edit. Single truth:
+    # sync/raw_title_contract.py, shared with issue-sync._platform_title() and
+    # platform-adapter.pull_raw_issue(). Historical issues are never rewritten
+    # — this applies only to a title the operator explicitly passes via --title.
+    if [[ -n "$has_title" && "$_issue_kind" == "raw" ]]; then
+      edit_title=$(python3 - "$SELF_ROOT/docs/system/workspace/scripts/sync" "$raw_key" "$edit_title" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+from raw_title_contract import canonical_raw_title
+print(canonical_raw_title(sys.argv[2], sys.argv[3]))
+PY
+      ) || { log_error "failed to normalize raw title"; return 1; }
+    fi
+
     # Call platform-adapter to update remote issues
     local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
     local _adapter_result _updated=0

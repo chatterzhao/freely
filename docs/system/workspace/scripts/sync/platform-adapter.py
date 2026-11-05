@@ -48,6 +48,7 @@ sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 from freely_user_env import value as freely_env_value
 from freely_config import read_config
+from raw_title_contract import canonical_raw_title, is_canonical_raw_title
 
 # ══════════════════════════════════════════════
 # Abstract PlatformHandler — new platform? subclass this.
@@ -1199,11 +1200,30 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     details = info
 
     title = info.get("title", "")
-    if not (f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title):
+    if not (is_canonical_raw_title(title, raw_key)
+            or f"raw-{raw_key}" in title
+            or f"RAW-{raw_key}" in title):
+        # Compatibility branch — KEPT ON PURPOSE. A platform-created or
+        # hand-edited title may not declare a canonical identity. Deriving the
+        # platform's own key from created_at is a *diagnostic* signal only:
+        # the caller-supplied raw_key stays the single source of local truth,
+        # so neither raw_key nor target_dir may be rewritten here.
         created_at = details.get("created_at", "")
-        if (sk := _created_at_to_key(created_at)) and sk != raw_key:
-            _update_issue_title(platform, issue_number, title.replace(f"raw-{raw_key}", f"raw-{sk}"))
-            raw_key = sk; target_dir = target_dir.parent / f"raw-{raw_key}"
+        if (suggested := _created_at_to_key(created_at)) and suggested != raw_key:
+            print(
+                f"[compat] raw-{raw_key}: platform created_at suggests raw-{suggested}; "
+                "keeping caller key as local identity",
+                file=sys.stderr,
+            )
+        canonical = canonical_raw_title(raw_key, title)
+        for plat, replica in replicas.items():
+            if replica.get("title", "") == canonical:
+                continue
+            if _update_issue_title(plat, replica["issue_id"], canonical):
+                print(f"[title] {plat}: normalized to {canonical}", file=sys.stderr)
+            else:
+                print(f"[title] WARNING {plat}: failed to normalize title to {canonical}",
+                      file=sys.stderr)
 
     target_dir.mkdir(parents=True, exist_ok=True)
     platform_ids = {p: {"issue_id": i["issue_id"], "url": i.get("url", ""), "synced_at": ""}

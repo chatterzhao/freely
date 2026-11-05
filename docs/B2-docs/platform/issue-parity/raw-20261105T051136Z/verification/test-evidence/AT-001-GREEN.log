@@ -1,0 +1,53 @@
+GREEN — raw-20261105T051136Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-raw-key-drift all
+[assignee] github: ok
+[assignee] gitee: ok
+[compat] raw-20261105T051136Z: platform created_at suggests raw-20261105T051142Z; keeping caller key as local identity
+[title] github: normalized to [RAW-20261105T051136Z] fix: 手工创建的标题
+[title] gitee: normalized to [RAW-20261105T051136Z] fix: 手工创建的标题
+  [ok] no drifted materialization dir
+  [ok] returned local_id keeps caller key
+  [ok] issue.md exists at caller-key path
+  [ok] frontmatter local_id keeps caller key
+  [ok] both platform_ids materialized
+  [ok] title normalized on every replica
+  [ok] normalized platforms
+  [ok] normalized title is canonical
+  [ok] strips stale RAW prefix
+  [ok] keeps type prefix
+  [ok] idempotent
+  [ok] 100 char cap
+  [ok] identity prefix survives cap
+  [ok] empty title falls back
+  [ok] single-match legacy fallback preserved
+  [ok] created_at compat branch retained
+PASS: raw identity contract holds
+RESULT: 9 passed, 0 failed
+AT001_EXIT=0
+
+=== degradation audit: _platform_title old vs new, 803 real B1 issue.md ===
+auditing 803 real B1 issue.md files (old vs new _platform_title contract)
+  checked=802  differences=9  unparseable=1
+   DIFF ('docs/B1-docs/raw-20260621T150316Z/issue.md', '[RAW-20260621T150316Z] [RAW-20260621T150316Z] feat: wt-create should clone develop .freely state to test-pre-m', '[RAW-20260621T150316Z] feat: wt-create should clone develop .freely state to test-pre-merge worktree')
+   DIFF ('docs/B1-docs/raw-20260621T190007Z/issue.md', '[RAW-20260621T190007Z] feat: comprehensive gate enforcement — hard block raw git ops, soft block with --reason', '[RAW-20260621T190007Z] feat: comprehensive gate enforcement — hard block raw git ops, soft block wit')
+   DIFF ('docs/B1-docs/raw-20260621T195456Z/issue.md', '[RAW-20260621T195456Z] feat: Manager prompt — persistent session note + A2A pre-check + three dispatch modes', '[RAW-20260621T195456Z] feat: Manager prompt — persistent session note + A2A pre-check + three dispat')
+   DIFF ('docs/B1-docs/raw-20260719T101009Z/issue.md', '[RAW-20260719T101009Z] → /tmp/freely-acp-xxx-opencode.sock ← Manager的opencode bridge不存在(Manager用claude)', '[RAW-20260719T101009Z] → /tmp/freely-acp-xxx-opencode.sock ← Manager的opencode bridge不存在(Manager用clau')
+   DIFF ('docs/B1-docs/raw-20261102T103216Z/issue.md', '[RAW-20261102T103216Z] [RAW-20261102T103216Z] fix: pre-push 在 ps 不可用时误拦 wt-close 的远程分支删除', '[RAW-20261102T103216Z] fix: pre-push 在 ps 不可用时误拦 wt-close 的远程分支删除')
+   DIFF ('docs/B1-docs/raw-20261102T103231Z/issue.md', '[RAW-20261102T103231Z] [RAW-20261102T103231Z] fix: owner-lane 工位 daemon 启动要求 agent_working 绑定', '[RAW-20261102T103231Z] fix: owner-lane 工位 daemon 启动要求 agent_working 绑定')
+   DIFF ('docs/B1-docs/raw-20261102T113816Z/issue.md', '[RAW-20261102T113816Z] [RAW-20261102T113816Z] fix: raw 副本门禁把读取抖动当成平台不可用（unknown/missing 未区分、无重试）', '[RAW-20261102T113816Z] fix: raw 副本门禁把读取抖动当成平台不可用（unknown/missing 未区分、无重试）')
+   DIFF ('docs/B1-docs/raw-20261102T130721Z/issue.md', '[RAW-20261102T130721Z] [RAW-20261102T130721Z] feat: 工作树种子清单（worktree seed）——声明式复制未跟踪的本地配置', '[RAW-20261102T130721Z] feat: 工作树种子清单（worktree seed）——声明式复制未跟踪的本地配置')
+   DIFF ('docs/B1-docs/raw-20261102T133249Z/issue.md', '[RAW-20261102T133249Z] [RAW-20261102T133249Z] fix: owner-lane 认领被 "当前路径≠项目" 守卫挡住，daemon 内从未执行', '[RAW-20261102T133249Z] fix: owner-lane 认领被 "当前路径≠项目" 守卫挡住，daemon 内从未执行')
+   SKIP ('docs/B1-docs/raw-20260519T145435Z/issue.md', 'ScannerError')
+
+=== related regression suite (14 tests) ===
+  12 PASS / 2 FAIL; both failures reproduce on unmodified develop HEAD b9a89fb08/71bb71c0b baseline:
+    test-command-lifecycle-wt-close.py  (asserts 'uniquely' in an error message — message drift)
+    test-wt-create-source-local         (asserts REMINDER fix/feature guidance)
+  => 0 new failures introduced by this PR
+
+=== syntax ===
+  bash -n OK bin/issue-sync
+  bash -n OK bin/raw-issue-pull
+  bash -n OK docs/system/workspace/scripts/worktree/wt-create
+  bash -n OK docs/system/workspace/scripts/runtime/freely
+  py_compile OK
