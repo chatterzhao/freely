@@ -1,0 +1,11 @@
+[FAIL] re-run after Step 1 interruption exits 0 (see wt-create: verifying configured raw replicas...
+python3: can't open file '/private/tmp/freely-wt-resume.CwICPq/repo/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py': [Errno 2] No such file or directory
+拒绝创建工位: configured raw replicas are inconsistent or unavailable)
+[FAIL] missing test-pre-merge branch was provisioned
+[FAIL] test-pre-merge worktree directory exists
+[FAIL] recovered test worktree is fully initialised (test-gate.env)
+[FAIL] second re-run is an idempotent no-op (exit 0)
+[FAIL] second re-run reports existing worktrees
+[PASS] second re-run creates no duplicate worktree (2 -> 2)
+
+RED: resume contract missing or broken (6 assertion(s) failed)

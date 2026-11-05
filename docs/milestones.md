@@ -12,6 +12,33 @@
 - milestone: M-20261104T074512Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/runtime/package-output-guard/raw-20261104T074512Z/issues/I-20261104T074512Z-A.md
+### completed_issues
+1. `I-20261104T074512Z-A`
+- milestone: M-20261104T074512Z-A
+- phase_state: completed
+- completed_at: 2026-11-05T06:30:00Z
+- issue_path: docs/B2-docs/runtime/package-output-guard/raw-20261104T074512Z/issues/I-20261104T074512Z-A.md
+
+## M-20261104T083043Z-A
+- title: fix — wt-create 中断恢复与 test-pre-merge 工位补建
+- status: active
+### candidate_issues
+1. `C-20261104T083043Z-A`
+- milestone: M-20261104T083043Z-A
+- status: promoted
+- promoted_issue_id: `I-20261104T083043Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261104T083043Z/issues/I-20261104T083043Z-A.md
+### committed_issues
+1. `I-20261104T083043Z-A`
+- milestone: M-20261104T083043Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261104T083043Z/issues/I-20261104T083043Z-A.md
+### completed_issues
+1. `I-20261104T083043Z-A`
+- milestone: M-20261104T083043Z-A
+- phase_state: completed
+- completed_at: 2026-11-05T05:30:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261104T083043Z/issues/I-20261104T083043Z-A.md
 
 ## M-20261103T124003Z-A
 - title: fix — GitHub open 列表 GraphQL 504 时 REST 回退

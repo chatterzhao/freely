@@ -1,0 +1,15 @@
+[PASS] wt-create passes bash -n
+[PASS] four-state resume machine present
+[PASS] idempotent no-op branch present
+[PASS] inconsistent-state rejection present
+[PASS] _init_test_worktree_state defined
+[PASS] initialisation helper reused by standard/resume/legacy paths (3 call sites)
+[PASS] recovery path skips replica gate
+[PASS] fuzzy-match is bypassed in recovery mode
+[PASS] legacy detects test-pre-merge branch names
+[PASS] legacy derives dev branch as base
+[PASS] legacy refuses to fall back to develop
+[PASS] usage documents re-run recovery
+[PASS] test-gate.env initialisation present
+
+PASS: wt-create resume contract holds

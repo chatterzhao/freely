@@ -1,0 +1,10 @@
+[PASS] legacy 补建 refuses when dev branch is missing
+[PASS] legacy 补建 explicitly refuses develop fallback
+[PASS] legacy 补建 test-pre-merge worktree exits 0
+[PASS] legacy 补建 provisions the test-pre-merge branch
+[PASS] legacy 补建 provisions the test-pre-merge worktree directory
+[PASS] legacy 补建 fully initialises test-gate.env
+[PASS] legacy 补建 bases the test worktree on the dev branch, not develop
+[PASS] legacy 补建 carries the dev-only baseline content
+
+PASS: wt-create resume contract holds
