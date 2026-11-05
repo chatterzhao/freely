@@ -1,0 +1,21 @@
+[assignee] github: ok
+[assignee] gitee: ok
+  [FAIL] no drifted materialization dir: got ['raw-20261105T051142Z'], want ['raw-20261105T051136Z']
+  [FAIL] returned local_id keeps caller key: got 'raw-20261105T051142Z', want 'raw-20261105T051136Z'
+  [FAIL] issue.md exists at caller-key path: got False, want True
+  [FAIL] title normalized on every replica: got 1, want 2
+  [FAIL] normalized platforms: got ['github'], want ['gitee', 'github']
+  [FAIL] normalized title is canonical: got ['fix: 手工创建的标题'], want ['[RAW-20261105T051136Z] fix: 手工创建的标题', '[RAW-20261105T051136Z] fix: 手工创建的标题']
+  [FAIL] canonical_raw_title missing (no single source of truth)
+RED: 7 assertion(s) failed
+  [ok] single-match legacy fallback preserved
+  [ok] created_at compat branch retained
+  [FAIL] issue-sync uses canonical title contract
+  [FAIL] feedback edit normalizes raw titles
+  [FAIL] raw-issue-pull no longer swallows sync failure
+  [FAIL] raw-issue-pull emits diagnostic on sync failure
+  [FAIL] wt-create strictly validates local_id
+  [FAIL] wt-create validates materialized file path
+  [FAIL] mismatched local_id is rejected
+  [FAIL] missing issue.md is rejected
+RESULT: 1 passed, 8 failed

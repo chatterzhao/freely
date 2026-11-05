@@ -1,3 +1,24 @@
+## M-20261105T051136Z-A
+- title: fix — raw 身份不漂移与平台标题达标单一真源
+- status: active
+### candidate_issues
+1. `C-20261105T051136Z-A`
+- milestone: M-20261105T051136Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T051136Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T051136Z/issues/I-20261105T051136Z-A.md
+### committed_issues
+1. `I-20261105T051136Z-A`
+- milestone: M-20261105T051136Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T051136Z/issues/I-20261105T051136Z-A.md
+### completed_issues
+1. `I-20261105T051136Z-A`
+- milestone: M-20261105T051136Z-A
+- phase_state: completed
+- completed_at: 2026-11-05T14:00:18Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T051136Z/issues/I-20261105T051136Z-A.md
+
 ## M-20261104T082740Z-A
 - title: fix — pretests-gate 字段值解析统一化，兼容行内代码并修复空值跨行错读
 - status: active

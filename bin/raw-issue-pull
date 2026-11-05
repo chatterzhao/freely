@@ -63,8 +63,21 @@ fi
 
 python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull "$raw_key" "$target"
 
-# After pull: sync to all configured platforms (fill missing platform_ids)
+# After pull: sync to all configured platforms (fill missing platform_ids,
+# and let issue-sync's _platform_title() normalize the platform title).
+# Never swallow a failure silently — the caller (wt-create) must be able to
+# diagnose an identity/title mismatch instead of reporting a false success.
 local_id="raw-${raw_key}"
-if [[ -x "$ROOT_DIR/bin/issue-sync" ]] && [[ -f "$target/issue.md" ]]; then
-  "$ROOT_DIR/bin/issue-sync" create "$local_id" 2>/dev/null || true
+if [[ -f "$target/issue.md" ]]; then
+  if [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
+    # STDOUT must remain exactly one JSON document: wt-create parses it to
+    # verify the materialized identity. Route every diagnostic to STDERR.
+    if ! "$ROOT_DIR/bin/issue-sync" create "$local_id" >&2; then
+      echo "[WARN] raw-issue-pull: issue-sync create failed for $local_id (platform title normalization may be incomplete)" >&2
+    fi
+  else
+    echo "[WARN] raw-issue-pull: $ROOT_DIR/bin/issue-sync missing; skipped title normalization for $local_id" >&2
+  fi
+else
+  echo "[WARN] raw-issue-pull: expected $target/issue.md missing; skipped issue-sync create for $local_id" >&2
 fi

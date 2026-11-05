@@ -237,11 +237,15 @@ _platform_title() {
   local kind title
   kind=$(_fm_get "$file" "kind")
   title=$(_issue_title "$file" "$local_id")
-  case "$kind" in
-    raw)    printf '[RAW-%s] %s\n' "${local_id#raw-}" "$title" ;;
-    linked) printf '[%s] %s\n' "$local_id" "$title" ;;
-    *)      printf '[%s] %s\n' "$local_id" "$title" ;;
-  esac
+  # Single source of truth shared with platform-adapter.pull_raw_issue() and
+  # `freely feedback edit --title` (see sync/raw_title_contract.py).
+  # linked/other kinds keep their historical projection unchanged.
+  python3 - "$ROOT_DIR/docs/system/workspace/scripts/sync" "$local_id" "$kind" "$title" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+from raw_title_contract import platform_title
+print(platform_title(sys.argv[2], sys.argv[3], sys.argv[4]))
+PY
 }
 
 # ── body assembly ────────────────────────────────────────

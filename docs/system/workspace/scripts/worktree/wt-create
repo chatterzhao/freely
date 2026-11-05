@@ -455,15 +455,40 @@ _run_scan_once() {
 
 _pull_raw_issue() {
   local raw_key="$1" source="$2"
+  local expected_local_id="raw-${raw_key}"
+  local expected_issue_file="$PWD/docs/B1-docs/${expected_local_id}/issue.md"
   case "$source" in
     platform)
       if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
-        local result
-        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>/dev/null || true)
-        if echo "$result" | grep -q '"local_id"'; then
-          echo "pull: materialized raw-$raw_key from platform" >&2
-          return 0
+        local result parsed_id pull_err
+        pull_err="$(mktemp /tmp/freely-raw-pull.XXXXXX)"
+        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>"$pull_err") || {
+          if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
+          rm -f "$pull_err"
+          echo "pull: raw-issue-pull failed for $expected_local_id" >&2
+          return 1
+        }
+        # Surface warnings (e.g. issue-sync normalization failure) without
+        # mixing them into the JSON document parsed below.
+        if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
+        rm -f "$pull_err"
+        parsed_id=$(printf '%s' "$result" | python3 -c '
+import json, sys
+try:
+    print(json.load(sys.stdin).get("local_id", ""))
+except Exception:
+    print("")
+' 2>/dev/null || true)
+        if [[ "$parsed_id" != "$expected_local_id" ]]; then
+          echo "pull: identity mismatch — expected $expected_local_id, got '${parsed_id:-<none>}'" >&2
+          return 1
         fi
+        if [[ ! -f "$expected_issue_file" ]]; then
+          echo "pull: expected issue file missing: $expected_issue_file" >&2
+          return 1
+        fi
+        echo "pull: materialized $expected_local_id from platform" >&2
+        return 0
       fi
       return 1
       ;;
