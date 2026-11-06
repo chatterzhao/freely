@@ -297,16 +297,48 @@ freely_wt_assert_strict_root
 # replica gate below can be skipped for recovery: the dev worktree already
 # exists, so re-verifying configured platforms only adds latency and a new
 # failure mode to the very command that is supposed to recover.
+# ── Worktree state helpers ────────────────────────────────────
+# A branch existing is NOT the same as a usable worktree: the directory may
+# have been removed (manual delete, disk cleanup, `git worktree prune`), and
+# an added test worktree may not have finished initialisation yet.
+_wt_registered_dir() {
+  local branch="$1" dir
+  dir="$(git worktree list --porcelain 2>/dev/null | awk -v b="refs/heads/$branch" '
+    $1=="worktree" { w=$2 }
+    $1=="branch" && $2==b { print w; exit }
+  ')"
+  [[ -n "$dir" && -d "$dir" ]] || return 1
+  printf '%s\n' "$dir"
+}
+
+# test-gate.env is written by _init_test_worktree_state() at the END of a
+# successful initialisation, so it doubles as the completion marker. Accept
+# any TEST_STATUS value: after a GREEN run the value is "completed", and a
+# re-run must still be recognised as fully initialised.
+_wt_test_initialized() {
+  local dir="$1" marker
+  [[ -n "$dir" && -d "$dir" ]] || return 1
+  marker="$dir/.freely/run/test-gate.env"
+  [[ -f "$marker" ]] || return 1
+  grep -q '^TEST_STATUS=' "$marker"
+}
+
 resume_mode=0
+_dev_dir=""; _test_dir=""; _test_ready=0
 if [[ "$using_new" -eq 1 ]]; then
   _dev_exists=0; _test_exists=0
   git show-ref --verify --quiet "refs/heads/$dev_branch" && _dev_exists=1 || true
   git show-ref --verify --quiet "refs/heads/$test_pre_merge_branch" && _test_exists=1 || true
+  _dev_dir="$(_wt_registered_dir "$dev_branch")" || _dev_dir=""
+  _test_dir="$(_wt_registered_dir "$test_pre_merge_branch")" || _test_dir=""
+  if _wt_test_initialized "$_test_dir"; then _test_ready=1; fi
 
-  if [[ "$_dev_exists" -eq 1 && "$_test_exists" -eq 1 ]]; then
+  # Complete state: both branches, both REGISTERED DIRECTORIES, and the test
+  # initialisation marker. Anything less is interruption residue to repair.
+  if [[ "$_dev_exists" -eq 1 && "$_test_exists" -eq 1 && -n "$_dev_dir" && -n "$_test_dir" && "$_test_ready" -eq 1 ]]; then
     echo "wt-create: 工位已存在，无需创建 (idempotent no-op)" >&2
-    echo "  dev:  $(freely_wt_resolve_target_path "$dev_branch")" >&2
-    echo "  test: $(freely_wt_resolve_target_path "$test_pre_merge_branch")" >&2
+    echo "  dev:  $_dev_dir" >&2
+    echo "  test: $_test_dir" >&2
     exit 0
   fi
   if [[ "$_dev_exists" -eq 0 && "$_test_exists" -eq 1 ]]; then
@@ -316,7 +348,10 @@ if [[ "$using_new" -eq 1 ]]; then
   fi
   if [[ "$_dev_exists" -eq 1 ]]; then
     resume_mode=1
-    echo "wt-create: 检测到中断残留 —— dev 工位已存在、test 工位缺失，进入恢复模式" >&2
+    echo "wt-create: 检测到中断残留 —— dev 分支存在但工位不完整，进入恢复模式" >&2
+    [[ -z "$_dev_dir" ]] && echo "  dev 工位目录缺失，需补建" >&2
+    [[ -z "$_test_dir" ]] && echo "  test 工位目录缺失，需补建" >&2
+    [[ "$_test_ready" -eq 0 && -n "$_test_dir" ]] && echo "  test 工位未完成初始化，需重跑初始化" >&2
   fi
 fi
 
@@ -811,20 +846,57 @@ TEST_INIT
 # issue, so re-validating platforms or syncing develop would reintroduce the
 # very network dependency that caused the interruption in the first place.
 if [[ "$resume_mode" -eq 1 ]]; then
-  tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
-  echo "=== 恢复模式: 补建缺失的 test-pre-merge 工位 ==="
-  if ! _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch"; then
-    echo "恢复失败: test 工位创建失败" >&2
-    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
-    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
-    exit 1
+  echo "=== 恢复模式: 补齐缺失的工位与初始化 ==="
+
+  # (1) dev worktree directory was removed but its branch survived.
+  #     The branch already exists, so `git worktree add` MUST NOT use -b.
+  if [[ -z "$_dev_dir" ]]; then
+    _dev_target="$(freely_wt_target_path_for_branch "$dev_branch")"
+    mkdir -p "$(freely_wt_root_dir)"
+    if ! FREELY_WT_CREATE=1 git worktree add "$_dev_target" "$dev_branch"; then
+      echo "恢复失败: dev 工位补建失败" >&2
+      exit 1
+    fi
+    _dev_dir="$_dev_target"
+    echo "  dev 工位已补建: $_dev_dir"
   fi
-  if ! _init_test_worktree_state "$tp_target"; then
-    echo "恢复失败: test 工位初始化失败" >&2
-    git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
-    git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
-    exit 1
+
+  # (2) test worktree: rebuild the directory when missing, otherwise keep
+  #     the registered one. A surviving test branch also means "no -b".
+  if [[ -z "$_test_dir" ]]; then
+    tp_target="$(freely_wt_target_path_for_branch "$test_pre_merge_branch")"
+    mkdir -p "$(freely_wt_root_dir)"
+    if [[ "$_test_exists" -eq 1 ]]; then
+      _created=0
+      FREELY_WT_CREATE=1 git worktree add "$tp_target" "$test_pre_merge_branch" && _created=1
+    else
+      _created=0
+      _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch" && _created=1
+    fi
+    if [[ "$_created" -ne 1 ]]; then
+      echo "恢复失败: test 工位创建失败" >&2
+      git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+      exit 1
+    fi
+    _test_dir="$tp_target"
+    echo "  test 工位已补建: $tp_target"
+  else
+    tp_target="$_test_dir"
   fi
+
+  # (3) A surviving test directory may be only half-initialised. The marker
+  #     is test-gate.env; re-run the SAME initialisation single source.
+  if [[ "$_test_ready" -eq 0 ]]; then
+    if ! _init_test_worktree_state "$tp_target"; then
+      echo "恢复失败: test 工位初始化失败" >&2
+      git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+      exit 1
+    fi
+    echo "  test 工位初始化已补齐"
+  fi
+
   _update_scan_state "$raw_key" "working" "$(freely_wt_resolve_target_path "$dev_branch")"
   cat <<MSG
 
