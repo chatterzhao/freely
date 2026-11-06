@@ -339,18 +339,20 @@ echo ""
 # Scans raw issue comments on all platforms. Blocks PR if any human comment
 # lacks a resolution sub-comment (adopted/discarded).
 echo "Step 2e/4: comment resolution check..."
+# Single-process scan (see quality/comment-resolution-scan.py).
+# Historically this was a find + cat + 2x grep -c loop over every raw issue
+# (~4000 subprocesses / ~188s).  The scan contract is unchanged: same file
+# set, same ^### comment- / ^#### resolution- line counts, same verdict,
+# same output lines.
 _comment_check_failed=0
-for _raw_file in $(find "$ROOT_DIR/docs/B1-docs" -maxdepth 2 -name "issue.md" -path "*/raw-*" 2>/dev/null); do
-  _raw_text="$(cat "$_raw_file")"
-  # Check for human comments without resolution
-  _unresolved=$(echo "$_raw_text" | grep -c "^### comment-" 2>/dev/null || true)
-  _resolved=$(echo "$_raw_text" | grep -c "^#### resolution-" 2>/dev/null || true)
-  if [[ "$_unresolved" -gt "$_resolved" ]]; then
-    _raw_id=$(basename "$(dirname "$_raw_file")")
-    echo "  $_raw_id: $_unresolved comments, $_resolved resolutions — $_((_unresolved - _resolved)) unresolved"
-    _comment_check_failed=1
-  fi
-done
+_COMMENT_SCAN="$ROOT_DIR/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
+if [[ -f "$_COMMENT_SCAN" ]]; then
+  python3 "$_COMMENT_SCAN" "$ROOT_DIR/docs/B1-docs" || _comment_check_failed=1
+else
+  # Fail closed: never silently skip the comment gate if the scanner is absent.
+  echo "[ERROR] comment-resolution-scan.py missing — cannot validate comment resolutions" >&2
+  _comment_check_failed=1
+fi
 if [[ "$_comment_check_failed" -eq 1 ]]; then
   cat >&2 <<COMMENT_GATE_BLOCKED
 ========================================

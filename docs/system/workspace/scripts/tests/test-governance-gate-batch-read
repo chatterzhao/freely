@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+# Regression: governance gates must be batch-read, not N+1 subprocesses.
+#
+# raw-20261106T065711Z / GitHub #4198 / Gitee IKTF7Y
+#
+# Zero-semantics-change contract (reviewed, do NOT "optimize" away):
+#  - read_repo_text view priority: staged (:path) > range (REF:path) > disk
+#  - FileNotFoundError message must stay byte-identical
+#  - path_exists = disk OR staged OR range
+#  - Step 2e comment resolution: ^### comment- vs ^#### resolution- counts
+#    over docs/B1-docs/raw-*/issue.md, unchanged verdict + unchanged message
+#  - search_raw_issue / _retry_read / remote-head caching are OUT OF SCOPE
+#
+# Modes: static | unit | equivalence | perf | all
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+QUALITY="$ROOT_DIR/docs/system/workspace/scripts/quality"
+GATE="$QUALITY/governance-merge-gate"
+PR_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-create-guarded"
+SCAN="$QUALITY/comment-resolution-scan.py"
+VIEW="$QUALITY/governance_repo_view.py"
+
+FAILED=0
+PASSED=0
+ok()   { echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad()  { echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+expect(){ local label="$1" got="$2" want="$3"
+  if [[ "$got" == "$want" ]]; then ok "$label"; else bad "$label: got '$got', want '$want'"; fi; }
+
+static_checks() {
+  echo "=== STATIC: batch-read single source present ==="
+  check "governance_repo_view.py exists" "[[ -f '$VIEW' ]]"
+  check "governance_repo_view uses git cat-file --batch" "grep -q 'cat-file' '$VIEW' && grep -q 'batch' '$VIEW'"
+  check "governance-merge-gate delegates to RepoView" "grep -q 'RepoView' '$GATE'"
+  check "governance-merge-gate no longer runs per-path git show" "! grep -q 'return git(\"show\"' '$GATE'"
+  check "comment-resolution-scan.py exists" "[[ -f '$SCAN' ]]"
+  check "pr-create-guarded no longer loops find/cat/grep per file" "! grep -q 'for _raw_file in' '$PR_CREATE'"
+  check "pr-create-guarded invokes single-process scan" "grep -q 'comment-resolution-scan.py' '$PR_CREATE'"
+  check "comment gate block message preserved" "grep -q '评论 resolution 检查未通过' '$PR_CREATE'"
+}
+
+unit_checks() {
+  echo "=== UNIT: three-view priority, missing, FileNotFoundError ==="
+  [[ -f "$VIEW" ]] || { bad "RepoView module missing (cannot run unit)"; return; }
+  python3 - "$ROOT_DIR" <<'PY'
+import sys, os, subprocess, tempfile, importlib.util, traceback
+root = sys.argv[1]
+vp = os.path.join(root, 'docs/system/workspace/scripts/quality/governance_repo_view.py')
+spec = importlib.util.spec_from_file_location('grv_under_test', vp)
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+
+tmp = tempfile.mkdtemp(prefix='freely-repoview-')
+def run(*a):
+    return subprocess.run(a, cwd=tmp, capture_output=True, text=True)
+run('git','init','-q','-b','develop')
+run('git','config','user.name','t'); run('git','config','user.email','t@t')
+os.makedirs(os.path.join(tmp,'docs'), exist_ok=True)
+p = os.path.join(tmp,'docs','view.md')
+open(p,'w').write('BASE\n')
+run('git','add','.'); run('git','commit','-q','-m','base')
+base = run('git','rev-parse','HEAD').stdout.strip()
+open(p,'w').write('RANGE\n')
+run('git','add','.'); run('git','commit','-q','-m','range')
+rng = run('git','rev-parse','HEAD').stdout.strip()
+open(p,'w').write('DISK\n')
+run('git','add','docs/view.md')               # index = STAGED
+# now: disk=DISK, index(:path)=? , range(rng:path)=RANGE
+# set staged content explicitly
+open(p,'w').write('STAGED\n'); run('git','add','docs/view.md')
+open(p,'w').write('DISK\n')                    # worktree differs from index
+
+fails=[]
+def eq(label, got, want):
+    if got != want: fails.append(f'{label}: got {got!r}, want {want!r}')
+
+v = m.RepoView(tmp)
+# direct spec reads
+eq('staged spec read', v.read_text(':docs/view.md'), 'STAGED\n')
+eq('range spec read',  v.read_text(f'{rng}:docs/view.md'), 'RANGE\n')
+eq('missing spec -> None', v.peek(':docs/__nope__.md'), None)
+eq('staged_path_exists', v.staged_path_exists('docs/view.md'), True)
+eq('range_path_exists',  v.range_path_exists('docs/view.md', rng), True)
+eq('missing staged_path_exists', v.staged_path_exists('docs/__nope__.md'), False)
+eq('missing range_path_exists',  v.range_path_exists('docs/__nope__.md', rng), False)
+
+# gate-level delegation: staged > range > disk
+import importlib.util as iu
+from importlib.machinery import SourceFileLoader
+gp = os.path.join(root, 'docs/system/workspace/scripts/quality/governance-merge-gate')
+gs = iu.spec_from_loader('gmg_under_test', SourceFileLoader('gmg_under_test', gp))
+g = iu.module_from_spec(gs); gs.loader.exec_module(g)
+g.ROOT_DIR = tmp
+g.USE_STAGED_VIEW = True; g.USE_RANGE_VIEW = True; g.RANGE_SOURCE_REF = rng
+g._REPO_VIEW = m.RepoView(tmp)
+eq('read_repo_text staged wins', g.read_repo_text('docs/view.md'), 'STAGED\n')
+g.USE_STAGED_VIEW = False
+eq('read_repo_text range wins over disk', g.read_repo_text('docs/view.md'), 'RANGE\n')
+g.USE_RANGE_VIEW = False
+eq('read_repo_text falls back to disk', g.read_repo_text('docs/view.md'), 'DISK\n')
+eq('path_exists disk', g.path_exists('docs/view.md'), True)
+eq('path_exists missing', g.path_exists('docs/__nope__.md'), False)
+try:
+    g.read_repo_text('docs/__nope__.md')
+    fails.append('FileNotFoundError not raised')
+except FileNotFoundError as e:
+    eq('FileNotFoundError message', str(e),
+       'cannot read docs/__nope__.md: not on disk, not in staged view, not in range view')
+try:
+    g._REPO_VIEW.close()
+except Exception:
+    pass
+print('UNIT_RESULT:', 'PASS' if not fails else 'FAIL')
+for f in fails: print('  [FAIL]', f)
+sys.exit(1 if fails else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "three-view priority / FileNotFoundError / path_exists"; else bad "unit contract (see output above)"; fi
+}
+
+equivalence_checks() {
+  echo "=== EQUIVALENCE: count + byte parity on real corpus ==="
+  python3 - "$ROOT_DIR" <<'PY'
+import sys, subprocess, re, random
+from pathlib import Path
+root = Path(sys.argv[1])
+files = subprocess.run(['find','docs/B1-docs','-maxdepth','2','-name','issue.md','-path','*/raw-*'],
+                       cwd=root, capture_output=True, text=True).stdout.split()
+pu = re.compile(r'^### comment-'); pr = re.compile(r'^#### resolution-')
+mismatches = []
+for f in files:
+    t = (root/f).read_text(encoding='utf-8', errors='replace').splitlines()
+    a = (sum(1 for l in t if pu.match(l)), sum(1 for l in t if pr.match(l)))
+    b = (sum(1 for l in t if l.startswith('### comment-')),
+         sum(1 for l in t if l.startswith('#### resolution-')))
+    if a != b: mismatches.append((f,a,b))
+print(f'  corpus: {len(files)} files; regex-vs-startswith mismatches = {len(mismatches)}')
+# real grep spot check
+random.seed(7); sample = random.sample(files, min(15,len(files))); gdiff=0
+for f in sample:
+    txt = (root/f).read_text(encoding='utf-8', errors='replace')
+    for pat, rgx in (('^### comment-',pu), ('^#### resolution-',pr)):
+        g = subprocess.run(['grep','-c',pat], input=txt, capture_output=True, text=True).stdout.strip() or '0'
+        if int(g) != sum(1 for l in txt.splitlines() if rgx.match(l)): gdiff += 1
+print(f'  real grep spot-check mismatches = {gdiff}')
+# git show vs batch byte parity
+def sh(*a): return subprocess.run(list(a), cwd=root, capture_output=True).stdout
+def batch(spec):
+    p = subprocess.run(['git','cat-file','--batch'], cwd=root,
+                       input=(spec+'\n').encode(), capture_output=True)
+    out=p.stdout; nl=out.find(b'\n'); hdr=out[:nl].decode('utf-8','replace')
+    if hdr.endswith('missing'): return None
+    n=int(hdr.split()[2]); return out[nl+1:nl+1+n]
+for spec, cmd in ((':docs/milestones.md',['git','show',':docs/milestones.md']),
+                  ('82cd1e8de:docs/milestones.md',['git','show','82cd1e8de:docs/milestones.md'])):
+    print(f'  byte parity {spec}: {sh(*cmd) == batch(spec)}')
+PY
+}
+
+perf_checks() {
+  echo "=== PERF: single-process scan + gate subprocess count ==="
+  [[ -f "$SCAN" ]] || { bad "comment-resolution-scan.py missing (cannot time)"; return; }
+  # Measure the scan ALGORITHM in-process, separate from interpreter startup.
+  # The IDE's brokered-bin shim adds ~3.5s to every `python3` launch here;
+  # that is environment overhead, not the gate's cost (baseline Step 2e was
+  # ~188s with ~4000 subprocesses).
+  python3 - "$ROOT_DIR" <<'PY'
+import sys, os, time, importlib.util
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+root=sys.argv[1]
+sp=os.path.join(root,'docs/system/workspace/scripts/quality/comment-resolution-scan.py')
+s=importlib.util.spec_from_loader('crs_perf',SourceFileLoader('crs_perf',sp))
+m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+b1=Path(root)/'docs/B1-docs'
+ts=[]
+for _ in range(3):
+    t=time.perf_counter(); out=m.scan(b1); ts.append(time.perf_counter()-t)
+best=min(ts)
+# Separate the ALGORITHM from unavoidable per-file open() I/O.  On this
+# machine the IDE's brokered-bin shim adds ~4.4ms per open: 804 files ~= 3.5s.
+# That is environment overhead, NOT process fan-out (baseline was ~4000
+# subprocesses / ~188s).  Pure counting over the same buffered text is ~3ms.
+files=sorted(b1.glob('raw-*/issue.md'))
+texts=[f.read_text(encoding='utf-8',errors='replace') for f in files]
+t=time.perf_counter()
+counts=[(sum(1 for l in x.splitlines() if l.startswith('### comment-')),
+         sum(1 for l in x.splitlines() if l.startswith('#### resolution-'))) for x in texts]
+pure=time.perf_counter()-t
+print(f'  Step 2e full scan: {best:.3f}s ({len(files)} files, {sum(len(x) for x in texts)} bytes)')
+print(f'  Step 2e pure counting (I/O excluded): {pure:.3f}s')
+print(f'  baseline: ~188s / ~4000 subprocesses -> {(188.0/best):.1f}x faster')
+# Contract: no subprocess fan-out (full scan < 15s even under the shim),
+# and the counting algorithm itself stays sub-second.
+ok_perf = best < 15.0 and pure < 1.0
+print('  PERF_SCAN_RESULT:', 'PASS' if ok_perf else 'FAIL')
+sys.exit(0 if ok_perf else 1)
+PY
+  if [[ $? -eq 0 ]]; then ok "Step 2e no process fan-out (algorithm <1s, full scan <15s)"; else bad "Step 2e perf contract"; fi
+  [[ -f "$VIEW" ]] || { bad "RepoView missing (cannot count subprocesses)"; return; }
+  local n
+  n=$(python3 - "$ROOT_DIR" <<'PY'
+import sys, os, importlib.util
+from importlib.machinery import SourceFileLoader
+root=sys.argv[1]
+gp=os.path.join(root,'docs/system/workspace/scripts/quality/governance-merge-gate')
+s=importlib.util.spec_from_loader('gmg_count',SourceFileLoader('gmg_count',gp))
+g=importlib.util.module_from_spec(s); s.loader.exec_module(g)
+calls=[0]
+orig=g.subprocess.run
+def counting(*a,**k):
+    calls[0]+=1
+    return orig(*a,**k)
+g.subprocess.run=counting
+orig_co=g.subprocess.check_output
+def counting_co(*a,**k):
+    calls[0]+=1
+    return orig_co(*a,**k)
+g.subprocess.check_output=counting_co
+try:
+    g.USE_RANGE_VIEW=True; g.RANGE_SOURCE_REF='82cd1e8de'
+    g.build_issue_index(changed_paths=set())
+except Exception as e:
+    print('ERR',e,file=sys.stderr)
+print(calls[0])
+PY
+)
+  echo "  build_issue_index git subprocesses: $n (baseline 3423)"
+  check "git subprocesses under 25" "[[ '$n' =~ ^[0-9]+$ ]] && [[ '$n' -lt 25 ]]"
+}
+
+case "${1:-all}" in
+  static)      static_checks ;;
+  unit)        unit_checks ;;
+  equivalence) equivalence_checks ;;
+  perf)        perf_checks ;;
+  all)         static_checks; unit_checks; equivalence_checks; perf_checks ;;
+  *) echo "usage: $0 [static|unit|equivalence|perf|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$FAILED" -eq 0 ]]; then
+  echo "PASS: $PASSED checks, 0 failed"
+  exit 0
+fi
+echo "FAIL: $FAILED of $((PASSED+FAILED)) checks failed"
+exit 1
