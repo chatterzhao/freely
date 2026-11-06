@@ -48,7 +48,8 @@ sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 from freely_user_env import value as freely_env_value
 from freely_config import read_config
-from raw_title_contract import canonical_raw_title, is_canonical_raw_title
+from raw_title_contract import (canonical_raw_title, is_canonical_raw_title,
+                               local_heading_title)
 
 # ══════════════════════════════════════════════
 # Abstract PlatformHandler — new platform? subclass this.
@@ -1260,7 +1261,20 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
               "created_at": details.get("created_at", ""), "updated_at": details.get("updated_at", ""),
               "intake_id": "", "author": "platform", "channel": platform, "session_refs": []}
     fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
-    (target_dir / "issue.md").write_text(f"---\n{fm_str}\n---\n\n{body}\n", encoding="utf-8")
+    # Materialization must carry an H1: raw-reconciliation-gate derives the
+    # LOCAL title from the first '# ' line, and _platform_title()/_issue_title()
+    # fall back to the same heading. Without it every first PR of a new raw
+    # issue is blocked with content_diverged. The H1 is the human part of the
+    # canonical platform title (via the shared contract), and is idempotent:
+    # a body that already declares a heading keeps exactly that one.
+    if re.search(r"^#[ \t]+\S", body, re.MULTILINE):
+        rendered_body = body.strip()
+    else:
+        heading = local_heading_title(raw_key, title)
+        rendered_body = f"# {heading}\n\n{body.strip()}" if body.strip() else f"# {heading}"
+    (target_dir / "issue.md").write_text(
+        f"---\n{fm_str}\n---\n\n{rendered_body}\n", encoding="utf-8"
+    )
     return {"path": str(target_dir / "issue.md"), "local_id": f"raw-{raw_key}",
             "platform": platform, "issue_number": issue_number, "platform_ids": platform_ids}
 

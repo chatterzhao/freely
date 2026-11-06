@@ -1,3 +1,24 @@
+## M-20261104T082542Z-A
+- title: fix — raw-issue-pull 物化时写入达标 H1，提供安全回填命令
+- status: active
+### candidate_issues
+1. `C-20261104T082542Z-A`
+- milestone: M-20261104T082542Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T082542Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261104T082542Z/issues/I-20261104T082542Z-A.md
+### committed_issues
+1. `I-20261104T082542Z-A`
+- milestone: M-20261104T082542Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261104T082542Z/issues/I-20261104T082542Z-A.md
+### completed_issues
+1. `I-20261104T082542Z-A`
+- milestone: M-20261104T082542Z-A
+- phase_state: completed
+- completed_at: 2026-11-06T08:25:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261104T082542Z/issues/I-20261104T082542Z-A.md
+
 ## M-20261106T065711Z-A
 - title: perf — 批量化治理门禁读取，消除 N+1 子进程开销
 - status: active

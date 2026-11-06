@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# Regression: raw-20261104T082542Z / GitHub #4181 / Gitee IKSWR8
+#
+# raw-issue-pull must write an H1 heading into the materialized issue.md.
+# Zero-semantics-change boundaries:
+#  - reuse raw_title_contract (Q2 single truth), never duplicate prefix logic
+#  - H1 must be the platform title WITHOUT the [RAW-<key>] identity prefix
+#    (raw-reconciliation-gate._local_record extracts the H1 as local title;
+#     canonical_projection strips the same prefix from the platform title)
+#  - idempotent: an existing H1 must not be duplicated (18 historical raws
+#    already carry more than one H1)
+#  - backfill command is dry-run by default and never invents a title
+#  - Q2 compatibility branch, _resolve_raw_identity fallback and
+#    _platform_title auto-normalization must stay intact
+#
+# Modes: unit | static | backfill | all
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+SYNC="$ROOT_DIR/docs/system/workspace/scripts/sync"
+QUALITY="$ROOT_DIR/docs/system/workspace/scripts/quality"
+ADAPTER="$SYNC/platform-adapter.py"
+CONTRACT="$SYNC/raw_title_contract.py"
+BACKFILL="$ROOT_DIR/bin/raw-issue-backfill-h1"
+
+FAILED=0; PASSED=0
+ok(){ echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad(){ echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+
+unit_checks() {
+  echo "=== UNIT: pull_raw_issue writes one conformant H1 ==="
+  python3 - "$ROOT_DIR" <<'PY'
+import sys, os, tempfile, importlib.util, json, shutil
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+root=Path(sys.argv[1])
+fails=[]
+def eq(label, got, want):
+    if got!=want: fails.append(f'{label}: got {got!r}, want {want!r}')
+def truthy(label, v):
+    if not v: fails.append(f'{label}: falsy')
+
+ap=root/'docs/system/workspace/scripts/sync/platform-adapter.py'
+spec=importlib.util.spec_from_loader('pa_h1',SourceFileLoader('pa_h1',str(ap)))
+pa=importlib.util.module_from_spec(spec); sys.modules['pa_h1']=pa; spec.loader.exec_module(pa)
+
+KEY='20261104T082542Z'
+TITLE=f'[RAW-{KEY}] fix: raw-issue-pull 物化后不写一级标题'
+FM = ("---\n"
+      "schema_version: '1'\nlocal_id: raw-"+KEY+"\nkind: raw\nphase_state: proposed\n"
+      "absorbed_into: ''\nplatform_ids: {}\nprimary_platform: github\n"
+      "canonical_issue_path: ''\nlast_synced_comment_at: {}\nhash: ''\n"
+      "created_at: '2026-11-04T08:25:42Z'\nupdated_at: '2026-11-04T08:25:42Z'\n"
+      "intake_id: ''\nauthor: platform\nchannel: github\nsession_refs: []\n"
+      "platform_state: open\npromoted_children: []\nsource_candidate: ''\n"
+      "completed_at: ''\ncloseout_note: ''\n---\n\n")
+BODY = FM + 'workflow_kind: fix\n\n## 根因\nx\n'
+
+# Stub platform I/O: keep every other code path real.
+pa.discover_raw_replicas=lambda k: {
+    'github': {'status':'ok','issue_id':'4181','title':TITLE,'body':BODY,
+               'created_at':'2026-11-04T08:25:42Z','updated_at':'2026-11-04T08:25:42Z',
+               'labels':[],'url':'https://github.com/x/y/issues/4181','state':'OPEN'},
+    'gitee':  {'status':'ok','issue_id':'IKSWR8','title':TITLE,'body':BODY,
+               'created_at':'2026-11-04T08:25:42Z','updated_at':'2026-11-04T08:25:42Z',
+               'labels':[],'url':'https://gitee.com/x/y/issues/IKSWR8','state':'OPEN'},
+}
+pa.check_and_claim_assignee=lambda p,i,who: (True,'ok')
+pa._update_issue_title=lambda p,i,t: True
+
+tmp=Path(tempfile.mkdtemp(prefix='freely-h1-'))
+try:
+    target=tmp/'docs'/'B1-docs'/f'raw-{KEY}'
+    result=pa.pull_raw_issue(KEY,target)
+    truthy('pull returns a result', result)
+    text=(target/'issue.md').read_text(encoding='utf-8')
+    import re
+    hs=re.findall(r'^#\s+(.+)$',text,re.MULTILINE)
+    eq('exactly one H1',len(hs),1)
+    if hs:
+        eq('H1 has no RAW prefix',hs[0],'fix: raw-issue-pull 物化后不写一级标题')
+        truthy('H1 follows frontmatter',text.find('---\n',4) < text.find('# '+hs[0]))
+    eq('workflow_kind preserved','workflow_kind: fix' in text,True)
+    eq('raw_key unchanged in local_id',f'local_id: raw-{KEY}' in text,True)
+
+    # Idempotence: re-pull into the SAME dir must not duplicate the H1
+    result2=pa.pull_raw_issue(KEY,target)
+    text2=(target/'issue.md').read_text(encoding='utf-8')
+    hs2=re.findall(r'^#\s+(.+)$',text2,re.MULTILINE)
+    eq('re-pull still exactly one H1',len(hs2),1)
+
+    # Body without a canonical prefix: Q2 compat branch must stay, H1 must
+    # still be conformant and local identity must not drift.
+    TITLE_NONCANON='fix: hand edited title without identity'
+    pa.discover_raw_replicas=lambda k: {
+        'github': {'status':'ok','issue_id':'4181','title':TITLE_NONCANON,'body':BODY,
+                   'created_at':'2026-11-04T08:25:42Z','updated_at':'2026-11-04T08:25:42Z',
+                   'labels':[],'url':'u','state':'OPEN'},
+    }
+    t2=tmp/'docs'/'B1-docs'/f'raw-{KEY}-nc'
+    r2=pa.pull_raw_issue(KEY,t2)
+    txt2=(t2/'issue.md').read_text(encoding='utf-8')
+    hs3=re.findall(r'^#\s+(.+)$',txt2,re.MULTILINE)
+    eq('non-canonical title: one H1',len(hs3),1)
+    if hs3: eq('non-canonical H1 still human-only',hs3[0],TITLE_NONCANON)
+    eq('non-canonical: local identity unchanged',f'local_id: raw-{KEY}' in txt2,True)
+    # Q2 regression guard: a title without canonical identity must NOT produce
+    # a created_at-derived sibling directory (the historical drift symptom).
+    drift=[p.name for p in t2.parent.glob('raw-*') if p.name not in
+           (f'raw-{KEY}', f'raw-{KEY}-nc')]
+    eq('non-canonical: no created_at drift dir', drift, [])
+
+    # Historical non-standard raw keys ('20260501', '20260503-0000',
+    # 'MIGRATED') are not matched by the Q2 _STALE_PREFIX timestamp regex.
+    # The H1 must still be prefix-free and single-line for every one of them.
+    import importlib.util as iu2
+    cp=root/'docs/system/workspace/scripts/sync/raw_title_contract.py'
+    cs=iu2.spec_from_loader('rtc_nonstd',SourceFileLoader('rtc_nonstd',str(cp)))
+    c=iu2.module_from_spec(cs); cs.loader.exec_module(c)
+    for nk in ('20260501','20260503','20260503-0000','MIGRATED'):
+        h=c.local_heading_title(nk, f'[RAW-{nk}] fix: sample')
+        eq(f'non-standard key {nk}: prefix-free H1', h, 'fix: sample')
+finally:
+    shutil.rmtree(tmp,ignore_errors=True)
+print('UNIT_RESULT:','PASS' if not fails else 'FAIL')
+for f in fails: print('  [FAIL]',f)
+sys.exit(1 if fails else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "materialize writes one H1, idempotent, Q2 compat preserved"; else bad "unit contract (see above)"; fi
+}
+
+static_checks() {
+  echo "=== STATIC: single truth + backfill command ==="
+  check "raw_title_contract exports local heading helper" "grep -q 'def local_heading_title' '$CONTRACT'"
+  check "platform-adapter reuses the contract for H1" "grep -q 'local_heading_title' '$ADAPTER'"
+  check "backfill command exists" "[[ -f '$BACKFILL' ]]"
+  check "backfill defaults to dry-run" "grep -q -- '--apply' '$BACKFILL' && grep -q 'DRY-RUN' '$BACKFILL'"
+  check "Q2 canonical_raw_title unchanged" "grep -q 'def canonical_raw_title' '$CONTRACT'"
+  check "Q2 is_canonical_raw_title unchanged" "grep -q 'def is_canonical_raw_title' '$CONTRACT'"
+  check "Q2 platform_title unchanged" "grep -q 'def platform_title' '$CONTRACT'"
+  check "Q2 compat branch still present" "grep -q 'Compatibility branch' '$ADAPTER'"
+  check "Q2 identity fallback still present" "grep -q '_resolve_raw_identity' '$ADAPTER'"
+}
+
+backfill_checks() {
+  echo "=== BACKFILL: dry-run never writes, --apply is idempotent ==="
+  [[ -f "$BACKFILL" ]] || { bad "backfill command missing"; return; }
+  T=$(mktemp -d /tmp/freely-backfill.XXXXXX)
+  mkdir -p "$T/docs/B1-docs/raw-AAA" "$T/docs/B1-docs/raw-BBB" "$T/docs/B1-docs/raw-CCC"
+  cat > "$T/docs/B1-docs/raw-AAA/issue.md" <<'EOF'
+---
+schema_version: '1'
+local_id: raw-AAA
+kind: raw
+---
+
+workflow_kind: fix
+EOF
+  cat > "$T/docs/B1-docs/raw-BBB/issue.md" <<'EOF'
+---
+schema_version: '1'
+local_id: raw-BBB
+kind: raw
+---
+
+# fix: already has a heading
+workflow_kind: fix
+EOF
+  cat > "$T/docs/B1-docs/raw-CCC/issue.md" <<'EOF'
+---
+schema_version: '1'
+local_id: raw-CCC
+kind: raw
+issue_title: 'fix: title from frontmatter'
+---
+
+workflow_kind: fix
+EOF
+  cp "$T/docs/B1-docs/raw-AAA/issue.md" "$T/a.before"
+  cp "$T/docs/B1-docs/raw-BBB/issue.md" "$T/b.before"
+  cp "$T/docs/B1-docs/raw-CCC/issue.md" "$T/c.before"
+  python3 "$BACKFILL" --project "$T" --no-platform > "$T/dry.out" 2>&1; RC=$?
+  echo "  dry-run exit=$RC"
+  check "dry-run exits 0" "[[ '$RC' -eq 0 ]]"
+  check "dry-run did not change any file" "cmp -s '$T/a.before' '$T/docs/B1-docs/raw-AAA/issue.md' && cmp -s '$T/b.before' '$T/docs/B1-docs/raw-BBB/issue.md' && cmp -s '$T/c.before' '$T/docs/B1-docs/raw-CCC/issue.md'"
+  check "dry-run lists the missing-H1 raw" "grep -q 'raw-AAA' '$T/dry.out'"
+  check "dry-run does not touch existing H1" "! grep -q '^APPLY.*raw-BBB' '$T/dry.out'"
+  python3 "$BACKFILL" --project "$T" --apply --no-platform > "$T/apply.out" 2>&1; echo "  apply exit=$?"
+  check "apply wrote H1 where title source exists" "grep -q '^# fix: title from frontmatter' '$T/docs/B1-docs/raw-CCC/issue.md'"
+  check "apply skipped H1-less file with no title source" "! grep -q '^# ' '$T/docs/B1-docs/raw-AAA/issue.md'"
+  check "apply left existing H1 untouched" "cmp -s '$T/b.before' '$T/docs/B1-docs/raw-BBB/issue.md'"
+  python3 "$BACKFILL" --project "$T" --apply --no-platform > "$T/apply2.out" 2>&1
+  cp "$T/docs/B1-docs/raw-CCC/issue.md" "$T/c.apply1"
+  check "second apply is idempotent" "! grep -q 'raw-CCC' '$T/apply2.out'"
+  rm -rf "$T"
+}
+
+case "${1:-all}" in
+  unit)     unit_checks ;;
+  static)   static_checks ;;
+  backfill) backfill_checks ;;
+  all)      unit_checks; static_checks; backfill_checks ;;
+  *) echo "usage: $0 [unit|static|backfill|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$FAILED" -eq 0 ]]; then echo "PASS: $PASSED checks, 0 failed"; exit 0; fi
+echo "FAIL: $FAILED of $((PASSED+FAILED)) checks failed"
+exit 1

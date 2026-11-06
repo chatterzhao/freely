@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""One-shot, dry-run-first backfill of H1 headings in local raw issue files.
+
+Context: ``raw-issue-pull`` historically wrote frontmatter + body without a
+``# <title>`` line. 700 local raw issues are affected. This command reports
+(and, only with ``--apply``, repairs) them.
+
+Safety contract (deliberately conservative):
+  * default is DRY-RUN: never writes anything, exits 0
+  * NEVER invents a title. A heading is written only when a trustworthy
+    source exists: the ``issue_title`` frontmatter field, or a platform
+    replica title resolved via ``platform-adapter`` (with the canonical
+    ``[RAW-<key>]`` prefix stripped by the shared contract).
+  * files that already carry an H1 are left byte-for-byte untouched
+    (18 historical raws carry more than one H1 — do not "fix" them here)
+  * ``--apply`` is explicit, idempotent, and only inserts one line; the
+    frontmatter and the rest of the body are preserved verbatim
+  * rewrites are atomic (temp file + os.replace) to avoid partial writes
+
+Usage:
+  ./bin/raw-issue-backfill-h1 --project <root>              # dry-run
+  ./bin/raw-issue-backfill-h1 --project <root> --apply      # repair
+  ./bin/raw-issue-backfill-h1 --project <root> --no-platform
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import sys
+import tempfile
+from pathlib import Path
+
+H1 = re.compile(r"^#[ \t]+\S", re.MULTILINE)
+
+
+def _import_contract(project: Path):
+    """Load the shared title contract from this command's own project.
+
+    ``--project`` may point at a minimal/isolated tree that only contains
+    ``docs/B1-docs`` (regression fixtures, partial checkouts). The contract is
+    part of THIS freely installation, so fall back to the script's own root
+    when the target project does not carry it.
+    """
+    own_sync = Path(__file__).resolve().parent.parent / "docs/system/workspace/scripts/sync"
+    target_sync = project / "docs/system/workspace/scripts/sync"
+    for candidate in (target_sync, own_sync):
+        if (candidate / "raw_title_contract.py").is_file():
+            sys.path.insert(0, str(candidate))
+            break
+    import raw_title_contract  # noqa: F401
+    return raw_title_contract
+
+
+def _split_frontmatter(text: str):
+    """Return (frontmatter_block, body) preserving the original separators."""
+    if not text.startswith("---"):
+        return None, text
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return None, text
+    return parts[1], parts[2]
+
+
+def _frontmatter_title(fm_block: str) -> str:
+    try:
+        import yaml
+        yaml.SafeLoader.yaml_implicit_resolvers.pop("tag:yaml.org,2002:timestamp", None)
+        data = yaml.safe_load(fm_block) or {}
+        value = data.get("issue_title") if isinstance(data, dict) else None
+        return str(value).strip() if value and str(value).strip() != "None" else ""
+    except Exception:
+        return ""
+
+
+def _platform_title(project: Path, raw_key: str) -> str:
+    """Resolve a trustworthy title from configured platform replicas."""
+    try:
+        import importlib.util
+        from importlib.machinery import SourceFileLoader
+        ap = project / "docs/system/workspace/scripts/sync/platform-adapter.py"
+        spec = importlib.util.spec_from_loader(
+            "pa_backfill", SourceFileLoader("pa_backfill", str(ap)))
+        pa = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(pa)
+        os.environ.setdefault("FREELY_PROJECT_ROOT", str(project))
+        replicas = pa.discover_raw_replicas(raw_key)
+        for info in replicas.values():
+            if info.get("status") == "ok" and str(info.get("title", "")).strip():
+                return str(info["title"]).strip()
+    except Exception:
+        pass
+    return ""
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--project", default=".", help="project root (default: cwd)")
+    parser.add_argument("--apply", action="store_true", help="actually write H1 lines (default: dry-run)")
+    parser.add_argument("--no-platform", action="store_true", help="do not query platforms; use frontmatter only")
+    args = parser.parse_args()
+    project = Path(args.project).resolve()
+    b1 = project / "docs" / "B1-docs"
+    if not b1.is_dir():
+        print(f"[ERROR] not a freely project: {b1} missing", file=sys.stderr)
+        return 2
+    contract = _import_contract(project)
+
+    candidates = []
+    for issue in sorted(b1.glob("raw-*/issue.md")):
+        text = issue.read_text(encoding="utf-8", errors="replace")
+        fm_block, body = _split_frontmatter(text)
+        if fm_block is None:
+            print(f"SKIP no-frontmatter {issue.relative_to(project)}")
+            continue
+        if H1.search(body):
+            continue  # already has a heading — never touch, even if malformed
+        raw_key = issue.parent.name[4:]
+        title = _frontmatter_title(fm_block)
+        if not title and not args.no_platform:
+            title = _platform_title(project, raw_key)
+        heading = contract.local_heading_title(raw_key, title) if title else ""
+        candidates.append((issue, fm_block, body, raw_key, heading))
+
+    print(f"[backfill] mode={'APPLY' if args.apply else 'DRY-RUN'}  scanned={len(list(b1.glob('raw-*/issue.md')))}  missing_h1={len(candidates)}")
+    applied = skipped = 0
+    for issue, fm_block, body, raw_key, heading in candidates:
+        if not heading:
+            print(f"SKIP no-title-source {issue.relative_to(project)}")
+            skipped += 1
+            continue
+        prefix = f"APPLY {issue.relative_to(project)} <- # {heading}"
+        if not args.apply:
+            print(f"WOULD {prefix}")
+            continue
+        # Idempotent re-check in case the file changed during this run.
+        current = issue.read_text(encoding="utf-8", errors="replace")
+        _, current_body = _split_frontmatter(current)
+        if H1.search(current_body):
+            print(f"SKIP already-h1 {issue.relative_to(project)}")
+            continue
+        new_text = f"---{fm_block}---\n\n# {heading}\n\n{current_body.lstrip()}"
+        fd, tmp = tempfile.mkstemp(prefix=".issue-h1-", dir=issue.parent)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(new_text)
+            os.replace(tmp, issue)
+        except Exception:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
+        print(prefix)
+        applied += 1
+    print(f"[backfill] applied={applied} skipped_no_title={skipped} dry_run={not args.apply}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
