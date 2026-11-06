@@ -1,0 +1,68 @@
+GREEN — raw-20261104T082542Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-materialize-h1 all
+=== UNIT: pull_raw_issue writes one conformant H1 ===
+[assignee] github: ok
+[assignee] gitee: ok
+[assignee] github: ok
+[assignee] gitee: ok
+[assignee] github: ok
+[title] github: normalized to [RAW-20261104T082542Z] fix: hand edited title without identity
+UNIT_RESULT: PASS
+  [ok] materialize writes one H1, idempotent, Q2 compat preserved
+=== STATIC: single truth + backfill command ===
+  [ok] raw_title_contract exports local heading helper
+  [ok] platform-adapter reuses the contract for H1
+  [ok] backfill command exists
+  [ok] backfill defaults to dry-run
+  [ok] Q2 canonical_raw_title unchanged
+  [ok] Q2 is_canonical_raw_title unchanged
+  [ok] Q2 platform_title unchanged
+  [ok] Q2 compat branch still present
+  [ok] Q2 identity fallback still present
+=== BACKFILL: dry-run never writes, --apply is idempotent ===
+  dry-run exit=0
+  [ok] dry-run exits 0
+  [ok] dry-run did not change any file
+  [ok] dry-run lists the missing-H1 raw
+  [ok] dry-run does not touch existing H1
+  apply exit=0
+  [ok] apply wrote H1 where title source exists
+  [ok] apply skipped H1-less file with no title source
+  [ok] apply left existing H1 untouched
+  [ok] second apply is idempotent
+
+PASS: 18 checks, 0 failed
+AT001_EXIT=0
+
+=== end-to-end: real platform replicas -> materialized issue.md ===
+  pull result local_id: raw-20261104T082542Z
+  H1 count: 1
+  H1: fix: raw-issue-pull 物化后不写一级标题，导致 PR 门禁判定 content_diverged
+  local    fingerprint: 9140d678763e4dd9
+  platform fingerprint: 9140d678763e4dd9
+  BODY MATCH: True   TITLE MATCH: True
+  => first PR no longer blocked by content_diverged
+
+=== Q2 no-regression audit (805 real B1 issue.md) ===
+  canonical_raw_title / is_canonical_raw_title / platform_title (raw+linked): 0 differences
+  Q2 created_at compatibility branch kept (unit non-canonical case PASS)
+  Q2 local identity never drifts (no created_at-derived sibling dir)
+  4 historical non-standard keys (20260501 / 20260503 / 20260503-0000 /
+    MIGRATED): H1 prefix-free and single-line after exact-key prefix strip
+
+=== related regression suite ===
+  test-raw-key-drift, test-governance-gate-batch-read,
+  test-pretests-gate-inline-code-fields, test-platform-adapter-raw-identity.py,
+  test-raw-replica-degraded.py, test-command-lifecycle-materialization.py,
+  test-cli-help-contracts: 7 PASS / 0 FAIL
+
+=== backfill safety ===
+  default DRY-RUN: writes nothing, exit 0
+  never invents a title (only issue_title frontmatter or platform replica)
+  existing H1 (incl. 18 multi-H1 historical raws) left byte-for-byte untouched
+  --apply inserts exactly one H1, atomic os.replace, idempotent on re-run
+  bulk historical rewrite deliberately NOT executed in this PR (700 files,
+  410 already absorbed); command is delivered, not applied
+
+=== syntax ===
+  py_compile OK

@@ -36,6 +36,40 @@ def canonical_raw_title(raw_key: str, title: str, max_len: int = MAX_TITLE_LEN) 
     return prefix + human
 
 
+def local_heading_title(raw_key: str, title: str, max_len: int = MAX_TITLE_LEN) -> str:
+    """Return the H1 text for a materialized ``docs/B1-docs/raw-*/issue.md``.
+
+    ``raw-reconciliation-gate._local_record()`` extracts the first ``# `` line
+    as the LOCAL title, while ``canonical_projection()`` strips the
+    ``[RAW-<key>] `` prefix from the PLATFORM title.  To keep both fingerprints
+    identical the H1 must therefore be the human part only — no identity prefix.
+
+    Derived through ``canonical_raw_title()`` so the same de-duplication,
+    identity anchoring and length cap that shape the platform title also shape
+    the local H1: a hand-edited or prefix-less platform title is normalized to
+    the same human text on both sides of the comparison.
+
+    Empty/whitespace-only titles fall back to ``raw-<key>`` via the canonical
+    contract, so the H1 is never blank.
+    """
+    key = str(raw_key or "").strip()
+    # Strip any identity prefix BEFORE delegating. _STALE_PREFIX (used inside
+    # canonical_raw_title) only matches timestamp-shaped keys, so handing it a
+    # historical/non-standard key ('20260501', 'MIGRATED', ...) would produce
+    # a doubled '[RAW-...] [RAW-...]' prefix. Removing the exact-key prefix
+    # first keeps canonical_raw_title() itself untouched (no Q2 regression).
+    exact = re.compile(r"^\[raw-" + re.escape(key) + r"\]\s*", re.IGNORECASE)
+    human = exact.sub("", str(title or "").strip()).strip()
+    human = _STALE_PREFIX.sub("", human).strip()
+    canonical = canonical_raw_title(key, human, max_len)
+    prefix = f"[RAW-{key}] "
+    human = canonical[len(prefix):].strip() if canonical.startswith(prefix) else _STALE_PREFIX.sub("", canonical).strip()
+    # An H1 is one line. canonical_projection() collapses whitespace and
+    # lowercases the platform title, so this keeps both sides identical.
+    human = re.sub(r"\s+", " ", human)
+    return human or f"raw-{key}"
+
+
 def is_canonical_raw_title(title: str, raw_key: str) -> bool:
     """True when the title already declares this exact canonical identity."""
     return str(title or "").startswith(f"[RAW-{str(raw_key or '').strip()}] ")

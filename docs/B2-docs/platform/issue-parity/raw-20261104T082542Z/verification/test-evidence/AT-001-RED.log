@@ -1,0 +1,26 @@
+=== UNIT: pull_raw_issue writes one conformant H1 ===
+[assignee] github: ok
+[assignee] gitee: ok
+[assignee] github: ok
+[assignee] gitee: ok
+[assignee] github: ok
+[title] github: normalized to [RAW-20261104T082542Z] fix: hand edited title without identity
+UNIT_RESULT: FAIL
+  [FAIL] exactly one H1: got 0, want 1
+  [FAIL] re-pull still exactly one H1: got 0, want 1
+  [FAIL] non-canonical title: one H1: got 0, want 1
+  [FAIL] unit contract (see above)
+=== STATIC: single truth + backfill command ===
+  [FAIL] raw_title_contract exports local heading helper
+  [FAIL] platform-adapter reuses the contract for H1
+  [FAIL] backfill command exists
+  [FAIL] backfill defaults to dry-run
+  [ok] Q2 canonical_raw_title unchanged
+  [ok] Q2 is_canonical_raw_title unchanged
+  [ok] Q2 platform_title unchanged
+  [ok] Q2 compat branch still present
+  [ok] Q2 identity fallback still present
+=== BACKFILL: dry-run never writes, --apply is idempotent ===
+  [FAIL] backfill command missing
+
+FAIL: 6 of 11 checks failed
