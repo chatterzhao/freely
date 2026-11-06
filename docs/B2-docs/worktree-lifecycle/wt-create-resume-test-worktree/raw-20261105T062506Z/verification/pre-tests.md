@@ -5,7 +5,7 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: wt-create 新建的工位无需人工复制即可跑通打包；打包白名单中位于 gitignored 路径的条目必须在 seed manifest 中有声明，新增未同步条目被一致性检查拦下；输出路径守卫及其顺序不变；seed 条目不得在干净 clone 上新增硬失败
+- requirement: wt-create 新建的工位无需人工复制即可跑通打包；打包白名单中位于 gitignored 路径的条目必须在 seed manifest 中有声明，新增未同步条目被一致性检查拦下；输出路径守卫及其顺序不变；新 seed 条目不得新增硬失败点（既有 agent-table required=true 行为不在范围）
 - acceptance_target: 消除新工位打包测试的无关失败，并用机器约束防止清单漂移复发
 - surface_kind: end_to_end
 - target_lane: premerge-integration

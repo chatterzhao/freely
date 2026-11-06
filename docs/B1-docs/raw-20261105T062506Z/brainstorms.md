@@ -20,6 +20,7 @@
 ## 不退化边界（评审要点）
 
 1. **seed 条目 required=false**：全新 clone 没有本地 `.freely/` 目录；若设 `required=true`，`worktree_seed.apply()` 会抛 `required seed missing`，使 `wt-create` 在干净环境里整体失败——这是新增硬失败，属退化。改为 false 后，缺源只记 `missing` 并继续；打包阶段由既有 allowlist 校验 fail-closed。
+   **review 补充观察（诚实边界）**：隔离验证显示，一个完全没有 `.freely/` 的最小源项目运行 `worktree_seed.apply()` 仍会因**既有**的 `.freely/agent-table.toml required=true` 抛 `required seed missing`。因此本条 required=false 保证的是「不新增同类硬失败点」，并不等于宣称「干净 clone 一定能创建工位」；真实链路里 `_seed_worktree` 的 seed 源是主项目树 / `FREELY_HOME`，该既有约束不在本 issue 范围。评审判定：证据不足以认定它是「现有 open issue 未覆盖的新 bug」，未新建 raw issue。
 2. **mode=copy 而非 link**：静态文档，且工位需要拥有自己的副本才能独立打包（link 会指向主仓库，打包产物含符号链接，语义不同）。
 3. **一致性检查只读**：只比对「声明」，不改写 allowlist 或 seed manifest；复用项目自己的 `worktree_seed.load()` 作为 manifest 解析真源，不另写解析器。
 4. **检查位置**：在 `freely-package` 的 `rm -rf "$OUTPUT"` **之前**，且保留 #4158 的输出路径守卫与其顺序；守卫仍在前。

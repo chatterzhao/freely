@@ -21,7 +21,7 @@
 
 - `worktree_seed.py` / `wt-create` / `_init_test_worktree_state()` / allowlist 内容不改。
 - 输出路径守卫（#4158）及其在 rm 之前的顺序不变；allowlist 复制循环行为不变。
-- seed 条目 required=false（干净 clone 无 `.freely/` 时仍可创建工位）。
+- 新 seed 条目 required=false（**不新增**硬失败点）；干净 clone 上既有的 `.freely/agent-table.toml required=true` 行为不在本 issue 范围，见 B1 brainstorms §不退化边界。
 - 顶层 `return 1`（#4201）、R3 四态、R4 反查、Q2 标题契约均不动。
 
 ## 功能需求

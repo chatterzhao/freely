@@ -23,7 +23,7 @@ milestone: M-20261105T062506Z-A
   - 新增未 seed 的 gitignored allowlist 条目被一致性检查拦下并点名路径。
   - 输出路径守卫及其顺序、allowlist 复制循环行为不变。
   - 7 个相关回归零新增失败。
-  - seed 条目 required=false（干净 clone 不产生新硬失败）。
+  - 新 seed 条目 required=false（不新增硬失败点；不改变既有的 agent-table required=true 行为）。
 - promotion_gate: AT-001 RED → GREEN + 7 个回归基线对比 + governance gate
 - open_questions: []
 - acceptance_reviews:
