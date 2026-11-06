@@ -1,0 +1,20 @@
+=== STATIC: batch-read single source present ===
+  [FAIL] governance_repo_view.py exists
+  [FAIL] governance_repo_view uses git cat-file --batch
+  [FAIL] governance-merge-gate delegates to RepoView
+  [FAIL] governance-merge-gate no longer runs per-path git show
+  [FAIL] comment-resolution-scan.py exists
+  [FAIL] pr-create-guarded no longer loops find/cat/grep per file
+  [FAIL] pr-create-guarded invokes single-process scan
+  [ok] comment gate block message preserved
+=== UNIT: three-view priority, missing, FileNotFoundError ===
+  [FAIL] RepoView module missing (cannot run unit)
+=== EQUIVALENCE: count + byte parity on real corpus ===
+  corpus: 804 files; regex-vs-startswith mismatches = 0
+  real grep spot-check mismatches = 0
+  byte parity :docs/milestones.md: True
+  byte parity 82cd1e8de:docs/milestones.md: True
+=== PERF: single-process scan + gate subprocess count ===
+  [FAIL] comment-resolution-scan.py missing (cannot time)
+
+FAIL: 9 of 10 checks failed

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import atexit
 import json
 import os
 import re
@@ -15,6 +16,11 @@ import yaml
 _LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
 sys.path.insert(0, str(_LIFECYCLE_DIR))
 from raw_metadata_contract import MetadataValidationError, validate as validate_raw_metadata
+
+_QUALITY_DIR = Path(__file__).resolve().parent
+if str(_QUALITY_DIR) not in sys.path:
+    sys.path.insert(0, str(_QUALITY_DIR))
+from governance_repo_view import RepoView
 
 try:
     import tomllib
@@ -232,41 +238,53 @@ def is_test_premerge_branch(branch: Optional[str]) -> bool:
     return bool(branch) and branch.startswith("test-pre-merge-")
 
 
+_REPO_VIEW: Optional[RepoView] = None
+
+
+def _close_repo_view() -> None:
+    global _REPO_VIEW
+    if _REPO_VIEW is not None:
+        _REPO_VIEW.close()
+        _REPO_VIEW = None
+
+
+atexit.register(_close_repo_view)
+
+
+def _repo_view() -> RepoView:
+    """One long-lived git cat-file --batch process for the whole gate run.
+
+    Replaces the historical per-path `git cat-file -e` / `git show` subprocess
+    fan-out (3423 processes for build_issue_index alone).  View priority and
+    FileNotFoundError semantics stay entirely in read_repo_text / path_exists.
+    """
+    global _REPO_VIEW
+    if _REPO_VIEW is None:
+        _REPO_VIEW = RepoView(ROOT_DIR)
+    return _REPO_VIEW
+
+
 def staged_path_exists(rel_path: Optional[str]) -> bool:
     if not rel_path:
         return False
-    result = subprocess.run(
-        ["git", "cat-file", "-e", f":{rel_path}"],
-        cwd=ROOT_DIR,
-        text=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    return result.returncode == 0
+    return _repo_view().staged_path_exists(rel_path)
 
 
 def range_path_exists(rel_path: Optional[str]) -> bool:
     if not rel_path or not RANGE_SOURCE_REF:
         return False
-    result = subprocess.run(
-        ["git", "cat-file", "-e", f"{RANGE_SOURCE_REF}:{rel_path}"],
-        cwd=ROOT_DIR,
-        text=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    return result.returncode == 0
+    return _repo_view().range_path_exists(rel_path, RANGE_SOURCE_REF)
 
 
 def read_repo_text(rel_path: str) -> str:
     full_path = os.path.join(ROOT_DIR, rel_path)
     if USE_STAGED_VIEW and staged_path_exists(rel_path):
-        return git("show", f":{rel_path}")
+        return _repo_view().read_text(f":{rel_path}")
     # Range view must take priority over disk read:
     # When validating a feature→test-pre-merge merge from the target worktree,
     # the files exist in the source branch (git) but not on disk.
     if USE_RANGE_VIEW and RANGE_SOURCE_REF and range_path_exists(rel_path):
-        return git("show", f"{RANGE_SOURCE_REF}:{rel_path}")
+        return _repo_view().read_text(f"{RANGE_SOURCE_REF}:{rel_path}")
     if os.path.isfile(full_path):
         with open(full_path, "r", encoding="utf-8") as handle:
             return handle.read()

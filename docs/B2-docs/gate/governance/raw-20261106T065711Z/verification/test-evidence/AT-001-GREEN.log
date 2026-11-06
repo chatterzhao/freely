@@ -1,0 +1,66 @@
+GREEN — raw-20261106T065711Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-governance-gate-batch-read all
+=== STATIC: batch-read single source present ===
+  [ok] governance_repo_view.py exists
+  [ok] governance_repo_view uses git cat-file --batch
+  [ok] governance-merge-gate delegates to RepoView
+  [ok] governance-merge-gate no longer runs per-path git show
+  [ok] comment-resolution-scan.py exists
+  [ok] pr-create-guarded no longer loops find/cat/grep per file
+  [ok] pr-create-guarded invokes single-process scan
+  [ok] comment gate block message preserved
+=== UNIT: three-view priority, missing, FileNotFoundError ===
+UNIT_RESULT: PASS
+  [ok] three-view priority / FileNotFoundError / path_exists
+=== EQUIVALENCE: count + byte parity on real corpus ===
+  corpus: 804 files; regex-vs-startswith mismatches = 0
+  real grep spot-check mismatches = 0
+  byte parity :docs/milestones.md: True
+  byte parity 82cd1e8de:docs/milestones.md: True
+=== PERF: single-process scan + gate subprocess count ===
+  Step 2e full scan: 3.791s (804 files, 974506 bytes)
+  Step 2e pure counting (I/O excluded): 0.005s
+  baseline: ~188s / ~4000 subprocesses -> 49.6x faster
+  PERF_SCAN_RESULT: PASS
+  [ok] Step 2e no process fan-out (algorithm <1s, full scan <15s)
+  build_issue_index git subprocesses: 8 (baseline 3423)
+  [ok] git subprocesses under 25
+
+PASS: 11 checks, 0 failed
+AT001_EXIT=0
+
+=== zero-semantics-change audit ===
+1) gate verdict parity — baseline (HEAD b9a89fb08/82cd1e8de) vs new, byte-identical:
+   --range 71bb71c0b..82cd1e8de       IDENTICAL exit=1
+   --range 5eea2e8a1..b9a89fb08       IDENTICAL exit=1
+   --range 82cd1e8de                  IDENTICAL exit=1
+   --range ... --source-branch ...     IDENTICAL exit=0
+   --skip-ibm-gate                    IDENTICAL exit=1
+   --staged                           IDENTICAL exit=0
+   timing (same --range Q2): baseline 47.436s -> new 0.879s (54x)
+
+2) corpus parity — 4,363 real governance paths x {read_repo_text, path_exists},
+   range view + staged view: DIFFERENCES = 0
+
+3) Step 2e equivalence — 804 real issue.md:
+   regex vs startswith mismatches = 0; real grep -c spot-check = 0
+   pure counting = 0.005s; full scan = 3.487s (804 file opens via IDE shim,
+   ~4.4ms each); baseline ~188s with ~4000 subprocesses -> 53.9x faster
+
+4) build_issue_index git subprocess count: 3423 -> 8
+
+5) git cat-file --batch vs git show byte parity (:path and REF:path): True / True
+
+=== 7 directly-affected regression tests, baseline vs new ===
+   test-command-lifecycle-consumer-boundaries.py  1 / 1  (pre-existing)
+   test-command-lifecycle-pr-update.py             0 / 0
+   test-governance-merge-gate                      1 / 1  (pre-existing)
+   test-merge-guarded                              13 / 13 (pre-existing ENOENT)
+   test-pre-commit-hook                            1 / 1  (pre-existing)
+   test-pre-merge-commit-hook                      1 / 1  (pre-existing)
+   test-governance-gate-batch-read (new)           - / 0  (GREEN)
+   => 0 new failures; output diffs are only timing digits / random tmp paths
+
+=== syntax ===
+  bash -n pr-create-guarded OK
+  py_compile OK

@@ -1,3 +1,18 @@
+## M-20261106T065711Z-A
+- title: perf — 批量化治理门禁读取，消除 N+1 子进程开销
+- status: active
+### candidate_issues
+1. `C-20261106T065711Z-A`
+- milestone: M-20261106T065711Z-A
+- status: promoted
+- promoted_issue_id: I-20261106T065711Z-A
+### promoted_issues
+1. `I-20261106T065711Z-A`
+- milestone: M-20261106T065711Z-A
+- status: completed
+- source_candidate: `C-20261106T065711Z-A`
+- completed_at: '2026-11-06T07:41:59Z'
+
 ## M-20261105T051136Z-A
 - title: fix — raw 身份不漂移与平台标题达标单一真源
 - status: active
