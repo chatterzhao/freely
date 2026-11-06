@@ -1,3 +1,24 @@
+## M-20261105T062203Z-A
+- title: fix — 恢复模式按 git 登记反查 dev 工位真实路径
+- status: active
+### candidate_issues
+1. `C-20261105T062203Z-A`
+- milestone: M-20261105T062203Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T062203Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062203Z/issues/I-20261105T062203Z-A.md
+### committed_issues
+1. `I-20261105T062203Z-A`
+- milestone: M-20261105T062203Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062203Z/issues/I-20261105T062203Z-A.md
+### completed_issues
+1. `I-20261105T062203Z-A`
+- milestone: M-20261105T062203Z-A
+- phase_state: completed
+- completed_at: 2026-11-06T09:25:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062203Z/issues/I-20261105T062203Z-A.md
+
 ## M-20261105T061812Z-A
 - title: fix — wt-create 四态判定校验工位目录与初始化标记
 - status: active

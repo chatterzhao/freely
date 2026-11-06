@@ -1,0 +1,50 @@
+GREEN — raw-20261105T062203Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-wt-create-recovery-dev-path all
+=== STATIC: recovery uses reverse lookup, not new-target resolution ===
+  [ok] recovery block does not call resolve_target_path for dev
+  [ok] recovery uses reverse lookup for dev
+  [ok] reverse lookup failure is an explicit error
+  [ok] _update_scan_state still called in recovery
+  [ok] summary prints the resolved dev path
+  [ok] recovery block static contract
+  [ok] normal creation still avoids collisions (resolve_target_path retained outside recovery)
+  [ok] bash -n passes
+=== BEHAVIOR: recovery summary + scan state point at the REAL dev worktree ===
+  [ok] recovery run exits 0
+  [ok] recovery summary prints the real dev worktree path
+  [ok] scan_state_worktree points at the real dev worktree
+  [ok] test worktree still created and fully initialised
+  [ok] second run is idempotent no-op, no duplicate worktree
+
+PASS: 8 checks, 0 failed
+AT001_EXIT=0
+
+=== RED evidence (before fix) ===
+  recovery summary dev path: .../fix-raw-20261105T062300Z-recovery-path-300efa56 (does NOT exist)
+  scan_state_worktree:      same bogus hash-suffixed path
+  => 3 checks failed, 5 pre-existing capabilities PASS
+
+=== GREEN behaviour ===
+  recovery summary dev path = real dev worktree (verified -d)
+  scan_state_worktree       = real dev worktree (verified -d)
+  test worktree still created + fully initialised (test-gate.env)
+  second run = idempotent no-op, no duplicate worktree
+  reverse lookup failure -> explicit error, never guesses a path
+
+=== zero-regression suite ===
+  test-wt-create-four-state-dir        PASS (R3 four-state)
+  test-wt-create-resume-test-worktree PASS (Q1/#4186 recovery + legacy)
+  test-wt-create-recovery-dev-path    PASS (new)
+  test-raw-key-drift                  PASS (Q2)
+  test-governance-gate-batch-read     PASS (R1)
+  test-materialize-h1                 PASS (R2)
+  test-command-lifecycle-wt-create.py PASS
+  => 7 PASS / 0 FAIL
+
+=== boundary ===
+  normal creation and legacy 补建 still use freely_wt_resolve_target_path
+  (collision avoidance for genuinely NEW worktrees unchanged)
+  only the recovery block (2 call sites) switched to _wt_registered_dir
+
+=== syntax ===
+  bash -n OK
