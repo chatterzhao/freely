@@ -1,0 +1,53 @@
+GREEN — raw-20261105T062506Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-worktree-seed-package-parity all
+=== STATIC: seed declaration + packaging parity check ===
+  [ok] seed manifest declares the bootstrap file
+  [ok] bootstrap seed uses copy mode
+  [ok] bootstrap seed is not required (fresh clone safe)
+  [ok] parity checker exists
+  [ok] freely-package invokes the parity check
+  [ok] parity check runs before rm -rf
+  [ok] dangerous-output guard still present
+  [ok] bash -n passes
+=== BEHAVIOR: fresh worktree can package; missing seed declaration is blocked ===
+  [ok] seed apply copies the bootstrap into a fresh worktree
+  [ok] parity check passes on the real project
+  [ok] parity check blocks a new gitignored allowlist entry without a seed
+  [ok] seeder supplies bootstrap to the minimal packaging project
+  [ok] fresh seeded project packages successfully without manual copy
+
+PASS: 13 checks, 0 failed
+AT001_EXIT=0
+
+=== RED evidence ===
+  seeder applied only .freely/agent-table.toml (link), no bootstrap ->
+  fresh worktree packaging FAILED: [ERROR] missing file: .freely/tool-boundary-bootstrap.md
+  11 of 13 checks failed; 2 pre-existing capabilities PASS
+
+=== GREEN behaviour ===
+  worktree-seed.toml declares bootstrap as mode=copy required=false
+  seeder copies it into a fresh worktree (no manual copy)
+  package-seed-parity.py: 1 gitignored allowlist path, 0 undeclared -> OK
+  newly added gitignored allowlist entry WITHOUT a seed -> checker exits 1 and names it
+  minimal seeded project packages successfully; bootstrap present in output
+  13 checks, 0 failed
+
+=== zero-regression audit (baseline vs new) ===
+  test-freely-package-output-guard            0 / 0
+  test-wt-create-recovery-dev-path            0 / 0
+  test-wt-create-four-state-dir               0 / 0
+  test-wt-create-resume-test-worktree         0 / 0
+  test-materialize-h1                        0 / 0
+  test-raw-key-drift                         0 / 0
+  test-governance-gate-batch-read             0 / 0
+  => 7 PASS / 0 FAIL in both versions
+
+=== current-worktree residue note ===
+  The R5 dev worktree was created BEFORE the fix and therefore lacked the
+  bootstrap file. It was repaired through the ENCAPSULATED seeder
+  (worktree_seed.py apply with the fixed manifest as source), not by a
+  manual cp; output-guard test then passed (EXIT=0).
+
+=== syntax ===
+  bash -n freely-package OK
+  py_compile checker OK

@@ -94,6 +94,20 @@ refuse_dangerous_output "$OUTPUT" || exit 1
 echo "[package] version: $VERSION"
 echo "[package] output: $OUTPUT"
 
+# ── Packaging ↔ worktree seed parity (read-only, fail-closed) ──
+# Any gitignored allowlist path (e.g. .freely/tool-boundary-bootstrap.md) is
+# absent from a fresh worktree unless worktree-seed.toml declares it. Catch a
+# missing declaration HERE, before cleaning/copying the output, instead of
+# letting every packaging test inside a new worktree fail with a confusing
+# "missing file" error.
+_PARITY_CHECK="$ROOT_DIR/docs/system/workspace/scripts/quality/package-seed-parity.py"
+if [[ -f "$_PARITY_CHECK" ]]; then
+  if ! python3 "$_PARITY_CHECK" --project "$ROOT_DIR"; then
+    echo "[ERROR] packaging aborted: allowlist/seed parity check failed" >&2
+    exit 1
+  fi
+fi
+
 # 清理旧输出
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT"

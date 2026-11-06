@@ -1,0 +1,20 @@
+=== STATIC: seed declaration + packaging parity check ===
+  [FAIL] seed manifest declares the bootstrap file
+  [FAIL] bootstrap seed uses copy mode
+  [FAIL] bootstrap seed is not required (fresh clone safe)
+  [FAIL] parity checker exists
+  [FAIL] freely-package invokes the parity check
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+AssertionError: (-1, 2515)
+  [FAIL] parity check runs before rm -rf
+  [ok] dangerous-output guard still present
+  [ok] bash -n passes
+=== BEHAVIOR: fresh worktree can package; missing seed declaration is blocked ===
+  [FAIL] seed apply did not copy .freely/tool-boundary-bootstrap.md into a fresh worktree ([wt-seed] source=manifest [wt-seed] linked: .freely/agent-table.toml [wt-seed] missing: .env )
+  [FAIL] parity checker missing (/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T062506Z-seed-package-parity/docs/system/workspace/scripts/quality/package-seed-parity.py)
+  [FAIL] parity check blocks a new gitignored allowlist entry without a seed (checker missing)
+  [FAIL] seeder did not supply bootstrap to minimal project ([wt-seed] source=manifest [wt-seed] linked: .freely/agent-table.toml [wt-seed] missing: .env )
+  [FAIL] packaging a fresh seeded project (rc=1)   dir  bin/ (1 files)   dir  .githooks/ (0 files)   dir  templates/ (0 files)   [ERROR] missing file: .freely/tool-boundary-bootstrap.md [ERROR] 1 allowlist path(s) not found — packaging aborted 
+
+FAIL: 11 of 13 checks failed

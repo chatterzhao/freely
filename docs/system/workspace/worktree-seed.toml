@@ -23,3 +23,13 @@ required = true
 path = ".env"
 mode = "copy"
 required = false
+
+# Packaging allowlist input. This file is static documentation but lives under
+# the gitignored .freely/ tree, so `git worktree add` does not bring it along.
+# Copy (not link): a worktree must own its own copy to package independently.
+# required=false: a fresh clone without a local .freely/ tree must still be
+# able to create worktrees; the package gate fails closed if the file is absent.
+[[seed]]
+path = ".freely/tool-boundary-bootstrap.md"
+mode = "copy"
+required = false
