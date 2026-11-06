@@ -897,13 +897,25 @@ if [[ "$resume_mode" -eq 1 ]]; then
     echo "  test 工位初始化已补齐"
   fi
 
-  _update_scan_state "$raw_key" "working" "$(freely_wt_resolve_target_path "$dev_branch")"
+  # Recovery: the dev worktree ALREADY EXISTS, so reverse-lookup its real
+  # registered path. freely_wt_resolve_target_path() is for a worktree about
+  # to be CREATED: it appends a hash suffix when the target exists, which
+  # would yield a non-existent path here and poison scan_state_worktree.
+  _recovery_dev_path="$(_wt_registered_dir "$dev_branch")" || {
+    echo "恢复失败: 反查 dev 工位失败，git worktree list 中找不到 $dev_branch 的有效工位目录" >&2
+    exit 1
+  }
+  if [[ "$_recovery_dev_path" != "$_dev_dir" ]]; then
+    echo "恢复失败: dev 工位反查结果不一致 ($_dev_dir vs $_recovery_dev_path)" >&2
+    exit 1
+  fi
+  _update_scan_state "$raw_key" "working" "$_recovery_dev_path"
   cat <<MSG
 
 ╔══════════════════════════════════════════════════════════╗
 ║  Worktrees recovered                                    ║
 ╠══════════════════════════════════════════════════════════╣
-║  dev (kept):      $(freely_wt_resolve_target_path "$dev_branch")
+║  dev (kept):      $_recovery_dev_path
 ║  test (created):  $tp_target
 ║  base:            $dev_branch
 ║  raw key:         $raw_key

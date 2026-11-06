@@ -1,0 +1,13 @@
+=== STATIC: recovery uses reverse lookup, not new-target resolution ===
+  [FAIL] recovery block does not call resolve_target_path for dev
+  [FAIL] recovery block static contract (see above)
+  [ok] normal creation still avoids collisions (resolve_target_path retained outside recovery)
+  [ok] bash -n passes
+=== BEHAVIOR: recovery summary + scan state point at the REAL dev worktree ===
+  [ok] recovery run exits 0
+  [FAIL] recovery summary dev path (printed='/private/tmp/freely-r4.dqlgPK/repo-worktrees/fix-raw-20261105T062300Z-recovery-path-300efa56' want='/private/tmp/freely-r4.dqlgPK/repo-worktrees/fix-raw-20261105T062300Z-recovery-path' exists=no)
+  [FAIL] scan_state_worktree (stored='/private/tmp/freely-r4.dqlgPK/repo-worktrees/fix-raw-20261105T062300Z-recovery-path-300efa56' want='/private/tmp/freely-r4.dqlgPK/repo-worktrees/fix-raw-20261105T062300Z-recovery-path' exists=no)
+  [ok] test worktree still created and fully initialised
+  [ok] second run is idempotent no-op, no duplicate worktree
+
+FAIL: 3 of 8 checks failed

@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Regression: raw-20261105T062203Z / GitHub #4191 / Gitee IKT4DY
+#
+# In recovery mode the dev worktree ALREADY EXISTS. Using
+# freely_wt_resolve_target_path() (which computes a path for a worktree about
+# to be CREATED) therefore appends an 8-char hash suffix and yields a path that
+# does not exist. That wrong path is printed in the recovery summary and
+# written into scan_state_worktree.
+#
+# Zero-semantics-change boundaries:
+#  - normal creation and legacy 补建 keep resolve_target_path (those really do
+#    create a new worktree and must keep collision avoidance)
+#  - _init_test_worktree_state() stays the single initialisation source
+#  - no-op / inconsistent rejection / R3 four-state behaviour unchanged
+#  - reverse lookup must come from git worktree list --porcelain, and a
+#    lookup failure must ERROR rather than guess a path
+#
+# Modes: static | behavior | all
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+FAILED=0; PASSED=0
+ok(){ echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad(){ echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+
+static_checks() {
+  echo "=== STATIC: recovery uses reverse lookup, not new-target resolution ==="
+  python3 - "$WT_CREATE" <<'PYCHECK'
+import sys, re
+from pathlib import Path
+p=Path(sys.argv[1]); t=p.read_text(encoding='utf-8')
+start=t.index('if [[ "$resume_mode" -eq 1 ]]; then')
+end=t.index('# ── Pre-check: issue must exist', start)
+block=t[start:end]
+checks=[
+  ("recovery block does not call resolve_target_path for dev",
+   'freely_wt_resolve_target_path "$dev_branch"' not in block),
+  ("recovery uses reverse lookup for dev",
+   '_wt_registered_dir' in block),
+  ("reverse lookup failure is an explicit error",
+   any(k in block for k in ('反查 dev 工位失败','无法反查','reverse lookup'))),
+  ("_update_scan_state still called in recovery",
+   '_update_scan_state' in block),
+  ("summary prints the resolved dev path",
+   'dev (kept)' in block),
+]
+for label, ok in checks:
+    print(('  [ok] ' if ok else '  [FAIL] ')+label)
+    if not ok: sys.exit(1)
+PYCHECK
+  if [[ $? -eq 0 ]]; then ok "recovery block static contract"; else bad "recovery block static contract (see above)"; fi
+  check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+  if grep -Fq 'freely_wt_resolve_target_path "$dev_branch"' "$WT_CREATE"; then
+    ok "normal creation still avoids collisions (resolve_target_path retained outside recovery)"
+  else
+    bad "normal creation collision avoidance missing"
+  fi
+  if bash -n "$WT_CREATE"; then ok "bash -n passes"; else bad "bash -n passes"; fi
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: recovery summary + scan state point at the REAL dev worktree ==="
+  local TMP REPO KEY SLUG DEV_BRANCH TEST_BRANCH DEV_WT SCAN
+  TMP="$(mktemp -d /tmp/freely-r4.XXXXXX)"
+  TMP="$(cd "$TMP" && pwd -P)"
+  REPO="$TMP/repo"; KEY="20261105T062300Z"; SLUG="recovery-path"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"; TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/fix-raw-${KEY}-${SLUG}"
+  SCAN="$REPO/.freely/run/manager-task-source-scan-latest.json"
+
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" \
+           "$REPO/docs/system/workspace/scripts/lifecycle" \
+           "$REPO/docs/B1-docs/raw-${KEY}" "$REPO/.freely/run" "$TMP/repo-worktrees"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
+  cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+  cat > "$REPO/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" <<'STUB'
+import json
+print(json.dumps({"ok": True, "diagnostics": [], "observations": {}, "degraded": []}))
+STUB
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init
+  printf -- '---\nphase_state: proposed\n---\n\n# fixture\n' > "$REPO/docs/B1-docs/raw-${KEY}/issue.md"
+
+  # dev branch + a REAL dev worktree; test branch deliberately absent -> recovery
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" worktree add -q "$DEV_WT" "$DEV_BRANCH"
+  # scan state item whose key contains the raw key (what _update_scan_state matches)
+  printf '{"items":[{"key":"%s","next_action":"fix %s","scan_state":"queued","scan_state_worktree":""}]}\n' \
+    "$KEY" "$KEY" > "$SCAN"
+
+  ( cd "$REPO" && bash docs/system/workspace/scripts/worktree/wt-create \
+      --raw-key "$KEY" --source platform --kind fix --slug "$SLUG" ) > "$TMP/run.log" 2>&1
+  local RC=$?
+  if [[ $RC -eq 0 ]]; then ok "recovery run exits 0"; else bad "recovery run (rc=$RC) $(tail -3 "$TMP/run.log" | tr '\n' ' ')"; fi
+
+  # Extract the printed dev path from the recovery summary.
+  local PRINTED
+  PRINTED="$(sed -n 's/^║  dev (kept):[[:space:]]*//p' "$TMP/run.log" | sed 's/[[:space:]]*║$//' | head -1 | xargs)"
+  if [[ -n "$PRINTED" && "$PRINTED" == "$DEV_WT" && -d "$PRINTED" ]]; then
+    ok "recovery summary prints the real dev worktree path"
+  else
+    bad "recovery summary dev path (printed='$PRINTED' want='$DEV_WT' exists=$([[ -d "$PRINTED" ]] && echo yes || echo no))"
+  fi
+
+  # scan_state_worktree must equal the real dev worktree path.
+  local STORED
+  STORED="$(python3 -c "
+import json
+try:
+    d=json.load(open('$SCAN'))
+    print(d['items'][0].get('scan_state_worktree',''))
+except Exception:
+    print('')
+" 2>/dev/null)"
+  if [[ -n "$STORED" && "$STORED" == "$DEV_WT" && -d "$STORED" ]]; then
+    ok "scan_state_worktree points at the real dev worktree"
+  else
+    bad "scan_state_worktree (stored='$STORED' want='$DEV_WT' exists=$([[ -d "$STORED" ]] && echo yes || echo no))"
+  fi
+
+  # Recovery must still create and fully initialise the test worktree.
+  local TEST_WT
+  TEST_WT="$(git -C "$REPO" worktree list --porcelain | awk -v b="refs/heads/$TEST_BRANCH" '
+    $1=="worktree"{w=$2} $1=="branch"&&$2==b{print w;exit}')"
+  if [[ -n "$TEST_WT" && -d "$TEST_WT" && -f "$TEST_WT/.freely/run/test-gate.env" ]]; then
+    ok "test worktree still created and fully initialised"
+  else
+    bad "test worktree creation/initialisation regressed (test_wt='$TEST_WT')"
+  fi
+
+  # Second run must be an idempotent no-op and must NOT rewrite scan state to
+  # a bogus path.
+  local BEFORE AFTER
+  BEFORE="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  ( cd "$REPO" && bash docs/system/workspace/scripts/worktree/wt-create \
+      --raw-key "$KEY" --source platform --kind fix --slug "$SLUG" ) > "$TMP/run2.log" 2>&1
+  AFTER="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  if [[ "$BEFORE" == "$AFTER" ]] && grep -q '工位已存在，无需创建' "$TMP/run2.log"; then
+    ok "second run is idempotent no-op, no duplicate worktree"
+  else
+    bad "second run no-op (before=$BEFORE after=$AFTER)"
+  fi
+
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$FAILED" -eq 0 ]]; then echo "PASS: $PASSED checks, 0 failed"; exit 0; fi
+echo "FAIL: $FAILED of $((PASSED+FAILED)) checks failed"
+exit 1
