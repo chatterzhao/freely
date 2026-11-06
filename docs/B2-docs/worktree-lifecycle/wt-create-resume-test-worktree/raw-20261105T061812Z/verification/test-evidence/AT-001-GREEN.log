@@ -1,0 +1,46 @@
+GREEN — raw-20261105T061812Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-wt-create-four-state-dir all
+=== STATIC: pre-flight checks dirs + init marker ===
+  [ok] pre-flight resolves registered worktree dir
+  [ok] pre-flight checks test initialisation marker
+  [ok] no-op requires both dirs
+  [ok] inconsistent-state rejection preserved
+  [ok] _init_test_worktree_state still the single source
+  [ok] recovery path still present
+  [ok] bash -n passes
+=== BEHAVIOR: three residue states ===
+  [ok] CASE A branch-only residue re-provisions both worktrees
+  [ok] CASE A re-provisioned test worktree is fully initialised
+  [ok] CASE B half-initialised test worktree gets its marker re-written
+  [ok] CASE B after repair: complete state is idempotent no-op
+  [ok] CASE C dev-missing/test-present still rejected
+  [ok] CASE D complete state re-run is no-op with no duplicate worktree
+
+PASS: 13 checks, 0 failed
+AT001_EXIT=0
+
+=== four residue states (isolated git repos, real wt-create) ===
+  CASE A: both branches exist but both worktree DIRS removed -> re-provisions both + fully initialised
+  CASE B: test dir exists but test-gate.env missing -> re-runs _init_test_worktree_state; 2nd run = no-op
+  CASE C: dev missing / test present -> still REJECTED (状态不一致)
+  CASE D: complete state -> idempotent no-op, no duplicate worktree
+
+=== zero-regression audit ===
+  test-wt-create-resume-test-worktree        baseline 0 / new 0
+  test-command-lifecycle-wt-create.py        baseline 0 / new 0
+  test-wt-create-source-local                baseline 1 / new 1 (pre-existing REMINDER assertion drift, #4151)
+  test-wt-create-syncs-tooling               baseline 1 / new 1 (pre-existing 'unknown arg: --ai', output differs only in timestamp)
+  => 0 new failures; Q1/#4186 recovery + legacy 补建 behaviour preserved
+
+=== R2 self-bootstrap ===
+  This round's wt-create materialization already carries an H1 automatically
+  (no manual H1 patch), confirming raw-20261104T082542Z fix works end-to-end.
+
+=== self-bootstrap finding (new raw issue created, NOT bundled here) ===
+  raw-20261106T084804Z / GitHub #4201 / Gitee IKTHI3: wt-create top-level
+  'return 1' at :889/:909/:917 outputs a bash syntax error on failure.
+  Confirmed distinct from #4153 (opposite direction: library source-safety)
+  and #4157 (watchdog PRE_CHECK_MAP); not fixed in this PR (single-issue scope).
+
+=== syntax ===
+  bash -n OK

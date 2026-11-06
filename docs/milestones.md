@@ -1,3 +1,24 @@
+## M-20261105T061812Z-A
+- title: fix — wt-create 四态判定校验工位目录与初始化标记
+- status: active
+### candidate_issues
+1. `C-20261105T061812Z-A`
+- milestone: M-20261105T061812Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T061812Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T061812Z/issues/I-20261105T061812Z-A.md
+### committed_issues
+1. `I-20261105T061812Z-A`
+- milestone: M-20261105T061812Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T061812Z/issues/I-20261105T061812Z-A.md
+### completed_issues
+1. `I-20261105T061812Z-A`
+- milestone: M-20261105T061812Z-A
+- phase_state: completed
+- completed_at: 2026-11-06T08:55:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T061812Z/issues/I-20261105T061812Z-A.md
+
 ## M-20261104T082542Z-A
 - title: fix — raw-issue-pull 物化时写入达标 H1，提供安全回填命令
 - status: active

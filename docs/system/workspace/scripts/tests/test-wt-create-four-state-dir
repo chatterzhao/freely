@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# Regression: raw-20261105T061812Z / GitHub #4190 / Gitee IKT4B1
+#
+# wt-create's idempotence pre-flight must consider the WORKTREE DIRECTORY and
+# the test worktree's INITIALISATION MARKER, not only branch existence.
+#
+# Zero-semantics-change boundaries:
+#  - both worktrees complete -> idempotent no-op, no duplicate worktrees
+#  - dev missing / test present -> still REJECT (inconsistent state)
+#  - dev present / test branch+dir missing -> recovery rebuilds test
+#  - legacy test-pre-merge 补建 path and _init_test_worktree_state() stay
+#    the single source of initialisation
+#  - --source local / legacy invocation modes unchanged
+#
+# Modes: static | behavior | all
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+FAILED=0; PASSED=0
+ok(){ echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad(){ echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+
+static_checks() {
+  echo "=== STATIC: pre-flight checks dirs + init marker ==="
+  check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+  check "pre-flight resolves registered worktree dir" "grep -q '_wt_registered_dir' '$WT_CREATE'"
+  check "pre-flight checks test initialisation marker" "grep -q '_wt_test_initialized' '$WT_CREATE'"
+  check "no-op requires both dirs" "grep -q '_dev_dir' '$WT_CREATE'"
+  check "inconsistent-state rejection preserved" "grep -q '状态不一致' '$WT_CREATE'"
+  check "_init_test_worktree_state still the single source" "grep -q '^_init_test_worktree_state()' '$WT_CREATE'"
+  check "recovery path still present" "grep -q 'resume_mode' '$WT_CREATE'"
+  check "bash -n passes" "bash -n '$WT_CREATE'"
+}
+
+# Build an isolated repo with the real wt-create + helpers.
+# $1 = tmpdir; $2 = key; $3 = slug
+_setup_repo() {
+  local TMP="$1" KEY="$2" SLUG="$3"
+  local REPO="$TMP/repo"
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" \
+           "$REPO/docs/system/workspace/scripts/lifecycle" \
+           "$REPO/docs/B1-docs/raw-${KEY}" "$TMP/repo-worktrees"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
+  cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+  # Fresh-creation path consults the replica gate; an isolated fixture has no
+  # platform config, so stub it as a readable, consistent replica set.
+  cat > "$REPO/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" <<'STUB'
+import json
+print(json.dumps({"ok": True, "diagnostics": [], "observations": {}, "degraded": []}))
+STUB
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init
+  printf -- '---\nphase_state: proposed\n---\n\n# fixture\n' > "$REPO/docs/B1-docs/raw-${KEY}/issue.md"
+}
+
+_run_wt_create() {
+  local TMP="$1" KEY="$2" SLUG="$3" LOG="$4"
+  ( cd "$TMP/repo" && bash docs/system/workspace/scripts/worktree/wt-create \
+      --raw-key "$KEY" --source platform --kind fix --slug "$SLUG" ) > "$LOG" 2>&1
+  return $?
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: three residue states ==="
+
+  # CASE A: both branches exist, but both worktree DIRECTORIES were removed.
+  # Old code: no-op exit 0 with no usable worktree. New code: re-provision.
+  local TMP KEY SLUG REPO DEV_BRANCH TEST_BRANCH DEV_WT TEST_WT
+  TMP="$(mktemp -d /tmp/freely-four-a.XXXXXX)"; KEY="20261105T061900Z"; SLUG="dir-gone"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"; TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/dev-a"; TEST_WT="$TMP/repo-worktrees/test-a"
+  _setup_repo "$TMP" "$KEY" "$SLUG"; REPO="$TMP/repo"
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" branch "$TEST_BRANCH" "$DEV_BRANCH"
+  # directories intentionally absent
+  _run_wt_create "$TMP" "$KEY" "$SLUG" "$TMP/a.log"; local RC=$?
+  local DEV_DIR TEST_DIR
+  DEV_DIR="$(git -C "$REPO" worktree list --porcelain | awk -v b="refs/heads/$DEV_BRANCH" '$1=="worktree"{w=$2} $1=="branch"&&$2==b{print w;exit}')"
+  TEST_DIR="$(git -C "$REPO" worktree list --porcelain | awk -v b="refs/heads/$TEST_BRANCH" '$1=="worktree"{w=$2} $1=="branch"&&$2==b{print w;exit}')"
+  if [[ $RC -eq 0 && -n "$DEV_DIR" && -d "$DEV_DIR" && -n "$TEST_DIR" && -d "$TEST_DIR" ]]; then
+    ok "CASE A branch-only residue re-provisions both worktrees"
+  else
+    bad "CASE A branch-only residue (rc=$RC dev_dir=$DEV_DIR test_dir=$TEST_DIR) $(tail -3 "$TMP/a.log" | tr '\n' ' ')"
+  fi
+  if [[ -n "$TEST_DIR" && -f "$TEST_DIR/.freely/run/test-gate.env" ]]; then
+    ok "CASE A re-provisioned test worktree is fully initialised"
+  else
+    bad "CASE A test worktree missing test-gate.env"
+  fi
+  rm -rf "$TMP"
+
+  # CASE B: test branch + dir exist but test-gate.env is missing (Step 2
+  # interrupted after worktree add, before initialisation).
+  TMP="$(mktemp -d /tmp/freely-four-b.XXXXXX)"; KEY="20261105T062000Z"; SLUG="half-init"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"; TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/dev-b"; TEST_WT="$TMP/repo-worktrees/test-b"
+  _setup_repo "$TMP" "$KEY" "$SLUG"; REPO="$TMP/repo"
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" worktree add -q "$DEV_WT" "$DEV_BRANCH"
+  git -C "$REPO" branch "$TEST_BRANCH" "$DEV_BRANCH"
+  git -C "$REPO" worktree add -q "$TEST_WT" "$TEST_BRANCH"
+  rm -f "$TEST_WT/.freely/run/test-gate.env"
+  _run_wt_create "$TMP" "$KEY" "$SLUG" "$TMP/b.log"; RC=$?
+  if [[ $RC -eq 0 && -f "$TEST_WT/.freely/run/test-gate.env" ]] && grep -q 'TEST_STATUS=' "$TEST_WT/.freely/run/test-gate.env"; then
+    ok "CASE B half-initialised test worktree gets its marker re-written"
+  else
+    bad "CASE B half-init residue not repaired (rc=$RC) $(tail -3 "$TMP/b.log" | tr '\n' ' ')"
+  fi
+  # and a second run must be a genuine no-op
+  local BEFORE AFTER
+  BEFORE="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  _run_wt_create "$TMP" "$KEY" "$SLUG" "$TMP/b2.log"; RC=$?
+  AFTER="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  if [[ $RC -eq 0 && "$BEFORE" == "$AFTER" ]] && grep -q '工位已存在，无需创建' "$TMP/b2.log"; then
+    ok "CASE B after repair: complete state is idempotent no-op"
+  else
+    bad "CASE B no-op after repair (rc=$RC $BEFORE->$AFTER)"
+  fi
+  rm -rf "$TMP"
+
+  # CASE C: dev missing / test present must still be REJECTED.
+  TMP="$(mktemp -d /tmp/freely-four-c.XXXXXX)"; KEY="20261105T062100Z"; SLUG="inconsistent"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"; TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  TEST_WT="$TMP/repo-worktrees/test-c"
+  _setup_repo "$TMP" "$KEY" "$SLUG"; REPO="$TMP/repo"
+  git -C "$REPO" branch "$TEST_BRANCH" develop
+  git -C "$REPO" worktree add -q "$TEST_WT" "$TEST_BRANCH"
+  _run_wt_create "$TMP" "$KEY" "$SLUG" "$TMP/c.log"; RC=$?
+  if [[ $RC -ne 0 ]] && grep -q '状态不一致' "$TMP/c.log"; then
+    ok "CASE C dev-missing/test-present still rejected"
+  else
+    bad "CASE C inconsistent state not rejected (rc=$RC)"
+  fi
+  rm -rf "$TMP"
+
+  # CASE D: a COMPLETE pre-existing state (both branches, both registered
+  # dirs, test-gate.env present) must be an idempotent no-op with no extra
+  # worktree. Pre-seeding avoids pulling in the whole platform fixture chain
+  # (raw-issue-pull / sync-tooling), keeping this test focused on pre-flight.
+  TMP="$(mktemp -d /tmp/freely-four-d.XXXXXX)"; KEY="20261105T062200Z"; SLUG="fresh"
+  DEV_BRANCH="fix/raw-${KEY}-${SLUG}"; TEST_BRANCH="test-pre-merge-${KEY}-${SLUG}"
+  DEV_WT="$TMP/repo-worktrees/dev-d"; TEST_WT="$TMP/repo-worktrees/test-d"
+  _setup_repo "$TMP" "$KEY" "$SLUG"; REPO="$TMP/repo"
+  git -C "$REPO" branch "$DEV_BRANCH" develop
+  git -C "$REPO" worktree add -q "$DEV_WT" "$DEV_BRANCH"
+  git -C "$REPO" branch "$TEST_BRANCH" "$DEV_BRANCH"
+  git -C "$REPO" worktree add -q "$TEST_WT" "$TEST_BRANCH"
+  mkdir -p "$TEST_WT/.freely/run"
+  printf 'TEST_STATUS="not_tested"\nLAST_TESTED_AT="1970-01-01T00:00:00Z"\nLAST_TESTED_COMMIT=""\n' > "$TEST_WT/.freely/run/test-gate.env"
+  BEFORE="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  _run_wt_create "$TMP" "$KEY" "$SLUG" "$TMP/d2.log"; RC=$?
+  AFTER="$(git -C "$REPO" worktree list --porcelain | grep -c '^worktree ' || true)"
+  if [[ $RC -eq 0 && "$BEFORE" == "$AFTER" ]] && grep -q '工位已存在，无需创建' "$TMP/d2.log"; then
+    ok "CASE D complete state re-run is no-op with no duplicate worktree"
+  else
+    bad "CASE D re-run (rc=$RC $BEFORE->$AFTER) $(tail -3 "$TMP/d2.log" | tr '\n' ' ')"
+  fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$FAILED" -eq 0 ]]; then echo "PASS: $PASSED checks, 0 failed"; exit 0; fi
+echo "FAIL: $FAILED of $((PASSED+FAILED)) checks failed"
+exit 1

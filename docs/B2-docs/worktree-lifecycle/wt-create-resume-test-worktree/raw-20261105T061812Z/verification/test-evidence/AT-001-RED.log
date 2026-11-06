@@ -1,0 +1,17 @@
+=== STATIC: pre-flight checks dirs + init marker ===
+  [FAIL] pre-flight resolves registered worktree dir
+  [FAIL] pre-flight checks test initialisation marker
+  [FAIL] no-op requires both dirs
+  [ok] inconsistent-state rejection preserved
+  [ok] _init_test_worktree_state still the single source
+  [ok] recovery path still present
+  [ok] bash -n passes
+=== BEHAVIOR: three residue states ===
+  [FAIL] CASE A branch-only residue (rc=0 dev_dir= test_dir=) wt-create: 工位已存在，无需创建 (idempotent no-op)   dev:  /private/tmp/freely-four-a.MrjPuJ/repo-worktrees/fix-raw-20261105T061900Z-dir-gone   test: /private/tmp/freely-four-a.MrjPuJ/repo-worktrees/test-pre-merge-20261105T061900Z-dir-gone 
+  [FAIL] CASE A test worktree missing test-gate.env
+  [FAIL] CASE B half-init residue not repaired (rc=0) wt-create: 工位已存在，无需创建 (idempotent no-op)   dev:  /private/tmp/freely-four-b.9zXo4g/repo-worktrees/fix-raw-20261105T062000Z-half-init   test: /private/tmp/freely-four-b.9zXo4g/repo-worktrees/test-pre-merge-20261105T062000Z-half-init 
+  [ok] CASE B after repair: complete state is idempotent no-op
+  [ok] CASE C dev-missing/test-present still rejected
+  [ok] CASE D complete state re-run is no-op with no duplicate worktree
+
+FAIL: 6 of 13 checks failed
