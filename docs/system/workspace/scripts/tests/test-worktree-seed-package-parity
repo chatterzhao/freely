@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Regression: raw-20261105T062506Z / GitHub #4192 / Gitee IKT4G2
+#
+# package-allowlist.txt declares .freely/tool-boundary-bootstrap.md as a
+# required packaging input, but worktree-seed.toml does not seed it. Any
+# packaging (or packaging test) run inside a freshly created worktree fails
+# with "missing file: .freely/tool-boundary-bootstrap.md" — unrelated to the
+# code under test.
+#
+# Zero-semantics-change boundaries:
+#  - seed entries are declarative data; required=false for bootstrap so a
+#    fresh clone WITHOUT .freely/ can still create worktrees (no new hard
+#    failure) — the package gate remains the place that fails closed
+#  - the parity check only compares DECLARATIONS (allowlist gitignored paths
+#    vs seed manifest paths), never rewrites either file
+#  - freely-package's dangerous-output guard and allowlist copy loop keep
+#    their behaviour; parity runs BEFORE any rm -rf
+#  - wt-create / _init_test_worktree_state / seeder implementation unchanged
+#
+# Modes: static | behavior | all
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+SEED_MANIFEST="$ROOT_DIR/docs/system/workspace/worktree-seed.toml"
+ALLOWLIST="$ROOT_DIR/docs/system/workspace/package-allowlist.txt"
+PACKAGE="$ROOT_DIR/bin/freely-package"
+CHECKER="$ROOT_DIR/docs/system/workspace/scripts/quality/package-seed-parity.py"
+BOOTSTRAP=".freely/tool-boundary-bootstrap.md"
+FAILED=0; PASSED=0
+ok(){ echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad(){ echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+
+static_checks() {
+  echo "=== STATIC: seed declaration + packaging parity check ==="
+  check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+  check "seed manifest declares the bootstrap file" "grep -Fq '$BOOTSTRAP' '$SEED_MANIFEST'"
+  check "bootstrap seed uses copy mode" "python3 -c \"
+import sys
+sys.path.insert(0,'$ROOT_DIR/docs/system/workspace/scripts/worktree')
+import worktree_seed as w
+e,_=w.load('$ROOT_DIR')
+assert any(x['path']=='$BOOTSTRAP' and x['mode']=='copy' for x in e), e
+\""
+  check "bootstrap seed is not required (fresh clone safe)" "python3 -c \"
+import sys
+sys.path.insert(0,'$ROOT_DIR/docs/system/workspace/scripts/worktree')
+import worktree_seed as w
+e,_=w.load('$ROOT_DIR')
+assert any(x['path']=='$BOOTSTRAP' and not x['required'] for x in e), e
+\""
+  check "parity checker exists" "[[ -f '$CHECKER' ]]"
+  check "freely-package invokes the parity check" "grep -Fq 'package-seed-parity.py' '$PACKAGE'"
+  if python3 - "$PACKAGE" <<'PYORDER'
+import sys
+from pathlib import Path
+t = Path(sys.argv[1]).read_text()
+a = t.find('package-seed-parity.py')
+b = t.find('rm -rf "$OUTPUT"')
+assert a > 0 and b > 0 and a < b, (a, b)
+PYORDER
+  then ok "parity check runs before rm -rf"; else bad "parity check runs before rm -rf"; fi
+  check "dangerous-output guard still present" "grep -Fq 'refuse_dangerous_output' '$PACKAGE'"
+  check "bash -n passes" "bash -n '$PACKAGE'"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: fresh worktree can package; missing seed declaration is blocked ==="
+  local TMP TARGET SOURCE
+  TMP="$(mktemp -d /tmp/freely-r5.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  TARGET="$TMP/worktree"
+  SOURCE="$TMP/source-project"
+
+  # Minimal seed SOURCE with plain files (no symlinks): the real manifest is
+  # copied here so the assertion tests the project's actual declaration.
+  mkdir -p "$SOURCE/docs/system/workspace" "$SOURCE/.freely" "$TARGET"
+  cp "$ROOT_DIR/docs/system/workspace/worktree-seed.toml" "$SOURCE/docs/system/workspace/worktree-seed.toml"
+  printf 'role = test\n' > "$SOURCE/.freely/agent-table.toml"
+  printf '# bootstrap fixture\n' > "$SOURCE/.freely/tool-boundary-bootstrap.md"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree_seed.py" "$TMP/worktree_seed.py"
+
+  python3 "$TMP/worktree_seed.py" apply --project "$SOURCE" --target "$TARGET" > "$TMP/seed.log" 2>&1
+  if [[ -f "$TARGET/$BOOTSTRAP" ]]; then
+    ok "seed apply copies the bootstrap into a fresh worktree"
+  else
+    bad "seed apply did not copy $BOOTSTRAP into a fresh worktree ($(tr '\n' ' ' < "$TMP/seed.log"))"
+  fi
+
+  # Parity checker on the real project.
+  if [[ ! -f "$CHECKER" ]]; then
+    bad "parity checker missing ($CHECKER)"
+  else
+    python3 "$CHECKER" --project "$ROOT_DIR" > "$TMP/parity.log" 2>&1
+    if [[ $? -eq 0 ]]; then ok "parity check passes on the real project"; else bad "parity check on real project ($(tail -3 "$TMP/parity.log" | tr '\n' ' '))"; fi
+  fi
+
+  # Parity checker must FAIL when a NEW gitignored allowlist entry has no seed.
+  local FAKE="$TMP/fake-project"
+  mkdir -p "$FAKE/docs/system/workspace" "$FAKE/docs/system/workspace/scripts/quality" "$FAKE/.freely"
+  cp "$ROOT_DIR/docs/system/workspace/worktree-seed.toml" "$FAKE/docs/system/workspace/worktree-seed.toml"
+  printf '# test\n.freely/\n' > "$FAKE/.gitignore"
+  printf '%s\n' "$BOOTSTRAP" > "$FAKE/docs/system/workspace/package-allowlist.txt"
+  printf '# NEW gitignored entry never seeded\n.freely/new-runtime-only.md\n' >> "$FAKE/docs/system/workspace/package-allowlist.txt"
+  if [[ -f "$CHECKER" ]]; then
+    cp "$CHECKER" "$FAKE/docs/system/workspace/scripts/quality/package-seed-parity.py"
+    ( cd "$FAKE" && git init -q -b develop && git config user.name t && git config user.email t@t && echo x > s && git add s && git commit -q -m init )
+    python3 "$CHECKER" --project "$FAKE" --checker "$FAKE/docs/system/workspace/scripts/quality/package-seed-parity.py" > "$TMP/fake.log" 2>&1
+    local RC=$?
+    if [[ $RC -ne 0 ]] && grep -Fq '.freely/new-runtime-only.md' "$TMP/fake.log"; then
+      ok "parity check blocks a new gitignored allowlist entry without a seed"
+    else
+      bad "parity check failed to block undeclared gitignored entry (rc=$RC) $(tail -3 "$TMP/fake.log" | tr '\n' ' ')"
+    fi
+  else
+    bad "parity check blocks a new gitignored allowlist entry without a seed (checker missing)"
+  fi
+
+  # A fresh worktree (seeded) must run the REAL packaging command with no
+  # manual copy. Build a minimal project: allowlist inputs as stand-ins, then
+  # let ONLY the seeder provide the .freely content.
+  local MINI="$TMP/mini-project"
+  mkdir -p "$MINI/bin" "$MINI/docs/system/workspace" "$MINI/docs/system/workspace/scripts/quality" "$MINI/.freely"
+  cp "$ROOT_DIR/bin/freely-package" "$MINI/bin/freely-package"
+  chmod +x "$MINI/bin/freely-package"
+  cp "$ROOT_DIR/docs/system/workspace/package-allowlist.txt" "$MINI/docs/system/workspace/package-allowlist.txt"
+  cp "$ROOT_DIR/docs/system/workspace/worktree-seed.toml" "$MINI/docs/system/workspace/worktree-seed.toml"
+  printf '.freely/\n' > "$MINI/.gitignore"
+  [[ -f "$CHECKER" ]] && cp "$CHECKER" "$MINI/docs/system/workspace/scripts/quality/package-seed-parity.py"
+  while IFS= read -r line; do
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    case "$line" in
+      */) mkdir -p "$MINI/$line" ;;
+      *)  mkdir -p "$(dirname "$MINI/$line")"; [[ -e "$MINI/$line" ]] || printf 'x\n' > "$MINI/$line" ;;
+    esac
+  done < "$ROOT_DIR/docs/system/workspace/package-allowlist.txt"
+  rm -f "$MINI/$BOOTSTRAP"
+  python3 "$TMP/worktree_seed.py" apply --project "$SOURCE" --target "$MINI" > "$TMP/mini-seed.log" 2>&1
+  if [[ -f "$MINI/$BOOTSTRAP" ]]; then
+    ok "seeder supplies bootstrap to the minimal packaging project"
+  else
+    bad "seeder did not supply bootstrap to minimal project ($(tr '\n' ' ' < "$TMP/mini-seed.log"))"
+  fi
+  FREELY_PACKAGE_ALLOW_OUTSIDE=1 "$MINI/bin/freely-package" \
+    --version 20261106T0900Z-nightly --output "$TMP/pkg-out" > "$TMP/pkg.log" 2>&1
+  local PKGRC=$?
+  if [[ $PKGRC -eq 0 && -f "$TMP/pkg-out/$BOOTSTRAP" ]]; then
+    ok "fresh seeded project packages successfully without manual copy"
+  else
+    bad "packaging a fresh seeded project (rc=$PKGRC) $(tail -5 "$TMP/pkg.log" | tr '\n' ' ')"
+  fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo ""
+if [[ "$FAILED" -eq 0 ]]; then echo "PASS: $PASSED checks, 0 failed"; exit 0; fi
+echo "FAIL: $FAILED of $((PASSED+FAILED)) checks failed"
+exit 1

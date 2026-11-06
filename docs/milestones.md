@@ -1,3 +1,24 @@
+## M-20261105T062506Z-A
+- title: fix — 补齐 seed 声明并建立 allowlist/seed 一致性检查
+- status: active
+### candidate_issues
+1. `C-20261105T062506Z-A`
+- milestone: M-20261105T062506Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T062506Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062506Z/issues/I-20261105T062506Z-A.md
+### committed_issues
+1. `I-20261105T062506Z-A`
+- milestone: M-20261105T062506Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062506Z/issues/I-20261105T062506Z-A.md
+### completed_issues
+1. `I-20261105T062506Z-A`
+- milestone: M-20261105T062506Z-A
+- phase_state: completed
+- completed_at: 2026-11-06T09:45:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261105T062506Z/issues/I-20261105T062506Z-A.md
+
 ## M-20261105T062203Z-A
 - title: fix — 恢复模式按 git 登记反查 dev 工位真实路径
 - status: active
