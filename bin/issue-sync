@@ -690,13 +690,22 @@ cmd_close() {
 
   # Strict raw closure is delegated to the configured-platform effect. Only a
   # complete all-platform close may commit platform_state=closed locally.
+  # The effect validates the local phase BEFORE touching any platform, so a
+  # non-terminal raw aborts with zero platform writes. Its exit code is
+  # propagated: 0 complete, 3 partial (retryable), 1 nothing closed.
   if [[ "$(_fm_get "$file" "schema_version")" == "1" ]]; then
-    if ! _raw_effect close-platforms "$file" "$ROOT_DIR"; then
-      echo "[ERROR] issue-sync close: configured platform close failed for $local_id" >&2
-      return 1
+    local _effect_rc=0
+    _raw_effect close-platforms "$file" "$ROOT_DIR" || _effect_rc=$?
+    if [[ "$_effect_rc" -eq 0 ]]; then
+      echo "[issue-sync] close complete: $local_id"
+      return 0
     fi
-    echo "[issue-sync] close complete: $local_id"
-    return 0
+    if [[ "$_effect_rc" -eq 3 ]]; then
+      echo "[ERROR] issue-sync close: partial close for $local_id — at least one platform is still open; rerun to finish" >&2
+      return 3
+    fi
+    echo "[ERROR] issue-sync close: configured platform close failed for $local_id" >&2
+    return 1
   fi
 
   gh_id=$(_gh_issue_number "$file")
@@ -742,19 +751,39 @@ cmd_close() {
     exit 1
   fi
 
+  # Legacy path: per-platform accounting. `platform_state=closed` is an assertion
+  # about EVERY configured platform, so it may only be written after all of them
+  # accepted the close (#4184). Partial success is retryable and must stay visible
+  # to the batch scanner as unsynced.
+  local closed_count=0 failed_count=0 status_line=""
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: closing #$gh_id"
-    # `_gh_close` now returns the real status. Keep the historical
-    # continue-and-report behaviour here; turning partial close into a hard
-    # abort belongs to #4184's close-path accounting.
-    _gh_close "$gh_id" "$reason" || echo "[issue-sync] GitHub: close FAILED" >&2
+    if _gh_close "$gh_id" "$reason" >/dev/null; then
+      closed_count=$((closed_count + 1)); status_line+="github: closed; "
+    else
+      failed_count=$((failed_count + 1)); status_line+="github: error; "
+      echo "[issue-sync] GitHub: close FAILED" >&2
+    fi
   fi
 
   if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
     echo "[issue-sync] Gitee: closing $gitee_id"
-    # Close-path partial accounting (platform closed but local state not written)
-    # is tracked separately in #4184; here we only stop calling a broken CLI.
-    _gitee_close "$gitee_id" >/dev/null || echo "[issue-sync] Gitee: close FAILED" >&2
+    if _gitee_close "$gitee_id" >/dev/null; then
+      closed_count=$((closed_count + 1)); status_line+="gitee: closed; "
+    else
+      failed_count=$((failed_count + 1)); status_line+="gitee: error; "
+      echo "[issue-sync] Gitee: close FAILED" >&2
+    fi
+  fi
+
+  echo "[issue-sync] close status: ${status_line%; }"
+  if [[ "$failed_count" -gt 0 ]]; then
+    if [[ "$closed_count" -gt 0 ]]; then
+      echo "[ERROR] issue-sync close: partial close for $local_id — at least one platform is still open; rerun to finish" >&2
+      return 3
+    fi
+    echo "[ERROR] issue-sync close: no platform accepted the close for $local_id" >&2
+    return 1
   fi
 
   _fm_set_str "$file" "platform_state" "closed"

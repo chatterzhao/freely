@@ -1446,6 +1446,25 @@ def _safe(fn, *args):
     try: return fn(*args)
     except Exception as e: return {"status": "error", "error": str(e)[:200]}
 
+
+def _close_exit_code(results: object) -> int:
+    """Per-platform close accounting: 0 all closed, 3 partial, 1 nothing closed.
+
+    `create-issue` already distinguishes these three states; close used to collapse
+    "closed half of them" into the same exit code as "closed none", which made
+    a retry indistinguishable from a first attempt.
+    """
+    if not isinstance(results, dict) or not results:
+        return 1
+    statuses = [
+        item.get("status") if isinstance(item, dict) else None
+        for item in results.values()
+    ]
+    closed = [status for status in statuses if status == "closed"]
+    if len(closed) == len(statuses):
+        return 0
+    return 3 if closed else 1
+
 # Legacy helpers
 def _gh(*args, check=True):
     return subprocess.run(["gh", *args], capture_output=True, text=True, check=check)
@@ -1476,13 +1495,13 @@ if __name__ == "__main__":
         platform_ids = json.loads(a[2]) if len(a) > 2 else {}
         result = close_issue("", platform_ids)
         print(json.dumps(result, indent=2))
-        raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
+        raise SystemExit(_close_exit_code(result))
     elif len(a) > 1 and a[1] == "close-raw":
         raw_key = a[2] if len(a) > 2 else ""
         platform_ids = json.loads(a[3]) if len(a) > 3 else {}
         result = close_issue_by_raw_key(raw_key, platform_ids)
         print(json.dumps(result, indent=2))
-        raise SystemExit(0 if result and all(item.get("status") == "closed" for item in result.values()) else 1)
+        raise SystemExit(_close_exit_code(result))
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":

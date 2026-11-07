@@ -1,0 +1,8 @@
+# AT-001 regression baseline — raw-20261104T082603Z / #4184
+# worktree vs develop snapshot (/tmp/r12-base) — exit codes must match
+test-platform-write-channel                        worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py             worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                         worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                       worktree=0 baseline=0 MATCH
+test-platform-handler-probe.py                     worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                 worktree=1 baseline=1 MATCH

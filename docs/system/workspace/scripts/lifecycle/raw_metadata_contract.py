@@ -232,7 +232,10 @@ def transition(
         current["closeout_note"] = reason
     elif event == "platform_closed":
         if current["phase_state"] not in {"absorbed", "dropped"}:
-            raise MetadataValidationError("platform close requires terminal raw phase")
+            raise MetadataValidationError(
+                "platform close requires terminal raw phase "
+                f"(current: {current['phase_state']}, need: absorbed|dropped)"
+            )
         current["platform_state"] = "closed"
     else:
         raise MetadataValidationError(f"unknown raw metadata event: {event}")

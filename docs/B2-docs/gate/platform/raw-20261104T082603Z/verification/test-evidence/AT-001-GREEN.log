@@ -1,0 +1,32 @@
+=== STATIC: validate before write, single accounting ===
+  [ok] close_platforms pre-validates, then writes platforms, then persists
+  [ok] terminal-phase error names the current phase
+  [ok] adapter has one close accounting helper
+  [ok] close-multi and close-raw share the 0/3/1 accounting
+  [ok] issue-sync propagates the effect exit code
+  [ok] issue-sync reports partial close distinctly
+  [ok] legacy close path only certifies closed when all platforms closed
+  [ok] issue-sync bash -n
+  [ok] raw_lifecycle_effects parses
+  [ok] platform-adapter parses
+=== BEHAVIOR: close-platforms four-phase contract ===
+  [ok] non-terminal close exits non-zero (rc=1)
+  [ok] non-terminal close made zero platform calls
+  [ok] non-terminal close left platform_state untouched
+  [ok] non-terminal close names the terminal-phase rule
+  [ok] terminal + all closed exits 0
+  [ok] terminal + all closed persists platform_state=closed
+  [ok] platform adapter was actually invoked
+  [ok] partial close exits 3
+  [ok] partial close leaves platform_state uncertified
+  [ok] partial close reports per-platform status
+  [ok] all-failed close exits 1
+  [ok] all-failed close leaves platform_state uncertified
+=== BEHAVIOR: adapter close accounting 0/3/1 ===
+  [ok] accounting maps all/partial/none -> 0/3/1
+=== BEHAVIOR: issue-sync close end-to-end ===
+  [ok] issue-sync surfaces partial close as rc 3
+  [ok] issue-sync partial close does not certify closed
+  [ok] issue-sync refuses to close a non-terminal raw (rc=1)
+  [ok] issue-sync made zero platform calls for a non-terminal raw
+SUMMARY: 27 ok, 0 failed
