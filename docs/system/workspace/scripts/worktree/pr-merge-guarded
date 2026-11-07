@@ -13,9 +13,40 @@ if [[ -z "${PROJECT_ROOT:-}" ]]; then
 fi
 cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&2; exit 1; }
 
-# Shared verdict contract (#4150): the merge gate must READ the review
-# verdict, not treat "file exists" as "review passed".
-source "$PROJECT_ROOT/docs/system/workspace/scripts/worktree/review-verdict.sh" 2>/dev/null || true
+# ── Verdict contract (#4150) ─────────────────────────────────────────────
+# The merge gate must READ the review verdict, not treat "file exists" as
+# "review passed". The parser + decision live in exactly one helper, loaded
+# on demand (never with `source ... || true`: under `set -e` a missing file
+# aborts the whole gate silently).
+#
+# This gate runs in the PRIMARY worktree (the target branch). For the first
+# merge that introduces the helper the file is not on the target branch yet,
+# so fall back to the reviewed branch's own copy — the contract still has a
+# single definition, and the branch is what is about to land anyway.
+_VERDICT_SCRIPTS_DIR="docs/system/workspace/scripts/worktree"
+_verdict_tmpdir=""
+
+_freely_load_verdict_helper() {
+  local helper="$PROJECT_ROOT/$_VERDICT_SCRIPTS_DIR/review-verdict.sh"
+  if [[ -f "$helper" ]]; then
+    # shellcheck source=/dev/null
+    source "$helper"
+    return 0
+  fi
+  [[ -n "${source_branch:-}" ]] || return 1
+  _verdict_tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/freely-verdict.XXXXXX" 2>/dev/null || true)"
+  [[ -n "$_verdict_tmpdir" ]] || return 1
+  if git show "$source_branch:$_VERDICT_SCRIPTS_DIR/review-verdict.sh" > "$_verdict_tmpdir/review-verdict.sh" 2>/dev/null \
+     && git show "$source_branch:$_VERDICT_SCRIPTS_DIR/review_verdict.py" > "$_verdict_tmpdir/review_verdict.py" 2>/dev/null; then
+    # shellcheck source=/dev/null
+    source "$_verdict_tmpdir/review-verdict.sh"
+    trap 'rm -rf "$_verdict_tmpdir"' EXIT
+    return 0
+  fi
+  rm -rf "$_verdict_tmpdir"
+  _verdict_tmpdir=""
+  return 1
+}
 
 usage() {
   cat <<'USAGE'
@@ -641,8 +672,9 @@ do_initial_merge() {
       # Only a literal `pass` verdict may merge. The decision lives in the
       # shared helper (same parser the write side uses), so "file exists" can
       # never stand in for "review passed" again (#4150).
+      _freely_load_verdict_helper || true
       if ! declare -f freely_review_verdict_check >/dev/null 2>&1; then
-        echo "[MERGE-GUARD] ERROR: verdict helper unavailable ($PROJECT_ROOT/docs/system/workspace/scripts/worktree/review-verdict.sh). Refusing to merge without a verdict contract." >&2
+        echo "[MERGE-GUARD] ERROR: verdict helper unavailable ($PROJECT_ROOT/$_VERDICT_SCRIPTS_DIR/review-verdict.sh, and not present on $source_branch). Refusing to merge without a verdict contract." >&2
         exit 1
       fi
       if ! printf '%s\n' "$_review_text" | freely_review_verdict_check - "pr-review-raw-${_raw_key}.md"; then

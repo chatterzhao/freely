@@ -10,9 +10,14 @@
 ### committed_issues
 1. `I-20261103T132540Z-A`
 - milestone: M-20261103T132540Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md
 ### completed_issues
+1. `I-20261103T132540Z-A`
+- milestone: M-20261103T132540Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T10:45:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md
 
 ## M-20261107T090847Z-A
 - title: fix — 两代 receipt 兼容 + 审计链总能跑完
