@@ -210,7 +210,14 @@ cmd_promote_finalize "$RAW_ID"
             )
             self.contract.write_issue(raw_file, absorbed, "\n\n## 问题\n平台关闭聚合。\n")
             adapter.write_text(
-                "#!/usr/bin/env python3\nimport os\nraise SystemExit(int(os.environ['FAKE_CLOSE_RC']))\n",
+                # Faithful to the real adapter contract: close-multi prints
+                # per-platform results, and the exit code is 0/3/1 (#4184).
+                "#!/usr/bin/env python3\n"
+                "import json, os\n"
+                "rc = int(os.environ['FAKE_CLOSE_RC'])\n"
+                "status = 'closed' if rc == 0 else 'error'\n"
+                "print(json.dumps({'github': {'status': status}}))\n"
+                "raise SystemExit(rc)\n",
                 encoding="utf-8",
             )
 

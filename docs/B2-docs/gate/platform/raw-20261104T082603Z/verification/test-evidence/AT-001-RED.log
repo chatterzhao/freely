@@ -1,0 +1,38 @@
+=== STATIC: validate before write, single accounting ===
+  [FAIL] close_platforms order is MISORDERED (want validate -> platform -> persist)
+  [FAIL] terminal-phase error does not report the current phase
+  [FAIL] adapter has no _close_exit_code
+  [FAIL] close accounting used 0 times (want >=2)
+  [FAIL] issue-sync collapses the effect exit code
+  [FAIL] issue-sync has no partial-close branch
+  [FAIL] legacy close path writes platform_state=closed unconditionally
+  [ok] issue-sync bash -n
+  [ok] raw_lifecycle_effects parses
+  [ok] platform-adapter parses
+=== BEHAVIOR: close-platforms four-phase contract ===
+  [ok] non-terminal close exits non-zero (rc=1)
+  [FAIL] non-terminal close still called the platform adapter: close-multi {"github": {"issue_id": "1", "url": "https://github.com/o/r/issues/1", "synced_at": ""}, "gitee": {"issue_id": "A1", "url": "https://gitee.com/o/r/issues/A1", "synced_at": ""}}
+  [ok] non-terminal close left platform_state untouched
+  [ok] non-terminal close names the terminal-phase rule
+  [ok] terminal + all closed exits 0
+  [ok] terminal + all closed persists platform_state=closed
+  [ok] platform adapter was actually invoked
+  [ok] partial close exits 3
+  [ok] partial close leaves platform_state uncertified
+  [ok] partial close reports per-platform status
+  [ok] all-failed close exits 1
+  [ok] all-failed close leaves platform_state uncertified
+=== BEHAVIOR: adapter close accounting 0/3/1 ===
+Traceback (most recent call last):
+  File "<stdin>", line 11, in <module>
+  File "<stdin>", line 11, in <genexpr>
+AttributeError: module 'adapter_probe' has no attribute '_close_exit_code'
+  [FAIL] adapter accounting probe crashed (rc=1)
+=== BEHAVIOR: issue-sync close end-to-end ===
+  [FAIL] issue-sync rc=1 (want 3): {"github":{"status":"closed"},"gitee":{"status":"error","error":"boom"}}
+[ERROR] issue-sync close: configured platform close failed for raw-20260101T000000Z
+RC=1
+  [ok] issue-sync partial close does not certify closed
+  [ok] issue-sync refuses to close a non-terminal raw (rc=1)
+  [FAIL] issue-sync closed platforms first: close-multi {"github": {"issue_id": "1", "url": "https://github.com/o/r/issues/1", "synced_at": ""}, "gitee": {"issue_id": "A1", "url": "https://gitee.com/o/r/issues/A1", "synced_at": ""}}
+SUMMARY: 16 ok, 11 failed

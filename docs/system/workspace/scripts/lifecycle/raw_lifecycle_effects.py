@@ -8,7 +8,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-from raw_metadata_contract import MetadataValidationError, read_issue, transition_issue
+from raw_metadata_contract import (
+    MetadataValidationError,
+    read_issue,
+    transition as contract_transition,
+    transition_issue,
+    write_issue,
+)
 
 
 def _primary_child(metadata: dict[str, object], root_dir: str) -> tuple[str, str]:
@@ -56,26 +62,87 @@ def finalize(arguments: list[str]) -> int:
     return 0
 
 
+def _report_platform_statuses(results: object) -> None:
+    if not isinstance(results, dict):
+        return
+    for platform in sorted(results):
+        item = results[platform] if isinstance(results[platform], dict) else {}
+        status = item.get("status", "unknown")
+        detail = item.get("error", "")
+        suffix = f" ({detail})" if detail else ""
+        print(f"[raw-lifecycle] close {platform}: {status}{suffix}", file=sys.stderr)
+
+
 def close_platforms(arguments: list[str]) -> int:
     file_path, root_dir = arguments
-    metadata, _ = read_issue(file_path)
+    metadata, body = read_issue(file_path)
     platform_ids = metadata.get("platform_ids")
     if not isinstance(platform_ids, dict) or not platform_ids:
         raise ValueError("strict raw has no platform_ids")
 
+    from datetime import datetime, timezone
+
+    closed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Phase 1 — validate locally, without any side effect. Running the pure
+    # transition produces both the verdict and the exact metadata to persist,
+    # so a non-terminal raw fails here and no platform is touched.
+    target = contract_transition(
+        metadata, "platform_closed", base_dir=root_dir, at=closed_at
+    )
+
+    # Phase 2 — perform the platform write.
     adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
     environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
     result = subprocess.run(
         [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
         env=environment,
+        capture_output=True,
+        text=True,
     )
-    if result.returncode != 0:
-        return result.returncode
+    if result.stdout.strip():
+        print(result.stdout.strip())
+    if result.stderr.strip():
+        print(result.stderr.strip(), file=sys.stderr)
 
-    from datetime import datetime, timezone
+    try:
+        payload = json.loads(result.stdout.strip() or "{}")
+    except json.JSONDecodeError:
+        payload = {}
 
-    closed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    transition_issue(file_path, "platform_closed", base_dir=root_dir, at=closed_at)
+    # The adapter owns the 0/3/1 classification (`_close_exit_code`). Here we
+    # only refuse to certify success it cannot back up: rc 0 must come with
+    # every platform actually closed.
+    all_closed = (
+        isinstance(payload, dict)
+        and payload
+        and all(
+            isinstance(item, dict) and item.get("status") == "closed"
+            for item in payload.values()
+        )
+    )
+    code = result.returncode
+    if code == 0 and not all_closed:
+        code = 1
+
+    if code != 0:
+        _report_platform_statuses(payload)
+        if code == 3:
+            print(
+                "[raw-lifecycle] platform close is PARTIAL: at least one platform "
+                "is still open; platform_state left unchanged for an idempotent retry",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "[raw-lifecycle] platform close failed on every platform; "
+                "platform_state left unchanged",
+                file=sys.stderr,
+            )
+        return code
+
+    # Phase 3 — persist the state computed before the platform write, then
+    # phase 4 — report through the exit code returned above.
+    write_issue(file_path, target, body, base_dir=root_dir)
     return 0
 
 

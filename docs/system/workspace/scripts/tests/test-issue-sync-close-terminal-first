@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261104T082603Z / #4184
+# A platform close must never happen before the local contract allows it, and
+# "partially closed" must never look like either success or total failure.
+#
+# Boundaries that must stay green:
+#  - terminal raw + all platforms closed  -> platform_state=closed, rc 0
+#  - create / comment channels untouched
+#  - wt-close's read-only close helper keeps working (rc 3 falls to its else)
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+EFFECTS="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw_lifecycle_effects.py"
+CONTRACT="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw_metadata_contract.py"
+ADAPTER="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+# Pinned early: `ROOT_DIR=... CMD` env prefixes below must not shadow it.
+CONTRACT_ROOT="$ROOT_DIR"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+# ── Fixture: isolated project root with a stub platform adapter ─────────────
+FIX=""
+make_fixture() {
+  FIX="$(mktemp -d /tmp/freely-close.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
+  mkdir -p "$FIX/bin" "$FIX/docs/system/workspace/scripts/sync" \
+           "$FIX/docs/B1-docs/raw-20260101T000000Z"
+  cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  # The adapter is resolved from the project root handed to close-platforms,
+  # so a stub here proves whether the platform write happened at all.
+  cat > "$FIX/docs/system/workspace/scripts/sync/platform-adapter.py" <<'STUB'
+import json, os, sys
+marker = os.environ.get("STUB_MARKER", "")
+if marker:
+    with open(marker, "a") as f:
+        f.write(" ".join(sys.argv[1:]) + "\n")
+payload = os.environ.get("STUB_STATUSES", '{"github":{"status":"closed"},"gitee":{"status":"closed"}}')
+rc = int(os.environ.get("STUB_RC", "0"))
+print(payload)
+raise SystemExit(rc)
+STUB
+  export STUB_MARKER="$FIX/adapter-calls.log"
+  : > "$STUB_MARKER"
+}
+
+# write_issue(): strict frontmatter in canonical field order.
+write_issue_file() {
+  local phase="$1" pstate="${2:-open}"
+  python3 - "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md" "$phase" "$pstate" <<'PY'
+import sys, yaml
+path, phase, pstate = sys.argv[1], sys.argv[2], sys.argv[3]
+fm = {
+    "schema_version": "1",
+    "local_id": "raw-20260101T000000Z",
+    "kind": "raw",
+    "phase_state": phase,
+    "absorbed_into": "I-20260101T000000Z-A" if phase == "absorbed" else "",
+    "platform_ids": {
+        "github": {"issue_id": "1", "url": "https://github.com/o/r/issues/1", "synced_at": ""},
+        "gitee": {"issue_id": "A1", "url": "https://gitee.com/o/r/issues/A1", "synced_at": ""},
+    },
+    "primary_platform": "github",
+    "canonical_issue_path": "",
+    "last_synced_comment_at": {},
+    "hash": "",
+    "created_at": "2026-01-01T00:00:00Z",
+    "updated_at": "2026-01-01T00:00:00Z",
+    "intake_id": "",
+    "author": "platform",
+    "channel": "github",
+    "session_refs": [],
+    "platform_state": pstate,
+    "promoted_children": ["I-20260101T000000Z-A"] if phase == "absorbed" else [],
+    "source_candidate": "",
+    "completed_at": "2026-01-02T00:00:00Z" if phase == "absorbed" else "",
+    "closeout_note": "",
+}
+rendered = yaml.safe_dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+open(path, "w").write(f"---\n{rendered}\n---\n\n# probe issue\n")
+PY
+}
+
+_pstate_of() {
+  python3 - "$1" <<'PY'
+import sys, yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+text = open(sys.argv[1]).read()
+fm = yaml.safe_load(text.split('---', 2)[1]) or {}
+print(fm.get('platform_state', ''))
+PY
+}
+
+run_effects() {
+  # $1 = STUB_STATUSES, $2 = STUB_RC
+  STUB_STATUSES="$1" STUB_RC="$2" python3 "$EFFECTS" close-platforms \
+    "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md" "$FIX" 2>&1
+  echo "RC=$?"
+}
+
+_case() {
+  # Runs in the current shell on purpose: FIX and STUB_MARKER must survive.
+  local phase="$1" statuses="$2" rc="$3"
+  make_fixture; write_issue_file "$phase"
+  CASE_OUT=$(run_effects "$statuses" "$rc")
+  echo "$CASE_OUT" > "$FIX/last.out"
+}
+
+static_checks() {
+  echo "=== STATIC: validate before write, single accounting ==="
+  order=$(python3 - "$EFFECTS" <<'PY'
+src = open(__import__("sys").argv[1]).read()
+body = src[src.index("def close_platforms"):src.index("def main")]
+p, c, w = body.find("transition("), body.find("subprocess.run("), body.find("write_issue(")
+print("ORDERED" if -1 not in (p, c, w) and p < c < w else "MISORDERED")
+PY
+)
+  [[ "$order" == "ORDERED" ]] && ok "close_platforms pre-validates, then writes platforms, then persists" \
+    || bad "close_platforms order is $order (want validate -> platform -> persist)"
+
+  grep -q 'current:' "$CONTRACT" && ok "terminal-phase error names the current phase" \
+    || bad "terminal-phase error does not report the current phase"
+
+  if grep -q 'def _close_exit_code' "$ADAPTER"; then ok "adapter has one close accounting helper"; else bad "adapter has no _close_exit_code"; fi
+  uses=$(grep -c 'SystemExit(_close_exit_code(' "$ADAPTER" || true)
+  [[ "${uses:-0}" -ge 2 ]] && ok "close-multi and close-raw share the 0/3/1 accounting" \
+    || bad "close accounting used ${uses:-0} times (want >=2)"
+
+  grep -qE '_raw_effect close-platforms .*\|\| ' "$ISSUE_SYNC" && ok "issue-sync propagates the effect exit code" \
+    || bad "issue-sync collapses the effect exit code"
+
+  grep -q 'partial close for' "$ISSUE_SYNC" && ok "issue-sync reports partial close distinctly" \
+    || bad "issue-sync has no partial-close branch"
+
+  # The legacy (non-strict) path must not write platform_state=closed unless every platform closed.
+  guard=$(python3 - "$ISSUE_SYNC" <<'PY'
+import sys
+src = open(sys.argv[1]).read()
+body = src[src.index("cmd_close()"):src.index("cmd_promote()")]
+s, g = body.find('_fm_set_str "$file" "platform_state" "closed"'), body.find("failed_count")
+print("GUARDED" if g != -1 and g < s else "UNGUARDED")
+PY
+)
+  [[ "$guard" == "GUARDED" ]] && ok "legacy close path only certifies closed when all platforms closed" \
+    || bad "legacy close path writes platform_state=closed unconditionally"
+
+  bash -n "$ISSUE_SYNC" >/dev/null 2>&1 && ok "issue-sync bash -n" || bad "issue-sync syntax"
+  python3 -c "import ast; ast.parse(open('$EFFECTS').read())" 2>/dev/null \
+    && ok "raw_lifecycle_effects parses" || bad "raw_lifecycle_effects syntax"
+  python3 -c "import ast; ast.parse(open('$ADAPTER').read())" 2>/dev/null \
+    && ok "platform-adapter parses" || bad "platform-adapter syntax"
+}
+
+effect_checks() {
+  echo "=== BEHAVIOR: close-platforms four-phase contract ==="
+  local rc state
+
+  # 1) Non-terminal raw: fail closed, platforms never touched.
+  _case proposed '{"github":{"status":"closed"},"gitee":{"status":"closed"}}' 0
+  rc=$(sed -n 's/^RC=//p' <<<"$CASE_OUT" | tail -1)
+  state=$(_pstate_of "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  [[ "$rc" != "0" ]] && ok "non-terminal close exits non-zero (rc=$rc)" || bad "non-terminal close exited 0"
+  [[ ! -s "$STUB_MARKER" ]] && ok "non-terminal close made zero platform calls" \
+    || bad "non-terminal close still called the platform adapter: $(cat "$STUB_MARKER")"
+  [[ "$state" == "open" ]] && ok "non-terminal close left platform_state untouched" || bad "platform_state changed to $state"
+  grep -q 'requires terminal raw phase' <<<"$CASE_OUT" && ok "non-terminal close names the terminal-phase rule" \
+    || bad "non-terminal close error lacks the rule: $CASE_OUT"
+
+  # 2) Terminal raw + all closed: persist platform_closed.
+  _case absorbed '{"github":{"status":"closed"},"gitee":{"status":"closed"}}' 0
+  rc=$(sed -n 's/^RC=//p' <<<"$CASE_OUT" | tail -1)
+  state=$(_pstate_of "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  [[ "$rc" == "0" ]] && ok "terminal + all closed exits 0" || bad "terminal + all closed rc=$rc: $CASE_OUT"
+  [[ "$state" == "closed" ]] && ok "terminal + all closed persists platform_state=closed" || bad "platform_state=$state (want closed)"
+  [[ -s "$STUB_MARKER" ]] && ok "platform adapter was actually invoked" || bad "adapter never invoked"
+
+  # 3) Terminal raw + partial: rc 3, no local certification.
+  _case absorbed '{"github":{"status":"closed"},"gitee":{"status":"error","error":"boom"}}' 3
+  rc=$(sed -n 's/^RC=//p' <<<"$CASE_OUT" | tail -1)
+  state=$(_pstate_of "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  [[ "$rc" == "3" ]] && ok "partial close exits 3" || bad "partial close rc=$rc (want 3): $CASE_OUT"
+  [[ "$state" == "open" ]] && ok "partial close leaves platform_state uncertified" || bad "partial close wrote platform_state=$state"
+  grep -q 'gitee' <<<"$CASE_OUT" && ok "partial close reports per-platform status" || bad "partial close hides per-platform status"
+
+  # 4) Terminal raw + nothing closed: rc 1.
+  _case absorbed '{"github":{"status":"error","error":"x"},"gitee":{"status":"error","error":"y"}}' 1
+  rc=$(sed -n 's/^RC=//p' <<<"$CASE_OUT" | tail -1)
+  state=$(_pstate_of "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  [[ "$rc" == "1" ]] && ok "all-failed close exits 1" || bad "all-failed close rc=$rc (want 1): $CASE_OUT"
+  [[ "$state" == "open" ]] && ok "all-failed close leaves platform_state uncertified" || bad "all-failed close wrote platform_state=$state"
+  rm -rf "$FIX"; FIX=""
+}
+
+adapter_checks() {
+  echo "=== BEHAVIOR: adapter close accounting 0/3/1 ==="
+  local got got_rc
+  got=$(python3 - "$ADAPTER" <<'PY'
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("adapter_probe", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+cases = [
+    ({"github": {"status": "closed"}, "gitee": {"status": "closed"}}, 0),
+    ({"github": {"status": "closed"}, "gitee": {"status": "error"}}, 3),
+    ({"github": {"status": "error"}, "gitee": {"status": "error"}}, 1),
+    ({}, 1),
+]
+print(" ".join(str(module._close_exit_code(value)) for value, _ in cases))
+print(" ".join(str(want) for _, want in cases))
+PY
+); got_rc=$?
+  if [[ "$got_rc" -ne 0 ]]; then bad "adapter accounting probe crashed (rc=$got_rc)"; return; fi
+  local got_line want_line
+  got_line=$(head -1 <<<"$got"); want_line=$(tail -1 <<<"$got")
+  [[ "$got_line" == "$want_line" ]] && ok "accounting maps all/partial/none -> 0/3/1" \
+    || bad "accounting got '$got_line' want '$want_line'"
+}
+
+issuesync_checks() {
+  echo "=== BEHAVIOR: issue-sync close end-to-end ==="
+  local out rc state
+
+  make_fixture; write_issue_file absorbed; : > "$STUB_MARKER"
+  out=$(ROOT_DIR="$FIX" RAW_METADATA_CONTRACT_ROOT="$CONTRACT_ROOT" \
+        STUB_STATUSES='{"github":{"status":"closed"},"gitee":{"status":"error","error":"boom"}}' STUB_RC=3 \
+        bash -c 'set -uo pipefail; ROOT_DIR="$0"; source "$0/bin/issue-sync"; set +e; ISSUES_DIR="$0/docs/B1-docs"; cmd_close raw-20260101T000000Z; echo "RC=$?"' "$FIX" 2>&1)
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  state=$(_pstate_of "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  [[ "$rc" == "3" ]] && ok "issue-sync surfaces partial close as rc 3" || bad "issue-sync rc=${rc:-<none>} (want 3): $out"
+  [[ "$state" == "open" ]] && ok "issue-sync partial close does not certify closed" || bad "issue-sync wrote platform_state=$state"
+
+  make_fixture; write_issue_file proposed; : > "$STUB_MARKER"
+  out=$(ROOT_DIR="$FIX" RAW_METADATA_CONTRACT_ROOT="$CONTRACT_ROOT" \
+        bash -c 'set -uo pipefail; ROOT_DIR="$0"; source "$0/bin/issue-sync"; set +e; ISSUES_DIR="$0/docs/B1-docs"; cmd_close raw-20260101T000000Z; echo "RC=$?"' "$FIX" 2>&1)
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  [[ -n "$rc" && "$rc" != "0" ]] && ok "issue-sync refuses to close a non-terminal raw (rc=$rc)" || bad "issue-sync closed a non-terminal raw (rc=${rc:-<none>})"
+  [[ ! -s "$STUB_MARKER" ]] && ok "issue-sync made zero platform calls for a non-terminal raw" \
+    || bad "issue-sync closed platforms first: $(cat "$STUB_MARKER")"
+  rm -rf "$FIX"; FIX=""
+}
+
+mode="${1:-all}"
+case "$mode" in
+  static)   static_checks ;;
+  behavior) effect_checks; adapter_checks; issuesync_checks ;;
+  all)      static_checks; effect_checks; adapter_checks; issuesync_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]
