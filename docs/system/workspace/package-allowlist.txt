@@ -38,5 +38,17 @@ bin/
 # Owner: templates-maintainer — 模板
 templates/
 
+# Owner: runtime-maintainer — 运行时必需的 workspace 顶层文件
+# 这些是被 bin/ 与 scripts/{runtime,quality,worktree}/ 以字面路径引用的 tracked
+# 文件；显式列出，不可改成「自动包含整个 docs/system/workspace/」（#4157）。
+# 3 个纯文档/测试资料（commands.md / three-loop-lifecycle.svg /
+# command-wrapper-metadata-lifecycle.md）经评审不随包发布，见
+# docs/B1-docs/raw-20261106T100938Z/brainstorms.md。
+docs/system/workspace/worktree-seed.toml
+docs/system/workspace/package-allowlist.txt
+docs/system/workspace/AGENTS.md.example
+docs/system/workspace/install-lifecycle-allowlist.txt
+docs/system/workspace/release-build-allowlist.txt
+
 # Owner: runtime-maintainer — 工具边界引导
 .freely/tool-boundary-bootstrap.md

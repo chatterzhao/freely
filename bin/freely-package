@@ -108,6 +108,20 @@ if [[ -f "$_PARITY_CHECK" ]]; then
   fi
 fi
 
+# ── Runtime file ↔ package allowlist parity (read-only, fail-closed) ──
+# A tracked docs/system/workspace/ top-level file that runtime code references
+# by literal path but the allowlist omits silently vanishes from the installed
+# state (an installed freely-package then cannot find its own allowlist).
+# Separate from the seed-parity check above: this one guards RECURRENCE of
+# allowlist omissions, not gitignored/seed declarations.
+_RUNTIME_PARITY="$ROOT_DIR/docs/system/workspace/scripts/quality/package-runtime-file-parity.py"
+if [[ -f "$_RUNTIME_PARITY" ]]; then
+  if ! python3 "$_RUNTIME_PARITY" --project "$ROOT_DIR"; then
+    echo "[ERROR] packaging aborted: runtime file / allowlist parity check failed" >&2
+    exit 1
+  fi
+fi
+
 # 清理旧输出
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT"

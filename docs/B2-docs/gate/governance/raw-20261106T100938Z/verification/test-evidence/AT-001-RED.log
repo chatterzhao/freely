@@ -1,0 +1,30 @@
+=== STATIC: allowlist completeness + parity checker hook ===
+  [FAIL] allowlist declares worktree-seed.toml
+  [FAIL] allowlist declares package-allowlist.txt (self-bootstrap)
+  [FAIL] allowlist declares AGENTS.md.example
+  [FAIL] allowlist declares install-lifecycle-allowlist.txt
+  [FAIL] allowlist declares release-build-allowlist.txt
+  [ok] doc-only material NOT unconditionally packaged
+  [FAIL] read-only runtime-file parity checker exists
+  [FAIL] freely-package calls the runtime-file checker
+  [FAIL] parity hook runs before rm -rf
+  [ok] dangerous-output guard still before rm -rf
+  [ok] R5 seed parity hook preserved before rm -rf
+  [ok] R5 seed parity checker still present
+  [FAIL] static contract (see above)
+  [ok] bash -n freely-package
+=== BEHAVIOR: real package output + installed-state self-bootstrap ===
+  [ok] real packaging succeeds with integrity verified
+  [FAIL] missing in package: docs/system/workspace/worktree-seed.toml
+  [FAIL] missing in package: docs/system/workspace/package-allowlist.txt
+  [FAIL] missing in package: docs/system/workspace/AGENTS.md.example
+  [FAIL] missing in package: docs/system/workspace/install-lifecycle-allowlist.txt
+  [FAIL] missing in package: docs/system/workspace/release-build-allowlist.txt
+  [FAIL] package runtime-file parity (see above)
+  [FAIL] installed-state self-packaging (rc=1) [ERROR] allowlist not found: /private/tmp/freely-r55.9d6oTU/pkg/docs/system/workspace/package-allowlist.txt 
+  installed source=builtin entries=1; truth source=manifest entries=3
+  [FAIL] installed seeder fell back to builtin
+  [FAIL] installed seeder (see above)
+  [FAIL] installed R5 seed parity (rc=2) [seed-parity] ERROR: allowlist not found: /private/tmp/freely-r55.9d6oTU/pkg/docs/system/workspace/package-allowlist.txt 
+  [FAIL] recurrence guard (checker missing: docs/system/workspace/scripts/quality/package-runtime-file-parity.py)
+PASS: 2 checks, 6 failed
