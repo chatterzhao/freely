@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261103T132509Z / #4147
+# commit-msg.sh is a 130-line orphan: no .githooks/commit-msg shim, no caller.
+# Wire it (option 1) with two guarantees:
+#   - a protected-branch merge commit WITHOUT canonical trailers is rejected
+#   - a FORGED trailer (hand merge + self-filled receipt) is also rejected,
+#     via the controlled handshake (FREELY_GUARDED_MERGE_COMPLETION + state file)
+# Zero-regression boundaries:
+#   - test-pre-merge-* sync merges (every round) must NOT be blocked
+#   - normal commits keep passing (subject rules already verified against 25
+#     real history commits: 0 violations)
+#   - .githooks/post-checkout stays untouched
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR" || exit 1
+HOOKS="$ROOT_DIR/.githooks"
+TRUTH="$ROOT_DIR/docs/system/workspace/hooks/commit-msg.sh"
+README="$ROOT_DIR/docs/system/workspace/hooks/README.md"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+static_checks() {
+  echo "=== STATIC: commit-msg hook is wired ==="
+  if [[ -f "$HOOKS/commit-msg" ]]; then ok ".githooks/commit-msg shim exists"; else bad ".githooks/commit-msg shim missing (orphan truth)"; fi
+  if [[ -f "$HOOKS/commit-msg" ]] && grep -qF '[[ -f ' "$HOOKS/commit-msg"; then ok "shim uses -f (works with 100644 truth)"; else bad "shim requires execute bit"; fi
+  if [[ -f "$HOOKS/commit-msg" ]] && grep -qF 'exit 2' "$HOOKS/commit-msg"; then ok "shim is fail-closed (exit 2 on missing truth)"; else bad "shim not fail-closed"; fi
+  if grep -qF 'freely-guarded-merge-state' "$TRUTH" && grep -qF 'FREELY_GUARDED_MERGE_COMPLETION' "$TRUTH"; then
+    ok "truth validates the controlled handshake (forged trailer rejected)"
+  else
+    bad "truth has no independent handshake check"
+  fi
+  # Check the CASE pattern, not a comment that mentions test-pre-merge-*.
+  if grep -qE '^ *main\|develop\|test-pre-merge-\*\)' "$TRUTH"; then bad "truth still treats test-pre-merge merges as receipt-required"; else ok "test-pre-merge sync merges exempt from receipt check"; fi
+  if grep -qF 'commit-msg' "$README"; then ok "README documents the wired commit-msg layer"; else bad "README does not mention commit-msg"; fi
+  git diff --quiet HEAD -- "$HOOKS/post-checkout" && ok "post-checkout untouched" || bad "post-checkout changed"
+  bash -n "$TRUTH" >/dev/null 2>&1 && ok "commit-msg.sh bash -n passes" || bad "commit-msg.sh syntax broken"
+}
+
+# Build an isolated repo with the REAL shim + REAL truth script.
+_setup() {
+  local TMP="$1" R="$TMP/repo"
+  mkdir -p "$R/.githooks" "$R/docs/system/workspace/hooks"
+  # When the shim is missing (RED baseline), simply do not install a
+  # commit-msg hook: that IS the orphan state under test.
+  if [[ -f "$HOOKS/commit-msg" ]]; then
+    cp "$HOOKS/commit-msg" "$R/.githooks/commit-msg"
+    chmod +x "$R/.githooks/commit-msg"
+  fi
+  cp "$TRUTH" "$R/docs/system/workspace/hooks/commit-msg.sh"
+  git -C "$R" init -q -b develop
+  git -C "$R" config user.name tester
+  git -C "$R" config user.email tester@example.com
+  git -C "$R" config core.hooksPath .githooks
+  printf 'base\n' > "$R/a"
+  git -C "$R" add a
+  git -C "$R" commit -q -m init --no-verify
+  git -C "$R" checkout -q -b fix/FEATURE
+  printf 'feature\n' >> "$R/a"
+  git -C "$R" add a
+  git -C "$R" commit -q -m feat --no-verify
+  git -C "$R" checkout -q develop
+}
+
+# $1=tmp $2=branch $3=msg-file-content $4=handshake(0|1)
+_try_merge() {
+  local TMP="$1" BRANCH="$2" MSG="$3" HANDSHAKE="$4" R="$TMP/repo"
+  git -C "$R" checkout -q "$BRANCH" 2>/dev/null || git -C "$R" checkout -q -b "$BRANCH"
+  git -C "$R" merge --no-commit --no-ff fix/FEATURE >/dev/null 2>&1 || true
+  local GD; GD="$(git -C "$R" rev-parse --git-dir)"
+  printf '%s' "$MSG" > "$R/$GD/MERGE_MSG"
+  if [[ "$HANDSHAKE" == "1" ]]; then
+    printf 'target_branch=%s\nsource_branch=fix/FEATURE\nbypass_mode=forbidden\n' "$BRANCH" > "$R/$GD/freely-guarded-merge-state"
+  else
+    rm -f "$R/$GD/freely-guarded-merge-state"
+  fi
+  ( cd "$R" && FREELY_GUARDED_MERGE_COMPLETION="$HANDSHAKE" GIT_EDITOR=: git merge --continue ) > "$TMP/merge.log" 2>&1
+  local RC=$?
+  git -C "$R" merge --abort >/dev/null 2>&1 || true
+  git -C "$R" reset --hard -q HEAD >/dev/null 2>&1 || true
+  return "$RC"
+}
+
+FULL_MSG=$'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: pr-merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+NO_TRAILER=$'Merge branch \'fix/FEATURE\' into develop\n'
+FORGED_MSG=$'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: pr-merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+
+behavior_checks() {
+  echo "=== BEHAVIOR: isolated git repos ==="
+  local TMP RC
+
+  # CASE A: develop merge WITHOUT trailers -> must be rejected.
+  TMP="$(mktemp -d /tmp/freely-r9a.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  _try_merge "$TMP" develop "$NO_TRAILER" 0; RC=$?
+  if [[ "$RC" -ne 0 ]] && grep -qF 'Commit blocked' "$TMP/merge.log"; then ok "CASE A: develop merge without trailer rejected with reason"; else bad "CASE A: merge without trailer passed (rc=$RC)"; fi
+  rm -rf "$TMP"
+
+  # CASE B: FORGED trailer (hand merge, no controlled handshake) -> rejected.
+  TMP="$(mktemp -d /tmp/freely-r9b.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  _try_merge "$TMP" develop "$FORGED_MSG" 0; RC=$?
+  if [[ "$RC" -ne 0 ]] && grep -qF 'handshake' "$TMP/merge.log"; then ok "CASE B: forged trailer rejected by handshake check"; else bad "CASE B: forged trailer accepted (rc=$RC)"; fi
+  rm -rf "$TMP"
+
+  # CASE C: legitimate guarded merge (trailers + handshake) -> accepted.
+  TMP="$(mktemp -d /tmp/freely-r9c.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  _try_merge "$TMP" develop "$FULL_MSG" 1; RC=$?
+  if [[ "$RC" -eq 0 ]]; then ok "CASE C: legitimate guarded merge accepted"; else bad "CASE C: guarded merge blocked (rc=$RC): $(tail -3 "$TMP/merge.log" | tr '\n' ' ')"; fi
+  rm -rf "$TMP"
+
+  # CASE D: test-pre-merge sync merge (every round) must NOT be blocked.
+  TMP="$(mktemp -d /tmp/freely-r9d.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  _try_merge "$TMP" test-pre-merge-X $'test: sync into test-pre-merge\n' 0; RC=$?
+  if [[ "$RC" -eq 0 ]]; then ok "CASE D: test-pre-merge sync merge accepted (no self-lock)"; else bad "CASE D: test worktree merge blocked (rc=$RC): $(tail -3 "$TMP/merge.log" | tr '\n' ' ')"; fi
+  rm -rf "$TMP"
+
+  # CASE E: normal commit still passes general message rules.
+  TMP="$(mktemp -d /tmp/freely-r9e.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  printf 'normal\n' >> "$TMP/repo/a"
+  git -C "$TMP/repo" add a
+  git -C "$TMP/repo" commit -m "fix: normal worktree commit" > "$TMP/e.log" 2>&1; RC=$?
+  if [[ "$RC" -eq 0 ]]; then ok "CASE E: normal commit accepted by wired hook"; else bad "CASE E: normal commit blocked (rc=$RC)"; fi
+  rm -rf "$TMP"
+
+  # CASE F: general rules still enforced (subject >100 rejected).
+  TMP="$(mktemp -d /tmp/freely-r9f.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup "$TMP"
+  printf 'more\n' >> "$TMP/repo/a"
+  git -C "$TMP/repo" add a
+  local LONG; LONG="fix: $(printf 'x%.0s' $(seq 1 110))"
+  git -C "$TMP/repo" commit -m "$LONG" > "$TMP/f.log" 2>&1; RC=$?
+  if [[ "$RC" -ne 0 ]] && grep -qF 'exceeds 100' "$TMP/f.log"; then ok "CASE F: general subject-length rule enforced"; else bad "CASE F: general rule lost (rc=$RC)"; fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "PASS: $PASS checks, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1

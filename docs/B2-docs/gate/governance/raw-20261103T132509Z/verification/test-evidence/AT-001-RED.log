@@ -1,0 +1,17 @@
+=== STATIC: commit-msg hook is wired ===
+  [FAIL] .githooks/commit-msg shim missing (orphan truth)
+  [FAIL] shim requires execute bit
+  [FAIL] shim not fail-closed
+  [FAIL] truth has no independent handshake check
+  [FAIL] truth still treats test-pre-merge merges as receipt-required
+  [FAIL] README does not mention commit-msg
+  [ok] post-checkout untouched
+  [ok] commit-msg.sh bash -n passes
+=== BEHAVIOR: isolated git repos ===
+  [FAIL] CASE A: merge without trailer passed (rc=0)
+  [FAIL] CASE B: forged trailer accepted (rc=0)
+  [ok] CASE C: legitimate guarded merge accepted
+  [ok] CASE D: test-pre-merge sync merge accepted (no self-lock)
+  [ok] CASE E: normal commit accepted by wired hook
+  [FAIL] CASE F: general rule lost (rc=0)
+PASS: 5 checks, 9 failed

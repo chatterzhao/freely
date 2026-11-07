@@ -1,0 +1,65 @@
+=== STATIC: commit-msg hook is wired ===
+  [ok] .githooks/commit-msg shim exists
+  [ok] shim uses -f (works with 100644 truth)
+  [ok] shim is fail-closed (exit 2 on missing truth)
+  [ok] truth validates the controlled handshake (forged trailer rejected)
+  [ok] test-pre-merge sync merges exempt from receipt check
+  [ok] README documents the wired commit-msg layer
+  [ok] post-checkout untouched
+  [ok] commit-msg.sh bash -n passes
+=== BEHAVIOR: isolated git repos ===
+  [ok] CASE A: develop merge without trailer rejected with reason
+  [ok] CASE B: forged trailer rejected by handshake check
+  [ok] CASE C: legitimate guarded merge accepted
+  [ok] CASE D: test-pre-merge sync merge accepted (no self-lock)
+  [ok] CASE E: normal commit accepted by wired hook
+  [ok] CASE F: general subject-length rule enforced
+PASS: 14 checks, 0 failed
+
+=== zero-regression audit (unmodified develop HEAD ba1a1ece8 baseline) ===
+  RED on baseline: PASS 5 / 9 failed (orphan state: no .githooks/commit-msg)
+  GREEN on fix:    PASS 14 / 0 failed
+  test-pre-commit-hook                    1 / 1  (pre-existing, #4151)
+  test-pre-merge-commit-hook              1 / 1  (pre-existing, #4151)
+  test-merge-guarded-hooked-initial-merge-receipt 13 / 13 (deprecated shim ENOENT, R1)
+  test-governance-check-protected-branch-merge-receipt 1 / 1 (pre-existing)
+  test-reference-transaction-hook       128 / 128 IDENTICAL output (pre-existing)
+  test-gate-fail-closed                   0 / 0
+  test-wt-create-four-state-dir           0 / 0
+  test-wt-create-resume-test-worktree     0 / 0
+  test-command-lifecycle-wt-create.py    0 / 0
+  test-governance-gate-batch-read         0 / 0
+  test-open-list-read-degraded.py         0 / 0
+  test-package-runtime-allowlist-parity   0 / 0
+  test-wt-create-top-level-return         0 / 0
+  => 13/13 identical exit codes, 0 new failures, 9 PASS / 5 pre-existing FAIL
+
+=== design notes (verified by probe) ===
+  - `git merge --continue` DOES fire the commit-msg hook, and both
+    FREELY_GUARDED_MERGE_COMPLETION=1 and the freely-guarded-merge-state file
+    are visible to it. Hand merges have neither -> independent rejection point
+    for a self-filled trailer. A direct probe confirmed this before wiring.
+  - Real history: 25 recent commits checked against the general message rules
+    (subject <=100 / no trailing period / blank second line / no trailing
+    whitespace) -> 0 violations. Guarded develop merges all carry the full
+    canonical trailer set, so wiring does not block normal work.
+  - `commit-msg.sh` trailer extraction used `grep|tail` under `set -euo
+    pipefail`: a MISSING trailer made the pipeline fail and aborted the hook
+    BEFORE printing any rejection reason. Replaced with `sed -n ...p` (always
+    succeeds) and routed every rejection heredoc to STDERR (git swallows hook
+    stdout). Without this, CASE A was blocked silently with no reason.
+  - Receipt-gated branches narrowed from `main|develop|test-pre-merge-*` to
+    `main|develop`: every round syncs dev commits into the test-pre-merge
+    sandbox with a plain merge, so requiring a guarded receipt there would
+    self-lock wt-create/testing. Verified CASE D passes.
+  - `.githooks/commit-msg` is byte-identical to the R8 fail-closed shim
+    template (HOOK_NAME-driven), so it works with the 100644 truth script and
+    exits 2 when the truth is missing. `.githooks/post-checkout` untouched.
+
+=== boundary ===
+  `governance-check` post-merge audit, pr-merge-guarded trailer writing and
+  self-check were NOT modified; this PR only adds the missing submission-time
+  layer so the self-check is no longer the only verification point.
+  The `governance-check` merge_path allowlist mismatch (merge-guarded* vs
+  pr-merge-guarded*) was reviewed as a separate defect candidate and is NOT
+  bundled; no new raw issue was filed because it needs a separate scope review.

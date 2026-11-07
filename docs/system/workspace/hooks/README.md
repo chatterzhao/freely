@@ -40,6 +40,14 @@
 - gate 误判应通过修正 gate 模式或向 `FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"` 白名单收敛解决，不得绕过。
 - canonical 治理依赖：hook 时机阻断 + `pr-merge-guarded` 受控 receipt + `governance-check` post-merge audit。
 
+### commit-msg 提交期阻断（已接线）
+
+`.githooks/commit-msg` → `docs/system/workspace/hooks/commit-msg.sh`：
+- 普通提交执行通用 message 规范（subject ≤100 字符、不以句点结尾、第二行留空、无行尾空格）。
+- `develop` / `main` 上的 **merge commit** 必须携带完整 canonical receipt trailer（`Freely-Merge-Path` / `Freely-Bypass-Mode` / `Freely-Source-Branch`），且必须具备由 `pr-merge-guarded` 写入的受控 handshake（`FREELY_GUARDED_MERGE_COMPLETION=1` + `freely-guarded-merge-state`），使「手工 merge 后自填 trailer」无法通过。
+- `test-pre-merge-*` 是一次性测试沙箱，其 sync merge 不需要 receipt（AGENTS.md 允许在该工位 merge/cherry-pick）。
+- shim 用 `-f` 判定真身（`bash file` 不需要执行位），真身缺失时 `exit 2`（环境不可用，按不通过处理）。
+
 ## Guarded Completion Handshake
 
 受保护分支 merge conflict completion 的 machine-readable handshake 由 `pr-merge-guarded` 写入环境变量、由 hook 消费；这不是自由约定文本。

@@ -1,3 +1,24 @@
+## M-20261103T132509Z-A
+- title: fix — 接线 commit-msg 提交期阻断
+- status: active
+### candidate_issues
+1. `C-20261103T132509Z-A`
+- milestone: M-20261103T132509Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132509Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261103T132509Z/issues/I-20261103T132509Z-A.md
+### committed_issues
+1. `I-20261103T132509Z-A`
+- milestone: M-20261103T132509Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132509Z/issues/I-20261103T132509Z-A.md
+### completed_issues
+1. `I-20261103T132509Z-A`
+- milestone: M-20261103T132509Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T09:15:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132509Z/issues/I-20261103T132509Z-A.md
+
 ## M-20261103T132458Z-A
 - title: fix — 门禁 fail-open 收敛为 fail-closed
 - status: active
