@@ -451,20 +451,27 @@ fi
 if [[ -n "$issue_id" ]]; then
   _raw_file="$ISSUES_DIR/$issue_id/issue.md"
   if [[ -f "$_raw_file" ]]; then
-    _scan_py="$ROOT_DIR/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
+    _wt_root="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)}"
+    _scan_py="$_wt_root/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
     if [[ ! -f "$_scan_py" ]]; then
-      echo "[wt-close] comment check unavailable: missing $_scan_py" >&2
-      exit 1
+      # Minimal trees (fixtures, partial packages) may not ship the scan. Only
+      # skip when there is nothing to judge; otherwise fail closed.
+      if grep -q "^### comment-" "$_raw_file"; then
+        echo "[wt-close] comment check unavailable: missing $_scan_py" >&2
+        exit 1
+      fi
+      echo "wt-close: comment check skipped (no scan, no comments)"
+    else
+      _scan_out="$(python3 "$_scan_py" "$ISSUES_DIR" 2>&1 || true)"
+      if grep -q "^  $issue_id:" <<<"$_scan_out"; then
+        echo "[wt-close] comments without resolution:"
+        grep "^  $issue_id:" <<<"$_scan_out"
+        echo "  每条人类评论必须有子评论标记 adopted（采纳）或 discarded（丢弃）"
+        echo "  添加 #### resolution-{ts} 后重试 wt-close"
+        exit 1
+      fi
+      echo "wt-close: comment check ✓"
     fi
-    _scan_out="$(python3 "$_scan_py" "$ISSUES_DIR" 2>&1 || true)"
-    if grep -q "^  $issue_id:" <<<"$_scan_out"; then
-      echo "[wt-close] comments without resolution:"
-      grep "^  $issue_id:" <<<"$_scan_out"
-      echo "  每条人类评论必须有子评论标记 adopted（采纳）或 discarded（丢弃）"
-      echo "  添加 #### resolution-{ts} 后重试 wt-close"
-      exit 1
-    fi
-    echo "wt-close: comment check ✓"
   fi
 fi
 
