@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261107T090847Z / #4211
+# governance-check's post-merge receipt audit has two defects:
+#   1) merge_path allowlist only accepts legacy `merge-guarded*`, so all
+#      current `pr-merge-guarded*` merges are reported as unknown
+#   2) `set -e` aborts the whole script at an earlier failing check, so the
+#      receipt audit (line ~878) never runs and no summary is printed
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR" || exit 1
+GC="$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check"
+GC_BIN="$ROOT_DIR/bin/governance-check"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+static_checks() {
+  echo "=== STATIC: two-generation allowlist + always-run audit ==="
+  python3 - "$GC" <<'PY'
+import sys, re
+from pathlib import Path
+t = Path(sys.argv[1]).read_text(encoding="utf-8")
+def _body(name):
+    s = t.index(name + "()")
+    e = t.index("\n}\n", s)
+    return t[s:e]
+
+checks = [
+    ("allowlist accepts pr-merge-guarded", "pr-merge-guarded|pr-merge-guarded-complete" in t),
+    ("allowlist keeps legacy merge-guarded", "merge-guarded|merge-guarded-complete" in t),
+    ("check_no_tbd guards missing files", '[[ -f "$file" ]]' in _body("check_no_tbd")),
+    ("check_three_loop_reference guards missing files", '[[ -f "$file" ]]' in _body("check_three_loop_reference")),
+    ("check_fixed_string guards missing files", '[[ ! -f "$file" ]]' in _body("check_fixed_string")),
+    ("empty entries guarded under set -u", 'if [[ "${#entries[@]}" -gt 0 ]]; then' in t),
+    ("check_entry_naming no longer returns 1 after fail", "return 1" not in _body("check_entry_naming")),
+    ("receipt audit call is guarded against set -e", "audit_current_protected_branch_merge_receipt || true" in t),
+    ("backfills audit still present", "audit_recorded_protected_branch_merge_receipt_backfills" in t),
+]
+failed = 0
+for label, good in checks:
+    print(("  [ok] " if good else "  [FAIL] ") + label)
+    if not good:
+        failed += 1
+sys.exit(1 if failed else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "static contract"; else bad "static contract (see above)"; fi
+  bash -n "$GC" >/dev/null 2>&1 && ok "governance-check bash -n passes" || bad "bash -n failed"
+}
+
+# Build an isolated project with a minimal governance-check copy and a
+# synthetic protected-branch merge commit. We reuse ONLY the audit function
+# plus the top-level chain shape to prove both defects.
+_setup() {
+  local TMP="$1" R="$TMP/repo"
+  mkdir -p "$R/bin" "$R/docs/system/workspace/scripts/quality" "$R/docs/system/workspace/hooks" "$R/docs/B1-docs"
+  cp "$GC_BIN" "$R/bin/governance-check"
+  cp "$GC" "$R/docs/system/workspace/scripts/quality/governance-check"
+  chmod +x "$R/bin/governance-check" "$R/docs/system/workspace/scripts/quality/governance-check"
+  git -C "$R" init -q -b develop
+  git -C "$R" config user.name tester
+  git -C "$R" config user.email tester@example.com
+  printf 'base\n' > "$R/a"
+  git -C "$R" add a
+  git -C "$R" commit -q -m init --no-verify
+  git -C "$R" checkout -q -b fix/FEATURE
+  printf 'feature\n' >> "$R/a"
+  git -C "$R" add a
+  git -C "$R" commit -q -m feat --no-verify
+  git -C "$R" checkout -q develop
+  # Create a real 2-parent merge commit with the given receipt message.
+  git -C "$R" merge --no-commit --no-ff fix/FEATURE >/dev/null 2>&1 || true
+  git -C "$R" commit -q -m "$2" --no-verify
+}
+
+# Extract the audit function into a standalone probe (self-contained fail()).
+_probe_audit() {
+  local R="$1"
+  python3 - "$GC" "$R" <<'PY'
+import sys
+from pathlib import Path
+src, repo = Path(sys.argv[1]), Path(sys.argv[2])
+text = src.read_text(encoding="utf-8")
+start = text.index("audit_current_protected_branch_merge_receipt()")
+end = text.index("\nprotected_branch_merge_source_allowed()", start)
+fn = text[start:end]
+# Helper functions are defined AFTER the audit function in this script
+# (merge_source_allowed / source_policy_effective_date / active_for_head).
+# Include everything from `end` up to the next unrelated function.
+hs = end
+he = text.index("\naudit_recorded_protected_branch_merge_receipt_backfills()", hs)
+helpers = text[hs:he]
+Path(repo, "probe.sh").write_text(
+    "#!/usr/bin/env bash\nset -uo pipefail\nerrors=0; warnings=0\n"
+    "fail(){ echo \"[FAIL] $*\"; errors=$((errors+1)); }\n"
+    + helpers + "\n" + fn + "\n"
+    "audit_current_protected_branch_merge_receipt\n"
+    "echo \"PROBE_ERRORS=$errors\"\n", encoding="utf-8")
+PY
+  ( cd "$R" && bash probe.sh )
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: real merge commits + full script ==="
+  local TMP R OUT
+
+  # CASE A: current pr-merge-guarded merge must NOT be flagged as unknown.
+  TMP="$(mktemp -d /tmp/freely-r95a.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: pr-merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+  OUT="$(_probe_audit "$R" 2>&1)"
+  if ! grep -qF 'unknown Freely-Merge-Path' <<<"$OUT"; then ok "CASE A: pr-merge-guarded receipt accepted"; else bad "CASE A: $(grep 'unknown Freely' <<<"$OUT" | head -1)"; fi
+  rm -rf "$TMP"
+
+  # CASE B: legacy merge-guarded merge must still be accepted (history compat).
+  TMP="$(mktemp -d /tmp/freely-r95b.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+  OUT="$(_probe_audit "$R" 2>&1)"
+  if ! grep -qF 'unknown Freely-Merge-Path' <<<"$OUT"; then ok "CASE B: legacy merge-guarded receipt accepted"; else bad "CASE B: legacy rejected"; fi
+  rm -rf "$TMP"
+
+  # CASE C: a bogus merge_path must still be rejected.
+  TMP="$(mktemp -d /tmp/freely-r95c.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: bogus-hand-merge\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+  OUT="$(_probe_audit "$R" 2>&1)"
+  if grep -qF 'unknown Freely-Merge-Path' <<<"$OUT"; then ok "CASE C: invalid merge_path rejected"; else bad "CASE C: invalid value accepted"; fi
+  rm -rf "$TMP"
+
+  # CASE D: missing trailer must still be rejected.
+  TMP="$(mktemp -d /tmp/freely-r95d.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n'
+  OUT="$(_probe_audit "$R" 2>&1)"
+  if grep -qF 'missing Freely-Merge-Path' <<<"$OUT"; then ok "CASE D: missing trailer rejected"; else bad "CASE D: missing trailer not reported"; fi
+  rm -rf "$TMP"
+
+  # CASE E: full governance-check must run to the summary even with pre-existing
+  # [FAIL] lines (currently set -e aborts before the receipt audit).
+  TMP="$(mktemp -d /tmp/freely-r95e.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: pr-merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+  ( cd "$R" && ./bin/governance-check ) > "$TMP/e.log" 2>&1 || true
+  if grep -qE 'Governance check (failed|passed)' "$TMP/e.log"; then
+    ok "CASE E: full script reaches the summary despite earlier FAILs"
+  else
+    bad "CASE E: script aborted before summary ($(tail -1 "$TMP/e.log" | cut -c1-80))"
+  fi
+  rm -rf "$TMP"
+
+  # CASE F: full run must not report the valid pr-merge-guarded merge as unknown.
+  TMP="$(mktemp -d /tmp/freely-r95f.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; R="$TMP/repo"
+  _setup "$TMP" $'Merge branch \'fix/FEATURE\' into develop\n\nFreely-Merge-Path: pr-merge-guarded\nFreely-Bypass-Mode: forbidden\nFreely-Source-Branch: fix/FEATURE\n'
+  ( cd "$R" && ./bin/governance-check ) > "$TMP/f.log" 2>&1 || true
+  if ! grep -qF 'unknown Freely-Merge-Path' "$TMP/f.log"; then ok "CASE F: full run has no false unknown receipt"; else bad "CASE F: full run false-positives"; fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "PASS: $PASS checks, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1

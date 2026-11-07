@@ -1,3 +1,24 @@
+## M-20261107T090847Z-A
+- title: fix — 两代 receipt 兼容 + 审计链总能跑完
+- status: active
+### candidate_issues
+1. `C-20261107T090847Z-A`
+- milestone: M-20261107T090847Z-A
+- status: promoted
+- promoted_issue_id: I-20261107T090847Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261107T090847Z/issues/I-20261107T090847Z-A.md
+### committed_issues
+1. `I-20261107T090847Z-A`
+- milestone: M-20261107T090847Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T090847Z/issues/I-20261107T090847Z-A.md
+### completed_issues
+1. `I-20261107T090847Z-A`
+- milestone: M-20261107T090847Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T09:50:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T090847Z/issues/I-20261107T090847Z-A.md
+
 ## M-20261103T132509Z-A
 - title: fix — 接线 commit-msg 提交期阻断
 - status: active
