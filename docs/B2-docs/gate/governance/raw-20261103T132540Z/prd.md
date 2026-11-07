@@ -21,7 +21,7 @@
 
 ## 不退化边界
 
-- 历史两种 verdict 写法（`- verdict: pass` 与 `- verdict: **pass**`）都必须解析成功；401 份真实 review 文档零不可判定。
+- 历史两种 verdict 写法（`- verdict: pass` 与 `- verdict: **pass**`）都必须解析成功；402 份真实 review 文档零不可判定。
 - `pr-merge-guarded --dry-run` 仍不要求 review 文件。
 - `completed` 的历史记账豁免保留：仍不强制 `verification_artifact_dir`，避免对大量历史缺失字段的 issue 立即自锁。
 - 不改 `.githooks/`、`commit-msg.sh`、R8/R9/R9.5 的 fail-closed 语义。

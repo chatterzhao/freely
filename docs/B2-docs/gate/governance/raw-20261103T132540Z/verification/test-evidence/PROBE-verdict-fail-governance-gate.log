@@ -1,0 +1,20 @@
+[FAIL] develop merge governance gate blocked.
+
+── 需要阅读的 Skill ──
+  skill:freely-doc-B2_IBM-execution §门禁常见坑速查 (1 个错误)
+
+── B2_IBM 相关错误 (1) ──
+  - I-20261103T132540Z-A in docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md is marked completed, but its review artifact declares a non-pass verdict: docs/B2-docs/gate/governance/raw-20261103T132540Z/code-reviews/pr-review-raw-20261103T132540Z.md (fail). An explicit failing review cannot be outvoted by the completed phase.
+
+Allowed candidate statuses before merge:
+- needs_research (还需要继续研究；可停在 milestone candidate_issues，但必须有 next_action 和 revisit_trigger)
+- blocked (当前 pre-brainstorm 已识别阻塞；可停在 milestone candidate_issues，但必须写清 blocker 后的下一步)
+- promoted (不允许停在当前环；必须已经 materialize 成一个或多个 I-{issue-id}*)
+- absorbed (允许不新开独立 issue，但必须指向吸收它的 canonical owner issue)
+- dropped (允许不进入下一环，但必须写清不再推进的原因)
+
+不要对着错误逐条改字段。
+先看上面「需要阅读的 Skill」——加载对应的 skill 按规范流程修正。
+
+Warnings:
+- I-20261103T132540Z-A in docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md has phase_state 'completed' but carries capability/implementation changes. Verify commit history shows B1→B2→RED→dev→GREEN order (governance commits before implementation). If governance preceded implementation in separate commits, this is valid — ignore this warning.

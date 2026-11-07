@@ -15,7 +15,7 @@ review 文件写 `verdict: fail` 也照合并；作者一句 `--verdict pass --r
 
 ## 证据
 
-- 格式普查：`docs/B2-docs` 下 401 份 `pr-review-*.md`，其中 399 份含 `verdict:` 行（AT-001 census 实测 `401 review docs, 399 with verdict, 0 unparseable`）。
+- 格式普查：`docs/B2-docs` 下 401 份 `pr-review-*.md`，其中 399 份含 `verdict:` 行（AT-001 census 实测 `402 review docs, 400 with verdict, 0 unparseable（含本轮新增 1 份；合并前基线 401/399）`）。
 - 历史写法并存：`- verdict: pass`（多数）与 `- verdict: **pass**`（本会话 R1..R9.5 共 9 份粗体），另有 3 份历史 `fail`。
 - 因此任何只看单一写法的解析器都会对历史语料自我锁死 —— 这是本 issue 的设计硬约束，不是附带细节。
 
