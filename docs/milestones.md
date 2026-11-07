@@ -1,3 +1,24 @@
+## M-20261104T082556Z-A
+- title: fix — issue-sync 能找到 B2 文档，promote 不再必然失败
+- status: active
+### candidate_issues
+1. `C-20261104T082556Z-A`
+- milestone: M-20261104T082556Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T082556Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261104T082556Z/issues/I-20261104T082556Z-A.md
+### committed_issues
+1. `I-20261104T082556Z-A`
+- milestone: M-20261104T082556Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261104T082556Z/issues/I-20261104T082556Z-A.md
+### completed_issues
+1. `I-20261104T082556Z-A`
+- milestone: M-20261104T082556Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T13:05:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261104T082556Z/issues/I-20261104T082556Z-A.md
+
 ## M-20261104T082603Z-A
 - title: fix — 关闭路径先校验后执行，部分成功独立退出码
 - status: active

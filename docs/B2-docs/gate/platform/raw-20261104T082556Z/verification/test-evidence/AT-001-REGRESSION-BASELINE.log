@@ -1,0 +1,8 @@
+# AT-001 regression baseline — raw-20261104T082556Z / #4183
+test-platform-write-channel                        worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first               worktree=0 baseline=0 MATCH
+test-test-gate-record                              worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py             worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                         worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                       worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                 worktree=1 baseline=1 MATCH

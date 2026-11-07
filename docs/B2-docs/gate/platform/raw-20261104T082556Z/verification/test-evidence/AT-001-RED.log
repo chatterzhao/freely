@@ -1,0 +1,24 @@
+=== STATIC: one resolver, no B1-only assumptions ===
+  [FAIL] no _issue_file_for resolver
+  [FAIL] 5 command(s) still hard-code the B1 path
+  [FAIL] cmd_promote still prefix-searches the B2 tree
+  [FAIL] platform_state is written unconditionally
+  [ok] issue-sync bash -n
+=== BEHAVIOR: B2 documents can be created and promoted ===
+  [FAIL] cmd_create on a B2 document rc=1: [ERROR] /private/tmp/freely-promote.atC3mu/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+RC=1
+  [FAIL] platform_ids on the B2 document: {}
+  [ok] no platform_state field was injected into the linked document
+  [FAIL] promote rc=1: [issue-sync] promote: raw-20260101T000000Z → I-20260101T000000Z-A
+[ERROR] /private/tmp/freely-promote.5R25uH/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+RC=1
+  [FAIL] promoted_children: []
+  [FAIL] B2 document has no promoted_from comment
+  [FAIL] promote did not write platform ids: {}
+  [ok] missing document fails (rc=1)
+  [FAIL] missing document error is unhelpful: [ERROR] /private/tmp/freely-promote.qT4xZ6/docs/B1-docs/I-20260102T000000Z-A/issue.md not found
+RC=1
+  [ok] ambiguous document fails (rc=1)
+  [FAIL] ambiguity not reported: [ERROR] /private/tmp/freely-promote.JYEXqB/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+RC=1
+SUMMARY: 4 ok, 12 failed

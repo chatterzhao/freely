@@ -1,0 +1,19 @@
+=== STATIC: one resolver, no B1-only assumptions ===
+  [ok] resolver _issue_file_for exists
+  [ok] no command hard-codes the B1 path any more
+  [ok] cmd_promote resolves through the shared helper
+  [ok] platform_state is written only when declared
+  [ok] issue-sync bash -n
+=== BEHAVIOR: B2 documents can be created and promoted ===
+  [ok] cmd_create resolves the B2 document and exits 0
+  [ok] B2 document received both platform ids
+  [ok] no platform_state field was injected into the linked document
+  [ok] promote exits 0 for a B2 target
+  [ok] raw recorded the promoted child
+  [ok] B2 document carries the promoted_from comment
+  [ok] promote created the platform issue for the B2 document
+  [ok] missing document fails (rc=1)
+  [ok] missing document reports what was checked
+  [ok] ambiguous document fails (rc=1)
+  [ok] ambiguity is reported with both candidates
+SUMMARY: 16 ok, 0 failed
