@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261107T120208Z / #4216
+# "Tests ran at this commit" must be recordable through a command, by exactly
+# one writer, and daemon lifecycle must stop impersonating a test result.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+FREELY="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+FIX=""
+make_fixture() {
+  FIX="$(mktemp -d /tmp/freely-tg.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
+  git -C "$FIX" init -q .
+  git -C "$FIX" config user.email probe@example.com
+  git -C "$FIX" config user.name probe
+  printf 'probe\n' > "$FIX/probe.txt"
+  git -C "$FIX" add probe.txt
+  git -C "$FIX" commit -qm "probe init"
+  git -C "$FIX" checkout -qb test-pre-merge-20260101T000000Z-probe
+}
+
+gate_field() {
+  sed -n "s/^$2=\"\(.*\)\"/\1/p" "$FIX/.freely/run/test-gate.env" 2>/dev/null
+}
+
+record() { bash "$FREELY" test-gate record --worktree "$FIX" "$@" 2>&1; }
+
+static_checks() {
+  echo "=== STATIC: one writer, no daemon impersonation ==="
+
+  if grep -q '_update_test_gate' "$FREELY"; then
+    bad "runtime still has the daemon-owned _update_test_gate writer"
+  else ok "daemon-owned test-gate writer is gone"; fi
+
+  local path_writers; path_writers=$(python3 - "$FREELY" <<'PY'
+import re
+import sys
+
+raw_lines = open(sys.argv[1]).read().split("\n")
+# Comments and usage text are not writers: only code lines count.
+lines = [line for line in raw_lines if not line.lstrip().startswith("#")]
+FUNC = re.compile(r"^[a-z_][a-z0-9_]*\(\) \{")
+
+
+def body(name):
+    start = None
+    for i, line in enumerate(lines):
+        if line.startswith(name + "() {"):
+            start = i
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if FUNC.match(lines[j]):
+            end = j
+            break
+    return "\n".join(lines[start:end])
+
+
+owner = body("_test_gate_file")
+if owner is None:
+    print("NO_FILE_HELPER")
+else:
+    total = sum(line.count("test-gate.env") for line in lines)
+    inside = owner.count("test-gate.env")
+    print("SINGLE_PATH" if total == 1 and inside == 1 else f"PATH_WRITERS:{total - inside}")
+PY
+)
+  [[ "$path_writers" == "SINGLE_PATH" ]] && ok "the file path literal lives only in _test_gate_file" \
+    || bad "test-gate.env path appears outside the single helper ($path_writers)"
+
+  local writers; writers=$(python3 - "$FREELY" <<'PY'
+import sys
+src = open(sys.argv[1]).read()
+print(src.count("_test_gate_write"))
+PY
+)
+  [[ "$writers" == "2" ]] && ok "_test_gate_write is defined once and called once (cmd_test_gate_record)" \
+    || bad "_test_gate_write call sites = $writers (want 2: definition + record command)"
+
+  if grep -qE '^[[:space:]]+record\) cmd_test_gate_record' "$FREELY"; then
+    ok "test-gate record is wired into the dispatcher"
+  else bad "test-gate record is not dispatched"; fi
+
+  grep -q 'freely test-gate record' "$FREELY" && ok "usage documents the record command" \
+    || bad "usage does not document test-gate record"
+
+  bash -n "$FREELY" >/dev/null 2>&1 && ok "runtime bash -n" || bad "runtime syntax"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: record is explicit, validated and fail-closed ==="
+  local out rc head
+
+  make_fixture
+  head=$(git -C "$FIX" rev-parse HEAD)
+  out=$(record --status completed); rc=$?
+  [[ "$rc" == "0" ]] && ok "record completed exits 0" || bad "record completed rc=$rc: $out"
+  [[ "$(gate_field X TEST_STATUS)" == "completed" ]] && ok "TEST_STATUS=completed is written" \
+    || bad "TEST_STATUS=$(gate_field X TEST_STATUS)"
+  [[ "$(gate_field X LAST_TESTED_COMMIT)" == "$head" ]] && ok "LAST_TESTED_COMMIT records HEAD" \
+    || bad "LAST_TESTED_COMMIT=$(gate_field X LAST_TESTED_COMMIT) want $head"
+  local at; at=$(gate_field X LAST_TESTED_AT)
+  [[ -n "$at" && "$at" != "1970-01-01T00:00:00Z" ]] && ok "LAST_TESTED_AT is a real timestamp" \
+    || bad "LAST_TESTED_AT=$at"
+
+  # started -> completed keeps the recorded commit honest (no HEAD at started)
+  out=$(record --status started); rc=$?
+  [[ "$rc" == "0" && "$(gate_field X TEST_STATUS)" == "started" ]] && ok "record started exits 0" \
+    || bad "record started rc=$rc ($out)"
+  [[ -z "$(gate_field X LAST_TESTED_COMMIT)" ]] && ok "started records no commit" \
+    || bad "started recorded a commit: $(gate_field X LAST_TESTED_COMMIT)"
+  record --status completed >/dev/null
+  [[ "$(gate_field X TEST_STATUS)" == "completed" ]] && ok "started -> completed is recorded" \
+    || bad "status did not advance to completed"
+
+  # invalid status
+  out=$(record --status finished); rc=$?
+  [[ "$rc" == "2" ]] && ok "unknown status is rejected with rc 2" || bad "unknown status rc=$rc ($out)"
+
+  # unknown commit
+  before=$(gate_field X LAST_TESTED_COMMIT)
+  out=$(record --status completed --commit deadbeefdeadbeefdeadbeefdeadbeefdeadbeef); rc=$?
+  [[ "$rc" == "2" ]] && ok "unknown --commit is rejected with rc 2" || bad "unknown commit rc=$rc ($out)"
+  [[ "$(gate_field X LAST_TESTED_COMMIT)" == "$before" ]] && ok "rejected commit leaves the file untouched" \
+    || bad "rejected commit rewrote LAST_TESTED_COMMIT"
+
+  # non test-pre-merge branch: refuse and never create the file
+  make_fixture
+  git -C "$FIX" checkout -q -b fix/some-dev-branch
+  out=$(record --status completed); rc=$?
+  [[ "$rc" == "2" ]] && ok "non-test worktree is refused with rc 2" || bad "non-test worktree rc=$rc ($out)"
+  [[ ! -f "$FIX/.freely/run/test-gate.env" ]] && ok "refusal writes no test-gate.env" \
+    || bad "refusal still created test-gate.env"
+
+  # default target is the current directory (agent ergonomics inside the worktree)
+  make_fixture
+  out=$(cd "$FIX" && bash "$FREELY" test-gate record --status completed 2>&1); rc=$?
+  [[ "$rc" == "0" && "$(gate_field X TEST_STATUS)" == "completed" ]] && ok "cwd default target records in place" \
+    || bad "cwd default target rc=$rc ($out)"
+
+  # write is atomic: no stray temp file left behind
+  local strays; strays=$(find "$FIX/.freely/run" -name '.test-gate.*' | wc -l | tr -d ' ')
+  [[ "$strays" == "0" ]] && ok "atomic write leaves no temp file" || bad "$strays temp file(s) left behind"
+
+  rm -rf "$FIX"; FIX=""
+}
+
+mode="${1:-all}"
+case "$mode" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]

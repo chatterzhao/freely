@@ -982,6 +982,7 @@ Usage:
   freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
   freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
   freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely test-gate record [--worktree <abs_path>] --status started|completed|failed [--commit <sha>]
   freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
   freely stop [--project <abs_path>]
 
@@ -8578,27 +8579,73 @@ LAST_STATE_UPDATED_AT="$updated_at"
 EOF
 }
 
-# _update_test_gate: if test-gate.env exists (test worktree), update its fields.
-# Called on daemon start/stop so the gate can compare LAST_TESTED_COMMIT vs HEAD.
-_update_test_gate() {
-  local project="$1" status="$2"
-  local gate_file branch
-  gate_file="$(run_dir_for_project "$project")/test-gate.env"
-  # Only for test-pre-merge worktrees. Other worktrees don't need test-gate.
-  branch="$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  [[ "$branch" == test-pre-merge-* ]] || return 0
+# ── test-gate: single writer for test evidence ───────────────────────────
+# `.freely/run/test-gate.env` answers exactly one question: "did the tests run
+# at this commit?". It is NOT daemon lifecycle state (that lives in
+# workcell-state.env), so the only writers are:
+#   1. wt-create's initialisation marker (TEST_STATUS="not_tested")
+#   2. `freely test-gate record` (this file's cmd_test_gate_record)
+# Daemon start/stop must never touch it: they used to write "testing" and
+# "completed", which let a started-but-untested worktree pass the gate and let
+# a failed start be "completed" by the following stop (#4135 / #4216).
+_test_gate_file() {
+  echo "$(run_dir_for_project "$1")/test-gate.env"
+}
+
+_test_gate_write() {
+  local project="$1" status="$2" tested_commit="${3:-}"
+  local gate_file tmp
+  gate_file="$(_test_gate_file "$project")"
   mkdir -p "$(dirname "$gate_file")"
-  local tested_at tested_commit
-  tested_at="$(current_timestamp_utc_for_machine)"
-  tested_commit=""
-  if [[ "$status" == "completed" ]]; then
-    tested_commit="$(git -C "$project" rev-parse HEAD 2>/dev/null || true)"
+  tmp="$(mktemp "$(dirname "$gate_file")/.test-gate.XXXXXX")"
+  {
+    printf 'TEST_STATUS="%s"\n' "$status"
+    printf 'LAST_TESTED_AT="%s"\n' "$(current_timestamp_utc_for_machine)"
+    printf 'LAST_TESTED_COMMIT="%s"\n' "$tested_commit"
+  } >"$tmp"
+  mv "$tmp" "$gate_file"
+}
+
+cmd_test_gate_record() {
+  local target="" status="" commit=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --worktree|--project) target="${2:-}"; shift 2 || true ;;
+      --status) status="${2:-}"; shift 2 || true ;;
+      --commit) commit="${2:-}"; shift 2 || true ;;
+      -h|--help)
+        printf '%s\n' "Usage: freely test-gate record --worktree <test worktree> --status started|completed|failed [--commit <sha>]"
+        return 0
+        ;;
+      *) log_error "test-gate record: unknown argument: $1"; return 2 ;;
+    esac
+  done
+  case "$status" in
+    started|completed|failed) ;;
+    *) log_error "test-gate record: --status must be one of started|completed|failed"; return 2 ;;
+  esac
+  target="${target:-$PWD}"
+  [[ -d "$target" ]] || { log_error "test-gate record: no such worktree: $target"; return 2; }
+  local branch
+  branch="$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  if [[ "$branch" != test-pre-merge-* ]]; then
+    log_error "test-gate record: '$target' is on branch '${branch:-<detached>}', not a test-pre-merge-* worktree"
+    log_error "  test evidence belongs to the test worktree; pass --worktree <test worktree>"
+    return 2
   fi
-  cat >"$gate_file" <<EOF
-TEST_STATUS="$status"
-LAST_TESTED_AT="$tested_at"
-LAST_TESTED_COMMIT="$tested_commit"
-EOF
+  if [[ "$status" == "completed" ]]; then
+    if [[ -n "$commit" ]]; then
+      if ! git -C "$target" rev-parse --verify --quiet "${commit}^{commit}" >/dev/null 2>&1; then
+        log_error "test-gate record: --commit '$commit' is not a commit of $target"
+        return 2
+      fi
+      commit="$(git -C "$target" rev-parse "${commit}^{commit}")"
+    else
+      commit="$(git -C "$target" rev-parse HEAD)"
+    fi
+  fi
+  _test_gate_write "$target" "$status" "$commit"
+  echo "[test-gate] $target: TEST_STATUS=$status LAST_TESTED_COMMIT=${commit:-<none>}"
 }
 
 ensure_project_agents_md() {
@@ -22213,7 +22260,8 @@ print(f'/tmp/freely-db-{h}.pid')
   done
   rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
-  _update_test_gate "$project" "completed"
+  # Stopping the daemon is not a test result: never mark the worktree tested
+  # here (#4135 / #4216).
   if [[ "$stop_lock_acquired" == "1" ]]; then
     release_project_start_lock_for_runtime "$project"
   fi
@@ -22583,7 +22631,7 @@ start_project_runtime() {
   }
   append_runtime_event "$project" "start_project_runtime_after_doc_gate" \
     "entrypoint_mode=$entrypoint_mode"
-  _update_test_gate "$project" "testing"
+  # Test evidence is written by `freely test-gate record` only (#4216).
 
   # Initialize SQLite worker delegation store + migrate old exit contracts
   local _a2a_task_py _worker_db_path
@@ -26845,6 +26893,14 @@ main() {
     deploy-skills) cmd_deploy_skills "$@" ;;
     governance-check) cmd_governance_check "$@" ;;
     checkpoint-guard) cmd_checkpoint_guard "$@" ;;
+    test-gate)
+      local subcmd="${1:-}"
+      shift || true
+      case "$subcmd" in
+        record) cmd_test_gate_record "$@" ;;
+        *) log_error "unknown test-gate subcommand: $subcmd"; usage; exit 1 ;;
+      esac
+      ;;
     pretests-gate) cmd_pretests_gate "$@" ;;
     pretests-retirement-gate) cmd_pretests_retirement_gate "$@" ;;
     stop) cmd_stop "$@" ;;

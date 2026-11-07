@@ -1,0 +1,479 @@
+=== STATIC: one writer, no daemon impersonation ===
+  [FAIL] runtime still has the daemon-owned _update_test_gate writer
+  [FAIL] test-gate.env path appears outside the single helper (NO_FILE_HELPER)
+  [FAIL] _test_gate_write call sites = 0 (want 2: definition + record command)
+  [FAIL] test-gate record is not dispatched
+  [FAIL] usage does not document test-gate record
+  [ok] runtime bash -n
+=== BEHAVIOR: record is explicit, validated and fail-closed ===
+  [FAIL] record completed rc=1: [2026-11-07T12:34:52Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败"
+  [FAIL] TEST_STATUS=
+  [FAIL] LAST_TESTED_COMMIT= want 88e60881f21f1c6b799839028161174ed9914c11
+  [FAIL] LAST_TESTED_AT=
+  [FAIL] record started rc=1 ([2026-11-07T12:34:53Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败")
+  [ok] started records no commit
+  [FAIL] status did not advance to completed
+  [FAIL] unknown status rc=1 ([2026-11-07T12:34:53Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败")
+  [FAIL] unknown commit rc=1 ([2026-11-07T12:34:53Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败")
+  [ok] rejected commit leaves the file untouched
+  [FAIL] non-test worktree rc=1 ([2026-11-07T12:34:54Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败")
+  [ok] refusal writes no test-gate.env
+  [FAIL] cwd default target rc=1 ([2026-11-07T12:34:54Z] [ERROR] unknown command: test-gate
+Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
+  freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely chat [--project <abs_path>] (--issue <id>) [--urgent] <message>
+  freely comment --issue raw-{key} <message>          (write comment to all platforms via adapter)
+  freely comment --issue raw-{key} --file <path>      (write comment from file)
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--issue <id>) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
+  freely task-mode get --project <abs_path>
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
+  freely restart [--project <abs_path>] [--all-projects]
+  freely restore-work [--project <abs_path>]
+  freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
+  freely harness-status [--project <abs_path>] [--json] [--require <caps>]
+  freely live-status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
+  freely stop [--project <abs_path>]
+
+AI mode:
+  auto  -> non-interactive, auto-approve (where supported)
+  step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败")
+find: '/private/tmp/freely-tg.80FMP7/.freely/run': No such file or directory  [ok] atomic write leaves no temp file
+SUMMARY: 5 ok, 15 failed
