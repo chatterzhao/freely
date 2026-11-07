@@ -1,3 +1,24 @@
+## M-20261104T082549Z-A
+- title: fix — pull 按可用平台回退并复用 sync-debt 记账
+- status: active
+### candidate_issues
+1. `C-20261104T082549Z-A`
+- milestone: M-20261104T082549Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T082549Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261104T082549Z/issues/I-20261104T082549Z-A.md
+### committed_issues
+1. `I-20261104T082549Z-A`
+- milestone: M-20261104T082549Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261104T082549Z/issues/I-20261104T082549Z-A.md
+### completed_issues
+1. `I-20261104T082549Z-A`
+- milestone: M-20261104T082549Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T07:15:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261104T082549Z/issues/I-20261104T082549Z-A.md
+
 ## M-20261106T100938Z-A
 - title: fix — 补齐打包 allowlist 运行时必需文件并建立防复发检查
 - status: active

@@ -5,33 +5,48 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  freely raw-issue-pull --raw-key <key> [--target <dir>]
+  freely raw-issue-pull --raw-key <key> [--target <dir>] [--platform <github|gitee>]
 
 Pull a raw issue from platform by matching raw-{key} in OPEN issue titles.
 Materializes to docs/B1-docs/raw-{key}/issue.md with proper platform_ids.
 
 Options:
-  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMSSZ format)
-  --target  <dir>   Target directory (default: docs/B1-docs/raw-{key}/)
+  --raw-key  <key>    Raw issue key (YYYYMMDDTHHMMSSZ format)
+  --target   <dir>    Target directory (default: docs/B1-docs/raw-{key}/)
+  --platform <name>   Pin the read source (github|gitee). Default: first
+                      READABLE configured platform; an unreadable platform is
+                      recorded as sync debt instead of blocking.
+
+Exit codes:
+  0  all configured platforms readable, materialized
+  3  partial success: materialized from a fallback platform, one or more
+     platforms unreadable (sync debt recorded) — worktree creation continues
+  1  failure: nothing readable, or explicitly requested platform unreadable
 
 Example:
-  freely raw-issue-pull --raw-key 20260506T100035Z
+  freely raw-issue-pull --raw-key 20260506T100035Z --platform gitee
 USAGE
 }
 
 raw_key=""
 target=""
+platform=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --raw-key) raw_key="${2:-}"; shift 2 ;;
-    --target)  target="${2:-}"; shift 2 ;;
-    --help|-h) usage; exit 0 ;;
+    --raw-key)  raw_key="${2:-}"; shift 2 ;;
+    --target)   target="${2:-}"; shift 2 ;;
+    --platform) platform="${2:-}"; shift 2 ;;
+    --help|-h)  usage; exit 0 ;;
     *) echo "Unknown: $1" >&2; usage; exit 1 ;;
   esac
 done
 
 [[ -n "$raw_key" ]] || { echo "Missing --raw-key" >&2; usage; exit 1; }
+case "$platform" in
+  ""|github|gitee) ;;
+  *) echo "Invalid --platform '$platform' (expected github|gitee)" >&2; exit 1 ;;
+esac
 
 ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 [[ -z "$target" ]] && target="$(pwd)/docs/B1-docs/raw-${raw_key}"
@@ -61,7 +76,50 @@ if [[ "$current_branch" != *"$raw_key"* ]]; then
   exit 1
 fi
 
-python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull "$raw_key" "$target"
+# STDOUT must remain exactly ONE JSON document: wt-create parses it to verify
+# the materialized identity. Keep the adapter output in a temp file so we can
+# both forward it and inspect degraded platforms; all diagnostics go to STDERR.
+_pull_json="$(mktemp -t freely-pull-json.XXXXXX)"
+_pull_err="$(mktemp -t freely-pull-err.XXXXXX)"
+_pull_rc=0
+python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+  pull "$raw_key" "$target" "$platform" > "$_pull_json" 2> "$_pull_err" || _pull_rc=$?
+if [[ -s "$_pull_err" ]]; then cat "$_pull_err" >&2; fi
+cat "$_pull_json"
+
+if [[ "$_pull_rc" -ne 0 && "$_pull_rc" -ne 3 ]]; then
+  rm -f "$_pull_json" "$_pull_err"
+  exit "$_pull_rc"
+fi
+
+# Partial success: record each unreadable platform in the EXISTING sync-debt
+# ledger (lifecycle/sync-debt.py) so issue-sync reconcile can settle it later.
+# Uncertainty is debt, not a fact — it must not block worktree creation.
+if [[ "$_pull_rc" -eq 3 ]]; then
+  _debt_script="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/sync-debt.py"
+  if [[ -f "$_debt_script" ]]; then
+    while IFS= read -r _plat; do
+      [[ -n "$_plat" ]] || continue
+      python3 "$_debt_script" --root "$ROOT_DIR" record \
+        --raw-key "$raw_key" --platform "$_plat" \
+        --reason "raw-issue-pull: platform unreadable, materialized from fallback" \
+        >/dev/null 2>&1 || true
+    done < <(python3 - "$_pull_json" <<'PY'
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+    for item in data.get("degraded_platforms") or []:
+        print(str(item))
+except Exception:
+    pass
+PY
+)
+    echo "[WARN] raw-issue-pull: partial success — unreadable platform(s) recorded as sync debt (sync-debt list)" >&2
+  else
+    echo "[WARN] raw-issue-pull: sync-debt.py missing; unreadable platform(s) not recorded" >&2
+  fi
+fi
+rm -f "$_pull_json" "$_pull_err"
 
 # After pull: sync to all configured platforms (fill missing platform_ids,
 # and let issue-sync's _platform_title() normalize the platform title).
@@ -81,3 +139,7 @@ if [[ -f "$target/issue.md" ]]; then
 else
   echo "[WARN] raw-issue-pull: expected $target/issue.md missing; skipped issue-sync create for $local_id" >&2
 fi
+
+# Preserve the partial-success code so callers can distinguish it from a hard
+# failure. wt-create treats 3 as "continue" (it is not a blocking condition).
+exit "$_pull_rc"

@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>]
+  freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>] [--source-platform <github|gitee>]
   freely wt-create <branch> [--base <base-branch>]    (legacy: 传 test-pre-merge-* 分支名补建测试工位；纯文档、init develop、release 分支)
 
   可重跑恢复：标准模式若在 Step 2 之前中断（dev 工位已建、test 工位缺失），
@@ -20,6 +20,10 @@ Required:
 Optional:
   --base <branch>     Base branch (default: develop)
   --skill  <name>     Override workflow skill (default: freely-workflow-guarded-execution)
+  --source-platform <github|gitee>
+                      Pin the raw issue read source. Default: first READABLE
+                      configured platform; an unreadable platform is recorded
+                      as sync debt and worktree creation continues.
 
 ── --kind 选择指南 ──────────────────────────────────────────
 
@@ -73,6 +77,7 @@ fi
 
 raw_key=""
 source_val=""
+source_platform=""
 skill_name="freely-workflow-guarded-execution"
 skill_path="docs/system/workspace/skills/freely-workflow-guarded-execution/SKILL.md"
 branch_kind=""
@@ -114,6 +119,15 @@ while [[ $# -gt 0 ]]; do
     --base)
       base="${2:-}"
       [[ -n "$base" ]] || { echo "Missing value for --base" >&2; exit 1; }
+      shift 2
+      ;;
+    --source-platform)
+      source_platform="${2:-}"
+      [[ -n "$source_platform" ]] || { echo "Missing value for --source-platform" >&2; exit 1; }
+      case "$source_platform" in
+        github|gitee) ;;
+        *) echo "Invalid --source-platform '$source_platform' (expected github|gitee)" >&2; exit 1 ;;
+      esac
       shift 2
       ;;
     --*)
@@ -489,24 +503,35 @@ _run_scan_once() {
 # ── Pull helpers (unified) ────────────────────────────────
 
 _pull_raw_issue() {
-  local raw_key="$1" source="$2"
+  local raw_key="$1" source="$2" preferred_platform="${3:-}"
   local expected_local_id="raw-${raw_key}"
   local expected_issue_file="$PWD/docs/B1-docs/${expected_local_id}/issue.md"
   case "$source" in
     platform)
       if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
-        local result parsed_id pull_err
+        local result parsed_id pull_err pull_rc=0
+        local -a pull_args=(--raw-key "$raw_key")
+        if [[ -n "$preferred_platform" ]]; then
+          pull_args+=(--platform "$preferred_platform")
+        fi
         pull_err="$(mktemp /tmp/freely-raw-pull.XXXXXX)"
-        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>"$pull_err") || {
+        result=$("$ROOT_DIR/bin/raw-issue-pull" "${pull_args[@]}" 2>"$pull_err") || pull_rc=$?
+        # Exit 3 = partial success: materialized from a readable fallback
+        # platform while another platform was unreadable. That is sync debt,
+        # not a blocking failure — worktree creation must continue.
+        if [[ "$pull_rc" -ne 0 && "$pull_rc" -ne 3 ]]; then
           if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
           rm -f "$pull_err"
-          echo "pull: raw-issue-pull failed for $expected_local_id" >&2
+          echo "pull: raw-issue-pull failed for $expected_local_id (exit $pull_rc)" >&2
           return 1
-        }
-        # Surface warnings (e.g. issue-sync normalization failure) without
-        # mixing them into the JSON document parsed below.
+        fi
+        # Surface warnings (e.g. partial-success debt, issue-sync normalization
+        # failure) without mixing them into the JSON document parsed below.
         if [[ -s "$pull_err" ]]; then cat "$pull_err" >&2; fi
         rm -f "$pull_err"
+        if [[ "$pull_rc" -eq 3 ]]; then
+          echo "pull: 部分成功 —— 已从未读平台回退物化，未读平台记入 sync-debt，工位创建继续" >&2
+        fi
         parsed_id=$(printf '%s' "$result" | python3 -c '
 import json, sys
 try:
@@ -966,7 +991,7 @@ fi
   if [[ "$using_new" -eq 1 ]]; then
     echo ""
     echo "=== Pulling raw issue from inside ${prefix} worktree ==="
-    if ! ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" ); then
+    if ! ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" "$source_platform" ); then
       echo "拒绝创建工位: raw-issue-pull failed" >&2
       git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
       git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
