@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261107T133328Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261107T133328Z-A
 platform_ids:
   github:
     issue_id: '4221'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKTO77
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/governance/raw-20261107T133328Z/issues/I-20261107T133328Z-A.md
+last_synced_comment_at:
+  github: '2026-11-07T13:39:26Z'
+  gitee: '2026-11-07T13:39:26Z'
 hash: ''
 created_at: '2026-11-07T13:33:28Z'
-updated_at: '2026-11-07T13:33:35Z'
+updated_at: '2026-11-07T13:39:32Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261107T133328Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-07T13:39:25Z'
 closeout_note: ''
 ---
 
@@ -73,3 +76,11 @@ workflow_kind: fix
 - GREEN：上述 raw 的 `wt-close` 评论检查通过（rc=0），且 `- source: system` 不计入未解决。
 - GREEN：人类评论无 resolution 时 wt-close 与 scan 都拦（rc≠0），补 resolution 后都放行。
 - GREEN：`wt-close` 源码内不再出现 `grep -c "^### comment-"` 的重复实现。
+
+### comment-20261107T133926Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261107T133328Z-A"]
+
+拆解为以下任务:
+1. [I-20261107T133328Z-A](will-be-updated)
