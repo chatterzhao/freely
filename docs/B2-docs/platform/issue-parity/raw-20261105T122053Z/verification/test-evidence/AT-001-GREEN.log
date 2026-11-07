@@ -1,0 +1,57 @@
+test_all_platforms_failed_still_marks_degraded (__main__.AggregatorTests.test_all_platforms_failed_still_marks_degraded)
+RED: total read failure must be explicit, never a clean empty dict. ... ok
+test_exception_from_handler_is_degraded_not_fake_records (__main__.AggregatorTests.test_exception_from_handler_is_degraded_not_fake_records)
+RED: _safe() used to return {'status':'error'} which the aggregator ... ok
+test_handlers_expose_read_health (__main__.AggregatorTests.test_handlers_expose_read_health)
+RED: each configured handler must report ok/error/partial. ... ok
+test_healthy_merge_unchanged_preexisting (__main__.AggregatorTests.test_healthy_merge_unchanged_preexisting)
+PRE-EXISTING: both platforms healthy -> plain 107-record dict. ... ok
+test_single_platform_failure_emits_degraded_marker (__main__.AggregatorTests.test_single_platform_failure_emits_degraded_marker)
+RED: one platform unreadable -> result must carry a failure marker. ... ok
+test_parity_healthy_still_compares_preexisting (__main__.ParityTests.test_parity_healthy_still_compares_preexisting)
+PRE-EXISTING: healthy parity check still works. ... ok
+test_parity_skips_with_retry_hint_on_degraded (__main__.ParityTests.test_parity_skips_with_retry_hint_on_degraded)
+RED: parity must not report fake gitee-only divergence on read failure. ... ok
+test_scan_degraded_consumer_still_exists_preexisting (__main__.ScanTests.test_scan_degraded_consumer_still_exists_preexisting)
+PRE-EXISTING: scan already pops the marker into platform_health. ... ok
+test_scan_get_platform_open_issues_produces_degraded (__main__.ScanTests.test_scan_get_platform_open_issues_produces_degraded)
+RED: scan must see __degraded__ when a platform read failed. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.137s
+
+OK
+
+=== zero-regression audit (unmodified develop HEAD baseline, same assertions) ===
+  RED on baseline: Ran 9 tests, FAILED (failures=5); 4 pre-existing capabilities PASS
+  GREEN on fix:    Ran 9 tests, OK
+  test-raw-replica-degraded.py              0 / 0  (only timing digits)
+  test-platform-adapter-raw-identity.py    0 / 0  IDENTICAL
+  test-raw-issue-pull-platform-fallback.py 0 / 0  (only timing digits)
+  test-wt-create-four-state-dir             0 / 0  IDENTICAL
+  test-wt-create-recovery-dev-path          0 / 0  IDENTICAL
+  test-wt-create-resume-test-worktree       0 / 0  IDENTICAL
+  test-command-lifecycle-wt-create.py      0 / 0  IDENTICAL
+  test-materialize-h1                      0 / 0  IDENTICAL
+  test-package-runtime-allowlist-parity    0 / 0  IDENTICAL
+  test-worktree-seed-package-parity        0 / 0  IDENTICAL
+  test-governance-gate-batch-read          0 / 0  (only timing digits)
+  test-wt-create-top-level-return          0 / 0  IDENTICAL
+  => 12/12 identical exit codes, 0 new failures; full suite 13 PASS / 0 FAIL
+
+=== real-platform healthy path (dual platform read, no marker) ===
+  list_open_issue_records() -> 102 records (github=52, gitee=50)
+  __degraded__ marker absent -> plain merged dict, caller contract unchanged
+  (fixture test asserts the canonical 57+50=107 case with identical record shape)
+
+=== REST fallback preserved ===
+  GitHub GraphQL double failure still calls _open_issue_records_via_rest();
+  a valid (even empty) REST response sets read_health ok=True; only a REST
+  failure sets ok=False. REST fallback was NOT removed or rewritten away.
+
+=== scan / parity ===
+  task-lifecycle-scan.py already consumes __degraded__ at :773
+  (platform_health=degraded, pops marker) -> ZERO changes to the scan truth file
+  test-platform-open-parity.py now returns (openings, degraded_platforms),
+  skips with a retry hint on any degraded platform, never reports a fake
+  gitee-only/github-only divergence from a partial list

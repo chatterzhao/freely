@@ -17,15 +17,31 @@ RAW_KEY = re.compile(r"raw-(\d{8}T\d{6}Z)", re.IGNORECASE)
 
 
 def collect_open_issues():
+    """Return (openings, degraded_platforms).
+
+    A platform read failure is NOT "this platform has no open issues": never
+    compute parity from a partial list. Report the degraded platforms so the
+    caller can skip with a retry hint instead of emitting a fake difference.
+    """
     openings = {}
+    degraded = []
     for handler in pa._handlers():
-        records = handler.list_open_issue_records() or {}
+        try:
+            records = handler.list_open_issue_records() or {}
+        except Exception as exc:
+            degraded.append(f"{handler.name}: {str(exc)[:120]}")
+            continue
+        health = getattr(handler, "read_health", None)
+        if isinstance(health, dict) and health.get("ok") is False:
+            degraded.append(f"{handler.name}: {str(health.get('error') or 'unreadable')[:120]}")
         for issue_id, record in records.items():
+            if not isinstance(record, dict):
+                continue
             match = RAW_KEY.search(record.get("title", "") or "")
             if not match:
                 continue
             openings.setdefault(match.group(1), {}).setdefault(handler.name, str(issue_id))
-    return openings
+    return openings, degraded
 
 
 def load_local_docs():
@@ -47,7 +63,13 @@ def load_local_docs():
 
 def main():
     require_local = "--require-local-docs" in sys.argv[1:]
-    openings = collect_open_issues()
+    openings, degraded = collect_open_issues()
+    if degraded:
+        print("SKIP: platform read degraded — parity NOT evaluated (partial list). Retry later.")
+        for item in degraded:
+            print("  -", item)
+        print("  hint: retry once the platform is reachable; ignore any platform-set differences from this partial list")
+        return 0
     local = load_local_docs()
     errors = []
     github_keys = {key for key, plats in openings.items() if "github" in plats}

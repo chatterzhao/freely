@@ -1,0 +1,89 @@
+test_all_platforms_failed_still_marks_degraded (__main__.AggregatorTests.test_all_platforms_failed_still_marks_degraded)
+RED: total read failure must be explicit, never a clean empty dict. ... FAIL
+test_exception_from_handler_is_degraded_not_fake_records (__main__.AggregatorTests.test_exception_from_handler_is_degraded_not_fake_records)
+RED: _safe() used to return {'status':'error'} which the aggregator ... FAIL
+test_handlers_expose_read_health (__main__.AggregatorTests.test_handlers_expose_read_health)
+RED: each configured handler must report ok/error/partial. ... FAIL
+test_healthy_merge_unchanged_preexisting (__main__.AggregatorTests.test_healthy_merge_unchanged_preexisting)
+PRE-EXISTING: both platforms healthy -> plain 107-record dict. ... ok
+test_single_platform_failure_emits_degraded_marker (__main__.AggregatorTests.test_single_platform_failure_emits_degraded_marker)
+RED: one platform unreadable -> result must carry a failure marker. ... FAIL
+test_parity_healthy_still_compares_preexisting (__main__.ParityTests.test_parity_healthy_still_compares_preexisting)
+PRE-EXISTING: healthy parity check still works. ... ok
+test_parity_skips_with_retry_hint_on_degraded (__main__.ParityTests.test_parity_skips_with_retry_hint_on_degraded)
+RED: parity must not report fake gitee-only divergence on read failure. ... FAIL
+test_scan_degraded_consumer_still_exists_preexisting (__main__.ScanTests.test_scan_degraded_consumer_still_exists_preexisting)
+PRE-EXISTING: scan already pops the marker into platform_health. ... ok
+test_scan_get_platform_open_issues_produces_degraded (__main__.ScanTests.test_scan_get_platform_open_issues_produces_degraded)
+RED: scan must see __degraded__ when a platform read failed. ... ok
+
+======================================================================
+FAIL: test_all_platforms_failed_still_marks_degraded (__main__.AggregatorTests.test_all_platforms_failed_still_marks_degraded)
+RED: total read failure must be explicit, never a clean empty dict.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 114, in test_all_platforms_failed_still_marks_degraded
+    self.assertTrue("__degraded__" in result, "total read failure returned a clean empty dict")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : total read failure returned a clean empty dict
+
+======================================================================
+FAIL: test_exception_from_handler_is_degraded_not_fake_records (__main__.AggregatorTests.test_exception_from_handler_is_degraded_not_fake_records)
+RED: _safe() used to return {'status':'error'} which the aggregator
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 66, in _run
+    return self.pa.list_open_issue_records()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/sync/platform-adapter.py", line 983, in list_open_issue_records
+    records[f"{h.name}:{issue_id}"] = {"issue_id": str(issue_id), **record}
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'str' object is not a mapping
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 101, in test_exception_from_handler_is_degraded_not_fake_records
+    result = self._run([gh, gt])
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 71, in _run
+    self.fail(f"aggregator treated an error object as issue records: {error}")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: aggregator treated an error object as issue records: 'str' object is not a mapping
+
+======================================================================
+FAIL: test_handlers_expose_read_health (__main__.AggregatorTests.test_handlers_expose_read_health)
+RED: each configured handler must report ok/error/partial.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 120, in test_handlers_expose_read_health
+    self.assertTrue("read_health" in src, "handlers have no read-health state")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : handlers have no read-health state
+
+======================================================================
+FAIL: test_single_platform_failure_emits_degraded_marker (__main__.AggregatorTests.test_single_platform_failure_emits_degraded_marker)
+RED: one platform unreadable -> result must carry a failure marker.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 90, in test_single_platform_failure_emits_degraded_marker
+    self.assertTrue("__degraded__" in result, "read failure was silently flattened to a plain list")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : read failure was silently flattened to a plain list
+
+======================================================================
+FAIL: test_parity_skips_with_retry_hint_on_degraded (__main__.ParityTests.test_parity_skips_with_retry_hint_on_degraded)
+RED: parity must not report fake gitee-only divergence on read failure.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261105T122053Z-open-list-degraded/docs/system/workspace/scripts/tests/test-open-list-read-degraded.py", line 154, in test_parity_skips_with_retry_hint_on_degraded
+    self.assertEqual(rc, 0, text)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: 1 != 0 : FAIL: platform open parity broken
+  - open key sets differ: github-only=[] gitee-only=['20261105T122053Z']
+  - 20261105T122053Z: missing open copy on github
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 3.442s
+
+FAILED (failures=5)
