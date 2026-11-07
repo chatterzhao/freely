@@ -301,22 +301,34 @@ check_file_exists() {
 
 check_no_tbd() {
   local file="$1"
+  # check_file_exists() already reports a missing file. Do not run rg on it:
+  # rg returns 2 for a missing path, which under set -e could abort the script
+  # before the remaining audits and the final summary.
+  [[ -f "$file" ]] || return 0
   if rg -n "<TBD>" "$file" >/dev/null 2>&1; then
     fail "placeholder <TBD> found in $file"
   fi
+  return 0
 }
 
 check_three_loop_reference() {
   local file="$1"
+  [[ -f "$file" ]] || { fail "missing three-loop lifecycle reference in $file"; return 0; }
   rg -n --fixed-strings "docs/system/workspace/three-loop-capability-lifecycle.md" "$file" >/dev/null 2>&1 \
     || fail "missing three-loop lifecycle reference in $file"
+  return 0
 }
 
 check_fixed_string() {
   local file="$1"
   local text="$2"
   local description="$3"
+  if [[ ! -f "$file" ]]; then
+    fail "missing ${description} in $file"
+    return 0
+  fi
   rg -n --fixed-strings "$text" "$file" >/dev/null 2>&1 || fail "missing ${description} in $file"
+  return 0
 }
 
 check_entry_naming() {
@@ -333,7 +345,10 @@ check_entry_naming() {
     return 0
   else
     fail "pre-brainstorm entry '$entry' does not match naming convention: YYYYMMDD-HHMM--<topic>"
-    return 1
+    # fail() already recorded the error in the global counter. Returning 1 here
+    # would abort the whole script under `set -e` before the receipt audit and
+    # the final summary ever run.
+    return 0
   fi
 }
 
@@ -366,8 +381,13 @@ audit_current_protected_branch_merge_receipt() {
     fail "protected branch '$branch' HEAD merge commit has invalid Freely-Source-Branch '$source_branch'"
   fi
 
+  # Two generations of canonical receipts coexist in history:
+  #   legacy: merge-guarded / merge-guarded-complete (1200+ commits)
+  #   current: pr-merge-guarded / pr-merge-guarded-complete (680+ commits)
+  # Keep both so the post-merge audit does not false-positive on valid merges.
+  # break-glass receipts are handled by their own ledger, not this allowlist.
   case "$merge_path" in
-    merge-guarded|merge-guarded-complete) ;;
+    merge-guarded|merge-guarded-complete|pr-merge-guarded|pr-merge-guarded-complete) ;;
     *) fail "protected branch '$branch' HEAD merge commit has unknown Freely-Merge-Path '$merge_path'" ;;
   esac
 
@@ -856,6 +876,7 @@ if [[ "${#entries[@]}" -eq 0 ]]; then
   fail "no pre-brainstorm entries found under docs/pre-brainstorms"
 fi
 
+if [[ "${#entries[@]}" -gt 0 ]]; then
 for entry in "${entries[@]}"; do
   check_entry_naming "$entry"
   
@@ -872,11 +893,14 @@ for entry in "${entries[@]}"; do
   rg -n "session_refs:" "$candidates" >/dev/null 2>&1 || fail "missing session_refs in $candidates"
   check_v2_candidate_fields "$candidates"
 done
+fi
 
 check_candidate_milestone_bindings || errors=$((errors + 1))
 check_milestone_issue_phase_queue_alignment || errors=$((errors + 1))
-audit_current_protected_branch_merge_receipt
- audit_recorded_protected_branch_merge_receipt_backfills || errors=$((errors + 1))
+# fail() records errors; a non-zero return here must not abort the remaining
+# audits / summary under set -e.
+audit_current_protected_branch_merge_receipt || true
+audit_recorded_protected_branch_merge_receipt_backfills || errors=$((errors + 1))
 
 if [[ "$errors" -gt 0 ]]; then
   echo

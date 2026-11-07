@@ -1,0 +1,20 @@
+=== STATIC: two-generation allowlist + always-run audit ===
+  [FAIL] allowlist accepts pr-merge-guarded
+  [ok] allowlist keeps legacy merge-guarded
+  [FAIL] check_no_tbd guards missing files
+  [FAIL] check_three_loop_reference guards missing files
+  [FAIL] check_fixed_string guards missing files
+  [FAIL] empty entries guarded under set -u
+  [FAIL] check_entry_naming no longer returns 1 after fail
+  [FAIL] receipt audit call is guarded against set -e
+  [ok] backfills audit still present
+  [FAIL] static contract (see above)
+  [ok] governance-check bash -n passes
+=== BEHAVIOR: real merge commits + full script ===
+  [FAIL] CASE A: [FAIL] protected branch 'develop' HEAD merge commit has unknown Freely-Merge-Path 'pr-merge-guarded'
+  [ok] CASE B: legacy merge-guarded receipt accepted
+  [ok] CASE C: invalid merge_path rejected
+  [ok] CASE D: missing trailer rejected
+  [FAIL] CASE E: script aborted before summary (/private/tmp/freely-r95e.zpBONg/repo/docs/system/workspace/scripts/quality/gover)
+  [ok] CASE F: full run has no false unknown receipt
+PASS: 5 checks, 3 failed

@@ -1,0 +1,62 @@
+=== STATIC: two-generation allowlist + always-run audit ===
+  [ok] allowlist accepts pr-merge-guarded
+  [ok] allowlist keeps legacy merge-guarded
+  [ok] check_no_tbd guards missing files
+  [ok] check_three_loop_reference guards missing files
+  [ok] check_fixed_string guards missing files
+  [ok] empty entries guarded under set -u
+  [ok] check_entry_naming no longer returns 1 after fail
+  [ok] receipt audit call is guarded against set -e
+  [ok] backfills audit still present
+  [ok] static contract
+  [ok] governance-check bash -n passes
+=== BEHAVIOR: real merge commits + full script ===
+  [ok] CASE A: pr-merge-guarded receipt accepted
+  [ok] CASE B: legacy merge-guarded receipt accepted
+  [ok] CASE C: invalid merge_path rejected
+  [ok] CASE D: missing trailer rejected
+  [ok] CASE E: full script reaches the summary despite earlier FAILs
+  [ok] CASE F: full run has no false unknown receipt
+PASS: 8 checks, 0 failed
+
+=== zero-regression audit (unmodified develop HEAD 0ad3941ff baseline) ===
+  RED on baseline: PASS 5 / 3 failed (static 7 FAIL + CASE A + CASE E)
+  GREEN on fix:    PASS 8 / 0 failed (9 static assertions + 6 behaviour cases)
+  test-governance-check-protected-branch-merge-receipt          1 / 1 (pre-existing)
+  test-governance-check-protected-branch-merge-receipt-backfills 1 / 1 (pre-existing)
+  test-governance-gate-batch-read     0 / 0
+  test-gate-fail-closed              0 / 0
+  test-commit-msg-wireup             0 / 0
+  test-open-list-read-degraded.py    0 / 0
+  test-package-runtime-allowlist-parity 0 / 0
+  test-wt-create-four-state-dir      0 / 0
+  test-wt-create-top-level-return    0 / 0
+  => 9/9 identical exit codes, 0 new failures, 8 PASS / 2 pre-existing FAIL
+  NOTE: the 2 pre-existing receipt tests produced ZERO output on baseline
+  (script aborted silently under set -e) but now print all diagnostics plus
+  "Governance check failed with 12 error(s)" — this observability improvement
+  IS the fix, not a regression. Both remain rc=1 (covered by #4151).
+
+=== real develop verification ===
+  Fixed audit function extracted and executed against real develop HEAD
+  (2-parent merge with Freely-Merge-Path: pr-merge-guarded) -> PROBE_ERRORS=0,
+  no "unknown Freely-Merge-Path" (baseline probe produced that false positive).
+  Full fixed truth source now reaches "Governance check failed with N error(s)"
+  summary instead of aborting; the remaining errors are pre-existing governance
+  doc issues (#4151 family), not introduced by this PR.
+
+=== root causes fixed ===
+  1. merge_path allowlist accepted only legacy merge-guarded*; now accepts both
+     generations (history: legacy 1205+84+23, current 675+8).
+  2. set -e early exits found and hardened WITHOUT removing any check:
+     - check_entry_naming returned 1 after fail() (errors already recorded)
+     - check_no_tbd / check_three_loop_reference / check_fixed_string ran rg on
+       missing files (rg rc=2 as the function's last command)
+     - empty entries=() under set -u aborted `for ... in "${entries[@]}"` with
+       "unbound variable" (line 874)
+     - audit call itself guarded with `|| true` (fail() records errors)
+  No check was deleted or weakened: all still call fail()/warn() as before.
+
+=== boundary ===
+  pr-merge-guarded trailer writing, commit-msg.sh, post-checkout, .githooks/bin
+  unchanged. Backfills ledger and break-glass separate handling untouched.
