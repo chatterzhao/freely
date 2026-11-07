@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261106T084804Z / #4201
+# wt-create is an ENTRY SCRIPT (bin/wt-create uses `exec bash`), so `return 1`
+# at top level is invalid control flow. It prints a bash syntax error instead
+# of the business error, and the failure semantics depend on `set -e`.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+SHIM="$ROOT_DIR/bin/wt-create"
+FAILED=0; PASSED=0
+ok(){ echo "  [ok] $1"; PASSED=$((PASSED+1)); }
+bad(){ echo "  [FAIL] $1"; FAILED=$((FAILED+1)); }
+
+# Count `return` statements outside any function body (brace-depth tracking).
+_scope_counts() {
+  python3 - "$WT_CREATE" <<'PY'
+import sys
+from pathlib import Path
+lines = Path(sys.argv[1]).read_text().splitlines()
+depth = 0; in_func = False; top = 0; inside = 0
+for line in lines:
+    s = line.strip()
+    if (s.endswith('() {') or ('()' in s and s.endswith('{'))) and not in_func:
+        in_func = True; depth = 1; continue
+    if in_func:
+        depth += s.count('{') - s.count('}')
+        if s.startswith('return ') or s == 'return':
+            inside += 1
+        if depth <= 0:
+            in_func = False; depth = 0
+        continue
+    if s.startswith('return ') or s == 'return':
+        top += 1
+print(f"{top} {inside}")
+PY
+}
+
+static_checks() {
+  echo "=== STATIC: no top-level return; function-internal returns unchanged ==="
+  local counts top inside
+  counts="$(_scope_counts)"; top="${counts%% *}"; inside="${counts##* }"
+  echo "  top-level=$top  function-internal=$inside"
+  [[ "$top" -eq 0 ]] && ok "top-level return count is 0" || bad "top-level return count is $top (expected 0)"
+  [[ "$inside" -eq 22 ]] && ok "function-internal return count unchanged (22)" || bad "function-internal return count changed to $inside (expected 22)"
+  grep -q 'exec bash' "$SHIM" && ok "shim still execs bash (entry script, not a library)" || bad "shim structure changed"
+  grep -qF '拒绝创建工位: raw-issue-pull failed' "$WT_CREATE" && ok "pull failure message preserved" || bad "pull failure message changed"
+  grep -qF '拒绝创建工位: worktree seed failed' "$WT_CREATE" && ok "seed failure message preserved" || bad "seed failure message changed"
+  grep -qF '拒绝创建工位: test worktree initialisation failed' "$WT_CREATE" && ok "init failure message preserved" || bad "init failure message changed"
+  bash -n "$WT_CREATE" >/dev/null 2>&1 && ok "bash -n passes" || bad "bash -n failed"
+  local cleanup
+  cleanup=$(grep -cF 'git -C "$ROOT_DIR" branch -D' "$WT_CREATE")
+  [[ "$cleanup" -ge 3 ]] && ok "cleanup actions preserved ($cleanup branch deletions)" || bad "cleanup actions changed"
+}
+
+# Build an isolated repo with the real wt-create + helpers, plus injectable
+# failure points for the three top-level failure branches.
+_setup_repo() {
+  local TMP="$1" KEY="$2" SLUG="$3" SEED_FAIL="$4" PULL_BAD="$5"
+  local REPO="$TMP/repo"
+  mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" \
+           "$REPO/docs/system/workspace/scripts/lifecycle" \
+           "$REPO/docs/B1-docs/raw-${KEY}" "$TMP/repo-worktrees"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
+  cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+
+  # Replica gate stub: readable / consistent.
+  cat > "$REPO/docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py" <<'STUB'
+import json
+print(json.dumps({"ok": True, "diagnostics": [], "observations": {}, "degraded": []}))
+STUB
+
+  # raw-issue-pull stub: materialize the issue file (wt-create verifies its
+  # existence) and emit either a valid identity or a deliberate mismatch.
+  cat > "$REPO/bin/raw-issue-pull" <<STUB
+#!/usr/bin/env bash
+if [[ "\${R65_PULL_BAD:-0}" == "1" ]]; then
+  echo '{"local_id": "raw-WRONG"}'
+  exit 0
+fi
+target="\$(pwd)/docs/B1-docs/raw-${KEY}"
+mkdir -p "\$target"
+printf -- '---\\nphase_state: proposed\\n---\\n\\n# fixture\\n' > "\$target/issue.md"
+echo '{"local_id": "raw-${KEY}"}'
+STUB
+  chmod +x "$REPO/bin/raw-issue-pull"
+
+  # Seeder stub: fails on the dev target or the test target, on request.
+  cat > "$REPO/docs/system/workspace/scripts/worktree/worktree_seed.py" <<'STUB'
+import os, sys
+target = ""
+for i, a in enumerate(sys.argv):
+    if a == "--target" and i + 1 < len(sys.argv):
+        target = sys.argv[i + 1]
+mode = os.environ.get("R65_SEED_FAIL", "")
+is_test = "test-pre-merge" in target
+if (mode == "dev" and not is_test) or (mode == "test" and is_test):
+    print("[wt-seed] fixture: forced seed failure", file=sys.stderr)
+    sys.exit(1)
+print("[wt-seed] fixture: seed ok")
+STUB
+
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init
+  printf -- '---\nphase_state: proposed\n---\n\n# fixture\n' > "$REPO/docs/B1-docs/raw-${KEY}/issue.md"
+
+  # Export failure-injection variables for the child run.
+  printf 'export R65_SEED_FAIL="%s"\nexport R65_PULL_BAD="%s"\n' "$SEED_FAIL" "$PULL_BAD" > "$TMP/env.sh"
+}
+
+_run_case() {
+  local LABEL="$1" SEED_FAIL="$2" PULL_BAD="$3" EXPECT_MSG="$4"
+  local TMP KEY SLUG REPO LOG RC
+  TMP="$(mktemp -d /tmp/freely-r65.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  KEY="20261106T090000Z"; SLUG="failbr"; REPO="$TMP/repo"; LOG="$TMP/out.log"
+  _setup_repo "$TMP" "$KEY" "$SLUG" "$SEED_FAIL" "$PULL_BAD"
+  ( source "$TMP/env.sh"; cd "$REPO" && bash docs/system/workspace/scripts/worktree/wt-create \
+      --raw-key "$KEY" --source platform --kind fix --slug "$SLUG" ) > "$LOG" 2>&1
+  RC=$?
+
+  if [[ "$RC" -eq 1 ]]; then ok "$LABEL: exit 1"; else bad "$LABEL: exit $RC (expected 1)"; fi
+  if grep -Fq "$EXPECT_MSG" "$LOG"; then ok "$LABEL: business error present"; else bad "$LABEL: business error missing"; fi
+  if grep -Fq "can only \`return'" "$LOG" || grep -Fq "can only 'return'" "$LOG"; then
+    bad "$LABEL: bash 'return' syntax error still printed"
+  else
+    ok "$LABEL: no bash 'return' syntax error"
+  fi
+  # Cleanup: dev branch must be gone, no worktree left besides the main repo.
+  if git -C "$REPO" show-ref --verify --quiet "refs/heads/fix/raw-${KEY}-${SLUG}"; then
+    bad "$LABEL: dev branch leaked"
+  else
+    ok "$LABEL: dev branch cleaned up"
+  fi
+  rm -rf "$TMP"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: three top-level failure branches ==="
+  _run_case "branch1 pull"        ""     "1" "拒绝创建工位: raw-issue-pull failed"
+  _run_case "branch2 dev seed"    "dev"  "0" "拒绝创建工位: worktree seed failed"
+  _run_case "branch3 test init"   "test" "0" "拒绝创建工位: test worktree initialisation failed"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "PASS: $PASSED checks, $FAILED failed"
+[[ $FAILED -eq 0 ]] || exit 1

@@ -995,7 +995,7 @@ fi
       echo "拒绝创建工位: raw-issue-pull failed" >&2
       git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
       git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
-      return 1
+      exit 1
     fi
     _fill_platform_ids "$raw_key"
 	    _update_scan_state "$raw_key" "working" "$fix_target"
@@ -1015,7 +1015,7 @@ fi
     git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
-    return 1
+    exit 1
   fi
   if ! _init_test_worktree_state "$tp_target"; then
     echo "拒绝创建工位: test worktree initialisation failed" >&2
@@ -1023,7 +1023,7 @@ fi
     git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
-    return 1
+    exit 1
   fi
 
   cat <<MSG
