@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261104T082556Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261104T082556Z-A
 platform_ids:
   github:
     issue_id: '4183'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSWRD
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261104T082556Z/issues/I-20261104T082556Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-04T08:25:56Z'
-updated_at: '2026-11-04T08:26:02Z'
+updated_at: '2026-11-07T13:03:02Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261104T082556Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-07T13:03:01Z'
 closeout_note: ''
 ---
 
@@ -56,3 +57,11 @@ workflow_kind: fix
 - RED：对 B2 的 I-* 执行 promote，断言平台 issue 创建成功；当前报文件不存在。
 - GREEN：promote + promote-finalize 全链路成功，raw 变 absorbed 且平台关闭。
 - GREEN：`platform_ids` 在 I-* 文件中被回写。
+
+### comment-20261107T130301Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261104T082556Z-A"]
+
+拆解为以下任务:
+1. [I-20261104T082556Z-A](will-be-updated)
