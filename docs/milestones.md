@@ -1,3 +1,24 @@
+## M-20261106T084804Z-A
+- title: fix — wt-create 顶层 return 改为 exit
+- status: active
+### candidate_issues
+1. `C-20261106T084804Z-A`
+- milestone: M-20261106T084804Z-A
+- status: promoted
+- promoted_issue_id: I-20261106T084804Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261106T084804Z/issues/I-20261106T084804Z-A.md
+### committed_issues
+1. `I-20261106T084804Z-A`
+- milestone: M-20261106T084804Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261106T084804Z/issues/I-20261106T084804Z-A.md
+### completed_issues
+1. `I-20261106T084804Z-A`
+- milestone: M-20261106T084804Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T07:40:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261106T084804Z/issues/I-20261106T084804Z-A.md
+
 ## M-20261104T082549Z-A
 - title: fix — pull 按可用平台回退并复用 sync-debt 记账
 - status: active

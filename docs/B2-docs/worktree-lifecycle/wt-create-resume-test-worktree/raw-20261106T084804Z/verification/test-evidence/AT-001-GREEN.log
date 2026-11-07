@@ -1,0 +1,51 @@
+=== STATIC: no top-level return; function-internal returns unchanged ===
+  top-level=0  function-internal=22
+  [ok] top-level return count is 0
+  [ok] function-internal return count unchanged (22)
+  [ok] shim still execs bash (entry script, not a library)
+  [ok] pull failure message preserved
+  [ok] seed failure message preserved
+  [ok] init failure message preserved
+  [ok] bash -n passes
+  [ok] cleanup actions preserved (9 branch deletions)
+=== BEHAVIOR: three top-level failure branches ===
+  [ok] branch1 pull: exit 1
+  [ok] branch1 pull: business error present
+  [ok] branch1 pull: no bash 'return' syntax error
+  [ok] branch1 pull: dev branch cleaned up
+  [ok] branch2 dev seed: exit 1
+  [ok] branch2 dev seed: business error present
+  [ok] branch2 dev seed: no bash 'return' syntax error
+  [ok] branch2 dev seed: dev branch cleaned up
+  [ok] branch3 test init: exit 1
+  [ok] branch3 test init: business error present
+  [ok] branch3 test init: no bash 'return' syntax error
+  [ok] branch3 test init: dev branch cleaned up
+PASS: 20 checks, 0 failed
+
+=== zero-regression audit (unmodified develop HEAD baseline) ===
+  AT-001 on baseline: PASS 16 / 4 failed (top-level=3, three bash syntax errors)
+  AT-001 on fix:      PASS 20 / 0 failed (top-level=0)
+  test-wt-create-four-state-dir             0 / 0  (R3)
+  test-wt-create-recovery-dev-path          0 / 0  (R4)
+  test-wt-create-resume-test-worktree       0 / 0  (Q1)
+  test-wt-create-source-local               1 / 1  (pre-existing, #4151)
+  test-wt-create-syncs-tooling              1 / 1  (pre-existing, #4151)
+  test-command-lifecycle-wt-create.py      0 / 0
+  test-raw-issue-pull-platform-fallback.py 0 / 0  (R6)
+  test-materialize-h1                      0 / 0  (R2)
+  test-package-runtime-allowlist-parity    0 / 0  (R5.5)
+  test-governance-gate-batch-read          0 / 0  (R1)
+  => 9 PASS / 2 pre-existing FAIL in new; identical to baseline (only timestamp diffs)
+  => 0 new failures
+
+=== scope proof ===
+  top-level return count: 3 -> 0
+  function-internal return count: 22 -> 22 (unchanged)
+  shim bin/wt-create still `exec bash` (entry script, not a sourceable library)
+  three business error messages preserved verbatim
+  cleanup actions (9 branch deletions with || true) preserved verbatim
+  only 3 lines changed in wt-create: `return 1` -> `exit 1` at 998 / 1018 / 1026
+  all 26 pre-existing top-level `exit 1` statements untouched
+  #4153 (library source-safety, opposite direction) NOT touched
+  #4157 (watchdog PRE_CHECK_MAP) NOT touched

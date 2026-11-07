@@ -1,0 +1,24 @@
+=== STATIC: no top-level return; function-internal returns unchanged ===
+  top-level=3  function-internal=22
+  [FAIL] top-level return count is 3 (expected 0)
+  [ok] function-internal return count unchanged (22)
+  [ok] shim still execs bash (entry script, not a library)
+  [ok] pull failure message preserved
+  [ok] seed failure message preserved
+  [ok] init failure message preserved
+  [ok] bash -n passes
+  [ok] cleanup actions preserved (9 branch deletions)
+=== BEHAVIOR: three top-level failure branches ===
+  [ok] branch1 pull: exit 1
+  [ok] branch1 pull: business error present
+  [FAIL] branch1 pull: bash 'return' syntax error still printed
+  [ok] branch1 pull: dev branch cleaned up
+  [ok] branch2 dev seed: exit 1
+  [ok] branch2 dev seed: business error present
+  [FAIL] branch2 dev seed: bash 'return' syntax error still printed
+  [ok] branch2 dev seed: dev branch cleaned up
+  [ok] branch3 test init: exit 1
+  [ok] branch3 test init: business error present
+  [FAIL] branch3 test init: bash 'return' syntax error still printed
+  [ok] branch3 test init: dev branch cleaned up
+PASS: 16 checks, 4 failed
