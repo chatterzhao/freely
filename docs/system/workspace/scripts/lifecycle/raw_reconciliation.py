@@ -10,6 +10,15 @@ from typing import Any
 _RAW_PREFIX = re.compile(r"^raw-", re.IGNORECASE)
 _SPACE = re.compile(r"\s+")
 _COMMENT = re.compile(r"^#{3,4}\s+(?:comment|resolution)-[^\n]+$", re.IGNORECASE | re.MULTILINE)
+# A comment block is its heading plus everything up to the next heading. System
+# events (promote / promote_finalized) write these inline in the document body,
+# so the body comparison must ignore them and the comment comparison must look at
+# their content — otherwise a documented raw can never match its platform copies.
+_COMMENT_BLOCK = re.compile(
+    r"^#{3,4}[ \t]+(?:comment|resolution)-[^\n]*\n(.*?)(?=^#{1,4}[ \t]+|\Z)",
+    re.IGNORECASE | re.MULTILINE | re.DOTALL,
+)
+_META_LINE = re.compile(r"^(?:-\s+[A-Za-z_][\w-]*:.*|\{.*\})\s*$")
 
 
 def normalize_raw_key(value: object) -> str:
@@ -20,10 +29,19 @@ def _text(value: object) -> str:
     return _SPACE.sub(" ", str(value or "").replace("\r\n", "\n").strip())
 
 
+def _strip_meta(text: str) -> str:
+    """Drop the machine-readable prefix (bullets or one JSON line) of a comment."""
+    lines = text.split("\n")
+    while lines and (not lines[0].strip() or _META_LINE.match(lines[0].strip())):
+        lines.pop(0)
+    return "\n".join(lines)
+
+
 def _comments(body: object, values: object = ()) -> tuple[str, ...]:
     inline = [
-        _text(match.group(0)).lower()
-        for match in _COMMENT.finditer(str(body or ""))
+        _text(_strip_meta(match.group(1))).lower()
+        for match in _COMMENT_BLOCK.finditer(str(body or ""))
+        if _text(_strip_meta(match.group(1)))
     ]
     remote = [
         _text(item).lower()
@@ -37,6 +55,9 @@ def _body(value: object) -> str:
     text = str(value or "").replace("\r\n", "\n").strip()
     if text.startswith("---") and text.count("---") >= 2:
         text = text.split("---", 2)[2]
+    # Comment blocks live in the body but are compared separately, so the body
+    # projection must exclude them (platform copies never inline them).
+    text = _COMMENT_BLOCK.sub("", text)
     return _text(text)
 
 

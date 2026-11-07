@@ -75,6 +75,52 @@ _fm_set_str() {
   _fm_set "$file" "$key" "'$value'"
 }
 
+# _issue_file_for: resolve an issue document by local id across both layouts.
+#   B1: docs/B1-docs/<id>/issue.md
+#   B2: docs/B2-docs/**/issues/<id>.md
+# `promote` used to hand a B2 I-* id to cmd_create, which only knew the B1 layout,
+# so platform creation for promoted issues could never succeed (#4183).
+_issue_file_for() {
+  local local_id="$1" direct
+  direct="$ISSUES_DIR/$local_id/issue.md"
+  if [[ -f "$direct" ]]; then
+    printf '%s\n' "$direct"
+    return 0
+  fi
+  local -a matches=()
+  local found
+  while IFS= read -r found; do
+    [[ -n "$found" ]] && matches+=("$found")
+  done < <(find "$ROOT_DIR/docs/B2-docs" -type f -path "*/issues/${local_id}.md" 2>/dev/null || true)
+  if [[ ${#matches[@]} -eq 0 ]]; then
+    # Legacy fallback: some historical B2 trees carry a filename prefix variant.
+    while IFS= read -r found; do
+      [[ -n "$found" ]] && matches+=("$found")
+    done < <(find "$ROOT_DIR/docs/B2-docs" -type f -path "*/issues/${local_id}-*.md" 2>/dev/null || true)
+  fi
+  if [[ ${#matches[@]} -eq 0 ]]; then
+    return 1
+  fi
+  if [[ ${#matches[@]} -gt 1 ]]; then
+    printf '[issue-sync] ambiguous issue document for %s:\n' "$local_id" >&2
+    printf '  %s\n' "${matches[@]}" >&2
+    return 2
+  fi
+  printf '%s\n' "${matches[0]}"
+}
+
+_fm_has_key() {
+  local file="$1" key="$2"
+  python3 -c "
+import sys, yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+sys.exit(0 if isinstance(fm, dict) and '$key' in fm else 1)
+" 2>/dev/null
+}
+
 _raw_effect() {
   local contract_root="${RAW_METADATA_CONTRACT_ROOT:-$ROOT_DIR}"
   PYTHONPATH="$contract_root/docs/system/workspace/scripts/lifecycle" python3 \
@@ -180,6 +226,46 @@ if os.path.exists('$SCAN_STATE'):
 }
 
 # Check if there are unsynced comments since last_synced_comment_at.
+# _comment_blocks: parse every "### comment-<ts>" block in the document body.
+# Prints "<ts>\t<body-on-one-line>" per block, oldest first.
+_comment_blocks() {
+  python3 -c "
+import re
+with open('$1') as f:
+    content = f.read()
+parts = content.split('---', 2)
+body = parts[2] if len(parts) >= 3 else content
+pattern = re.compile(r'### (comment-\S+)\n(.*?)(?=\n### comment-|\Z)', re.DOTALL)
+for match in pattern.finditer(body):
+    ts = match.group(1)[len('comment-'):]
+    text = match.group(2)
+    lines = text.split('\n')
+    # strip the optional metadata prefix: a {json} line or leading '- key:' bullets
+    while lines and (not lines[0].strip() or lines[0].startswith('- ') or lines[0].startswith('{')):
+        lines.pop(0)
+    print(ts + '\t' + '\\n'.join(lines).strip())
+" 2>/dev/null || true
+}
+
+_last_comment_body() {
+  python3 -c "
+import re
+with open('$1') as f:
+    content = f.read()
+parts = content.split('---', 2)
+body = parts[2] if len(parts) >= 3 else content
+pattern = re.compile(r'### (comment-\S+)\n(.*?)(?=\n### comment-|\Z)', re.DOTALL)
+blocks = list(pattern.finditer(body))
+if not blocks:
+    raise SystemExit(0)
+text = blocks[-1].group(2)
+lines = text.split('\n')
+while lines and (not lines[0].strip() or lines[0].startswith('- ') or lines[0].startswith('{')):
+    lines.pop(0)
+print('\n'.join(lines).strip())
+" 2>/dev/null || true
+}
+
 _has_unsynced_comments() {
   local file="$1" platform="$2"
   local last_sync
@@ -194,25 +280,21 @@ if len(parts) >= 3:
   print(lsca.get('$platform', ''))
 " 2>/dev/null || true)
   [[ -z "$last_sync" || "$last_sync" == "None" ]] && return 0  # never synced
-  # Check if any comment is newer
-  python3 -c "
-import re
-with open('$file') as f: content = f.read()
-parts = content.split('## Comments', 1)
-if len(parts) < 2: exit(1)
-import datetime
-last = datetime.datetime.fromisoformat('${last_sync}'.replace('Z', '+00:00'))
-for m in re.finditer(r'### (comment-\S+)', parts[1]):
-  ts_str = m.group(1).replace('comment-', '')
-  try:
-    ct = datetime.datetime.strptime(ts_str[:15], '%Y%m%dT%H%M%S').replace(tzinfo=datetime.timezone.utc)
-    if ct > last: exit(0)
-  except: pass
-exit(1)
-" 2>/dev/null
+  # Any comment block newer than the last sync counts, whatever its metadata
+  # shape and wherever it sits (system events are not under `## Comments`).
+  # Both timestamps are UTC and fixed width, so plain string compare is exact.
+  local normalised_sync="${last_sync//-/}"
+  normalised_sync="${normalised_sync//:/}"
+  normalised_sync="${normalised_sync:0:15}"
+  local ts _rest
+  while IFS=$'\t' read -r ts _rest; do
+    [[ -z "$ts" ]] && continue
+    if [[ "${ts:0:15}" > "$normalised_sync" ]]; then
+      return 0
+    fi
+  done < <(_comment_blocks "$file")
+  return 1
 }
-
-# ── title derivation ─────────────────────────────────────
 
 _issue_title() {
   local file="$1" local_id="$2"
@@ -516,8 +598,11 @@ _gitee_resolve_issue_number() {
 
 cmd_create() {
   local local_id="$1" file
-  file="$ISSUES_DIR/$local_id/issue.md"
-  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync: cannot resolve issue document for $local_id" >&2
+    echo "  checked: $ISSUES_DIR/$local_id/issue.md and docs/B2-docs/**/issues/$local_id.md" >&2
+    exit 1
+  fi
 
   local title body labels
   title=$(_platform_title "$local_id" "$file")
@@ -575,7 +660,11 @@ cmd_create() {
   # batch scanner then skips the issue forever (#793 uses the same field).
   if [[ ${#_failed[@]} -eq 0 ]]; then
     _scan_state_record_sync "$local_id" "$file"
-    _fm_set_str "$file" "platform_state" "open"
+    # `platform_state` is a raw-issue field; linked I-* documents do not declare
+    # it and adding it would silently change their schema.
+    if _fm_has_key "$file" "platform_state"; then
+      _fm_set_str "$file" "platform_state" "open"
+    fi
     echo "[issue-sync] create complete: $local_id"
     return 0
   fi
@@ -590,8 +679,11 @@ cmd_create() {
 
 cmd_update() {
   local local_id="$1" file title body labels gh_id gitee_id
-  file="$ISSUES_DIR/$local_id/issue.md"
-  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync: cannot resolve issue document for $local_id" >&2
+    echo "  checked: $ISSUES_DIR/$local_id/issue.md and docs/B2-docs/**/issues/$local_id.md" >&2
+    exit 1
+  fi
 
   # Dedup: skip if content hasn't changed since last sync
   if ! _changed_since_last_sync "$local_id" "$file"; then
@@ -620,29 +712,22 @@ cmd_update() {
 
 cmd_comment() {
   local local_id="$1" file
-  file="$ISSUES_DIR/$local_id/issue.md"
-  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync: cannot resolve issue document for $local_id" >&2
+    echo "  checked: $ISSUES_DIR/$local_id/issue.md and docs/B2-docs/**/issues/$local_id.md" >&2
+    exit 1
+  fi
 
   # Dedup: check if there are unsynced comments
   if [[ -n "${GH_REPO:-}" ]] && ! _has_unsynced_comments "$file" "github"; then
     echo "[issue-sync] skip comment: no unsynced comments for $local_id (GitHub)"
   fi
 
-  # Extract latest comment without platform_ids
+  # Extract the latest comment block. System events (promote / promote_finalized)
+  # write bullet metadata, user comments write a {json} line, so the reader must
+  # accept both instead of assuming a `## Comments` section (#4183).
   local last_comment
-  last_comment=$(python3 -c "
-import re
-with open('$file') as f: content = f.read()
-# Find last ### comment- entry, extract text
-matches = list(re.finditer(r'### (comment-\S+)\n(\{[^}]+\})?\n(.*?)(?=\n### |\Z)', content, re.DOTALL))
-if matches:
-  m = matches[-1]
-  meta = m.group(2) or ''
-  body = m.group(3).strip()
-  # Only push if not already synced to both platforms
-  if 'github' not in meta or 'gitee' not in meta:
-    print(body)
-" 2>/dev/null || true)
+  last_comment="$(_last_comment_body "$file")"
 
   if [[ -z "$last_comment" ]]; then
     echo "[issue-sync] no unsynced comments for $local_id"
@@ -685,8 +770,11 @@ with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body_text)
 
 cmd_close() {
   local local_id="$1" reason="${2:-completed}" file gh_id gitee_id
-  file="$ISSUES_DIR/$local_id/issue.md"
-  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync: cannot resolve issue document for $local_id" >&2
+    echo "  checked: $ISSUES_DIR/$local_id/issue.md and docs/B2-docs/**/issues/$local_id.md" >&2
+    exit 1
+  fi
 
   # Strict raw closure is delegated to the configured-platform effect. Only a
   # complete all-platform close may commit platform_state=closed locally.
@@ -794,9 +882,12 @@ cmd_promote() {
   local raw_id="$1" i_id="$2"
   local raw_file i_file
   raw_file="$ISSUES_DIR/$raw_id/issue.md"
-  i_file=$(find "$ROOT_DIR/docs/B2-docs" -name "${i_id}*.md" -print -quit 2>/dev/null || true)
   [[ -f "$raw_file" ]] || { echo "[ERROR] $raw_file not found" >&2; exit 1; }
-  [[ -n "$i_file" && -f "$i_file" ]] || { echo "[ERROR] I-* file not found for $i_id in docs/B2-docs" >&2; exit 1; }
+  if ! i_file="$(_issue_file_for "$i_id")"; then
+    echo "[ERROR] issue-sync promote: cannot resolve the B2 document for $i_id" >&2
+    echo "  looked for docs/B2-docs/**/issues/$i_id.md" >&2
+    exit 1
+  fi
 
   echo "[issue-sync] promote: $raw_id → $i_id"
 
@@ -1021,8 +1112,11 @@ cmd_scan() {
 
 cmd_status() {
   local local_id="$1" file
-  file="$ISSUES_DIR/$local_id/issue.md"
-  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync: cannot resolve issue document for $local_id" >&2
+    echo "  checked: $ISSUES_DIR/$local_id/issue.md and docs/B2-docs/**/issues/$local_id.md" >&2
+    exit 1
+  fi
 
   echo "local_id:        $local_id"
   echo "kind:            $(_fm_get "$file" "kind")"

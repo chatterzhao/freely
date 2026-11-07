@@ -24,19 +24,33 @@ Zero-semantics-change contract:
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
 COMMENT_PREFIX = "### comment-"
 RESOLUTION_PREFIX = "#### resolution-"
+COMMENT_BLOCK = re.compile(r"^### comment-[^\n]*\n(.*?)(?=^#{3,4}[ \t]|\Z)", re.MULTILINE | re.DOTALL)
+SYSTEM_SOURCE = re.compile(r"^-\s*source:\s*system\s*$", re.MULTILINE | re.IGNORECASE)
+
+
+def _human_comments(text: str) -> int:
+    """Count comments that are human input.
+
+    System events (promote / promote_finalized) write ``### comment-`` blocks with
+    ``- source: system``; they are machine bookkeeping and have nothing to adopt
+    or discard, so requiring a resolution for them would force a fabricated one.
+    """
+    return sum(1 for match in COMMENT_BLOCK.finditer(text) if not SYSTEM_SOURCE.search(match.group(1)))
 
 
 def scan(b1_docs: Path) -> list[tuple[str, int, int]]:
     unresolved: list[tuple[str, int, int]] = []
     for issue_file in sorted(b1_docs.glob("raw-*/issue.md")):
         with issue_file.open("r", encoding="utf-8", errors="replace") as handle:
-            lines = handle.read().splitlines()
-        comments = sum(1 for line in lines if line.startswith(COMMENT_PREFIX))
+            text = handle.read()
+        lines = text.splitlines()
+        comments = _human_comments(text)
         resolutions = sum(1 for line in lines if line.startswith(RESOLUTION_PREFIX))
         if comments > resolutions:
             unresolved.append((issue_file.parent.name, comments, resolutions))

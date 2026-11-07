@@ -190,11 +190,25 @@ def cmd_list(args: argparse.Namespace) -> object:
 
 def cmd_get(args: argparse.Namespace) -> object:
     repo = detect_repo(args.repo)
-    return api_request(
+    issue = api_request(
         method="GET",
         path=repo_path(repo, f"/{args.number}"),
         auth_required=False,
     )
+    # Gitee reports `comments` as a COUNT on the issue resource, while callers
+    # (platform-adapter.fetch_issue) expect the comment bodies. Fetch the list so
+    # replica reconciliation can compare comments instead of always seeing none.
+    if isinstance(issue, dict) and not isinstance(issue.get("comments"), list):
+        try:
+            comments = api_request(
+                method="GET",
+                path=repo_path(repo, f"/{args.number}/comments"),
+                auth_required=False,
+            )
+        except Exception:
+            comments = []
+        issue["comments"] = comments if isinstance(comments, list) else []
+    return issue
 
 
 def cmd_create(args: argparse.Namespace) -> object:

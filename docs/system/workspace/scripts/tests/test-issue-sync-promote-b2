@@ -1,0 +1,296 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261104T082556Z / #4183
+# Promoting a candidate into a B2 I-* document must be able to create that issue
+# on both platforms. The B1-only file assumption made it impossible.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+RAW_KEY="20260101T000000Z"
+RAW_ID="raw-$RAW_KEY"
+I_ID="I-$RAW_KEY-A"
+STORY="docs/B2-docs/gate/platform/raw-$RAW_KEY"
+
+FIX=""
+make_fixture() {
+  FIX="$(mktemp -d /tmp/freely-promote.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
+  mkdir -p "$FIX/bin" "$FIX/stub" \
+           "$FIX/docs/system/workspace/scripts/runtime" \
+           "$FIX/docs/system/workspace/scripts/sync" \
+           "$FIX/docs/system/workspace/scripts/lifecycle" \
+           "$FIX/docs/B1-docs/$RAW_ID" "$FIX/$STORY/issues"
+  cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/sync/raw_title_contract.py" \
+     "$FIX/docs/system/workspace/scripts/sync/raw_title_contract.py"
+
+  cat > "$FIX/docs/system/workspace/scripts/runtime/gitee-issue.py" <<'STUB'
+import json, os, sys
+with open(os.environ["STUB_LOG"], "a") as f:
+    f.write(json.dumps(sys.argv[1:]) + "\n")
+args = sys.argv[1:]
+if "create" in args:
+    print(json.dumps({"number": "77", "html_url": "https://gitee.com/o/r/issues/77"}))
+else:
+    print(json.dumps({"ok": True}))
+STUB
+
+  cat > "$FIX/stub/gh" <<'STUB'
+#!/usr/bin/env bash
+echo "$*" >> "${STUB_LOG:-/dev/null}.gh"
+case "$*" in
+  "repo view --json nameWithOwner -q .nameWithOwner") echo "o/r"; exit 0 ;;
+  repo\ view*) echo '{"nameWithOwner":"o/r"}'; exit 0 ;;
+  auth\ status*) exit 0 ;;
+  issue\ create*) echo "https://github.com/o/r/issues/88"; exit 0 ;;
+  *) exit 0 ;;
+esac
+STUB
+  chmod +x "$FIX/stub/gh"
+
+  cat > "$FIX/docs/B1-docs/$RAW_ID/issue.md" <<DOC
+---
+schema_version: '1'
+local_id: $RAW_ID
+kind: raw
+phase_state: proposed
+absorbed_into: ''
+platform_ids:
+  github:
+    issue_id: '11'
+    url: https://github.com/o/r/issues/11
+    synced_at: ''
+  gitee:
+    issue_id: 'G11'
+    url: https://gitee.com/o/r/issues/G11
+    synced_at: ''
+primary_platform: github
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-01-01T00:00:00Z'
+updated_at: '2026-01-01T00:00:00Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
+platform_state: open
+promoted_children: []
+source_candidate: ''
+completed_at: ''
+closeout_note: ''
+---
+
+workflow_kind: fix
+
+## 问题
+
+promote 目标文档在 B2。
+DOC
+
+  cat > "$FIX/$STORY/issues/$I_ID.md" <<DOC
+---
+schema_version: '1'
+issue_id: $I_ID
+kind: linked
+status: in_dev
+phase_state: completed
+promoted_from: $RAW_ID
+source_candidate: docs/B1-docs/$RAW_ID/candidates.md
+canonical_issue_path: ""
+platform_ids: {}
+primary_platform: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: 2026-01-01T00:00:00Z
+updated_at: 2026-01-01T00:00:00Z
+intake_id: ""
+author: platform
+channel: freely-workflow-guarded-execution
+session_refs: []
+pre_tests_path: $STORY/verification/pre-tests.md
+verification_artifact_dir: $STORY/code-reviews
+---
+
+# $I_ID: promoted issue in B2
+
+- issue_id: $I_ID
+- title: promoted issue in B2
+
+## 实现
+
+B2 文档。
+DOC
+
+  export STUB_LOG="$FIX/stub-log.jsonl"
+  : > "$STUB_LOG"
+  export PATH="$FIX/stub:$PATH"
+  export GH_REPO="o/r" GITEE_REPO="o/r"
+  export PYTHONPATH="$ROOT_DIR/docs/system/workspace/scripts/lifecycle:$ROOT_DIR/docs/system/workspace/scripts/runtime"
+}
+
+CONTRACT_ROOT="$ROOT_DIR"
+
+run_sync() {
+  # The lifecycle modules must come from the real tree (the fixture only holds
+  # documents); ROOT_DIR still points at the fixture for every path lookup.
+  RAW_METADATA_CONTRACT_ROOT="$CONTRACT_ROOT" ROOT_DIR="$FIX" bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"
+    source "$0/bin/issue-sync"
+    set +e
+    cmd="$1"; shift
+    # Commands call `exit` on fatal input: run them in a subshell to keep RC.
+    ( "$cmd" "$@" )
+    echo "RC=$?"
+  ' "$FIX" "$@" 2>&1
+}
+
+fm() {
+  python3 - "$1" "$2" <<'PY'
+import sys, yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+text = open(sys.argv[1]).read()
+fm = yaml.safe_load(text.split('---', 2)[1]) or {}
+print(fm.get(sys.argv[2], ''))
+PY
+}
+
+static_checks() {
+  echo "=== STATIC: one resolver, no B1-only assumptions ==="
+
+  grep -q '^_issue_file_for() {' "$ISSUE_SYNC" && ok "resolver _issue_file_for exists" \
+    || bad "no _issue_file_for resolver"
+
+  local legacy; legacy=$(grep -c 'file="\$ISSUES_DIR/\$local_id/issue.md"' "$ISSUE_SYNC" || true)
+  [[ "$legacy" == "0" ]] && ok "no command hard-codes the B1 path any more" \
+    || bad "$legacy command(s) still hard-code the B1 path"
+
+  local promote; promote=$(python3 - "$ISSUE_SYNC" <<'PY'
+import re
+
+lines = open(__import__("sys").argv[1]).read().split("\n")
+FUNC = re.compile(r"^[a-z_][a-z0-9_]*\(\) \{")
+
+
+def body(name):
+    start = next((i for i, l in enumerate(lines) if l.startswith(name + "() {")), None)
+    if start is None:
+        return None
+    end = next((j for j in range(start + 1, len(lines)) if FUNC.match(lines[j])), len(lines))
+    return "\n".join(lines[start:end])
+
+
+promote = body("cmd_promote") or ""
+print("PROMOTE_RESOLVES" if "_issue_file_for" in promote and "find \"$ROOT_DIR/docs/B2-docs\"" not in promote else "PROMOTE_BROKEN")
+PY
+)
+  [[ "$promote" == "PROMOTE_RESOLVES" ]] && ok "cmd_promote resolves through the shared helper" \
+    || bad "cmd_promote still prefix-searches the B2 tree"
+
+  grep -q '_fm_has_key "$file" "platform_state"' "$ISSUE_SYNC" && ok "platform_state is written only when declared" \
+    || bad "platform_state is written unconditionally"
+
+  grep -q '^_comment_blocks() {' "$ISSUE_SYNC" && grep -q '^_last_comment_body() {' "$ISSUE_SYNC" \
+    && ok "comment blocks have one shared reader" || bad "comment readers are missing"
+  grep -q "split('## Comments'" "$ISSUE_SYNC" && bad "comment sync still requires a '## Comments' section" \
+    || ok "comment sync no longer assumes a '## Comments' section"
+
+  bash -n "$ISSUE_SYNC" >/dev/null 2>&1 && ok "issue-sync bash -n" || bad "issue-sync syntax"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: B2 documents can be created and promoted ==="
+  local out rc ids state
+
+  # 1) create a B2 I-* document directly
+  make_fixture
+  out=$(run_sync cmd_create "$I_ID")
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  ids=$(fm "$FIX/$STORY/issues/$I_ID.md" platform_ids)
+  [[ "$rc" == "0" ]] && ok "cmd_create resolves the B2 document and exits 0" \
+    || bad "cmd_create on a B2 document rc=${rc:-<none>}: $out"
+  [[ "$ids" == *"github"* && "$ids" == *"gitee"* ]] && ok "B2 document received both platform ids" \
+    || bad "platform_ids on the B2 document: $ids"
+  local has_state; has_state=$(grep -c '^platform_state:' "$FIX/$STORY/issues/$I_ID.md" || true)
+  [[ "$has_state" == "0" ]] && ok "no platform_state field was injected into the linked document" \
+    || bad "platform_state leaked into the linked document"
+
+  # 2) promote: raw gets the child, B2 gets the cross-reference
+  make_fixture
+  out=$(run_sync cmd_promote "$RAW_ID" "$I_ID")
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  local children; children=$(fm "$FIX/docs/B1-docs/$RAW_ID/issue.md" promoted_children)
+  [[ "$rc" == "0" ]] && ok "promote exits 0 for a B2 target" || bad "promote rc=${rc:-<none>}: $out"
+  [[ "$children" == *"$I_ID"* ]] && ok "raw recorded the promoted child" || bad "promoted_children: $children"
+  grep -q "event: promoted_from" "$FIX/$STORY/issues/$I_ID.md" && ok "B2 document carries the promoted_from comment" \
+    || bad "B2 document has no promoted_from comment"
+  ids=$(fm "$FIX/$STORY/issues/$I_ID.md" platform_ids)
+  [[ "$ids" == *"github"* ]] && ok "promote created the platform issue for the B2 document" \
+    || bad "promote did not write platform ids: $ids"
+
+  # 3) missing document: fail loudly, never silently promote
+  make_fixture
+  out=$(run_sync cmd_create "I-20260102T000000Z-A")
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  [[ -n "$rc" && "$rc" != "0" ]] && ok "missing document fails (rc=$rc)" || bad "missing document rc=${rc:-<none>}: $out"
+  grep -q "cannot resolve issue document" <<<"$out" && ok "missing document reports what was checked" \
+    || bad "missing document error is unhelpful: $out"
+
+  # 4) ambiguous document: refuse rather than pick one
+  make_fixture
+  mkdir -p "$FIX/docs/B2-docs/other/raw-$RAW_KEY/issues"
+  cp "$FIX/$STORY/issues/$I_ID.md" "$FIX/docs/B2-docs/other/raw-$RAW_KEY/issues/$I_ID.md"
+  out=$(run_sync cmd_create "$I_ID")
+  rc=$(sed -n 's/^RC=//p' <<<"$out" | tail -1)
+  [[ -n "$rc" && "$rc" != "0" ]] && ok "ambiguous document fails (rc=$rc)" || bad "ambiguous document rc=${rc:-<none>}: $out"
+  grep -q "ambiguous issue document" <<<"$out" && ok "ambiguity is reported with both candidates" \
+    || bad "ambiguity not reported: $out"
+
+  # 5) system-event comments must reach the platforms
+  make_fixture
+  run_sync cmd_promote "$RAW_ID" "$I_ID" >/dev/null
+  # The promoted_from comment lives on the I-* document; it must reach the I-*
+  # platform issue (bullet metadata + no '## Comments' heading).
+  out=$(run_sync cmd_comment "$I_ID")
+  local gh_comments gitee_comments
+  gh_comments=$(grep -c 'issue comment' "$STUB_LOG.gh" 2>/dev/null || true)
+  gitee_comments=$(grep -c '"comment"' "$STUB_LOG" 2>/dev/null || true)
+  [[ "${gh_comments:-0}" -ge 1 ]] && ok "promote's event comment reached GitHub" \
+    || bad "no GitHub comment call was made"
+  [[ "${gitee_comments:-0}" -ge 1 ]] && ok "promote's event comment reached Gitee" \
+    || bad "no Gitee comment call was made"
+
+  # 6) comment-resolution scan: system events need no resolution, humans do
+  local scan="$ROOT_DIR/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
+  local scan_dir="$FIX/docs/B1-docs"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; local scan_rc=$?
+  [[ "$scan_rc" == "0" ]] && ok "system-event comment needs no resolution" \
+    || bad "scan flagged the system-event comment (rc=$scan_rc)"
+
+  printf '\n### comment-20260101T010101Z\n{}\n\nA human asked something.\n' >> "$scan_dir/$RAW_ID/issue.md"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; scan_rc=$?
+  [[ "$scan_rc" == "1" ]] && ok "human comment without resolution is flagged" \
+    || bad "scan missed an unresolved human comment (rc=$scan_rc)"
+
+  printf '\n#### resolution-20260101T020202Z\n- status: adopted\n- reason: fixed\n- resolved_by: probe\n' >> "$scan_dir/$RAW_ID/issue.md"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; scan_rc=$?
+  [[ "$scan_rc" == "0" ]] && ok "human comment with resolution passes" \
+    || bad "scan rejected a resolved comment (rc=$scan_rc)"
+
+  rm -rf "$FIX"; FIX=""
+}
+
+mode="${1:-all}"
+case "$mode" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]
