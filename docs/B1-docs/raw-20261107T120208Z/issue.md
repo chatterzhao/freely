@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261107T120208Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261107T120208Z-A
 platform_ids:
   github:
     issue_id: '4216'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKTNYG
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/governance/raw-20261107T120208Z/issues/I-20261107T120208Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-07T12:02:08Z'
-updated_at: '2026-11-07T12:02:13Z'
+updated_at: '2026-11-07T12:36:08Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261107T120208Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-07T12:35:59Z'
 closeout_note: ''
 ---
 
