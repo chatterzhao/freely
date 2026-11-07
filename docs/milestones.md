@@ -1,3 +1,24 @@
+## M-20261103T132526Z-A
+- title: fix — 平台写通道失败必报、部分成功可追
+- status: active
+### candidate_issues
+1. `C-20261103T132526Z-A`
+- milestone: M-20261103T132526Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132526Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261103T132526Z/issues/I-20261103T132526Z-A.md
+### committed_issues
+1. `I-20261103T132526Z-A`
+- milestone: M-20261103T132526Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132526Z/issues/I-20261103T132526Z-A.md
+### completed_issues
+1. `I-20261103T132526Z-A`
+- milestone: M-20261103T132526Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T11:45:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132526Z/issues/I-20261103T132526Z-A.md
+
 ## M-20261103T132540Z-A
 - title: fix — 合并门禁读 verdict，评审判定不再默认通过
 - status: active

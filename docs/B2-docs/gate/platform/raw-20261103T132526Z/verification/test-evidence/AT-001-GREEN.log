@@ -1,0 +1,28 @@
+=== STATIC: no silent-success constructs ===
+  [ok] issue-sync no longer masks gitee failures
+  [ok] issue-sync no longer gates on GITEE_TOKEN
+  [ok] issue-sync uses the real gitee CLI contract
+  [ok] freely parses platform status as JSON
+  [ok] issue-sync bash -n
+  [ok] platform-adapter parses
+=== BEHAVIOR: gitee CLI contract + failure propagation ===
+  [ok] gitee create exits 0 on success
+  [ok] gitee create uses subcommand + named flags
+  [ok] gitee create returns the platform id
+  [ok] gitee failure propagates non-zero
+=== BEHAVIOR: gitee repo identity ===
+  [ok] repo url git@gitee-zhaoquan:zhaoquan/freely.git -> zhaoquan/freely
+  [ok] repo url https://gitee.com/zhaoquan/freely.git -> zhaoquan/freely
+  [ok] repo url git@gitee.com:zhaoquan/freely.git -> zhaoquan/freely
+=== BEHAVIOR: partial success must not self-certify ===
+  [ok] partial create exits 3
+  [ok] partial create left platform_state untouched (platform_state='' ids=['github'])
+  [ok] partial create persisted only the created platform
+  [ok] full create exits 0 with both ids and platform_state=open
+=== BEHAVIOR: adapter detects WHY a platform is unavailable ===
+  [ok] missing gh reports 'not installed'
+  [ok] no longer confuses missing CLI with unsupported platform
+  [ok] all-platforms-failed exits 1
+  [ok] partial create-issue exits 3
+  [ok] per-platform status reported side by side
+SUMMARY: 22 ok, 0 failed

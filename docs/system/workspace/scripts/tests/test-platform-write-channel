@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261103T132526Z / #4149
+# Platform write channel must FAIL LOUDLY and must never self-certify success.
+#
+# Boundaries that must stay green:
+#  - `_gitee_repo` keeps producing `owner/repo` for all remote URL shapes
+#  - adapters still report `created` with the real issue id on the happy path
+#  - `issue-sync create` with a single configured platform keeps exit 0
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+ADAPTER="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+FREELY="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+# ── Fixture: an isolated project tree with stub platform CLIs ──────────────
+FIX=""
+make_fixture() {
+  FIX="$(mktemp -d /tmp/freely-write.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
+  mkdir -p "$FIX/bin" "$FIX/stub" \
+           "$FIX/docs/system/workspace/scripts/runtime" \
+           "$FIX/docs/system/workspace/scripts/sync" \
+           "$FIX/docs/B1-docs/raw-20260101T000000Z"
+  # _platform_title() imports the shared title contract from scripts/sync.
+  cp "$ROOT_DIR/docs/system/workspace/scripts/sync/raw_title_contract.py" \
+     "$FIX/docs/system/workspace/scripts/sync/raw_title_contract.py"
+  cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+
+  # Stub gitee-issue.py — real CLI shape (subcommand + named flags).
+  cat > "$FIX/docs/system/workspace/scripts/runtime/gitee-issue.py" <<'STUB'
+import json, os, sys
+with open(os.environ["STUB_LOG"], "a") as f:
+    f.write(json.dumps(sys.argv[1:]) + "\n")
+if os.environ.get("STUB_GITEE_MODE") == "fail":
+    sys.stderr.write("gitee stub forced failure\n"); raise SystemExit(2)
+args = sys.argv[1:]
+if "create" in args:
+    print(json.dumps({"number": "77", "html_url": "https://gitee.com/o/r/issues/77"}))
+elif "close" in args:
+    print(json.dumps({"number": "77", "state": "closed"}))
+else:
+    print(json.dumps({"ok": True}))
+STUB
+
+  # Stub `gh` — create returns a URL, everything else a plausible value.
+  cat > "$FIX/stub/gh" <<'STUB'
+#!/usr/bin/env bash
+echo "$*" >> "${STUB_LOG:-/dev/null}.gh"
+case "$*" in
+  "repo view --json nameWithOwner -q .nameWithOwner") echo "o/r"; exit 0 ;;
+  repo\ view*) echo '{"nameWithOwner":"o/r"}'; exit 0 ;;
+  auth\ status*) exit 0 ;;
+  issue\ create*) echo "https://github.com/o/r/issues/88"; exit 0 ;;
+  *) exit 0 ;;
+esac
+STUB
+  chmod +x "$FIX/stub/gh"
+
+  cat > "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md" <<'DOC'
+---
+schema_version: '1'
+local_id: raw-20260101T000000Z
+kind: raw
+phase_state: proposed
+absorbed_into: ''
+platform_ids: {}
+primary_platform: github
+created_at: '2026-01-01T00:00:00Z'
+updated_at: '2026-01-01T00:00:00Z'
+platform_state: ''
+---
+
+# probe issue
+DOC
+  export STUB_LOG="$FIX/stub-log.jsonl"
+  : > "$STUB_LOG"
+  export PATH="$FIX/stub:$PATH"
+  export GH_REPO="o/r" GITEE_REPO="o/r" FREELY_REPO_PLATFORMS="github,gitee"
+  export PYTHONPATH="$ROOT_DIR/docs/system/workspace/scripts/lifecycle:$ROOT_DIR/docs/system/workspace/scripts/runtime"
+}
+
+# Load issue-sync as a library (it must not dispatch when sourced).
+load_issue_sync() {
+  ROOT_DIR="$FIX" bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"
+    source "$0/bin/issue-sync"
+    type -t cmd_create >/dev/null && echo LOADED
+  ' "$FIX" 2>/dev/null
+}
+
+_pstate() {
+  python3 - "$1" <<'PY'
+import sys, yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+text = open(sys.argv[1]).read()
+fm = yaml.safe_load(text.split('---', 2)[1]) or {}
+print(f"platform_state={fm.get('platform_state','')!r} ids={sorted((fm.get('platform_ids') or {}).keys())}")
+PY
+}
+
+static_checks() {
+  echo "=== STATIC: no silent-success constructs ==="
+  if grep -q "|| echo '{\"ok\":false}'" "$ISSUE_SYNC"; then
+    bad "issue-sync still masks gitee failures with || echo ok:false"
+  else ok "issue-sync no longer masks gitee failures"; fi
+
+  if grep -qE 'GITEE_TOKEN:-' "$ISSUE_SYNC"; then
+    bad "issue-sync still gates gitee writes on an unset GITEE_TOKEN"
+  else ok "issue-sync no longer gates on GITEE_TOKEN"; fi
+
+  if grep -q '"\\"title\\":\\"' "$ISSUE_SYNC" || grep -q '_gitee_call "create" "{"' "$ISSUE_SYNC"; then
+    bad "issue-sync still passes a JSON blob to gitee-issue.py"
+  else ok "issue-sync uses the real gitee CLI contract"; fi
+
+  if grep -q 'grep -A2' "$FREELY"; then
+    bad "freely still uses grep -A2 to read platform status"
+  else ok "freely parses platform status as JSON"; fi
+
+  bash -n "$ISSUE_SYNC" >/dev/null 2>&1 && ok "issue-sync bash -n" || bad "issue-sync syntax"
+  python3 -c "import ast,sys; ast.parse(open('$ADAPTER').read())" 2>/dev/null \
+    && ok "platform-adapter parses" || bad "platform-adapter syntax"
+}
+
+gitee_cli_checks() {
+  echo "=== BEHAVIOR: gitee CLI contract + failure propagation ==="
+  make_fixture || { bad "fixture setup"; return; }
+
+  out=$(ROOT_DIR="$FIX" bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"; source "$0/bin/issue-sync"
+    _gitee_create "the title" "the body"; echo "RC=$?"
+  ' "$FIX" 2>&1)
+  if echo "$out" | grep -q 'RC=0'; then ok "gitee create exits 0 on success"; else bad "gitee create failed: $out"; fi
+  if grep -q '"create"' "$STUB_LOG" && grep -q '"--title"' "$STUB_LOG"; then
+    ok "gitee create uses subcommand + named flags"
+  else bad "gitee create argv wrong: $(cat "$STUB_LOG")"; fi
+  if grep -q '"number": "77"\|"number": "77"' <<<"$out" || echo "$out" | grep -q '77'; then
+    ok "gitee create returns the platform id"
+  else bad "gitee create did not surface the id: $out"; fi
+
+  : > "$STUB_LOG"
+  out=$(STUB_GITEE_MODE=fail ROOT_DIR="$FIX" bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"; source "$0/bin/issue-sync"
+    _gitee_create "t" "b"; echo "RC=$?"
+  ' "$FIX" 2>&1)
+  if echo "$out" | grep -q 'RC=0'; then bad "gitee failure still reported as success"; else ok "gitee failure propagates non-zero"; fi
+  rm -rf "$FIX"; FIX=""
+}
+
+repo_url_checks() {
+  echo "=== BEHAVIOR: gitee repo identity ==="
+  make_fixture || return
+  for pair in "git@gitee-zhaoquan:zhaoquan/freely.git|zhaoquan/freely" \
+              "https://gitee.com/zhaoquan/freely.git|zhaoquan/freely" \
+              "git@gitee.com:zhaoquan/freely.git|zhaoquan/freely"; do
+    url="${pair%%|*}"; want="${pair##*|}"
+    got=$(ROOT_DIR="$FIX" bash -c '
+      set -uo pipefail
+      ROOT_DIR="$0"; source "$0/bin/issue-sync"
+      _gitee_repo_from_url "$1"
+    ' "$FIX" "$url" 2>/dev/null)
+    if [[ "$got" == "$want" ]]; then ok "repo url $url -> $got"; else bad "repo url $url -> '$got' (want $want)"; fi
+  done
+  rm -rf "$FIX"; FIX=""
+}
+
+state_checks() {
+  echo "=== BEHAVIOR: partial success must not self-certify ==="
+  make_fixture || return
+  errlog="$FIX/err.log"
+
+  # 1) GitHub ok + Gitee fail → partial exit 3, no platform_state, gitee id absent
+  out=$(ROOT_DIR="$FIX" STUB_GITEE_MODE=fail bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"; source "$0/bin/issue-sync"
+    ISSUES_DIR="$0/docs/B1-docs"
+    cmd_create raw-20260101T000000Z
+  ' "$FIX" 2>"$errlog"); rc=$?
+  if [[ "$rc" == "3" ]]; then ok "partial create exits 3"; else bad "partial create rc=$rc (want 3)"; fi
+  st=$(_pstate "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  if [[ "$st" == *"'open'"* ]]; then bad "partial create still wrote platform_state=open ($st)"; else ok "partial create left platform_state untouched ($st)"; fi
+  if [[ "$st" == *"github"* && "$st" != *"gitee"* ]]; then ok "partial create persisted only the created platform"; else bad "platform_ids wrong: $st"; fi
+
+  # 2) Both platforms ok → exit 0, both ids, platform_state open
+  python3 - "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md" <<'PY'
+import sys, yaml
+p = sys.argv[1]
+text = open(p).read()
+fm_text = text.split('---', 2)[1]
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+fm = yaml.safe_load(fm_text)
+fm['platform_ids'] = {}
+fm['platform_state'] = ''
+out = '---\n' + yaml.safe_dump(fm, allow_unicode=True, sort_keys=False).strip() + '\n---\n' + text.split('---', 2)[2]
+open(p, 'w').write(out)
+PY
+  out=$(ROOT_DIR="$FIX" bash -c '
+    set -uo pipefail
+    ROOT_DIR="$0"; source "$0/bin/issue-sync"
+    ISSUES_DIR="$0/docs/B1-docs"
+    cmd_create raw-20260101T000000Z
+  ' "$FIX" 2>>"$errlog"); rc=$?
+  st=$(_pstate "$FIX/docs/B1-docs/raw-20260101T000000Z/issue.md")
+  if [[ "$rc" == "0" && "$st" == *"'open'"* && "$st" == *"gitee"* && "$st" == *"github"* ]]; then
+    ok "full create exits 0 with both ids and platform_state=open"
+  else bad "full create rc=$rc state=$st"; fi
+
+  rm -rf "$FIX"; FIX=""
+}
+
+adapter_checks() {
+  echo "=== BEHAVIOR: adapter detects WHY a platform is unavailable ==="
+  TMP=$(mktemp -d /tmp/freely-adapter.XXXXXX)
+  local PY; PY=$(command -v python3)
+  # `gh` uninstalled: PATH without any gh
+  out=$(cd "$TMP" && env -u GH_REPO -u GITEE_REPO FREELY_REPO_PLATFORMS=github \
+        PATH="/usr/bin:/bin:/usr/sbin:/sbin" \
+        "$PY" "$ADAPTER" create-issue raw-20260101T000000Z "t" "b" 2>&1)
+  rc=$?
+  if echo "$out" | grep -qiE 'not installed|command not found|FileNotFoundError'; then
+    ok "missing gh reports 'not installed'"
+  else bad "missing gh message not diagnostic: $(echo "$out" | head -3)"; fi
+  if echo "$out" | grep -q 'unsupported platform'; then
+    bad "still reports 'unsupported platform' for a missing CLI"
+  else ok "no longer confuses missing CLI with unsupported platform"; fi
+  if [[ "$rc" == "1" ]]; then ok "all-platforms-failed exits 1"; else bad "all-failed rc=$rc (want 1)"; fi
+
+  # partial: github ok (stub) + gitee unavoidable error → exit 3, both statuses listed
+  mkdir -p "$TMP/stub"
+  cat > "$TMP/stub/gh" <<'STUB'
+#!/usr/bin/env bash
+case "$*" in
+  "repo view --json nameWithOwner -q .nameWithOwner") echo "o/r" ;;
+  repo\ view*) echo '{"nameWithOwner":"o/r"}' ;;
+  issue\ create*) echo "https://github.com/o/r/issues/99" ;;
+  *) exit 0 ;;
+esac
+STUB
+  chmod +x "$TMP/stub/gh"
+  out=$(cd "$TMP" && PATH="$TMP/stub:/usr/bin:/bin:/usr/sbin:/sbin" \
+        GH_REPO=o/r GITEE_REPO=o/r FREELY_REPO_PLATFORMS=github,gitee \
+        GITEE_ACCESS_TOKEN="" GITEE_TOKEN="" \
+        "$PY" "$ADAPTER" create-issue raw-20260101T000000Z "t" "b" 2>&1)
+  rc=$?
+  if [[ "$rc" == "3" ]]; then ok "partial create-issue exits 3"; else bad "partial create-issue rc=$rc (want 3)"; fi
+  if echo "$out" | grep -q '"created"' && echo "$out" | grep -q '"error"'; then
+    ok "per-platform status reported side by side"
+  else bad "per-platform status missing: $(echo "$out" | tr '\n' ' ' | head -c 200)"; fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) gitee_cli_checks; repo_url_checks; state_checks; adapter_checks ;;
+  all)      static_checks; gitee_cli_checks; repo_url_checks; state_checks; adapter_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1
