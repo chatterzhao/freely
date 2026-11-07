@@ -1,3 +1,24 @@
+## M-20261107T120208Z-A
+- title: fix — 测试证据有显式写入命令，守护进程不再冒充测试结果
+- status: active
+### candidate_issues
+1. `C-20261107T120208Z-A`
+- milestone: M-20261107T120208Z-A
+- status: promoted
+- promoted_issue_id: I-20261107T120208Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261107T120208Z/issues/I-20261107T120208Z-A.md
+### committed_issues
+1. `I-20261107T120208Z-A`
+- milestone: M-20261107T120208Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T120208Z/issues/I-20261107T120208Z-A.md
+### completed_issues
+1. `I-20261107T120208Z-A`
+- milestone: M-20261107T120208Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T12:45:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T120208Z/issues/I-20261107T120208Z-A.md
+
 ## M-20261103T132526Z-A
 - title: fix — 平台写通道失败必报、部分成功可追
 - status: active
