@@ -5,7 +5,7 @@
 ## 任务分解
 
 - [x] T1: 复现 promote 对 B2 目标的必然失败，列出 5 处同一假设。
-- [x] T2: 写 AT-001（5 静态 + 11 行为），基线快照确认 RED `4 ok / 16 failed`。
+- [x] T2: 写 AT-001（5 静态 + 11 行为），基线快照确认 RED `7 ok / 16 failed`。
 - [x] T3: 新增 `_issue_file_for` / `_fm_has_key`。
 - [x] T4: 5 个命令与 `cmd_promote` 统一走解析器。
 - [x] T5: `platform_state` 条件写入。

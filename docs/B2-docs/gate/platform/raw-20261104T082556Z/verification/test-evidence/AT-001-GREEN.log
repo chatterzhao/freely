@@ -20,4 +20,7 @@
   [ok] ambiguity is reported with both candidates
   [ok] promote's event comment reached GitHub
   [ok] promote's event comment reached Gitee
-SUMMARY: 20 ok, 0 failed
+  [ok] system-event comment needs no resolution
+  [ok] human comment without resolution is flagged
+  [ok] human comment with resolution passes
+SUMMARY: 23 ok, 0 failed

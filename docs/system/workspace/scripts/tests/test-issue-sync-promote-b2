@@ -264,6 +264,23 @@ behavior_checks() {
   [[ "${gitee_comments:-0}" -ge 1 ]] && ok "promote's event comment reached Gitee" \
     || bad "no Gitee comment call was made"
 
+  # 6) comment-resolution scan: system events need no resolution, humans do
+  local scan="$ROOT_DIR/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
+  local scan_dir="$FIX/docs/B1-docs"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; local scan_rc=$?
+  [[ "$scan_rc" == "0" ]] && ok "system-event comment needs no resolution" \
+    || bad "scan flagged the system-event comment (rc=$scan_rc)"
+
+  printf '\n### comment-20260101T010101Z\n{}\n\nA human asked something.\n' >> "$scan_dir/$RAW_ID/issue.md"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; scan_rc=$?
+  [[ "$scan_rc" == "1" ]] && ok "human comment without resolution is flagged" \
+    || bad "scan missed an unresolved human comment (rc=$scan_rc)"
+
+  printf '\n#### resolution-20260101T020202Z\n- status: adopted\n- reason: fixed\n- resolved_by: probe\n' >> "$scan_dir/$RAW_ID/issue.md"
+  python3 "$scan" "$scan_dir" >/dev/null 2>&1; scan_rc=$?
+  [[ "$scan_rc" == "0" ]] && ok "human comment with resolution passes" \
+    || bad "scan rejected a resolved comment (rc=$scan_rc)"
+
   rm -rf "$FIX"; FIX=""
 }
 

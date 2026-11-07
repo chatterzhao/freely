@@ -7,22 +7,25 @@
   [FAIL] comment sync still requires a '## Comments' section
   [ok] issue-sync bash -n
 === BEHAVIOR: B2 documents can be created and promoted ===
-  [FAIL] cmd_create on a B2 document rc=1: [ERROR] /private/tmp/freely-promote.cXBaKK/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+  [FAIL] cmd_create on a B2 document rc=1: [ERROR] /private/tmp/freely-promote.IRo0yc/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
 RC=1
   [FAIL] platform_ids on the B2 document: {}
   [ok] no platform_state field was injected into the linked document
   [FAIL] promote rc=1: [issue-sync] promote: raw-20260101T000000Z → I-20260101T000000Z-A
-[ERROR] /private/tmp/freely-promote.sPvoNy/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+[ERROR] /private/tmp/freely-promote.bf0V4S/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
 RC=1
   [FAIL] promoted_children: []
   [FAIL] B2 document has no promoted_from comment
   [FAIL] promote did not write platform ids: {}
   [ok] missing document fails (rc=1)
-  [FAIL] missing document error is unhelpful: [ERROR] /private/tmp/freely-promote.jkPtbV/docs/B1-docs/I-20260102T000000Z-A/issue.md not found
+  [FAIL] missing document error is unhelpful: [ERROR] /private/tmp/freely-promote.j0rsT0/docs/B1-docs/I-20260102T000000Z-A/issue.md not found
 RC=1
   [ok] ambiguous document fails (rc=1)
-  [FAIL] ambiguity not reported: [ERROR] /private/tmp/freely-promote.VgoTwP/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
+  [FAIL] ambiguity not reported: [ERROR] /private/tmp/freely-promote.zqznnJ/docs/B1-docs/I-20260101T000000Z-A/issue.md not found
 RC=1
   [FAIL] no GitHub comment call was made
   [FAIL] no Gitee comment call was made
-SUMMARY: 4 ok, 16 failed
+  [ok] system-event comment needs no resolution
+  [ok] human comment without resolution is flagged
+  [ok] human comment with resolution passes
+SUMMARY: 7 ok, 16 failed
