@@ -1,3 +1,24 @@
+## M-20261105T122053Z-A
+- title: fix — 读失败显式标记，健康路径零变化
+- status: active
+### candidate_issues
+1. `C-20261105T122053Z-A`
+- milestone: M-20261105T122053Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T122053Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T122053Z/issues/I-20261105T122053Z-A.md
+### committed_issues
+1. `I-20261105T122053Z-A`
+- milestone: M-20261105T122053Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T122053Z/issues/I-20261105T122053Z-A.md
+### completed_issues
+1. `I-20261105T122053Z-A`
+- milestone: M-20261105T122053Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T08:05:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261105T122053Z/issues/I-20261105T122053Z-A.md
+
 ## M-20261106T084804Z-A
 - title: fix — wt-create 顶层 return 改为 exit
 - status: active

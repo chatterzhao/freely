@@ -56,6 +56,12 @@ from raw_title_contract import (canonical_raw_title, is_canonical_raw_title,
 # ══════════════════════════════════════════════
 
 class PlatformHandler(ABC):
+    # Read-channel health for the most recent list_open_issue_records() call.
+    # A read FAILURE must never be reported as a clean empty list; handlers set
+    # ok=False / error / partial=True so the aggregator can emit a degraded
+    # marker instead of dropping the whole platform silently.
+    read_health: dict = {"ok": True, "error": "", "partial": False}
+
     @property
     @abstractmethod
     def name(self) -> str: ...
@@ -385,16 +391,23 @@ class GitHubHandler(PlatformHandler):
         """
         repo = self._repo()
         if not repo:
+            self.read_health = {"ok": False, "error": "REST fallback: repo unresolved", "partial": True}
             return {}
         try:
             r = subprocess.run(["gh", "api", "--paginate", "--slurp",
                                 f"repos/{repo}/issues?state=open&per_page=100"],
                                capture_output=True, text=True, timeout=30)
             if r.returncode != 0 or not r.stdout.strip():
+                self.read_health = {"ok": False, "partial": True,
+                                    "error": f"REST fallback failed: {(r.stderr or 'empty response')[:200]}"}
                 return {}
             pages = json.loads(r.stdout)
-        except Exception:
+        except Exception as exc:
+            self.read_health = {"ok": False, "partial": True,
+                                "error": f"REST fallback failed: {str(exc)[:200]}"}
             return {}
+        # A valid (possibly empty) REST response means the read succeeded.
+        self.read_health = {"ok": True, "error": "", "partial": False}
         records = {}
         page_list = pages if isinstance(pages, list) else [pages]
         for page in page_list:
@@ -419,23 +432,34 @@ class GitHubHandler(PlatformHandler):
         return {number: record.get("state", "OPEN") for number, record in records.items()}
 
     def list_open_issue_records(self):
+        self.read_health = {"ok": True, "error": "", "partial": False}
         repo = self._repo()
         if not repo:
+            self.read_health = {"ok": False, "error": "github repo unresolved", "partial": True}
             return {}
+        errors: list[str] = []
         for attempt in range(2):
             try:
                 r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
                                     "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
                 if r.returncode == 0 and r.stdout.strip():
+                    self.read_health = {"ok": True, "error": "", "partial": False}
                     return {str(issue["number"]): {"platform": self.name, "title": issue.get("title", ""),
                                                    "body": issue.get("body", ""),
                                                    "state": issue.get("state", "OPEN")}
                             for issue in json.loads(r.stdout or "[]")}
-            except Exception:
-                pass
+                errors.append((r.stderr or "empty response")[:180])
+            except Exception as exc:
+                errors.append(str(exc)[:180])
             if attempt == 0:
                 time.sleep(0.3)
-        return self._open_issue_records_via_rest()
+        # GraphQL failed twice; the REST fallback is preserved (never removed).
+        fallback = self._open_issue_records_via_rest()
+        if not self.read_health.get("ok"):
+            self.read_health = {"ok": False, "partial": True,
+                                "error": ("GraphQL: " + "; ".join(errors) + " | REST: "
+                                          + str(self.read_health.get("error", "")))[:400]}
+        return fallback
 
     def _gh_json(self, args: list[str], timeout: int = 30):
         repo = self._repo()
@@ -690,12 +714,17 @@ class GiteeHandler(PlatformHandler):
         return {}
 
     def list_open_issue_records(self):
+        self.read_health = {"ok": True, "error": "", "partial": False}
         try:
             r = self._run("list", "--state", "open", "--per-page", "50")
             if r.returncode != 0:
+                self.read_health = {"ok": False, "partial": True,
+                                    "error": f"gitee CLI list failed: {(r.stderr or 'empty response')[:200]}"}
                 return {}
             return {str(issue.get("number", issue.get("id", ""))): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
-        except Exception:
+        except Exception as exc:
+            self.read_health = {"ok": False, "partial": True,
+                                "error": f"gitee CLI list failed: {str(exc)[:200]}"}
             return {}
 
 # ══════════════════════════════════════════════
@@ -976,11 +1005,45 @@ def list_open_issues(platforms: list[str] = None) -> dict[str, str]:
     return result
 
 def list_open_issue_records(platforms: list[str] = None) -> dict[str, dict]:
+    """Merge per-platform OPEN issue records, preserving read-failure signals.
+
+    Healthy path is unchanged: a plain ``{platform:issue_id -> record}`` dict
+    (e.g. 57 GitHub + 50 Gitee = 107) with no extra keys. On ANY read failure
+    the result additionally carries ``__degraded__`` with the failing platform
+    and its error, so the existing consumer in task-lifecycle-scan.py can set
+    platform_health=degraded instead of acting on a partial list.
+    """
     records: dict[str, dict] = {}
+    degraded: list[dict] = []
     targets = [h for h in _handlers() if platforms is None or h.name in platforms]
     for h in targets:
-        for issue_id, record in (_safe(h.list_open_issue_records) or {}).items():
+        try:
+            result = h.list_open_issue_records() or {}
+        except Exception as exc:
+            # _safe() used to turn an exception into {'status': 'error', ...},
+            # which the old loop then expanded as issue records (TypeError or
+            # fabricated entries). Record the failure explicitly instead.
+            degraded.append({"platform": h.name, "error": str(exc)[:200]})
+            continue
+        if not isinstance(result, dict):
+            degraded.append({"platform": h.name, "error": "read returned a non-dict"})
+            continue
+        health = getattr(h, "read_health", None)
+        if isinstance(health, dict) and health.get("ok") is False:
+            degraded.append({"platform": h.name,
+                             "error": str(health.get("error") or "unreadable")[:200]})
+        for issue_id, record in result.items():
+            if not isinstance(record, dict):
+                continue  # never treat an error/status object as an issue
             records[f"{h.name}:{issue_id}"] = {"issue_id": str(issue_id), **record}
+    if degraded:
+        records["__degraded__"] = {
+            "platform": ",".join(item["platform"] for item in degraded),
+            "platforms": [item["platform"] for item in degraded],
+            "error": "; ".join(f"{item['platform']}: {item['error']}" for item in degraded)[:400],
+            "ok": False,
+            "partial": True,
+        }
     return records
 
 def get_assignees(platform: str, issue_number: str) -> list[str]:
