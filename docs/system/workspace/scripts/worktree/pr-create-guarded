@@ -118,7 +118,8 @@ if [[ -x "$ROOT_DIR/bin/check-epics-map" ]]; then
     exit 1
   }
 else
-  echo "[WARN] check-epics-map not found, skipping"
+  echo "[ERROR] check-epics-map not found — environment unusable (exit 2)" >&2
+  exit 2
 fi
 echo ""
 
@@ -205,7 +206,8 @@ GATE_BLOCKED
   echo "$gate_output"
   echo "[GOVERNANCE-GATE] IBM governance artifacts: OK"
 else
-  echo "[WARN] governance-merge-gate not found, skipping IBM gate check"
+  echo "[ERROR] governance-merge-gate not found — environment unusable (exit 2)" >&2
+  exit 2
 fi
 echo ""
 
@@ -331,7 +333,8 @@ PRETEST_GATE_BLOCKED
   fi
   echo "[PRETESTS-GATE] pretests execution evidence: OK ✓"
 else
-  echo "[WARN] pretests-retirement-gate not found, skipping pretests evidence check"
+  echo "[ERROR] pretests-retirement-gate not found — environment unusable (exit 2)" >&2
+  exit 2
 fi
 echo ""
 
@@ -455,7 +458,8 @@ if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
     exit 1
   }
 else
-  echo "[WARN] pr-merge-guarded not found, skipping dry-run"
+  echo "[ERROR] pr-merge-guarded not found — cannot dry-run merge gate (exit 2)" >&2
+  exit 2
 fi
 
 echo ""

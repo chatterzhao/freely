@@ -9,6 +9,8 @@ if [[ "$_hooks_path" != ".githooks" ]]; then
   Hooks enforce the canonical workflow. Restore with:
     git config core.hooksPath .githooks
 MSG
+  # 0=pass, 1=fail, 2=environment unusable (treated as NOT passing).
+  exit 2
 fi
 
 
@@ -150,7 +152,32 @@ MSG
 
 _scan_staged_for_secrets || exit 1
 
-[[ -f "./bin/worktree-common.sh" ]] || exit 0
+if [[ ! -f "./bin/worktree-common.sh" ]]; then
+  if [[ -f "./docs/system/workspace/hooks/pre-commit.sh" ]]; then
+    # This IS a freely source tree; its worktree helper must be present.
+    echo "[HOOK] BLOCKED: ./bin/worktree-common.sh missing in a freely source tree." >&2
+    exit 2
+  fi
+  # External project using the installed freely hook: the worktree-specific
+  # checks below do not apply, and this is a legitimate pass (not a bypass).
+  exit 0
+fi
+
+# ── File-size gate (incremental) ───────────────────────────
+# check-file-size was an orphan (no caller). Wire it in with --staged-only so
+# only files added/changed in THIS commit are judged; historic oversized files
+# stay visible in a full run but cannot lock every future commit.
+if [[ ! -f "./bin/check-file-size" ]]; then
+  echo "[HOOK] BLOCKED: ./bin/check-file-size missing (environment unusable)." >&2
+  exit 2
+fi
+if ! bash ./bin/check-file-size --staged-only >/tmp/freely-check-file-size.$$ 2>&1; then
+  cat /tmp/freely-check-file-size.$$ >&2
+  rm -f /tmp/freely-check-file-size.$$
+  echo "[HOOK] Commit blocked: staged file exceeds the file-size error limit." >&2
+  exit 1
+fi
+rm -f /tmp/freely-check-file-size.$$
 # shellcheck disable=SC1091
 source ./bin/worktree-common.sh
 
@@ -202,8 +229,11 @@ MSG
 
 run_guarded_merge_followthrough_hook() {
   local hook_path="./docs/system/workspace/hooks/pre-merge-commit.sh"
-  [[ -x "$hook_path" ]] || return 0
-  "$hook_path"
+  if [[ ! -f "$hook_path" ]]; then
+    echo "[HOOK] BLOCKED: pre-merge-commit.sh truth script missing (environment unusable)." >&2
+    exit 2
+  fi
+  bash "$hook_path"
 }
 
 if freely_wt_is_test_pre_merge_branch "$branch"; then
@@ -242,7 +272,11 @@ REASON_GATE
         exit 1
       fi
       echo "[HOOK] FREELY_SKIP_IBM_GATE — validating governance-only paths"
-      if [[ -x "./bin/governance-merge-gate" ]]; then
+      if [[ ! -f "./bin/governance-merge-gate" ]]; then
+        echo "[HOOK] BLOCKED: governance-merge-gate missing; cannot validate skip request." >&2
+        exit 2
+      fi
+      if [[ -f "./bin/governance-merge-gate" ]]; then
         set +e
         gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --skip-ibm-gate 2>&1)"
         gate_rc=$?
@@ -297,7 +331,11 @@ MSG
 esac
 
 if ! freely_wt_is_primary_worktree; then
-  if [[ -x "./bin/governance-merge-gate" ]]; then
+  if [[ -f "./bin/governance-merge-gate" ]]; then
+    if [[ ! -f "./bin/checkpoint-guard" ]]; then
+      echo "[HOOK] BLOCKED: ./bin/checkpoint-guard missing (environment unusable)." >&2
+      exit 2
+    fi
     set +e
     checkpoint_output="$(./bin/checkpoint-guard --staged-only 2>&1)"
     checkpoint_rc=$?
@@ -314,7 +352,11 @@ MSG
       exit "$checkpoint_rc"
     fi
   fi
-  if [[ -x "./bin/governance-merge-gate" ]]; then
+  if [[ -f "./bin/governance-merge-gate" ]]; then
+    if [[ ! -f "./bin/pretests-gate" ]]; then
+      echo "[HOOK] BLOCKED: ./bin/pretests-gate missing (environment unusable)." >&2
+      exit 2
+    fi
     set +e
     pretests_output="$(./bin/pretests-gate --staged-only 2>&1)"
     pretests_rc=$?

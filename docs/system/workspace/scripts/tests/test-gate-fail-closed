@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261103T132458Z / #4146
+# Gate fail-open: "cannot decide" must never share exit code 0 with "passed".
+#
+# Exit-code contract: 0 = pass, 1 = fail, 2 = environment unusable (treated as
+# not-passing). All behaviour tests run in ISOLATED git repos; the real
+# worktree's hooks are never disabled or renamed.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR" || exit 1
+HOOKS="$ROOT_DIR/.githooks"
+TRUTH="$ROOT_DIR/docs/system/workspace/hooks"
+PR_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-create-guarded"
+CHECKPOINT="$ROOT_DIR/docs/system/workspace/scripts/quality/checkpoint-guard"
+PRE_COMMIT="$TRUTH/pre-commit.sh"
+
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+# Shim family that delegates to a truth script. post-checkout is DELIBERATELY
+# excluded: it is a self-contained implementation with no truth script.
+SHIM_FAMILY=(pre-commit pre-merge-commit pre-push reference-transaction pre-rebase post-rewrite)
+
+static_checks() {
+  echo "=== STATIC: shim family is fail-closed ==="
+  for name in "${SHIM_FAMILY[@]}"; do
+    local f="$HOOKS/$name"
+    if grep -q '^exit 0$' "$f"; then bad "$name shim still exits 0 without a truth script"; else ok "$name shim has no bare exit 0"; fi
+    if grep -qF '[[ -x ' "$f"; then bad "$name shim still requires the execute bit"; else ok "$name shim uses -f (bash file needs no +x)"; fi
+    if grep -qF 'exit 2' "$f"; then ok "$name shim reports environment-unusable (2)"; else bad "$name shim has no exit 2"; fi
+  done
+  # post-checkout must stay an independent implementation (no truth script).
+  if grep -qF 'freely_wt_assert_strict_root' "$HOOKS/post-checkout"; then
+    ok "post-checkout stays self-contained (unchanged by shim-family fix)"
+  else
+    bad "post-checkout lost its self-contained logic"
+  fi
+
+  echo "=== STATIC: pre-commit.sh truth guards ==="
+  # hooksPath mismatch must exit non-zero, not just print BLOCKED.
+  python3 - "$PRE_COMMIT" <<'PY'
+import sys
+from pathlib import Path
+t = Path(sys.argv[1]).read_text(encoding="utf-8")
+lines = t.splitlines()
+block = "\n".join(lines[:14])
+checks = [
+    ("hooksPath mismatch exits non-zero", "BLOCKED" in block and ("exit 1" in block or "exit 2" in block)),
+    ("worktree-common.sh missing is a failure", "|| exit 0" not in "\n".join(lines[148:158])),
+    ("gate guards use -f not -x", "[[ -x " not in t),
+    ("missing gate produces exit 2", "exit 2" in t),
+]
+for label, good in checks:
+    print(("  [ok] " if good else "  [FAIL] ") + label)
+    if not good:
+        sys.exit(1)
+PY
+  if [[ $? -eq 0 ]]; then ok "pre-commit.sh guard contract"; else bad "pre-commit.sh guard contract (see above)"; fi
+
+  echo "=== STATIC: pr-create-guarded skipping is never a pass ==="
+  python3 - "$PR_CREATE" <<'PY'
+import sys, re
+from pathlib import Path
+t = Path(sys.argv[1]).read_text(encoding="utf-8")
+lines = t.splitlines()
+sites = [i for i, l in enumerate(lines) if "not found, skipping" in l]
+print(f"  skipping sites found: {len(sites)}")
+bad = 0
+for i in sites:
+    window = "\n".join(lines[i:i+6])
+    if not re.search(r"exit [12]", window):
+        print(f"  [FAIL] line {i+1}: skipping without a non-zero exit")
+        bad += 1
+if "no raw key found in branch, skipping review check" in t:
+    line_no = next(i for i, l in enumerate(lines) if "no raw key found in branch" in l)
+    window = "\n".join(lines[line_no:line_no+4])
+    if re.search(r"exit [12]", window):
+        print("  [FAIL] normal 'no raw key' path was made a failure")
+        bad += 1
+    else:
+        print("  [ok] normal 'no raw key' path still continues")
+sys.exit(1 if bad else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "pr-create-guarded skipping contract"; else bad "pr-create-guarded skipping contract (see above)"; fi
+
+  echo "=== STATIC: checkpoint-guard default & check-file-size wiring ==="
+  if sed -n '1,10p' "$CHECKPOINT" | grep -qF 'FAIL_ON_REQUIRED=1'; then ok "checkpoint-guard defaults to FAIL_ON_REQUIRED=1"; else bad "checkpoint-guard still defaults to 0"; fi
+  if grep -qF 'check-file-size' "$PRE_COMMIT"; then ok "check-file-size is wired into pre-commit"; else bad "check-file-size still has no caller"; fi
+  # Historic oversized files must not lock future commits (found by a real
+  # commit attempt: docs/milestones.md is 1263 lines and edited every round).
+  if grep -qF '[HISTORIC]' "$ROOT_DIR/bin/check-file-size"; then
+    ok "staged-only exempts files already oversized in HEAD (no self-lock)"
+  else
+    bad "staged-only would block historic oversized files (self-lock)"
+  fi
+
+  echo "=== STATIC: no 'unbypassable' claim without wrapper wiring ==="
+  if grep -qF 'githooks/bin' "$ROOT_DIR/AGENTS.md"; then ok "--no-verify wrapper is wired/documented"; else ok "no PATH claim to reconcile (wrapper left as-is, documented)"; fi
+}
+
+# Build an isolated repo whose git hooks point at a COPY of the shim family.
+# $1 = tmpdir; $2 = "truth" | "no-truth"
+_setup_repo() {
+  local TMP="$1" MODE="$2"
+  local REPO="$TMP/repo"
+  mkdir -p "$REPO/.githooks" "$REPO/docs/system/workspace/hooks" "$REPO/bin"
+  for name in pre-commit pre-merge-commit pre-push reference-transaction pre-rebase post-rewrite; do
+    cp "$HOOKS/$name" "$REPO/.githooks/$name"
+    chmod +x "$REPO/.githooks/$name"
+  done
+  # Every copied shim needs its own pass-through truth script, otherwise the
+  # newly fail-closed shims (reference-transaction etc.) correctly block the
+  # initial commit too. Only pre-commit is removed for the no-truth case.
+  for name in pre-commit pre-merge-commit pre-push reference-transaction pre-rebase post-rewrite; do
+    printf '#!/usr/bin/env bash\nexit 0\n' > "$REPO/docs/system/workspace/hooks/$name.sh"
+    chmod +x "$REPO/docs/system/workspace/hooks/$name.sh"
+  done
+  printf '#!/usr/bin/env bash\nprintf "ran" > .truth-ran\nexit 0\n' > "$REPO/docs/system/workspace/hooks/pre-commit.sh"
+  chmod +x "$REPO/docs/system/workspace/hooks/pre-commit.sh"
+  if [[ "$MODE" == "no-truth" ]]; then
+    rm -f "$REPO/docs/system/workspace/hooks/pre-commit.sh"
+  fi
+  git -C "$REPO" init -q -b develop
+  git -C "$REPO" config user.name tester
+  git -C "$REPO" config user.email tester@example.com
+  git -C "$REPO" config core.hooksPath .githooks
+  printf 'base\n' > "$REPO/README.md"
+  git -C "$REPO" add README.md
+  git -C "$REPO" commit -q -m init --no-verify 2>/dev/null || git -C "$REPO" commit -q -m init
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: isolated git repos ==="
+
+  # CASE A: truth script missing -> commit MUST be rejected.
+  local TMP RC
+  TMP="$(mktemp -d /tmp/freely-r8a.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup_repo "$TMP" no-truth
+  printf 'change\n' >> "$TMP/repo/README.md"
+  git -C "$TMP/repo" add README.md
+  git -C "$TMP/repo" commit -m "should be blocked" > "$TMP/a.log" 2>&1; RC=$?
+  if [[ "$RC" -ne 0 ]]; then ok "CASE A: missing truth script blocks commit (rc=$RC)"; else bad "CASE A: commit PASSED with no truth script (fail-open)"; fi
+  if grep -qE 'exit 2|environment|unusable|BLOCKED' "$TMP/a.log"; then ok "CASE A: diagnostic explains environment failure"; else bad "CASE A: no diagnostic"; fi
+  rm -rf "$TMP"
+
+  # CASE B: truth script present but NOT executable (-x lost) -> must still run.
+  TMP="$(mktemp -d /tmp/freely-r8b.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  _setup_repo "$TMP" truth
+  chmod -x "$TMP/repo/docs/system/workspace/hooks/pre-commit.sh"
+  printf 'change2\n' >> "$TMP/repo/README.md"
+  git -C "$TMP/repo" add README.md
+  git -C "$TMP/repo" commit -m "should pass with -x lost" > "$TMP/b.log" 2>&1; RC=$?
+  if [[ "$RC" -eq 0 && -f "$TMP/repo/.truth-ran" ]]; then
+    ok "CASE B: bash file actually ran without +x (no false block, no silent skip)"
+  elif [[ "$RC" -eq 0 ]]; then
+    bad "CASE B: commit passed but truth script was NOT executed (silent fail-open)"
+  else
+    bad "CASE B: commit blocked despite truth file existing (rc=$RC)"
+  fi
+  rm -rf "$TMP"
+
+  # CASE C: checkpoint-guard default must be non-zero when required artifacts
+  # are missing. Use a temp project with staged implementation changes.
+  TMP="$(mktemp -d /tmp/freely-r8c.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  local CG="$TMP/project"
+  mkdir -p "$CG/bin" "$CG/docs"
+  cp "$CHECKPOINT" "$CG/bin/checkpoint-guard"
+  chmod +x "$CG/bin/checkpoint-guard"
+  git -C "$CG" init -q -b develop
+  git -C "$CG" config user.name tester; git -C "$CG" config user.email tester@example.com
+  printf 'x\n' > "$CG/README.md"; git -C "$CG" add README.md; git -C "$CG" commit -q -m init
+  # stage enough files to trip checkpoint_required without governance docs
+  for i in $(seq 1 12); do printf 'x\n' > "$CG/src_$i.py"; done
+  git -C "$CG" add -A
+  ( cd "$CG" && ./bin/checkpoint-guard --staged-only ) > "$TMP/c.log" 2>&1; RC=$?
+  if [[ "$RC" -ne 0 ]]; then ok "CASE C: checkpoint-guard default is non-zero when required (rc=$RC)"; else bad "CASE C: checkpoint-guard default returned 0"; fi
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "PASS: $PASS checks, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1

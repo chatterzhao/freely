@@ -1,3 +1,24 @@
+## M-20261103T132458Z-A
+- title: fix — 门禁 fail-open 收敛为 fail-closed
+- status: active
+### candidate_issues
+1. `C-20261103T132458Z-A`
+- milestone: M-20261103T132458Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132458Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261103T132458Z/issues/I-20261103T132458Z-A.md
+### committed_issues
+1. `I-20261103T132458Z-A`
+- milestone: M-20261103T132458Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132458Z/issues/I-20261103T132458Z-A.md
+### completed_issues
+1. `I-20261103T132458Z-A`
+- milestone: M-20261103T132458Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T08:40:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132458Z/issues/I-20261103T132458Z-A.md
+
 ## M-20261105T122053Z-A
 - title: fix — 读失败显式标记，健康路径零变化
 - status: active
