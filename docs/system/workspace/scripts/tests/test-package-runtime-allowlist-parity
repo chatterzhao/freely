@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+# AT-001 — package allowlist covers runtime-required workspace top-level files.
+# RED: 5 runtime files missing from package; installed state cannot self-package;
+#      no read-only parity checker to prevent recurrence.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR" || exit 1
+
+ALLOWLIST="docs/system/workspace/package-allowlist.txt"
+PACKAGE="bin/freely-package"
+CHECKER="docs/system/workspace/scripts/quality/package-runtime-file-parity.py"
+SEED_PARITY="docs/system/workspace/scripts/quality/package-seed-parity.py"
+
+RUNTIME_FILES=(
+  "docs/system/workspace/worktree-seed.toml"
+  "docs/system/workspace/package-allowlist.txt"
+  "docs/system/workspace/AGENTS.md.example"
+  "docs/system/workspace/install-lifecycle-allowlist.txt"
+  "docs/system/workspace/release-build-allowlist.txt"
+)
+DOC_ONLY=(
+  "docs/system/workspace/commands.md"
+  "docs/system/workspace/three-loop-lifecycle.svg"
+  "docs/system/workspace/command-wrapper-metadata-lifecycle.md"
+)
+
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+check(){ if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
+
+static_checks() {
+  echo "=== STATIC: allowlist completeness + parity checker hook ==="
+  python3 - "$ROOT_DIR" <<'PYCHECK'
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+allow = root / "docs/system/workspace/package-allowlist.txt"
+pkg = root / "bin/freely-package"
+checker = root / "docs/system/workspace/scripts/quality/package-runtime-file-parity.py"
+seed_parity = root / "docs/system/workspace/scripts/quality/package-seed-parity.py"
+runtime = [
+    "docs/system/workspace/worktree-seed.toml",
+    "docs/system/workspace/package-allowlist.txt",
+    "docs/system/workspace/AGENTS.md.example",
+    "docs/system/workspace/install-lifecycle-allowlist.txt",
+    "docs/system/workspace/release-build-allowlist.txt",
+]
+doc_only = [
+    "docs/system/workspace/commands.md",
+    "docs/system/workspace/three-loop-lifecycle.svg",
+    "docs/system/workspace/command-wrapper-metadata-lifecycle.md",
+]
+lines = [l.strip() for l in allow.read_text(encoding="utf-8").splitlines()
+         if l.strip() and not l.strip().startswith("#")]
+t = pkg.read_text(encoding="utf-8") if pkg.is_file() else ""
+checks = [
+    ("allowlist declares worktree-seed.toml", runtime[0] in lines),
+    ("allowlist declares package-allowlist.txt (self-bootstrap)", runtime[1] in lines),
+    ("allowlist declares AGENTS.md.example", runtime[2] in lines),
+    ("allowlist declares install-lifecycle-allowlist.txt", runtime[3] in lines),
+    ("allowlist declares release-build-allowlist.txt", runtime[4] in lines),
+    ("doc-only material NOT unconditionally packaged",
+     all(d not in lines for d in doc_only)),
+    ("read-only runtime-file parity checker exists", checker.is_file()),
+    ("freely-package calls the runtime-file checker",
+     "package-runtime-file-parity.py" in t),
+    ("parity hook runs before rm -rf",
+     t.find("package-runtime-file-parity.py") > 0 and
+     t.find('rm -rf "$OUTPUT"') > 0 and
+     t.find("package-runtime-file-parity.py") < t.find('rm -rf "$OUTPUT"')),
+    # Independent of the new hook: these are pre-existing capabilities that
+    # must stay green in RED (otherwise a chained failure hides a regression).
+    ("dangerous-output guard still before rm -rf",
+     t.find("refuse_dangerous_output") > 0 and
+     t.find('rm -rf "$OUTPUT"') > 0 and
+     t.find("refuse_dangerous_output") < t.find('rm -rf "$OUTPUT"')),
+    ("R5 seed parity hook preserved before rm -rf",
+     "package-seed-parity.py" in t and
+     t.find('rm -rf "$OUTPUT"') > 0 and
+     t.find("package-seed-parity.py") < t.find('rm -rf "$OUTPUT"')),
+    ("R5 seed parity checker still present", seed_parity.is_file()),
+]
+failed = 0
+for label, ok in checks:
+    print(("  [ok] " if ok else "  [FAIL] ") + label)
+    if not ok:
+        failed += 1
+sys.exit(1 if failed else 0)
+PYCHECK
+  if [[ $? -eq 0 ]]; then ok "static contract"; else bad "static contract (see above)"; fi
+  check "bash -n freely-package" "bash -n '$PACKAGE'"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: real package output + installed-state self-bootstrap ==="
+  local TMP PKG SELFPKG
+  TMP="$(mktemp -d /tmp/freely-r55.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"
+  PKG="$TMP/pkg"; SELFPKG="$TMP/self-pkg"
+
+  # 1) Real packaging into a safe temp output.
+  FREELY_PACKAGE_ALLOW_OUTSIDE=1 "$ROOT_DIR/bin/freely-package" \
+    --version 20261106T1100Z-nightly --output "$PKG" > "$TMP/pkg.log" 2>&1
+  local PKGRC=$?
+  if [[ $PKGRC -eq 0 ]] && grep -Fq 'integrity: verified' "$TMP/pkg.log"; then
+    ok "real packaging succeeds with integrity verified"
+  else
+    bad "real packaging (rc=$PKGRC) $(tail -3 "$TMP/pkg.log" | tr '\n' ' ')"
+  fi
+
+  # 2) All 5 runtime files present in output AND byte-identical to source.
+  python3 - "$ROOT_DIR" "$PKG" <<'PYHASH'
+import sys, hashlib
+from pathlib import Path
+root, pkg = Path(sys.argv[1]), Path(sys.argv[2])
+files = [
+    "docs/system/workspace/worktree-seed.toml",
+    "docs/system/workspace/package-allowlist.txt",
+    "docs/system/workspace/AGENTS.md.example",
+    "docs/system/workspace/install-lifecycle-allowlist.txt",
+    "docs/system/workspace/release-build-allowlist.txt",
+]
+bad = []
+for rel in files:
+    src, dst = root / rel, pkg / rel
+    if not dst.is_file():
+        bad.append(f"missing in package: {rel}")
+        continue
+    a = hashlib.sha256(src.read_bytes()).hexdigest()
+    b = hashlib.sha256(dst.read_bytes()).hexdigest()
+    if a != b:
+        bad.append(f"hash differs: {rel}")
+for b in bad:
+    print("  [FAIL] " + b)
+if bad:
+    sys.exit(1)
+print("  [ok] 5 runtime files present with sha256 parity")
+PYHASH
+  if [[ $? -eq 0 ]]; then ok "package contains the 5 runtime files (sha256 parity)"; else bad "package runtime-file parity (see above)"; fi
+
+  # 3) INSTALLED state must self-package: run the PACKAGED freely-package.
+  if [[ -f "$PKG/bin/freely-package" ]]; then
+    FREELY_PACKAGE_ALLOW_OUTSIDE=1 bash "$PKG/bin/freely-package" \
+      --version 20261106T1101Z-nightly --output "$SELFPKG" > "$TMP/self.log" 2>&1
+    local SELFRC=$?
+    if [[ $SELFRC -eq 0 ]] && grep -Fq 'integrity: verified' "$TMP/self.log"; then
+      ok "installed state self-packages (no 'allowlist not found')"
+    else
+      bad "installed-state self-packaging (rc=$SELFRC) $(tail -4 "$TMP/self.log" | tr '\n' ' ')"
+    fi
+  else
+    bad "installed-state self-packaging (packaged freely-package missing)"
+  fi
+
+  # 4) INSTALLED seeder reads the manifest, not the builtin fallback.
+  python3 - "$ROOT_DIR" "$PKG" <<'PYSEED'
+import sys, importlib.util
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+root, pkg = Path(sys.argv[1]), Path(sys.argv[2])
+s = importlib.util.spec_from_loader("wts_pkg", SourceFileLoader("wts_pkg", str(pkg / "docs/system/workspace/scripts/worktree/worktree_seed.py")))
+m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+s2 = importlib.util.spec_from_loader("wts_src", SourceFileLoader("wts_src", str(root / "docs/system/workspace/scripts/worktree/worktree_seed.py")))
+m2 = importlib.util.module_from_spec(s2); s2.loader.exec_module(m2)
+e_pkg, src_pkg = m.load(pkg)
+e_src, src_src = m2.load(root)
+print(f"  installed source={src_pkg} entries={len(e_pkg)}; truth source={src_src} entries={len(e_src)}")
+if src_pkg != "manifest":
+    print("  [FAIL] installed seeder fell back to builtin"); sys.exit(1)
+if len(e_pkg) != len(e_src) or e_pkg != e_src:
+    print("  [FAIL] installed seed manifest differs from truth"); sys.exit(1)
+print("  [ok] installed seeder reads the shipped manifest")
+PYSEED
+  if [[ $? -eq 0 ]]; then ok "installed seeder reads manifest (not builtin)"; else bad "installed seeder (see above)"; fi
+
+  # 5) INSTALLED R5 parity checker must still pass (0 undeclared).
+  if [[ -f "$PKG/$SEED_PARITY" ]]; then
+    python3 "$PKG/$SEED_PARITY" --project "$PKG" --json > "$TMP/seedparity.log" 2>&1
+    local SPRC=$?
+    if [[ $SPRC -eq 0 ]] && grep -Fq '"undeclared": []' "$TMP/seedparity.log"; then
+      ok "installed R5 seed parity checker passes"
+    else
+      bad "installed R5 seed parity (rc=$SPRC) $(tail -3 "$TMP/seedparity.log" | tr '\n' ' ')"
+    fi
+  else
+    bad "installed R5 seed parity checker missing"
+  fi
+
+  # 6) Recurrence guard: a NEW runtime-referenced tracked top-level file with
+  #    no allowlist entry must be named and blocked by the checker.
+  if [[ ! -f "$ROOT_DIR/$CHECKER" ]]; then
+    bad "recurrence guard (checker missing: $CHECKER)"
+  else
+    local FAKE="$TMP/fake-project"
+    mkdir -p "$FAKE/bin" "$FAKE/docs/system/workspace" \
+             "$FAKE/docs/system/workspace/scripts/runtime" \
+             "$FAKE/docs/system/workspace/scripts/quality" \
+             "$FAKE/docs/system/workspace/scripts/worktree"
+    cp "$ROOT_DIR/$ALLOWLIST" "$FAKE/$ALLOWLIST"
+    cp "$ROOT_DIR/$CHECKER" "$FAKE/$CHECKER"
+    printf '# fixture\n' > "$FAKE/docs/system/workspace/new-runtime-contract.txt"
+    printf '# runtime shim referencing the new contract\nNEW_CONTRACT="docs/system/workspace/new-runtime-contract.txt"\n' > "$FAKE/bin/freely-runtime-shim"
+    ( cd "$FAKE" && git init -q -b develop && git config user.name t && git config user.email t@t \
+      && git add -A && git commit -q -m init ) >/dev/null 2>&1
+    python3 "$ROOT_DIR/$CHECKER" --project "$FAKE" > "$TMP/fake.log" 2>&1
+    local CRC=$?
+    if [[ $CRC -ne 0 ]] && grep -Fq 'new-runtime-contract.txt' "$TMP/fake.log"; then
+      ok "recurrence guard blocks an undeclared runtime-referenced file"
+    else
+      bad "recurrence guard (rc=$CRC) $(tail -3 "$TMP/fake.log" | tr '\n' ' ')"
+    fi
+  fi
+
+  rm -rf "$TMP"
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "PASS: $PASS checks, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1

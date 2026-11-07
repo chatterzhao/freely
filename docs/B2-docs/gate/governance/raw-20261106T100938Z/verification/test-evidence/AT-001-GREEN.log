@@ -1,0 +1,83 @@
+GREEN — raw-20261106T100938Z / AT-001
+command: bash docs/system/workspace/scripts/tests/test-package-runtime-allowlist-parity all
+=== STATIC: allowlist completeness + parity checker hook ===
+  [ok] allowlist declares worktree-seed.toml
+  [ok] allowlist declares package-allowlist.txt (self-bootstrap)
+  [ok] allowlist declares AGENTS.md.example
+  [ok] allowlist declares install-lifecycle-allowlist.txt
+  [ok] allowlist declares release-build-allowlist.txt
+  [ok] doc-only material NOT unconditionally packaged
+  [ok] read-only runtime-file parity checker exists
+  [ok] freely-package calls the runtime-file checker
+  [ok] parity hook runs before rm -rf
+  [ok] dangerous-output guard still before rm -rf
+  [ok] R5 seed parity hook preserved before rm -rf
+  [ok] R5 seed parity checker still present
+  [ok] static contract
+  [ok] bash -n freely-package
+=== BEHAVIOR: real package output + installed-state self-bootstrap ===
+  [ok] real packaging succeeds with integrity verified
+  [ok] 5 runtime files present with sha256 parity
+  [ok] package contains the 5 runtime files (sha256 parity)
+  [ok] installed state self-packages (no 'allowlist not found')
+  installed source=manifest entries=3; truth source=manifest entries=3
+  [ok] installed seeder reads the shipped manifest
+  [ok] installed seeder reads manifest (not builtin)
+  [ok] installed R5 seed parity checker passes
+  [ok] recurrence guard blocks an undeclared runtime-referenced file
+PASS: 8 checks, 0 failed
+AT001_EXIT=0
+
+=== RED evidence (before fix) ===
+  real package output MISSING all 5 runtime files
+  installed freely-package: [ERROR] allowlist not found -> exit 1
+  installed seeder: source=builtin entries=1 (truth: manifest entries=3)
+  installed R5 seed parity: exit 2 allowlist not found
+  recurrence checker missing; 5 allowlist declarations missing
+  2 pre-existing capabilities PASS (doc-only not packaged, R5 checker present,
+  dangerous-output guard, R5 hook, bash -n, real packaging integrity)
+
+=== GREEN behaviour ===
+  allowlist declares all 5 runtime files explicitly (3 doc-only files NOT packaged)
+  package output contains all 5 with sha256 parity to truth
+  INSTALLED freely-package self-packages with integrity: verified (no allowlist-not-found)
+  INSTALLED seeder: source=manifest entries=3 == truth manifest entries=3
+  INSTALLED R5 seed parity checker: ok=true undeclared=[]
+  recurrence guard: a new runtime-referenced tracked top-level file with no
+    allowlist entry is named and blocked (exit 1)
+  guard order: dangerous-output guard -> R5 seed parity -> runtime parity -> rm -rf
+  PASS: 8 checks, 0 failed (plus 14 static assertions all ok)
+
+=== zero-regression audit (unmodified develop HEAD baseline) ===
+  test-worktree-seed-package-parity        0 / 0  IDENTICAL
+  test-freely-package-output-guard         0 / 0  (only rm line 112->126 + tmp path)
+  test-wt-create-four-state-dir            0 / 0  IDENTICAL
+  test-wt-create-recovery-dev-path         0 / 0  IDENTICAL
+  test-wt-create-resume-test-worktree      0 / 0  IDENTICAL
+  test-materialize-h1                     0 / 0  IDENTICAL
+  test-raw-key-drift                      0 / 0  IDENTICAL
+  test-governance-gate-batch-read          0 / 0  (only timing digits)
+  test-command-lifecycle-wt-create.py     0 / 0  IDENTICAL
+  => 9/9 identical exit codes, 0 new failures, 0 substantive output diffs
+  full suite (incl. new test): 10 PASS / 0 FAIL
+
+=== boundary ===
+  explicit allowlist mechanism kept (NOT auto-include whole directory)
+  R5 package-seed-parity.py semantics/order unchanged; seed manifest unchanged
+  worktree_seed.py load()/apply() untouched; builtin fallback preserved
+  no bulk rewrite of historical installed versions
+
+=== design review note (honest correction vs issue body) ===
+  install-lifecycle-allowlist.txt / release-build-allowlist.txt are actually
+  repo-scoped (project-root-based, auto-created by
+  ensure_install_lifecycle_allowlist_file), NOT installation-root files.
+  They still ship because they are tracked runtime capability manifests
+  referenced by literal path in doctor gates; the issue body's phrasing
+  "安装态 doctor 门禁缺清单" is refined in B1 brainstorms.
+  AGENTS.md.example / worktree-seed.toml / package-allowlist.txt are
+  SELF_ROOT-based installation-truth files and are the actual
+  self-bootstrap blockers.
+
+=== syntax ===
+  bash -n freely-package OK
+  py_compile checker OK

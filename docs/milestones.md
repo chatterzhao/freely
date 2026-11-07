@@ -1,3 +1,24 @@
+## M-20261106T100938Z-A
+- title: fix — 补齐打包 allowlist 运行时必需文件并建立防复发检查
+- status: active
+### candidate_issues
+1. `C-20261106T100938Z-A`
+- milestone: M-20261106T100938Z-A
+- status: promoted
+- promoted_issue_id: I-20261106T100938Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261106T100938Z/issues/I-20261106T100938Z-A.md
+### committed_issues
+1. `I-20261106T100938Z-A`
+- milestone: M-20261106T100938Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261106T100938Z/issues/I-20261106T100938Z-A.md
+### completed_issues
+1. `I-20261106T100938Z-A`
+- milestone: M-20261106T100938Z-A
+- phase_state: completed
+- completed_at: 2026-11-06T11:20:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261106T100938Z/issues/I-20261106T100938Z-A.md
+
 ## M-20261105T062506Z-A
 - title: fix — 补齐 seed 声明并建立 allowlist/seed 一致性检查
 - status: active
