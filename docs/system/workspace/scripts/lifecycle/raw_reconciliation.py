@@ -18,7 +18,7 @@ _COMMENT_BLOCK = re.compile(
     r"^#{3,4}[ \t]+(?:comment|resolution)-[^\n]*\n(.*?)(?=^#{1,4}[ \t]+|\Z)",
     re.IGNORECASE | re.MULTILINE | re.DOTALL,
 )
-_META_LINE = re.compile(r"^(?:-\s+[A-Za-z_][\w-]*:|\{.*\})\s*$")
+_META_LINE = re.compile(r"^(?:-\s+[A-Za-z_][\w-]*:.*|\{.*\})\s*$")
 
 
 def normalize_raw_key(value: object) -> str:
