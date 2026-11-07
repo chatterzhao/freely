@@ -226,6 +226,46 @@ if os.path.exists('$SCAN_STATE'):
 }
 
 # Check if there are unsynced comments since last_synced_comment_at.
+# _comment_blocks: parse every "### comment-<ts>" block in the document body.
+# Prints "<ts>\t<body-on-one-line>" per block, oldest first.
+_comment_blocks() {
+  python3 -c "
+import re
+with open('$1') as f:
+    content = f.read()
+parts = content.split('---', 2)
+body = parts[2] if len(parts) >= 3 else content
+pattern = re.compile(r'### (comment-\S+)\n(.*?)(?=\n### comment-|\Z)', re.DOTALL)
+for match in pattern.finditer(body):
+    ts = match.group(1)[len('comment-'):]
+    text = match.group(2)
+    lines = text.split('\n')
+    # strip the optional metadata prefix: a {json} line or leading '- key:' bullets
+    while lines and (not lines[0].strip() or lines[0].startswith('- ') or lines[0].startswith('{')):
+        lines.pop(0)
+    print(ts + '\t' + '\\n'.join(lines).strip())
+" 2>/dev/null || true
+}
+
+_last_comment_body() {
+  python3 -c "
+import re
+with open('$1') as f:
+    content = f.read()
+parts = content.split('---', 2)
+body = parts[2] if len(parts) >= 3 else content
+pattern = re.compile(r'### (comment-\S+)\n(.*?)(?=\n### comment-|\Z)', re.DOTALL)
+blocks = list(pattern.finditer(body))
+if not blocks:
+    raise SystemExit(0)
+text = blocks[-1].group(2)
+lines = text.split('\n')
+while lines and (not lines[0].strip() or lines[0].startswith('- ') or lines[0].startswith('{')):
+    lines.pop(0)
+print('\n'.join(lines).strip())
+" 2>/dev/null || true
+}
+
 _has_unsynced_comments() {
   local file="$1" platform="$2"
   local last_sync
@@ -240,25 +280,21 @@ if len(parts) >= 3:
   print(lsca.get('$platform', ''))
 " 2>/dev/null || true)
   [[ -z "$last_sync" || "$last_sync" == "None" ]] && return 0  # never synced
-  # Check if any comment is newer
-  python3 -c "
-import re
-with open('$file') as f: content = f.read()
-parts = content.split('## Comments', 1)
-if len(parts) < 2: exit(1)
-import datetime
-last = datetime.datetime.fromisoformat('${last_sync}'.replace('Z', '+00:00'))
-for m in re.finditer(r'### (comment-\S+)', parts[1]):
-  ts_str = m.group(1).replace('comment-', '')
-  try:
-    ct = datetime.datetime.strptime(ts_str[:15], '%Y%m%dT%H%M%S').replace(tzinfo=datetime.timezone.utc)
-    if ct > last: exit(0)
-  except: pass
-exit(1)
-" 2>/dev/null
+  # Any comment block newer than the last sync counts, whatever its metadata
+  # shape and wherever it sits (system events are not under `## Comments`).
+  # Both timestamps are UTC and fixed width, so plain string compare is exact.
+  local normalised_sync="${last_sync//-/}"
+  normalised_sync="${normalised_sync//:/}"
+  normalised_sync="${normalised_sync:0:15}"
+  local ts _rest
+  while IFS=$'\t' read -r ts _rest; do
+    [[ -z "$ts" ]] && continue
+    if [[ "${ts:0:15}" > "$normalised_sync" ]]; then
+      return 0
+    fi
+  done < <(_comment_blocks "$file")
+  return 1
 }
-
-# ── title derivation ─────────────────────────────────────
 
 _issue_title() {
   local file="$1" local_id="$2"
@@ -687,21 +723,11 @@ cmd_comment() {
     echo "[issue-sync] skip comment: no unsynced comments for $local_id (GitHub)"
   fi
 
-  # Extract latest comment without platform_ids
+  # Extract the latest comment block. System events (promote / promote_finalized)
+  # write bullet metadata, user comments write a {json} line, so the reader must
+  # accept both instead of assuming a `## Comments` section (#4183).
   local last_comment
-  last_comment=$(python3 -c "
-import re
-with open('$file') as f: content = f.read()
-# Find last ### comment- entry, extract text
-matches = list(re.finditer(r'### (comment-\S+)\n(\{[^}]+\})?\n(.*?)(?=\n### |\Z)', content, re.DOTALL))
-if matches:
-  m = matches[-1]
-  meta = m.group(2) or ''
-  body = m.group(3).strip()
-  # Only push if not already synced to both platforms
-  if 'github' not in meta or 'gitee' not in meta:
-    print(body)
-" 2>/dev/null || true)
+  last_comment="$(_last_comment_body "$file")"
 
   if [[ -z "$last_comment" ]]; then
     echo "[issue-sync] no unsynced comments for $local_id"

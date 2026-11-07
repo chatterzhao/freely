@@ -15,10 +15,12 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: docs/B2-docs/gate/platform/raw-20261104T082556Z/issues/I-20261104T082556Z-A.md
-last_synced_comment_at: {}
+last_synced_comment_at:
+  github: '2026-11-07T13:07:16Z'
+  gitee: '2026-11-07T13:07:16Z'
 hash: ''
 created_at: '2026-11-04T08:25:56Z'
-updated_at: '2026-11-07T13:03:02Z'
+updated_at: '2026-11-07T13:07:16Z'
 intake_id: ''
 author: platform
 channel: github
