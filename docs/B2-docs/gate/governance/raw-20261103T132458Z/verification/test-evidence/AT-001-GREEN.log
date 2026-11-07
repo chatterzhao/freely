@@ -1,0 +1,42 @@
+=== STATIC: shim family is fail-closed ===
+  [ok] pre-commit shim has no bare exit 0
+  [ok] pre-commit shim uses -f (bash file needs no +x)
+  [ok] pre-commit shim reports environment-unusable (2)
+  [ok] pre-merge-commit shim has no bare exit 0
+  [ok] pre-merge-commit shim uses -f (bash file needs no +x)
+  [ok] pre-merge-commit shim reports environment-unusable (2)
+  [ok] pre-push shim has no bare exit 0
+  [ok] pre-push shim uses -f (bash file needs no +x)
+  [ok] pre-push shim reports environment-unusable (2)
+  [ok] reference-transaction shim has no bare exit 0
+  [ok] reference-transaction shim uses -f (bash file needs no +x)
+  [ok] reference-transaction shim reports environment-unusable (2)
+  [ok] pre-rebase shim has no bare exit 0
+  [ok] pre-rebase shim uses -f (bash file needs no +x)
+  [ok] pre-rebase shim reports environment-unusable (2)
+  [ok] post-rewrite shim has no bare exit 0
+  [ok] post-rewrite shim uses -f (bash file needs no +x)
+  [ok] post-rewrite shim reports environment-unusable (2)
+  [ok] post-checkout stays self-contained (unchanged by shim-family fix)
+=== STATIC: pre-commit.sh truth guards ===
+  [ok] hooksPath mismatch exits non-zero
+  [ok] worktree-common.sh missing is a failure
+  [ok] gate guards use -f not -x
+  [ok] missing gate produces exit 2
+  [ok] pre-commit.sh guard contract
+=== STATIC: pr-create-guarded skipping is never a pass ===
+  skipping sites found: 0
+  [ok] normal 'no raw key' path still continues
+  [ok] pr-create-guarded skipping contract
+=== STATIC: checkpoint-guard default & check-file-size wiring ===
+  [ok] checkpoint-guard defaults to FAIL_ON_REQUIRED=1
+  [ok] check-file-size is wired into pre-commit
+  [ok] staged-only exempts files already oversized in HEAD (no self-lock)
+=== STATIC: no 'unbypassable' claim without wrapper wiring ===
+  [ok] no PATH claim to reconcile (wrapper left as-is, documented)
+=== BEHAVIOR: isolated git repos ===
+  [ok] CASE A: missing truth script blocks commit (rc=1)
+  [ok] CASE A: diagnostic explains environment failure
+  [ok] CASE B: bash file actually ran without +x (no false block, no silent skip)
+  [ok] CASE C: checkpoint-guard default is non-zero when required (rc=2)
+PASS: 29 checks, 0 failed

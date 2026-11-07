@@ -3,7 +3,9 @@
 set -euo pipefail
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || { cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P; })"
 HOOK_SCRIPT="$ROOT_DIR/docs/system/workspace/hooks/post-rewrite.sh"
-if [[ -x "$HOOK_SCRIPT" ]]; then
+if [[ -f "$HOOK_SCRIPT" ]]; then
   exec bash "$HOOK_SCRIPT" "$@"
 fi
-exit 0
+# 0 = pass, 1 = fail, 2 = environment unusable (treated as NOT passing).
+echo "[HOOK] BLOCKED: ${HOOK_NAME:-shim} truth script missing: $HOOK_SCRIPT" >&2
+exit 2

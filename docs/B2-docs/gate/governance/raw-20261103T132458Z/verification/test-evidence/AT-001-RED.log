@@ -1,0 +1,42 @@
+=== STATIC: shim family is fail-closed ===
+  [FAIL] pre-commit shim still exits 0 without a truth script
+  [FAIL] pre-commit shim still requires the execute bit
+  [FAIL] pre-commit shim has no exit 2
+  [FAIL] pre-merge-commit shim still exits 0 without a truth script
+  [FAIL] pre-merge-commit shim still requires the execute bit
+  [FAIL] pre-merge-commit shim has no exit 2
+  [FAIL] pre-push shim still exits 0 without a truth script
+  [FAIL] pre-push shim still requires the execute bit
+  [FAIL] pre-push shim has no exit 2
+  [FAIL] reference-transaction shim still exits 0 without a truth script
+  [FAIL] reference-transaction shim still requires the execute bit
+  [FAIL] reference-transaction shim has no exit 2
+  [FAIL] pre-rebase shim still exits 0 without a truth script
+  [FAIL] pre-rebase shim still requires the execute bit
+  [FAIL] pre-rebase shim has no exit 2
+  [FAIL] post-rewrite shim still exits 0 without a truth script
+  [FAIL] post-rewrite shim still requires the execute bit
+  [FAIL] post-rewrite shim has no exit 2
+  [ok] post-checkout stays self-contained (unchanged by shim-family fix)
+=== STATIC: pre-commit.sh truth guards ===
+  [FAIL] hooksPath mismatch exits non-zero
+  [FAIL] pre-commit.sh guard contract (see above)
+=== STATIC: pr-create-guarded skipping is never a pass ===
+  skipping sites found: 4
+  [FAIL] line 121: skipping without a non-zero exit
+  [FAIL] line 208: skipping without a non-zero exit
+  [FAIL] line 334: skipping without a non-zero exit
+  [FAIL] line 458: skipping without a non-zero exit
+  [ok] normal 'no raw key' path still continues
+  [FAIL] pr-create-guarded skipping contract (see above)
+=== STATIC: checkpoint-guard default & check-file-size wiring ===
+  [FAIL] checkpoint-guard still defaults to 0
+  [FAIL] check-file-size still has no caller
+=== STATIC: no 'unbypassable' claim without wrapper wiring ===
+  [ok] no PATH claim to reconcile (wrapper left as-is, documented)
+=== BEHAVIOR: isolated git repos ===
+  [FAIL] CASE A: commit PASSED with no truth script (fail-open)
+  [FAIL] CASE A: no diagnostic
+  [FAIL] CASE B: commit passed but truth script was NOT executed (silent fail-open)
+  [FAIL] CASE C: checkpoint-guard default returned 0
+PASS: 2 checks, 26 failed

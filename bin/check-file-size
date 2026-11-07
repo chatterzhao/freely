@@ -14,6 +14,13 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 WARN="${FILE_SIZE_WARN:-500}"
 DANGER="${FILE_SIZE_DANGER:-750}"
 ERROR="${FILE_SIZE_ERROR:-1000}"
+STAGED_ONLY=0
+for _arg in "$@"; do
+  case "$_arg" in
+    --staged-only) STAGED_ONLY=1 ;;
+    *) echo "[check-file-size] unknown arg: $_arg" >&2; exit 2 ;;
+  esac
+done
 
 warnings=0
 dangers=0
@@ -47,11 +54,51 @@ check_file() {
   fi
 }
 
-# Code files
+if [[ "$STAGED_ONLY" -eq 1 ]]; then
+  # Incremental gate: inspect only files staged in THIS commit, then exit.
+  # Historic oversized files remain visible in a full run but must not
+  # permanently block every future commit.
+  if ! git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "[check-file-size] ERROR: not a git worktree (environment unusable)" >&2
+    exit 2
+  fi
+  while IFS= read -r -d '' rel; do
+    [[ -n "$rel" ]] || continue
+    f="$ROOT_DIR/$rel"
+    [[ -f "$f" ]] || continue
+    # A file that was ALREADY oversized in HEAD is historic debt, not a new
+    # violation introduced by this commit. Blocking it would lock every
+    # future commit that merely touches milestones.md / other legacy files.
+    if git -C "$ROOT_DIR" cat-file -e "HEAD:$rel" 2>/dev/null; then
+      _old_lines="$(git -C "$ROOT_DIR" show "HEAD:$rel" 2>/dev/null | wc -l | tr -d ' ')"
+      if (( _old_lines > ERROR )); then
+        echo "[HISTORIC] $rel: already over $ERROR lines in HEAD (not a new violation)"
+        continue
+      fi
+    fi
+    check_file "$f"
+  done < <(git -C "$ROOT_DIR" diff --cached --name-only -z --diff-filter=ACMR 2>/dev/null)
+  echo ""
+  echo "Limits: warn=$WARN danger=$DANGER error=$ERROR | staged-only | Warnings: $warnings Dangers: $dangers Errors: $errors Skips: $skips"
+  exit $(( errors > 0 ? 1 : 0 ))
+fi
+
+# Code files (full run)
 while IFS= read -r -d '' f; do
   check_file "$f"
 done < <(find "$ROOT_DIR/docs/system/workspace/scripts" "$ROOT_DIR/bin" \
   \( -name "*.sh" -o -name "*.py" \) -print0 2>/dev/null)
+
+# Extensionless executable scripts (e.g. scripts/runtime/freely, 26k+ lines)
+# were invisible to the *.sh/*.py scan. Cover them in full runs.
+while IFS= read -r -d '' f; do
+  check_file "$f"
+done < <(find "$ROOT_DIR/docs/system/workspace/scripts/runtime" \
+  "$ROOT_DIR/docs/system/workspace/scripts/sync" \
+  "$ROOT_DIR/docs/system/workspace/scripts/quality" \
+  "$ROOT_DIR/docs/system/workspace/scripts/worktree" \
+  "$ROOT_DIR/docs/system/workspace/scripts/lifecycle" "$ROOT_DIR/bin" \
+  -maxdepth 1 -type f ! -name "*.*" -print0 2>/dev/null)
 
 # Active governance docs
 while IFS= read -r -d '' f; do
