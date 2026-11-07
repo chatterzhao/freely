@@ -163,6 +163,16 @@ def register(handler: PlatformHandler):
 # several times.  Failures are never cached so a later call can recover.
 _HANDLER_PROBE_CACHE: dict[str, PlatformHandler] = {}
 
+# Why the last probe of a platform failed. "not installed" / "not authenticated" /
+# "timed out" / "no repo permission" are four different operator actions; folding
+# them into one False is what made a missing `gh` binary look like an
+# unsupported platform (#4149).
+_HANDLER_PROBE_ERRORS: dict[str, str] = {}
+
+
+def _probe_failure_reason(platform: str) -> str:
+    return _HANDLER_PROBE_ERRORS.get(platform, "unavailable (probe did not run)")
+
 
 def _probe_handler(platform: str) -> Optional[PlatformHandler]:
     cached = _HANDLER_PROBE_CACHE.get(platform)
@@ -171,11 +181,29 @@ def _probe_handler(platform: str) -> Optional[PlatformHandler]:
     for handler in _registry:
         if handler.name != platform:
             continue
-        value, _error = _retry_read(lambda: True if handler.detect() else None)
-        if value:
+        reason = ""
+        if hasattr(handler, "detect_reason"):
+            probe = {"ok": False, "reason": ""}
+
+            def _do_probe():
+                ok_now, why = handler.detect_reason()
+                probe["ok"], probe["reason"] = ok_now, why
+                return True if ok_now else None
+
+            value, _error = _retry_read(_do_probe)
+            ok, reason = bool(value), probe["reason"]
+        else:  # pragma: no cover - third-party handler without detect_reason
+            value, _error = _retry_read(lambda: True if handler.detect() else None)
+            ok = bool(value)
+            if not ok:
+                reason = "unavailable"
+        if ok:
             _HANDLER_PROBE_CACHE[platform] = handler
+            _HANDLER_PROBE_ERRORS.pop(platform, None)
             return handler
+        _HANDLER_PROBE_ERRORS[platform] = reason or "unavailable"
         return None
+    _HANDLER_PROBE_ERRORS[platform] = "not a registered platform"
     return None
 
 
@@ -194,7 +222,7 @@ def _ensure_handler(platform: str):
         return None, {
             "status": "error",
             "stage": "execute",
-            "error": f"platform handler unavailable: {platform}",
+            "error": f"platform handler unavailable: {platform} ({_probe_failure_reason(platform)})",
         }
     return handler, None
 
@@ -206,12 +234,30 @@ class GitHubHandler(PlatformHandler):
     name = "github"
 
     def detect(self) -> bool:
+        return self.detect_reason()[0]
+
+    def detect_reason(self) -> tuple[bool, str]:
+        """Probe `gh` and say WHY it is unusable, not just that it is."""
         try:
-            subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner"],
-                          capture_output=True, timeout=10, check=True)
-            return True
-        except Exception:
-            return False
+            r = subprocess.run(["gh", "repo", "view", "--json", "nameWithOwner"],
+                               capture_output=True, text=True, timeout=10)
+        except FileNotFoundError:
+            return False, "gh not installed (gh: command not found)"
+        except subprocess.TimeoutExpired:
+            return False, "gh timed out after 10s"
+        except Exception as exc:
+            return False, f"gh probe failed: {exc.__class__.__name__}"
+        if r.returncode != 0:
+            detail = ((r.stderr or "") + (r.stdout or "")).strip()
+            line = detail.splitlines()[-1][:200] if detail else f"gh exited {r.returncode}"
+            if re.search(r"auth|login|credential|token", line, re.IGNORECASE):
+                return False, f"gh not authenticated ({line})"
+            if re.search(r"timed? ?out|timeout", line, re.IGNORECASE):
+                return False, f"gh timed out ({line})"
+            if re.search(r"not found|could not resolve|permission|403|404", line, re.IGNORECASE):
+                return False, f"gh has no access to the repository ({line})"
+            return False, f"gh unavailable ({line})"
+        return True, ""
 
     def detect_repo(self) -> str:
         try:
@@ -525,7 +571,15 @@ class GiteeHandler(PlatformHandler):
     name = "gitee"
 
     def detect(self) -> bool:
-        return bool(freely_env_value("GITEE_ACCESS_TOKEN", "GITEE_TOKEN")) and bool(self.detect_repo())
+        return self.detect_reason()[0]
+
+    def detect_reason(self) -> tuple[bool, str]:
+        if not freely_env_value("GITEE_ACCESS_TOKEN", "GITEE_TOKEN"):
+            return False, "gitee token not configured (GITEE_ACCESS_TOKEN / GITEE_TOKEN)"
+        repo = self.detect_repo()
+        if not repo:
+            return False, "gitee repo not detectable from git remotes"
+        return True, ""
 
     def detect_repo(self) -> str:
         try:
@@ -739,6 +793,11 @@ register(GiteeHandler())
 # Public API — iterates registry, zero platform hardcoding
 # ══════════════════════════════════════════════
 
+def _unavailable_error(platform: str) -> str:
+    """Diagnostic text for a platform we cannot reach — never a bare 'unsupported'."""
+    return f"{platform} unavailable: {_probe_failure_reason(platform)}"
+
+
 def available_platforms() -> list[str]:
     return [h.name for h in _handlers()]
 
@@ -763,7 +822,7 @@ def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
         results[platform] = (
             _safe(handler.create_issue, title, body)
             if handler
-            else {"status": "error", "error": f"unsupported platform: {platform}"}
+            else {"status": "error", "error": _unavailable_error(platform)}
         )
     return results
 
@@ -772,7 +831,7 @@ def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
     for platform in configured_platforms():
         h = _handler_for(platform)
         if not h:
-            results[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            results[platform] = {"status": "error", "error": _unavailable_error(platform)}
             continue
         pid = (platform_ids or {}).get(platform, {})
         issue_id = pid.get('issue_id', '') if isinstance(pid, dict) else str(pid or '')
@@ -852,7 +911,7 @@ def close_issue_by_raw_key(raw_key: str, platform_ids: dict = None) -> dict[str,
     for platform in platforms:
         handler = _handler_for(platform)
         if not handler:
-            failures[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            failures[platform] = {"status": "error", "error": _unavailable_error(platform)}
             continue
         issue_id, error = _unique_raw_issue(handler, raw_key)
         if error:
@@ -892,7 +951,7 @@ def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str =
     for platform in configured_platforms():
         handler = _handler_for(platform)
         if not handler:
-            results[platform] = {"status": "error", "error": f"unsupported platform: {platform}"}
+            results[platform] = {"status": "error", "error": _unavailable_error(platform)}
             continue
         reference = (platform_ids or {}).get(platform, {})
         issue_id = reference.get("issue_id", "") if isinstance(reference, dict) else str(reference or "")
@@ -1455,9 +1514,14 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "create-issue":
         result = create_issue(a[2], a[3], a[4] if len(a) > 4 else "")
         print(json.dumps(result, indent=2))
-        raise SystemExit(
-            0 if result and all(item.get("status") == "created" for item in result.values()) else 1
-        )
+        # Per-platform accounting: 0 = every configured platform created,
+        # 3 = partial (at least one created, at least one failed),
+        # 1 = nothing created. A partial success used to surface as a plain
+        # failure, which invited a retry that duplicated the created issue.
+        created = [p for p, item in (result or {}).items() if item.get("status") == "created"]
+        if result and len(created) == len(result):
+            raise SystemExit(0)
+        raise SystemExit(3 if created else 1)
     elif len(a) > 1 and a[1] == "get-issue-state":
         print(_resolve_issue_state(a[2]) if len(a) > 2 else "unknown")
     elif len(a) > 1 and a[1] == "comment":

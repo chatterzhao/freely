@@ -28,7 +28,8 @@
 #   bin/issue-sync scan                   Show which issues changed since last scan
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# ROOT_DIR is overridable so tests can load this file against an isolated tree.
+ROOT_DIR="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 ISSUES_DIR="$ROOT_DIR/docs/B1-docs"
 
 # ── YAML helpers ─────────────────────────────────────────
@@ -299,11 +300,31 @@ _gh_repo() {
   gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo ""
 }
 
+# Accept every remote URL shape git can hand us: scp-like (`git@host:owner/repo.git`),
+# ssh/https URLs, and host paths. The previous awk kept the `git@host:` prefix and the
+# trailing `.git`, producing a value no API accepts (#4149).
+_gitee_repo_from_url() {
+  local url="${1:-}" path
+  [[ -n "$url" ]] || return 0
+  path="${url#*://}"
+  if [[ "$path" == "$url" ]]; then
+    path="${url#*:}"          # scp-like: [user@]host:owner/repo(.git)
+  else
+    path="${path#*/}"         # drop scheme + host
+  fi
+  path="${path#/}"
+  path="${path%.git}"
+  [[ "$path" == */* ]] && printf '%s\n' "$path"
+  return 0
+}
+
 _gitee_repo() {
-  git remote -v 2>/dev/null | awk '/gitee.*\(push\)/ {
-    n=split($2, a, "/"); sub(/\.git$/, "", a[n]);
-    printf "%s/%s", a[n-1], a[n]; exit
-  }'
+  local url
+  url=$(git remote get-url origin 2>/dev/null || true)
+  if [[ "$url" != *gitee* ]]; then
+    url=$(git remote -v 2>/dev/null | awk '/gitee.*\(push\)/ {print $2; exit}')
+  fi
+  _gitee_repo_from_url "$url"
 }
 
 # ── GitHub ops ───────────────────────────────────────────
@@ -323,7 +344,10 @@ _gh_comment() {
 
 _gh_close() {
   local issue_number="$1" reason="${2:-completed}"
-  gh issue close "$issue_number" --repo "$GH_REPO" --reason "$reason" >/dev/null 2>&1 && echo "ok" || echo "fail"
+  if gh issue close "$issue_number" --repo "$GH_REPO" --reason "$reason" >/dev/null 2>&1; then
+    echo "ok"; return 0
+  fi
+  echo "fail"; return 1
 }
 
 _gh_update() {
@@ -339,10 +363,40 @@ _gh_update() {
 
 # ── Gitee ops ────────────────────────────────────────────
 
-_gitee_call() {
-  local method="$1" data="$2"
+# Gitee writes use the SAME CLI contract the adapter uses
+# (`gitee-issue.py --repo <repo> <subcommand> [flags]`). The previous helper passed
+# a JSON blob as a positional argument, so argparse exited 2 on every call and
+# a trailing `|| echo` fallback then turned that into a valid-looking empty
+# result, so every write "succeeded" without touching the platform (#4149).
+_gitee_cli() {
+  local action="$1"; shift
+  [[ -n "${GITEE_REPO:-}" ]] || { echo "[issue-sync] gitee repo unknown" >&2; return 2; }
   python3 "$ROOT_DIR/docs/system/workspace/scripts/runtime/gitee-issue.py" \
-    --repo "$GITEE_REPO" "$method" "$data" 2>/dev/null || echo '{"ok":false}'
+    --repo "$GITEE_REPO" "$action" "$@"
+}
+
+_gitee_create()  { _gitee_cli create --title "${1:-}" --body "${2:-}"; }
+_gitee_update()  { _gitee_cli update "${1:-}" --title "${2:-}" --body "${3:-}"; }
+_gitee_comment() { _gitee_cli comment "${1:-}" --body "${2:-}"; }
+
+_gitee_close() {
+  local num="${1:-}" comment="${2:-}"
+  if [[ -n "$comment" ]]; then
+    _gitee_cli close "$num" --comment "$comment"
+  else
+    _gitee_cli close "$num"
+  fi
+}
+
+# Pull the platform id out of the JSON the CLI prints.
+_gitee_issue_number_from_json() {
+  python3 -c 'import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    print("")
+else:
+    print(d.get("number") or d.get("id") or "")'
 }
 
 # ── platform_ids helpers ─────────────────────────────────
@@ -461,54 +515,77 @@ _gitee_resolve_issue_number() {
 # ── commands ─────────────────────────────────────────────
 
 cmd_create() {
-  local local_id="$1" file title body labels url ts
+  local local_id="$1" file
   file="$ISSUES_DIR/$local_id/issue.md"
   [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
 
-  # Dedup: skip if already on platform
-  if [[ -n "${GH_REPO:-}" ]] && _already_on_platform "$file" "github"; then
-    echo "[issue-sync] skip create: $local_id already on GitHub"
-  else
-    title=$(_platform_title "$local_id" "$file")
-    body=$(_issue_body "$file" "$local_id")
-    labels=$(_labels "$file")
+  local title body labels
+  title=$(_platform_title "$local_id" "$file")
+  body=$(_issue_body "$file" "$local_id")
+  labels=$(_labels "$file")
 
-    if [[ -n "${GH_REPO:-}" ]]; then
+  local -a _created=() _failed=()
+  [[ -n "${GH_REPO:-}" ]] || true
+
+  # GitHub
+  if [[ -n "${GH_REPO:-}" ]]; then
+    if _already_on_platform "$file" "github"; then
+      echo "[issue-sync] skip create: $local_id already on GitHub"
+      _created+=("github")
+    else
       echo "[issue-sync] GitHub: creating issue..."
-      url=$(_gh_create "$title" "$body" "$labels")
+      local url=""
+      url=$(_gh_create "$title" "$body" "$labels") || url=""
       if [[ -n "$url" ]]; then
         local gh_num; gh_num=$(basename "$url")
         echo "[issue-sync] GitHub: $url"
         _update_platform_ids "$file" "github" "$gh_num" "$url"
+        _created+=("github")
       else
-        echo "[issue-sync] GitHub: FAILED"
+        echo "[issue-sync] GitHub: FAILED (no issue url returned)" >&2
+        _failed+=("github")
       fi
     fi
   fi
 
-  # Gitee — same dedup
-  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" ]]; then
+  # Gitee. The token lives in gitee-issue.py (freely_user_env); gating here on a
+  # shell variable this script never assigns silently skipped the whole channel.
+  if [[ -n "${GITEE_REPO:-}" ]]; then
     if _already_on_platform "$file" "gitee"; then
       echo "[issue-sync] skip create: $local_id already on Gitee"
+      _created+=("gitee")
     else
-      title=$(_platform_title "$local_id" "$file")
-      body=$(_issue_body "$file" "$local_id")
       echo "[issue-sync] Gitee: creating issue..."
-      local gitee_result gitee_id
-      gitee_result=$(_gitee_call "create" "{\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}")
-      gitee_id=$(printf '%s\n' "$gitee_result" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('output',''))" 2>/dev/null || true)
-      if [[ -n "$gitee_id" ]]; then
-        echo "[issue-sync] Gitee: created $gitee_id"
-        _update_platform_ids "$file" "gitee" "$gitee_id" "https://gitee.com/$GITEE_REPO/issues/$gitee_id"
+      local out="" rc=0 num=""
+      out=$(_gitee_create "$title" "$body" 2>&1) || rc=$?
+      num=$(printf '%s' "$out" | _gitee_issue_number_from_json 2>/dev/null || true)
+      if [[ "$rc" -eq 0 && -n "$num" ]]; then
+        echo "[issue-sync] Gitee: created $num"
+        _update_platform_ids "$file" "gitee" "$num" "https://gitee.com/$GITEE_REPO/issues/$num"
+        _created+=("gitee")
       else
-        echo "[issue-sync] Gitee: FAILED - $gitee_result"
+        echo "[issue-sync] Gitee: FAILED (rc=$rc) $(printf '%s' "$out" | tail -1)" >&2
+        _failed+=("gitee")
       fi
     fi
   fi
 
-  _scan_state_record_sync "$local_id" "$file"
-  _fm_set_str "$file" "platform_state" "open"
-  echo "[issue-sync] create complete: $local_id"
+  # platform_state is a claim about ALL configured platforms. Writing it while any
+  # platform has no id is exactly the self-certification #4149 is about, and the
+  # batch scanner then skips the issue forever (#793 uses the same field).
+  if [[ ${#_failed[@]} -eq 0 ]]; then
+    _scan_state_record_sync "$local_id" "$file"
+    _fm_set_str "$file" "platform_state" "open"
+    echo "[issue-sync] create complete: $local_id"
+    return 0
+  fi
+  if [[ ${#_created[@]} -eq 0 ]]; then
+    echo "[issue-sync] create FAILED on every configured platform: ${_failed[*]}" >&2
+    exit 1
+  fi
+  echo "[issue-sync] create PARTIAL: created=${_created[*]} failed=${_failed[*]}" >&2
+  echo "[issue-sync] platform_state left unchanged; re-run 'issue-sync create $local_id' to heal" >&2
+  exit 3
 }
 
 cmd_update() {
@@ -533,9 +610,9 @@ cmd_update() {
   fi
 
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
-  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+  if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
     echo "[issue-sync] Gitee: updating $gitee_id"
-    _gitee_call "update" "{\"issue_id\":\"$gitee_id\",\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}"
+    _gitee_update "$gitee_id" "$title" "$body" >/dev/null || echo "[issue-sync] Gitee: update FAILED" >&2
   fi
 
   echo "[issue-sync] update complete: $local_id"
@@ -582,9 +659,9 @@ if matches:
     _gh_comment "$gh_id" "$last_comment"
   fi
 
-  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+  if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
     echo "[issue-sync] Gitee: adding comment to $gitee_id"
-    _gitee_call "comment" "{\"issue_id\":\"$gitee_id\",\"body\":\"$(printf '%s' "$last_comment" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}"
+    _gitee_comment "$gitee_id" "$last_comment" >/dev/null || echo "[issue-sync] Gitee: comment FAILED" >&2
   fi
 
   # Update last_synced_comment_at
@@ -667,12 +744,17 @@ cmd_close() {
 
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: closing #$gh_id"
-    _gh_close "$gh_id" "$reason"
+    # `_gh_close` now returns the real status. Keep the historical
+    # continue-and-report behaviour here; turning partial close into a hard
+    # abort belongs to #4184's close-path accounting.
+    _gh_close "$gh_id" "$reason" || echo "[issue-sync] GitHub: close FAILED" >&2
   fi
 
-  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+  if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
     echo "[issue-sync] Gitee: closing $gitee_id"
-    _gitee_call "close" "{\"issue_id\":\"$gitee_id\"}" || true
+    # Close-path partial accounting (platform closed but local state not written)
+    # is tracked separately in #4184; here we only stop calling a broken CLI.
+    _gitee_close "$gitee_id" >/dev/null || echo "[issue-sync] Gitee: close FAILED" >&2
   fi
 
   _fm_set_str "$file" "platform_state" "closed"
@@ -1001,4 +1083,6 @@ main() {
   esac
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

@@ -25216,33 +25216,54 @@ PYEOF
 
   echo "[feedback] raw issue created: raw-${raw_key}"
 
-  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" 2>&1) || {
-    echo "[feedback] ERROR: platform adapter failed (rc=$?)" >&2
-    exit 1
-  }
+  local _adapter_rc=0
+  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" 2>&1) || _adapter_rc=$?
   echo "[feedback] adapter output:"
   echo "$_adapter_result"
 
-  # Check if any platform succeeded
-  if echo "$_adapter_result" | grep -q '"status": "created"'; then
-    _created=1
-  fi
+  # Read the per-platform receipt as JSON. The old fixed-context grep missed
+  # `status` whenever it landed on the third line of the pretty-printed object,
+  # and the adapter's plain exit 1 could not tell "nothing created" from
+  # "one created, one failed" (#4149).
+  local _summary
+  _summary=$(printf '%s\n' "$_adapter_result" | python3 -c '
+import json, sys
+text = sys.stdin.read()
+start = text.find("{")
+if start < 0:
+    raise SystemExit(0)
+try:
+    obj, _ = json.JSONDecoder().raw_decode(text[start:])
+except Exception:
+    raise SystemExit(0)
+for name in sorted(obj or {}):
+    item = obj[name] or {}
+    print("%s\t%s\t%s" % (name, item.get("status", "?"),
+                           item.get("issue_id") or item.get("error") or ""))
+' || true)
 
-  if [[ "$_created" != "1" ]]; then
-    echo "[feedback] ERROR: no platform issue created" >&2
+  local _ok_count=0 _err_count=0 _line _pf _st _id
+  while IFS=$'\t' read -r _pf _st _id; do
+    [[ -n "$_pf" ]] || continue
+    if [[ "$_st" == "created" ]]; then
+      _ok_count=$((_ok_count + 1))
+      echo "[feedback] $_pf: created #$_id"
+    else
+      _err_count=$((_err_count + 1))
+      echo "[feedback] ERROR: $_pf platform creation failed: $_id" >&2
+    fi
+  done <<< "$_summary"
+
+  if [[ "$_ok_count" == "0" ]]; then
+    echo "[feedback] ERROR: no platform issue created (adapter rc=$_adapter_rc)" >&2
     exit 1
   fi
-
-  # Check every configured platform individually: any error → exit
-  for _pf in $(echo "$_platforms" | tr ',' ' '); do
-    [[ -n "$_pf" ]] || continue
-    if echo "$_adapter_result" | grep -q "\"$_pf\""; then
-      if echo "$_adapter_result" | grep -A2 "\"$_pf\"" | grep -q '"status": "error"'; then
-        echo "[feedback] ERROR: $_pf platform creation failed" >&2
-        exit 1
-      fi
-    fi
-  done
+  if [[ "$_err_count" != "0" ]]; then
+    echo "[feedback] PARTIAL: $_ok_count platform(s) created, $_err_count failed." >&2
+    echo "[feedback] Fix the failing platform, then run: freely issue-sync create $local_id" >&2
+    printf 'raw-%s\n' "$raw_key"
+    exit 3
+  fi
 
   echo "[feedback]"
   echo "[feedback] Next: create a worktree to fix or implement:"

@@ -1,0 +1,18 @@
+# R11 回归基线对比 — raw-20261103T132526Z / #4149
+# 基线：把 bin/issue-sync、platform-adapter.py、runtime/freely 还原为 develop 版本后运行
+# 本轮：恢复改动后同命令、同顺序运行
+
+TEST                                               BASELINE   CURRENT    DELTA
+test-command-lifecycle-raw-metadata.py             rc=0       rc=0       timing-only
+test-platform-adapter-gitee-search.py              rc=0       rc=0       identical
+test-platform-adapter-github-rest-fallback.py      rc=0       rc=0       timing-only
+test-platform-adapter-raw-identity.py              rc=0       rc=0       identical
+test-platform-handler-probe.py                     rc=0       rc=0       timing-only
+test-platform-open-parity.py                       rc=0       rc=0       identical
+test-raw-issue-pull-platform-fallback.py           rc=0       rc=0       timing-only
+test-raw-reconciliation.py                         rc=0       rc=0       timing-only
+test-scan-platform-adapter-import.py               rc=0       rc=0       identical
+
+## 结论
+- 9 个相关回归：退出码全部一致（rc=0），5 处逐字节差异仅为 unittest 计时行
+- 0 新增失败
