@@ -1,0 +1,17 @@
+  ▸ freely [dev]
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [MERGE-GUARD] 锁目录存在但无 pid 文件 — 孤儿锁，自动清理  ║
+╠══════════════════════════════════════════════════════════════╣
+║  Lock:  .git/freely-merge-lock
+║  原因: 进程在写入 pid 前崩溃，或上次 merge 异常退出              ║
+║  操作: 自动清理孤儿锁，继续本次 merge                           ║
+╚══════════════════════════════════════════════════════════════╝
+[MERGE-GUARD] merge lock acquired (waited 0s).
+[MERGE-GUARD] fetching latest develop from origin...
+[MERGE-GUARD] allowed: fix/raw-20261103T132540Z-verdict-contract -> develop
+[MERGE-GUARD] PR gate: GitHub PR #4214 exists
+[verdict] pr-review-raw-20261103T132540Z.md: verdict=fail (expected pass) -> blocked
+  - verdict: fail
+[MERGE-GUARD] Merge blocked: review verdict is not 'pass'.
+[MERGE-GUARD] review file: docs/B2-docs/gate/governance/raw-20261103T132540Z/code-reviews/pr-review-raw-20261103T132540Z.md
+[MERGE-GUARD] Re-run pr-review-guarded and address the review before merging.

@@ -1,0 +1,28 @@
+# R10 回归基线对比 — raw-20261103T132540Z / #4150
+# 基线：把本轮 3 个真源 git checkout 回 develop，并把 2 个新文件移出仓库后运行
+# 本轮：恢复改动后以同样命令、同样顺序运行
+
+TEST                                                       BASELINE   CURRENT    DELTA
+test-commit-msg-wireup                                     rc=0       rc=0       identical
+test-gate-fail-closed                                      rc=0       rc=0       identical
+test-governance-gate-batch-read                            rc=0       rc=0       bytes-differ (see below)
+test-governance-merge-gate                                 rc=1       rc=1       identical
+test-governance-receipt-audit                              rc=0       rc=0       identical
+test-merge-guarded-develop-push-attempt-followthrough      rc=13      rc=13      bytes-differ (see below)
+test-merge-guarded-hooked-initial-merge-receipt            rc=13      rc=13      bytes-differ (see below)
+test-merge-guarded                                         rc=13      rc=13      bytes-differ (see below)
+test-pre-merge-commit-hook                                 rc=1       rc=1       identical
+test-pretests-gate-inline-code-fields                      rc=0       rc=0       bytes-differ (see below)
+test-wt-create-four-state-dir                              rc=0       rc=0       identical
+
+## 逐字节差异说明（均为非语义差异）
+- test-governance-gate-batch-read：仅 Step 2e 耗时与倍数（2.843s/66.1x vs 2.883s/65.2x）
+- test-pretests-gate-inline-code-fields：仅 mktemp 随机目录名
+- test-merge-guarded / -develop-push-attempt-followthrough / -hooked-initial-merge-receipt：
+  三个预存红测试（旧真源路径 docs/system/workspace/scripts/worktree/merge-guarded 已迁移，ENOENT, rc=13）
+  输出仅 mktemp 目录后缀不同，正文逐字节一致
+
+## 结论
+- 11 个回归：退出码全部一致，行数全部一致 → 0 新增失败
+- 5 个预存红测试（test-governance-merge-gate rc=1、test-pre-merge-commit-hook rc=1 均无输出；3 个 test-merge-guarded* rc=13 ENOENT）
+  在基线与本轮表现完全相同，属 #4151 家族既存漂移，本 PR 未改变其行为
