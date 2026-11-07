@@ -1180,13 +1180,41 @@ def _resolve_issue_state(local_id: str) -> str:
 
 # ── pull_raw_issue ──
 
-def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
+def pull_raw_issue(raw_key: str, target_dir: Path,
+                   preferred_platform: str = "") -> Optional[dict]:
+    """Materialize a raw issue from the first READABLE configured platform.
+
+    A transient failure on one platform is uncertainty, not absence: it must
+    not block materialization when another replica is readable. Unreadable
+    platforms are returned as ``degraded_platforms`` so the caller can record
+    sync debt and use the partial-success exit code. ``preferred_platform``
+    pins the read source; an explicitly requested but unreadable platform is
+    an error (never a silent fallback).
+
+    The pre-flight raw-reconciliation gate already decides whether an
+    unreadable replica is a *fact* that must block; this function only chooses
+    a usable read source, so any non-ok replica is treated as degraded here.
+    """
     replicas = discover_raw_replicas(raw_key)
-    if not replicas or any(item.get("status") != "ok" for item in replicas.values()):
+    readable = {p: i for p, i in replicas.items() if i.get("status") == "ok"}
+    degraded = [p for p, i in replicas.items() if i.get("status") != "ok"]
+    if not readable:
         print(f"FATAL: raw-{raw_key} replicas are unresolved: {replicas}", file=sys.stderr)
         return None
+
+    if preferred_platform:
+        if preferred_platform not in readable:
+            print(f"FATAL: requested platform '{preferred_platform}' is not readable "
+                  f"for raw-{raw_key}; configured={list(replicas)}", file=sys.stderr)
+            return None
+        platform = preferred_platform
+    else:
+        # dict order == configured_platforms() order, so "first ok" keeps the
+        # historical primary when every replica is healthy.
+        platform = next(iter(readable))
+
     my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
-    for plat, info in replicas.items():
+    for plat, info in readable.items():
         ok, msg = check_and_claim_assignee(plat, info["issue_id"], my_login)
         print(f"[assignee] {plat}: {msg}", file=sys.stderr)
         if not ok and "already assigned to" in msg.lower():
@@ -1195,8 +1223,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
         if not ok:
             print(f"WARNING: Cannot claim assignee on {plat}, continuing anyway.", file=sys.stderr)
 
-    platform = next(iter(replicas))
-    info = replicas[platform]
+    info = readable[platform]
     issue_number = info["issue_id"]
     details = info
 
@@ -1217,7 +1244,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
                 file=sys.stderr,
             )
         canonical = canonical_raw_title(raw_key, title)
-        for plat, replica in replicas.items():
+        for plat, replica in readable.items():
             if replica.get("title", "") == canonical:
                 continue
             if _update_issue_title(plat, replica["issue_id"], canonical):
@@ -1227,8 +1254,11 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
                       file=sys.stderr)
 
     target_dir.mkdir(parents=True, exist_ok=True)
+    # Only readable replicas have an issue_id. Writing an entry for an
+    # unreadable one would either KeyError or poison platform_ids with a
+    # fabricated identity; _fill_platform_ids / issue-sync fill it later.
     platform_ids = {p: {"issue_id": i["issue_id"], "url": i.get("url", ""), "synced_at": ""}
-                    for p, i in replicas.items()}
+                    for p, i in readable.items()}
     phase = "proposed"
     for label in details.get("labels", []):
         if label.startswith("phase/"): phase = label.replace("phase/", ""); break
@@ -1276,7 +1306,8 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
         f"---\n{fm_str}\n---\n\n{rendered_body}\n", encoding="utf-8"
     )
     return {"path": str(target_dir / "issue.md"), "local_id": f"raw-{raw_key}",
-            "platform": platform, "issue_number": issue_number, "platform_ids": platform_ids}
+            "platform": platform, "issue_number": issue_number, "platform_ids": platform_ids,
+            "degraded_platforms": degraded, "partial": bool(degraded)}
 
 def _created_at_to_key(created_at: str) -> Optional[str]:
     try:
@@ -1334,7 +1365,16 @@ if __name__ == "__main__":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":
         raw_key = a[2]; target = Path(a[3]) if len(a) > 3 else Path(f"docs/B1-docs/raw-{raw_key}")
-        print(json.dumps(pull_raw_issue(raw_key, target), indent=2, default=str))
+        preferred = a[4] if len(a) > 4 else ""
+        result = pull_raw_issue(raw_key, target, preferred)
+        print(json.dumps(result, indent=2, default=str))
+        if result is None:
+            raise SystemExit(1)
+        if result.get("partial"):
+            # Distinct from failure (1): materialization succeeded but at
+            # least one configured platform could not be read. The caller
+            # records sync debt and continues worktree creation.
+            raise SystemExit(3)
     elif len(a) > 1 and a[1] == "create-pr":
         print(json.dumps(create_pr(a[2], a[3] if len(a) > 3 else "develop",
                                    a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else ""), indent=2))

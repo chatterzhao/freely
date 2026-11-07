@@ -1,0 +1,64 @@
+test_all_ok_unchanged_preexisting (__main__.PullFallbackTests.test_all_ok_unchanged_preexisting)
+PRE-EXISTING: both platforms readable -> primary stays github. ... ok
+test_all_unreadable_still_fatal_preexisting (__main__.PullFallbackTests.test_all_unreadable_still_fatal_preexisting)
+PRE-EXISTING: nothing readable -> must still fail closed. ... ok
+test_cli_supports_platform_argument (__main__.PullFallbackTests.test_cli_supports_platform_argument)
+RED: bin/raw-issue-pull must accept --platform. ... ok
+test_degraded_platforms_reported_for_sync_debt (__main__.PullFallbackTests.test_degraded_platforms_reported_for_sync_debt)
+RED: caller must be able to record the unreadable platform as debt. ... ok
+test_explicit_platform_selects_source (__main__.PullFallbackTests.test_explicit_platform_selects_source)
+RED: --platform gitee must read from gitee and write it back. ... ok
+test_explicit_unreadable_platform_fails_closed (__main__.PullFallbackTests.test_explicit_unreadable_platform_fails_closed)
+RED: an explicitly requested but unreadable platform must not silently fall back. ... ok
+test_materialization_keeps_h1_and_identity_preexisting (__main__.PullFallbackTests.test_materialization_keeps_h1_and_identity_preexisting)
+PRE-EXISTING (R2): the materialized file carries an H1. ... ok
+test_partial_platform_ids_exclude_unreadable (__main__.PullFallbackTests.test_partial_platform_ids_exclude_unreadable)
+RED: an unreadable replica has no issue_id -> must not poison platform_ids. ... ok
+test_partial_replica_still_materializes (__main__.PullFallbackTests.test_partial_replica_still_materializes)
+RED: github unreadable, gitee ok -> pull must still succeed. ... ok
+test_partial_success_has_distinct_exit_code_3 (__main__.PullFallbackTests.test_partial_success_has_distinct_exit_code_3)
+RED: partial success must be exit 3, not 1 (behaviour, not a string). ... ok
+test_sync_debt_reuses_existing_ledger (__main__.PullFallbackTests.test_sync_debt_reuses_existing_ledger)
+RED: pull must record debt in the existing sync-debt ledger. ... ok
+test_wt_create_supports_source_platform_passthrough (__main__.PullFallbackTests.test_wt_create_supports_source_platform_passthrough)
+RED: wt-create must accept --source-platform and pass it through. ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.953s
+
+OK
+
+=== zero-regression audit (unmodified develop HEAD baseline, same assertions) ===
+  RED on baseline: Ran 12 tests, FAILED (failures=9); 3 pre-existing capabilities PASS
+  GREEN on fix:    Ran 12 tests, OK
+  test-raw-replica-degraded.py             0 / 0  (only timing digits)
+  test-materialize-h1                      0 / 0  IDENTICAL
+  test-raw-key-drift                       0 / 0  IDENTICAL
+  test-wt-create-four-state-dir            0 / 0  IDENTICAL
+  test-wt-create-recovery-dev-path         0 / 0  IDENTICAL
+  test-wt-create-resume-test-worktree      0 / 0  IDENTICAL
+  test-command-lifecycle-wt-create.py     0 / 0  IDENTICAL
+  test-platform-adapter-raw-identity.py   0 / 0  IDENTICAL
+  test-package-runtime-allowlist-parity   0 / 0  IDENTICAL
+  test-worktree-seed-package-parity       0 / 0  IDENTICAL
+  test-governance-gate-batch-read          0 / 0  (only timing digits)
+  => 11/11 identical exit codes, 0 new failures, full suite 12 PASS / 0 FAIL
+
+=== end-to-end (isolated git project, fake adapter: github unreadable / gitee ok) ===
+  CLI exit code: 3 (partial success, NOT 1)
+  stdout: exactly ONE JSON document -> local_id=raw-20261104T082549Z,
+          platform=gitee, degraded_platforms=['github']
+  sync-debt.json entry: '20261104T082549Z::github'
+          reason='raw-issue-pull: platform unreadable, materialized from fallback'
+  stderr: partial-success sync-debt warning present
+  wt-create: treats exit 3 as continue (pull_rc != 0 && != 3 guard), prints
+          "部分成功 —— 已从未读平台回退物化，未读平台记入 sync-debt，工位创建继续"
+
+=== boundary ===
+  sync-debt ledger REUSED (lifecycle/sync-debt.py record), no new ledger invented
+  all-ok behaviour unchanged (primary = first configured platform, all platform_ids)
+  all-unreadable still FATAL; explicitly requested unreadable platform fails closed
+  R2 H1 materialization, Q2 created_at compatibility branch, title contract unchanged
+  R7/#4195 (silent empty list) and R11/#4149 (silent write failure) NOT bundled
+  platform write (close/update) per-available-platform execution NOT in this PR
+  (issue fix-plan item 4 covers the pull path's partial-success code only)
