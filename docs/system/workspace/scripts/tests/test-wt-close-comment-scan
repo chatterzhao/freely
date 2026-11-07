@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261107T133328Z / #4221
+# wt-close must not re-implement the comment-resolution rule; both gates must
+# read the same scan so they can never disagree, and system-event comments must
+# never be counted as human input.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+WT_CLOSE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-close"
+SCAN="$ROOT_DIR/docs/system/workspace/scripts/quality/comment-resolution-scan.py"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+RAW_ID="raw-20260101T000000Z"
+FIX=""
+make_fixture() {
+  FIX="$(mktemp -d /tmp/freely-wtclose.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
+  mkdir -p "$FIX/$RAW_ID"
+  printf -- '---\nlocal_id: %s\nkind: raw\n---\n\n## 问题\n\nprobe\n' "$RAW_ID" > "$FIX/$RAW_ID/issue.md"
+}
+
+# Mirrors exactly what wt-close now does: run the scan, then look for this issue id.
+check_like_wt_close() {
+  local out
+  out="$(python3 "$SCAN" "$FIX" 2>&1 || true)"
+  grep -q "^  $RAW_ID:" <<<"$out" && return 1
+  return 0
+}
+
+static_checks() {
+  echo "=== STATIC: wt-close has no second implementation ==="
+  grep -q 'grep -c "\^### comment-"' "$WT_CLOSE" \
+    && bad "wt-close still counts comments itself" \
+    || ok "wt-close no longer counts comments itself"
+  grep -q 'comment-resolution-scan.py' "$WT_CLOSE" \
+    && ok "wt-close delegates to the shared scan" \
+    || bad "wt-close does not use the shared scan"
+  grep -q '\$_((_unresolved' "$WT_CLOSE" \
+    && bad "wt-close still has the broken arithmetic message" \
+    || ok "broken arithmetic message is gone"
+  bash -n "$WT_CLOSE" >/dev/null 2>&1 && ok "wt-close bash -n" || bad "wt-close syntax"
+  python3 -c "import ast; ast.parse(open('$SCAN').read())" 2>/dev/null \
+    && ok "scan parses" || bad "scan syntax"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: same verdict as pr-create ==="
+  make_fixture
+
+  check_like_wt_close && ok "document with no comments passes" || bad "document with no comments blocked"
+
+  # system-event comment only: machine bookkeeping, nothing to adopt/discard
+  printf '\n### comment-20260101T010101Z\n- source: system\n- event: promote_finalized\n\n拆解为以下任务:\n1. [I-20260101T000000Z-A](x)\n' >> "$FIX/$RAW_ID/issue.md"
+  check_like_wt_close && ok "system-event comment alone does not block" \
+    || bad "system-event comment still blocks closeout"
+
+  # human comment: must block
+  printf '\n### comment-20260101T020202Z\n{"source":"human","author":"reviewer"}\n\n请补充证据。\n' >> "$FIX/$RAW_ID/issue.md"
+  check_like_wt_close && bad "human comment without resolution was not blocked" \
+    || ok "human comment without resolution blocks"
+
+  # resolution on the human comment: passes again
+  printf '\n#### resolution-20260101T030303Z\n- status: adopted\n- reason: added evidence\n- resolved_by: probe\n' >> "$FIX/$RAW_ID/issue.md"
+  check_like_wt_close && ok "resolution clears the block" || bad "resolution did not clear the block"
+
+  # both gates agree: the scan verdict is the only source
+  local scan_rc=0
+  python3 "$SCAN" "$FIX" >/dev/null 2>&1 || scan_rc=$?
+  [[ "$scan_rc" == "0" ]] && ok "pr-create scan agrees (rc=0)" || bad "pr-create scan disagrees (rc=$scan_rc)"
+
+  rm -rf "$FIX"; FIX=""
+}
+
+mode="${1:-all}"
+case "$mode" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]" >&2; exit 2 ;;
+esac
+
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ "$FAIL" -eq 0 ]]

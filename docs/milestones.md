@@ -1,3 +1,24 @@
+## M-20261107T133328Z-A
+- title: fix — wt-close 复用单一评论扫描
+- status: active
+### candidate_issues
+1. `C-20261107T133328Z-A`
+- milestone: M-20261107T133328Z-A
+- status: promoted
+- promoted_issue_id: I-20261107T133328Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261107T133328Z/issues/I-20261107T133328Z-A.md
+### committed_issues
+1. `I-20261107T133328Z-A`
+- milestone: M-20261107T133328Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T133328Z/issues/I-20261107T133328Z-A.md
+### completed_issues
+1. `I-20261107T133328Z-A`
+- milestone: M-20261107T133328Z-A
+- phase_state: completed
+- completed_at: 2026-11-07T13:50:00Z
+- issue_path: docs/B2-docs/gate/governance/raw-20261107T133328Z/issues/I-20261107T133328Z-A.md
+
 ## M-20261104T082556Z-A
 - title: fix — issue-sync 能找到 B2 文档，promote 不再必然失败
 - status: active

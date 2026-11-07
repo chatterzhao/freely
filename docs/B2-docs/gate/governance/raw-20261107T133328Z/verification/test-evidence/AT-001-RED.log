@@ -1,0 +1,13 @@
+=== STATIC: wt-close has no second implementation ===
+  [FAIL] wt-close still counts comments itself
+  [FAIL] wt-close does not use the shared scan
+  [FAIL] wt-close still has the broken arithmetic message
+  [ok] wt-close bash -n
+  [ok] scan parses
+=== BEHAVIOR: same verdict as pr-create ===
+  [ok] document with no comments passes
+  [ok] system-event comment alone does not block
+  [ok] human comment without resolution blocks
+  [ok] resolution clears the block
+  [ok] pr-create scan agrees (rc=0)
+SUMMARY: 7 ok, 3 failed
