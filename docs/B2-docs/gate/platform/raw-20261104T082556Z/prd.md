@@ -32,4 +32,4 @@ issue 文档的定位必须与布局无关：无论 raw 在 `docs/B1-docs/` 还�
 
 ## 验收
 
-AT-001 基线快照 RED `4 ok / 12 failed` → GREEN `16 ok / 0 failed`；7 个回归全 MATCH。
+AT-001 基线快照 RED `4 ok / 16 failed` → GREEN `20 ok / 0 failed`；7 个回归全 MATCH。

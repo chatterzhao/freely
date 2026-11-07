@@ -16,10 +16,10 @@
 - evidence_level: integration
 - artifact_ref: docs/system/workspace/scripts/tests/test-issue-sync-promote-b2
 - test_command: bash docs/system/workspace/scripts/tests/test-issue-sync-promote-b2 all
-- expected_output: SUMMARY: 16 ok, 0 failed
-- expected_RED_output: SUMMARY: 12 failed（静态 4：无 `_issue_file_for`、5 处 B1 硬编码、promote 前缀搜索、`platform_state` 无条件写；行为 8：B2 create rc=1、platform_ids 空、promote rc=1、children 空、无 promoted_from、缺失/歧义错误信息不含检查位置与候选）
-- actual_RED_output: develop `d3751870a` 基线快照（`git archive develop -- bin docs`）内放入**最终版** AT-001 —— `SUMMARY: 4 ok, 12 failed`（AT-001-RED.log）：`no _issue_file_for resolver`、`5 command(s) still hard-code the B1 path`、`cmd_promote still prefix-searches the B2 tree`、`platform_state is written unconditionally`、`cmd_create on a B2 document rc=1: [ERROR] .../docs/B1-docs/I-.../issue.md not found`、`promote rc=1` 等
-- actual_output: 工位同一断言 —— `SUMMARY: 16 ok, 0 failed`（AT-001-GREEN.log）
+- expected_output: SUMMARY: 20 ok, 0 failed
+- expected_RED_output: SUMMARY: 16 failed（静态 6：无 `_issue_file_for`、5 处 B1 硬编码、promote 前缀搜索、`platform_state` 无条件写、无共享评论读取、仍依赖 `## Comments` 段落；行为 10：B2 create rc=1、platform_ids 空、promote rc=1、children 空、无 promoted_from、缺失/歧义错误信息不含检查位置与候选、系统事件评论未推到双平台）
+- actual_RED_output: develop `d3751870a` 基线快照（`git archive develop -- bin docs`）内放入**最终版** AT-001 —— `SUMMARY: 4 ok, 16 failed`（AT-001-RED.log）：`no _issue_file_for resolver`、`5 command(s) still hard-code the B1 path`、`cmd_promote still prefix-searches the B2 tree`、`platform_state is written unconditionally`、`cmd_create on a B2 document rc=1: [ERROR] .../docs/B1-docs/I-.../issue.md not found`、`promote rc=1` 等
+- actual_output: 工位同一断言 —— `SUMMARY: 20 ok, 0 failed`（AT-001-GREEN.log）
 - evidence_file: docs/B2-docs/gate/platform/raw-20261104T082556Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log,AT-001-REGRESSION-BASELINE.log
 - red-green-status: green
 - status: passed

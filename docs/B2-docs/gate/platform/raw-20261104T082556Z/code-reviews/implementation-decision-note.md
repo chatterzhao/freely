@@ -6,7 +6,7 @@
 - boundary_non_goals: 不改 close 的四段式与 0/3/1（#4184）；不改生命周期契约与 `_raw_effect`；不改 batch/scan dedup；不改任何平台写语义。
 - residual_risk: ①B2 前缀兜底（`<id>-*.md`）只在精确名缺失时启用，若将来出现 `I-x-A` 与 `I-x-AB` 同存可能被判歧义并拒绝 —— 属预期的 fail-closed。②解析器每次调用做一次 `find`，在 800+ B2 文档下耗时约 30–60ms，`cmd_create/close` 每次仅调用一次，未做缓存（避免陈旧缓存引入更难查的 bug）。③`cmd_status` 等只读命令失败时仍 `exit 1`（与旧行为一致），未改为返回码细分。④歧义场景只能靠人工消歧，本轮未提供自动修复命令。
 - verification: AT-001 develop 基线快照 RED `4 ok / 12 failed` → 工位 GREEN `16 ok / 0 failed`；7 个相关回归 worktree/baseline 退出码全 MATCH；真机用修好的 promote 完成本轮 absorb。
-- self_bootstrap_findings: 本条即 R12 收口时自举发现（promote 对 B2 必然失败）；未发现其他未被 open issue 覆盖的新缺陷。
+- self_bootstrap_findings: 本条即 R12 收口时自举发现（promote 对 B2 必然失败）。**同一轮内追加发现并修复一个连带缺陷**：`promote` / `promote_finalize` 写入的系统事件评论使用 `- key: value` 项目符号元数据且不在 `## Comments` 段落之下，而原读取器要求「`## Comments` 段落 + `{json}` 元数据行」，于是系统评论既判不出「未同步」也抽不出正文 —— 结果 finalize 的「拆解为以下任务」评论只留在本地，`pr-create-guarded` 的副本一致性检查报 `content_diverged` 直接挡下。修法：`_comment_blocks` / `_last_comment_body` 统一解析两种元数据形态，`_has_unsynced_comments` 改为比较最新评论时间戳与 `last_synced_comment_at`。真机修复过程：GitHub 评论推送成功，Gitee 因已关闭而拒绝评论（`当前issue已关闭评论功能`），用 `gitee-issue.py reopen → comment → close` 补齐，随后一致性检查通过。
 
 ## Implementation Decision Note
 - decision: 单一文档解析器（B1 优先/B2 兜底/歧义拒绝）、5 命令 + promote 统一、platform_state 条件写

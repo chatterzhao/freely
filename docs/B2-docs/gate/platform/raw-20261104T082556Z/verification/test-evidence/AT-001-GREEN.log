@@ -3,6 +3,8 @@
   [ok] no command hard-codes the B1 path any more
   [ok] cmd_promote resolves through the shared helper
   [ok] platform_state is written only when declared
+  [ok] comment blocks have one shared reader
+  [ok] comment sync no longer assumes a '## Comments' section
   [ok] issue-sync bash -n
 === BEHAVIOR: B2 documents can be created and promoted ===
   [ok] cmd_create resolves the B2 document and exits 0
@@ -16,4 +18,6 @@
   [ok] missing document reports what was checked
   [ok] ambiguous document fails (rc=1)
   [ok] ambiguity is reported with both candidates
-SUMMARY: 16 ok, 0 failed
+  [ok] promote's event comment reached GitHub
+  [ok] promote's event comment reached Gitee
+SUMMARY: 20 ok, 0 failed

@@ -194,6 +194,11 @@ PY
   grep -q '_fm_has_key "$file" "platform_state"' "$ISSUE_SYNC" && ok "platform_state is written only when declared" \
     || bad "platform_state is written unconditionally"
 
+  grep -q '^_comment_blocks() {' "$ISSUE_SYNC" && grep -q '^_last_comment_body() {' "$ISSUE_SYNC" \
+    && ok "comment blocks have one shared reader" || bad "comment readers are missing"
+  grep -q "split('## Comments'" "$ISSUE_SYNC" && bad "comment sync still requires a '## Comments' section" \
+    || ok "comment sync no longer assumes a '## Comments' section"
+
   bash -n "$ISSUE_SYNC" >/dev/null 2>&1 && ok "issue-sync bash -n" || bad "issue-sync syntax"
 }
 
@@ -244,6 +249,20 @@ behavior_checks() {
   [[ -n "$rc" && "$rc" != "0" ]] && ok "ambiguous document fails (rc=$rc)" || bad "ambiguous document rc=${rc:-<none>}: $out"
   grep -q "ambiguous issue document" <<<"$out" && ok "ambiguity is reported with both candidates" \
     || bad "ambiguity not reported: $out"
+
+  # 5) system-event comments must reach the platforms
+  make_fixture
+  run_sync cmd_promote "$RAW_ID" "$I_ID" >/dev/null
+  # The promoted_from comment lives on the I-* document; it must reach the I-*
+  # platform issue (bullet metadata + no '## Comments' heading).
+  out=$(run_sync cmd_comment "$I_ID")
+  local gh_comments gitee_comments
+  gh_comments=$(grep -c 'issue comment' "$STUB_LOG.gh" 2>/dev/null || true)
+  gitee_comments=$(grep -c '"comment"' "$STUB_LOG" 2>/dev/null || true)
+  [[ "${gh_comments:-0}" -ge 1 ]] && ok "promote's event comment reached GitHub" \
+    || bad "no GitHub comment call was made"
+  [[ "${gitee_comments:-0}" -ge 1 ]] && ok "promote's event comment reached Gitee" \
+    || bad "no Gitee comment call was made"
 
   rm -rf "$FIX"; FIX=""
 }
