@@ -1,0 +1,23 @@
+=== STATIC: one writer, no daemon impersonation ===
+  [ok] daemon-owned test-gate writer is gone
+  [ok] the file path literal lives only in _test_gate_file
+  [ok] _test_gate_write is defined once and called once (cmd_test_gate_record)
+  [ok] test-gate record is wired into the dispatcher
+  [ok] usage documents the record command
+  [ok] runtime bash -n
+=== BEHAVIOR: record is explicit, validated and fail-closed ===
+  [ok] record completed exits 0
+  [ok] TEST_STATUS=completed is written
+  [ok] LAST_TESTED_COMMIT records HEAD
+  [ok] LAST_TESTED_AT is a real timestamp
+  [ok] record started exits 0
+  [ok] started records no commit
+  [ok] started -> completed is recorded
+  [ok] unknown status is rejected with rc 2
+  [ok] unknown --commit is rejected with rc 2
+  [ok] rejected commit leaves the file untouched
+  [ok] non-test worktree is refused with rc 2
+  [ok] refusal writes no test-gate.env
+  [ok] cwd default target records in place
+  [ok] atomic write leaves no temp file
+SUMMARY: 20 ok, 0 failed
