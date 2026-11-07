@@ -1,0 +1,33 @@
+=== STATIC: verdict is a real contract ===
+  [ok] shared verdict helper exists
+  [ok] helper parses list-item verdict
+  [ok] helper strips bold markers
+  [ok] merge guard delegates to the shared verdict contract
+  [ok] merge guard carries no second verdict regex
+  [ok] merge guard blocks with an explicit reason
+  [ok] merge guard no longer prints pass on mere existence
+  [ok] merge guard announces pass only for verdict=pass
+  [ok] review guard default is not pass
+  [ok] review guard default is needs_changes
+  [ok] review guard requires reason for override
+  [ok] review doc carries verdict line
+  [ok] gate completed branch no longer bare continue
+  [ok] gate checks verdict for completed
+  [ok] gate uses the shared verdict parser
+  [ok] gate requires an issue-bound review for completed
+  [ok] static contract
+  [ok] merge guard bash -n
+  [ok] review guard bash -n
+=== BEHAVIOR: verdict parsing + fail-closed ===
+  [ok] CASE A: fail verdict parsed
+  [ok] CASE B: missing verdict -> unknown
+  [ok] CASE C: bold pass accepted (history compatible)
+  [ok] CASE D: bare verdict: pass accepted
+  [ok] CASE E: needs_changes parsed
+  [ok] CASE G: verdict=fail blocked by merge decision
+  [ok] CASE H: verdict=pass allowed (history-compatible bold form)
+  [ok] CASE I: review without verdict blocked (fail-closed)
+  [ok] CASE J: needs_changes blocked by merge decision
+  census: 401 review docs, 399 with verdict, 0 unparseable
+  [ok] CASE F: all real review docs parse (no self-lock)
+SUMMARY: 13 ok, 0 failed

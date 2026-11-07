@@ -1,0 +1,23 @@
+=== STATIC: verdict is a real contract ===
+  [FAIL] shared verdict helper exists
+  [FAIL] helper parses list-item verdict
+  [FAIL] helper strips bold markers
+  [FAIL] merge guard delegates to the shared verdict contract
+  [ok] merge guard carries no second verdict regex
+  [FAIL] merge guard blocks with an explicit reason
+  [FAIL] merge guard no longer prints pass on mere existence
+  [FAIL] merge guard announces pass only for verdict=pass
+  [FAIL] review guard default is not pass
+  [FAIL] review guard default is needs_changes
+  [ok] review guard requires reason for override
+  [ok] review doc carries verdict line
+  [FAIL] gate completed branch no longer bare continue
+  [FAIL] gate checks verdict for completed
+  [FAIL] gate uses the shared verdict parser
+  [FAIL] gate requires an issue-bound review for completed
+  [FAIL] static contract (see above)
+  [ok] merge guard bash -n
+  [ok] review guard bash -n
+=== BEHAVIOR: verdict parsing + fail-closed ===
+  [FAIL] helper missing (cannot test parsing)
+SUMMARY: 2 ok, 2 failed

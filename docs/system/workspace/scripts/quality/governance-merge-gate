@@ -22,6 +22,24 @@ if str(_QUALITY_DIR) not in sys.path:
     sys.path.insert(0, str(_QUALITY_DIR))
 from governance_repo_view import RepoView
 
+# Single verdict parser shared with pr-review-guarded (write side) and
+# pr-merge-guarded (read side). A second copy of this regex is exactly the
+# drift #4150 / #4154 are about.
+_WORKTREE_SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "worktree"
+if str(_WORKTREE_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_WORKTREE_SCRIPTS_DIR))
+try:
+    from review_verdict import parse_verdict as parse_review_verdict
+except Exception as _verdict_import_error:  # pragma: no cover - broken install
+    print(
+        f"[governance-merge-gate] WARNING: review_verdict module unavailable ({_verdict_import_error}); "
+        "review verdicts resolve to 'unknown' and completed issues will fail closed.",
+        file=sys.stderr,
+    )
+
+    def parse_review_verdict(text: str) -> str:  # type: ignore[misc]
+        return "unknown"
+
 try:
     import tomllib
 except ImportError:
@@ -679,6 +697,36 @@ def parse_review_file(rel_path: str) -> ReviewRecord:
         issue_path=issue_path,
         decision_note_fields=decision_note_fields,
     )
+
+
+def review_verdict_of(rel_path: str) -> str:
+    """Verdict declared by one review artifact (`unknown` when unreadable)."""
+    try:
+        return parse_review_verdict(read_repo_text(rel_path))
+    except Exception:
+        return "unknown"
+
+
+def issue_bound_reviews(
+    owner_issue: "IssueRecord",
+    verification_dir: str,
+    review_records_list: List[ReviewRecord],
+) -> List[ReviewRecord]:
+    """Review artifacts attributable to one owner issue.
+
+    Attribution is by `verification_artifact_dir` first, then by the explicit
+    `issue_id` / `issue_path` fields the review document declares.
+    """
+    normalized_dir = verification_dir.rstrip("/") if verification_dir else ""
+    bound: List[ReviewRecord] = []
+    for review in review_records_list:
+        if normalized_dir and review.path.startswith(f"{normalized_dir}/"):
+            bound.append(review)
+        elif owner_issue.issue_id and review.issue_id == owner_issue.issue_id:
+            bound.append(review)
+        elif review.issue_path and review.issue_path == owner_issue.path:
+            bound.append(review)
+    return bound
 
 
 def parse_milestones() -> List[MilestoneEntry]:
@@ -1760,9 +1808,41 @@ def main() -> int:
 
             verification_dir = normalize_scalar(owner_issue.verification_artifact_dir or "")
 
-            # 对于已完成的 issue，豁免 review artifact 要求（历史遗留问题）
+            # `completed` used to be a wholesale exemption (#4150): passing review
+            # flipped done_b2_ibm → completed, and completed switched the review
+            # requirement back off, so "was reviewed" itself removed the need for
+            # review evidence. The exemption now only covers the
+            # verification_artifact_dir bookkeeping many legacy issues never
+            # recorded — the review artifact and its verdict are still required.
             phase = normalized_phase(owner_issue.phase_state)
             if phase == "completed":
+                completed_reviews = issue_bound_reviews(
+                    owner_issue, verification_dir, review_records
+                )
+                if not completed_reviews:
+                    errors.append(
+                        f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state 'completed' but the develop-bound diff carries no review artifact tied to it. "
+                        f"Stage the issue-bound review (with a `- verdict: pass` line) so completion is backed by real review evidence."
+                    )
+                    continue
+                contradicted = [
+                    (review.path, review_verdict_of(review.path))
+                    for review in completed_reviews
+                    if review_verdict_of(review.path) in {"fail", "needs_changes"}
+                ]
+                if contradicted:
+                    errors.append(
+                        f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} is marked completed, but its review artifact declares a non-pass verdict: "
+                        + ", ".join(f"{path} ({verdict})" for path, verdict in sorted(contradicted))
+                        + ". An explicit failing review cannot be outvoted by the completed phase."
+                    )
+                elif not any(
+                    review_verdict_of(review.path) == "pass" for review in completed_reviews
+                ):
+                    errors.append(
+                        f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state 'completed' but none of its bound review artifacts declares a verdict (expected `- verdict: pass`). "
+                        f"Artifacts: {', '.join(sorted(review.path for review in completed_reviews))}."
+                    )
                 continue
 
             if not verification_dir:

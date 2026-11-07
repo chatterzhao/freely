@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# AT-001 — raw-20261103T132540Z / #4150
+# The merge gate must read the review VERDICT, not merely the file's existence.
+#
+# Boundaries (must stay green):
+#  - all 401 real review docs (incl `- verdict: **pass**` bold form used by
+#    R1..R9.5) must still parse to a definite verdict
+#  - `-- dry-run` must not require a review file (unchanged behaviour)
+#  - governance-merge-gate --range must still pass for a completed issue whose
+#    review artifact is present with verdict=pass
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR" || exit 1
+HELPER="$ROOT_DIR/docs/system/workspace/scripts/worktree/review-verdict.sh"
+# The parse logic lives in the Python single source of truth; the .sh is a thin
+# wrapper. Static asserts about parsing must look at both halves.
+MODULE="$ROOT_DIR/docs/system/workspace/scripts/worktree/review_verdict.py"
+MERGE_GUARD="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-merge-guarded"
+REVIEW_GUARD="$ROOT_DIR/bin/pr-review-guarded"
+GATE="$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate"
+PASS=0; FAIL=0
+ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
+bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
+
+static_checks() {
+  echo "=== STATIC: verdict is a real contract ==="
+  python3 - "$HELPER" "$MODULE" "$MERGE_GUARD" "$REVIEW_GUARD" "$GATE" <<'PY'
+import sys
+from pathlib import Path
+helper_path, module_path, merge_path, review_path, gate_path = [Path(x) for x in sys.argv[1:]]
+helper = helper_path.read_text(encoding="utf-8") if helper_path.is_file() else ""
+module = module_path.read_text(encoding="utf-8") if module_path.is_file() else ""
+h = helper + "\n" + module
+m = merge_path.read_text(encoding="utf-8")
+r = review_path.read_text(encoding="utf-8")
+g = gate_path.read_text(encoding="utf-8")
+checks = [
+    ("shared verdict helper exists", helper_path.is_file() and module_path.is_file()),
+    ("helper parses list-item verdict", "- verdict:" in h or "verdict:" in h),
+    ("helper strips bold markers", "**" in h or "strip" in h),
+    ("merge guard delegates to the shared verdict contract",
+     "freely_review_verdict_check" in m),
+    ("merge guard carries no second verdict regex",
+     "verdict[[:space:]]*:" not in m and "verdict\\\\s*:" not in m),
+    ("merge guard blocks with an explicit reason",
+     "Merge blocked: review verdict is not 'pass'" in m),
+    ("merge guard no longer prints pass on mere existence",
+     "[MERGE-GUARD] PR review: pass" not in m),
+    ("merge guard announces pass only for verdict=pass",
+     "[MERGE-GUARD] PR review: verdict=pass" in m),
+    ("review guard default is not pass", '_review_verdict="pass"' not in r),
+    ("review guard default is needs_changes", '_review_verdict="needs_changes"' in r),
+    ("review guard requires reason for override", "verdict_reason" in r and "--reason" in r),
+    ("review doc carries verdict line", "- verdict:" in r),
+    ("gate completed branch no longer bare continue",
+     "phase == \"completed\":\n                continue" not in g),
+    ("gate checks verdict for completed", "verdict" in g and "completed" in g),
+    ("gate uses the shared verdict parser", "parse_review_verdict" in g),
+    ("gate requires an issue-bound review for completed",
+     "issue_bound_reviews" in g),
+]
+failed = 0
+for label, good in checks:
+    print(("  [ok] " if good else "  [FAIL] ") + label)
+    if not good:
+        failed += 1
+sys.exit(1 if failed else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "static contract"; else bad "static contract (see above)"; fi
+  bash -n "$MERGE_GUARD" >/dev/null 2>&1 && ok "merge guard bash -n" || bad "merge guard syntax"
+  bash -n "$REVIEW_GUARD" >/dev/null 2>&1 && ok "review guard bash -n" || bad "review guard syntax"
+}
+
+behavior_checks() {
+  echo "=== BEHAVIOR: verdict parsing + fail-closed ==="
+  local TMP F RC
+
+  if [[ ! -f "$HELPER" ]]; then
+    bad "helper missing (cannot test parsing)"
+    return
+  fi
+
+  # CASE A: verdict: fail -> parser returns fail; merge guard would reject.
+  TMP="$(mktemp -d /tmp/freely-r10a.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '---\nissue_id: I-X\n---\n\n- verdict: fail\n' > "$F"
+  if [[ "$(source "$HELPER"; freely_parse_review_verdict "$F")" == "fail" ]]; then ok "CASE A: fail verdict parsed"; else bad "CASE A: fail verdict not parsed"; fi
+  rm -rf "$TMP"
+
+  # CASE B: missing verdict -> unknown (caller must fail closed).
+  TMP="$(mktemp -d /tmp/freely-r10b.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '# PR Review\n\nNo verdict here.\n' > "$F"
+  if [[ "$(source "$HELPER"; freely_parse_review_verdict "$F")" == "unknown" ]]; then ok "CASE B: missing verdict -> unknown"; else bad "CASE B: missing verdict mis-parsed"; fi
+  rm -rf "$TMP"
+
+  # CASE C: `- verdict: **pass**` (bold, R1..R9.5) -> pass (no self-lock).
+  TMP="$(mktemp -d /tmp/freely-r10c.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '---\nissue_id: I-X\nphase_state: completed\n---\n\n- verdict: **pass**\n' > "$F"
+  if [[ "$(source "$HELPER"; freely_parse_review_verdict "$F")" == "pass" ]]; then ok "CASE C: bold pass accepted (history compatible)"; else bad "CASE C: bold pass rejected (self-lock)"; fi
+  rm -rf "$TMP"
+
+  # CASE D: bare frontmatter `verdict: pass` -> pass.
+  TMP="$(mktemp -d /tmp/freely-r10d.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '---\nverdict: pass\n---\n\n# review\n' > "$F"
+  if [[ "$(source "$HELPER"; freely_parse_review_verdict "$F")" == "pass" ]]; then ok "CASE D: bare verdict: pass accepted"; else bad "CASE D: bare pass rejected"; fi
+  rm -rf "$TMP"
+
+  # CASE E: needs_changes -> not pass.
+  TMP="$(mktemp -d /tmp/freely-r10e.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '- verdict: needs_changes\n' > "$F"
+  if [[ "$(source "$HELPER"; freely_parse_review_verdict "$F")" == "needs_changes" ]]; then ok "CASE E: needs_changes parsed"; else bad "CASE E: needs_changes mis-parsed"; fi
+  rm -rf "$TMP"
+
+  # CASE G..J: the merge-gate DECISION (the exact function pr-merge-guarded
+  # calls), not just the parser. This is the behaviour the issue is about.
+  TMP="$(mktemp -d /tmp/freely-r10g.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '# PR Review\n\n- verdict: fail\n\nReviewer found a correctness bug.\n' > "$F"
+  if ( source "$HELPER"; freely_review_verdict_check "$F" "gate-fail" ) >/dev/null 2>&1; then
+    bad "CASE G: verdict=fail was allowed through the merge decision"
+  else
+    ok "CASE G: verdict=fail blocked by merge decision"
+  fi
+  rm -rf "$TMP"
+
+  TMP="$(mktemp -d /tmp/freely-r10h.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '- verdict: **pass**\n' > "$F"
+  if ( source "$HELPER"; freely_review_verdict_check "$F" "gate-pass" ) >/dev/null 2>&1; then
+    ok "CASE H: verdict=pass allowed (history-compatible bold form)"
+  else
+    bad "CASE H: verdict=pass wrongly blocked (self-lock)"
+  fi
+  rm -rf "$TMP"
+
+  TMP="$(mktemp -d /tmp/freely-r10i.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '# PR Review\n\nNothing declared.\n' > "$F"
+  if ( source "$HELPER"; freely_review_verdict_check "$F" "gate-unknown" ) >/dev/null 2>&1; then
+    bad "CASE I: review without verdict was allowed through"
+  else
+    ok "CASE I: review without verdict blocked (fail-closed)"
+  fi
+  rm -rf "$TMP"
+
+  TMP="$(mktemp -d /tmp/freely-r10j.XXXXXX)"; TMP="$(cd "$TMP" && pwd -P)"; F="$TMP/review.md"
+  printf -- '- verdict: needs_changes\n- reason: missing adequacy evidence\n' > "$F"
+  if ( source "$HELPER"; freely_review_verdict_check "$F" "gate-needs-changes" ) >/dev/null 2>&1; then
+    bad "CASE J: needs_changes was allowed through"
+  else
+    ok "CASE J: needs_changes blocked by merge decision"
+  fi
+  rm -rf "$TMP"
+
+  # CASE F: census over REAL review docs — every file that has a verdict line
+  # must parse to a definite value (no accidental self-lock on history).
+  python3 - "$HELPER" "$ROOT_DIR" <<'PY'
+import sys, subprocess
+from pathlib import Path
+helper, root = Path(sys.argv[1]), Path(sys.argv[2])
+files = sorted((root / "docs/B2-docs").rglob("pr-review-*.md"))
+with_verdict = [f for f in files if "verdict:" in f.read_text(encoding="utf-8", errors="replace")]
+bad = []
+for f in with_verdict:
+    p = subprocess.run(
+        ["bash", "-c", f'source "{helper}"; freely_parse_review_verdict "{f}"'],
+        capture_output=True, text=True)
+    value = p.stdout.strip()
+    if value not in {"pass", "fail", "needs_changes"}:
+        bad.append((f.name, value))
+print(f"  census: {len(files)} review docs, {len(with_verdict)} with verdict, {len(bad)} unparseable")
+for name, value in bad[:5]:
+    print(f"    [FAIL] {name} -> {value!r}")
+sys.exit(1 if bad else 0)
+PY
+  if [[ $? -eq 0 ]]; then ok "CASE F: all real review docs parse (no self-lock)"; else bad "CASE F: real review docs unparseable"; fi
+}
+
+case "${1:-all}" in
+  static)   static_checks ;;
+  behavior) behavior_checks ;;
+  all)      static_checks; behavior_checks ;;
+  *) echo "usage: $0 [static|behavior|all]"; exit 2 ;;
+esac
+echo "SUMMARY: $PASS ok, $FAIL failed"
+[[ $FAIL -eq 0 ]] || exit 1

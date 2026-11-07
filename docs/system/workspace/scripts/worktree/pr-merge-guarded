@@ -13,6 +13,10 @@ if [[ -z "${PROJECT_ROOT:-}" ]]; then
 fi
 cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&2; exit 1; }
 
+# Shared verdict contract (#4150): the merge gate must READ the review
+# verdict, not treat "file exists" as "review passed".
+source "$PROJECT_ROOT/docs/system/workspace/scripts/worktree/review-verdict.sh" 2>/dev/null || true
+
 usage() {
   cat <<'USAGE'
 Usage:
@@ -621,12 +625,33 @@ do_initial_merge() {
     _raw_key=$(echo "$source_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
     if [[ -n "$_raw_key" ]]; then
       _review_file="$(find docs/B2-docs -name "pr-review-raw-${_raw_key}.md" 2>/dev/null | head -1 || true)"
-      if [[ -z "$_review_file" ]]; then
-        git fetch github "$source_branch" 2>/dev/null || true
-        _review_file="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-raw-${_raw_key}.md" | head -1 || true)"
+      _review_text=""
+      if [[ -n "$_review_file" && -f "$_review_file" ]]; then
+        _review_text="$(cat "$_review_file")"
       fi
-      [[ -z "$_review_file" ]] && { echo "[MERGE-GUARD] PR review missing. Run pr-review-guarded first." >&2; exit 1; }
-      echo "[MERGE-GUARD] PR review: pass ✓"
+      if [[ -z "$_review_text" ]]; then
+        git fetch github "$source_branch" 2>/dev/null || true
+        _remote_review="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-raw-${_raw_key}.md" | head -1 || true)"
+        if [[ -n "$_remote_review" ]]; then
+          _review_file="$_remote_review"
+          _review_text="$(git show "refs/remotes/github/$source_branch:$_remote_review" 2>/dev/null || true)"
+        fi
+      fi
+      [[ -z "$_review_text" ]] && { echo "[MERGE-GUARD] PR review missing. Run pr-review-guarded first." >&2; exit 1; }
+      # Only a literal `pass` verdict may merge. The decision lives in the
+      # shared helper (same parser the write side uses), so "file exists" can
+      # never stand in for "review passed" again (#4150).
+      if ! declare -f freely_review_verdict_check >/dev/null 2>&1; then
+        echo "[MERGE-GUARD] ERROR: verdict helper unavailable ($PROJECT_ROOT/docs/system/workspace/scripts/worktree/review-verdict.sh). Refusing to merge without a verdict contract." >&2
+        exit 1
+      fi
+      if ! printf '%s\n' "$_review_text" | freely_review_verdict_check - "pr-review-raw-${_raw_key}.md"; then
+        echo "[MERGE-GUARD] Merge blocked: review verdict is not 'pass'." >&2
+        echo "[MERGE-GUARD] review file: $_review_file" >&2
+        echo "[MERGE-GUARD] Re-run pr-review-guarded and address the review before merging." >&2
+        exit 1
+      fi
+      echo "[MERGE-GUARD] PR review: verdict=pass ✓"
     fi
   fi
   # ── Local↔Remote sync check: local branch must match what's in the PR ──

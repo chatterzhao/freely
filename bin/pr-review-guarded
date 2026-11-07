@@ -13,7 +13,9 @@ review_branch=""
 # Usage:
 #   freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
 #
-# --reason gate: when --verdict pass overrides failing review, --reason is required.
+# --reason gate: every --verdict override requires --reason; the reason is
+#                recorded in the review document. Unknown review outcomes are
+#                `needs_changes`, never `pass` (#4150).
 
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
@@ -44,21 +46,44 @@ while [[ $# -gt 0 ]]; do
     --slot) REVIEWER_SLOT="${2:-}"; shift 2 ;;
     --help|-h)
       cat >&2 <<'HELPMSG'
-Usage: freely pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail] [--reason <text>]
+Usage: freely pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail|needs_changes --reason <text>]
 
 Launches TDD Reviewer via ACP for independent four-question review.
 Loops until pass (with Worker fixes between rounds) or escalates after 3 rounds.
 
 Options:
   --slot <name>     Reviewer AI slot (default: from agent-table reviewer_slot)
-  --verdict <value> Override verdict (pass|fail)
-  --reason <text>   REQUIRED when overriding
+  --verdict <value> Override verdict (pass|fail|needs_changes)
+  --reason <text>   REQUIRED with --verdict; recorded in the review doc
 HELPMSG
       exit 0 ;;
     -*) echo "Unknown: $1" >&2; exit 1 ;;
     *) review_branch="$1"; shift ;;
   esac
 done
+
+# ── --verdict override contract (#4150) ───────────────────
+# An override is an explicit human decision, so it must be explainable:
+#   * only the three contract values are accepted
+#   * `--verdict` without `--reason` is rejected — an unexplained override is
+#     exactly the hole that let "pass" be self-issued
+#   * `--reason` without `--verdict` is rejected (dangling justification)
+if [[ -n "$verdict_override" ]]; then
+  case "$verdict_override" in
+    pass|fail|needs_changes) ;;
+    *)
+      echo "ERROR: --verdict must be one of: pass | fail | needs_changes (got '$verdict_override')" >&2
+      exit 2
+      ;;
+  esac
+  if [[ -z "$verdict_reason" ]]; then
+    echo "ERROR: --verdict $verdict_override requires --reason <text>: an override without a recorded reason is not a review." >&2
+    exit 2
+  fi
+elif [[ -n "$verdict_reason" ]]; then
+  echo "ERROR: --reason is only valid together with --verdict." >&2
+  exit 2
+fi
 
 if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
@@ -320,17 +345,33 @@ if [[ "$_identity_kind" == "owner" ]]; then
   _acp_unavailable_reason="owner lane: no delegated worker session"
 fi
 
+# A verdict override only makes sense when an independent reviewer ran. In
+# manual mode there is nothing to override: rejecting here is stricter (and
+# more honest) than silently ignoring the flag while the run still ends in
+# `manual_required` (#4150).
+if [[ -n "$verdict_override" && "$_acp_available" != "1" ]]; then
+  echo "ERROR: --verdict override is not available in manual-review mode (${_acp_unavailable_reason})." >&2
+  echo "       Manual mode means no independent reviewer ran; record the verdict with its justification" >&2
+  echo "       in $review_file instead." >&2
+  exit 2
+fi
+
 # Only try freely-review or raw ACP if bridge is actually available
 if [[ "$_acp_available" == "1" ]]; then
   echo "ACP bridge: $_acp_bridge_socket (freely PID $_freely_pid)"
 
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
     # freely-review launches reviewer agent with full context.
-    if [[ "$verdict_override" == "pass" && -n "$verdict_reason" ]]; then
-      _review_verdict="pass"
+    if [[ -n "$verdict_override" ]]; then
+      # Explicit, reason-bearing override (#4150). The reason is persisted into
+      # the review document below so the override is auditable.
+      _review_verdict="$verdict_override"
+      echo "Verdict override: $_review_verdict (reason: $verdict_reason)"
     else
       _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
-      _review_verdict="pass"
+      # "Cannot decide" (timeout / empty output / unrecognised verdict) must no
+      # longer read as a pass: the default is needs_changes (#4150).
+      _review_verdict="needs_changes"
       if [[ "${_freely_rc:-0}" -ne 0 ]]; then
         _review_verdict="fail"
       fi
@@ -342,6 +383,12 @@ if [[ "$_acp_available" == "1" ]]; then
       echo "Review PASSED"
       # Update I-* phase_state → completed (before commit, so it flows into merge)
       _update_issue_phase_state "$_raw_key"
+      if [[ -n "$verdict_override" ]] && [[ -f "$ROOT_DIR/$review_file" ]]; then
+        # Persist the override justification next to the verdict it explains.
+        if ! grep -qF -- "- verdict_override_reason:" "$ROOT_DIR/$review_file" 2>/dev/null; then
+          printf -- '\n- verdict_override_reason: %s\n' "$verdict_reason" >> "$ROOT_DIR/$review_file"
+        fi
+      fi
       if [[ -f "$ROOT_DIR/$review_file" ]]; then
         git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
         if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
@@ -546,6 +593,10 @@ if [[ "$_review_verdict" == "pass" ]]; then
   # Write review document
   _now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   _review_summary=$(echo "$_review_json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('summary','TDD review passed'))" 2>/dev/null || echo "TDD review passed")
+  _override_trace=""
+  if [[ -n "$verdict_override" ]]; then
+    _override_trace="- verdict_override_reason: $verdict_reason"
+  fi
 
   cat > "$review_file" << REVIEWDOC
 # PR Review: #$pr_number
@@ -557,6 +608,7 @@ if [[ "$_review_verdict" == "pass" ]]; then
 - verdict: pass
 - rounds: $_review_round
 - issue_id: $_issue_id
+$_override_trace
 
 ## TDD Review ($_review_round rounds)
 - verdict: pass

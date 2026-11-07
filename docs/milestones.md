@@ -1,3 +1,19 @@
+## M-20261103T132540Z-A
+- title: fix — 合并门禁读 verdict，评审判定不再默认通过
+- status: active
+### candidate_issues
+1. `C-20261103T132540Z-A`
+- milestone: M-20261103T132540Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132540Z-A
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md
+### committed_issues
+1. `I-20261103T132540Z-A`
+- milestone: M-20261103T132540Z-A
+- phase_state: done_b2_ibm
+- issue_path: docs/B2-docs/gate/governance/raw-20261103T132540Z/issues/I-20261103T132540Z-A.md
+### completed_issues
+
 ## M-20261107T090847Z-A
 - title: fix — 两代 receipt 兼容 + 审计链总能跑完
 - status: active
