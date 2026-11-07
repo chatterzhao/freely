@@ -16,15 +16,18 @@ subject="$(head -n1 "$commit_msg_file" | sed 's/^[[:space:]]*//' | sed 's/[[:spa
 subject_len="${#subject}"
 
 [[ -n "$subject" ]] || {
-  cat <<MSG
+  cat >&2 <<MSG
 [HOOK] Commit blocked: empty subject line.
 MSG
   exit 1
 }
 
 is_protected_branch() {
+  # Receipt-gated merges are ONLY main/develop. test-pre-merge-* is a
+  # discardable sandbox: every round syncs dev commits into it with a plain
+  # merge, so requiring a guarded-merge receipt there would block all work.
   case "$1" in
-    main|develop|test-pre-merge-*) return 0 ;;
+    main|develop) return 0 ;;
   esac
   return 1
 }
@@ -43,7 +46,7 @@ is_merge_commit() {
 
 if ! is_merge_commit; then
   if [[ "$subject_len" -gt 100 ]]; then
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: subject line exceeds 100 characters ($subject_len).
 MSG
     exit 1
@@ -52,7 +55,7 @@ MSG
   fi
 
   if [[ "$subject" =~ \.$ ]]; then
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: subject line must not end with a period.
 MSG
     exit 1
@@ -62,7 +65,7 @@ MSG
   if [[ "$total_lines" -gt 1 ]]; then
     second_line="$(sed -n '2p' "$commit_msg_file")"
     if [[ -n "${second_line}" ]]; then
-      cat <<MSG
+      cat >&2 <<MSG
 [HOOK] Commit blocked: second line must be blank (separate subject from body).
 MSG
       exit 1
@@ -70,7 +73,7 @@ MSG
   fi
 
   if grep -q '[[:space:]]$' "$commit_msg_file"; then
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: trailing whitespace detected.
 MSG
     exit 1
@@ -80,12 +83,15 @@ MSG
 fi
 
 if is_protected_branch "$branch"; then
-  merge_path="$(printf '%s\n' "$msg" | grep -E '^Freely-Merge-Path:' | tail -1 | sed 's/^Freely-Merge-Path: *//')"
-  bypass_mode="$(printf '%s\n' "$msg" | grep -E '^Freely-Bypass-Mode:' | tail -1 | sed 's/^Freely-Bypass-Mode: *//')"
-  source_branch_t="$(printf '%s\n' "$msg" | grep -E '^Freely-Source-Branch:' | tail -1 | sed 's/^Freely-Source-Branch: *//')"
+  # sed (not grep|tail): with `set -euo pipefail`, a missing trailer made the
+  # grep pipeline fail and aborted the hook BEFORE printing any rejection
+  # reason. sed always succeeds and yields an empty string when absent.
+  merge_path="$(printf '%s\n' "$msg" | sed -n 's/^Freely-Merge-Path: *//p' | tail -1)"
+  bypass_mode="$(printf '%s\n' "$msg" | sed -n 's/^Freely-Bypass-Mode: *//p' | tail -1)"
+  source_branch_t="$(printf '%s\n' "$msg" | sed -n 's/^Freely-Source-Branch: *//p' | tail -1)"
 
   [[ -n "$merge_path" ]] || {
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Merge-Path trailer.
 MSG
     exit 1
@@ -94,7 +100,7 @@ MSG
   case "$merge_path" in
     pr-merge-guarded|pr-merge-guarded-complete) ;;
     *)
-      cat <<MSG
+      cat >&2 <<MSG
 [HOOK] Commit blocked: invalid Freely-Merge-Path '$merge_path'.
 Valid: pr-merge-guarded, pr-merge-guarded-complete
 MSG
@@ -103,7 +109,7 @@ MSG
   esac
 
   [[ -n "$bypass_mode" ]] || {
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Bypass-Mode trailer.
 MSG
     exit 1
@@ -112,7 +118,7 @@ MSG
   case "$bypass_mode" in
     forbidden) ;;
     *)
-      cat <<MSG
+      cat >&2 <<MSG
 [HOOK] Commit blocked: invalid Freely-Bypass-Mode '$bypass_mode'.
 Valid: forbidden
 MSG
@@ -121,10 +127,48 @@ MSG
   esac
 
   [[ -n "$source_branch_t" ]] || {
-    cat <<MSG
+    cat >&2 <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Source-Branch trailer.
 MSG
     exit 1
   }
+
+  # Trailers are just text. Independently require the CONTROLLED handshake
+  # written by `freely pr-merge-guarded`: FREELY_GUARDED_MERGE_COMPLETION=1
+  # plus a matching freely-guarded-merge-state file in git-dir. Without it a
+  # hand merge with self-filled trailers is still rejected.
+  if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
+    cat >&2 <<MSG
+[HOOK] Commit blocked: protected branch merge lacks the controlled handshake.
+Use: freely pr-merge-guarded develop <source-branch>
+MSG
+    exit 1
+  fi
+
+  _state_file="$git_dir/freely-guarded-merge-state"
+  if [[ ! -f "$_state_file" ]]; then
+    cat >&2 <<MSG
+[HOOK] Commit blocked: guarded merge completion state is missing.
+Re-run the merge through freely pr-merge-guarded.
+MSG
+    exit 1
+  fi
+  _state_source="$(sed -n 's/^source_branch=//p' "$_state_file" | tail -1)"
+  _state_target="$(sed -n 's/^target_branch=//p' "$_state_file" | tail -1)"
+  _state_bypass="$(sed -n 's/^bypass_mode=//p' "$_state_file" | tail -1)"
+  if [[ -z "$_state_source" || -z "$_state_target" || -z "$_state_bypass" ]]; then
+    cat >&2 <<MSG
+[HOOK] Commit blocked: guarded merge completion state is malformed.
+MSG
+    exit 1
+  fi
+  if [[ "$_state_target" != "$branch" || "$_state_source" != "$source_branch_t" ]]; then
+    cat >&2 <<MSG
+[HOOK] Commit blocked: guarded merge completion state does not match this merge
+  state target='$_state_target' source='$_state_source'
+  message source='$source_branch_t' branch='$branch'
+MSG
+    exit 1
+  fi
 
 fi

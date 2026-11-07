@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || { cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P; })"
+HOOK_NAME="$(basename "$0")"
+# Prefer in-repo hook scripts (freely self-development)
+if [[ -f "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
+  exec bash "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
+fi
+# Fall back to installed freely (external projects)
+FREELY_HOME="$(sed -n 's/^FREELY_HOME = "\(.*\)"$/\1/p' "$ROOT_DIR/.freely/config.toml" 2>/dev/null || true)"
+if [[ -n "${FREELY_HOME:-}" && -f "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
+  exec bash "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
+fi
+# 0 = pass, 1 = fail, 2 = environment unusable (treated as NOT passing).
+# A missing hook truth script is an environment failure, never a pass.
+echo "[HOOK] BLOCKED: ${HOOK_NAME} truth script missing (checked in-repo and FREELY_HOME)." >&2
+echo "[HOOK] git hooks are mandatory; restore docs/system/workspace/hooks/${HOOK_NAME}.sh." >&2
+exit 2
