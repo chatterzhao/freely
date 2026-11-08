@@ -69,7 +69,7 @@ class PlatformHandler(ABC):
     def detect(self) -> bool: ...
     def detect_repo(self) -> str: return ""
     @abstractmethod
-    def create_issue(self, title: str, body: str) -> dict: ...
+    def create_issue(self, title: str, body: str, labels: str = "") -> dict: ...
     @abstractmethod
     def close_issue(self, issue_number: str) -> dict: ...
     def add_comment(self, issue_number: str, comment_body: str) -> dict:
@@ -269,9 +269,11 @@ class GitHubHandler(PlatformHandler):
 
     def _repo(self) -> str: return self.detect_repo()
 
-    def create_issue(self, title, body):
-        r = subprocess.run(["gh", "issue", "create", "--repo", self._repo(), "--title", title, "--body", body],
-                          capture_output=True, text=True)
+    def create_issue(self, title, body, labels=""):
+        args = ["gh", "issue", "create", "--repo", self._repo(), "--title", title, "--body", body]
+        if labels:
+            args += ["--label", labels]
+        r = subprocess.run(args, capture_output=True, text=True)
         if r.returncode != 0:
             return {"status": "error", "error": r.stderr[:200]}
         url = r.stdout.strip()
@@ -597,8 +599,11 @@ class GiteeHandler(PlatformHandler):
         return subprocess.run([sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                                "--repo", self._repo(), *args], capture_output=True, text=True)
 
-    def create_issue(self, title, body):
-        r = self._run("create", "--title", title, "--body", body)
+    def create_issue(self, title, body, labels=""):
+        args = ["create", "--title", title, "--body", body]
+        if labels:
+            args += ["--labels", labels]
+        r = self._run(*args)
         if r.returncode != 0: return {"status": "error", "error": r.stderr.strip()[:200]}
         m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', r.stdout.strip())
         return {"issue_id": m.group(1) if m else "?", "status": "created"}
@@ -815,14 +820,18 @@ def configured_platforms() -> list[str]:
         configured = str(read_config(project).get("FREELY_REPO_PLATFORMS", "")).strip()
     return list(dict.fromkeys(p.strip() for p in configured.split(",") if p.strip()))
 
-def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
+def create_issue(local_id: str, title: str, body: str, labels: str = "") -> dict[str, dict]:
     results = {}
     for platform in configured_platforms():
         handler = _handler_for(platform)
+        if not handler:
+            results[platform] = {"status": "error", "error": _unavailable_error(platform)}
+            continue
+        # Keep the 2-arg call intact when no labels were supplied: custom
+        # handlers and existing integrations must not see a new positional arg.
         results[platform] = (
-            _safe(handler.create_issue, title, body)
-            if handler
-            else {"status": "error", "error": _unavailable_error(platform)}
+            _safe(handler.create_issue, title, body, labels)
+            if labels else _safe(handler.create_issue, title, body)
         )
     return results
 
@@ -1531,7 +1540,7 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "close-pr":
         print(json.dumps(close_pr(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "create-issue":
-        result = create_issue(a[2], a[3], a[4] if len(a) > 4 else "")
+        result = create_issue(a[2], a[3], a[4] if len(a) > 4 else "", a[5] if len(a) > 5 else "")
         print(json.dumps(result, indent=2))
         # Per-platform accounting: 0 = every configured platform created,
         # 3 = partial (at least one created, at least one failed),

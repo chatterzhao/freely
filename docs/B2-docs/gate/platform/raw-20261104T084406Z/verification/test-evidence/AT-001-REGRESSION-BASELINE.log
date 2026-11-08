@@ -1,0 +1,16 @@
+# AT-001 regression baseline — raw-20261104T084406Z / #4187
+# worktree vs develop snapshot (/tmp/r15-base)
+test-platform-write-channel                          worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first                 worktree=0 baseline=0 MATCH
+test-issue-sync-promote-b2                           worktree=0 baseline=0 MATCH
+test-test-gate-record                                worktree=0 baseline=0 MATCH
+test-wt-close-comment-scan                           worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                           worktree=0 baseline=0 MATCH
+test-raw-replica-degraded.py                         worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py               worktree=0 baseline=0 MATCH
+test-command-lifecycle-materialization.py            worktree=0 baseline=0 MATCH
+test-platform-handler-probe.py                       worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                   worktree=1 baseline=1 MATCH
+test-scan-frontmatter-nested.py                      worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                         worktree=0 baseline=0 MATCH
+test-governance-gate-batch-read                      worktree=0 baseline=0 MATCH
