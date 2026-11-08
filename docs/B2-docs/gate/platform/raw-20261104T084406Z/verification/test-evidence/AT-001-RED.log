@@ -1,0 +1,25 @@
+AT-001 source-dir: /private/tmp/r15-base mode: all
+=== STATIC: severity wiring ===
+  [FAIL] contract missing severity (no VALID_SEVERITIES / SEVERITY_FIELD)
+  [FAIL] feedback still discards severity (new_raw_metadata has no severity arg)
+  [FAIL] issue-sync has no severity label
+  [ok] platform-adapter create-issue present (label threading checked in behavior)
+  [FAIL] contract normalize missing severity default
+  [ok] issue-sync bash -n clean
+=== UNIT: raw_metadata_contract severity semantics ===
+  [FAIL] contract has no VALID_SEVERITIES (severity not implemented) — RED
+=== BEHAVIOR: feedback create threads severity ===
+  [FAIL] --severity P0 -> frontmatter missing severity: "---\nschema_version: '1'\nlocal_id: raw-20261108T125027Z\nkind: raw\nphase_state: proposed\nabsorbed_into: ''\nplatform_ids: {}\nprimary_platform: github\ncanonical_issue_path: ''\nlast_synced_comment_at: {}\nhash: ''\ncreated_at: "
+  [FAIL] create-issue labels missing severity/P0: labels=''
+  [FAIL] default severity not in frontmatter: "---\nschema_version: '1'\nlocal_id: raw-20261108T125027Z\nkind: raw\nphase_state: proposed\nabsorbed_into: ''\nplatform_ids: {}\nprimary_platform: github\ncanonical_iss"
+  [FAIL] default severity label missing: ''
+=== BEHAVIOR: issue-sync _labels severity ===
+  [FAIL] _labels missing severity/P0: 'kind/raw,phase/proposed\nRC=0' ''
+  [FAIL] _labels missing default severity/P2: 'kind/raw,phase/proposed\nRC=0'
+=== BEHAVIOR: scan orders by severity ===
+  [FAIL] scan severity order wrong: [] / rows=4 / '20260101T000001Z  kind=raw phase=proposed  raw-20260101T000001Z\n  CREATE raw-20260101T000002Z  kind=raw phase=proposed  raw-20260101T000002Z\n  CREATE raw-20260101T000004Z  kind=raw phase=proposed  raw-20260101T000004Z\n  CREATE raw-20260101T000003Z  kind=raw phase=proposed  raw-20260101T000003Z\nRC=1\n'
+  [FAIL] scan did not report legacy as P2: '  CREATE raw-20260101T000004Z  kind=raw phase=proposed  raw-20260101T000004Z'
+=== BEHAVIOR: adapter create-issue label threading ===
+  [FAIL] adapter create_issue has no labels parameter (RED): create_issue() takes 3 positional arguments but 4 were given
+  [ok] legacy 2-arg handler path unchanged (no regression)
+SUMMARY: 3 ok, 14 failed

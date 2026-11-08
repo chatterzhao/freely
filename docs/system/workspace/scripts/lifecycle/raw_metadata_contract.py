@@ -35,6 +35,29 @@ RAW_METADATA_FIELDS = (
     "completed_at",
     "closeout_note",
 )
+
+# ── Severity (#4187) ──────────────────────────────────────────────────────
+# `severity` is OPTIONAL, NOT part of the strict RAW_METADATA_FIELDS tuple.
+# Adding it as a required 22nd field would make validate() reject all 59
+# existing strict docs + the canonical new_raw_metadata() output (R2 precedent:
+# keep compatibility, no bulk 824-doc rewrite). It is appended AFTER the
+# canonical block when explicitly supplied by `freely feedback --severity`;
+# legacy docs without it resolve to DEFAULT_SEVERITY at the read view
+# (normalize()). `validate()` enforces the value when present.
+SEVERITY_FIELD = "severity"
+VALID_SEVERITIES = ("P0", "P1", "P2")
+DEFAULT_SEVERITY = "P2"
+# Canonical field order WITH severity appended (the only legal extended shape).
+RAW_METADATA_FIELDS_WITH_SEVERITY = RAW_METADATA_FIELDS + (SEVERITY_FIELD,)
+
+
+def resolve_severity(metadata: Mapping) -> str:
+    """Single source of truth for the effective severity: a legal explicit
+    value, else DEFAULT_SEVERITY (存量回填 at the read view, no file rewrite)."""
+    value = _string(metadata.get(SEVERITY_FIELD)) if isinstance(metadata, Mapping) else ""
+    return value if value in VALID_SEVERITIES else DEFAULT_SEVERITY
+
+
 PHASE_STATES = {"proposed", "absorbed", "dropped"}
 PLATFORM_STATES = {"open", "closed"}
 
@@ -57,6 +80,7 @@ def new_raw_metadata(
     author: str,
     channel: str,
     intake_id: str = "",
+    severity: str | None = None,
 ) -> dict[str, Any]:
     metadata = {
         "schema_version": SCHEMA_VERSION,
@@ -81,6 +105,10 @@ def new_raw_metadata(
         "completed_at": "",
         "closeout_note": "",
     }
+    # `severity` is optional and always appended last. Legacy callers keep the
+    # canonical 21-field shape; only explicitly prioritised new issues carry it.
+    if severity is not None:
+        metadata[SEVERITY_FIELD] = severity
     validate(metadata)
     return metadata
 
@@ -112,6 +140,8 @@ def normalize(metadata: Mapping[str, Any]) -> dict[str, Any]:
         "closeout_note": _string(metadata.get("closeout_note")),
         "force_closed_at": _string(metadata.get("force_closed_at")),
         "force_closed_reason": _string(metadata.get("force_closed_reason")),
+        # Read-view backfill: legacy documents resolve to P2 without any rewrite.
+        "severity": resolve_severity(metadata),
         "strict_schema": strict,
     }
     return normalized
@@ -125,8 +155,11 @@ def validate(
 ) -> None:
     if _string(metadata.get("schema_version")) != SCHEMA_VERSION:
         raise MetadataValidationError("strict raw metadata requires current schema_version")
-    if tuple(metadata.keys()) != RAW_METADATA_FIELDS:
+    keys = tuple(metadata.keys())
+    if keys not in (RAW_METADATA_FIELDS, RAW_METADATA_FIELDS_WITH_SEVERITY):
         raise MetadataValidationError("raw metadata fields are missing, extra, or reordered")
+    if SEVERITY_FIELD in metadata and metadata[SEVERITY_FIELD] not in VALID_SEVERITIES:
+        raise MetadataValidationError(f"invalid severity: {metadata[SEVERITY_FIELD]!r}")
     if metadata.get("kind") != "raw" or not _string(metadata.get("local_id")).startswith("raw-"):
         raise MetadataValidationError("raw identity is invalid")
 

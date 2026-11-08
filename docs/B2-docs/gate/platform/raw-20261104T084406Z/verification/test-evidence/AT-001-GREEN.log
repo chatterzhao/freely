@@ -1,0 +1,38 @@
+AT-001 source-dir: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261104T084406Z-feedback-severity-persist mode: all
+=== STATIC: severity wiring ===
+  [ok] contract declares severity levels + field
+  [ok] feedback passes severity into new_raw_metadata frontmatter
+  [ok] issue-sync _labels emits severity/* label
+  [ok] platform-adapter create-issue present (label threading checked in behavior)
+  [ok] contract normalize backfills default severity
+  [ok] issue-sync bash -n clean
+=== UNIT: raw_metadata_contract severity semantics ===
+  [ok] canonical 21-field doc validates unchanged (no regression)
+  [ok] new_raw_metadata(severity=P0) appends severity: P0
+  [ok] validate accepts severity P0
+  [ok] validate accepts severity P1
+  [ok] validate accepts severity P2
+  [ok] validate rejects illegal severity 'P3'
+  [ok] validate rejects illegal severity 'urgent'
+  [ok] validate rejects illegal severity ''
+  [ok] validate rejects illegal severity 7
+  [ok] normalize backfills default severity P2 for legacy docs
+  [ok] normalize preserves explicit P0
+  [ok] normalize preserves explicit P1
+  [ok] normalize preserves explicit P2
+  [ok] normalize coerces invalid severity to P2
+=== BEHAVIOR: feedback create threads severity ===
+  [ok] --severity P0 -> frontmatter contains severity: P0
+  [ok] create-issue passes severity/P0 label
+  [ok] default severity P2 persisted explicitly
+  [ok] default severity/P2 label passed
+=== BEHAVIOR: issue-sync _labels severity ===
+  [ok] _labels emits severity/P0 for a P0 doc
+  [ok] _labels defaults legacy doc to severity/P2
+=== BEHAVIOR: scan orders by severity ===
+  [ok] scan output is ordered P0 -> P1 -> P2
+  [ok] scan backfills legacy doc as sev=P2
+=== BEHAVIOR: adapter create-issue label threading ===
+  [ok] adapter forwards severity/P0 to the platform handler
+  [ok] legacy 2-arg handler path unchanged (no regression)
+SUMMARY: 30 ok, 0 failed

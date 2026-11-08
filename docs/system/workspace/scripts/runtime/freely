@@ -25238,12 +25238,12 @@ HELP
   _primary_platform="${_platforms%%,*}"
   _created_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   _raw_schema=$(PYTHONPATH="$SELF_ROOT/docs/system/workspace/scripts/lifecycle" python3 - \
-    "$local_id" "$_primary_platform" "$_created_at" <<'PYEOF'
+    "$local_id" "$_primary_platform" "$_created_at" "$severity" <<'PYEOF'
 import sys
 import yaml
 from raw_metadata_contract import new_raw_metadata
 
-local_id, primary, created_at = sys.argv[1:]
+local_id, primary, created_at, severity = sys.argv[1:]
 metadata = new_raw_metadata(
     local_id=local_id,
     platform_ids={},
@@ -25252,6 +25252,7 @@ metadata = new_raw_metadata(
     updated_at=created_at,
     author="platform",
     channel=primary,
+    severity=severity,
 )
 print(yaml.safe_dump(metadata, allow_unicode=True, sort_keys=False).strip())
 PYEOF
@@ -25265,7 +25266,10 @@ PYEOF
   echo "[feedback] raw issue created: raw-${raw_key}"
 
   local _adapter_rc=0
-  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" 2>&1) || _adapter_rc=$?
+  # Labels mirror issue-sync._labels(): kind/raw + phase/proposed + severity/Pn.
+  # Passed as the 4th create-issue argument so both platforms can set them.
+  local _issue_labels="kind/raw,phase/proposed,severity/${severity}"
+  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" "${_issue_labels}" 2>&1) || _adapter_rc=$?
   echo "[feedback] adapter output:"
   echo "$_adapter_result"
 

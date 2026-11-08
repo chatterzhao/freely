@@ -1,3 +1,24 @@
+## M-20261104T084406Z-A
+- title: fix — severity 从校验值变成可追溯的一等数据
+- status: active
+### candidate_issues
+1. `C-20261104T084406Z-A`
+- milestone: M-20261104T084406Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T084406Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261104T084406Z/issues/I-20261104T084406Z-A.md
+### committed_issues
+1. `I-20261104T084406Z-A`
+- milestone: M-20261104T084406Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261104T084406Z/issues/I-20261104T084406Z-A.md
+### completed_issues
+1. `I-20261104T084406Z-A`
+- milestone: M-20261104T084406Z-A
+- phase_state: completed
+- completed_at: 2026-11-08T13:05:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261104T084406Z/issues/I-20261104T084406Z-A.md
+
 ## M-20261108T092758Z-A
 - title: fix — create/close 以平台侧发现为身份判定源
 - status: active
