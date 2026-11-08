@@ -1,0 +1,26 @@
+=== STATIC: install-state wiring ===
+  [ok] freely-package exists (pre-existing)
+  [ok] cmd_doctor exists (pre-existing)
+  [ok] install_state library exists
+  [ok] install-state-check CLI exists
+  [ok] CLI delegates to the shared library
+  [ok] freely-package exposes --activate
+  [ok] freely-package accepts an auto version
+  [ok] freely-package writes the hash manifest
+  [ok] merge followthrough triggers a repackage
+  [ok] cmd_doctor reports install state
+=== BEHAVIOR: isolated install state ===
+  [ok] behind latest is reported (rc != 0)
+  [ok] dangling latest is reported
+  [ok] dangling bin link is reported
+  [ok] hash drift is reported
+  [ok] write_manifest produces .freely_hashes
+  [ok] activate swaps latest atomically
+  [ok] activate reports success
+  [ok] check passes on a synced install ([])
+  [ok] activate is idempotent for the same HEAD
+  [ok] latest never dangles after activate
+  [ok] activate keeps a healthy bin link
+  [ok] CLI exit code follows check result (good=0, bad=1)
+  [ok] CLI JSON carries the diagnosis
+SUMMARY: 23 ok, 0 failed

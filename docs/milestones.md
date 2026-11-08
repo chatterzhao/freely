@@ -1,3 +1,24 @@
+## M-20261105T121046Z-A
+- title: fix — 安装态版本可证明且与 develop 同步
+- status: active
+### candidate_issues
+1. `C-20261105T121046Z-A`
+- milestone: M-20261105T121046Z-A
+- status: promoted
+- promoted_issue_id: I-20261105T121046Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261105T121046Z/issues/I-20261105T121046Z-A.md
+### committed_issues
+1. `I-20261105T121046Z-A`
+- milestone: M-20261105T121046Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261105T121046Z/issues/I-20261105T121046Z-A.md
+### completed_issues
+1. `I-20261105T121046Z-A`
+- milestone: M-20261105T121046Z-A
+- phase_state: completed
+- completed_at: 2026-11-08T13:35:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261105T121046Z/issues/I-20261105T121046Z-A.md
+
 ## M-20261104T084406Z-A
 - title: fix — severity 从校验值变成可追溯的一等数据
 - status: active

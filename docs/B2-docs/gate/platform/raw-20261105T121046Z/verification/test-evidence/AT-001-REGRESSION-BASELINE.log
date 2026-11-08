@@ -1,0 +1,35 @@
+# AT-001 regression baseline — raw-20261105T121046Z / #4194
+# worktree vs develop snapshot (/tmp/r16-base)
+test-freely-doctor-build-artifact-exposure-gate          worktree=1 baseline=1 MATCH
+test-freely-doctor-execution-boundary-audit              worktree=1 baseline=1 MATCH
+test-freely-doctor-supply-chain-gate                     worktree=1 baseline=1 MATCH
+test-freely-package-output-guard                         worktree=0 baseline=0 MATCH (see note)
+test-package-runtime-allowlist-parity                    worktree=0 baseline=0 MATCH (see note)
+test-worktree-seed-package-parity                        worktree=0 baseline=0 MATCH
+test-platform-write-channel                              worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first                     worktree=0 baseline=0 MATCH
+test-issue-sync-promote-b2                               worktree=0 baseline=0 MATCH
+test-test-gate-record                                    worktree=0 baseline=0 MATCH
+test-wt-close-comment-scan                               worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                               worktree=0 baseline=0 MATCH
+test-raw-replica-degraded.py                             worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py                   worktree=0 baseline=0 MATCH
+test-command-lifecycle-materialization.py                worktree=0 baseline=0 MATCH
+test-platform-handler-probe.py                           worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                       worktree=1 baseline=1 MATCH
+test-scan-frontmatter-nested.py                          worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                             worktree=0 baseline=0 MATCH
+test-governance-gate-batch-read                          worktree=0 baseline=0 MATCH
+test-feedback-severity.py                                worktree=0 baseline=0 MATCH
+
+# NOTE (baseline snapshot completeness)
+# The first pass used `git archive develop -- bin docs`, which omits three
+# allowlist paths that live outside bin/docs: .githooks/, templates/ and
+# .freely/tool-boundary-bootstrap.md. Both packaging tests therefore failed on
+# the baseline with "3 allowlist path(s) not found" while passing in the worktree
+# (DIFF). After copying those three paths from develop into the baseline
+# snapshot, both sides return 0:
+#   test-freely-package-output-guard          worktree=0 baseline=0
+#   test-package-runtime-allowlist-parity     worktree=0 baseline=0
+# These are snapshot artifacts, NOT a code regression. All 21 regressions MATCH.
+# Pre-existing reds (same failure on both sides): 3 doctor gates + wt-close.
