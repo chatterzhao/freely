@@ -146,11 +146,48 @@ class ACPClient:
     def __init__(self, transport: Transport, mode: str = "auto"):
         self.transport = transport
         self.mode = mode
+        # Session this client owns. Set via set_session_id() right after the
+        # session is negotiated in main(). Until it is known, inbound filtering
+        # is a no-op (see _inbound_session_mismatch) so legacy single-session
+        # behavior is preserved. (#4152)
+        self.session_id = ""
         self._next_id = 1
         self._pending = {}
         self._pending_lock = threading.Lock()
         self._recv_thread = threading.Thread(target=self._recv_loop, daemon=True)
         self._recv_thread.start()
+
+    def set_session_id(self, sid: str) -> None:
+        """Bind this client to the ACP session it owns."""
+        self.session_id = sid or ""
+
+    def _inbound_session_mismatch(self, message: dict) -> bool:
+        """True only when a server notification/request is PROVABLY for another
+        session than ours.
+
+        One (project, base_tool) bridge broadcasts server notifications to every
+        connected client (acp-bridge.py). Each client must ignore traffic that
+        belongs to a different session, otherwise worker A's output is written
+        into worker B's stdout and B answers A's permission request with allow
+        (concurrency + privilege-boundary defect, #4152).
+
+        We drop ONLY on a positively-mismatched params.sessionId:
+          * no sessionId on the message, or
+          * our own session_id not negotiated yet, or
+          * sessionId equal to ours
+        all keep the legacy delivery path. This is deliberate: the U6
+        prerequisite in #4152 warns that filtering on an absent sessionId would
+        silently drop messages, so never drop what we cannot attribute.
+        """
+        if not self.session_id:
+            return False
+        params = message.get("params")
+        if not isinstance(params, dict):
+            return False
+        sid = params.get("sessionId")
+        if not sid:
+            return False
+        return sid != self.session_id
 
     def _send(self, message):
         payload = json.dumps(message, separators=(",", ":"))
@@ -218,6 +255,13 @@ class ACPClient:
             return
 
         method = message.get("method")
+        # Cross-session isolation (#4152): the bridge broadcasts server
+        # notifications to every client. Drop session-scoped messages that are
+        # provably for a different session BEFORE they touch stdout or trigger
+        # a permission answer. Missing/unknown sessionId is left untouched.
+        if method in ("session/update", "session/request_permission") and \
+                self._inbound_session_mismatch(message):
+            return
         if method == "session/update":
             self._handle_session_update(message.get("params", {}))
             return
@@ -249,6 +293,12 @@ class ACPClient:
             print(f"\n[ACP tool_call_update] {tool_call_id} ({status})", file=sys.stderr, flush=True)
 
     def _handle_permission_request(self, message):
+        # #4152: never answer (and never default-allow) a permission request
+        # that belongs to another session. The owning session's client answers.
+        # This guard is also enforced in _handle_message; keeping it here makes
+        # the handler safe even when called directly.
+        if self._inbound_session_mismatch(message):
+            return
         request_id = message.get("id")
         params = message.get("params", {})
         options = params.get("options", [])
@@ -491,6 +541,11 @@ def main():
             print(f"session id: {session_id}", flush=True)       # line 2: human log
 
         t_session = time.time()
+
+        # Bind the client to its negotiated session so inbound server
+        # notifications from a DIFFERENT session are dropped (#4152). Set only
+        # after session_id is final (all launch_kind branches converge here).
+        client.set_session_id(session_id)
 
         # Ensure bypassPermissions is active for this session.
         # In bridge mode, the bridge already handles this after session/new

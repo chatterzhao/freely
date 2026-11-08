@@ -1,0 +1,22 @@
+[acp-bridge] CLAUDE_CODE_PERMISSION_MODE not set — defaulting to bypassPermissions. Set via monitor-ai-acp.sh _bridge_ensure_running or export manually.
+AT-001 source-dir: /tmp/r14-baseline-runtime mode: all
+  [FAIL] static: sessionId NOT in inbound filter path (only outbound params)
+  [FAIL] static: client lacks _inbound_session_mismatch filter helper
+  [FAIL] static: bypassPermissions is still a silent default
+  [FAIL] static: bridge has no session registry
+  [FAIL] client: foreign-session chunk LEAKED into B stdout
+  [ok] client: own-session chunk still printed (no regression)
+  [ok] client: no-sessionId chunk preserved (U6 no-message-loss)
+  [ok] client: unknown-own-session preserved (no regression)
+  [FAIL] client: foreign permission request was auto-answered
+  [FAIL] client: permission handler auto-allowed a foreign session
+  [ok] client: own permission request still auto-answered (no regression)
+  [FAIL] client: step mode answered a foreign permission request
+  [FAIL] bridge: session A notification leaked to B (broadcast)
+  [ok] bridge: unknown session -> broadcast fallback (no message loss)
+  [ok] bridge: no-sessionId notification still broadcast (no regression)
+  [ok] bridge: empty registry -> broadcast (no regression)
+  [FAIL] permission: bare default is 'bypassPermissions', expected 'default'
+  [ok] permission: explicit opt-in still enables bypassPermissions
+  [ok] permission: CLAUDE_CODE_PERMISSION_MODE remains authoritative
+SUMMARY: 9 ok, 10 failed

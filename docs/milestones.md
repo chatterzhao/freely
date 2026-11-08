@@ -1,3 +1,24 @@
+## M-20261103T132556Z-A
+- title: fix — ACP bridge 按 session 路由避免越权代答
+- status: active
+### candidate_issues
+1. `C-20261103T132556Z-A`
+- milestone: M-20261103T132556Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132556Z-A
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261103T132556Z/issues/I-20261103T132556Z-A.md
+### committed_issues
+1. `I-20261103T132556Z-A`
+- milestone: M-20261103T132556Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261103T132556Z/issues/I-20261103T132556Z-A.md
+### completed_issues
+1. `I-20261103T132556Z-A`
+- milestone: M-20261103T132556Z-A
+- phase_state: completed
+- completed_at: 2026-11-08T00:26:00Z
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261103T132556Z/issues/I-20261103T132556Z-A.md
+
 ## M-20261107T133328Z-A
 - title: fix — wt-close 复用单一评论扫描
 - status: active

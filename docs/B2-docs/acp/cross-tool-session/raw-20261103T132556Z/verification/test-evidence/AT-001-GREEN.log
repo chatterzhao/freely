@@ -1,0 +1,22 @@
+[acp-bridge] CLAUDE_CODE_PERMISSION_MODE not set — using 'default' permission mode. Set FREELY_ACP_BYPASS_PERMISSIONS=1 to opt in to bypassPermissions.
+AT-001 source-dir: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T132556Z-acp-session-routing/docs/system/workspace/scripts/runtime mode: all
+  [ok] static: sessionId referenced before main() (inbound filter present)
+  [ok] static: client has _inbound_session_mismatch filter helper
+  [ok] static: bypassPermissions requires explicit opt-in
+  [ok] static: bridge tracks per-client session routing
+  [ok] client: foreign-session agent_message_chunk dropped (B stdout clean)
+  [ok] client: own-session chunk still printed (no regression)
+  [ok] client: no-sessionId chunk preserved (U6 no-message-loss)
+  [ok] client: unknown-own-session preserved (no regression)
+  [ok] client: foreign permission request not answered (inbound filter)
+  [ok] client: permission handler refuses foreign session (no allow)
+  [ok] client: own permission request still auto-answered (no regression)
+  [ok] client: step mode drops foreign permission (no allow/reject)
+  [ok] bridge: session A notification delivered to A only
+  [ok] bridge: unknown session -> broadcast fallback (no message loss)
+  [ok] bridge: no-sessionId notification still broadcast (no regression)
+  [ok] bridge: empty registry -> broadcast (no regression)
+  [ok] permission: bare default is 'default' (not bypassPermissions)
+  [ok] permission: explicit opt-in still enables bypassPermissions
+  [ok] permission: CLAUDE_CODE_PERMISSION_MODE remains authoritative
+SUMMARY: 19 ok, 0 failed
