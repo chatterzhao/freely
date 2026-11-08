@@ -32,11 +32,24 @@ import threading
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "180"))
 ACP_IDLE_SHUTDOWN_GRACE = int(os.environ.get("ACP_BRIDGE_IDLE_SHUTDOWN_GRACE", "30"))
-ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE") or "bypassPermissions"
-if not os.environ.get("CLAUDE_CODE_PERMISSION_MODE"):
+# Permission mode is authoritative when explicitly configured via
+# CLAUDE_CODE_PERMISSION_MODE (production sets this from the slot's
+# settings.json). When it is unset, bypassPermissions used to be the silent
+# default, which widened the permission surface of the whole bridge (#4152).
+# Bare default is now "default"; explicitly opt in to bypass via
+# FREELY_ACP_BYPASS_PERMISSIONS=1 (escape hatch for operators who relied on
+# the old behaviour). The configured env still wins, so production is
+# byte-identical.
+_explicit_perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE")
+if _explicit_perm_mode:
+    ACP_PERMISSION_MODE = _explicit_perm_mode
+elif os.environ.get("FREELY_ACP_BYPASS_PERMISSIONS") == "1":
+    ACP_PERMISSION_MODE = "bypassPermissions"
+else:
+    ACP_PERMISSION_MODE = "default"
     import sys as _sys
-    _sys.stderr.write("[acp-bridge] CLAUDE_CODE_PERMISSION_MODE not set — defaulting to bypassPermissions. "
-                       "Set via monitor-ai-acp.sh _bridge_ensure_running or export manually.\n")
+    _sys.stderr.write("[acp-bridge] CLAUDE_CODE_PERMISSION_MODE not set — using 'default' permission mode. "
+                       "Set FREELY_ACP_BYPASS_PERMISSIONS=1 to opt in to bypassPermissions.\n")
     _sys.stderr.flush()
 
 
@@ -125,6 +138,12 @@ class AcpBridge:
         self._restarting = False
         self.clients = []  # connected client sockets for notification broadcast
         self.clients_lock = threading.Lock()
+        # Maps a client socket to the set of ACP session ids it owns. Used to
+        # deliver a server notification to the owning session only, instead of
+        # broadcasting it to every connected worker (#4152). Populated from
+        # session/new|fork|resume results and any params.sessionId the client
+        # sends; entries are removed when the client disconnects.
+        self.client_sessions = {}  # sock -> set[str]
         self.last_activity_ts = time.time()
         self.activity_lock = threading.Lock()
         self.stdin_write_lock = threading.Lock()
@@ -494,19 +513,56 @@ class AcpBridge:
 
         return response.get("result", {})
 
+    def _register_client_session(self, conn, sid):
+        """Record that `conn` owns ACP session `sid` (#4152)."""
+        if not sid:
+            return
+        with self.clients_lock:
+            self.client_sessions.setdefault(conn, set()).add(str(sid))
+
     def _broadcast_notification(self, msg):
-        """Forward server notification to all connected clients."""
+        """Forward a server notification to the owning session's client(s).
+
+        Historically this broadcast every notification to ALL connected
+        clients, which let worker A's output land in worker B's stdout and let
+        any client answer another session's permission request (#4152). When a
+        notification carries params.sessionId and we know which client(s) own
+        that session, deliver only to them.
+
+        Fallback is deliberately FAIL-OPEN, never drop: when the sessionId is
+        missing or not (yet) registered, we broadcast exactly as before. The U6
+        prerequisite in #4152 warns that some servers/notifications may omit
+        sessionId; dropping those would silently lose messages. The client-side
+        inbound filter in run-acp-prompt.py remains the authoritative defense,
+        so a fallback broadcast cannot reintroduce the leak.
+        """
         payload = json.dumps(msg, separators=(",", ":")) + "\n"
         data = payload.encode()
+        params = msg.get("params") if isinstance(msg, dict) else None
+        sid = params.get("sessionId") if isinstance(params, dict) else None
         with self.clients_lock:
+            if sid:
+                targets = [s for s in self.clients
+                           if sid in self.client_sessions.get(s, ())]
+            else:
+                targets = None
+            if targets:
+                recipients = targets
+            else:
+                # Unknown/unregistered/missing session -> legacy broadcast.
+                recipients = list(self.clients)
+                if sid:
+                    self.log(f"session {str(sid)[:12]}... has no registered client; broadcast fallback")
             dead = []
-            for sock in self.clients:
+            for sock in recipients:
                 try:
                     sock.send(data)
                 except Exception:
                     dead.append(sock)
             for sock in dead:
-                self.clients.remove(sock)
+                if sock in self.clients:
+                    self.clients.remove(sock)
+                self.client_sessions.pop(sock, None)
 
     @property
     def _is_claude_acp(self) -> bool:
@@ -657,6 +713,11 @@ def handle_client(conn, bridge):
                 params = request.get("params", {})
                 req_id = request.get("id", 0)
 
+                # Bind this client socket to any session id it references, so
+                # server notifications for that session are routed here (#4152).
+                if isinstance(params, dict) and params.get("sessionId"):
+                    bridge._register_client_session(conn, params["sessionId"])
+
                 if "id" not in request:
                     # Client notification — forward to server without waiting for response
                     with bridge.stdin_write_lock:
@@ -719,6 +780,13 @@ def handle_client(conn, bridge):
                     bridge.log(f"client request {method} failed: {e}")
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32603, "message": str(e)}}
 
+                # A session created/resumed without a client-supplied id gets a
+                # server-assigned one; bind it here (#4152) so its notifications
+                # can be routed to this client.
+                _result = response.get("result")
+                if isinstance(_result, dict) and _result.get("sessionId"):
+                    bridge._register_client_session(conn, _result["sessionId"])
+
                 try:
                     conn.send((json.dumps(response, separators=(",", ":")) + "\n").encode())
                 except (BrokenPipeError, ConnectionResetError, OSError):
@@ -732,6 +800,7 @@ def handle_client(conn, bridge):
         with bridge.clients_lock:
             if conn in bridge.clients:
                 bridge.clients.remove(conn)
+            bridge.client_sessions.pop(conn, None)
         try:
             conn.close()
         except Exception:
