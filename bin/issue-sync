@@ -196,6 +196,67 @@ if len(parts) >= 3:
   [[ -n "$pid" && "$pid" != "None" ]]
 }
 
+# ── Platform-side replica guard (#4225) ────────────────────────────────────
+# `platform_ids` is a cache and can be partial after a degraded pull (R6).
+# Before creating on a platform that appears missing locally, ask the platform
+# itself (by [RAW-key]) whether a canonical replica already exists. The pure
+# decision logic lives in sync/replica_guard.py; here we only do the I/O.
+_GUARD_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/sync/replica_guard.py"
+_ADAPTER_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+
+# Print the discover-raw receipt (one JSON doc) for a raw key, or nothing on
+# any transport failure. Never fabricate a verdict from a failed read.
+_replica_receipt() {
+  local raw_key="$1"
+  [[ -f "$_ADAPTER_SCRIPT" && -f "$_GUARD_SCRIPT" ]] || return 0
+  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 "$_ADAPTER_SCRIPT" \
+    discover-raw "$raw_key" 2>/dev/null || true
+}
+
+# Decide what to do for one platform that is missing from the local cache.
+# Args: <guard_on> <receipt> <platform>  → echoes "<state>\t<id>\t<url>".
+#   guard_on=0  → 'absent' (original create path, zero behavior change).
+#   guard_on=1, no receipt → 'indeterminate' (transport blip, fail closed).
+#   guard_on=1, receipt    → delegate to the pure classifier.
+_replica_decide() {
+  local guard_on="$1" receipt="$2" platform="$3"
+  if [[ "$guard_on" != "1" ]]; then
+    printf 'absent\t\t\n'; return 0
+  fi
+  if [[ -z "$receipt" ]]; then
+    printf 'indeterminate\t\t\n'; return 0
+  fi
+  printf '%s\n' "$receipt" | python3 "$_GUARD_SCRIPT" "$platform" 2>/dev/null || \
+    printf 'indeterminate\t\t\n'
+}
+
+# #4225: before a strict close, heal a partial `platform_ids` cache from
+# platform-side discovery so close-platforms closes ALL real replicas, not just
+# the ones the local cache happens to list (the other half of the degraded-pull
+# defect). Healthy path (no platform missing) is a no-op. Only `present`
+# replicas are backfilled; indeterminate/absent never fabricate an id.
+_backfill_close_replicas() {
+  local file="$1" local_id="$2" platform st rid rurl missing=0 receipt
+  [[ "$local_id" == raw-* && -f "$_ADAPTER_SCRIPT" && -f "$_GUARD_SCRIPT" ]] || return 0
+  # R12 invariant: a non-terminal raw must abort with ZERO writes. Only heal on
+  # a terminal phase, so a rejected close never mutates the local doc.
+  local _phase; _phase="$(_fm_get "$file" "phase_state")"
+  [[ "$_phase" == "absorbed" || "$_phase" == "dropped" ]] || return 0
+  if [[ -n "${GH_REPO:-}" ]] && ! _already_on_platform "$file" github; then missing=1; fi
+  if [[ -n "${GITEE_REPO:-}" ]] && ! _already_on_platform "$file" gitee; then missing=1; fi
+  [[ "$missing" == "1" ]] || return 0
+  receipt="$(_replica_receipt "${local_id#raw-}")"
+  [[ -n "$receipt" ]] || return 0
+  for platform in github gitee; do
+    _already_on_platform "$file" "$platform" && continue
+    IFS=$'\t' read -r st rid rurl <<<"$(printf '%s\n' "$receipt" | python3 "$_GUARD_SCRIPT" "$platform" 2>/dev/null || printf 'indeterminate\t\t\n')"
+    if [[ "$st" == "present" && -n "$rid" ]]; then
+      echo "[issue-sync] close: discovered $platform replica $rid; backfilling platform_ids so it gets closed"
+      _update_platform_ids "$file" "$platform" "$rid" "$rurl"
+    fi
+  done
+}
+
 # Content hash for change detection.
 _content_hash() {
   local file="$1"
@@ -612,24 +673,62 @@ cmd_create() {
   local -a _created=() _failed=()
   [[ -n "${GH_REPO:-}" ]] || true
 
+  # ── #4225: consult platform-side identity before creating on a platform that
+  # is missing from the local cache. `platform_ids` can be partial after a
+  # degraded pull (R6); a missing local id is NOT proof the platform has no
+  # replica. Only engage for raw-* issues and only when some configured
+  # platform is actually missing locally — the healthy path (all ids present)
+  # does zero extra I/O and behaves byte-identically. ──
+  local _guard_on=0 _receipt="" _kind
+  _kind="$(_fm_get "$file" "kind")"
+  if [[ "$local_id" == raw-* && "$_kind" == "raw" \
+        && -f "$_ADAPTER_SCRIPT" && -f "$_GUARD_SCRIPT" ]]; then
+    local _missing=0
+    if [[ -n "${GH_REPO:-}" ]] && ! _already_on_platform "$file" github; then _missing=1; fi
+    if [[ -n "${GITEE_REPO:-}" ]] && ! _already_on_platform "$file" gitee; then _missing=1; fi
+    if [[ "$_missing" == "1" ]]; then
+      _guard_on=1
+      _receipt="$(_replica_receipt "${local_id#raw-}")"
+    fi
+  fi
+
   # GitHub
   if [[ -n "${GH_REPO:-}" ]]; then
     if _already_on_platform "$file" "github"; then
       echo "[issue-sync] skip create: $local_id already on GitHub"
       _created+=("github")
     else
-      echo "[issue-sync] GitHub: creating issue..."
-      local url=""
-      url=$(_gh_create "$title" "$body" "$labels") || url=""
-      if [[ -n "$url" ]]; then
-        local gh_num; gh_num=$(basename "$url")
-        echo "[issue-sync] GitHub: $url"
-        _update_platform_ids "$file" "github" "$gh_num" "$url"
-        _created+=("github")
-      else
-        echo "[issue-sync] GitHub: FAILED (no issue url returned)" >&2
-        _failed+=("github")
-      fi
+      local _st _rid _rurl
+      IFS=$'\t' read -r _st _rid _rurl <<<"$(_replica_decide "$_guard_on" "$_receipt" github)"
+      case "$_st" in
+        present)
+          # A canonical replica already exists on the platform. Backfill the
+          # cached id instead of creating a duplicate (#4225).
+          echo "[issue-sync] GitHub: replica $_rid already exists on platform; backfilling platform_ids (no create)"
+          _update_platform_ids "$file" "github" "$_rid" "$_rurl"
+          _created+=("github")
+          ;;
+        indeterminate)
+          # Transport blip / ambiguous identity is not a verdict (R7/#4195).
+          # Refuse to create: creating now could duplicate an existing replica.
+          echo "[issue-sync] GitHub: platform-side identity undetermined; refusing to create (rerun after platform recovers)" >&2
+          _failed+=("github")
+          ;;
+        *)  # absent — platform confirmed no replica; original create path.
+          echo "[issue-sync] GitHub: creating issue..."
+          local url=""
+          url=$(_gh_create "$title" "$body" "$labels") || url=""
+          if [[ -n "$url" ]]; then
+            local gh_num; gh_num=$(basename "$url")
+            echo "[issue-sync] GitHub: $url"
+            _update_platform_ids "$file" "github" "$gh_num" "$url"
+            _created+=("github")
+          else
+            echo "[issue-sync] GitHub: FAILED (no issue url returned)" >&2
+            _failed+=("github")
+          fi
+          ;;
+      esac
     fi
   fi
 
@@ -640,18 +739,33 @@ cmd_create() {
       echo "[issue-sync] skip create: $local_id already on Gitee"
       _created+=("gitee")
     else
-      echo "[issue-sync] Gitee: creating issue..."
-      local out="" rc=0 num=""
-      out=$(_gitee_create "$title" "$body" 2>&1) || rc=$?
-      num=$(printf '%s' "$out" | _gitee_issue_number_from_json 2>/dev/null || true)
-      if [[ "$rc" -eq 0 && -n "$num" ]]; then
-        echo "[issue-sync] Gitee: created $num"
-        _update_platform_ids "$file" "gitee" "$num" "https://gitee.com/$GITEE_REPO/issues/$num"
-        _created+=("gitee")
-      else
-        echo "[issue-sync] Gitee: FAILED (rc=$rc) $(printf '%s' "$out" | tail -1)" >&2
-        _failed+=("gitee")
-      fi
+      local _gst _grid _grurl
+      IFS=$'\t' read -r _gst _grid _grurl <<<"$(_replica_decide "$_guard_on" "$_receipt" gitee)"
+      case "$_gst" in
+        present)
+          echo "[issue-sync] Gitee: replica $_grid already exists on platform; backfilling platform_ids (no create)"
+          _update_platform_ids "$file" "gitee" "$_grid" "$_grurl"
+          _created+=("gitee")
+          ;;
+        indeterminate)
+          echo "[issue-sync] Gitee: platform-side identity undetermined; refusing to create (rerun after platform recovers)" >&2
+          _failed+=("gitee")
+          ;;
+        *)  # absent — original create path.
+          echo "[issue-sync] Gitee: creating issue..."
+          local out="" rc=0 num=""
+          out=$(_gitee_create "$title" "$body" 2>&1) || rc=$?
+          num=$(printf '%s' "$out" | _gitee_issue_number_from_json 2>/dev/null || true)
+          if [[ "$rc" -eq 0 && -n "$num" ]]; then
+            echo "[issue-sync] Gitee: created $num"
+            _update_platform_ids "$file" "gitee" "$num" "https://gitee.com/$GITEE_REPO/issues/$num"
+            _created+=("gitee")
+          else
+            echo "[issue-sync] Gitee: FAILED (rc=$rc) $(printf '%s' "$out" | tail -1)" >&2
+            _failed+=("gitee")
+          fi
+          ;;
+      esac
     fi
   fi
 
@@ -782,6 +896,10 @@ cmd_close() {
   # non-terminal raw aborts with zero platform writes. Its exit code is
   # propagated: 0 complete, 3 partial (retryable), 1 nothing closed.
   if [[ "$(_fm_get "$file" "schema_version")" == "1" ]]; then
+    # #4225: heal a partial platform_ids cache from platform-side discovery
+    # first, so close-platforms closes every real replica. No-op on healthy
+    # (all-ids-present) docs; never fabricates an id from a degraded read.
+    _backfill_close_replicas "$file" "$local_id"
     local _effect_rc=0
     _raw_effect close-platforms "$file" "$ROOT_DIR" || _effect_rc=$?
     if [[ "$_effect_rc" -eq 0 ]]; then

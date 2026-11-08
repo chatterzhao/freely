@@ -1,0 +1,38 @@
+AT-001 source-dir: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261108T092758Z-create-replica-idempotency mode: all
+=== STATIC: guard wiring (RED expects FAIL) ===
+  [ok] replica_guard.py present with pure classify_receipt
+  [ok] issue-sync create consults platform-side discovery helper
+  [ok] issue-sync create uses per-platform decision
+  [ok] issue-sync close heals partial cache
+  [ok] issue-sync create has idempotent backfill branch
+  [ok] issue-sync create fails closed on degraded/ambiguous read
+  [ok] issue-sync bash -n clean
+  [ok] replica_guard.py parses
+=== UNIT: classify_receipt (pure) ===
+  [ok] classify present: present/'4151'
+  [ok] classify absent: absent/''
+  [ok] classify unknown: indeterminate/''
+  [ok] classify ambiguous: indeterminate/''
+  [ok] classify ok-no-id: indeterminate/''
+  [ok] classify platform-missing: indeterminate/''
+  [ok] classify malformed: indeterminate/''
+  [ok] classify non-dict-entry: indeterminate/''
+=== BEHAVIOR create: partial cache + existing platform replica ===
+  [ok] no duplicate GitHub create (guard backfilled instead)
+  [ok] platform_ids.github backfilled with the REAL existing id 4151
+  [ok] gitee id unchanged
+=== BEHAVIOR create: genuinely absent replica still creates (no regression) ===
+  [ok] missing replica still created via original path
+=== BEHAVIOR create: degraded/ambiguous read fails closed ===
+  [ok] unknown receipt → no create (fail-closed, no duplicate risk)
+  [ok] ambiguous receipt → no create (fail-closed, no duplicate risk)
+=== BEHAVIOR: healthy path (full cache) = zero extra discovery I/O ===
+  [ok] discover-raw not called when cache complete (byte-identical healthy path)
+  [ok] healthy path creates nothing (both replicas already cached)
+=== BEHAVIOR close: partial cache heals so ALL replicas closed ===
+  [ok] close-multi received BOTH github(4151) and gitee(A1) ids
+  [ok] platform_ids.github healed before close
+  [ok] strict close completed (phase transition valid after heal)
+=== BEHAVIOR close: non-terminal raw = zero local writes ===
+  [ok] non-terminal close left the doc byte-identical (no backfill write)
+SUMMARY: 28 ok, 0 failed

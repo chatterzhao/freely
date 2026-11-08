@@ -1,0 +1,30 @@
+AT-001 source-dir: /private/tmp/r14_5-baseline mode: all
+=== STATIC: guard wiring (RED expects FAIL) ===
+  [FAIL] replica_guard.py missing / no classify_receipt (create would trust stale cache)
+  [FAIL] issue-sync missing: create consults platform-side discovery helper
+  [FAIL] issue-sync missing: create uses per-platform decision
+  [FAIL] issue-sync missing: close heals partial cache
+  [FAIL] issue-sync missing: create has idempotent backfill branch
+  [FAIL] issue-sync missing: create fails closed on degraded/ambiguous read
+  [ok] issue-sync bash -n clean
+=== UNIT: classify_receipt (pure) ===
+  [FAIL] replica_guard.py absent — cannot unit-test classifier
+=== BEHAVIOR create: partial cache + existing platform replica ===
+  [FAIL] created 1 duplicate GitHub replica(s) — cache trusted over platform
+  [FAIL] github id not backfilled correctly: {'issue_id': 'NEW88', 'url': 'https://github.com/o/r/issues/NEW88', 'synced_at': '2026-11-08T10:24:01Z'}
+  [ok] gitee id unchanged
+=== BEHAVIOR create: genuinely absent replica still creates (no regression) ===
+  [ok] missing replica still created via original path
+=== BEHAVIOR create: degraded/ambiguous read fails closed ===
+  [FAIL] unknown receipt still created a replica (would duplicate)
+  [FAIL] ambiguous receipt still created a replica (would duplicate)
+=== BEHAVIOR: healthy path (full cache) = zero extra discovery I/O ===
+  [ok] discover-raw not called when cache complete (byte-identical healthy path)
+  [ok] healthy path creates nothing (both replicas already cached)
+=== BEHAVIOR close: partial cache heals so ALL replicas closed ===
+  [FAIL] close-multi did not receive both ids (partial close / leak): ['ADAPTER close-multi {"gitee": {"issue_id": "A1", "url": "https://gitee.com/o/r/issues/A1", "synced_at": ""}}']
+  [FAIL] github id not healed: None
+  [ok] strict close completed (phase transition valid after heal)
+=== BEHAVIOR close: non-terminal raw = zero local writes ===
+  [ok] non-terminal close left the doc byte-identical (no backfill write)
+SUMMARY: 7 ok, 13 failed
