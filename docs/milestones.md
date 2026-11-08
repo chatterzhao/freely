@@ -1,3 +1,24 @@
+## M-20261108T092758Z-A
+- title: fix — create/close 以平台侧发现为身份判定源
+- status: active
+### candidate_issues
+1. `C-20261108T092758Z-A`
+- milestone: M-20261108T092758Z-A
+- status: promoted
+- promoted_issue_id: I-20261108T092758Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261108T092758Z/issues/I-20261108T092758Z-A.md
+### committed_issues
+1. `I-20261108T092758Z-A`
+- milestone: M-20261108T092758Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261108T092758Z/issues/I-20261108T092758Z-A.md
+### completed_issues
+1. `I-20261108T092758Z-A`
+- milestone: M-20261108T092758Z-A
+- phase_state: completed
+- completed_at: 2026-11-08T10:35:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261108T092758Z/issues/I-20261108T092758Z-A.md
+
 ## M-20261103T132556Z-A
 - title: fix — ACP bridge 按 session 路由避免越权代答
 - status: active
