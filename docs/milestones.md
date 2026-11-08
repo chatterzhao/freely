@@ -1,3 +1,24 @@
+## M-20261108T134853Z-A
+- title: fix — GitHub handler 自动补齐缺失标签，feedback 不再 PARTIAL
+- status: active
+### candidate_issues
+1. `C-20261108T134853Z-A`
+- milestone: M-20261108T134853Z-A
+- status: promoted
+- promoted_issue_id: I-20261108T134853Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261108T134853Z/issues/I-20261108T134853Z-A.md
+### committed_issues
+1. `I-20261108T134853Z-A`
+- milestone: M-20261108T134853Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261108T134853Z/issues/I-20261108T134853Z-A.md
+### completed_issues
+1. `I-20261108T134853Z-A`
+- milestone: M-20261108T134853Z-A
+- phase_state: completed
+- completed_at: 2026-11-08T14:02:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261108T134853Z/issues/I-20261108T134853Z-A.md
+
 ## M-20261105T121046Z-A
 - title: fix — 安装态版本可证明且与 develop 同步
 - status: active

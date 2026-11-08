@@ -64,6 +64,16 @@ def _body(value: object) -> str:
 def canonical_projection(record: Mapping[str, Any]) -> dict[str, Any]:
     """Remove platform transport fields and preserve only lifecycle meaning."""
     labels = record.get("labels") or []
+    # Only labels whose value is determined by the local document belong in a
+    # replica comparison. phase/* is a creation-time snapshot the platforms
+    # never update (proposed -> absorbed -> closed), and severity/* currently
+    # lives ONLY on the platform copies: wt-create materialisation does not
+    # write the severity frontmatter field. Comparing either would report a
+    # fake divergence for every labelled raw. kind/* stays comparable.
+    labels = [
+        item for item in labels
+        if not _text(item).lower().startswith(("phase/", "severity/"))
+    ]
     state = _text(record.get("state")).lower()
     lifecycle_state = "open" if state in {"open", "proposed"} else "closed" if state in {"closed", "absorbed", "dropped"} else state
     title = _text(record.get("title")).lower()
