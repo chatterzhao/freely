@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261108T092758Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261108T092758Z-A
 platform_ids:
   github:
     issue_id: '4225'
@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKTR2N
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261108T092758Z/issues/I-20261108T092758Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-08T09:27:58Z'
@@ -24,9 +24,10 @@ author: platform
 channel: github
 session_refs: []
 platform_state: open
-promoted_children: []
+promoted_children:
+- I-20261108T092758Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-08T10:40:00Z'
 closeout_note: ''
 ---
 
