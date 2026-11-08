@@ -18,12 +18,12 @@ canonical_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261103T132556Z/i
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-03T13:25:56Z'
-updated_at: '2026-11-04T07:57:56Z'
+updated_at: '2026-11-08T09:30:46Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children:
 - I-20261103T132556Z-A
 source_candidate: ''
