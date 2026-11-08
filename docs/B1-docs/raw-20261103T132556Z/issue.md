@@ -2,27 +2,32 @@
 schema_version: '1'
 local_id: raw-20261103T132556Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T132556Z-A
 platform_ids:
+  github:
+    issue_id: '4152'
+    url: https://github.com/chatterzhao/freely/issues/4152
+    synced_at: ''
   gitee:
     issue_id: IKSPQ7
     url: https://gitee.com/zhaoquan/freely/issues/IKSPQ7
     synced_at: ''
-primary_platform: gitee
-canonical_issue_path: ''
+primary_platform: github
+canonical_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261103T132556Z/issues/I-20261103T132556Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-03T13:25:56Z'
-updated_at: '2026-11-04T15:57:58+08:00'
+updated_at: '2026-11-04T07:57:56Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 platform_state: open
-promoted_children: []
+promoted_children:
+- I-20261103T132556Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-08T09:30:00Z'
 closeout_note: ''
 ---
 
