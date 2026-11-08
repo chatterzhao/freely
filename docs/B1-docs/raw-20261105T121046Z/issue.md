@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261105T121046Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261105T121046Z-A
 platform_ids:
   github:
     issue_id: '4194'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKT9AV
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261105T121046Z/issues/I-20261105T121046Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-05T12:10:46Z'
-updated_at: '2026-11-05T12:10:52Z'
+updated_at: '2026-11-08T13:37:02Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261105T121046Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-08T13:36:59Z'
 closeout_note: ''
 ---
 
