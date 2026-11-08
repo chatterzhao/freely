@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261108T134853Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261108T134853Z-A
 platform_ids:
   github:
     issue_id: '4230'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKTSSM
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261108T134853Z/issues/I-20261108T134853Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-08T13:48:53Z'
-updated_at: '2026-11-08T13:49:00Z'
+updated_at: '2026-11-08T14:02:46Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261108T134853Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-08T14:02:44Z'
 closeout_note: ''
 ---
 
