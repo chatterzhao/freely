@@ -18,7 +18,7 @@ canonical_issue_path: docs/B2-docs/gate/platform/raw-20261105T121046Z/issues/I-2
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-05T12:10:46Z'
-updated_at: '2026-11-08T13:37:02Z'
+updated_at: '2026-11-08T13:43:28Z'
 intake_id: ''
 author: platform
 channel: github
