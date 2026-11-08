@@ -24610,6 +24610,23 @@ cmd_doctor() {
     echo "security_review_scope: unavailable-uninitialized"
     print_current_slot_switch_lock_snapshot
   fi
+
+  # ── Installed-state identity (#4194) ────────────────────────────────────
+  # A diagnosed project must also say whether the freely command it runs is
+  # actually built from this source tree. Never fail silently: print the full
+  # diagnosis and the repair command.
+  local _isc="$project/docs/system/workspace/scripts/quality/install-state-check.py"
+  if [[ -f "$_isc" ]]; then
+    local _isc_out _isc_rc=0
+    _isc_out="$(python3 "$_isc" --project "$project" --json 2>&1)" || _isc_rc=$?
+    if [[ "$_isc_rc" -eq 0 ]]; then
+      echo "install_state: ok"
+    else
+      echo "install_state: MISMATCH"
+      printf '%s\n' "$_isc_out"
+      log_error "install state is out of sync; run: freely-package --version auto --activate"
+    fi
+  fi
 }
 
 cmd_security_review_brief() {

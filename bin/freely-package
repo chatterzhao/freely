@@ -14,17 +14,27 @@ set -euo pipefail
 #   freely freely-package --version 20260501T1207Z-nightly
 #   freely freely-package --version 2026.05.01-stable --output ~/.freely/versions/2026.05.01-stable
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# FREELY_PACKAGE_ROOT lets the merge followthrough package the real project
+# tree instead of whichever worktree happened to invoke the guarded command.
+ROOT_DIR="${FREELY_PACKAGE_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 ALLOWLIST="$ROOT_DIR/docs/system/workspace/package-allowlist.txt"
+INSTALL_STATE_LIB="$ROOT_DIR/docs/system/workspace/scripts/quality/install_state.py"
 VERSION=""
 OUTPUT=""
+ACTIVATE=0
+HOME_DIR="${FREELY_HOME:-$HOME/.freely}"
+HOME_DIR="$(python3 -c 'import os,sys; print(os.path.abspath(sys.argv[1]))' "$HOME_DIR")"
+BIN_LINK="${FREELY_BIN_LINK:-$HOME/.local/bin/freely}"
 
 usage() {
   cat <<'EOF'
-Usage: freely-package --version <ver> [--output <dir>]
+Usage: freely-package --version <ver>|auto [--output <dir>] [--activate]
 
-  --version <ver>  版本号 (YYYYMMDDTHHMMZ-nightly 或 YYYY.MM.DD-stable)
-  --output <dir>   输出目录 (默认: ~/.freely/versions/<ver>)
+  --version <ver>  版本号 (YYYYMMDDTHHMMZ-nightly 或 YYYY.MM.DD-stable)；auto 自动生成
+  --output <dir>   输出目录 (默认: $FREELY_HOME/versions/<ver>)
+  --activate       打包并校验成功后原子切换 latest，修复悬空的 PATH 链接
+  --home <dir>     安装态根目录 (默认: $FREELY_HOME 或 ~/.freely)
+  --bin <path>     PATH 中的 freely 链接 (默认: ~/.local/bin/freely)
 EOF
   exit 1
 }
@@ -47,6 +57,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --version) VERSION="${2:-}"; shift 2 ;;
     --output) OUTPUT="${2:-}"; shift 2 ;;
+    --activate) ACTIVATE=1; shift ;;
+    --home) HOME_DIR="${2:-}"; shift 2 ;;
+    --bin) BIN_LINK="${2:-}"; shift 2 ;;
     *) usage ;;
   esac
 done
@@ -54,8 +67,12 @@ done
 [[ -n "$VERSION" ]] || { echo "[ERROR] --version is required" >&2; usage; }
 [[ -f "$ALLOWLIST" ]] || { echo "[ERROR] allowlist not found: $ALLOWLIST" >&2; exit 1; }
 
+if [[ "$VERSION" == "auto" ]]; then
+  VERSION="$(date -u +%Y%m%dT%H%MZ)-nightly"
+fi
+
 if [[ -z "$OUTPUT" ]]; then
-  OUTPUT="$HOME/.freely/versions/$VERSION"
+  OUTPUT="$HOME_DIR/versions/$VERSION"
 fi
 
 # 校验版本号格式
@@ -82,14 +99,37 @@ refuse_dangerous_output() {
       return 1
       ;;
   esac
-  if [[ "$abs" != "$HOME/.freely/versions/"* && "${FREELY_PACKAGE_ALLOW_OUTSIDE:-0}" != "1" ]]; then
-    echo "[ERROR] output outside \$HOME/.freely/versions: $abs" >&2
+  if [[ "$abs" != "$HOME_DIR/versions/"* && "${FREELY_PACKAGE_ALLOW_OUTSIDE:-0}" != "1" ]]; then
+    echo "[ERROR] output outside $HOME_DIR/versions: $abs" >&2
     echo "        set FREELY_PACKAGE_ALLOW_OUTSIDE=1 to override" >&2
     return 1
   fi
   OUTPUT="$abs"
 }
 refuse_dangerous_output "$OUTPUT" || exit 1
+
+# Idempotent followthrough: when the active version already records this HEAD,
+# merging again (or retrying) must not create another version or flip links.
+if [[ "$ACTIVATE" -eq 1 && -f "$INSTALL_STATE_LIB" ]]; then
+  _pkg_head="${FREELY_PACKAGE_FROM:-$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)}"
+  _already="$(python3 - "$INSTALL_STATE_LIB" "$HOME_DIR" "$_pkg_head" <<'PY'
+import importlib.util
+import sys
+from pathlib import Path
+lib, home, head = sys.argv[1], Path(sys.argv[2]), sys.argv[3]
+spec = importlib.util.spec_from_file_location("install_state", lib)
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+target = mod.latest_target(home)
+packaged = mod.packaged_from(target) if target else ""
+print("yes" if packaged and head != "unknown" and (head.startswith(packaged) or packaged.startswith(head)) else "no")
+PY
+)"
+  if [[ "$_already" == "yes" ]]; then
+    echo "[package] installed state already matches HEAD $_pkg_head; nothing to do"
+    exit 0
+  fi
+fi
 
 echo "[package] version: $VERSION"
 echo "[package] output: $OUTPUT"
@@ -172,7 +212,10 @@ fi
 # 写入版本文件
 echo "FREELY_VERSION=$VERSION" > "$OUTPUT/.freely_version"
 echo "FREELY_PACKAGED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$OUTPUT/.freely_version"
-echo "FREELY_PACKAGED_FROM=$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo 'unknown')" >> "$OUTPUT/.freely_version"
+# The merge followthrough may package from a worktree; it passes the develop
+# HEAD explicitly so the installed version records the integration commit, not
+# whichever branch the guarded command happened to be invoked from.
+echo "FREELY_PACKAGED_FROM=${FREELY_PACKAGE_FROM:-$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo 'unknown')}" >> "$OUTPUT/.freely_version"
 
 # 完整性验证：确认 allowlist 中所有路径都存在
 verify_ok=0
@@ -196,3 +239,28 @@ fi
 echo "[package] done: $copied files → $OUTPUT"
 echo "[package] version: $VERSION"
 echo "[package] integrity: verified"
+
+# Record which source bytes produced this version, so `freely doctor` can prove
+# identity later instead of trusting a version string.
+if [[ -f "$INSTALL_STATE_LIB" ]]; then
+  python3 "$INSTALL_STATE_LIB" --write-manifest --root "$ROOT_DIR" --output "$OUTPUT" >/dev/null || {
+    echo "[ERROR] failed to write hash manifest" >&2
+    exit 1
+  }
+  echo "[package] hash manifest: written"
+fi
+
+if [[ "$ACTIVATE" -eq 1 ]]; then
+  if [[ ! -f "$INSTALL_STATE_LIB" ]]; then
+    echo "[ERROR] --activate requires $INSTALL_STATE_LIB" >&2
+    exit 1
+  fi
+  # activate() validates the version + manifest before touching anything, so a
+  # failed packaging run always leaves the previous installation usable.
+  python3 "$INSTALL_STATE_LIB" --activate --home "$HOME_DIR" \
+    --version-dir "$OUTPUT" --bin "$BIN_LINK" --json >/dev/null || {
+    echo "[ERROR] activation failed; previous version left untouched" >&2
+    exit 1
+  }
+  echo "[package] activated: $OUTPUT"
+fi

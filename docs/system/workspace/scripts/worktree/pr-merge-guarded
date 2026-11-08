@@ -410,6 +410,22 @@ attempt_develop_push_followthrough_if_needed() {
 
   if [[ -z "$failed_remotes" ]]; then
     echo "[MERGE-GUARD] all remotes synced ✓"
+
+    # ── Installed-state followthrough (#4194) ─────────────────────────────
+    # The merge is already committed, so a packaging failure must not undo it;
+    # report loudly instead. freely-package is idempotent: an install that
+    # already records this HEAD is a no-op, so retries are harmless.
+    local _pkg_root="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+    if [[ -x "$_pkg_root/bin/freely-package" ]]; then
+      echo "[MERGE-GUARD] refreshing packaged install state from $_pkg_root"
+      local _develop_head
+      _develop_head="$(git -C "$_pkg_root" rev-parse --short develop 2>/dev/null || true)"
+      if ! FREELY_PACKAGE_ROOT="$_pkg_root" \
+        FREELY_PACKAGE_FROM="$_develop_head" \
+        "$_pkg_root/bin/freely-package" --version auto --activate 2>&1; then
+        echo "[MERGE-GUARD] warning: install-state refresh failed; run freely-package --version auto --activate" >&2
+      fi
+    fi
     cat <<NEXTSTEP
 
 ┌─ 下一步 ──────────────────────────────────────────────┐
