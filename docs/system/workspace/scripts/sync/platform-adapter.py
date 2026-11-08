@@ -269,11 +269,39 @@ class GitHubHandler(PlatformHandler):
 
     def _repo(self) -> str: return self.detect_repo()
 
+    @staticmethod
+    def _label_names(labels: str) -> list[str]:
+        return [name.strip() for name in labels.split(",") if name.strip()]
+
+    def ensure_github_labels(self, labels: str) -> None:
+        """Create labels that `gh issue create --label` refuses to add.
+
+        GitHub does NOT auto-create labels, so a fresh repo (or a new label
+        family such as severity/*) makes the entire issue create fail. This is
+        called only after such a failure: the healthy path costs zero extra API
+        calls, and an already-existing label simply returns a harmless error.
+        """
+        repo = self._repo()
+        for name in self._label_names(labels):
+            subprocess.run(
+                ["gh", "label", "create", name, "--repo", repo,
+                 "--color", "0E8A16", "--description", "Freely issue label"],
+                capture_output=True, text=True,
+            )
+
     def create_issue(self, title, body, labels=""):
         args = ["gh", "issue", "create", "--repo", self._repo(), "--title", title, "--body", body]
         if labels:
             args += ["--label", labels]
         r = subprocess.run(args, capture_output=True, text=True)
+        if r.returncode != 0 and labels:
+            detail = ((r.stderr or "") + (r.stdout or "")).lower()
+            # Only a missing-label failure is recoverable. Auth / permission /
+            # network errors must stay visible instead of being masked by a retry.
+            if "not found" in detail and "label" in detail:
+                self.ensure_github_labels(labels)
+                # Retry exactly once after bootstrapping the labels.
+                r = subprocess.run(args, capture_output=True, text=True)
         if r.returncode != 0:
             return {"status": "error", "error": r.stderr[:200]}
         url = r.stdout.strip()

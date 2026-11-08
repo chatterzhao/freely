@@ -1,0 +1,34 @@
+# AT-001 regression baseline — raw-20261108T134853Z / #4230
+# worktree vs develop snapshot (/tmp/r165-base)
+test-feedback-severity.py                            worktree=0 baseline=0 MATCH
+test-platform-write-channel                          worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                         worktree=1 baseline=0 DIFF
+test-platform-handler-probe.py                       worktree=0 baseline=0 MATCH
+test-issue-sync-promote-b2                           worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first                 worktree=0 baseline=0 MATCH
+test-install-state.py                                worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                           worktree=0 baseline=0 MATCH
+test-raw-replica-degraded.py                         worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py               worktree=0 baseline=0 MATCH
+test-command-lifecycle-materialization.py            worktree=0 baseline=0 MATCH
+test-wt-close-comment-scan                           worktree=0 baseline=0 MATCH
+test-test-gate-record                                worktree=0 baseline=0 MATCH
+test-governance-gate-batch-read                      worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                   worktree=1 baseline=1 MATCH
+test-scan-frontmatter-nested.py                      worktree=0 baseline=0 MATCH
+
+# NOTE (one DIFF = live platform state, not a code regression)
+# test-platform-open-parity.py: worktree=1 baseline=0 DIFF.
+# This test compares the live OPEN raw-key sets on GitHub vs Gitee. The baseline
+# snapshot is not a git worktree with remotes, so it resolves no repo and returns
+# an empty set (a false OK). In the real worktree it correctly detects:
+#   gitee-only=['20261108T134701Z'] / missing open copy on github
+# That raw was created by `feedback create` BEFORE this fix, when the missing
+# severity/P2 label made the GitHub create fail (PARTIAL: Gitee IKTSRS only).
+# It is NOT caused by the platform-adapter change in this PR; the other 15
+# regressions MATCH, including all label/create/write-channel tests.
+# Full grep confirms test-platform-open-parity.py is referenced by NO gate, so
+# it does not block pr-create/pr-merge. Repairing the missing GitHub copy needs
+# `raw-issue-pull` in a worktree whose branch contains that raw-key (the tool
+# refuses cross-worktree materialization), so it is scheduled as R59 in the v4
+# queue (use `issue-sync create` there). User asked to pause after this issue.
