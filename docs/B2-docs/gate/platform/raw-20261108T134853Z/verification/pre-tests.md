@@ -12,14 +12,14 @@
 - promotion_gate: develop_merge
 - testing_layer: end-to-end
 - target_environment: `unittest.mock` 替换 `subprocess.run` 驱动真实 `GitHubHandler` + develop HEAD 基线快照对比；真机由本条 issue 自身的创建过程验证
-- required_evidence: 5 静态 + 9 行为共 14 项全 GREEN；16 个相关回归对比；真机双平台 created
+- required_evidence: 7 静态 + 12 行为共 19 项全 GREEN；16 个相关回归对比；真机双平台 created
 - evidence_level: integration
 - artifact_ref: docs/system/workspace/scripts/tests/test-github-label-autocreate.py
 - test_command: python3 docs/system/workspace/scripts/tests/test-github-label-autocreate.py all
-- expected_output: SUMMARY: 14 ok, 0 failed
-- expected_RED_output: SUMMARY: 8 failed（静态 3：无 label create 字面量、无 ensure helper、create_issue 函数体无补齐/重试；行为 5：缺标签直接 error、无重试、无 label create、标签去重断言空集、二次失败无界）
-- actual_RED_output: develop `c2a55934e` 基线快照（`git archive develop -- bin docs`）放入**最终版** AT-001 —— `SUMMARY: 6 ok, 8 failed`（AT-001-RED.log）。6 项 PASS 是既有能力守卫（GitHubHandler 存在、create_issue 已支持 labels、健康路径、非 label 错误不吞、无 labels 路径），证明夹具可跑通。
-- actual_output: 工位同一断言 —— `SUMMARY: 14 ok, 0 failed`（AT-001-GREEN.log）
+- expected_output: SUMMARY: 19 ok, 0 failed
+- expected_RED_output: SUMMARY: 12 failed（静态 3：无 label create 字面量、无 ensure helper、create_issue 函数体无补齐/重试；行为 5：缺标签直接 error、无重试、无 label create、标签去重断言空集、二次失败无界）
+- actual_RED_output: develop `c2a55934e` 基线快照（`git archive develop -- bin docs`）放入**最终版** AT-001 —— `SUMMARY: 7 ok, 12 failed`（AT-001-RED.log）。6 项 PASS 是既有能力守卫（GitHubHandler 存在、create_issue 已支持 labels、健康路径、非 label 错误不吞、无 labels 路径），证明夹具可跑通。
+- actual_output: 工位同一断言 —— `SUMMARY: 19 ok, 0 failed`（AT-001-GREEN.log）
 - evidence_file: docs/B2-docs/gate/platform/raw-20261108T134853Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log,AT-001-REGRESSION-BASELINE.log
 - red-green-status: green
 - status: passed

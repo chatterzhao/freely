@@ -28,4 +28,4 @@ Gitee handler、R15 severity 链、平台关闭/更新/评论语义均不动；1
 
 ## 验收
 
-AT-001 基线快照 RED `6 ok / 8 failed` → GREEN `14 ok / 0 failed`；16 个回归全 MATCH；真机 feedback 双平台 created。
+AT-001 基线快照 RED `7 ok / 12 failed` → GREEN `19 ok / 0 failed`；16 个回归全 MATCH；真机 feedback 双平台 created。

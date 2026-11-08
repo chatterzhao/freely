@@ -32,3 +32,17 @@ test-scan-frontmatter-nested.py                      worktree=0 baseline=0 MATCH
 # `raw-issue-pull` in a worktree whose branch contains that raw-key (the tool
 # refuses cross-worktree materialization), so it is scheduled as R59 in the v4
 # queue (use `issue-sync create` there). User asked to pause after this issue.
+
+# FINAL PASS after same-round prerequisite fix (replica label projection)
+test-raw-reconciliation.py                           worktree=0 baseline=0 MATCH
+test-raw-replica-degraded.py                         worktree=0 baseline=0 MATCH
+test-feedback-severity.py                            worktree=0 baseline=0 MATCH
+test-platform-write-channel                          worktree=0 baseline=0 MATCH
+test-issue-sync-promote-b2                           worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first                 worktree=0 baseline=0 MATCH
+test-install-state.py                                worktree=0 baseline=0 MATCH
+test-wt-close-comment-scan                           worktree=0 baseline=0 MATCH
+test-test-gate-record                                worktree=0 baseline=0 MATCH
+test-governance-gate-batch-read                      worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py               worktree=0 baseline=0 MATCH
+test-platform-handler-probe.py                       worktree=0 baseline=0 MATCH

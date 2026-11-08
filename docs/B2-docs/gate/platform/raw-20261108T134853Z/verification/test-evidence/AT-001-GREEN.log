@@ -4,6 +4,8 @@
   [ok] handler can create missing GitHub labels
   [ok] a dedicated label-ensure helper exists
   [ok] create_issue body delegates label bootstrap and retries the create
+  [ok] local replica projection no longer hard-codes empty labels
+  [ok] replica comparison excludes creation-time/presentation labels
 === BEHAVIOR: fake gh, no real platform calls ===
   [ok] missing label is repaired and the issue is created ({'issue_id': '42', 'url': 'https://github.com/o/r/issues/42', 'status': 'created'})
   [ok] issue create is retried exactly once
@@ -14,4 +16,7 @@
   [ok] non-label failures are not masked or retried
   [ok] legacy no-label path stays untouched
   [ok] retry is bounded (no infinite loop) and still fails closed
-SUMMARY: 14 ok, 0 failed
+  [ok] local and platform label projections agree for the same raw
+  [ok] a real kind/* label difference is still detected
+  [ok] local projection derives kind/* from the document (['kind/raw'])
+SUMMARY: 19 ok, 0 failed

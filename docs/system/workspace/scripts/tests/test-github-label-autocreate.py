@@ -11,6 +11,7 @@ All behaviour runs against a fake `subprocess.run`; no real gh call is made.
 import argparse
 import importlib.util
 from pathlib import Path
+import tempfile
 import sys
 from types import SimpleNamespace
 from unittest import mock
@@ -101,6 +102,15 @@ def static_checks(project: Path):
     expect("ensure_github_labels" in body and "subprocess.run" in body,
            "create_issue body delegates label bootstrap and retries the create")
 
+    # Same-round prerequisites (R13 precedent): a labelled raw must still pass
+    # the replica-consistency gate. The local projection used to hard-code [].
+    gate = (project / "docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py").read_text()
+    recon = (project / "docs/system/workspace/scripts/lifecycle/raw_reconciliation.py").read_text()
+    expect('"labels": []' not in gate,
+           "local replica projection no longer hard-codes empty labels")
+    expect('startswith(("phase/", "severity/"))' in recon,
+           "replica comparison excludes creation-time/presentation labels")
+
 
 def behavior_checks(project: Path):
     print("=== BEHAVIOR: fake gh, no real platform calls ===")
@@ -149,6 +159,46 @@ def behavior_checks(project: Path):
     result_twice = invoke(mod, fake_twice, labels="severity/P0")
     expect(result_twice.get("status") == "error" and len(fake_twice.issue_creates()) == 2,
            "retry is bounded (no infinite loop) and still fails closed")
+
+    # Same-round prerequisite: local vs platform label projections must agree.
+    try:
+        rp = project / "docs/system/workspace/scripts/lifecycle/raw_reconciliation.py"
+        spec = importlib.util.spec_from_file_location("probe_recon", str(rp))
+        recon_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(recon_mod)
+        local = recon_mod.canonical_projection({
+            "raw_key": "raw-X", "title": "t", "body": "b", "state": "absorbed",
+            "labels": ["kind/raw"],
+        })
+        remote = recon_mod.canonical_projection({
+            "raw_key": "raw-X", "title": "t", "body": "b", "state": "closed",
+            "labels": ["kind/raw", "phase/proposed", "severity/P0"],
+        })
+        expect(local["labels"] == remote["labels"] == ("kind/raw",),
+               "local and platform label projections agree for the same raw")
+        drifted = recon_mod.canonical_projection({
+            **{"raw_key": "raw-X", "title": "t", "body": "b", "state": "closed"},
+            "labels": ["kind/linked"],
+        })
+        expect(drifted["labels"] != local["labels"],
+               "a real kind/* label difference is still detected")
+
+        gp = project / "docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py"
+        spec2 = importlib.util.spec_from_file_location("probe_gate", str(gp))
+        gate_mod = importlib.util.module_from_spec(spec2)
+        spec2.loader.exec_module(gate_mod)
+        with tempfile.TemporaryDirectory(prefix="gate-") as td:
+            doc = Path(td) / "issue.md"
+            doc.write_text(
+                "---\nschema_version: '1'\nlocal_id: raw-20260101T000000Z\n"
+                "kind: raw\nphase_state: absorbed\nseverity: P0\n---\n\n# t\n\nbody\n",
+                encoding="utf-8",
+            )
+            record = gate_mod._local_record(doc, "20260101T000000Z")
+            expect(record["labels"] == ["kind/raw"],
+                   f"local projection derives kind/* from the document ({record['labels']})")
+    except Exception as exc:
+        bad(f"replica-label projection probe crashed: {exc}")
 
 
 def main() -> int:

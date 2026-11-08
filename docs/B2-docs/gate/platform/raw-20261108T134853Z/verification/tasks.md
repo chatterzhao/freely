@@ -5,9 +5,9 @@
 ## 任务分解
 
 - [x] T1: 真机复现 PARTIAL 与标签缺失，证伪现有 open issue 覆盖。
-- [x] T2: 写 AT-001（5 静态 + 9 行为，fake subprocess 驱动真实 handler），基线快照确认 RED `6 ok / 8 failed`。
+- [x] T2: 写 AT-001（5 静态 + 9 行为，fake subprocess 驱动真实 handler），基线快照确认 RED `7 ok / 12 failed`。
 - [x] T3: `GitHubHandler` 加 `_label_names` / `ensure_github_labels` 与有限重试。
-- [x] T4: GREEN `14 ok / 0 failed` + 16 个回归基线对比。
+- [x] T4: GREEN `19 ok / 0 failed` + 16 个回归基线对比。
 - [x] T5: B1/B2/milestone/review 落盘，按封装命令收口。
 
 ## 验收关联

@@ -4,6 +4,8 @@
   [FAIL] handler can create missing GitHub labels
   [FAIL] a dedicated label-ensure helper exists
   [FAIL] create_issue body delegates label bootstrap and retries the create
+  [FAIL] local replica projection no longer hard-codes empty labels
+  [FAIL] replica comparison excludes creation-time/presentation labels
 === BEHAVIOR: fake gh, no real platform calls ===
   [FAIL] missing label is repaired and the issue is created ({'status': 'error', 'error': "could not add label: 'severity/P0' not found\n"})
   [FAIL] issue create is retried exactly once
@@ -14,4 +16,7 @@
   [ok] non-label failures are not masked or retried
   [ok] legacy no-label path stays untouched
   [FAIL] retry is bounded (no infinite loop) and still fails closed
-SUMMARY: 6 ok, 8 failed
+  [FAIL] local and platform label projections agree for the same raw
+  [ok] a real kind/* label difference is still detected
+  [FAIL] local projection derives kind/* from the document ([])
+SUMMARY: 7 ok, 12 failed
