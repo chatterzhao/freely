@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261104T084406Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261104T084406Z-A
 platform_ids:
   github:
     issue_id: '4187'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSX1A
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261104T084406Z/issues/I-20261104T084406Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-04T08:44:06Z'
-updated_at: '2026-11-04T08:44:11Z'
+updated_at: '2026-11-08T12:56:39Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261104T084406Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-08T12:56:36Z'
 closeout_note: ''
 ---
 
