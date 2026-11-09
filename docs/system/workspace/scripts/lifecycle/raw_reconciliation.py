@@ -87,7 +87,17 @@ def canonical_projection(record: Mapping[str, Any]) -> dict[str, Any]:
         "comments": _comments(record.get("body"), record.get("comments")),
     }
     fingerprint = hashlib.sha256(repr(tuple(projection.items())).encode("utf-8")).hexdigest()
-    return {**projection, "fingerprint": fingerprint}
+    # A raw document without an explicit `labels` field cannot assert platform
+    # labels. Comparing that dimension would report a fake divergence for every
+    # legacy raw (and for labelled raws whose materialisation lost the field).
+    # Keep a second fingerprint so the local-vs-platform comparison can skip it
+    # while platform-vs-platform still compares labels strictly.
+    without_labels = {k: v for k, v in projection.items() if k != "labels"}
+    fingerprint_no_labels = hashlib.sha256(
+        repr(tuple(without_labels.items())).encode("utf-8")
+    ).hexdigest()
+    return {**projection, "fingerprint": fingerprint,
+            "fingerprint_no_labels": fingerprint_no_labels}
 
 
 def reconcile(
@@ -141,8 +151,14 @@ def reconcile(
         observations["local"] = local_projection
         if local_projection["raw_key"] != key:
             diagnostics.append({"scope": "local", "code": "raw_key_mismatch", "detail": local_projection["raw_key"]})
-        elif baseline and local_projection["fingerprint"] != baseline["fingerprint"]:
-            diagnostics.append({"scope": "local", "code": "content_diverged", "detail": "local canonical content differs from platforms"})
+        elif baseline:
+            if local_projection["labels"]:
+                _same = local_projection["fingerprint"] == baseline["fingerprint"]
+            else:
+                _same = (local_projection["fingerprint_no_labels"]
+                         == baseline["fingerprint_no_labels"])
+            if not _same:
+                diagnostics.append({"scope": "local", "code": "content_diverged", "detail": "local canonical content differs from platforms"})
 
     blocked_by_facts = bool(diagnostics)
     unreadable = bool(degraded)

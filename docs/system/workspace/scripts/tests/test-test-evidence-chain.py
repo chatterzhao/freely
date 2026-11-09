@@ -7,6 +7,7 @@ single-source evidence helper, the aggregate runner and the CI files. Nothing
 here touches the real ~/.freely or .freely/run of the project.
 """
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -87,6 +88,14 @@ def static_checks(project: Path):
     expect("run:" in workflow and "bin/test-all" in workflow,
            "GitHub workflow has a real run: step")
 
+    # Same-round prerequisite (#4151 is an old raw with NO platform labels).
+    gate_src = (project / "docs/system/workspace/scripts/lifecycle/raw-reconciliation-gate.py").read_text()
+    recon = (project / "docs/system/workspace/scripts/lifecycle/raw_reconciliation.py").read_text()
+    expect('f"kind/{kind}"' not in gate_src,
+           "local projection does not invent kind/* for unlabelled legacy raws")
+    expect("fingerprint_no_labels" in recon,
+           "replica comparison can skip labels when the document declares none")
+
 
 def behavior_checks(project: Path):
     print("=== BEHAVIOR: real gate + evidence helper ===")
@@ -120,6 +129,9 @@ def behavior_checks(project: Path):
                 "failed test run is refused (exit_code=1)", "successful real run is accepted",
                 "tampered evidence is rejected (sha256 mismatch)", "stale HEAD evidence is rejected",
                 "real gate accepts runner-produced evidence",
+                "unlabelled legacy raw reconciles without fake divergence",
+                "labelled platforms reconcile with a local doc that declares no labels",
+                "an explicitly declared local label disagreement is still blocked",
                 "bin/test-all --ci passes with an explicit known-broken list",
                 "evidence add records the file sha256 in a manifest",
             ):
@@ -185,7 +197,33 @@ def behavior_checks(project: Path):
         else:
             bad("bin/test-all --ci passes with an explicit known-broken list (runner missing)")
 
-        # 8) evidence add records a hash (isolated git repo)
+        # 8) replica label projection (same-round prerequisite)
+        rp = project / "docs/system/workspace/scripts/lifecycle/raw_reconciliation.py"
+        spec = importlib.util.spec_from_file_location("probe_recon_labels", str(rp))
+        recon_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(recon_mod)
+        base = {"raw_key": "raw-X", "title": "t", "body": "b", "state": "closed", "labels": []}
+        local_plain = dict(base)
+        receipt = recon_mod.reconcile(
+            raw_key="X", configured_platforms=["github", "gitee"],
+            replicas={"github": dict(base), "gitee": dict(base)}, local=local_plain)
+        expect(receipt["ok"], "unlabelled legacy raw reconciles without fake divergence")
+
+        labelled = {**base, "labels": ["kind/raw"]}
+        receipt = recon_mod.reconcile(
+            raw_key="X", configured_platforms=["github", "gitee"],
+            replicas={"github": dict(labelled), "gitee": dict(labelled)}, local=local_plain)
+        expect(receipt["ok"],
+               "labelled platforms reconcile with a local doc that declares no labels")
+
+        receipt = recon_mod.reconcile(
+            raw_key="X", configured_platforms=["github", "gitee"],
+            replicas={"github": dict(labelled), "gitee": dict(labelled)},
+            local={**base, "labels": ["kind/linked"]})
+        expect(not receipt["ok"],
+               "an explicitly declared local label disagreement is still blocked")
+
+        # 9) evidence add records a hash (isolated git repo)
         manifest_cmd = run_helper("manifest-add", "--project", fixture,
                                   "--file", evidence_file)
         manifest = fixture / ".freely/run/evidence-manifest.json"

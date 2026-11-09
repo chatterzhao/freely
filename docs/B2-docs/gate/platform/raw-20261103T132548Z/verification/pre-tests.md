@@ -12,14 +12,14 @@
 - promotion_gate: develop_merge
 - testing_layer: end-to-end
 - target_environment: 隔离 git 夹具（真实 `pretests-retirement-gate`、真实 `test-evidence.py`、真实 `bin/test-all`）+ develop HEAD 基线快照对比；真机由本轮收口的 `freely test-gate run` 验证
-- required_evidence: 12 静态 + 8 行为共 20 项全 GREEN；17 个相关回归 worktree/baseline 退出码对比
+- required_evidence: 14 静态 + 11 行为共 25 项全 GREEN；首轮 17 个 + 复跑 16 个相关回归 worktree/baseline 退出码对比
 - evidence_level: integration
 - artifact_ref: docs/system/workspace/scripts/tests/test-test-evidence-chain.py
 - test_command: python3 docs/system/workspace/scripts/tests/test-test-evidence-chain.py all
-- expected_output: SUMMARY: 20 ok, 0 failed
-- expected_RED_output: SUMMARY: 16 failed（静态 8：无 evidence helper、门禁无校验、无 test-gate run / evidence add / test-all、CI 桩未替换；行为 8：手写三行 env 被真实门禁放行、失败运行未拒、成功运行未证、篡改未拒、HEAD 漂移未拒、真门禁未接、runner 缺失、manifest 缺失）
-- actual_RED_output: develop `3906ac56c` 基线快照（`git archive develop -- bin docs .gitee-ci.yml .github`）放入**最终版** AT-001 —— `SUMMARY: 4 ok, 16 failed`（AT-001-RED.log）。4 项 PASS 是既有能力守卫（gate / writer / 两个 CI 文件存在），证明夹具可跑通；行为组第 1 项实测真实门禁 `rc=0` 放行手写 env，即缺陷本体。
-- actual_output: 工位同一断言 —— `SUMMARY: 20 ok, 0 failed`（AT-001-GREEN.log）
+- expected_output: SUMMARY: 25 ok, 0 failed
+- expected_RED_output: SUMMARY: 21 failed（静态 8：无 evidence helper、门禁无校验、无 test-gate run / evidence add / test-all、CI 桩未替换；行为 8：手写三行 env 被真实门禁放行、失败运行未拒、成功运行未证、篡改未拒、HEAD 漂移未拒、真门禁未接、runner 缺失、manifest 缺失）
+- actual_RED_output: develop `3906ac56c` 基线快照（`git archive develop -- bin docs .gitee-ci.yml .github`）放入**最终版** AT-001 —— `SUMMARY: 4 ok, 21 failed`（AT-001-RED.log）。4 项 PASS 是既有能力守卫（gate / writer / 两个 CI 文件存在），证明夹具可跑通；行为组第 1 项实测真实门禁 `rc=0` 放行手写 env，即缺陷本体。
+- actual_output: 工位同一断言 —— `SUMMARY: 25 ok, 0 failed`（AT-001-GREEN.log）
 - evidence_file: docs/B2-docs/gate/platform/raw-20261103T132548Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log,AT-001-REGRESSION-BASELINE.log
 - red-green-status: green
 - status: passed

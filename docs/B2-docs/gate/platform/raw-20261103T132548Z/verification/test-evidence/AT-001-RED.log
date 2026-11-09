@@ -11,6 +11,8 @@
   [FAIL] Gitee CI no longer prints CI OK
   [FAIL] Gitee CI covers fix/* and runs the real test suite
   [FAIL] GitHub workflow has a real run: step
+  [FAIL] local projection does not invent kind/* for unlabelled legacy raws
+  [FAIL] replica comparison can skip labels when the document declares none
 === BEHAVIOR: real gate + evidence helper ===
   [FAIL] hand-written 3-line test-gate.env is rejected by the real gate (rc=0)
   [FAIL] failed test run is refused (exit_code=1) (helper missing)
@@ -18,6 +20,9 @@
   [FAIL] tampered evidence is rejected (sha256 mismatch) (helper missing)
   [FAIL] stale HEAD evidence is rejected (helper missing)
   [FAIL] real gate accepts runner-produced evidence (helper missing)
+  [FAIL] unlabelled legacy raw reconciles without fake divergence (helper missing)
+  [FAIL] labelled platforms reconcile with a local doc that declares no labels (helper missing)
+  [FAIL] an explicitly declared local label disagreement is still blocked (helper missing)
   [FAIL] bin/test-all --ci passes with an explicit known-broken list (helper missing)
   [FAIL] evidence add records the file sha256 in a manifest (helper missing)
-SUMMARY: 4 ok, 16 failed
+SUMMARY: 4 ok, 21 failed

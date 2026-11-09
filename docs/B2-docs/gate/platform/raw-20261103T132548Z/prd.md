@@ -32,4 +32,4 @@
 
 ## 验收
 
-AT-001 基线快照 RED `4 ok / 16 failed` → GREEN `20 ok / 0 failed`；17 个回归对比；真机收口用 `test-gate run`。
+AT-001 基线快照 RED `4 ok / 21 failed` → GREEN `25 ok / 0 failed`；17 个回归对比；真机收口用 `test-gate run`。
