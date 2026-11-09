@@ -675,7 +675,7 @@ _require_issue_exists() {
         local consumed
         consumed=$(python3 -c "
 import sqlite3
-conn=sqlite3.connect('$db_path')
+conn=sqlite3.connect("file:" + '$db_path' + "?mode=ro", uri=True)
 r=conn.execute('SELECT consumed FROM chats WHERE id=?', ('$ts_bare',)).fetchone()
 print(r[0] if r else '')
 conn.close()
@@ -730,7 +730,7 @@ _materialize_chat_if_needed() {
   ts_bare=$(echo "$ts" | tr -d 'TZ')
   consumed=$(python3 -c "
 import sqlite3
-conn=sqlite3.connect('$db_path')
+conn=sqlite3.connect("file:" + '$db_path' + "?mode=ro", uri=True)
 r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts_bare',)).fetchone()
 print(r[0] if r else '')
 conn.close()

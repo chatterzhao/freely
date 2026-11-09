@@ -43,7 +43,7 @@ def _chat_comments(project: Path, issue_id: str) -> list[dict]:
     db = project / ".freely" / "freely.db"
     if not db.is_file():
         return []
-    conn = sqlite3.connect(str(db))
+    conn = sqlite3.connect("file:" + str(db + "?mode=ro", uri=True))
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
         "SELECT * FROM chats WHERE chat_type = 'comment' AND issue_id = ? ORDER BY id",

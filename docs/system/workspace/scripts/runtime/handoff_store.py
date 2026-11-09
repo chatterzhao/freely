@@ -41,6 +41,7 @@ class HandoffStore:
     def __init__(self, db_path: str | Path):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        # db-writer: handoff_store: 委托任务 store（自建表 + 写入），登记于 State 契约
         self.conn = sqlite3.connect(self.db_path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)

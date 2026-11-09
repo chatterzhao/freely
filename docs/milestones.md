@@ -1,3 +1,24 @@
+## M-20261104T075910Z-A
+- title: fix — DB 读写边界收口（单写入方可追溯）
+- status: active
+### candidate_issues
+1. `C-20261104T075910Z-A`
+- milestone: M-20261104T075910Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T075910Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261104T075910Z/issues/I-20261104T075910Z-A.md
+### committed_issues
+1. `I-20261104T075910Z-A`
+- milestone: M-20261104T075910Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261104T075910Z/issues/I-20261104T075910Z-A.md
+### completed_issues
+1. `I-20261104T075910Z-A`
+- milestone: M-20261104T075910Z-A
+- phase_state: completed
+- completed_at: 2026-11-09T08:45:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261104T075910Z/issues/I-20261104T075910Z-A.md
+
 ## M-20261103T132622Z-A
 - title: fix — 消除启动锁 TOCTOU 与 DB daemon 双实例
 - status: active

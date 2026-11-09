@@ -51,6 +51,34 @@ SQLite 不是单一职责的 crash-recovery 文件；不同表在 Freely runtime
 | `task_mode_gate` | `auto` / `wait` / `listen` 模式门控 |
 | `agent_working` | agent-worktree-session 绑定（替代 agent-id.env）。raw_key 为主键，manager_id/worker_id/reviewer_id 列存 `agent_id:session_id` 格式。reviewer 逗号分隔多对 |
 
+### State 契约（写入方唯一性）
+
+`.freely/freely.db` 的**长期写入方只有一个**：`freely_db_manager.py`（持有单 connection + socket server）。
+其他进程只允许两种形态的访问，由 `bin/check-db-writers` 强制：
+
+| 形态 | 入口 | 说明 |
+|---|---|---|
+| 长期写者 | `freely_db_manager.py` | 唯一 daemon，跑 socket server |
+| 短写者 | `runtime/db_write_gate.py` 的 `write_tx()` / `connect_writer()` | `BEGIN IMMEDIATE` + `busy_timeout` + 锁重试；两个短写者串行化而不是竞争 |
+| 只读 | `connect_reader()` / `connect_reader_if_exists()`，或显式 `?mode=ro` URI | 永不建库、永不取写锁、看不到未提交行 |
+| 登记写者 | 连接行/上一行带 `# db-writer: <owner>: <reason>` | 仅用于下表已登记的辅助 store，迁移到 `write_tx()` 后应删除登记 |
+
+`bin/check-db-writers`（`pr-create-guarded` / CI 可调用）扫描 `docs/system/workspace/scripts/**` 的每个
+`sqlite3.connect`，只允许上述四种形态 + `tests/` 与 `*.bak.*`；否则退出 1 并列出位置。
+
+#### 辅助 store 登记
+
+这些 store 自建 schema、与 daemon 共享同一个库文件，属于**已知的第二个写入方**，必须在迁移前显式登记：
+
+| 表 | owner 文件 | 列（要点） | 迁移 | 状态 |
+|---|---|---|---|---|
+| `agent_decisions`, `agent_reports` | `runtime/agent_protocol.py` | 决策/报告记录，按 task 关联 | 待迁 `write_tx()` | 已登记 |
+| `handoffs`, `handoff_messages`, `delegation_tasks` | `runtime/handoff_store.py` | 委托任务与消息；`a2a_tasks` 已取代 `handoffs` 语义 | 待迁 `write_tx()` | 已登记（`handoffs` 为遗留表） |
+| `discussion_events` | `runtime/discussion_events.py` | 讨论事件流（event_type / payload / 时间） | 待迁 `write_tx()` | 已登记 |
+
+迁移约束：迁到 `write_tx()` 后必须在同一 PR 内删除对应的 `# db-writer:` 登记，否则 `check-db-writers`
+会把它当成「仍是登记写者」而放过真实的违规。
+
 ### 关键数据流
 
 ```
