@@ -9,7 +9,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set
 
 import yaml
 
@@ -541,6 +541,61 @@ def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
             continue
         changed.update(range(start, start + length))
     return changed
+
+
+def baseline_text(rel_path: str, args: argparse.Namespace) -> str:
+    """Content of `rel_path` before this merge (empty if unknown).
+
+    `pr-merge-guarded` triggers this gate from the pre-merge commit hook, which
+    runs in `--staged` mode; there the "before" side is simply HEAD.
+    """
+    if args.staged:
+        base = "HEAD"
+    elif args.range and ".." in args.range:
+        base = args.range.split("..", 1)[0].strip()
+    else:
+        base = ""
+    if not base:
+        return ""
+    result = subprocess.run(
+        ["git", "show", f"{base}:{rel_path}"],
+        cwd=ROOT_DIR, capture_output=True, text=True,
+    )
+    return result.stdout if result.returncode == 0 else ""
+
+
+def legacy_frontmatter_damaged(text: str) -> bool:
+    """True when the BASELINE copy of a document was already unparseable.
+
+    A structurally damaged document has no valid lifecycle owner (#4148): its
+    metadata could not be read, so no phase/candidate/issue chain ever saw it.
+    Repairing that structure therefore cannot change another issue's governance
+    state. Without this, the gate deadlocks every repair — a broken document may
+    only be fixed by a branch whose key it does not match.
+
+    Deliberately implemented on plain YAML only: this gate must work on develop
+    before the single-owner parser lands there.
+    """
+    if not text.startswith("---"):
+        return False  # legacy bullet-only linked format: supported, not damage
+    lines = text.split("\n")
+    closing = [i for i in range(1, len(lines)) if lines[i].strip() == "---"]
+    if not closing:
+        return True  # closing delimiter glued to the last field
+    if any(line.startswith("<<<<<<<") for line in lines) and any(
+        line.startswith(">>>>>>>") for line in lines
+    ):
+        return True  # unresolved conflict markers
+    try:
+        yaml.safe_load("\n".join(lines[1:closing[0]]))
+    except yaml.YAMLError:
+        return True  # stray bullets inside YAML / field glued to previous value
+    return False
+
+
+def select_repair_only_paths(paths: Iterable[str], args: argparse.Namespace) -> Set[str]:
+    """Subset of `paths` whose pre-merge copy had unparseable frontmatter."""
+    return {p for p in paths if legacy_frontmatter_damaged(baseline_text(p, args))}
 
 
 def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
@@ -1137,6 +1192,21 @@ def main() -> int:
     errors: List[str] = []
     warnings: List[str] = []
 
+    # #4148: a document whose BASELINE copy could not be parsed had no readable
+    # lifecycle state, so repairing its structure is not "this issue took part in
+    # the merge". Exclude such paths from every owner check instead of failing
+    # GATE 1 / phase-vs-code / review-artifact checks one by one — otherwise the
+    # gate deadlocks every repair (a broken doc may only be fixed by a branch
+    # whose key it does not match).
+    repair_only_paths: Set[str] = select_repair_only_paths(issue_paths, args)
+    if repair_only_paths:
+        for repair_path in sorted(repair_only_paths):
+            warnings.append(
+                f"GATE 1: {repair_path} had unparseable frontmatter on the baseline; "
+                f"the change is treated as a structural repair only (#4148)."
+            )
+        issue_paths -= repair_only_paths
+
     # ── GATE 1: source branch must carry a valid issue key ──
     source_branch = (args.source_branch or "").strip()
     # In --range mode without explicit --source-branch, derive from current branch
@@ -1233,6 +1303,13 @@ def main() -> int:
                         i_ts = _extract_ts(iid)
                         if i_ts and not i_ts.startswith(branch_ts) and not branch_ts.startswith(i_ts):
                             if i_ts.rstrip("Z") != branch_ts.rstrip("Z"):
+                                if legacy_frontmatter_damaged(baseline_text(issue_path, args)):
+                                    warnings.append(
+                                        f"GATE 1: {issue_path} belongs to {iid}, not {branch_issue_key}, "
+                                        f"but its baseline copy had damaged frontmatter that no lifecycle "
+                                        f"could read — treated as a structural repair, not a second issue."
+                                    )
+                                    continue
                                 errors.append(_gate1_mismatch_msg(
                                     branch_issue_key, branch_ts,
                                     f"issue {iid}", issue_path, i_ts,
