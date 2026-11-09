@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T132517Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T132517Z-A
 platform_ids:
   github:
     issue_id: '4148'
@@ -14,20 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSPQ2
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+last_synced_comment_at:
+  github: '2026-11-09T06:49:51Z'
+  gitee: '2026-11-09T06:49:51Z'
 hash: ''
 created_at: '2026-11-03T13:25:17Z'
-updated_at: '2026-11-09T06:47:36Z'
+updated_at: '2026-11-09T06:49:55Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children:
 - I-20261103T132517Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-09T06:49:50Z'
 closeout_note: ''
 ---
 
@@ -66,3 +68,11 @@ workflow_kind: feature
 - GREEN：`grep -c "yaml.safe_load" task-lifecycle-scan.py` = 0，`grep -c "_fm_get" bin/issue-sync` = 0（或仅剩薄封装且内部走规范路径）。
 - GREEN：对 12+1 个存量坏文件跑 repair 后，`scan` 不再产出任何 `phase_state=""`。
 - GREEN：新增对等测试，断言 `scan` 与 `issue-sync` 对同一份损坏 frontmatter 给出**一致**结论；当前两者对同一坏输入的判定不同。
+
+### comment-20261109T064951Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261103T132517Z-A"]
+
+拆解为以下任务:
+1. [I-20261103T132517Z-A](will-be-updated)
