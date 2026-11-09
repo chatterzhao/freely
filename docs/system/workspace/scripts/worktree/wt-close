@@ -1248,7 +1248,7 @@ agent_release_all('$_dev_wt', 'raw-${_tp_raw_key}')
 	    # Fallback: legacy agent-id.env cleanup
 	    _agent_env="$_dev_wt/.freely/agent-id.env"
 	    if [[ -f "$_agent_env" ]]; then
-	      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true
+	      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true; rm -f "$_agent_env.bak"
 	    fi
   fi
 fi

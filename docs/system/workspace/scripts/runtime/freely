@@ -2067,7 +2067,7 @@ startup_self_heal_machine_state_if_needed() {
     local last_sid
     last_sid=$(grep "^LAST_TOOL_SESSION_ID=" "$state_file" 2>/dev/null | cut -d= -f2- | tr -d '"')
     if [[ -n "$last_sid" ]] && ! is_valid_uuid "$last_sid"; then
-      sed -i '' 's/^LAST_TOOL_SESSION_ID=.*/LAST_TOOL_SESSION_ID=""/' "$state_file"
+      sed -i.bak 's/^LAST_TOOL_SESSION_ID=.*/LAST_TOOL_SESSION_ID=""/' "$state_file"; rm -f "$state_file.bak"
     fi
   fi
 
@@ -5485,7 +5485,7 @@ runtime_clear_session_state_for_fresh_launch() {
   local _state_file
   _state_file="$(session_state_file "$project")"
   if [[ -f "$_state_file" ]]; then
-    sed -i '' '/^LAST_TOOL_SESSION_ID=/d; /^LAST_TOOL_RESUME_TARGET=/d' "$_state_file" 2>/dev/null || true
+    sed -i.bak '/^LAST_TOOL_SESSION_ID=/d; /^LAST_TOOL_RESUME_TARGET=/d' "$_state_file" 2>/dev/null || true; rm -f "$_state_file.bak"
     log_info "cross-tool switch: cleared session state for fresh launch"
   fi
 }
@@ -17841,7 +17841,7 @@ _update_task_source_scan_state_active_workers() {
   local state_path
   state_path="$(task_source_scan_state_file_for_project "$project")"
   if [[ -f "$state_path" ]]; then
-    sed -i '' -E '/^LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS=/d' "$state_path" 2>/dev/null || true
+    sed -i.bak -E '/^LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS=/d' "$state_path" 2>/dev/null || true; rm -f "$state_path.bak"
   fi
   printf 'LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS=%s\n' "$count" >>"$state_path"
 }
@@ -21591,7 +21591,7 @@ EOF
       else
         cp "$tmpl" "$target_file"
         project_dir_name="$(basename "$project")"
-        sed -i '' "s/\$(project_name)/$project_dir_name/g" "$target_file"
+        sed -i.bak "s/\$(project_name)/$project_dir_name/g" "$target_file"; rm -f "$target_file.bak"
         log_info "created: $target_file from template"
       fi
     done

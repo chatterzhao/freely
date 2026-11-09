@@ -94,17 +94,20 @@ fi
 # Resolve reviewer slot from agent_working after branch is known (canonical raw key).
 if [[ -z "$REVIEWER_SLOT" ]]; then
   if [[ -f "$_aw_py" ]]; then
-    _my_worker_id=$(python3 -c "
+    # Branch names come from callers (and from external PRs): pass them as argv,
+    # never interpolate into the script body (#4156).
+    _my_worker_id=$(python3 - "$ROOT_DIR" "$review_branch" <<'PY' 2>/dev/null || true
 import sys
-sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+root_dir, branch = sys.argv[1], sys.argv[2]
+sys.path.insert(0, root_dir + '/docs/system/workspace/scripts/runtime')
 from raw_key_canon import try_canonicalize_raw_key
 from agent_working import agent_list_by_raw_key, AgentWorkingError
 from agent_identity_value import first_agent_id
-rk = try_canonicalize_raw_key('$review_branch')
+rk = try_canonicalize_raw_key(branch)
 if not rk:
     raise SystemExit(0)
 try:
-    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+    row = agent_list_by_raw_key(root_dir, rk)
 except AgentWorkingError as e:
     print(f'ERROR: agent_working unavailable: {e}', file=sys.stderr)
     raise SystemExit(2)
@@ -112,7 +115,8 @@ if row:
     wid = first_agent_id(row.get('worker_id', ''))
     if wid:
         print(wid)
-" 2>/dev/null || true)
+PY
+)
     if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
       _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
       if [[ -n "$_rev_info" ]]; then
@@ -296,24 +300,26 @@ fi
 _my_worker_id=""
 # agent_working only — no file-based identity fallback
 if [[ -f "$_aw_py" ]]; then
-  _my_worker_id=$(python3 -c "
+  _my_worker_id=$(python3 - "$ROOT_DIR" "$review_branch" <<'PY' 2>/dev/null || true
 import sys
-sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+root_dir, branch = sys.argv[1], sys.argv[2]
+sys.path.insert(0, root_dir + '/docs/system/workspace/scripts/runtime')
 from raw_key_canon import try_canonicalize_raw_key
 from agent_working import agent_list_by_raw_key, AgentWorkingError
 from agent_identity_value import first_agent_id
-rk = try_canonicalize_raw_key('$review_branch')
+rk = try_canonicalize_raw_key(branch)
 if not rk:
     raise SystemExit(0)
 try:
-    row = agent_list_by_raw_key('$ROOT_DIR', rk)
+    row = agent_list_by_raw_key(root_dir, rk)
 except AgentWorkingError:
     raise SystemExit(0)
 if row:
     wid = first_agent_id(row.get('worker_id', ''))
     if wid:
         print(wid)
-" 2>/dev/null || true)
+PY
+)
 fi
 _identity_kind="worker"
 if [[ -z "$_my_worker_id" ]]; then
@@ -760,7 +766,7 @@ _update_issue_phase_state() {
   _i_file=$(find "$ROOT_DIR/docs/B2-docs" -name "I-${_raw_key}*.md" 2>/dev/null | head -1)
   if [[ -n "$_i_file" && -f "$_i_file" ]]; then
     if grep -q "phase_state: done_b2_ibm" "$_i_file" 2>/dev/null; then
-      sed -i '' 's/phase_state: done_b2_ibm/phase_state: completed/' "$_i_file"
+      sed -i.bak 's/phase_state: done_b2_ibm/phase_state: completed/' "$_i_file"; rm -f "$_i_file.bak"
       git -C "$ROOT_DIR" add "${_i_file#$ROOT_DIR/}" 2>/dev/null || true
       echo "Updated phase_state → completed in ${_i_file#$ROOT_DIR/}"
     fi
