@@ -299,6 +299,18 @@ def behavior_checks() -> None:
         shutil.rmtree(fix, ignore_errors=True)
 
 
+def _seed_lifecycle(fix: Path) -> None:
+    """issue-sync reads frontmatter through the single-owner CLI (#4148).
+
+    Without it every `_fm_*` call no-ops, so the fixture would pass/fail for
+    the wrong reason (missing dependency instead of missing behaviour).
+    """
+    dst = fix / "docs" / "system" / "workspace" / "scripts" / "lifecycle"
+    dst.mkdir(parents=True, exist_ok=True)
+    for path in (SRC / "docs" / "system" / "workspace" / "scripts" / "lifecycle").glob("*.py"):
+        shutil.copy(path, dst / path.name)
+
+
 def labels_checks() -> None:
     """REAL issue-sync _labels() emits severity/Pn from frontmatter (default P2)."""
     print("=== BEHAVIOR: issue-sync _labels severity ===")
@@ -306,6 +318,7 @@ def labels_checks() -> None:
     try:
         (fix / "bin").mkdir(parents=True)
         shutil.copy(SRC / "bin" / "issue-sync", fix / "bin" / "issue-sync")
+        _seed_lifecycle(fix)
         d = fix / "docs" / "B1-docs" / "raw-20260101T000000Z"
         d.mkdir(parents=True)
         # P0 doc
@@ -340,6 +353,7 @@ def scan_checks() -> None:
     try:
         (fix / "bin").mkdir(parents=True)
         shutil.copy(SRC / "bin" / "issue-sync", fix / "bin" / "issue-sync")
+        _seed_lifecycle(fix)
         b1 = fix / "docs" / "B1-docs"
         b1.mkdir(parents=True)
         docs = {

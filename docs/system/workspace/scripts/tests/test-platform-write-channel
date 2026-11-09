@@ -23,11 +23,15 @@ make_fixture() {
   mkdir -p "$FIX/bin" "$FIX/stub" \
            "$FIX/docs/system/workspace/scripts/runtime" \
            "$FIX/docs/system/workspace/scripts/sync" \
+           "$FIX/docs/system/workspace/scripts/lifecycle" \
            "$FIX/docs/B1-docs/raw-20260101T000000Z"
   # _platform_title() imports the shared title contract from scripts/sync.
   cp "$ROOT_DIR/docs/system/workspace/scripts/sync/raw_title_contract.py" \
      "$FIX/docs/system/workspace/scripts/sync/raw_title_contract.py"
   cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  # Single-owner frontmatter CLI (#4148): without it platform_state writes vanish.
+  cp "$ROOT_DIR"/docs/system/workspace/scripts/lifecycle/*.py \
+     "$FIX/docs/system/workspace/scripts/lifecycle/"
 
   # Stub gitee-issue.py — real CLI shape (subcommand + named flags).
   cat > "$FIX/docs/system/workspace/scripts/runtime/gitee-issue.py" <<'STUB'

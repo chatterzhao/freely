@@ -25,8 +25,13 @@ FIX=""
 make_fixture() {
   FIX="$(mktemp -d /tmp/freely-close.XXXXXX)"; FIX="$(cd "$FIX" && pwd -P)"
   mkdir -p "$FIX/bin" "$FIX/docs/system/workspace/scripts/sync" \
+           "$FIX/docs/system/workspace/scripts/lifecycle" \
            "$FIX/docs/B1-docs/raw-20260101T000000Z"
   cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  # issue-sync reads/writes frontmatter through the single-owner lifecycle CLI
+  # (#4148). A fixture without it would silently lose every frontmatter write.
+  cp "$ROOT_DIR"/docs/system/workspace/scripts/lifecycle/*.py \
+     "$FIX/docs/system/workspace/scripts/lifecycle/"
   # The adapter is resolved from the project root handed to close-platforms,
   # so a stub here proves whether the platform write happened at all.
   cat > "$FIX/docs/system/workspace/scripts/sync/platform-adapter.py" <<'STUB'

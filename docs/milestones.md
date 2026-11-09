@@ -1,3 +1,23 @@
+## M-20261103T132517Z-A
+- title: refactor — 统一 SDD frontmatter 解析所有权
+- status: active
+### candidate_issues
+1. `C-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132517Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+### committed_issues
+1. `I-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+### completed_issues
+1. `I-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- phase_state: completed
+- completed_at: 2026-11-09T06:52:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
 ## M-20261109T070744Z-A
 - title: fix — 门禁区分「修复既有损坏」与「多 issue 混入」
 - status: active
