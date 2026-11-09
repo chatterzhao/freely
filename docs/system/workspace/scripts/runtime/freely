@@ -7109,7 +7109,7 @@ chat_intake_snapshot_for_project() {
   _rows=$(python3 -c "
 import sqlite3, sys
 try:
-    db = sqlite3.connect('$_db_path')
+    db = sqlite3.connect("file:" + '$_db_path' + "?mode=ro", uri=True)
     rows = db.execute('SELECT id, chat_type, issue_id, author, message, created_at FROM chats WHERE consumed = 0 ORDER BY id DESC LIMIT $limit').fetchall()
     for r in rows:
         cid, ctype, issue, author, msg, created = r
@@ -17344,7 +17344,7 @@ PYEOF
   if [[ -f "$_aw_db" ]]; then
     python3 - "$_aw_db" <<'PYEOF'
 import sqlite3, sys
-db = sqlite3.connect(sys.argv[1])
+db = sqlite3.connect("file:" + sys.argv[1] + "?mode=ro", uri=True)
 
 # Read agent_working
 rows = list(db.execute("SELECT raw_key, manager_id, worker_id, reviewer_id, slot FROM agent_working ORDER BY raw_key"))
@@ -20726,6 +20726,7 @@ ensure_interruption_dispatch_once() {
     python3 -c "
 import sqlite3, time
 try:
+    # db-writer: freely-runtime: chat 状态更新（UPDATE chats），登记于 State 契约
     db = sqlite3.connect('$_db_path')
     cutoff = int(time.time()) - 7*86400  # 7 days
     db.execute(\"UPDATE chats SET consumed = -1 WHERE consumed = 1 AND CAST(created_at AS INTEGER) < ?\", (cutoff,))
@@ -24940,7 +24941,7 @@ HELP
       local _discuss_session
       _discuss_session=$(python3 -c "
 import sqlite3
-conn = sqlite3.connect('${PROJECT_ROOT}/.freely/freely.db')
+conn = sqlite3.connect("file:" + '${PROJECT_ROOT}/.freely/freely.db' + "?mode=ro", uri=True)
 r = conn.execute(\"SELECT session_id FROM sessions WHERE role='discuss' AND status='active' ORDER BY updated_at DESC LIMIT 1\").fetchone()
 print(r[0] if r else '')
 conn.close()
@@ -25039,7 +25040,7 @@ HELP
       local _session_id
       _session_id=$(python3 -c "
 import sqlite3, json
-conn = sqlite3.connect('${project}/.freely/freely.db')
+conn = sqlite3.connect("file:" + '${project}/.freely/freely.db' + "?mode=ro", uri=True)
 r = conn.execute(\"SELECT session_id FROM sessions WHERE project=? AND role IN ('worker','manager') AND status='active' ORDER BY updated_at DESC LIMIT 1\", ('$_wt_path',)).fetchone()
 print(r[0] if r else '')
 conn.close()

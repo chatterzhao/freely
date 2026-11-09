@@ -1321,7 +1321,7 @@ def main() -> int:
         db_path = os.path.join(ROOT_DIR, ".freely", "freely.db")
         if os.path.isfile(db_path) and branch_issue_key.startswith("raw-"):
             try:
-                conn = sqlite3.connect(db_path)
+                conn = sqlite3.connect("file:" + db_path + "?mode=ro", uri=True)
                 raw_ts_match = re.match(r"raw-(\d{8}[-T]\d{4}Z?)", branch_issue_key)
                 if raw_ts_match:
                     ts_prefix = raw_ts_match.group(1).replace("-", "").replace("T", "").replace("Z", "")
@@ -2111,7 +2111,7 @@ def main() -> int:
     db_path = os.path.join(ROOT_DIR, ".freely", "freely.db")
     if os.path.isfile(db_path) and touched_issue_records:
         try:
-            conn = sqlite3.connect(db_path)
+            conn = sqlite3.connect("file:" + db_path + "?mode=ro", uri=True)
             for issue in touched_issue_records:
                 iid = issue.issue_id
                 if not iid:

@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Boundary lint: only the DB daemon (and the write gate) may open a writable
+`freely.db` connection (raw-20261104T075910Z).
+
+Allowed forms of `sqlite3.connect(...)`:
+
+1. inside `runtime/freely_db_manager.py` — the single long-lived writer;
+2. inside `runtime/db_write_gate.py` — the only short-lived writer factory;
+3. a read-only URI (`mode=ro`) — cannot mutate, cannot see uncommitted rows;
+4. an explicit registration: the call line or the line above carries
+   `# db-writer: <owner>: <reason>` and the store is listed in the State
+   contract (`three-loop-capability-lifecycle.md`);
+5. under `tests/` or a `*.bak.*` file (fixtures / backups).
+
+Usage: python3 bin/check-db-writers [--project <path>]
+Exit 0: no unregistered writers. Exit 1: violations listed.
+"""
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+OWNER_FILES = {
+    "docs/system/workspace/scripts/runtime/freely_db_manager.py",
+    "docs/system/workspace/scripts/runtime/db_write_gate.py",
+}
+SCAN_ROOT = "docs/system/workspace/scripts"
+SKIP_PARTS = ("tests/", "node_modules")
+SKIP_SUFFIXES = (".pyc",)
+CONNECT = re.compile(r"sqlite3\.connect\s*\(")
+REGISTRATION = re.compile(r"#\s*db-writer:\s*\S+")
+
+
+def _iter_files(root: Path, project: Path):
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(project).as_posix()
+        if any(part in rel for part in SKIP_PARTS):
+            continue
+        if path.suffix in SKIP_SUFFIXES or ".bak." in path.name:
+            continue
+        yield path, rel
+
+
+def _is_allowed(text: str, rel: str, offset: int) -> bool:
+    if rel in OWNER_FILES:
+        return True
+    line_start = text.rfind("\n", 0, offset) + 1
+    line_end = text.find("\n", offset)
+    line = text[line_start: line_end if line_end >= 0 else len(text)]
+    if "mode=ro" in line:
+        return True
+    prev_start = text.rfind("\n", 0, line_start - 1) + 1
+    prev_line = text[prev_start: line_start]
+    return bool(REGISTRATION.search(line) or REGISTRATION.search(prev_line))
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="DB writer boundary lint")
+    ap.add_argument("--project", default=str(Path(__file__).resolve().parents[1]))
+    args = ap.parse_args()
+    project = Path(args.project).resolve()
+    root = project / SCAN_ROOT
+
+    violations = []
+    allowed = 0
+    total = 0
+    for path, rel in _iter_files(root, project):
+        try:
+            text = path.read_text(errors="replace")
+        except OSError:
+            continue
+        for match in CONNECT.finditer(text):
+            total += 1
+            if _is_allowed(text, rel, match.start()):
+                allowed += 1
+                continue
+            line = text[: match.start()].count("\n") + 1
+            violations.append((rel, line))
+
+    print(f"[db-writers] scanned {total} sqlite3.connect call(s), allowed {allowed}, "
+          f"unregistered {len(violations)}")
+    if violations:
+        print("[db-writers] FAIL: writable connections outside the daemon / write gate:")
+        for rel, line in violations:
+            print(f"  - {rel}:{line}")
+        print()
+        print("  Fix by one of:")
+        print("    * use db_write_gate.connect_reader(...) for reads (mode=ro)")
+        print("    * use db_write_gate.write_tx(...) / connect_writer(...) for writes")
+        print("    * register a short-lived store with `# db-writer: <owner>: <reason>`")
+        print("      and list it in three-loop-capability-lifecycle.md 的 State 契约")
+        return 1
+    print("[db-writers] OK: every connection is the daemon, the write gate, read-only, or registered")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

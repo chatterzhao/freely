@@ -583,7 +583,7 @@ class A2AChecker:
     @property
     def conn(self):
         if self._conn is None:
-            self._conn = sqlite3.connect(str(self.db_path))
+            self._conn = sqlite3.connect("file:" + str(self.db_path + "?mode=ro", uri=True))
         return self._conn
 
     def agent_session_active(self, agent_id: str) -> bool:

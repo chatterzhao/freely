@@ -379,7 +379,7 @@ def _handle_message_delivery(project: str, data: dict):
     raw_key = ""
     task_agent_id = ""
     try:
-        db = sqlite3.connect(db_path)
+        db = sqlite3.connect("file:" + db_path + "?mode=ro", uri=True)
         row = db.execute(
             "SELECT raw_key, agent_id FROM a2a_tasks WHERE task_id=?", (task_id,)
         ).fetchone()
