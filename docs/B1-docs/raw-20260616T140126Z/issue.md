@@ -5,21 +5,20 @@ kind: raw
 phase_state: absorbed
 absorbed_into: I-20260616T140126Z-A
 open_questions:
-  - Overwrite vs. skip on re-init for .freely/ai-auth/?
-  - Include kiro-cli templates?
-  - Permission matrix scope in examples?
+- Overwrite vs. skip on re-init for .freely/ai-auth/?
+- Include kiro-cli templates?
+- Permission matrix scope in examples?
 acceptance_criteria:
-  - 7 template files exist and reviewed
-  - freely init integration tested
-  - Skill reference cross-links updated
+- 7 template files exist and reviewed
+- freely init integration tested
+- Skill reference cross-links updated
 acceptance_reviews: []
-created: 2026-06-18T08:05:54Z
-updated: 2026-06-18T08:05:54Z
+created: 2026-06-18 08:05:54+00:00
+updated: 2026-06-18 08:05:54+00:00
 b1_dir: docs/B1-docs/raw-20260616T140126Z26Z
-
 platform_state: closed
-local_id: raw-20260616T140126Z---
-
+local_id: raw-20260616T140126Z
+---
 # 创建 templates/ai-auth/ slot 配置示例模板，解决新用户安装后不知道如何配置 ~/.ai-auth/ slot 的问题。
 
 

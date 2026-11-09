@@ -32,42 +32,16 @@ set -euo pipefail
 ROOT_DIR="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 ISSUES_DIR="$ROOT_DIR/docs/B1-docs"
 
-# ── YAML helpers ─────────────────────────────────────────
+# ── YAML helpers — single owner: lifecycle/frontmatter_contract_cli.py ──
+_FM_CLI="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/frontmatter_contract_cli.py"
+
 
 _fm_get() {
-  local file="$1" key="$2"
-  python3 -c "
-import yaml, sys
-yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
-with open('$file') as f: content = f.read()
-if not content.startswith('---'): sys.exit(0)
-parts = content.split('---', 2)
-if len(parts) < 3: sys.exit(0)
-fm = yaml.safe_load(parts[1]) or {}
-val = fm.get('$key','')
-if isinstance(val, dict):
-  import json; print(json.dumps(val))
-elif isinstance(val, list):
-  import json; print(json.dumps(val))
-elif val is not None:
-  print(val)
-" 2>/dev/null || true
+  python3 "$_FM_CLI" get --file "$1" --key "$2" 2>/dev/null || true
 }
 
 _fm_set() {
-  local file="$1" key="$2" value="$3"
-  python3 -c "
-import yaml
-# Disable timestamp auto-parsing to preserve original datetime string format.
-yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
-with open('$file') as f: content = f.read()
-parts = content.split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-fm['$key'] = $value
-new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
-body = parts[2] if len(parts) >= 3 else ''
-with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body)
-" 2>/dev/null || true
+  python3 "$_FM_CLI" set --file "$1" --key "$2" --value "$3" 2>/dev/null || true
 }
 
 _fm_set_str() {
@@ -110,15 +84,7 @@ _issue_file_for() {
 }
 
 _fm_has_key() {
-  local file="$1" key="$2"
-  python3 -c "
-import sys, yaml
-yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
-with open('$file') as f: content = f.read()
-parts = content.split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-sys.exit(0 if isinstance(fm, dict) and '$key' in fm else 1)
-" 2>/dev/null
+  python3 "$_FM_CLI" has-key --file "$1" --key "$2" 2>/dev/null
 }
 
 _raw_effect() {

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 from collections.abc import Mapping
 from copy import deepcopy
@@ -277,12 +278,72 @@ def transition(
     return current
 
 
+_CONFLICT_START = re.compile(r"^<{7}", re.MULTILINE)
+_CONFLICT_END = re.compile(r"^>{7}", re.MULTILINE)
+# Legacy B2 linked issues declare part of their metadata as `- key: value`
+# bullets instead of YAML. Kept as a documented format, not as damage.
+_BULLET_FIELD = re.compile(r"^-\s*(\w[\w_]*):\s*(.*)")
+
+
+def extract_bullet_fields(text: str) -> dict[str, str]:
+    """Collect `- key: value` metadata bullets (legacy linked-issue format)."""
+    fields: dict[str, str] = {}
+    for line in text.split("\n"):
+        match = _BULLET_FIELD.match(line)
+        if match:
+            fields.setdefault(match.group(1), match.group(2).strip().strip("`'\""))
+    return fields
+
+
+def validate_issue_text(text: str) -> None:
+    """Structural checks that the lenient `split("---", 2)` reader cannot do.
+
+    Historical damage (#4148): a closing delimiter glued to the last field
+    (`platform_state: closed---`) and unresolved git conflict markers. Both used
+    to be swallowed by `except Exception: pass` in the scan-side parser.
+    """
+    if not text.startswith("---"):
+        raise MetadataValidationError("issue file has no YAML frontmatter")
+    # Require both halves: a bare `=======` line is a legal Markdown setext rule.
+    if _CONFLICT_START.search(text) and _CONFLICT_END.search(text):
+        raise MetadataValidationError("issue document contains unresolved git conflict markers")
+    lines = text.split("\n")
+    if not any(lines[i].strip() == "---" for i in range(1, len(lines))):
+        raise MetadataValidationError(
+            "issue frontmatter closing '---' is missing or glued to a field")
+
+
+def parse_issue_text(text: str) -> tuple[dict[str, Any], str]:
+    """Strict, single-owner frontmatter parser for scan / gates / sync."""
+    validate_issue_text(text)
+    lines = text.split("\n")
+    closing = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+    fm_text = "\n".join(lines[1:closing])
+    body = "\n" + "\n".join(lines[closing + 1:])
+    try:
+        metadata = yaml.safe_load(fm_text) or {}
+    except yaml.YAMLError as exc:
+        raise MetadataValidationError(f"invalid YAML frontmatter: {exc}") from exc
+    if not isinstance(metadata, dict):
+        raise MetadataValidationError("issue frontmatter must be a mapping")
+    return metadata, body
+
+
+def validate_issue_path(path: str | Path) -> dict[str, Any]:
+    """Shared entry point for scan, issue-sync and gates."""
+    metadata, _ = parse_issue_text(Path(path).read_text(encoding="utf-8"))
+    return metadata
+
+
 def read_issue(path: str | Path) -> tuple[dict[str, Any], str]:
     text = Path(path).read_text(encoding="utf-8")
     parts = text.split("---", 2)
     if len(parts) < 3:
         raise MetadataValidationError("issue file has no YAML frontmatter")
-    metadata = yaml.safe_load(parts[1]) or {}
+    try:
+        metadata = yaml.safe_load(parts[1]) or {}
+    except yaml.YAMLError as exc:
+        raise MetadataValidationError(f"invalid YAML frontmatter: {exc}") from exc
     if not isinstance(metadata, dict):
         raise MetadataValidationError("issue frontmatter must be a mapping")
     return metadata, parts[2]

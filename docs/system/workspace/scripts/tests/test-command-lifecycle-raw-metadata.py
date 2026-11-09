@@ -154,6 +154,9 @@ class RawMetadataContractTests(unittest.TestCase):
 set -euo pipefail
 source "$SOURCE_FILE"
 ROOT_DIR="$SANDBOX"
+# The copied functions file lives outside docs/, so pin the single-owner CLI
+# explicitly (#4148) — otherwise every _fm_* write silently no-ops here.
+_FM_CLI="$CONTRACT_ROOT/docs/system/workspace/scripts/lifecycle/frontmatter_contract_cli.py"
 RAW_METADATA_CONTRACT_ROOT="$CONTRACT_ROOT"
 ISSUES_DIR="$SANDBOX/docs/B1-docs"
 find() { printf '%s\n' "$CHILD_FILE"; }
@@ -228,6 +231,9 @@ cmd_promote_finalize "$RAW_ID"
 set -euo pipefail
 source "$SOURCE_FILE"
 ROOT_DIR="$SANDBOX"
+# The copied functions file lives outside docs/, so pin the single-owner CLI
+# explicitly (#4148) — otherwise every _fm_* write silently no-ops here.
+_FM_CLI="$CONTRACT_ROOT/docs/system/workspace/scripts/lifecycle/frontmatter_contract_cli.py"
 RAW_METADATA_CONTRACT_ROOT="$CONTRACT_ROOT"
 ISSUES_DIR="$SANDBOX/docs/B1-docs"
 cmd_close "$RAW_ID"

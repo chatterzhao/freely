@@ -33,7 +33,9 @@ from datetime import datetime, timezone
 
 _LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
 sys.path.insert(0, str(_LIFECYCLE_DIR))
-from raw_metadata_contract import MetadataValidationError, normalize, validate
+from raw_metadata_contract import (
+    MetadataValidationError, extract_bullet_fields, normalize, parse_issue_text, validate,
+)
 from agent_identity_value import first_agent_id
 
 try:
@@ -355,48 +357,27 @@ def cache_put(cache_file: Path, payload: dict):
         pass
 
 def parse_frontmatter(text: str) -> dict:
-    """Parse YAML frontmatter from issue.md, returning flat dict."""
-    fm_block = []
-    in_fm = False
-    for line in text.split("\n"):
-        s = line.strip()
-        if s == "---":
-            if not in_fm:
-                in_fm = True
-                continue
-            break
-        if in_fm:
-            fm_block.append(line)
-    if fm_block:
-        try:
-            data = yaml.safe_load("\n".join(fm_block))
-            if isinstance(data, dict):
-                return data
-        except Exception:
-            pass
-    fm = {}
-    lines = text.split("\n")
-    in_fm = False
-    for line in lines:
-        s = line.strip()
-        if s == "---":
-            if not in_fm:
-                in_fm = True
-                continue
-            else:
-                break
-        if in_fm and ":" in s:
-            k, v = s.split(":", 1)
-            fm[k.strip()] = v.strip().strip("'\"")
-      # Also scan bullet format (- key: value). Many I-* issues
-    # use mixed format: YAML has kind/local_id, bullet has phase_state.
-    for line in lines:
-        m = re.match(r"^-\s*(\w[\w_]*):\s*(.*)", line)
-        if m:
-            k = m.group(1)
-            if k not in fm:  # bullet supplements YAML, does not overwrite
-                fm[k] = m.group(2).strip().strip("`'\"")
-    return fm
+    """Strict parse via the single-owner contract (#4148).
+
+    Damaged frontmatter is NEVER an empty dict: it carries an explicit error
+    marker that read_issues_dir turns into a metadata_validation_error item.
+
+    One compatibility rule keeps a pre-existing format working: legacy linked
+    issues may have no YAML block at all and declare their metadata as
+    `- key: value` bullets. That is a format, not damage. When a YAML block
+    parses, it is the whole answer — exactly the pre-#4148 semantics — so prose
+    bullets in the body never leak into metadata.
+    """
+    try:
+        metadata, _ = parse_issue_text(text)
+        return metadata
+    except MetadataValidationError as exc:
+        bullets = extract_bullet_fields(text)
+        if not text.lstrip().startswith("---") and bullets:
+            return bullets
+        return {"__metadata_validation_error__": str(exc)}
+
+
 def extract_raw_key(text: str) -> str | None:
     """Extract raw-{timestamp} key from text (title + body)."""
     m = re.search(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", text, re.MULTILINE | re.IGNORECASE)
@@ -677,10 +658,11 @@ def read_issues_dir(project: Path) -> list[dict]:
             except Exception:
                 continue
             fm = parse_frontmatter(text)
+            parse_error = fm.pop("__metadata_validation_error__", "")
             name = d.name
             kind = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
             view = normalize(fm) if kind == "raw" else fm
-            validation_error = ""
+            validation_error = parse_error
             if kind == "raw" and view["strict_schema"]:
                 try:
                     validate(fm, base_dir=project)
@@ -720,6 +702,7 @@ def read_issues_dir(project: Path) -> list[dict]:
             except Exception:
                 continue
             fm = parse_frontmatter(text)
+            validation_error = fm.pop("__metadata_validation_error__", "")
             name = mf.stem  # e.g. I-20260628T005815Z-A
             issues.append({
                 "name": name,
@@ -732,6 +715,7 @@ def read_issues_dir(project: Path) -> list[dict]:
                 "source_raw": fm.get("source_raw", ""),
                 "source_candidate": fm.get("source_candidate", ""),
                 "frontmatter": fm,
+                "metadata_validation_error": validation_error,
             })
     return issues
 
