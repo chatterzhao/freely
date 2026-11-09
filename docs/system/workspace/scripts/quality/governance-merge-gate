@@ -9,17 +9,13 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set
 
 import yaml
 
 _LIFECYCLE_DIR = Path(__file__).resolve().parents[1] / "lifecycle"
 sys.path.insert(0, str(_LIFECYCLE_DIR))
 from raw_metadata_contract import MetadataValidationError, validate as validate_raw_metadata
-try:  # present from #4148 on; older worktrees fall back to the structural check below
-    from raw_metadata_contract import parse_issue_text as _parse_issue_text
-except ImportError:  # pragma: no cover
-    _parse_issue_text = None  # type: ignore[assignment]
 
 _QUALITY_DIR = Path(__file__).resolve().parent
 if str(_QUALITY_DIR) not in sys.path:
@@ -548,10 +544,17 @@ def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
 
 
 def baseline_text(rel_path: str, args: argparse.Namespace) -> str:
-    """Content of `rel_path` on the left side of `--range` (empty if unknown)."""
-    base = ""
-    if args.range and ".." in args.range:
+    """Content of `rel_path` before this merge (empty if unknown).
+
+    `pr-merge-guarded` triggers this gate from the pre-merge commit hook, which
+    runs in `--staged` mode; there the "before" side is simply HEAD.
+    """
+    if args.staged:
+        base = "HEAD"
+    elif args.range and ".." in args.range:
         base = args.range.split("..", 1)[0].strip()
+    else:
+        base = ""
     if not base:
         return ""
     result = subprocess.run(
@@ -564,29 +567,35 @@ def baseline_text(rel_path: str, args: argparse.Namespace) -> str:
 def legacy_frontmatter_damaged(text: str) -> bool:
     """True when the BASELINE copy of a document was already unparseable.
 
-    A structurally damaged document has no valid lifecycle owner yet (#4148):
-    its metadata could not be read, so no phase/candidate/issue chain ever saw
-    it. Repairing that structure therefore cannot change another issue's
-    governance state. Without this, GATE 1 deadlocks every repair — a broken
-    document may only be fixed by a branch whose key it does not match.
+    A structurally damaged document has no valid lifecycle owner (#4148): its
+    metadata could not be read, so no phase/candidate/issue chain ever saw it.
+    Repairing that structure therefore cannot change another issue's governance
+    state. Without this, the gate deadlocks every repair — a broken document may
+    only be fixed by a branch whose key it does not match.
+
+    Deliberately implemented on plain YAML only: this gate must work on develop
+    before the single-owner parser lands there.
     """
     if not text.startswith("---"):
         return False  # legacy bullet-only linked format: supported, not damage
-    if _parse_issue_text is not None:
-        try:
-            _parse_issue_text(text)
-            return False
-        except MetadataValidationError:
-            return True
-    # Fallback for worktrees that predate the single-owner parser.
     lines = text.split("\n")
-    if not any(line.strip() == "---" for line in lines[1:]):
+    closing = [i for i in range(1, len(lines)) if lines[i].strip() == "---"]
+    if not closing:
         return True  # closing delimiter glued to the last field
     if any(line.startswith("<<<<<<<") for line in lines) and any(
         line.startswith(">>>>>>>") for line in lines
     ):
         return True  # unresolved conflict markers
+    try:
+        yaml.safe_load("\n".join(lines[1:closing[0]]))
+    except yaml.YAMLError:
+        return True  # stray bullets inside YAML / field glued to previous value
     return False
+
+
+def select_repair_only_paths(paths: Iterable[str], args: argparse.Namespace) -> Set[str]:
+    """Subset of `paths` whose pre-merge copy had unparseable frontmatter."""
+    return {p for p in paths if legacy_frontmatter_damaged(baseline_text(p, args))}
 
 
 def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
@@ -1189,9 +1198,7 @@ def main() -> int:
     # GATE 1 / phase-vs-code / review-artifact checks one by one — otherwise the
     # gate deadlocks every repair (a broken doc may only be fixed by a branch
     # whose key it does not match).
-    repair_only_paths: Set[str] = {
-        p for p in issue_paths if legacy_frontmatter_damaged(baseline_text(p, args))
-    }
+    repair_only_paths: Set[str] = select_repair_only_paths(issue_paths, args)
     if repair_only_paths:
         for repair_path in sorted(repair_only_paths):
             warnings.append(
