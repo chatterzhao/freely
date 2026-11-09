@@ -1,6 +1,6 @@
 # Tasks: 消除启动锁 TOCTOU 与 DB daemon 双实例
 - issue_id: I-20261103T132622Z-A
-- pre_tests_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/verification/pre-tests.md
 
 ## 任务分解
 

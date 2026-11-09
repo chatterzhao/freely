@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSPQC
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 last_synced_comment_at:
   github: '2026-11-09T07:57:55Z'
   gitee: '2026-11-09T07:57:55Z'

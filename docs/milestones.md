@@ -6,18 +6,18 @@
 - milestone: M-20261103T132622Z-A
 - status: promoted
 - promoted_issue_id: I-20261103T132622Z-A
-- promoted_issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+- promoted_issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 ### committed_issues
 1. `I-20261103T132622Z-A`
 - milestone: M-20261103T132622Z-A
 - phase_state: completed
-- issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+- issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 ### completed_issues
 1. `I-20261103T132622Z-A`
 - milestone: M-20261103T132622Z-A
 - phase_state: completed
 - completed_at: 2026-11-09T08:05:00Z
-- issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+- issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 
 ## M-20261103T132517Z-A
 - title: refactor — 统一 SDD frontmatter 解析所有权

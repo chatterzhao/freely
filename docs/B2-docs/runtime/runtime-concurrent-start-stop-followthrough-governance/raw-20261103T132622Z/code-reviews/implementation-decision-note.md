@@ -1,6 +1,6 @@
 # Implementation Decision Note
 - issue_id: I-20261103T132622Z-A
-- issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+- issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 - decision: 启动锁的回收改成「age + owner」双校验（不引入新锁原语）；DB daemon 在 fork 前用 `fcntl.flock` 抢 pid 文件、bind 前探测、cleanup 校验 owner
 - why_this: 两个后果都是「控制面分裂 / 全项目 DB 不可用」，且表现为 AI 行为怪异而非崩溃。TOCTOU 的真正常态只有一个毫秒级窗口（mkdir→写 state.env），修复点是回收判定而不是创建方式；DB 双实例的根因是 check-then-act 加无条件 unlink 别人的 socket。
 - alternatives_considered: ①`flock` fd 继承给 supervisor——会把启动窗口互斥变成运行期独占，改变 stop/restart 语义；②`ln` 硬链接原子锁——需要把锁从目录改成文件，影响 5 处读取路径，收益与风险不成比例；③只加 age 校验——DB 面完全没覆盖；④保留 SQLite 的 `database is locked` 兜底——那是症状不是约束，RED 已证明它让 pid 文件指向错误进程。

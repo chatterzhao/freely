@@ -33,6 +33,6 @@ milestone: M-20261103T132622Z-A
   - summary: 复核 9 个证据点中 4 个在 develop 仍成立（`state_file_missing` 设置/消费点、5 处 `rm -rf "$lock_dir"`、db_manager 零 flock、`_generate_chat_id` 单写者注释）；实测 macOS 无 `flock` 命令、项目既有 `fcntl.flock` 范式在 `freely:1621-1650`；据此把 issue 的「flock fd 继承」改为「回收判定进 flock 临界区 + age/cmdline 校验」，并把 3 个正交面拆出。
   - verdict: pass
 - promoted_issue_id: I-20261103T132622Z-A
-- promoted_issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+- promoted_issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
 - milestone: M-20261103T132622Z-A
 - session_refs: []

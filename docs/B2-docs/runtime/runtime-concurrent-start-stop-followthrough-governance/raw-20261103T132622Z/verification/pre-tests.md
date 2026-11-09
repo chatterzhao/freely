@@ -20,7 +20,7 @@
 - expected_RED_output: SUMMARY: 5 ok / 8 failed（静态 5 全缺；TOCTOU 窗口仍回收并抢到锁；DB 并发后 pid 文件指向错误进程、无单实例文案；4 项 PASS 是既有能力守卫——老目录回收、活 owner 阻塞、cmdline 不可读时保守、SQLite 自身锁让第二个恰好崩掉）
 - actual_RED_output: develop `c31b73724` 基线快照注入最终版 AT-001 → `SUMMARY: 5 ok, 8 failed`（AT-001-RED.log）。关键证据：`pid file belongs to the surviving daemon ('94129' vs 94128)` —— pid 文件记录的是已死进程，正是 issue 描述的「孤儿覆盖 pid」；且 loser 输出为 `[ERROR] daemon start failed: database is locked`，说明当时靠 SQLite 兜底而非单实例约束。
 - actual_output: 工位同一断言 → `SUMMARY: 13 ok, 0 failed`（AT-001-GREEN.log）。loser 输出 `freely-db daemon already running (singleton lock held)`。
-- evidence_file: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log
+- evidence_file: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261103T132622Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log
 - red-green-status: green
 - status: passed
 - blocker: ""
