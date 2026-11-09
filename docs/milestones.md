@@ -1,3 +1,24 @@
+## M-20261103T132605Z-A
+- title: refactor — `runtime/freely` 被 source 时无副作用
+- status: active
+### candidate_issues
+1. `C-20261103T132605Z-A`
+- milestone: M-20261103T132605Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132605Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132605Z/issues/I-20261103T132605Z-A.md
+### committed_issues
+1. `I-20261103T132605Z-A`
+- milestone: M-20261103T132605Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132605Z/issues/I-20261103T132605Z-A.md
+### completed_issues
+1. `I-20261103T132605Z-A`
+- milestone: M-20261103T132605Z-A
+- phase_state: completed
+- completed_at: 2026-11-09T09:05:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132605Z/issues/I-20261103T132605Z-A.md
+
 ## M-20261104T075910Z-A
 - title: fix — DB 读写边界收口（单写入方可追溯）
 - status: active
