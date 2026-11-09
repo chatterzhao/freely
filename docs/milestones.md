@@ -1,3 +1,24 @@
+## M-20261103T132517Z-A
+- title: refactor — 统一 SDD frontmatter 解析所有权
+- status: active
+### candidate_issues
+1. `C-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132517Z-A
+- promoted_issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+### committed_issues
+1. `I-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+### completed_issues
+1. `I-20261103T132517Z-A`
+- milestone: M-20261103T132517Z-A
+- phase_state: completed
+- completed_at: 2026-11-09T06:52:00Z
+- issue_path: docs/B2-docs/gate/platform/raw-20261103T132517Z/issues/I-20261103T132517Z-A.md
+
 ## M-20261103T132548Z-A
 - title: feat — 测试证据链可验证并替换 CI 桩
 - status: active
