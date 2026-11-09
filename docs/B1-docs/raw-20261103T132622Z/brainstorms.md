@@ -55,6 +55,49 @@ created_at: 2026-11-09
 
 **选 A + 必要的 owner 校验**：flock 提供原子性，owner 校验（pid 文件内容 == 自己 + cmdline 匹配）解决 PID 复用。
 
+## 实现约束复核（2026-11-09，开发前）
+
+### 约束 1：macOS 没有 `flock` 命令
+
+```
+$ command -v flock   → 不存在
+$ python3 -c "import fcntl"  → ok
+$ perl -MFcntl=:flock -e 1   → ok
+```
+
+issue 方案 1 原文「启动锁改 `flock` 持有 fd 并继承给 supervisor 子进程」在 macOS 上**无法用 shell 直接实现**。项目内已有 canonical 范式：`freely:1621-1650` 用 `python3 - <<'PY'` + `fcntl.flock` 包住「读 seq → 写日志 → 写 seq」临界区。本 issue 复用同一范式，不引入新原语。
+
+**同时否决「fd 继承给 supervisor」**：那会把锁语义从「启动窗口互斥」变成「运行期独占」，导致 `stop` / `restart` / 多实例检测全部改变，超出本 issue 边界。启动锁只需覆盖「启动动作」本身。
+
+### 约束 2：真正常态的 TOCTOU 只有一个窗口
+
+`mkdir`（631）与写 `state.env`（632-636）之间是毫秒级窗口；等待方在 712 读到 `state_file_missing` 就 `rm -rf`（721）。**修复点是回收判定，不是创建方式**：
+
+- 目录锁保留 `mkdir`（它本身就是原子原语）；
+- `state_file_missing` 分支必须先看**目录 age**：`age < stale_secs` 视为「对方正在写 state」，继续等待；`age >= stale_secs` 且无活跃进程才回收。
+
+这一条就能把「两个 supervisor 都过门」堵死，且改动面只有 712 一处判定。
+
+### 约束 3：PID 复用需要 cmdline 校验
+
+`kill -0` 成功只证明「这个 pid 存在」，不证明「它是我们的锁持有者」。回收 `stale` 分支前需校验 `owner_pid` 的 cmdline 含本工具路径/关键参数；不匹配则视为 PID 复用，按 stale 处理（而不是无限等待）。
+
+## scope 收敛（本轮 vs 后续）
+
+issue 列了 5 个面。5 面共享同一根因，但同时改会让 AT 无法收敛（并发测试各自需要隔离环境）。按后果严重度收敛：
+
+| 面 | 后果 | 本轮 |
+|---|---|---|
+| 启动锁 TOCTOU | 双 supervisor、状态文件互相覆盖 | ✅ 本轮 |
+| DB daemon 无单实例 | **全项目 DB 不可用** + 自激（5s 重试再起一个） | ✅ 本轮 |
+| 派发非幂等（两条派发器） | worker 重复拉起 | ➡ 拆出（见下） |
+| SSE 三重实例 + 死代码 | 同一条 state_update 注入两次 | ➡ 拆出 |
+| `pkill -f` 未转义 | 误杀同前缀项目 | ➡ 拆出（与 #4156 同族） |
+
+拆出理由：①前两面的后果是「整体不可用/控制面分裂」，后三面是「局部重复/误伤」；②派发与 SSE 需要改状态机与事件链，与锁语义正交，混在同一 PR 会让 AT 覆盖 4 套隔离环境、review 无法聚焦；③issue 原文亦标注 #4156 同族，说明 pkill 属于另一条线。
+
+拆出的三面用 `freely feedback` 单独立项并排进 goal（P1），本 issue 的 candidate 明确写「不覆盖」，避免门禁误判已完成。
+
 ## fidelity 基线
 
 candidate 的验收必须能回答「并发下真的只有一个实例吗」，而不是「代码里有 flock 字样」。因此：
@@ -74,4 +117,5 @@ candidate 的验收必须能回答「并发下真的只有一个实例吗」，�
 - **只修启动锁**：DB 双 daemon 会导致整个项目 DB 不可用，后果比启动锁更重。
 - **引入外部锁服务（Redis/etcd）**：本工具是单机 CLI，引入外部依赖违背「零配置可用」。
 - **用 PID 文件 + `kill -0` 作为唯一互斥**：PID 复用会让无关进程永久占锁，`freely start` 30s 后无原因失败——这正是 issue 里的一条。
-- **拆成 5 个 issue**：共享同一锁语义，拆开会导致实现不一致且无法端到端验证。
+- **一次性改完 5 个面**：并发测试各自需要隔离环境，混在一个 PR 里 AT 无法收敛、review 无法聚焦；改为本轮两面 + 其余拆独立 issue。
+- **`flock` fd 继承给 supervisor**：会把「启动窗口互斥」变成「运行期独占」，改变 stop/restart/多实例检测语义，超出边界；且 macOS 无 `flock` 命令。

@@ -12,6 +12,7 @@ Lifecycle:
 """
 
 import argparse
+import fcntl
 import hashlib
 import json
 import os
@@ -367,7 +368,27 @@ class DbDaemon:
         self._chat_seq = 0
         return ts
 
+    def _existing_daemon_alive(self) -> bool:
+        """True when a live daemon already answers on our socket path."""
+        if not os.path.exists(self.socket_path):
+            return False
+        probe = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        probe.settimeout(1.0)
+        try:
+            probe.connect(self.socket_path)
+            return True
+        except OSError:
+            return False
+        finally:
+            probe.close()
+
     def _run_socket_server(self) -> None:
+        # Never unlink a socket a live daemon is still serving: that single line
+        # is how an orphan daemon took the whole project's DB offline.
+        if self._existing_daemon_alive():
+            self.log("a live db daemon already serves this project; refusing to bind")
+            self.running = False
+            return
         if os.path.exists(self.socket_path):
             os.unlink(self.socket_path)
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -1691,6 +1712,20 @@ def cmd_start(args) -> int:
 
     daemon = DbDaemon(project)
 
+    # Singleton lock BEFORE forking (raw-20261103T132622Z). The old code did
+    # check-then-act on the pid file: two concurrent starts could both unlink,
+    # both fork, and both bind — the second unlinked the first's socket and the
+    # whole project lost its DB. The lock is taken here and inherited by the
+    # forked child, so exactly one process ever owns it.
+    os.makedirs(os.path.dirname(pid_file), exist_ok=True)
+    lock_handle = open(pid_file, "a+")
+    try:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        lock_handle.close()
+        print("freely-db daemon already running (singleton lock held)")
+        return 0
+
     if not args.foreground:
         pid = os.fork()
         if pid > 0:
@@ -1702,19 +1737,33 @@ def cmd_start(args) -> int:
                 print("[ERROR] db daemon failed to start", file=sys.stderr)
                 return 1
 
-    # Child or foreground
-    os.makedirs(os.path.dirname(pid_file), exist_ok=True)
-    with open(pid_file, "w") as f:
-        f.write(str(os.getpid()))
+    # Child or foreground. The pid file is the lock file: write through the
+    # inherited handle so the recorded pid and the held lock never disagree.
+    lock_handle.seek(0)
+    lock_handle.truncate()
+    lock_handle.write(str(os.getpid()))
+    lock_handle.flush()
+    os.fsync(lock_handle.fileno())
 
     def _cleanup(signum=None, frame=None):
         sig_name = signal.Signals(signum).name if signum is not None else "EXIT"
         daemon.log(f"daemon received signal {sig_name}, stopping")
         daemon.stop()
-        if os.path.exists(pid_file):
-            os.unlink(pid_file)
-        if os.path.exists(socket_path):
-            os.unlink(socket_path)
+        # Only the owner may remove the shared files: an orphan daemon exiting
+        # must not delete a healthy daemon's socket/pid (raw-20261103T132622Z).
+        try:
+            recorded_owner = open(pid_file).read().strip()
+        except OSError:
+            recorded_owner = ""
+        if recorded_owner == str(os.getpid()):
+            if os.path.exists(pid_file):
+                os.unlink(pid_file)
+            if os.path.exists(socket_path):
+                os.unlink(socket_path)
+        else:
+            daemon.log(
+                f"not the owner (pid file holds {recorded_owner!r}); leaving pid/socket intact"
+            )
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, _cleanup)

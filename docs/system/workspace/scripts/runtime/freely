@@ -512,6 +512,33 @@ project_start_lock_dir_for_runtime() {
   printf '%s\n' "$(run_dir_for_project "$project")/project-start.lock"
 }
 
+# Age of a lock directory in seconds, or empty when it cannot be determined.
+# Used to tell "the owner is still inside the mkdir->state.env window" apart
+# from "the owner died before writing state" (raw-20261103T132622Z).
+project_start_lock_dir_age_secs_for_runtime() {
+  local dir="$1" mtime="" now=""
+  [[ -d "$dir" ]] || return 0
+  mtime="$(stat -f %m "$dir" 2>/dev/null || stat -c %Y "$dir" 2>/dev/null || true)"
+  [[ "$mtime" =~ ^[0-9]+$ ]] || return 0
+  now="$(date +%s)"
+  printf '%s\n' "$(( now - mtime ))"
+}
+
+# Whether `pid` still belongs to this tool.
+# Returns 0 when it does OR when the command line cannot be read (keep the old
+# "active" behaviour rather than killing a live lock); 1 only on a positive
+# mismatch, which is how PID reuse is detected. Only the tool name is required:
+# supervisor command lines differ per launcher and may not embed the project
+# path, so demanding it would turn live locks into "reused" ones.
+project_start_lock_pid_belongs_to_project_for_runtime() {
+  local pid="$1" cmdline=""
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  cmdline="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+  [[ -n "$cmdline" ]] || return 0
+  [[ "$cmdline" == *"freely"* ]] || return 1
+  return 0
+}
+
 project_start_lock_state_file_for_runtime() {
   local project="$1"
   printf '%s\n' "$(project_start_lock_dir_for_runtime "$project")/state.env"
@@ -576,8 +603,15 @@ project_start_lock_snapshot_for_runtime() {
     owner_alive="1"
   fi
   if [[ "$owner_alive" == "1" ]]; then
-    CURRENT_PROJECT_START_LOCK_STATE="active"
-    CURRENT_PROJECT_START_LOCK_DETAIL="owner_pid_alive"
+    if project_start_lock_pid_belongs_to_project_for_runtime "$owner_pid"; then
+      CURRENT_PROJECT_START_LOCK_STATE="active"
+      CURRENT_PROJECT_START_LOCK_DETAIL="owner_pid_alive"
+      return 0
+    fi
+    # The pid is alive but is not ours: the real owner died and the pid was
+    # recycled. Treat it as stale instead of waiting out the timeout.
+    CURRENT_PROJECT_START_LOCK_STATE="stale"
+    CURRENT_PROJECT_START_LOCK_DETAIL="owner_pid_reused"
     return 0
   fi
 
@@ -710,14 +744,53 @@ EOF
         ;;
       ambiguous)
         if [[ "${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" == "state_file_missing" ]] && ! project_has_active_runtime_processes "$project"; then
-          log_warn "removing ambiguous project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          # A concurrent starter may be between `mkdir "$lock_dir"` and writing
+          # state.env. Reclaiming inside that window is exactly the double
+          # supervisor TOCTOU hole: both sides then believe they own the lock.
+          # Only reclaim once the directory is provably older than stale_secs.
+          lock_age_secs="$(project_start_lock_dir_age_secs_for_runtime "$lock_dir")"
+          if [[ -n "$lock_age_secs" ]] && (( lock_age_secs < stale_secs )); then
+            if [[ "$waiting_logged" == "0" ]]; then
+              log_warn "project start already in progress; waiting for state.env from the current lock owner (detail=state_file_missing owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} age_secs=$lock_age_secs stale_secs=$stale_secs path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+              append_runtime_event "$project" "project_start_lock_waiting" \
+                "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" \
+                "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+                "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+                "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+                "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+                "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+                "lock_age_secs=$lock_age_secs" \
+                "timeout_secs=$timeout_secs" \
+                "interval_secs=$interval_secs"
+              waiting_logged="1"
+            fi
+            now="$(date +%s)"
+            if (( now - start_ts >= timeout_secs )); then
+              log_error "timed out waiting for project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} age_secs=$lock_age_secs path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+              append_runtime_event "$project" "project_start_lock_timeout" \
+                "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" \
+                "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+                "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+                "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+                "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+                "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+                "lock_age_secs=$lock_age_secs" \
+                "timeout_secs=$timeout_secs"
+              return 1
+            fi
+            sleep "$interval_secs"
+            continue
+          fi
+          log_warn "removing ambiguous project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} age_secs=${lock_age_secs:-unknown} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_ambiguous_cleanup" \
             "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" \
             "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
             "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
             "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
             "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
-            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "lock_age_secs=${lock_age_secs:-unknown}" \
+            "stale_secs=$stale_secs"
           rm -rf "$lock_dir"
           continue
         fi

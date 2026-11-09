@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T132622Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T132622Z-A
 platform_ids:
   github:
     issue_id: '4155'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSPQC
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/runtime/concurrency/raw-20261103T132622Z/issues/I-20261103T132622Z-A.md
+last_synced_comment_at:
+  github: '2026-11-09T07:57:55Z'
+  gitee: '2026-11-09T07:57:55Z'
 hash: ''
 created_at: '2026-11-03T13:26:22Z'
-updated_at: '2026-11-04T07:44:15Z'
+updated_at: '2026-11-09T07:57:59Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261103T132622Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-09T07:57:54Z'
 closeout_note: ''
 ---
 
@@ -60,3 +63,11 @@ workflow_kind: fix
 - GREEN：锁文件由 flock fd 持有；`grep -n 'rm -rf "$lock_dir"' freely` 的清理路径带 age + owner 校验。
 - GREEN：`freely:13530` 「先启动 worker 后写状态」的顺序被 CAS 取代（启动前已完成状态抢占）。
 - GREEN：同一队列只剩一个派发器调用点；`:20624/20626` 死代码已删。
+
+### comment-20261109T075754Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261103T132622Z-A"]
+
+拆解为以下任务:
+1. [I-20261103T132622Z-A](will-be-updated)
