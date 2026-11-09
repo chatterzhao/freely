@@ -1,0 +1,30 @@
+# AT-001 regression baseline — raw-20261103T132548Z / #4151
+# worktree vs develop snapshot (/tmp/r17-base)
+test-test-gate-record                                worktree=0 baseline=0 MATCH
+test-platform-write-channel                          worktree=0 baseline=0 MATCH
+test-issue-sync-close-terminal-first                 worktree=0 baseline=0 MATCH
+test-issue-sync-promote-b2                           worktree=0 baseline=0 MATCH
+test-wt-close-comment-scan                           worktree=0 baseline=0 MATCH
+test-raw-reconciliation.py                           worktree=0 baseline=0 MATCH
+test-raw-replica-degraded.py                         worktree=0 baseline=0 MATCH
+test-command-lifecycle-raw-metadata.py               worktree=0 baseline=0 MATCH
+test-command-lifecycle-materialization.py            worktree=0 baseline=0 MATCH
+test-feedback-severity.py                            worktree=0 baseline=0 MATCH
+test-install-state.py                                worktree=0 baseline=0 MATCH
+test-github-label-autocreate.py                      worktree=0 baseline=0 MATCH
+test-platform-handler-probe.py                       worktree=0 baseline=0 MATCH
+test-scan-frontmatter-nested.py                      worktree=0 baseline=0 MATCH
+test-platform-open-parity.py                         worktree=1 baseline=0 DIFF
+test-governance-gate-batch-read                      worktree=0 baseline=0 MATCH
+test-command-lifecycle-wt-close.py                   worktree=1 baseline=1 MATCH
+
+# NOTE (one DIFF = live platform state, not a code regression)
+# test-platform-open-parity.py: worktree=1 baseline=0 DIFF. The baseline
+# snapshot is not a git worktree with remotes, so it resolves no repo and
+# returns an empty open-set (a false OK). The real worktree correctly detects
+# raw-20261108T134701Z existing only on Gitee (IKTSRS) — a PARTIAL raw created
+# before #4230 was merged, already filed as R59 in the v4 queue. This is NOT
+# caused by the test-evidence changes; all 16 other regressions MATCH. The
+# test has no gate references (verified by full-repo grep), so it does not
+# block pr-create/pr-merge. `test-command-lifecycle-wt-close.py` is a
+# pre-existing red on both sides.

@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Aggregate test runner for Freely (#4151).
+# Runs the verified subset (never the whole 500+ corpus at once — that would be
+# permanently red) and prints an explicit known-broken / not-yet-onboarded list.
+#   bin/test-all              verified local subset
+#   bin/test-all --ci         smaller, purely-local subset for CI runners
+#   bin/test-all --extended   also run the bash integration tests
+set -uo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TESTS_DIR="$ROOT_DIR/docs/system/workspace/scripts/tests"
+MODE="local"
+for arg in "$@"; do
+  case "$arg" in
+    --ci) MODE="ci" ;;
+    --extended) MODE="extended" ;;
+    -h|--help)
+      printf '%s\n' "Usage: bin/test-all [--ci|--extended]"
+      exit 0 ;;
+    *) echo "[test-all] unknown arg: $arg" >&2; exit 2 ;;
+  esac
+done
+
+CORE=(
+  test-raw-reconciliation.py
+  test-raw-replica-degraded.py
+  test-command-lifecycle-raw-metadata.py
+  test-command-lifecycle-materialization.py
+  test-scan-frontmatter-nested.py
+  test-platform-handler-probe.py
+  test-feedback-severity.py
+  test-install-state.py
+  test-github-label-autocreate.py
+)
+CI_CORE=(
+  test-raw-reconciliation.py
+  test-raw-replica-degraded.py
+  test-command-lifecycle-raw-metadata.py
+  test-command-lifecycle-materialization.py
+  test-scan-frontmatter-nested.py
+)
+EXTRA=(
+  test-platform-write-channel
+  test-issue-sync-close-terminal-first
+  test-issue-sync-promote-b2
+  test-wt-close-comment-scan
+  test-governance-gate-batch-read
+)
+
+selected=()
+case "$MODE" in
+  ci) selected=("${CI_CORE[@]}") ;;
+  local) selected=("${CORE[@]}") ;;
+  extended) selected=("${CORE[@]}" "${EXTRA[@]}") ;;
+esac
+
+echo "[test-all] mode=$MODE"
+echo "[test-all] verified subset: ${#selected[@]} tests"
+passed=0
+failed=0
+failed_names=()
+for name in "${selected[@]}"; do
+  path="$TESTS_DIR/$name"
+  if [[ ! -f "$path" ]]; then
+    echo "  [MISSING] $name"
+    failed=$((failed + 1))
+    failed_names+=("$name")
+    continue
+  fi
+  rc=0
+  if [[ "$name" == *.py ]]; then
+    python3 "$path" >/dev/null 2>&1 || rc=$?
+  else
+    bash "$path" >/dev/null 2>&1 || rc=$?
+  fi
+  if [[ "$rc" -eq 0 ]]; then
+    echo "  [ok] $name"
+    passed=$((passed + 1))
+  else
+    echo "  [FAIL] $name (rc=$rc)"
+    failed=$((failed + 1))
+    failed_names+=("$name")
+  fi
+done
+
+# Everything else is explicitly known-broken / not yet onboarded. Print the
+# list so the debt is visible instead of silently ignored (issue #4151 FR).
+# macOS ships bash 3.2 (no `mapfile`), so use portable ls/grep/printf.
+all_count=$(ls -1 "$TESTS_DIR" 2>/dev/null | grep -c '^test-' || true)
+known_broken=$(( all_count - ${#selected[@]} ))
+[[ "$known_broken" -lt 0 ]] && known_broken=0
+echo "[test-all] known-broken / not-yet-onboarded: $known_broken test files (TODO: triage and onboard)"
+if [[ "$known_broken" -gt 0 ]]; then
+  ls -1 "$TESTS_DIR" 2>/dev/null \
+    | grep '^test-' \
+    | grep -vFxf <(printf '%s\n' "${selected[@]}") \
+    | head -10 2>/dev/null \
+    | sed 's/^/  - /' || true
+  if [[ "$known_broken" -gt 10 ]]; then
+    echo "  ... and $(( known_broken - 10 )) more"
+  fi
+fi
+echo "SUMMARY: $passed ok, $failed failed, known-broken=$known_broken"
+if [[ "$failed" -ne 0 ]]; then
+  printf 'failing: %s\n' "${failed_names[*]}" >&2
+  exit 1
+fi
+exit 0

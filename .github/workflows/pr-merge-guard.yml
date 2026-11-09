@@ -62,3 +62,15 @@ jobs:
               }
             });
             console.log(`Created check run ${checkRun.id} — merge blocked until pr-merge-guarded sets it to success`);
+
+  # Real verification job (#4151). The guard above only creates a blocking
+  # check; this job actually executes the verified local test subset so a PR
+  # carries machine evidence instead of a status claim.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run verifiable test subset
+        run: bash bin/test-all --ci
+

@@ -35,6 +35,7 @@ done
 [[ -d "$WORKTREE_PATH" ]] || { echo "worktree not found: $WORKTREE_PATH" >&2; exit 1; }
 
 python3 - "$PROJECT" "$WORKTREE_PATH" "$RUNTIME_ROOT" <<'PY'
+import json
 import re
 import subprocess
 import sys
@@ -147,6 +148,30 @@ if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_com
     print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
     print(f"  按 pre-tests.md 的指导重新执行测试。", file=sys.stderr)
     print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
+    sys.exit(1)
+
+# ── Machine-verifiable test evidence (#4151) ─────────────────────────────
+# A hand-written three-line test-gate.env is an agent claim, not evidence.
+# Only `freely test-gate run` can produce a trusted verdict: a real exit code,
+# a real evidence file bound by sha256, and a HEAD matching this worktree.
+_evidence_helper = runtime_root / "docs" / "system" / "workspace" / "scripts" / "quality" / "test-evidence.py"
+if not _evidence_helper.is_file():
+    print("[pretests_evidence_invalid] test-evidence helper is missing; cannot verify test evidence", file=sys.stderr)
+    sys.exit(1)
+_evidence_proc = subprocess.run(
+    [sys.executable, str(_evidence_helper), "validate", "--gate", str(gate_file),
+     "--worktree", str(worktree), "--json"],
+    text=True, capture_output=True,
+)
+try:
+    _evidence_verdict = json.loads(_evidence_proc.stdout)
+except (ValueError, TypeError):
+    _evidence_verdict = {"ok": False, "errors": ["unreadable evidence verdict"]}
+if _evidence_proc.returncode != 0 or not _evidence_verdict.get("ok"):
+    print("[pretests_evidence_invalid] 测试证据不可验证（必须是 freely test-gate run 的真实运行结果）", file=sys.stderr)
+    for _evidence_error in _evidence_verdict.get("errors", []):
+        print(f"  - {_evidence_error}", file=sys.stderr)
+    print("  修复: 在 test-pre-merge 工位执行 freely test-gate run --worktree <test wt> --command '<tests>'", file=sys.stderr)
     sys.exit(1)
 
 # Tests are current — test-gate commit matches HEAD.
