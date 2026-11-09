@@ -440,7 +440,7 @@ if [[ -f "$_issue_file" ]]; then
       echo "[wt-create] raw-${raw_key} phase_state=${_phase} → proposed (auto-reopen)" >&2
       # Change phase_state in-place on the worktree branch (never on develop)
       if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"
+        sed -i.bak "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"; rm -f "$_issue_file.bak"
       else
         sed -i "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"
       fi
