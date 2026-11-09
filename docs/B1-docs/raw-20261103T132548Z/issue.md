@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T132548Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T132548Z-A
 platform_ids:
   github:
     issue_id: '4151'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSPQ6
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261103T132548Z/issues/I-20261103T132548Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-03T13:25:48Z'
-updated_at: '2026-11-04T07:44:28Z'
+updated_at: '2026-11-09T05:43:53Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261103T132548Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-09T05:43:50Z'
 closeout_note: ''
 ---
 
