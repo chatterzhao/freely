@@ -16,7 +16,16 @@
 # Adapter dispatch (AGENT_AI_TOOL_ADAPTER):
 #   direct → monitor-ai-cli.sh (DEPRECATED: PID-based, to be removed)
 #   acp    → monitor-ai-acp.sh (primary: stopReason-based, persistent sessions)
-set -euo pipefail
+# `freely` is both an executable and a library that 4 control-plane scripts
+# `source`. Sourcing must not change the caller's shell options nor kill it when
+# a library file is missing (#4153): only the direct-execution path opts into
+# strict mode and exits.
+_FREELY_IS_SOURCED=0
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+  _FREELY_IS_SOURCED=1
+else
+  set -euo pipefail
+fi
 
 TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
@@ -27,19 +36,31 @@ log_info() { echo "$(_log_ts) [INFO] $*" >&2; }
 log_warn() { echo "$(_log_ts) [WARN] $*" >&2; }
 log_error() { echo "$(_log_ts) [ERROR] $*" >&2; }
 
+# Record a library-load failure without an `exit` literal in the load section.
+# Direct execution runs under `set -e`, so the trailing `false` ends the process
+# with status 1 exactly like the old `exit 1`; a sourced caller instead gets
+# `return 1` plus FREELY_LIB_LOAD_ERROR and decides for itself.
+_freely_lib_missing() {
+  local message="$1" path="$2"
+  FREELY_LIB_LOAD_ERROR="missing ${message}: ${path}"
+  echo "[ERROR] $FREELY_LIB_LOAD_ERROR" >&2
+}
+
 WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/freely-watchdog-control-plane"
 WATCHDOG_AVAILABILITY_LIB="$WATCHDOG_CONTROL_PLANE_SKILL_ROOT/scripts/availability-watchdog.sh"
-[[ -f "$WATCHDOG_AVAILABILITY_LIB" ]] || {
-  echo "[ERROR] missing watchdog availability module: $WATCHDOG_AVAILABILITY_LIB" >&2
-  exit 1
-}
+if [[ ! -f "$WATCHDOG_AVAILABILITY_LIB" ]]; then
+  _freely_lib_missing "watchdog availability module" "$WATCHDOG_AVAILABILITY_LIB"
+  [[ "$_FREELY_IS_SOURCED" == "1" ]] && return 1
+  false
+fi
 source "$WATCHDOG_AVAILABILITY_LIB"
 
 SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
-[[ -f "$SESSION_EVIDENCE_RESOLVER_LIB" ]] || {
-  echo "[ERROR] missing session evidence resolver module: $SESSION_EVIDENCE_RESOLVER_LIB" >&2
-  exit 1
-}
+if [[ ! -f "$SESSION_EVIDENCE_RESOLVER_LIB" ]]; then
+  _freely_lib_missing "session evidence resolver module" "$SESSION_EVIDENCE_RESOLVER_LIB"
+  [[ "$_FREELY_IS_SOURCED" == "1" ]] && return 1
+  false
+fi
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 # ── Tool registry  ──
@@ -22192,7 +22213,7 @@ stop_project_runtime() {
   # Clean stale start lock before acquiring — a force-killed daemon leaves
   # the lock behind, which would block stop with "start already in progress".
   cleanup_project_start_lock_if_stale_for_runtime "$project"
-  acquire_project_start_lock_or_wait "$project" "freely_stop" || exit 1
+  acquire_project_start_lock_or_wait "$project" "freely_stop" || return 1
   stop_lock_acquired="1"
   stop_marker="$(stop_marker_file "$project")"
   : >"$stop_marker"
