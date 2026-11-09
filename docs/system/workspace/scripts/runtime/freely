@@ -983,6 +983,8 @@ Usage:
   freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
   freely pr-merge-guarded complete <target-branch> <source-branch>
   freely test-gate record [--worktree <abs_path>] --status started|completed|failed [--commit <sha>]
+  freely test-gate run --worktree <abs_path> --command <shell cmd> | -- <cmd...>
+  freely evidence add --file <path> [--project <abs_path>]
   freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
   freely stop [--project <abs_path>]
 
@@ -8604,6 +8606,70 @@ _test_gate_write() {
     printf 'LAST_TESTED_COMMIT="%s"\n' "$tested_commit"
   } >"$tmp"
   mv "$tmp" "$gate_file"
+}
+
+# cmd_test_gate_run: execute the tests for real and record machine evidence.
+# `record` only writes an agent's claim; only this command can produce a verdict
+# the retirement gate trusts (real exit code + evidence sha256 + HEAD).
+cmd_test_gate_run() {
+  local target="" command=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --worktree|--project) target="${2:-}"; shift 2 || true ;;
+      --command) command="${2:-}"; shift 2 || true ;;
+      --) shift; command="$*"; break ;;
+      -h|--help)
+        printf '%s\n' "Usage: freely test-gate run --worktree <test worktree> --command <shell cmd> | -- <cmd...>"
+        return 0
+        ;;
+      *) log_error "test-gate run: unknown argument: $1"; return 2 ;;
+    esac
+  done
+  [[ -n "$target" && -n "$command" ]] || {
+    log_error "test-gate run: --worktree and --command are required"; return 2; }
+  [[ -d "$target" ]] || { log_error "test-gate run: no such worktree: $target"; return 2; }
+  local branch
+  branch="$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  [[ "$branch" == test-pre-merge-* ]] || {
+    log_error "test-gate run: '$target' is not a test-pre-merge-* worktree"; return 2; }
+  local helper="$SELF_ROOT/docs/system/workspace/scripts/quality/test-evidence.py"
+  [[ -f "$helper" ]] || { log_error "test-gate run: missing $helper"; return 2; }
+
+  local evidence="$target/.freely/run/test-evidence.log" rc=0 head status="completed"
+  mkdir -p "$(dirname "$evidence")"
+  ( cd "$target" && bash -c "$command" ) > "$evidence" 2>&1 || rc=$?
+  head="$(git -C "$target" rev-parse HEAD 2>/dev/null || true)"
+  [[ "$rc" -eq 0 ]] || status="failed"
+  python3 "$helper" write --gate "$(_test_gate_file "$target")" \
+    --status "$status" --command "$command" --exit-code "$rc" \
+    --evidence "$evidence" --head "$head" >/dev/null || return 1
+  echo "[test-gate] run: rc=$rc status=$status command=$command"
+  echo "[test-gate] evidence: $evidence"
+  return "$rc"
+}
+
+# cmd_evidence_add: put a log/evidence file under version control without the
+# agent having to remember `git add -f`, and bind its sha256 in a manifest.
+cmd_evidence_add() {
+  local file="" project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --file) file="${2:-}"; shift 2 || true ;;
+      --project) project="${2:-}"; shift 2 || true ;;
+      -h|--help)
+        printf '%s\n' "Usage: freely evidence add --file <path> [--project <abs_path>]"
+        return 0
+        ;;
+      *) log_error "evidence add: unknown argument: $1"; return 2 ;;
+    esac
+  done
+  project="${project:-$PWD}"
+  [[ -f "$file" ]] || { log_error "evidence add: no such file: $file"; return 2; }
+  local helper="$SELF_ROOT/docs/system/workspace/scripts/quality/test-evidence.py"
+  [[ -f "$helper" ]] || { log_error "evidence add: missing $helper"; return 2; }
+  git -C "$project" add -f -- "$file" || { log_error "evidence add: git add failed"; return 1; }
+  python3 "$helper" manifest-add --project "$project" --file "$file" || return 1
+  echo "[evidence] added $file (sha256 recorded)"
 }
 
 cmd_test_gate_record() {
@@ -26919,7 +26985,16 @@ main() {
       shift || true
       case "$subcmd" in
         record) cmd_test_gate_record "$@" ;;
+        run) cmd_test_gate_run "$@" ;;
         *) log_error "unknown test-gate subcommand: $subcmd"; usage; exit 1 ;;
+      esac
+      ;;
+    evidence)
+      local evidence_subcmd="${1:-}"
+      shift || true
+      case "$evidence_subcmd" in
+        add) cmd_evidence_add "$@" ;;
+        *) log_error "unknown evidence subcommand: $evidence_subcmd"; usage; exit 1 ;;
       esac
       ;;
     pretests-gate) cmd_pretests_gate "$@" ;;

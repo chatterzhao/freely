@@ -1,13 +1,16 @@
-# Minimal CI — satisfies Gitee's "must pass tests" merge requirement
-# Replace with real test suite when ready
+# Real CI for Freely (#4151): run the verified local test subset.
+# The previous stub printed a fixed success line to satisfy Gitee's merge
+# requirement without executing anything; it also never fired on fix/* branches.
 stages:
   - test
 
 quick-test:
   stage: test
   script:
-    - echo "CI OK"
+    - python3 --version
+    - bash bin/test-all --ci
   only:
     - develop
+    - fix/*
     - feature/*
     - hotfix/*

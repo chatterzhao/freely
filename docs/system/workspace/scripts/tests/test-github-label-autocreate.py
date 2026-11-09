@@ -195,8 +195,10 @@ def behavior_checks(project: Path):
                 encoding="utf-8",
             )
             record = gate_mod._local_record(doc, "20260101T000000Z")
-            expect(record["labels"] == ["kind/raw"],
-                   f"local projection derives kind/* from the document ({record['labels']})")
+            # R17 same-round fix: a document that does not declare labels must
+            # not invent them, or legacy unlabelled platform copies diverge.
+            expect(record["labels"] == [],
+                   f"local projection leaves labels undeclared ({record['labels']})")
     except Exception as exc:
         bad(f"replica-label projection probe crashed: {exc}")
 

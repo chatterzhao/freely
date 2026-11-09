@@ -34,15 +34,11 @@ def _local_record(path: Path, raw_key: str) -> dict:
         title = match.group(1).strip()
         body = body[match.end():].lstrip()
     declared = metadata.get("labels")
-    if isinstance(declared, list):
-        labels = [str(item) for item in declared]
-    else:
-        # Align with bin/issue-sync::_labels() for the one label the document
-        # can actually assert: kind/*. phase/* and severity/* are platform-side
-        # presentation state (see canonical_projection) and must not be invented
-        # here, or a default would silently disagree with the real label.
-        kind = str(metadata.get("kind") or "unknown").strip()
-        labels = [f"kind/{kind}"]
+    # Labels are platform-side presentation state. A raw document only asserts
+    # them when it explicitly declares a `labels` frontmatter field; deriving
+    # kind/* for legacy unlabelled raws would invent a fact and diverge from
+    # platform copies that predate the label pipeline (#4151 has no labels).
+    labels = [str(item) for item in declared] if isinstance(declared, list) else []
     return {
         "raw_key": metadata.get("local_id", raw_key),
         "title": title,
