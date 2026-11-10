@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# #4157: fail early with a precise message. 13 runtime modules import
+# `tomllib` (3.11+); on 3.8/3.9 the first symptom is a ModuleNotFoundError
+# raised deep inside the runtime, far from the real cause.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[ERROR] freely requires Python >= 3.11 (python3 not found in PATH)" >&2
+  exit 1
+fi
+if [[ "$(python3 -c 'import sys; print(1 if sys.version_info >= (3, 11) else 0)' 2>/dev/null || echo 0)" != "1" ]]; then
+  echo "[ERROR] freely requires Python >= 3.11 (found $(python3 -V 2>&1 || echo unknown))" >&2
+  echo "        Install Python 3.11+ and make sure 'python3' resolves to it." >&2
+  exit 1
+fi
+
 # Resolve symlinks so PATH-launched freely finds the correct version directory
 _SCRIPT="$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${BASH_SOURCE[0]}")"
 ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
