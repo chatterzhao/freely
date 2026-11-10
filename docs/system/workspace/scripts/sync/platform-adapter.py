@@ -1352,6 +1352,36 @@ def _resolve_issue_state(local_id: str) -> str:
 
 # ── pull_raw_issue ──
 
+def severity_from_replicas(readable: dict[str, dict]) -> tuple[Optional[str], list[str]]:
+    """Resolve the one authoritative severity from platform labels (#4231).
+
+    `freely feedback --severity` writes the priority into BOTH the raw
+    frontmatter and a `severity/Pn` label on every platform. Materialization
+    used to drop it, so the local read view fell back to P2 while the platforms
+    still showed P0/P1.
+
+    Two different *explicit* values are a hard conflict: guessing one would
+    hide a real replica divergence, so the caller must fail closed. A platform
+    with no severity label is reported as a warning but does not block — legacy
+    and partial replicas legitimately lack it (R16.5 / R59).
+    """
+    values: dict[str, set[str]] = {}
+    for plat, info in readable.items():
+        found: set[str] = set()
+        for label in info.get("labels") or []:
+            name = str(label).strip().lower()
+            if name.startswith("severity/"):
+                value = name.split("/", 1)[1].upper()
+                if value in ("P0", "P1", "P2"):
+                    found.add(value)
+        values[plat] = found
+    distinct: set[str] = set().union(*values.values()) if values else set()
+    if len(distinct) > 1:
+        raise ValueError(f"severity label conflict across platforms: {values}")
+    warnings = [f"{plat}: no severity/* label" for plat, found in values.items() if not found]
+    return (next(iter(distinct)) if distinct else None), warnings
+
+
 def pull_raw_issue(raw_key: str, target_dir: Path,
                    preferred_platform: str = "") -> Optional[dict]:
     """Materialize a raw issue from the first READABLE configured platform.
@@ -1435,6 +1465,14 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
     for label in details.get("labels", []):
         if label.startswith("phase/"): phase = label.replace("phase/", ""); break
 
+    # Priority must survive materialization: platform severity/* labels are the
+    # authoritative source. A cross-platform conflict is fatal (never guess).
+    severity, severity_warnings = severity_from_replicas(readable)
+    for warning in severity_warnings:
+        print(f"[severity] raw-{raw_key}: {warning}", file=sys.stderr)
+    if severity:
+        print(f"[severity] raw-{raw_key}: materialized as {severity}", file=sys.stderr)
+
     import yaml
     yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
     body = details.get("body", "")
@@ -1455,6 +1493,8 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
         fm["primary_platform"] = platform
         fm["phase_state"] = phase
         fm["updated_at"] = details.get("updated_at", "") or fm["updated_at"]
+        if severity:
+            fm["severity"] = severity
         validate(fm, require_canonical_file=False)
     else:
         fm = {"local_id": f"raw-{raw_key}", "kind": "raw", "phase_state": phase,
@@ -1462,6 +1502,8 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
               "canonical_issue_path": "", "last_synced_comment_at": {}, "hash": "",
               "created_at": details.get("created_at", ""), "updated_at": details.get("updated_at", ""),
               "intake_id": "", "author": "platform", "channel": platform, "session_refs": []}
+        if severity:
+            fm["severity"] = severity
     fm_str = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
     # Materialization must carry an H1: raw-reconciliation-gate derives the
     # LOCAL title from the first '# ' line, and _platform_title()/_issue_title()
