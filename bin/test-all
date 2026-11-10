@@ -21,6 +21,7 @@ for arg in "$@"; do
 done
 
 CORE=(
+  test-a2a-task-cli-loadable.py
   test-raw-reconciliation.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
@@ -32,6 +33,7 @@ CORE=(
   test-github-label-autocreate.py
 )
 CI_CORE=(
+  test-a2a-task-cli-loadable.py
   test-raw-reconciliation.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
