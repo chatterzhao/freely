@@ -1,0 +1,42 @@
+AT-001 source: /private/tmp/r27-base
+=== STATIC: issue-sync is a dispatcher, not a monolith ===
+  [FAIL] bin/issue-sync <= 665 lines (got 1330)
+  [FAIL] bin/issue-sync sources its module directory
+  [FAIL] no subcommand is defined inline (['cmd_create', 'cmd_update', 'cmd_comment', 'cmd_close', 'cmd_promote', 'cmd_promote_finalize', 'cmd_batch', 'cmd_scan', 'cmd_status'])
+  [FAIL] cmd-create.sh defines cmd_create()
+  [FAIL] cmd-update.sh defines cmd_update()
+  [FAIL] cmd-comment.sh defines cmd_comment()
+  [FAIL] cmd-close.sh defines cmd_close()
+  [FAIL] cmd-promote.sh defines cmd_promote()
+  [FAIL] cmd-promote-finalize.sh defines cmd_promote_finalize()
+  [FAIL] cmd-batch.sh defines cmd_batch()
+  [FAIL] cmd-scan.sh defines cmd_scan()
+  [FAIL] cmd-status.sh defines cmd_status()
+  [FAIL] shared helpers live in lib-*.sh ([])
+=== STATIC: one body/label contract ===
+  [FAIL] issue_create_contract.py owns strip_frontmatter/platform_body/labels_for
+  [FAIL] issue-sync renders the body through the contract
+  [ok] issue-sync no longer assembles the label list itself
+  [FAIL] freely feedback no longer hard-codes the label list
+  [FAIL] freely feedback renders through the contract
+  [FAIL] feedback states its phase instead of embedding it in a literal
+=== STATIC: bootstrap delete is a platform write ===
+  [FAIL] issue-sync-bootstrap does not call gh issue delete
+  [FAIL] issue-sync-bootstrap deletes through the adapter
+  [FAIL] adapter exposes delete_issue
+  [FAIL] adapter dispatches the delete action
+=== BEHAVIOR: sourcing, labels, body ===
+  [ok] sourcing bin/issue-sync defines every entry point (got 11)
+  [FAIL] issue-sync and the contract agree on labels ('kind/raw,phase/proposed,severity/P0')
+  [ok] legacy document without severity still yields P2 ('kind/raw,phase/proposed,severity/P2')
+  [FAIL] platform body carries exactly one fenced frontmatter block
+  [ok] platform body keeps workflow_kind
+  [ok] platform body keeps the title header and the field table
+  [ok] platform body keeps the human body
+  [FAIL] platform body drops the Comments section
+  [FAIL] issue-sync and the contract render identical bodies
+=== BEHAVIOR: bootstrap --delete routes through the adapter ===
+  [FAIL] delete reaches gh with the adapter-resolved repo (['issue delete https://github.com/acme/demo/issues/42 --yes'])
+  [FAIL] bootstrap reports the adapter receipt ('')
+  [FAIL] the raw URL is no longer handed to gh
+SUMMARY: 6 ok, 29 failed

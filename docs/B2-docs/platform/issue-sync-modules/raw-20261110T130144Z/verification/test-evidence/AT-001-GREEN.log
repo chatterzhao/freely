@@ -1,0 +1,42 @@
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261110T130144Z-issue-sync-modules
+=== STATIC: issue-sync is a dispatcher, not a monolith ===
+  [ok] bin/issue-sync <= 665 lines (got 161)
+  [ok] bin/issue-sync sources its module directory
+  [ok] no subcommand is defined inline ([])
+  [ok] cmd-create.sh defines cmd_create()
+  [ok] cmd-update.sh defines cmd_update()
+  [ok] cmd-comment.sh defines cmd_comment()
+  [ok] cmd-close.sh defines cmd_close()
+  [ok] cmd-promote.sh defines cmd_promote()
+  [ok] cmd-promote-finalize.sh defines cmd_promote_finalize()
+  [ok] cmd-batch.sh defines cmd_batch()
+  [ok] cmd-scan.sh defines cmd_scan()
+  [ok] cmd-status.sh defines cmd_status()
+  [ok] shared helpers live in lib-*.sh (['lib-content.sh', 'lib-frontmatter.sh', 'lib-platform.sh', 'lib-replica.sh', 'lib-state.sh'])
+=== STATIC: one body/label contract ===
+  [ok] issue_create_contract.py owns strip_frontmatter/platform_body/labels_for
+  [ok] issue-sync renders the body through the contract
+  [ok] issue-sync no longer assembles the label list itself
+  [ok] freely feedback no longer hard-codes the label list
+  [ok] freely feedback renders through the contract
+  [ok] feedback states its phase instead of embedding it in a literal
+=== STATIC: bootstrap delete is a platform write ===
+  [ok] issue-sync-bootstrap does not call gh issue delete
+  [ok] issue-sync-bootstrap deletes through the adapter
+  [ok] adapter exposes delete_issue
+  [ok] adapter dispatches the delete action
+=== BEHAVIOR: sourcing, labels, body ===
+  [ok] sourcing bin/issue-sync defines every entry point (got 11)
+  [ok] issue-sync and the contract agree on labels ('kind/raw,phase/proposed,severity/P0')
+  [ok] legacy document without severity still yields P2 ('kind/raw,phase/proposed,severity/P2')
+  [ok] platform body carries exactly one fenced frontmatter block
+  [ok] platform body keeps workflow_kind
+  [ok] platform body keeps the title header and the field table
+  [ok] platform body keeps the human body
+  [ok] platform body drops the Comments section
+  [ok] issue-sync and the contract render identical bodies
+=== BEHAVIOR: bootstrap --delete routes through the adapter ===
+  [ok] delete reaches gh with the adapter-resolved repo (['issue delete 42 --repo acme/demo --yes'])
+  [ok] bootstrap reports the adapter receipt ('GitHub: acme/demo\n\n{\n  "github": {\n    "status": "deleted",\n    "error": ""\n  }\n')
+  [ok] the raw URL is no longer handed to gh
+SUMMARY: 35 ok, 0 failed

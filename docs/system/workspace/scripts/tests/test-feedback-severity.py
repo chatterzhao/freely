@@ -79,7 +79,12 @@ def static_checks() -> None:
     contract = (_lifecycle(SRC) / "raw_metadata_contract.py").read_text()
     freely = (_runtime(SRC) / "freely").read_text()
     adapter = (_sync(SRC) / "platform-adapter.py").read_text()
-    issue_sync = (SRC / "bin" / "issue-sync").read_text()
+    # #4286: bin/issue-sync is a dispatcher; the projection lives in its modules.
+    issue_sync_files = [SRC / "bin" / "issue-sync"]
+    issue_sync_files += sorted((SRC / "bin" / "issue-sync.d").glob("*.sh"))
+    issue_sync = "\n".join(path.read_text() for path in issue_sync_files)
+    # The label list itself is owned by the shared create contract.
+    issue_sync += "\n" + (_sync(SRC) / "issue_create_contract.py").read_text()
 
     if "VALID_SEVERITIES" in contract and "SEVERITY_FIELD" in contract:
         ok("contract declares severity levels + field")
@@ -305,10 +310,12 @@ def _seed_lifecycle(fix: Path) -> None:
     Without it every `_fm_*` call no-ops, so the fixture would pass/fail for
     the wrong reason (missing dependency instead of missing behaviour).
     """
-    dst = fix / "docs" / "system" / "workspace" / "scripts" / "lifecycle"
-    dst.mkdir(parents=True, exist_ok=True)
-    for path in (SRC / "docs" / "system" / "workspace" / "scripts" / "lifecycle").glob("*.py"):
-        shutil.copy(path, dst / path.name)
+    scripts = fix / "docs" / "system" / "workspace" / "scripts"
+    for name in ("lifecycle", "sync"):
+        dst = scripts / name
+        dst.mkdir(parents=True, exist_ok=True)
+        for path in (SRC / "docs" / "system" / "workspace" / "scripts" / name).glob("*.py"):
+            shutil.copy(path, dst / path.name)
 
 
 def labels_checks() -> None:
@@ -318,6 +325,8 @@ def labels_checks() -> None:
     try:
         (fix / "bin").mkdir(parents=True)
         shutil.copy(SRC / "bin" / "issue-sync", fix / "bin" / "issue-sync")
+        # #4286: the entry point only dispatches; copy its modules too.
+        shutil.copytree(SRC / "bin" / "issue-sync.d", fix / "bin" / "issue-sync.d")
         _seed_lifecycle(fix)
         d = fix / "docs" / "B1-docs" / "raw-20260101T000000Z"
         d.mkdir(parents=True)
@@ -353,6 +362,8 @@ def scan_checks() -> None:
     try:
         (fix / "bin").mkdir(parents=True)
         shutil.copy(SRC / "bin" / "issue-sync", fix / "bin" / "issue-sync")
+        # #4286: the entry point only dispatches; copy its modules too.
+        shutil.copytree(SRC / "bin" / "issue-sync.d", fix / "bin" / "issue-sync.d")
         _seed_lifecycle(fix)
         b1 = fix / "docs" / "B1-docs"
         b1.mkdir(parents=True)

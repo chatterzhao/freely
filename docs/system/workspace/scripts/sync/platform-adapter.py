@@ -81,6 +81,9 @@ class PlatformHandler(ABC):
         return {"status": "error", "error": "not implemented"}
     def update_issue(self, issue_number: str, title: str = "", body: str = "") -> dict:
         return {"status": "error", "error": "not implemented"}
+    def delete_issue(self, issue_number: str) -> dict:
+        """Optional: not every platform can delete an issue (#4166)."""
+        return {"status": "error", "error": "not implemented"}
     def get_issue_state(self, issue_number: str) -> Optional[str]: return None
     def search_raw_issue(self, raw_key: str) -> Optional[dict]: return None
     def fetch_issue(self, issue_number: str) -> dict: return {}
@@ -340,6 +343,15 @@ class GitHubHandler(PlatformHandler):
         if body: args += ["--body", body]
         r = subprocess.run(args, capture_output=True, text=True)
         return {"status": "updated" if r.returncode == 0 else "error"}
+
+    def delete_issue(self, issue_number):
+        # #4166: issue-sync-bootstrap used to call `gh issue delete` itself,
+        # which made it the only platform write outside this adapter.
+        r = subprocess.run(["gh", "issue", "delete", issue_number,
+                            "--repo", self._repo(), "--yes"],
+                           capture_output=True, text=True)
+        return {"status": "deleted" if r.returncode == 0 else "error",
+                "error": r.stderr[:200] if r.returncode != 0 else ""}
 
     def get_issue_state(self, issue_number):
         try:
@@ -1642,9 +1654,11 @@ if __name__ == "__main__":
             raise SystemExit(0)
         raise SystemExit(3 if created else 1)
     elif len(a) > 1 and a[1] == "issue-write-one":
-        # #4166: single-platform write used by bin/issue-sync so the shell
-        # orchestrator never calls `gh` directly. Argument order:
+        # #4166: single-platform write used by bin/issue-sync and
+        # bin/issue-sync-bootstrap so no shell script calls `gh`/`gitee-issue.py`
+        # for a write. Argument order:
         #   issue-write-one <platform> <action> <number> <title> <body> <labels>
+        # Actions: create | comment | close | update | delete.
         platform = a[2] if len(a) > 2 else ""
         action = a[3] if len(a) > 3 else ""
         number = a[4] if len(a) > 4 else ""
@@ -1668,6 +1682,13 @@ if __name__ == "__main__":
                     add_label = getattr(handler, "add_label", None)
                     if callable(add_label):
                         add_label(number, lbl)
+            elif action == "delete":
+                delete_issue = getattr(handler, "delete_issue", None)
+                if not callable(delete_issue):
+                    result = {"status": "error",
+                              "error": f"delete not supported on {platform}"}
+                else:
+                    result = delete_issue(number)
             else:
                 result = {"status": "error", "error": f"unknown action: {action}"}
         except Exception as exc:  # platform CLIs raise on malformed output

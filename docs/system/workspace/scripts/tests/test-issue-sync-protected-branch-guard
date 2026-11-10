@@ -15,6 +15,8 @@ git config user.email tester@example.com
 # Copy issue-sync
 mkdir -p bin docs/B1-docs/raw-20260522T000000Z
 cp "$ROOT_DIR/bin/issue-sync" bin/issue-sync
+# #4286: bin/issue-sync only dispatches; the subcommands live in issue-sync.d.
+cp -R "$ROOT_DIR/bin/issue-sync.d" bin/issue-sync.d
 chmod +x bin/issue-sync
 
 # Create a raw issue

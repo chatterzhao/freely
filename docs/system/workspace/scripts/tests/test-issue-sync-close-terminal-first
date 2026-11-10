@@ -14,6 +14,11 @@ EFFECTS="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw_lifecycle_effects
 CONTRACT="$ROOT_DIR/docs/system/workspace/scripts/lifecycle/raw_metadata_contract.py"
 ADAPTER="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
 ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+# #4286: bin/issue-sync only dispatches; the subcommands live in
+# bin/issue-sync.d/*.sh, so static assertions must read the whole program.
+ISSUE_SYNC_SRC="$(mktemp "${TMPDIR:-/tmp}/issue-sync-src.XXXXXX")"
+cat "$ISSUE_SYNC" "$ROOT_DIR"/bin/issue-sync.d/*.sh > "$ISSUE_SYNC_SRC"
+
 # Pinned early: `ROOT_DIR=... CMD` env prefixes below must not shadow it.
 CONTRACT_ROOT="$ROOT_DIR"
 PASS=0; FAIL=0
@@ -28,6 +33,8 @@ make_fixture() {
            "$FIX/docs/system/workspace/scripts/lifecycle" \
            "$FIX/docs/B1-docs/raw-20260101T000000Z"
   cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  # #4286: bin/issue-sync only dispatches; the subcommands live in issue-sync.d.
+  cp -R "$ROOT_DIR/bin/issue-sync.d" "$FIX/bin/issue-sync.d"
   # issue-sync reads/writes frontmatter through the single-owner lifecycle CLI
   # (#4148). A fixture without it would silently lose every frontmatter write.
   cp "$ROOT_DIR"/docs/system/workspace/scripts/lifecycle/*.py \
@@ -131,14 +138,14 @@ PY
   [[ "${uses:-0}" -ge 2 ]] && ok "close-multi and close-raw share the 0/3/1 accounting" \
     || bad "close accounting used ${uses:-0} times (want >=2)"
 
-  grep -qE '_raw_effect close-platforms .*\|\| ' "$ISSUE_SYNC" && ok "issue-sync propagates the effect exit code" \
+  grep -qE '_raw_effect close-platforms .*\|\| ' "$ISSUE_SYNC_SRC" && ok "issue-sync propagates the effect exit code" \
     || bad "issue-sync collapses the effect exit code"
 
-  grep -q 'partial close for' "$ISSUE_SYNC" && ok "issue-sync reports partial close distinctly" \
+  grep -q 'partial close for' "$ISSUE_SYNC_SRC" && ok "issue-sync reports partial close distinctly" \
     || bad "issue-sync has no partial-close branch"
 
   # The legacy (non-strict) path must not write platform_state=closed unless every platform closed.
-  guard=$(python3 - "$ISSUE_SYNC" <<'PY'
+  guard=$(python3 - "$ISSUE_SYNC_SRC" <<'PY'
 import sys
 src = open(sys.argv[1]).read()
 body = src[src.index("cmd_close()"):src.index("cmd_promote()")]

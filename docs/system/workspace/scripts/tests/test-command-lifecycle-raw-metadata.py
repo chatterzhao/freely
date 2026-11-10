@@ -12,6 +12,24 @@ ROOT = Path(__file__).resolve().parents[5]
 MODULE = ROOT / "docs/system/workspace/scripts/lifecycle/raw_metadata_contract.py"
 ISSUE_SYNC = ROOT / "bin/issue-sync"
 
+def issue_sync_functions_source() -> str:
+    """Everything bin/issue-sync defines, without running main().
+
+    #4286: the entry point is a dispatcher; its subcommands live in
+    bin/issue-sync.d/*.sh. Concatenating the modules with the entry point
+    (minus the module loader and the dispatch guard) gives the test the same
+    function set a sourced entry point has.
+    """
+    entry = ISSUE_SYNC.read_text(encoding="utf-8")
+    # The entry point's loader resolves issue-sync.d next to itself; the
+    # functions file lives in a sandbox, so append the modules instead.
+    entry = entry.replace("\n_issue_sync_load_modules\n", "\n")
+    modules = [path.read_text(encoding="utf-8")
+               for path in sorted((ROOT / "bin" / "issue-sync.d").glob("*.sh"))]
+    return entry + "\n" + "\n".join(modules)
+
+
+
 
 def load_contract():
     spec = importlib.util.spec_from_file_location("raw_metadata_contract", MODULE)
@@ -147,7 +165,7 @@ class RawMetadataContractTests(unittest.TestCase):
             child_file.write_text("# canonical\n", encoding="utf-8")
             self.contract.write_issue(raw_file, self.base, "\n\n## 问题\n命令级状态流。\n")
 
-            source = ISSUE_SYNC.read_text(encoding="utf-8").rsplit('\nmain "$@"', 1)[0]
+            source = issue_sync_functions_source()
             source_file = sandbox / "issue-sync-functions.sh"
             source_file.write_text(source, encoding="utf-8")
             script = r'''
@@ -224,7 +242,7 @@ cmd_promote_finalize "$RAW_ID"
                 encoding="utf-8",
             )
 
-            source = ISSUE_SYNC.read_text(encoding="utf-8").rsplit('\nmain "$@"', 1)[0]
+            source = issue_sync_functions_source()
             source_file = sandbox / "issue-sync-functions.sh"
             source_file.write_text(source, encoding="utf-8")
             script = r'''

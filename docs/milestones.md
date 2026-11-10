@@ -1,3 +1,6 @@
+## M-20261110T130144Z-A
+- title: refactor — issue-sync 拆子命令模块 + 平台投影单一契约
+
 ## M-20261104T080014Z-A
 - title: refactor — 平台写收口到 adapter 单平台命令
 - status: active
