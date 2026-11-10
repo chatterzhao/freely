@@ -444,23 +444,44 @@ _gitee_repo() {
 }
 
 # ── GitHub ops ───────────────────────────────────────────
+# #4166: writes go through platform-adapter.py (`issue-write-one`), so this
+# script only orchestrates. Direct shell-level platform writes meant every
+# entry point had its own label/body/error behaviour.
+
+_platform_adapter_py() {
+  printf '%s\n' "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+}
+
+_gh_write() {
+  local action="$1"; shift
+  FREELY_PLATFORM_REPO="$GH_REPO" \
+    python3 "$(_platform_adapter_py)" issue-write-one github "$action" "$@"
+}
 
 _gh_create() {
   local title="$1" body="$2" labels="$3"
   local result url
-  result=$(gh issue create --repo "$GH_REPO" --title "$title" --body "$body" --label "$labels" 2>&1)
-  url=$(printf '%s\n' "$result" | grep -o 'https://github.com/[^ ]*' | head -1)
+  result="$(_gh_write create "" "$title" "$body" "$labels" 2>&1 || true)"
+  # The adapter answers JSON, so stop at the closing quote instead of taking
+  # the rest of the line (`NEW88"}}` used to become the issue id).
+  url=$(printf '%s\n' "$result" | grep -o 'https://github.com/[^"]*' | head -1)
   printf '%s\n' "${url:-}"
 }
 
 _gh_comment() {
   local issue_number="$1" message="$2"
-  gh issue comment "$issue_number" --repo "$GH_REPO" --body "$message" >/dev/null 2>&1 && echo "ok" || echo "fail"
+  if _gh_write comment "$issue_number" "" "$message" >/dev/null 2>&1; then
+    echo "ok"
+  else
+    echo "fail"
+  fi
 }
 
 _gh_close() {
   local issue_number="$1" reason="${2:-completed}"
-  if gh issue close "$issue_number" --repo "$GH_REPO" --reason "$reason" >/dev/null 2>&1; then
+  # The adapter closes through the platform handler; `--reason` is not part of
+  # the cross-platform contract, so the closed state is what callers can rely on.
+  if _gh_write close "$issue_number" >/dev/null 2>&1; then
     echo "ok"; return 0
   fi
   echo "fail"; return 1
@@ -468,12 +489,7 @@ _gh_close() {
 
 _gh_update() {
   local issue_number="$1" title="$2" body="$3" labels="$4"
-  gh issue edit "$issue_number" --repo "$GH_REPO" --title "$title" --body "$body" >/dev/null 2>&1 || true
-  # gh doesn't have --set-labels, so we add labels incrementally
-  IFS=',' read -ra LABEL_ARR <<< "$labels"
-  for lbl in "${LABEL_ARR[@]}"; do
-    gh issue edit "$issue_number" --repo "$GH_REPO" --add-label "$lbl" >/dev/null 2>&1 || true
-  done
+  _gh_write update "$issue_number" "$title" "$body" "$labels" >/dev/null 2>&1 || true
   echo "ok"
 }
 

@@ -1,3 +1,24 @@
+## M-20261104T080014Z-A
+- title: refactor — 平台写收口到 adapter 单平台命令
+- status: active
+### candidate_issues
+1. `C-20261104T080014Z-A`
+- milestone: M-20261104T080014Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T080014Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261104T080014Z/issues/I-20261104T080014Z-A.md
+### committed_issues
+1. `I-20261104T080014Z-A`
+- milestone: M-20261104T080014Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261104T080014Z/issues/I-20261104T080014Z-A.md
+### completed_issues
+1. `I-20261104T080014Z-A`
+- milestone: M-20261104T080014Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T12:55:00Z
+- issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261104T080014Z/issues/I-20261104T080014Z-A.md
+
 ## M-20261110T120124Z-A
 - title: fix — 运维底座六项收口
 - status: active

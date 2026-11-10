@@ -1,0 +1,8 @@
+AT-001 source: /private/tmp/r27-base
+=== STATIC: one platform-write implementation ===
+  [FAIL] issue-sync has no direct gh issue writes (['gh issue create', 'gh issue comment', 'gh issue close', 'gh issue edit'])
+  [FAIL] issue-sync writes through the adapter command
+  [FAIL] adapter exposes a single-platform write routed to the handler
+=== BEHAVIOR: adapter create-issue-one ===
+  [FAIL] adapter create reaches gh with labels
+SUMMARY: 0 ok, 4 failed
