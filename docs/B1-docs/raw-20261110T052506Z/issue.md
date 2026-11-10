@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261110T052506Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261110T052506Z-A
 platform_ids:
   github:
     issue_id: '4250'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKU94N
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261110T052506Z/issues/I-20261110T052506Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-10T05:25:06Z'
-updated_at: '2026-11-10T05:25:13Z'
+updated_at: '2026-11-10T05:42:38Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
-source_candidate: ''
-completed_at: ''
+platform_state: closed
+promoted_children:
+- I-20261110T052506Z-A
+source_candidate: docs/B1-docs/raw-20261110T052506Z/candidates.md
+completed_at: '2026-11-10T05:42:36Z'
 closeout_note: ''
 ---
 
