@@ -16,6 +16,47 @@ import re
 
 MAX_TITLE_LEN = 100
 _STALE_PREFIX = re.compile(r"^\[raw-[0-9]{8}T[0-9]{4,6}Z\]\s*", re.IGNORECASE)
+_FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+_H1 = re.compile(r"^#[ \t]+(\S.*)$")
+
+
+def find_local_heading(body: str):
+    """Return ``(title, end_offset)`` for the first H1 OUTSIDE fenced code.
+
+    Both the materializer (`platform-adapter.pull_raw_issue`) and the replica
+    gate (`raw-reconciliation-gate._local_record`) used a bare ``^#\\s+``
+    regex over the whole body. A bug report containing a python code block
+    with ``# -> StateFileError: ...`` comments therefore looked like it
+    already had an H1: materialization skipped injecting one, and the gate
+    borrowed the comment as the LOCAL title and discarded the body before it
+    (#4269). Fenced blocks are skipped so only real Markdown headings count.
+
+    ``end_offset`` is the character offset just after the heading line, which
+    lets callers slice the remaining body the same way the old regex match
+    did. Returns ``None`` when no real H1 exists.
+    """
+    text = str(body or "")
+    fence_char = ""
+    fence_len = 0
+    offset = 0
+    for line in text.splitlines(keepends=True):
+        stripped = line.rstrip("\r\n")
+        fence = _FENCE.match(stripped)
+        if fence:
+            marker = fence.group(1)
+            char = marker[0]
+            if not fence_char:
+                fence_char, fence_len = char, len(marker)
+            elif char == fence_char and len(marker) >= fence_len:
+                fence_char, fence_len = "", 0
+            offset += len(line)
+            continue
+        if not fence_char:
+            heading = _H1.match(stripped)
+            if heading:
+                return heading.group(1).strip(), offset + len(line)
+        offset += len(line)
+    return None
 
 
 def canonical_raw_title(raw_key: str, title: str, max_len: int = MAX_TITLE_LEN) -> str:

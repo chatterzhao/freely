@@ -53,8 +53,8 @@ sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 from freely_user_env import value as freely_env_value
 from freely_config import read_config
-from raw_title_contract import (canonical_raw_title, is_canonical_raw_title,
-                               local_heading_title)
+from raw_title_contract import (canonical_raw_title, find_local_heading,
+                               is_canonical_raw_title, local_heading_title)
 
 # ══════════════════════════════════════════════
 # Abstract PlatformHandler — new platform? subclass this.
@@ -1511,7 +1511,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
     # issue is blocked with content_diverged. The H1 is the human part of the
     # canonical platform title (via the shared contract), and is idempotent:
     # a body that already declares a heading keeps exactly that one.
-    if re.search(r"^#[ \t]+\S", body, re.MULTILINE):
+    if find_local_heading(body) is not None:
         rendered_body = body.strip()
     else:
         heading = local_heading_title(raw_key, title)
