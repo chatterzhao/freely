@@ -37,6 +37,7 @@ for _i, _arg in enumerate(sys.argv):
 
 ADAPTER = SRC / "docs/system/workspace/scripts/sync/platform-adapter.py"
 ISSUE_SYNC = SRC / "bin/issue-sync"
+MODULE_DIR = SRC / "bin/issue-sync.d"
 
 OK = 0
 BAD = 0
@@ -66,7 +67,9 @@ def read(path: Path) -> str:
 
 def static_checks() -> None:
     print("=== STATIC: one platform-write implementation ===")
-    sync = read(ISSUE_SYNC)
+    # #4286: bin/issue-sync only dispatches; read the whole program.
+    sync = "\n".join(read(path) for path in
+                      [ISSUE_SYNC, *sorted(MODULE_DIR.glob("*.sh"))])
     adapter = read(ADAPTER)
 
     direct = [needle for needle in (

@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 BATCH_SIZE=0
 DRY_RUN=0
+DELETE_TARGET=""
 
 usage() { cat <<'EOF'
 Usage:
@@ -21,7 +22,7 @@ while [[ $# -gt 0 ]]; do
     --dry-run) DRY_RUN=1; shift ;;
     --batch) BATCH_SIZE="$2"; shift 2 ;;
     --all) BATCH_SIZE=999; shift ;;
-    --delete) gh issue delete "$2" --yes 2>&1; exit $? ;;
+    --delete) DELETE_TARGET="$2"; shift 2 ;;
     *) shift ;;
   esac
 done
@@ -32,6 +33,21 @@ GITHUB_REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null 
 
 echo "GitHub: $GITHUB_REPO"
 echo ""
+
+# #4166: deletion is a platform write, so it goes through platform-adapter.py
+# like every other write. Talking to the CLI directly here made this script the
+# only entry point outside the adapter, with its own repo/error behaviour.
+if [[ -n "$DELETE_TARGET" ]]; then
+  _delete_number="${DELETE_TARGET##*/}"
+  if [[ ! "$_delete_number" =~ ^[0-9]+$ ]]; then
+    echo "[ERROR] --delete expects an issue URL or issue number, got: $DELETE_TARGET" >&2
+    exit 1
+  fi
+  FREELY_PLATFORM_REPO="$GITHUB_REPO" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    issue-write-one github delete "$_delete_number"
+  exit $?
+fi
 
 PY_CMD=(python3 "$SCRIPT_DIR/issue-sync-batch.py"
   --repo "$GITHUB_REPO"

@@ -182,6 +182,8 @@ def build_fixture() -> Path:
     rt.mkdir(parents=True)
     # Real code under test / helpers copied from SOURCE root.
     shutil.copy(SRC / "bin" / "issue-sync", fix / "bin" / "issue-sync")
+    # #4286: the entry point is a dispatcher; its modules must ship with it.
+    shutil.copytree(SRC / "bin" / "issue-sync.d", fix / "bin" / "issue-sync.d")
     for name in ("raw_title_contract.py", "replica_guard.py"):
         f = _sync_dir(SRC) / name
         if f.exists():
@@ -277,7 +279,10 @@ def static_checks() -> None:
     else:
         bad("replica_guard.py missing / no classify_receipt (create would trust stale cache)")
 
-    src = (SRC / "bin" / "issue-sync").read_text()
+    # #4286: bin/issue-sync only dispatches; read the whole program.
+    src = "\n".join(path.read_text() for path in
+                     [SRC / "bin" / "issue-sync",
+                      *sorted((SRC / "bin" / "issue-sync.d").glob("*.sh"))])
     for token, label in (
         ("_replica_receipt", "create consults platform-side discovery helper"),
         ("_replica_decide", "create uses per-platform decision"),

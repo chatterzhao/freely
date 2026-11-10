@@ -10,6 +10,11 @@ set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 ISSUE_SYNC="$ROOT_DIR/bin/issue-sync"
+
+# #4286: bin/issue-sync only dispatches; the subcommands live in
+# bin/issue-sync.d/*.sh, so static assertions must read the whole program.
+ISSUE_SYNC_SRC="$(mktemp "${TMPDIR:-/tmp}/issue-sync-src.XXXXXX")"
+cat "$ISSUE_SYNC" "$ROOT_DIR"/bin/issue-sync.d/*.sh > "$ISSUE_SYNC_SRC"
 ADAPTER="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
 FREELY="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 PASS=0; FAIL=0
@@ -25,10 +30,17 @@ make_fixture() {
            "$FIX/docs/system/workspace/scripts/sync" \
            "$FIX/docs/system/workspace/scripts/lifecycle" \
            "$FIX/docs/B1-docs/raw-20260101T000000Z"
-  # _platform_title() imports the shared title contract from scripts/sync.
-  cp "$ROOT_DIR/docs/system/workspace/scripts/sync/raw_title_contract.py" \
-     "$FIX/docs/system/workspace/scripts/sync/raw_title_contract.py"
+  # _platform_title() imports the shared title contract from scripts/sync and
+  # issue-sync writes through platform-adapter.py (#4166); the projection comes
+  # from issue_create_contract.py (#4286). A fixture without them exercises a
+  # missing dependency instead of the behaviour under test.
+  cp "$ROOT_DIR"/docs/system/workspace/scripts/sync/*.py \
+     "$FIX/docs/system/workspace/scripts/sync/"
+  cp "$ROOT_DIR"/docs/system/workspace/scripts/runtime/*.py \
+     "$FIX/docs/system/workspace/scripts/runtime/"
   cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
+  # #4286: bin/issue-sync only dispatches; the subcommands live in issue-sync.d.
+  cp -R "$ROOT_DIR/bin/issue-sync.d" "$FIX/bin/issue-sync.d"
   # Single-owner frontmatter CLI (#4148): without it platform_state writes vanish.
   cp "$ROOT_DIR"/docs/system/workspace/scripts/lifecycle/*.py \
      "$FIX/docs/system/workspace/scripts/lifecycle/"
@@ -45,6 +57,10 @@ if "create" in args:
     print(json.dumps({"number": "77", "html_url": "https://gitee.com/o/r/issues/77"}))
 elif "close" in args:
     print(json.dumps({"number": "77", "state": "closed"}))
+elif "list" in args:
+    # #4286: the replica guard asks the platform before creating; an empty
+    # list is what "no replica yet" actually looks like.
+    print(json.dumps([]))
 else:
     print(json.dumps({"ok": True}))
 STUB
@@ -108,15 +124,15 @@ PY
 
 static_checks() {
   echo "=== STATIC: no silent-success constructs ==="
-  if grep -q "|| echo '{\"ok\":false}'" "$ISSUE_SYNC"; then
+  if grep -q "|| echo '{\"ok\":false}'" "$ISSUE_SYNC_SRC"; then
     bad "issue-sync still masks gitee failures with || echo ok:false"
   else ok "issue-sync no longer masks gitee failures"; fi
 
-  if grep -qE 'GITEE_TOKEN:-' "$ISSUE_SYNC"; then
+  if grep -qE 'GITEE_TOKEN:-' "$ISSUE_SYNC_SRC"; then
     bad "issue-sync still gates gitee writes on an unset GITEE_TOKEN"
   else ok "issue-sync no longer gates on GITEE_TOKEN"; fi
 
-  if grep -q '"\\"title\\":\\"' "$ISSUE_SYNC" || grep -q '_gitee_call "create" "{"' "$ISSUE_SYNC"; then
+  if grep -q '"\\"title\\":\\"' "$ISSUE_SYNC_SRC" || grep -q '_gitee_call "create" "{"' "$ISSUE_SYNC_SRC"; then
     bad "issue-sync still passes a JSON blob to gitee-issue.py"
   else ok "issue-sync uses the real gitee CLI contract"; fi
 

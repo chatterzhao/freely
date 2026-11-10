@@ -25597,10 +25597,24 @@ PYEOF
   echo "[feedback] raw issue created: raw-${raw_key}"
 
   local _adapter_rc=0
-  # Labels mirror issue-sync._labels(): kind/raw + phase/proposed + severity/Pn.
-  # Passed as the 4th create-issue argument so both platforms can set them.
-  local _issue_labels="kind/raw,phase/proposed,severity/${severity}"
-  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" "${_issue_labels}" 2>&1) || _adapter_rc=$?
+  # #4166: the platform projection (frontmatter fence + workflow_kind + table +
+  # body) and the label list come from the shared contract, so `feedback` and
+  # `issue-sync create/update` cannot drift apart again. The contract consumes
+  # the same document shape a local issue.md has, so we hand it the text we
+  # would have written locally instead of a second hand-rolled renderer.
+  local _contract="$SELF_ROOT/docs/system/workspace/scripts/sync/issue_create_contract.py"
+  local _body_tmp _platform_body _issue_labels
+  _body_tmp="$(mktemp "${TMPDIR:-/tmp}/freely-feedback-body.XXXXXX")"
+  printf '%s\n' "$body" > "$_body_tmp"
+  _platform_body=$(python3 "$_contract" body --file "$_body_tmp" \
+    --local-id "$local_id" --title "$title") || {
+    rm -f "$_body_tmp"
+    log_error "failed to render the platform body"
+    return 1
+  }
+  rm -f "$_body_tmp"
+  _issue_labels=$(python3 "$_contract" labels --kind raw --phase proposed --severity "$severity")
+  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${_platform_body}" "${_issue_labels}" 2>&1) || _adapter_rc=$?
   echo "[feedback] adapter output:"
   echo "$_adapter_result"
 

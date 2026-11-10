@@ -337,7 +337,7 @@
   <text x="65" y="3219" fill="#333">worker-reactivation-and-local-reentry-residual-runtime-governance</text>
   <rect id="story-workflow" x="55" y="3224" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="3237" fill="#333">workflow</text>
-  <rect id="epic-platform" x="35" y="3250" width="730" height="116" fill="#e1f5fe" stroke="#0277bd" stroke-width="2" rx="4"/>
+  <rect id="epic-platform" x="35" y="3250" width="730" height="142" fill="#e1f5fe" stroke="#0277bd" stroke-width="2" rx="4"/>
   <text x="50" y="3266" font-size="14" font-weight="bold" fill="#0277bd">platform</text>
   <rect id="story-github-rest-fallback" x="55" y="3276" width="690" height="18" fill="#fff" stroke="#0277bd" stroke-width="1" rx="2"/>
   <text x="65" y="3289" fill="#333">github-rest-fallback</text>
@@ -348,103 +348,105 @@
   <rect id="story-raw-replica-reconciliation" x="55" y="3330" width="690" height="18" fill="#fff" stroke="#0277bd" stroke-width="1" rx="2"/>
   <text x="65" y="3343" fill="#333">raw-replica-reconciliation</text>
   <rect id="story-issue-sync-entrypoint" x="55" y="3348" width="690" height="18" fill="#fff" stroke="#0277bd" stroke-width="1" rx="2"/>
-  <text x="65" y="3379" fill="#333">issue-sync-entrypoint</text>
-  <rect id="epic-platform-sync" x="35" y="3374" width="730" height="44" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="4"/>
-  <text x="50" y="3390" font-size="14" font-weight="bold" fill="#7b1fa2">platform-sync</text>
-  <rect id="story-close-merged" x="55" y="3400" width="690" height="18" fill="#fff" stroke="#7b1fa2" stroke-width="1" rx="2"/>
-  <text x="65" y="3413" fill="#333">close-merged</text>
-  <rect id="epic-runtime" x="35" y="3426" width="730" height="710" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
-  <text x="50" y="3442" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
-  <rect id="story-agent-identity-single-truth" x="55" y="3452" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3465" fill="#333">agent-identity-single-truth</text>
-  <rect id="story-application-native-runtime-observation-contract-and-observability-planes" x="55" y="3470" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3483" fill="#333">application-native-runtime-observation-contract-and-observability-planes</text>
-  <rect id="story-bash32-daemon-compat-fix" x="55" y="3488" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3501" fill="#333">bash32-daemon-compat-fix</text>
-  <rect id="story-business-block-vs-system-crash-recovery" x="55" y="3506" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3519" fill="#333">business-block-vs-system-crash-recovery</text>
-  <rect id="story-command-lifecycle-state-contract" x="55" y="3524" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3537" fill="#333">command-lifecycle-state-contract</text>
-  <rect id="story-control-surface" x="55" y="3542" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3555" fill="#333">control-surface</text>
-  <rect id="story-daemon" x="55" y="3560" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3573" fill="#333">daemon</text>
-  <rect id="story-monitor" x="55" y="3578" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3591" fill="#333">monitor</text>
-  <rect id="story-runtime-adapter-axis-and-per-tool-adapter-selection" x="55" y="3596" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3609" fill="#333">runtime-adapter-axis-and-per-tool-adapter-selection</text>
-  <rect id="story-runtime-audio-notifier-and-sound-semantics-governance" x="55" y="3614" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3627" fill="#333">runtime-audio-notifier-and-sound-semantics-governance</text>
-  <rect id="story-runtime-blocked-intake-and-continuity-truth-governance" x="55" y="3632" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3645" fill="#333">runtime-blocked-intake-and-continuity-truth-governance</text>
-  <rect id="story-runtime-claude-launch-and-session-evidence-governance" x="55" y="3650" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3663" fill="#333">runtime-claude-launch-and-session-evidence-governance</text>
-  <rect id="story-runtime-closeout-selfhost-validation-followthrough-governance" x="55" y="3668" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3681" fill="#333">runtime-closeout-selfhost-validation-followthrough-governance</text>
-  <rect id="story-runtime-concurrent-start-stop-followthrough-governance" x="55" y="3686" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3699" fill="#333">runtime-concurrent-start-stop-followthrough-governance</text>
-  <rect id="story-runtime-daemon-self-loop-followthrough-governance" x="55" y="3704" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3717" fill="#333">runtime-daemon-self-loop-followthrough-governance</text>
-  <rect id="story-runtime-evidence-provenance-research-retirement-followthrough-governance" x="55" y="3722" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3735" fill="#333">runtime-evidence-provenance-research-retirement-followthrough-governance</text>
-  <rect id="story-runtime-forensic-time-alignment-and-stall-recovery-observability-governance" x="55" y="3740" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3753" fill="#333">runtime-forensic-time-alignment-and-stall-recovery-observability-governance</text>
-  <rect id="story-runtime-human-readable-time-display-governance" x="55" y="3758" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3771" fill="#333">runtime-human-readable-time-display-governance</text>
-  <rect id="story-runtime-lifecycle-receipt-followthrough-governance" x="55" y="3776" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3789" fill="#333">runtime-lifecycle-receipt-followthrough-governance</text>
-  <rect id="story-runtime-loop-log-timezone-label-followthrough-governance" x="55" y="3794" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3807" fill="#333">runtime-loop-log-timezone-label-followthrough-governance</text>
-  <rect id="story-runtime-network-failure-taxonomy-and-bounded-recovery-governance" x="55" y="3812" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3825" fill="#333">runtime-network-failure-taxonomy-and-bounded-recovery-governance</text>
-  <rect id="story-runtime-selfhost-continuity-gap-and-status-truth-governance" x="55" y="3830" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3843" fill="#333">runtime-selfhost-continuity-gap-and-status-truth-governance</text>
-  <rect id="story-runtime-start-stop-lifecycle-and-process-leak-governance" x="55" y="3848" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3861" fill="#333">runtime-start-stop-lifecycle-and-process-leak-governance</text>
-  <rect id="story-runtime-startup-authority-and-readiness-governance" x="55" y="3866" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3879" fill="#333">runtime-startup-authority-and-readiness-governance</text>
-  <rect id="story-runtime-startup-root-cause-packet-governance" x="55" y="3884" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3897" fill="#333">runtime-startup-root-cause-packet-governance</text>
-  <rect id="story-runtime-startup-self-healing-governance" x="55" y="3902" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3915" fill="#333">runtime-startup-self-healing-governance</text>
-  <rect id="story-runtime-supervisor-attach-reuse-followthrough-governance" x="55" y="3920" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3933" fill="#333">runtime-supervisor-attach-reuse-followthrough-governance</text>
-  <rect id="story-runtime-worker-launch-linkage-and-stall-recovery-governance" x="55" y="3938" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3951" fill="#333">runtime-worker-launch-linkage-and-stall-recovery-governance</text>
-  <rect id="story-scan" x="55" y="3956" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3969" fill="#333">scan</text>
-  <rect id="story-scan-lifecycle-migration" x="55" y="3974" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="3987" fill="#333">scan-lifecycle-migration</text>
-  <rect id="story-scan-pr-platform-config" x="55" y="3992" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4005" fill="#333">scan-pr-platform-config</text>
-  <rect id="story-sse-watchdog" x="55" y="4010" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4023" fill="#333">sse-watchdog</text>
-  <rect id="story-stale-prebrainstorm-truth-reconcile-governance" x="55" y="4028" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4041" fill="#333">stale-prebrainstorm-truth-reconcile-governance</text>
-  <rect id="story-stale-start-lock-cleanup" x="55" y="4046" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4059" fill="#333">stale-start-lock-cleanup</text>
-  <rect id="story-timeout" x="55" y="4064" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4077" fill="#333">timeout</text>
-  <rect id="story-watchdog-live-status-surface-and-manager-supervision" x="55" y="4082" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4095" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
-  <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4100" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4113" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
-  <rect id="story-package-output-guard" x="55" y="4118" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
-  <text x="65" y="4131" fill="#333">package-output-guard</text>
-  <rect id="epic-skills" x="35" y="4144" width="730" height="44" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="4"/>
-  <text x="50" y="4160" font-size="14" font-weight="bold" fill="#f57f17">skills</text>
-  <rect id="story-skill-yaml-frontmatter" x="55" y="4170" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
-  <text x="65" y="4183" fill="#333">skill-yaml-frontmatter</text>
-  <rect id="epic-worktree-lifecycle" x="35" y="4196" width="730" height="116" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
-  <text x="50" y="4212" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
-  <rect id="story-merge-guard-issue-sync-scope" x="55" y="4222" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4235" fill="#333">merge-guard-issue-sync-scope</text>
-  <rect id="story-owner-lane" x="55" y="4240" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4253" fill="#333">owner-lane</text>
-  <rect id="story-owner-lane-claim" x="55" y="4258" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4271" fill="#333">owner-lane-claim</text>
-  <rect id="story-worktree-seed" x="55" y="4276" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4289" fill="#333">worktree-seed</text>
-  <rect id="story-wt-create-resume-test-worktree" x="55" y="4294" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
-  <text x="65" y="4307" fill="#333">wt-create-resume-test-worktree</text>
+  <text x="65" y="3361" fill="#333">issue-sync-entrypoint</text>
+  <rect id="story-issue-sync-modules" x="55" y="3392" width="690" height="18" fill="#fff" stroke="#0277bd" stroke-width="1" rx="2"/>
+  <text x="65" y="3405" fill="#333">issue-sync-modules</text>
+  <rect id="epic-platform-sync" x="35" y="3400" width="730" height="44" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="4"/>
+  <text x="50" y="3416" font-size="14" font-weight="bold" fill="#7b1fa2">platform-sync</text>
+  <rect id="story-close-merged" x="55" y="3426" width="690" height="18" fill="#fff" stroke="#7b1fa2" stroke-width="1" rx="2"/>
+  <text x="65" y="3439" fill="#333">close-merged</text>
+  <rect id="epic-runtime" x="35" y="3452" width="730" height="710" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="4"/>
+  <text x="50" y="3468" font-size="14" font-weight="bold" fill="#00695c">runtime</text>
+  <rect id="story-agent-identity-single-truth" x="55" y="3478" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3491" fill="#333">agent-identity-single-truth</text>
+  <rect id="story-application-native-runtime-observation-contract-and-observability-planes" x="55" y="3496" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3509" fill="#333">application-native-runtime-observation-contract-and-observability-planes</text>
+  <rect id="story-bash32-daemon-compat-fix" x="55" y="3514" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3527" fill="#333">bash32-daemon-compat-fix</text>
+  <rect id="story-business-block-vs-system-crash-recovery" x="55" y="3532" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3545" fill="#333">business-block-vs-system-crash-recovery</text>
+  <rect id="story-command-lifecycle-state-contract" x="55" y="3550" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3563" fill="#333">command-lifecycle-state-contract</text>
+  <rect id="story-control-surface" x="55" y="3568" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3581" fill="#333">control-surface</text>
+  <rect id="story-daemon" x="55" y="3586" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3599" fill="#333">daemon</text>
+  <rect id="story-monitor" x="55" y="3604" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3617" fill="#333">monitor</text>
+  <rect id="story-runtime-adapter-axis-and-per-tool-adapter-selection" x="55" y="3622" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3635" fill="#333">runtime-adapter-axis-and-per-tool-adapter-selection</text>
+  <rect id="story-runtime-audio-notifier-and-sound-semantics-governance" x="55" y="3640" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3653" fill="#333">runtime-audio-notifier-and-sound-semantics-governance</text>
+  <rect id="story-runtime-blocked-intake-and-continuity-truth-governance" x="55" y="3658" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3671" fill="#333">runtime-blocked-intake-and-continuity-truth-governance</text>
+  <rect id="story-runtime-claude-launch-and-session-evidence-governance" x="55" y="3676" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3689" fill="#333">runtime-claude-launch-and-session-evidence-governance</text>
+  <rect id="story-runtime-closeout-selfhost-validation-followthrough-governance" x="55" y="3694" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3707" fill="#333">runtime-closeout-selfhost-validation-followthrough-governance</text>
+  <rect id="story-runtime-concurrent-start-stop-followthrough-governance" x="55" y="3712" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3725" fill="#333">runtime-concurrent-start-stop-followthrough-governance</text>
+  <rect id="story-runtime-daemon-self-loop-followthrough-governance" x="55" y="3730" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3743" fill="#333">runtime-daemon-self-loop-followthrough-governance</text>
+  <rect id="story-runtime-evidence-provenance-research-retirement-followthrough-governance" x="55" y="3748" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3761" fill="#333">runtime-evidence-provenance-research-retirement-followthrough-governance</text>
+  <rect id="story-runtime-forensic-time-alignment-and-stall-recovery-observability-governance" x="55" y="3766" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3779" fill="#333">runtime-forensic-time-alignment-and-stall-recovery-observability-governance</text>
+  <rect id="story-runtime-human-readable-time-display-governance" x="55" y="3784" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3797" fill="#333">runtime-human-readable-time-display-governance</text>
+  <rect id="story-runtime-lifecycle-receipt-followthrough-governance" x="55" y="3802" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3815" fill="#333">runtime-lifecycle-receipt-followthrough-governance</text>
+  <rect id="story-runtime-loop-log-timezone-label-followthrough-governance" x="55" y="3820" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3833" fill="#333">runtime-loop-log-timezone-label-followthrough-governance</text>
+  <rect id="story-runtime-network-failure-taxonomy-and-bounded-recovery-governance" x="55" y="3838" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3851" fill="#333">runtime-network-failure-taxonomy-and-bounded-recovery-governance</text>
+  <rect id="story-runtime-selfhost-continuity-gap-and-status-truth-governance" x="55" y="3856" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3869" fill="#333">runtime-selfhost-continuity-gap-and-status-truth-governance</text>
+  <rect id="story-runtime-start-stop-lifecycle-and-process-leak-governance" x="55" y="3874" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3887" fill="#333">runtime-start-stop-lifecycle-and-process-leak-governance</text>
+  <rect id="story-runtime-startup-authority-and-readiness-governance" x="55" y="3892" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3905" fill="#333">runtime-startup-authority-and-readiness-governance</text>
+  <rect id="story-runtime-startup-root-cause-packet-governance" x="55" y="3910" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3923" fill="#333">runtime-startup-root-cause-packet-governance</text>
+  <rect id="story-runtime-startup-self-healing-governance" x="55" y="3928" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3941" fill="#333">runtime-startup-self-healing-governance</text>
+  <rect id="story-runtime-supervisor-attach-reuse-followthrough-governance" x="55" y="3946" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3959" fill="#333">runtime-supervisor-attach-reuse-followthrough-governance</text>
+  <rect id="story-runtime-worker-launch-linkage-and-stall-recovery-governance" x="55" y="3964" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3977" fill="#333">runtime-worker-launch-linkage-and-stall-recovery-governance</text>
+  <rect id="story-scan" x="55" y="3982" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="3995" fill="#333">scan</text>
+  <rect id="story-scan-lifecycle-migration" x="55" y="4000" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4013" fill="#333">scan-lifecycle-migration</text>
+  <rect id="story-scan-pr-platform-config" x="55" y="4018" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4031" fill="#333">scan-pr-platform-config</text>
+  <rect id="story-sse-watchdog" x="55" y="4036" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4049" fill="#333">sse-watchdog</text>
+  <rect id="story-stale-prebrainstorm-truth-reconcile-governance" x="55" y="4054" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4067" fill="#333">stale-prebrainstorm-truth-reconcile-governance</text>
+  <rect id="story-stale-start-lock-cleanup" x="55" y="4072" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4085" fill="#333">stale-start-lock-cleanup</text>
+  <rect id="story-timeout" x="55" y="4090" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4103" fill="#333">timeout</text>
+  <rect id="story-watchdog-live-status-surface-and-manager-supervision" x="55" y="4108" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4121" fill="#333">watchdog-live-status-surface-and-manager-supervision</text>
+  <rect id="story-watchdog-restart-storm-and-process-churn-governance" x="55" y="4126" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4139" fill="#333">watchdog-restart-storm-and-process-churn-governance</text>
+  <rect id="story-package-output-guard" x="55" y="4144" width="690" height="18" fill="#fff" stroke="#00695c" stroke-width="1" rx="2"/>
+  <text x="65" y="4157" fill="#333">package-output-guard</text>
+  <rect id="epic-skills" x="35" y="4170" width="730" height="44" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="4"/>
+  <text x="50" y="4186" font-size="14" font-weight="bold" fill="#f57f17">skills</text>
+  <rect id="story-skill-yaml-frontmatter" x="55" y="4196" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
+  <text x="65" y="4209" fill="#333">skill-yaml-frontmatter</text>
+  <rect id="epic-worktree-lifecycle" x="35" y="4222" width="730" height="116" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
+  <text x="50" y="4238" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
+  <rect id="story-merge-guard-issue-sync-scope" x="55" y="4248" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4261" fill="#333">merge-guard-issue-sync-scope</text>
+  <rect id="story-owner-lane" x="55" y="4266" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4279" fill="#333">owner-lane</text>
+  <rect id="story-owner-lane-claim" x="55" y="4284" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4297" fill="#333">owner-lane-claim</text>
+  <rect id="story-worktree-seed" x="55" y="4302" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4315" fill="#333">worktree-seed</text>
+  <rect id="story-wt-create-resume-test-worktree" x="55" y="4320" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4333" fill="#333">wt-create-resume-test-worktree</text>
 </svg>

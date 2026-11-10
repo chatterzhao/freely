@@ -1,3 +1,24 @@
+## M-20261110T130144Z-A
+- title: refactor — issue-sync 拆子命令模块 + 平台投影单一契约
+- status: active
+### candidate_issues
+1. `C-20261110T130144Z-A`
+- milestone: M-20261110T130144Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T130144Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261110T130144Z/issues/I-20261110T130144Z-A.md
+### committed_issues
+1. `I-20261110T130144Z-A`
+- milestone: M-20261110T130144Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261110T130144Z/issues/I-20261110T130144Z-A.md
+### completed_issues
+1. `I-20261110T130144Z-A`
+- milestone: M-20261110T130144Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T13:45:00Z
+- issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261110T130144Z/issues/I-20261110T130144Z-A.md
+
 ## M-20261104T080014Z-A
 - title: refactor — 平台写收口到 adapter 单平台命令
 - status: active

@@ -70,7 +70,10 @@ def static_checks(project: Path):
            "contract exposes validate_issue_path / parse_issue_text")
     expect("yaml.safe_load" not in scan.read_text(),
            "scan no longer carries its own yaml.safe_load parser")
-    sync_text = sync.read_text()
+    # #4286: bin/issue-sync is a dispatcher; read the whole program so these
+    # assertions keep checking the implementation, not just the entry point.
+    sync_files = [sync] + sorted((project / "bin" / "issue-sync.d").glob("*.sh"))
+    sync_text = "\n".join(path.read_text() for path in sync_files)
     get_body = sync_text[sync_text.index("_fm_get() {"):sync_text.index("_fm_set() {")]
     expect("yaml.safe_load" not in get_body and "$_FM_CLI" in get_body,
            "issue-sync _fm_get is a thin wrapper over the shared CLI")
