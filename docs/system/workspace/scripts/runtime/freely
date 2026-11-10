@@ -470,21 +470,31 @@ print(f'updated {agent_id} slot → {new_slot}', file=sys.stderr)
 " "$_agent_id" "$_new_slot"
 }
 
-# ── Cooldown cycle state ─────────────────────────────────────────────
+# ── Cooldown cycle state (#4258, first migrated family) ──
+# State files are data, not shell code. This family uses the single-owner
+# protocol in state_file.py; the reader still accepts legacy KEY=value lines
+# WITHOUT expanding them, so rolling upgrades keep working.
+STATE_FILE_PY="$SELF_ROOT/docs/system/workspace/scripts/runtime/state_file.py"
+
 _read_cooldown_state() {
   local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
-  if [[ -f "$state_file" ]]; then
-    unset COOLDOWN_SWITCH_AT COOLDOWN_SWITCH_INDEX
-    source "$state_file"
-  fi
-  CROSS_TOOL_SWITCH_AT="${COOLDOWN_SWITCH_AT:-0}"
-  CROSS_TOOL_SWITCH_INDEX="${COOLDOWN_SWITCH_INDEX:-0}"
+  CROSS_TOOL_SWITCH_AT=0
+  CROSS_TOOL_SWITCH_INDEX=0
+  [[ -f "$state_file" ]] || return 0
+  local at="" idx=""
+  { read -r at; read -r idx; } < <(
+    python3 "$STATE_FILE_PY" values "$state_file" \
+      COOLDOWN_SWITCH_AT COOLDOWN_SWITCH_INDEX 2>/dev/null || true
+  )
+  CROSS_TOOL_SWITCH_AT="${at:-0}"
+  CROSS_TOOL_SWITCH_INDEX="${idx:-0}"
 }
 
 _write_cooldown_state() {
   local at="$1" idx="$2"
   local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
-  printf 'COOLDOWN_SWITCH_AT=%s\nCOOLDOWN_SWITCH_INDEX=%s\n' "$at" "$idx" >"$state_file"
+  python3 "$STATE_FILE_PY" write "$state_file" \
+    --kv "COOLDOWN_SWITCH_AT=$at" --kv "COOLDOWN_SWITCH_INDEX=$idx"
 }
 
 SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
