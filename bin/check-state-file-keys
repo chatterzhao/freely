@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""State-key contract lint (#4264).
+
+`runtime/state_file.py::ALLOWED_KEYS` is the single whitelist for the safe
+state-file protocol. `read_state` calls `_check_key` on EVERY line — including
+legacy `KEY=value` lines — so a single unregistered key makes a whole existing
+state file unreadable. In the shell callers that failure is swallowed by
+`|| true`, which silently drops the state instead of reporting it.
+
+#4252 claimed the whitelist came from a "full scan" but it only covered a
+subset of write shapes. This lint makes the scan itself the contract:
+
+  * extract every KEY= assignment written to a state-like file by `freely`
+    (heredoc, here-string, printf template, echo redirect);
+  * diff that set against ALLOWED_KEYS;
+  * fail on any missing key, and also fail if the whitelist contains keys that
+    no write site produces (stale entries) unless they are explicitly allowed.
+
+Only-additive usage: adding a new state key requires registering it here (via
+ALLOWED_KEYS) — that is the point. Removing a write site should also remove the
+key, but we only WARN on stale keys so a temporary removal is not a hard stop.
+
+Usage:
+  python3 bin/check-state-file-keys [--project <path>] [--json]
+"""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import re
+import sys
+from pathlib import Path
+
+# A KEY is an identifier at the start of an assignment. State files use both
+# historical UPPER_SNAKE keys and a few lowercase lock-file keys; both shapes
+# are accepted so the protocol can read every file the runtime currently writes.
+KEY_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_]{2,})=")
+INLINE_KEY_RE = re.compile(r"(?:^|[\"'\s])([A-Z][A-Z0-9_]{2,})=")
+
+# heredocs that are documentation / prompts, not state files. Their content is
+# Markdown or JSON, so the KEY_RE filter already excludes them; this list is a
+# belt-and-braces guard for future prose containing `WORD=...` lines.
+NON_STATE_MARKERS = ("WORKER_STATE_INJECT", "PROMPT_EOF", "AGENT_MD_EOF")
+
+
+def load_whitelist(root: Path) -> set[str]:
+    module_path = root / "docs/system/workspace/scripts/runtime/state_file.py"
+    spec = importlib.util.spec_from_file_location("_state_key_probe", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load state module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["_state_key_probe"] = module
+    spec.loader.exec_module(module)
+    return set(module.ALLOWED_KEYS)
+
+
+def extract_keys(freely_text: str) -> dict[str, list[int]]:
+    """Return {key: [line numbers]} for every state assignment write site."""
+    lines = freely_text.split("\n")
+    found: dict[str, list[int]] = {}
+
+    def add(key: str, number: int) -> None:
+        found.setdefault(key, []).append(number)
+
+    for i, line in enumerate(lines):
+        # here-string MUST be checked first: `<<<` also contains `<<`, and a
+        # heredoc regex would otherwise treat the payload as a heredoc body
+        # and swallow local shell variable assignments as state keys.
+        # The FIRST key is on the same physical line as `<<< "`, so it must be
+        # extracted from the remainder too — otherwise the scanner itself
+        # silently misses keys (the exact class of bug #4264 is about).
+        here = re.search(r'\bcat\s*>\s*.*<<<\s*"(.*)$', line)
+        if here:
+            first = KEY_RE.match(here.group(1))
+            if first:
+                add(first.group(1), i + 1)
+            for j in range(i + 1, min(i + 10, len(lines))):
+                m = KEY_RE.match(lines[j].strip())
+                if m:
+                    add(m.group(1), j + 1)
+                if lines[j].rstrip().endswith('"'):
+                    break
+            continue
+
+        # heredoc: cat >"$state_file" <<EOF (possibly <<'EOF' / <<-EOF / MARK).
+        # The target may be a command substitution containing spaces, e.g.
+        # cat >"$(manager_worker_launch_state_file "$project")" <<EOF — an
+        # earlier `[^"\s]*` pattern silently skipped those and missed 11 keys.
+        # `(?!<)` keeps `<<<` from being mistaken for a heredoc marker.
+        heredoc = re.search(
+            r"\bcat\s*>\s*.*<<(?!<)-?\s*['\"]?(\w+)['\"]?", line)
+        if heredoc:
+            marker = heredoc.group(1)
+            if marker not in NON_STATE_MARKERS:
+                for j in range(i + 1, min(i + 80, len(lines))):
+                    if lines[j].strip() == marker:
+                        break
+                    m = KEY_RE.match(lines[j].strip())
+                    if m:
+                        add(m.group(1), j + 1)
+            continue
+
+        # 3) printf 'KEY="%s"\n' templates (single or double quoted)
+        for quote in ("'", '"'):
+            for m in re.finditer(
+                r"printf\s+" + quote + r"((?:[^" + quote + r"\\]|\\.)*)" + quote,
+                line,
+            ):
+                for km in INLINE_KEY_RE.finditer(m.group(1)):
+                    add(km.group(1), i + 1)
+
+        # 4) echo "KEY=..." >/>> "$state_file"
+        if re.search(r"\becho\s+['\"]", line) and re.search(r">\s*\"?\$?\w*(state|_file|contract)", line):
+            for km in INLINE_KEY_RE.finditer(line):
+                add(km.group(1), i + 1)
+
+        # 5) migrated families: python3 "$STATE_FILE_PY" write ... --kv "KEY=value"
+        for km in re.finditer(r'--kv\s+["\']([A-Za-z][A-Za-z0-9_]{2,})=', line):
+            add(km.group(1), i + 1)
+
+    return found
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="state-key whitelist contract lint")
+    ap.add_argument("--project", default=str(Path(__file__).resolve().parents[1]))
+    ap.add_argument("--json", action="store_true", help="emit machine-readable result")
+    args = ap.parse_args()
+    root = Path(args.project).resolve()
+    freely = root / "docs/system/workspace/scripts/runtime/freely"
+
+    try:
+        whitelist = load_whitelist(root)
+    except Exception as exc:  # module missing / broken -> hard fail
+        print(f"[state-keys] FAIL: cannot load ALLOWED_KEYS: {exc}")
+        return 1
+
+    written = extract_keys(freely.read_text(encoding="utf-8", errors="replace")) if freely.is_file() else {}
+    missing = sorted(set(written) - whitelist)
+    stale = sorted(whitelist - set(written))
+    result = {
+        "write_keys": len(written),
+        "whitelist": len(whitelist),
+        "missing": missing,
+        "stale": stale,
+        "missing_sites": {k: written[k][:4] for k in missing},
+        "ok": not missing,
+    }
+    if args.json:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        print(f"[state-keys] write sites: {len(written)} keys; whitelist: {len(whitelist)} keys")
+        if missing:
+            print(f"[state-keys] FAIL: {len(missing)} written keys are NOT registered:")
+            for key in missing:
+                print(f"  - {key:46} freely:{','.join(map(str, written[key][:4]))}")
+        else:
+            print("[state-keys] OK: every written state key is registered")
+        if stale:
+            print(f"[state-keys] WARN: {len(stale)} whitelist keys have no write site (stale):")
+            for key in stale[:12]:
+                print(f"  - {key}")
+    return 1 if missing else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
