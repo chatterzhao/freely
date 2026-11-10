@@ -7,6 +7,13 @@ AI replies are A2A Messages; the state block at the end drives Task state transi
 A2A states: submitted, working, completed, failed, input-required, canceled (Google A2A standard)
 """
 
+# #4272: `_sse_pool() -> SSEPool` (defined below at ~:446) is a forward
+# reference. Without deferred evaluation Python evaluates annotations at
+# definition time and simply IMPORTING this module raises
+# `NameError: name 'SSEPool' is not defined` — which silently disables every
+# `python3 a2a_task.py ... || true` in the worker dispatch loop.
+from __future__ import annotations
+
 import argparse
 import json
 import os
