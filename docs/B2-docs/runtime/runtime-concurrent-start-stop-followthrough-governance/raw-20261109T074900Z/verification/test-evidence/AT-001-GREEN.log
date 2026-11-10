@@ -1,0 +1,13 @@
+[PASS] C1 unescaped path really matches a sibling project (control)
+[PASS] C2 fixed-pattern pkill sites exist (control)
+[PASS] S1 single escape helper defined
+[PASS] S2 both project-path pkill sites use the helper
+[PASS] S3 no raw project path in any pkill -f regex
+[PASS] S4 helper uses Python re.escape with argv (metacharacter-complete)
+[PASS] B1 helper escapes dots, plus, parens and brackets
+[PASS] B2 escaped pattern does not match the sibling project
+[PASS] B3 escaped pattern still matches its own project
+[PASS] B4 real pgrep: unescaped pattern hits extra processes
+[PASS] B5 real pgrep: escaped pattern hits only its own process
+[PASS] B6 runtime/freely syntax valid
+SUMMARY: 12 ok, 0 failed

@@ -69,6 +69,18 @@ TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-regis
 
 _sse_watchdog_sh="$SELF_ROOT/docs/system/workspace/scripts/runtime/sse-watchdog.sh"
 
+# Escape a value before it is embedded into a `pkill -f` / `pgrep -f` regex.
+# Project paths routinely contain `.`, `+`, `(`, `[` etc.; interpolating them
+# raw makes the path a wildcard pattern, so stopping project A can kill
+# project B's A2A server (raw-20261109T074900Z / #4239). Use Python's
+# re.escape via argv (R22 argv-safe form) rather than a hand-rolled table.
+freely_escape_regex() {
+  python3 - "$1" <<'PY'
+import re, sys
+print(re.escape(sys.argv[1]), end="")
+PY
+}
+
 _tool_registry_get() {
   # Usage: _tool_registry_get <tool> <dot.path> → prints value, exit 1 if not found
   local tool="$1" field="$2"
@@ -9004,7 +9016,9 @@ print(h)" 2>/dev/null || true).pid"
     rm -f "$a2a_cached_pid_file"
   fi
   # Belt-and-suspenders: kill any remaining a2a_server.py processes for this project
-  pkill -f "python3.*a2a_server\.py.*--project.*${project}.*--start" 2>/dev/null || true
+  local _project_re
+  _project_re="$(freely_escape_regex "$project")" || return 1
+  pkill -f "python3.*a2a_server\.py.*--project.*${_project_re}.*--start" 2>/dev/null || true
   # Clean stale socket
   rm -f "$a2a_socket" 2>/dev/null || true
 
@@ -22346,7 +22360,9 @@ stop_project_runtime() {
     rm -f "$_a2a_cached_pid_file"
   fi
   # Layer 3: pkill fallback for any remaining zombie processes
-  pkill -f "python3.*a2a_server\.py.*--project.*${project}.*--start" 2>/dev/null || true
+  local _project_re
+  _project_re="$(freely_escape_regex "$project")" || return 1
+  pkill -f "python3.*a2a_server\.py.*--project.*${_project_re}.*--start" 2>/dev/null || true
   rm -f "$_a2a_socket"
   # Stop DB daemon via PID file
   local _db_pid_file _db_pid
