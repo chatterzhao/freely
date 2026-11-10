@@ -924,13 +924,17 @@ codex_write_live_apikey_bundle() {
   backup_file_with_timestamp "$auth_file"
   backup_file_with_timestamp "$config_file"
 
-  python3 - <<'PY' "$auth_file" "$config_file" "$provider_name" "$base_url" "$api_key"
+  # #4281: the key goes through the environment, not argv — `ps` shows argv.
+  FREELY_CODEX_API_KEY="$api_key" python3 - <<'PY' "$auth_file" "$config_file" "$provider_name" "$base_url"
 import json
 import os
 import sys
 import tomllib
 
-auth_path, config_path, provider_name, base_url, api_key = sys.argv[1:6]
+auth_path, config_path, provider_name, base_url = sys.argv[1:5]
+api_key = os.environ.get("FREELY_CODEX_API_KEY", "")
+if not api_key:
+    raise SystemExit("missing FREELY_CODEX_API_KEY")
 
 def dump_value(value):
     if isinstance(value, str):

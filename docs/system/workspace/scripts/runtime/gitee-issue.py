@@ -119,14 +119,15 @@ def api_request(
     api_base = (os.environ.get("GITEE_API_BASE") or DEFAULT_API_BASE).rstrip("/")
     token = access_token(auth_required)
     query = dict(query or {})
-    if token:
-        query["access_token"] = token
     url = f"{api_base}{path}"
     encoded_query = encode_query(query)
     if encoded_query:
         url = f"{url}?{encoded_query}"
     payload = None
     headers = {"Accept": "application/json"}
+    if token:
+        # #4281: keep the token out of the URL (proxy logs, Referer, crash dumps).
+        headers["Authorization"] = f"Bearer {token}"
     if body:
         payload = encode_query(body, include_empty=True).encode("utf-8")
         headers["Content-Type"] = "application/x-www-form-urlencoded"

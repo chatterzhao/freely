@@ -1565,12 +1565,21 @@ sanitize_lifecycle_trace_kv() {
 append_runtime_event() {
   local project="$1" event="$2"
   shift 2
-  local log_file timestamp kv key value
+  local log_file timestamp kv key value severity trace_id
   log_file="$(runtime_events_log_file "$project")"
   mkdir -p "$(dirname "$log_file")"
   timestamp="$(current_timestamp_utc_for_machine)"
+  # #4281: severity lets operators filter without grepping event names, and
+  # trace_id correlates one run across processes. Callers keep the old
+  # two-argument signature; no call site needs to change.
+  case "$event" in
+    *error*|*fail*|*blocked*|*conflict*) severity="error" ;;
+    *warn*|*stale*|*degraded*|*missing*|*skip*|*stop*) severity="warn" ;;
+    *) severity="info" ;;
+  esac
+  trace_id="${FREELY_TRACE_ID:-${FREELY_RUN_ID:-runtime}-$(date -u +%Y%m%d)}"
   {
-    printf '%s event=%s' "$timestamp" "$event"
+    printf '%s event=%s severity=%s trace_id=%s' "$timestamp" "$event" "$severity" "$trace_id"
     for kv in "$@"; do
       key="${kv%%=*}"
       value="${kv#*=}"
@@ -9037,6 +9046,17 @@ print(h)" 2>/dev/null || true)
 
 
 # ── Log rotation: prevent unbounded growth for long-running daemon ──
+_prune_logs_by_count() {
+  # #4281: cycle-* / crash-* are one file per run, so _rotate_log (which bounds
+  # a single growing file) never applies. Keep the newest N by mtime.
+  local _dir="$1" _pattern="$2" _keep="${3:-20}"
+  [[ -d "$_dir" ]] || return 0
+  [[ "$_keep" =~ ^[0-9]+$ ]] || _keep=20
+  ls -1t "$_dir"/$_pattern 2>/dev/null | tail -n +$((_keep + 1)) | while IFS= read -r _f; do
+    rm -f "$_f" 2>/dev/null || true
+  done
+}
+
 _rotate_log() {
   local _log="$1" _max_size="${2:-10485760}" _max_keep="${3:-3}"
   [[ -f "$_log" ]] || return 0
@@ -23376,6 +23396,7 @@ print('ok')
       exit 0
     fi
     ts="$(date '+%Y%m%d-%H%M%S')"
+    _prune_logs_by_count "$logs_dir" 'cycle-*.log' "${FREELY_CYCLE_LOG_KEEP:-50}"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
     cycle_debug_log="$logs_dir/cycle-$ts.debug.log"
@@ -23998,6 +24019,7 @@ print(ready)
     # Preserve crash evidence: save debug log when AI exits non-zero.
     # Uses $AGENT_AI_TOOL (registry-derived, not hardcoded) — works for any tool.
     if [[ "$rc" != "0" && -f "${cycle_debug_log:-}" ]]; then
+      _prune_logs_by_count "$(logs_dir_for_project "$PROJECT_ROOT")" 'crash-*.log' "${FREELY_CRASH_LOG_KEEP:-20}"
       local _crash_log; _crash_log="$(logs_dir_for_project "$PROJECT_ROOT")/crash-${AGENT_AI_TOOL:-unknown}-$(date +%Y%m%d-%H%M%S).log"
       cp "$cycle_debug_log" "$_crash_log" 2>/dev/null || true
       [[ -f "$cycle_log" ]] && cp "$cycle_log" "${_crash_log}.stdout" 2>/dev/null || true

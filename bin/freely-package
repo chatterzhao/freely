@@ -182,7 +182,11 @@ while IFS= read -r line; do
       dst="$OUTPUT/$line"
       mkdir -p "$(dirname "$dst")"
       cp -R "$src" "$dst"
-      count=$(find "$src" -type f | wc -l | tr -d ' ')
+      # #4281: never ship interpreter caches or dead backups. Count the
+      # post-prune output so the log matches what was actually installed.
+      find "$dst" -name '__pycache__' -type d -prune -exec rm -rf {} + 2>/dev/null || true
+      find "$dst" -name '*.bak.py' -delete 2>/dev/null || true
+      count=$(find "$dst" -type f | wc -l | tr -d ' ')
       copied=$((copied + count))
       echo "  dir  $line ($count files)"
     else
