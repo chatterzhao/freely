@@ -56,6 +56,11 @@ def _log_file(project: str) -> str:
     return os.path.join(project, ".freely", "run", "db-daemon.log")
 
 
+# #4281: bump when the schema changes; recorded via PRAGMA user_version so a
+# newer database is refused instead of being silently mutated by an older build.
+SCHEMA_VERSION = 1
+
+
 # ── Timestamp helpers ─────────────────────────────────────────────────────
 
 def _now_utc() -> str:
@@ -124,6 +129,13 @@ class DbDaemon:
 
     def _ensure_tables(self) -> None:
         c = self.conn
+        # #4281: refuse a database written by a newer build instead of letting
+        # an older binary add columns / reinterpret rows.
+        current_version = c.execute("PRAGMA user_version").fetchone()[0]
+        if current_version > SCHEMA_VERSION:
+            raise RuntimeError(
+                f"database schema {current_version} is newer than this build "
+                f"({SCHEMA_VERSION}); upgrade freely instead of downgrading the data")
 
         # chats
         c.execute("""
@@ -294,8 +306,10 @@ class DbDaemon:
             if col_name not in existing_cols:
                 try:
                     c.execute(f"ALTER TABLE a2a_tasks ADD COLUMN {col_name} {col_def}")
-                except Exception:
-                    pass
+                except Exception as exc:
+                    # #4281: a failed migration must be visible, not swallowed.
+                    raise RuntimeError(
+                        f"a2a_tasks migration failed for {col_name}: {exc}") from exc
 
         # agent_working — tracks which agent is on which worktree (replaces agent-id.env)
         c.execute("""
@@ -335,9 +349,14 @@ class DbDaemon:
         # Schema migration: review_stage for a2a_tasks
         try:
             c.execute("ALTER TABLE a2a_tasks ADD COLUMN review_stage TEXT DEFAULT ''")
-        except Exception:
-            pass
+        except Exception as exc:
+            # #4281: the duplicate-column case is expected on an already
+            # migrated DB; everything else must surface.
+            if "duplicate column" not in str(exc).lower():
+                raise RuntimeError(
+                    f"a2a_tasks migration failed for review_stage: {exc}") from exc
 
+        c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
         self.conn.commit()
         self.log("all tables ensured")
 

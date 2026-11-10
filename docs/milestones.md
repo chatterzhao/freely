@@ -1,3 +1,24 @@
+## M-20261110T120124Z-A
+- title: fix — 运维底座六项收口
+- status: active
+### candidate_issues
+1. `C-20261110T120124Z-A`
+- milestone: M-20261110T120124Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T120124Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261110T120124Z/issues/I-20261110T120124Z-A.md
+### committed_issues
+1. `I-20261110T120124Z-A`
+- milestone: M-20261110T120124Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T120124Z/issues/I-20261110T120124Z-A.md
+### completed_issues
+1. `I-20261110T120124Z-A`
+- milestone: M-20261110T120124Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T12:15:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T120124Z/issues/I-20261110T120124Z-A.md
+
 ## M-20261103T132644Z-A
 - title: fix — supervisor 失败退出码 + Python 版本前置
 - status: active

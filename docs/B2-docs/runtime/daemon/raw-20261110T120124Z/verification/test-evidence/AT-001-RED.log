@@ -1,0 +1,18 @@
+AT-001 source: /private/tmp/r26-base
+=== STATIC: six items are wired in ===
+  [FAIL] watchdog follows rotation, creates a missing log, survives a failed pre-check and owns a pid
+  [FAIL] append_runtime_event emits severity and trace_id
+  [FAIL] cycle/crash logs have a retention bound
+  [FAIL] package excludes __pycache__ and *.bak.py
+  [FAIL] gitee token leaves the URL query for an Authorization header
+  [FAIL] codex api key goes through the environment, not Python argv
+  [FAIL] DB records user_version and no longer swallows migration errors
+=== BEHAVIOR: runtime event fields ===
+  [FAIL] runtime event carries severity= and trace_id=
+=== BEHAVIOR: log retention bound ===
+  [FAIL] _prune_logs_by_count keeps exactly the newest N logs
+=== BEHAVIOR: package output hygiene ===
+  [FAIL] package output contains no __pycache__ or *.bak.py
+=== BEHAVIOR: watchdog survives a missing log ===
+  [FAIL] watchdog starts with a missing log and writes its pid
+SUMMARY: 0 ok, 11 failed

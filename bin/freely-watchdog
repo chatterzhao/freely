@@ -1,14 +1,37 @@
 #!/usr/bin/env bash
-# freely-watchdog: detect [CMD] logs and run PRE_CHECK_MAP
+# freely-watchdog: detect [CMD] logs and run PRE_CHECK_MAP.
+#
+# #4281: this is a manual/diagnostic tool, not a supervised daemon. It used to
+# die silently twice: `tail -f` on a missing file failed under pipefail, and a
+# failed PRE_CHECK_MAP returned 1 inside the `while` subshell under `set -e`,
+# so the first violation killed the watchdog. It now creates the log, follows
+# rotation, keeps running after a failed pre-check, and holds a pid so a second
+# copy is a no-op instead of a duplicate consumer.
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+# #4281: was a fourth, hard-coded worktree-root derivation ("$ROOT_DIR/../freely-worktrees").
+WORKTREES_ROOT="${FREELY_WORKTREES_ROOT:-$(dirname "$ROOT_DIR")/$(basename "$ROOT_DIR")-worktrees}"
 LOG_FILE="${FREELY_WATCHDOG_LOG:-/tmp/freely-watchdog.log}"
+PID_FILE="${FREELY_WATCHDOG_PID:-/tmp/freely-watchdog.pid}"
+
+mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$PID_FILE")"
+[[ -f "$LOG_FILE" ]] || : > "$LOG_FILE"
+
+if [[ -f "$PID_FILE" ]]; then
+  _existing_pid="$(cat "$PID_FILE" 2>/dev/null || true)"
+  if [[ -n "$_existing_pid" ]] && kill -0 "$_existing_pid" 2>/dev/null; then
+    echo "[WATCHDOG] already running (pid=$_existing_pid)" >&2
+    exit 0
+  fi
+fi
+echo "$$" >"$PID_FILE"
+trap '[[ "$(cat "$PID_FILE" 2>/dev/null || true)" == "$$" ]] && rm -f "$PID_FILE"' EXIT INT TERM
 
 PRE_CHECK_MAP() {
   local cmd="$1" raw_key="$2"
-  local wt="$ROOT_DIR/../freely-worktrees"
-  
+  local wt="$WORKTREES_ROOT"
+
   case "$cmd" in
     pr-create-guarded)
       # Check B1 artifacts
@@ -24,13 +47,13 @@ PRE_CHECK_MAP() {
         grep -q 'red-green-status: red\|red-green-status: green' "$pre_tests" 2>/dev/null && red_ok=1
         grep -q 'red-green-status: green' "$pre_tests" 2>/dev/null && green_ok=1
       fi
-      
+
       local fails=0
       [[ $b1_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ B1 not done: brainstorms.md missing"; fails=$((fails+1)); }
       [[ $b2_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ B2 not done: pre-tests.md missing"; fails=$((fails+1)); }
       [[ $red_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ RED not executed: red-green-status not red/green"; fails=$((fails+1)); }
       [[ $green_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ GREEN not passed: red-green-status not green"; fails=$((fails+1)); }
-      
+
       if [[ $fails -gt 0 ]]; then
         echo "[WATCHDOG] $cmd 执行前应满足以下前置条件，但未满足:"
         [[ $b1_ok -eq 0 ]] && echo "[WATCHDOG]   - B1 未完成: brainstorms.md 缺失"
@@ -49,12 +72,17 @@ PRE_CHECK_MAP() {
   return 0
 }
 
-# Main: grep [CMD] from log and run checks
-tail -f "$LOG_FILE" 2>/dev/null | while read -r line; do
+# Main: grep [CMD] from log and run checks.
+# `tail -F` survives rotation; the `|| continue` keeps `set -e` from ending the
+# loop on the first violation.
+tail -F "$LOG_FILE" 2>/dev/null | while read -r line; do
   if echo "$line" | grep -q '\[CMD\]'; then
     cmd=$(echo "$line" | sed 's/.*\[CMD\] //' | sed 's/ called.*//')
     raw_key=$(echo "$line" | grep -oE 'raw-key: [^ ]+' | sed 's/raw-key: //')
     echo "[WATCHDOG] detected: $cmd, raw-key=$raw_key"
-    PRE_CHECK_MAP "$cmd" "$raw_key"
+    PRE_CHECK_MAP "$cmd" "$raw_key" || {
+      echo "[WATCHDOG] pre-check reported failures; watchdog stays alive"
+      continue
+    }
   fi
 done
