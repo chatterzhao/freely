@@ -14120,18 +14120,32 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   # A2A-native: query submitted worker tasks with structured data.
-  # Output: task_id<TAB>message<TAB>worktree<TAB>branch<TAB>raw_key<TAB>skill (one per task)
-  # A2A-native: query submitted worker tasks with structured data.
-  # Uses external Python script to avoid heredoc quoting issues in daemon context.
+  # Emit side produces JSON Lines; the decoder turns each record into a
+  # NUL-separated field stream so AI-generated text (tabs, newlines, quotes,
+  # shell metacharacters) is never parsed as shell syntax (#4246).
   local _consume_filter_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/consume_worker_tasks.py"
-  _worker_tasks=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 "$_consume_filter_py" 2>/dev/null || true)
+  local _decode_filter_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/decode_worker_tasks.py"
+  local _worker_tasks_stream
+  _worker_tasks_stream="$(mktemp "${TMPDIR:-/tmp}/freely-worker-tasks.XXXXXX")" || return 1
+  # Keep emitter/decoder stderr in the daemon log: malformed rows are now
+  # reported instead of vanishing into `except: pass` (#4246). The `|| true`
+  # preserves the historical "upstream unavailable == no pending tasks"
+  # semantics; a failed upstream must not abort the manager loop.
+  python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null \
+    | python3 "$_consume_filter_py" \
+    | python3 "$_decode_filter_py" >"$_worker_tasks_stream" || true
   # Get parent handoff_id (latest manager record)
   _parent_task_id=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | \
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
-  log_info "worker_launch: _worker_tasks has $(echo "$_worker_tasks" | wc -l | tr -d ' ') lines"
-  if [[ -n "$_worker_tasks" ]]; then
-    while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
+  log_info "worker_launch: decoded worker task stream has $(wc -c < "$_worker_tasks_stream" | tr -d ' ') bytes"
+  if [[ -s "$_worker_tasks_stream" ]]; then
+    while IFS= read -r -d '' _task_id \
+       && IFS= read -r -d '' _task_msg \
+       && IFS= read -r -d '' _target_worktree \
+       && IFS= read -r -d '' _task_branch \
+       && IFS= read -r -d '' _raw_key \
+       && IFS= read -r -d '' _task_skill; do
       [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
       # Save original A2A task_id before it gets overwritten by insert handoff record.
       # This is the A2A Server task that Manager monitors via SSE/polling.
@@ -14252,8 +14266,10 @@ EOF
             --reason "${LAUNCH_REJECT_REASON:-launchable check failed}" >/dev/null 2>&1 || true
         fi
       fi
-    done <<< "$_worker_tasks"
+    done < "$_worker_tasks_stream"
+    rm -f "$_worker_tasks_stream"
   fi
+  rm -f "$_worker_tasks_stream"
   launched_count="$_launched_count"
   [[ "$launched_count" =~ ^[0-9]+$ ]] || launched_count="0"
   if (( launched_count > 0 )); then

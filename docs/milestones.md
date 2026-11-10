@@ -1,3 +1,24 @@
+## M-20261109T085539Z-A
+- title: fix — worker 派发 JSON 化 + python3 -c 边界 lint
+- status: active
+### candidate_issues
+1. `C-20261109T085539Z-A`
+- milestone: M-20261109T085539Z-A
+- status: promoted
+- promoted_issue_id: I-20261109T085539Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261109T085539Z/issues/I-20261109T085539Z-A.md
+### committed_issues
+1. `I-20261109T085539Z-A`
+- milestone: M-20261109T085539Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261109T085539Z/issues/I-20261109T085539Z-A.md
+### completed_issues
+1. `I-20261109T085539Z-A`
+- milestone: M-20261109T085539Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T06:10:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261109T085539Z/issues/I-20261109T085539Z-A.md
+
 ## M-20261110T052506Z-A
 - title: fix — guarded PR plan 失败可诊断 + git 传输超时守卫
 - status: active

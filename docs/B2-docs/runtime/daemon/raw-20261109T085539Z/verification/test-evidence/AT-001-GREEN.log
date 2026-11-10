@@ -1,0 +1,17 @@
+[PASS] C1 old TSV shape really shifts fields (control)
+[PASS] C2 R22 argv-safe form still present (control)
+[PASS] S1 emit side is JSON Lines, not TSV
+[PASS] S2 decoder exists
+[PASS] S3 worker dispatch consumes NUL-separated stream
+[PASS] S4 except:pass replaced by explicit report + count
+[PASS] S5 boundary lint exists
+[PASS] B1 tab/newline/quote survive emission
+[PASS] B2 decoder emits 6 NUL-separated fields, message intact
+[PASS] B3 malformed row skipped with explicit stderr report
+[PASS] B4 field order unchanged
+[PASS] B5 empty input is a clean no-op
+[PASS] B6 lint flags single-quoted $var inside python3 -c
+[PASS] B7 lint does not flag argv-safe heredoc form
+[PASS] B8 lint reports a baseline count without crashing
+[PASS] B9 R22 external-input-boundary regression green
+SUMMARY: 16 ok, 0 failed
