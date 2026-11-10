@@ -120,6 +120,23 @@ def write_state(path: str | Path, values: dict[str, str]) -> None:
     p.write_text(body, encoding="utf-8")
 
 
+def values(path: str | Path, keys: list[str]) -> list[str]:
+    """Return raw values for `keys`, one per line, for shell consumers.
+
+    A value containing a newline is rejected instead of being silently split:
+    the caller uses line-oriented reads, so ambiguity would be a correctness
+    bug. Such values belong to the JSON `read` interface instead.
+    """
+    data = read_state(path)
+    result = []
+    for key in keys:
+        value = data.get(_check_key(key), "")
+        if "\n" in value or "\r" in value:
+            raise StateFileError(f"{key}: newline in value is unsafe for `values`")
+        result.append(value)
+    return result
+
+
 def to_shell(path: str | Path) -> str:
     """Render safe shell assignments for the migration period.
 
@@ -136,9 +153,14 @@ def main() -> int:
     sub = ap.add_subparsers(dest="command", required=True)
     p_write = sub.add_parser("write")
     p_write.add_argument("path")
-    p_write.add_argument("--data", required=True, help="JSON object of string values")
+    p_write.add_argument("--data", help="JSON object of string values")
+    p_write.add_argument("--kv", action="append", default=[],
+                         help="KEY=VALUE pair (repeatable); argv-safe, no JSON needed")
     p_read = sub.add_parser("read")
     p_read.add_argument("path")
+    p_values = sub.add_parser("values")
+    p_values.add_argument("path")
+    p_values.add_argument("keys", nargs="+")
     p_shell = sub.add_parser("to-shell")
     p_shell.add_argument("path")
     p_validate = sub.add_parser("validate")
@@ -146,12 +168,23 @@ def main() -> int:
     args = ap.parse_args()
     try:
         if args.command == "write":
-            data = json.loads(args.data)
-            if not isinstance(data, dict):
-                raise StateFileError("--data must be a JSON object")
+            if args.data:
+                data = json.loads(args.data)
+                if not isinstance(data, dict):
+                    raise StateFileError("--data must be a JSON object")
+            else:
+                data = {}
+            for pair in args.kv:
+                if "=" not in pair:
+                    raise StateFileError(f"--kv must be KEY=VALUE: {pair!r}")
+                key, value = pair.split("=", 1)
+                data[key.strip()] = value
             write_state(args.path, data)
         elif args.command == "read":
             print(json.dumps(read_state(args.path), ensure_ascii=False, sort_keys=True))
+        elif args.command == "values":
+            for value in values(args.path, args.keys):
+                print(value)
         elif args.command == "to-shell":
             sys.stdout.write(to_shell(args.path))
         else:
