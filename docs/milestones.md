@@ -1,3 +1,24 @@
+## M-20261103T132614Z-A
+- title: refactor — 注册表路径单一所有者 + raw key 入口规范化
+- status: active
+### candidate_issues
+1. `C-20261103T132614Z-A`
+- milestone: M-20261103T132614Z-A
+- status: promoted
+- promoted_issue_id: I-20261103T132614Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132614Z/issues/I-20261103T132614Z-A.md
+### committed_issues
+1. `I-20261103T132614Z-A`
+- milestone: M-20261103T132614Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132614Z/issues/I-20261103T132614Z-A.md
+### completed_issues
+1. `I-20261103T132614Z-A`
+- milestone: M-20261103T132614Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T11:35:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261103T132614Z/issues/I-20261103T132614Z-A.md
+
 ## M-20261110T064015Z-A
 - title: fix — 派发 CAS 幂等 + SSE watchdog 单实例所有权
 - status: active

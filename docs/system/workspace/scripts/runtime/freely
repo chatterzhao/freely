@@ -64,8 +64,18 @@ fi
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 # ── Tool registry  ──
-TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/tools/tool-registry.toml"
-TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+# #4154: the path itself has a single owner (runtime/paths.sh). A second copy
+# here had drifted to a non-existent scripts/runtime copy, which made ACP tool
+# setup skip itself with one warning.
+FREELY_PATHS_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/paths.sh"
+if [[ ! -f "$FREELY_PATHS_LIB" ]]; then
+  _freely_lib_missing "runtime path constants" "$FREELY_PATHS_LIB"
+  [[ "$_FREELY_IS_SOURCED" == "1" ]] && return 1
+  false
+fi
+source "$FREELY_PATHS_LIB"
+TOOL_REGISTRY="$(freely_tool_registry_path "$SELF_ROOT")"
+TOOL_REGISTRY_QUERY="$(freely_tool_registry_query_path "$SELF_ROOT")"
 
 _sse_watchdog_sh="$SELF_ROOT/docs/system/workspace/scripts/runtime/sse-watchdog.sh"
 
@@ -21466,10 +21476,14 @@ sys.exit(1)
   _init_acp_tool_setup() {
     local _auto_mode="${1:-false}"    # --auto: skip interactive confirmation
     local _reset_mode="${2:-false}"   # --reset: overwrite all config fields
-    local registry="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
-    local registry_query="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+    local registry="$TOOL_REGISTRY"
+    local registry_query="$TOOL_REGISTRY_QUERY"
     local ensure_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/ensure-acp-binary"
-    [[ -f "$registry" ]] || { log_warn "tool-registry.toml not found, skipping ACP tool setup"; return 0; }
+    # #4154: a missing registry is a broken installation, not a reason to skip
+    # silently. The old `log_warn ... return 0` made the whole ACP setup vanish.
+    [[ -f "$registry" ]] || { log_error "tool-registry.toml not found: $registry"; return 1; }
+    [[ -f "$registry_query" ]] || { log_error "tool-registry-query.py not found: $registry_query"; return 1; }
+    [[ -f "$ensure_script" ]] || { log_error "ensure-acp-binary not found: $ensure_script"; return 1; }
 
     # Discover all tool names from registry
     local -a _all_tools=()

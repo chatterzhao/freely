@@ -276,14 +276,22 @@ fi
 # ── Validate raw-key format ──────────────────────────────
 
 if [[ "$using_new" -eq 1 ]]; then
-  if echo "$raw_key" | grep -qE '^[0-9]{8}T[0-9]{4,6}Z$'; then
-    : # valid
-  elif echo "$raw_key" | grep -qE '^[0-9]{8}-[0-9]{4,6}$'; then
-    echo "警告: raw-key '$raw_key' uses legacy format. Prefer YYYYMMDDTHHMM[SS]Z." >&2
-  else
-    echo "Invalid raw-key format '$raw_key'. Expected YYYYMMDDTHHMM[SS]Z (e.g., 20260513T010343Z)." >&2
+  # #4154: normalize through the single owner instead of maintaining a second
+  # format table. The old branch accepted legacy YYYYMMDD-HHMM with a warning
+  # but kept it verbatim, so branch names became raw-20261103-1326 and every
+  # downstream T...Z extractor produced an empty raw_key.
+  _wt_canon_py="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)/docs/system/workspace/scripts/runtime/raw_key_canon.py"
+  [[ -f "$_wt_canon_py" ]] || { echo "raw_key_canon.py not found: $_wt_canon_py" >&2; exit 1; }
+  _canonical_raw_key="$(python3 "$_wt_canon_py" "$raw_key" 2>/dev/null || true)"
+  if [[ ! "$_canonical_raw_key" =~ ^raw-[0-9]{8}T[0-9]{6}Z$ ]]; then
+    echo "Invalid raw-key format '$raw_key'. Expected YYYYMMDDTHHMM[SS]Z or legacy YYYYMMDD-HHMM[SS]." >&2
     exit 1
   fi
+  _normalized_raw_key="${_canonical_raw_key#raw-}"
+  if [[ "$_normalized_raw_key" != "$raw_key" ]]; then
+    echo "raw-key normalized: '$raw_key' → '$_normalized_raw_key'" >&2
+  fi
+  raw_key="$_normalized_raw_key"
 fi
 
 # ── Resolve branches ─────────────────────────────────────

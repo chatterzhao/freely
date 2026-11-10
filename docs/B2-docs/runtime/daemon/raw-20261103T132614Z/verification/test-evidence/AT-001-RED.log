@@ -1,0 +1,18 @@
+AT-001 source: /private/tmp/r24-base
+=== STATIC: single source wiring ===
+  [FAIL] deploy-skills uses the shared registry path and has no claude fallback
+  [FAIL] ACP tool setup reuses $TOOL_REGISTRY instead of a wrong local path
+  [FAIL] runtime/paths.sh owns the registry path constant
+  [FAIL] no production reference to the wrong registry path (['bin/deploy-skills', 'runtime/freely'])
+  [FAIL] wt-create normalizes raw keys through the single owner
+  [FAIL] raw_key_canon.py understands legacy keys and is callable
+=== BEHAVIOR: registry present/missing ===
+  [FAIL] registry present: registry tools are read (cline detected)
+  [FAIL] registry missing: deploy-skills fails closed
+  [ok] explicit --tools still works
+=== BEHAVIOR: legacy raw-key normalization ===
+  [FAIL] legacy YYYYMMDD-HHMM pads seconds
+  [FAIL] legacy YYYYMMDD-HHMMSS keeps seconds
+  [FAIL] canonical key is unchanged
+  [FAIL] branch name yields canonical key
+SUMMARY: 1 ok, 12 failed

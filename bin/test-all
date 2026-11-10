@@ -22,6 +22,7 @@ done
 
 CORE=(
   test-a2a-task-cli-loadable.py
+  test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
   test-raw-replica-degraded.py
@@ -35,6 +36,7 @@ CORE=(
 )
 CI_CORE=(
   test-a2a-task-cli-loadable.py
+  test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
   test-raw-replica-degraded.py
