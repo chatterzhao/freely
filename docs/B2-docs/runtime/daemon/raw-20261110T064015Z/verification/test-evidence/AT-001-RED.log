@@ -1,0 +1,26 @@
+AT-001 source: /private/tmp/r23j-base
+=== STATIC: CAS chain + SSE singleton wiring ===
+  [FAIL] CLI registers --expected-state / --expected-status (no parse_known_args swallowing)
+  [FAIL] CLI forwards expected_state and exits non-zero on state_conflict
+  [FAIL] A2A server PATCH enforces expected_state and returns 409 conflict
+  [FAIL] DB single-writer handler makes the state transition conditional
+  [FAIL] dispatch CAS claims the submitted task BEFORE launching the worker
+  [FAIL] post-launch unconditional A2A state update removed
+  [FAIL] watch-in-watch dead code and self-pid impersonation removed
+  [FAIL] ensure-watch supervises through the single start path
+  [FAIL] shell watchdog claims its pid through the mutual-exclusion helper
+  [FAIL] flock-backed pid claim helper exists in runtime/freely
+  [FAIL] python watchdog pid also goes through the claim helper
+=== BEHAVIOR: conditional state transition (isolated SQLite) ===
+  [FAIL] first CAS wins (affected=1)
+  [FAIL] second CAS loses (affected=0)
+  [ok] plain update still works
+  [FAIL] mismatched expected_state refuses
+=== BEHAVIOR: CLI forwards CAS and surfaces conflict ===
+  [ok] legacy --status launched still maps to working
+  [FAIL] CLI PATCH body carries expected_state=submitted
+  [FAIL] 409 conflict makes the CLI fail closed
+=== BEHAVIOR: concurrent pid claims ===
+  [FAIL] exactly one concurrent claim succeeds
+  [FAIL] pid file records the winning owner only
+SUMMARY: 2 ok, 18 failed

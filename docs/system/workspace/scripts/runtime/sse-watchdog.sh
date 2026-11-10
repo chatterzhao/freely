@@ -37,7 +37,12 @@ ACP_BRIDGE_SOCK="$(_acp_bridge_socket "$PROJECT" "${AGENT_AI_TOOL%%-*}")"  # was
 MANAGER_SESSION_FILE="$(run_dir_for_project "$PROJECT")/manager-session-id"
 
 mkdir -p "$(run_dir_for_project "$PROJECT")"
-echo $$ > "$PID_FILE"
+# #4254: claim ownership atomically. Any second consumer started by the other
+# start paths must exit instead of injecting the same state_update twice.
+if ! sse_watchdog_claim_pid "$PID_FILE" "$$" "sse-watchdog.sh"; then
+  echo "sse-watchdog: another live instance owns $PID_FILE" >&2
+  exit 0
+fi
 
 # ── ACP session/prompt injection ────────────────────────────────────────
 

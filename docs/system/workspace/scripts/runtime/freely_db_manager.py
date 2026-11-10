@@ -1148,16 +1148,28 @@ def h_a2a_task_get(daemon: DbDaemon, params: dict) -> dict:
 
 @_h("a2a_task.update")
 def h_a2a_task_update(daemon: DbDaemon, params: dict) -> dict:
-    """Update A2A Task fields (excluding id/created_at)."""
+    """Update A2A Task fields (excluding id/created_at).
+
+    #4254: `expected_state` turns the update into an atomic compare-and-swap.
+    The daemon is the single writer, so a single UPDATE ... WHERE state = ?
+    is enough to make a dispatcher's claim exclusive — no read-modify-write
+    race between two launchers. It is never written as a column.
+    """
     task_id = params.pop("task_id")
     params.pop("updated_at", None)  # Handled by caller or use _now_utc()
+    expected_state = params.pop("expected_state", None) or None
     if not params:
         return {"affected": 0}
     now = _now_utc()
     set_cols = ", ".join(f"{k} = ?" for k in params.keys())
+    where = "task_id = ?"
+    values = list(params.values()) + [now, task_id]
+    if expected_state:
+        where += " AND state = ?"
+        values.append(expected_state)
     c = daemon.conn.execute(
-        f"UPDATE a2a_tasks SET {set_cols}, updated_at = ? WHERE task_id = ?",
-        list(params.values()) + [now, task_id],
+        f"UPDATE a2a_tasks SET {set_cols}, updated_at = ? WHERE {where}",
+        values,
     )
     daemon.conn.commit()
     return {"affected": c.rowcount}

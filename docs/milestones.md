@@ -1,3 +1,24 @@
+## M-20261110T064015Z-A
+- title: fix — 派发 CAS 幂等 + SSE watchdog 单实例所有权
+- status: active
+### candidate_issues
+1. `C-20261110T064015Z-A`
+- milestone: M-20261110T064015Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T064015Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261110T064015Z/issues/I-20261110T064015Z-A.md
+### committed_issues
+1. `I-20261110T064015Z-A`
+- milestone: M-20261110T064015Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T064015Z/issues/I-20261110T064015Z-A.md
+### completed_issues
+1. `I-20261110T064015Z-A`
+- milestone: M-20261110T064015Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T10:55:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T064015Z/issues/I-20261110T064015Z-A.md
+
 ## M-20261110T101358Z-A
 - title: fix — 恢复 a2a_task.py CLI 可加载性（P0）
 - status: active

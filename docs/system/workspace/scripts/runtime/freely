@@ -2703,6 +2703,50 @@ sse_watchdog_pid_file() {
   echo "$(run_dir_for_project "$project")/sse-watchdog.pid"
 }
 
+sse_watchdog_claim_pid() {
+  # #4254: atomically claim a watchdog pid file. Returns 0 for the owner and 1
+  # when another live instance owns it. Same fcntl.flock primitive as #4155 —
+  # a bare `echo $$ > pid` is a check-then-act race when three start paths
+  # (launch / ensure-watch / one-shot) can reach the pid file concurrently.
+  # $3 is an optional cmdline marker; when omitted only liveness is checked.
+  local pid_file="$1" pid="$2" marker="${3:-}"
+  mkdir -p "$(dirname "$pid_file")" 2>/dev/null || return 1
+  python3 - "$pid_file" "$pid" "$marker" <<'PY'
+import fcntl, os, pathlib, subprocess, sys
+
+pid_file = pathlib.Path(sys.argv[1])
+pid = int(sys.argv[2])
+marker = sys.argv[3]
+lock_path = pathlib.Path(str(pid_file) + ".lock")
+with lock_path.open("a+") as lock:
+    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+    try:
+        existing = pid_file.read_text().strip() if pid_file.exists() else ""
+        if existing.isdigit() and int(existing) != pid:
+            try:
+                os.kill(int(existing), 0)
+            except OSError:
+                pass  # stale pid: safe to take over
+            else:
+                if marker:
+                    try:
+                        cmd = subprocess.run(["ps", "-p", existing, "-o", "command="],
+                                             capture_output=True, text=True,
+                                             timeout=3).stdout
+                    except Exception:
+                        # Owner cannot be verified -> fail closed, do not
+                        # silently start a second consumer.
+                        cmd = marker
+                    if marker not in cmd:
+                        pid_file.write_text(f"{pid}\n")
+                        sys.exit(0)  # recycled pid, not our watchdog
+                sys.exit(1)
+        pid_file.write_text(f"{pid}\n")
+    finally:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+PY
+}
+
 interruption_triage_lock_dir_for_intake() {
   local project="$1" intake_id="$2"
   echo "$(run_dir_for_project "$project")/interruption-triage-locks/$intake_id.lock"
@@ -14202,6 +14246,18 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
         log_warn "worker skipped: worktree busy — $_target_worktree"
         continue
       fi
+      # #4254: claim the submitted A2A task BEFORE creating a handoff record or
+      # launching a worker. The DB daemon performs this as one conditional
+      # UPDATE, so two dispatchers cannot both win the same task. The CLI exits
+      # non-zero on a state conflict; do NOT swallow that with `|| true`.
+      if [[ -n "$_a2a_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+        if ! python3 "$_a2a_task_py" update \
+            --task-id "$_a2a_task_id" --state "working" --expected-state "submitted" \
+            >/dev/null 2>&1; then
+          log_warn "worker skipped: task already claimed — $_a2a_task_id"
+          continue
+        fi
+      fi
       # Compute previous_worker_task_id: latest completed worker for same raw_key
       _prev_worker_id=""
       _prev_worker_summary=""
@@ -14280,11 +14336,8 @@ EOF
         if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
           python3 "$_a2a_task_py" update \
             --task-id "$_task_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
-          # Also update A2A task with session_id if we didn't capture it in launch
-          if [[ -n "$_a2a_task_id" && "$_a2a_task_id" != "$_task_id" ]]; then
-            python3 "$_a2a_task_py" update \
-              --task-id "$_a2a_task_id" --status "working" >/dev/null 2>&1 || true
-          fi
+          # #4254: the A2A task state was already moved to working by the
+          # pre-launch CAS claim above; no post-launch state write remains.
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file") — ${LAUNCH_REJECT_REASON:-launchable check failed}"
@@ -20833,47 +20886,41 @@ _start_watchdog_sse_py() {
   local project="$1"
   local _watchdog_py="${project}/docs/system/workspace/scripts/runtime/watchdog_sse.py"
   local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null).sock"
-  # Guard: don't launch if already running (prevents duplicate instances on restart)
   local _pid_file; _pid_file="$(run_dir_for_project "$project")/watchdog-sse.pid"
-  if [[ -f "$_pid_file" ]]; then
-    local _existing_pid; _existing_pid=$(cat "$_pid_file" 2>/dev/null || true)
-    if [[ -n "$_existing_pid" ]] && kill -0 "$_existing_pid" 2>/dev/null; then
-      return 0
-    fi
-    rm -f "$_pid_file"
-  fi
   if [[ -f "$_watchdog_py" && -S "$_a2a_socket" ]]; then
     log_info "starting watchdog_sse.py for $project"
     nohup python3 "$_watchdog_py" --project "$project" --a2a-socket "$_a2a_socket" </dev/null >>"$project/.freely/run/watchdog-sse.log" 2>&1 &
-    echo $! > "$_pid_file"
-    disown $!
+    local _new_pid=$!
+    # #4254: the pid claim is exclusive. A losing duplicate is reaped instead
+    # of silently becoming a second input-required consumer.
+    if sse_watchdog_claim_pid "$_pid_file" "$_new_pid" "watchdog_sse.py"; then
+      disown "$_new_pid"
+    else
+      log_info "watchdog_sse.py already running; duplicate instance reaped"
+      kill "$_new_pid" 2>/dev/null || true
+    fi
   fi
 }
 
 cmd_ensure_sse_watchdog_watch() {
+  # #4254: supervise, do not consume. The old body wrote its own $$ into the
+  # watchdog pid file and wrapped the shell watchdog's own `while true` inside
+  # another `while true` (the outer loop/sleep was unreachable dead code). It
+  # also made the pid file look healthy while the real consumer was gone.
+  # Now there is exactly one start path: launch_sse_watchdog. The consumer
+  # itself claims its pid through sse_watchdog_claim_pid (flock).
   local project="$1" interval="$2" pid_file existing_pid
   pid_file="$(sse_watchdog_pid_file "$project")"
   mkdir -p "$(dirname "$pid_file")"
-
-  if [[ -f "$pid_file" ]]; then
-    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if [[ "$existing_pid" != "$$" ]] && valid_sse_watchdog_pid_for_project "$project" "$existing_pid"; then
-      log_info "SSE watchdog already running (pid=$existing_pid)"
-      return 0
-    fi
-    rm -f "$pid_file"
-  fi
-
-  echo "$$" >"$pid_file"
-  trap "rm -f '$pid_file'; exit 0" INT TERM HUP
-  trap "rm -f '$pid_file'" EXIT
 
   while true; do
     if [[ -f "$(stop_marker_file "$project")" ]]; then
       exit 0
     fi
-    if ! bash "$_sse_watchdog_sh" --project "$project" --watch --interval 10; then
-      log_warn "SSE watchdog iteration failed, retrying"
+    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [[ -z "$existing_pid" ]] || ! valid_sse_watchdog_pid_for_project "$project" "$existing_pid"; then
+      log_info "SSE watchdog not running; launching singleton chain"
+      launch_sse_watchdog "$project"
     fi
     sleep "$interval"
   done

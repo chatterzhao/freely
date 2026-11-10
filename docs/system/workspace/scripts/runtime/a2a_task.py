@@ -19,6 +19,7 @@ import json
 import os
 import re
 import socket
+import sys
 import time
 import threading
 import http.client
@@ -737,6 +738,12 @@ def _main() -> int:
     p_update.add_argument("--session-id", default=None, help="Worker ACP session ID")
     p_update.add_argument("--exit-kind", default=None, help=argparse.SUPPRESS)
     p_update.add_argument("--status", default=None, help=argparse.SUPPRESS)
+    # #4254: compare-and-swap. These MUST be registered: main() uses
+    # parse_known_args(), so an unregistered --expected-status was silently
+    # dropped while the caller believed it had claimed the task.
+    p_update.add_argument("--expected-state", default=None,
+                          help="Only apply the update while state matches (CAS)")
+    p_update.add_argument("--expected-status", default=None, help=argparse.SUPPRESS)
 
     sub.add_parser("latest-manager")
     p_lcw = sub.add_parser("latest-completed-worker")
@@ -851,6 +858,7 @@ def _main() -> int:
         PROJECT = args.project
 
     _task_id = getattr(args, 'task_id', '') or ''
+    expected_state = ""
     # Legacy arg mapping
     if args.cmd == "list":
         if getattr(args, 'role', None) and not getattr(args, 'agent_id', None):
@@ -867,6 +875,12 @@ def _main() -> int:
         # Map legacy --exit-kind to state
         if getattr(args, 'exit_kind', None) and not getattr(args, 'state', None):
             args.state = normalize_state(args.exit_kind)
+        sm_expected = {'pending': 'submitted', 'launched': 'working',
+                       'blocked': 'input-required', 'rejected': 'failed',
+                       'consumed': 'completed'}
+        expected_state = getattr(args, 'expected_state', None) or ""
+        if not expected_state and getattr(args, 'expected_status', None):
+            expected_state = sm_expected.get(args.expected_status, args.expected_status)
 
     try:
         if args.cmd == "create":
@@ -910,7 +924,17 @@ def _main() -> int:
             if getattr(args, 'completion_summary', None): kwargs['completion_summary'] = args.completion_summary
             if getattr(args, 'next_action', None): kwargs['next_action'] = args.next_action
             if getattr(args, 'exit_kind', None): kwargs['exit_kind'] = args.exit_kind
-            print(json.dumps({"affected": update_task(_task_id, **kwargs)}))
+            if expected_state: kwargs['expected_state'] = expected_state
+            # #4254: use the client directly so a 409 state_conflict is not
+            # flattened into update_task()'s boolean return value.
+            result = _client().update(_task_id, **kwargs)
+            if expected_state and (result.get("error") == "state_conflict"
+                                   or result.get("affected") == 0):
+                print(json.dumps({"affected": 0, "conflict": True,
+                                  "expected_state": expected_state,
+                                  "current_state": result.get("current_state", "unknown")}))
+                sys.exit(3)
+            print(json.dumps({"affected": 1 if "id" in result else 0}))
         elif args.cmd == "latest-manager":
             t = latest_manager()
             print(json.dumps(t or {}))
