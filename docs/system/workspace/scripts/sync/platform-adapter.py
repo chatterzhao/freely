@@ -44,6 +44,11 @@ from typing import Optional
 _ADAPTER_DIR = Path(__file__).resolve().parent
 _SCRIPTS_DIR = _ADAPTER_DIR.parent
 _RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
+# Single source of truth for git transport timeouts (#4250). A half-open
+# network used to hang `git fetch` indefinitely and stall the whole guarded
+# command for minutes with no diagnostic. Keep this in one place; do not
+# sprinkle literals across the three git calls in fetch_branch_head().
+GIT_FETCH_TIMEOUT_SECS = 30
 sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 from freely_user_env import value as freely_env_value
@@ -105,23 +110,30 @@ class PlatformHandler(ABC):
         if not remote:
             return None
         ref = f"refs/remotes/{remote}/{branch}"
-        fetched = subprocess.run(
-            ["git", "fetch", remote, f"+refs/heads/{branch}:{ref}"],
-            capture_output=True,
-            text=True,
-        )
+
+        def run_git(args: list[str], *, check: bool = False):
+            try:
+                return subprocess.run(
+                    args, capture_output=True, text=True,
+                    timeout=GIT_FETCH_TIMEOUT_SECS, check=check,
+                )
+            except subprocess.TimeoutExpired as exc:
+                # Normalise to an environment error that names the platform
+                # and the remote, so the plan can show a real cause instead of
+                # a bare "branch_state: error" (#4250).
+                raise RuntimeError(
+                    f"{self.name}: `{' '.join(args[:3])}` timed out after "
+                    f"{GIT_FETCH_TIMEOUT_SECS}s (remote={remote}, branch={branch}); "
+                    f"platform is unavailable"
+                ) from exc
+
+        fetched = run_git(["git", "fetch", remote, f"+refs/heads/{branch}:{ref}"])
         if fetched.returncode != 0:
-            probe = subprocess.run(
-                ["git", "ls-remote", "--heads", remote, branch],
-                capture_output=True,
-                text=True,
-            )
+            probe = run_git(["git", "ls-remote", "--heads", remote, branch])
             if probe.returncode == 0 and not probe.stdout.strip():
                 return None
             raise RuntimeError((fetched.stderr or probe.stderr).strip()[:300])
-        resolved = subprocess.run(
-            ["git", "rev-parse", ref], capture_output=True, text=True, check=True
-        )
+        resolved = run_git(["git", "rev-parse", ref], check=True)
         return resolved.stdout.strip()
     def push_branch(self, branch: str) -> dict:
         remote = self.remote_name()
@@ -1168,7 +1180,8 @@ def create_pr(branch: str, base: str = "develop", title: str = "", body: str = "
 def guarded_pr_update(
     branch: str, base: str = "develop", title: str = "", body: str = ""
 ) -> dict:
-    from pr_lifecycle import aggregate_results, classify_branch, plan_platform_updates
+    from pr_lifecycle import (aggregate_results, classify_branch,
+                              plan_platform_updates, recovery_for_plan)
 
     platforms = configured_platforms()
     local = subprocess.run(
@@ -1212,7 +1225,7 @@ def guarded_pr_update(
             "success": False,
             "stage": "plan",
             "plan": plan,
-            "recovery": "同步本地分支与对应平台远端后重试；禁止 force push 或原始 push 绕过。",
+            "recovery": recovery_for_plan(plan),
         }
 
     results = {}

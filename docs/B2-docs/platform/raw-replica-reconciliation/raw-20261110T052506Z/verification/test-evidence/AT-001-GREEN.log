@@ -1,0 +1,19 @@
+[PASS] C1 classify_branch 5 states unchanged (control)
+[PASS] C2 SAFE/BLOCKED state sets unchanged (control)
+[PASS] S1 single timeout constant declared
+[PASS] S2 plan retains observation error
+[PASS] S3 recovery classifier is a single source
+[PASS] S4 two distinct recovery texts
+[PASS] B1 plan carries real error for failing platform
+[PASS] B2 all-or-nothing aggregation unchanged
+[PASS] B3 healthy platform detail has no invented error
+[PASS] B4 environment recovery names a probe command
+[PASS] B5 diverged recovery still says sync branches
+[PASS] B6 safe plan recovery is the branch-sync text
+[PASS] B7 guarded failure result contains the real cause
+[PASS] B8 guarded failure result does not push anything
+[PASS] B9 git fetch has an explicit timeout
+[PASS] B10 rev-parse has an explicit timeout
+[PASS] B11 timeout produces explicit environment diagnostic
+[PASS] B12 existing pr-update regression suite green
+SUMMARY: 18 ok, 0 failed

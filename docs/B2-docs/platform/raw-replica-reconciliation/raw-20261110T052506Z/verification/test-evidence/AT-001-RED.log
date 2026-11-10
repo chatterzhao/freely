@@ -1,0 +1,19 @@
+[PASS] C1 classify_branch 5 states unchanged (control)
+[PASS] C2 SAFE/BLOCKED state sets unchanged (control)
+[FAIL] S1 single timeout constant declared — one constant, one git helper, no scattered literals
+[FAIL] S2 plan retains observation error — plan must copy the real error into details
+[FAIL] S3 recovery classifier is a single source — pure function in lifecycle, adapter calls it, no literal duplication
+[FAIL] S4 two distinct recovery texts — environment text must contain a probe command; branch text stays Chinese sync hint
+[FAIL] B1 plan carries real error for failing platform — github detail={'branch_state': 'error', 'action': 'fail_closed'}
+[PASS] B2 all-or-nothing aggregation unchanged
+[PASS] B3 healthy platform detail has no invented error
+[FAIL] B4 environment recovery names a probe command — recovery_for_plan missing
+[FAIL] B5 diverged recovery still says sync branches — recovery_for_plan missing
+[FAIL] B6 safe plan recovery is the branch-sync text — recovery_for_plan missing
+[FAIL] B7 guarded failure result contains the real cause — body={"success": false, "stage": "plan", "plan": {"safe_to_execute": false, "actions": [], "platforms": {"github": {"branch_state": "error", "action": "fail_closed"}, "gitee": {"branch_state": "unsupported", "action": "fail_closed"}}}, "recovery": "同步本地分支与对应平台远端后重试
+[PASS] B8 guarded failure result does not push anything
+[FAIL] B9 git fetch has an explicit timeout — calls=[{'argv': ['git', 'fetch', 'all', '+refs/heads/fix/x:refs/remotes/all/fix/x'], 'kwargs': {'capture_output': True, 'text': True}}]
+[FAIL] B10 rev-parse has an explicit timeout — calls=[{'argv': ['git', 'rev-parse', 'refs/remotes/all/fix/x'], 'kwargs': {'capture_output': True, 'text': True, 'check': True}}]
+[FAIL] B11 timeout produces explicit environment diagnostic — msg="Command '['git', 'fetch', 'all', '+refs/heads/fix/x:refs/remotes/all/fix/x']' timed out after 30 seconds"
+[PASS] B12 existing pr-update regression suite green
+SUMMARY: 6 ok, 12 failed
