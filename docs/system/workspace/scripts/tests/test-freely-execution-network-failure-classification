@@ -83,12 +83,15 @@ reason_three="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_L
 }
 
 STATE_FILE="$PROJECT/.freely/run/execution-network-recovery.env"
-grep -q '^EXECUTION_NETWORK_REASON="execution_network_persistent"$' "$STATE_FILE" || {
+STATE_READER="$ROOT_DIR/docs/system/workspace/scripts/runtime/state_file.py"
+read_state_value() { python3 "$STATE_READER" values "$STATE_FILE" "$1"; }
+
+[[ "$(read_state_value EXECUTION_NETWORK_REASON)" == "execution_network_persistent" ]] || {
   echo "[FAIL] expected persistent reason to be written to state file" >&2
   cat "$STATE_FILE" >&2
   exit 1
 }
-grep -q '^EXECUTION_NETWORK_FAILURE_COUNT="3"$' "$STATE_FILE" || {
+[[ "$(read_state_value EXECUTION_NETWORK_FAILURE_COUNT)" == "3" ]] || {
   echo "[FAIL] expected failure count to accumulate inside network window" >&2
   cat "$STATE_FILE" >&2
   exit 1
@@ -114,7 +117,7 @@ proxy_reason="$(runtime_network_failure_reason_from_log "$PROJECT" "$PROXY_LOG")
   echo "[FAIL] explicit proxy misconfiguration should classify as proxy_config_invalid" >&2
   exit 1
 }
-grep -q '^EXECUTION_NETWORK_REASON="proxy_config_invalid"$' "$STATE_FILE" || {
+[[ "$(read_state_value EXECUTION_NETWORK_REASON)" == "proxy_config_invalid" ]] || {
   echo "[FAIL] expected proxy_config_invalid to persist to recovery state" >&2
   cat "$STATE_FILE" >&2
   exit 1

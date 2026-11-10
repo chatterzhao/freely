@@ -8179,13 +8179,14 @@ persist_execution_network_state() {
   local project="$1" reason="$2" failure_count="$3" next_retry_epoch="$4" last_failure_epoch="$5"
   local state_file
   state_file="$(execution_network_state_file "$project")"
-  mkdir -p "$(dirname "$state_file")"
-  cat >"$state_file" <<EOF
-EXECUTION_NETWORK_REASON="$reason"
-EXECUTION_NETWORK_FAILURE_COUNT="$failure_count"
-EXECUTION_NETWORK_NEXT_RETRY_EPOCH="$next_retry_epoch"
-EXECUTION_NETWORK_LAST_FAILURE_EPOCH="$last_failure_epoch"
-EOF
+  # #4261: values go through argv into the non-executable TAB+JSON protocol.
+  # The old heredoc interpolated `reason` (a log-derived string) into shell
+  # assignments that readers sourced — `"`/`$()`/backticks executed on read.
+  python3 "$STATE_FILE_PY" write "$state_file" \
+    --kv "EXECUTION_NETWORK_REASON=$reason" \
+    --kv "EXECUTION_NETWORK_FAILURE_COUNT=$failure_count" \
+    --kv "EXECUTION_NETWORK_NEXT_RETRY_EPOCH=$next_retry_epoch" \
+    --kv "EXECUTION_NETWORK_LAST_FAILURE_EPOCH=$last_failure_epoch"
 }
 
 clear_execution_network_state() {
@@ -8251,11 +8252,14 @@ runtime_network_failure_reason_from_log() {
   last_epoch=0
   last_count=0
   if [[ -f "$state_file" ]]; then
-    unset EXECUTION_NETWORK_REASON EXECUTION_NETWORK_FAILURE_COUNT EXECUTION_NETWORK_NEXT_RETRY_EPOCH EXECUTION_NETWORK_LAST_FAILURE_EPOCH
-    # shellcheck disable=SC1090
-    source "$state_file"
-    last_epoch="${EXECUTION_NETWORK_LAST_FAILURE_EPOCH:-0}"
-    last_count="${EXECUTION_NETWORK_FAILURE_COUNT:-0}"
+    # #4261: line-oriented protocol read. Legacy KEY=value is still accepted
+    # verbatim (no expansion), so a rolling upgrade needs no cleanup.
+    { read -r last_epoch || true; read -r last_count || true; } < <(
+      python3 "$STATE_FILE_PY" values "$state_file" \
+        EXECUTION_NETWORK_LAST_FAILURE_EPOCH EXECUTION_NETWORK_FAILURE_COUNT 2>/dev/null || true
+    )
+    last_epoch="${last_epoch:-0}"
+    last_count="${last_count:-0}"
   fi
 
   now_epoch="$(date +%s)"
@@ -8468,10 +8472,10 @@ execution_network_launch_block_active() {
   esac
   state_file="$(execution_network_state_file "$project")"
   [[ -f "$state_file" ]] || return 1
-  unset EXECUTION_NETWORK_REASON EXECUTION_NETWORK_FAILURE_COUNT EXECUTION_NETWORK_NEXT_RETRY_EPOCH EXECUTION_NETWORK_LAST_FAILURE_EPOCH
-  # shellcheck disable=SC1090
-  source "$state_file"
-  next_retry_epoch="${EXECUTION_NETWORK_NEXT_RETRY_EPOCH:-0}"
+  # #4261: read the single key through the safe protocol (legacy still works).
+  next_retry_epoch="$(python3 "$STATE_FILE_PY" values "$state_file" \
+    EXECUTION_NETWORK_NEXT_RETRY_EPOCH 2>/dev/null || true)"
+  next_retry_epoch="${next_retry_epoch:-0}"
   [[ "$next_retry_epoch" =~ ^[0-9]+$ ]] || return 1
   now_epoch="$(date +%s)"
   (( now_epoch < next_retry_epoch ))
