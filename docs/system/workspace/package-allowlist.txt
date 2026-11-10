@@ -38,6 +38,11 @@ bin/
 # Owner: templates-maintainer — 模板
 templates/
 
+# Owner: config-contract-maintainer — 机器可读配置契约（doctor 校验真源）
+# 安装态 freely doctor 必须能找到 contracts/config/schema.yaml，否则配置类型
+# 错误会重新变成静默失效（raw-20261104T075810Z / #4159）。
+contracts/
+
 # Owner: runtime-maintainer — 运行时必需的 workspace 顶层文件
 # 这些是被 bin/ 与 scripts/{runtime,quality,worktree}/ 以字面路径引用的 tracked
 # 文件；显式列出，不可改成「自动包含整个 docs/system/workspace/」（#4157）。

@@ -1,0 +1,21 @@
+[PASS] S1 schema.yaml exists
+[PASS] S2 validator exists
+[PASS] S3 schema stdlib-parseable
+[PASS] S4 schema covers all 58 config keys
+[PASS] S5 allowed_paths declared list[str]
+[PASS] S6 required keys declared
+[PASS] S7 every schema key has type/default/scope/consumer
+[PASS] S8 doctor wires the validator
+[PASS] S9 no second implementation of config validation in doctor
+[PASS] S10 contracts/ is packaged
+[PASS] S11 template already list-shaped (control)
+[PASS] S12 gate silently ignores non-list (control)
+[PASS] B1 string allowed_paths reported with line
+[PASS] B2 unknown key reported with line
+[PASS] B3 missing required key reported
+[PASS] B4 valid list config passes
+[PASS] B5 shipped template passes
+[PASS] B6 bool/int/float mismatch detected
+[PASS] B7 missing schema fails closed
+[PASS] B8 doctor output carries diagnosis
+SUMMARY: 20 ok, 0 failed

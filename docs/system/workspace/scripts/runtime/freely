@@ -24753,6 +24753,26 @@ cmd_doctor() {
     esac
   done
   project="$(resolve_project_or_fail "$project" 1)"
+
+  # ── Config schema diagnosis (raw-20261104T075810Z / #4159) ─────────────
+  # Diagnostic-only: doctor is a report command, so a broken config is
+  # printed with file:line but does NOT change doctor's exit status. The
+  # machine-readable fail-closed verdict lives in the validator itself
+  # (rc 1 = findings, rc 2 = environment unusable) for gates/CI to call.
+  # This keeps a historical local config from dead-locking every commit/PR
+  # while still making silent type failures visible.
+  local _csg="$SELF_ROOT/docs/system/workspace/scripts/quality/config_schema.py"
+  if [[ -f "$_csg" ]]; then
+    local _csg_out _csg_rc=0
+    _csg_out="$(python3 "$_csg" --project "$project" 2>&1)" || _csg_rc=$?
+    if [[ "$_csg_rc" -eq 2 ]]; then
+      echo "config_schema: UNAVAILABLE"
+    fi
+    printf '%s\n' "$_csg_out"
+  else
+    echo "config_schema: UNAVAILABLE (validator missing)"
+  fi
+
   check_doc_gate_or_fail "$project"
   check_hook_gate_or_fail "$project"
   load_config "$project"

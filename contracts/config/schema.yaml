@@ -1,0 +1,592 @@
+{
+  "schema_version": 1,
+  "source": "contracts/config/schema.yaml — single source of truth for .freely/config.toml",
+  "note": "YAML 1.2 JSON-compatible subset: parseable by stdlib json.loads (and yaml.safe_load). No third-party dependency, so an installed freely can validate configs.",
+  "policy": "Type mismatch, unknown key and missing required key are reported with file:line. No silent coercion: a string where list[str] is expected is an error, not a fallback.",
+  "keys": {
+    "PROJECT_ROOT": {
+      "type": "str",
+      "default": "",
+      "scope": "project-identity",
+      "required": true,
+      "consumers": [
+        "ai-cli",
+        "check-epics-map",
+        "freely",
+        "issue-sync",
+        "platform-adapter.py",
+        "pr-merge-guarded",
+        "pre-init-runtime",
+        "raw-issue-backfill-h1",
+        "raw-issue-pull",
+        "watchdog_sse.py",
+        "worktree-common.sh",
+        "wt-close",
+        "wt-create",
+        "wt-fleet-status"
+      ]
+    },
+    "INTENT_FILE": {
+      "type": "str",
+      "default": "",
+      "scope": "project-identity",
+      "required": true,
+      "consumers": [
+        "freely",
+        "pre-init-runtime"
+      ]
+    },
+    "CONSTITUTION_FILE": {
+      "type": "str",
+      "default": "",
+      "scope": "project-identity",
+      "required": true,
+      "consumers": [
+        "freely",
+        "pre-init-runtime"
+      ]
+    },
+    "FREELY_HOME": {
+      "type": "str",
+      "default": "",
+      "scope": "project-identity",
+      "required": true,
+      "consumers": [
+        "freely",
+        "freely-package",
+        "freely_config.py",
+        "freely_user_env.py",
+        "install_state.py",
+        "network-proxy-resolver.sh",
+        "owner_lane.py",
+        "pr-review-guarded",
+        "wt-create"
+      ]
+    },
+    "AI_TOOL_ADAPTER": {
+      "type": "str",
+      "default": "acp",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely",
+        "harness_status.py",
+        "monitor-ai-acp.sh"
+      ]
+    },
+    "AI_TOOL_ADAPTER_POLICY": {
+      "type": "str",
+      "default": "acp",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AI_TOOL_CAPABILITIES": {
+      "type": "str",
+      "default": "",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely",
+        "interruption-manager-handler",
+        "signal-intent-handler"
+      ]
+    },
+    "AI_TOOL_POLICY": {
+      "type": "str",
+      "default": "",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely",
+        "interruption-manager-handler",
+        "signal-intent-handler"
+      ]
+    },
+    "AUTO_SWITCH_SLOT": {
+      "type": "bool",
+      "default": true,
+      "scope": "auto-switch",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AUTO_SWITCH_TOOL": {
+      "type": "bool",
+      "default": false,
+      "scope": "auto-switch",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AUTO_SETUP_FREELY_PROXY": {
+      "type": "bool",
+      "default": true,
+      "scope": "auto-switch",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AI_FALLBACK_TOOLS": {
+      "type": "str",
+      "default": "",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "ai-cli",
+        "freely"
+      ]
+    },
+    "CHECK_INTERVAL": {
+      "type": "int",
+      "default": 10,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "RESTART_DELAY": {
+      "type": "int",
+      "default": 2,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "MAX_RESTARTS": {
+      "type": "int",
+      "default": 0,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "MAX_RESUME_STREAK": {
+      "type": "int",
+      "default": 24,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "MAX_ROUTE_ONLY_STREAK": {
+      "type": "int",
+      "default": 1,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "ROTATE_ON_CONTEXT_COMPACTED": {
+      "type": "int",
+      "default": 1,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "SESSION_HANDOFF_TAIL_LINES": {
+      "type": "int",
+      "default": 80,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "CONTEXT_WARN_RATIO": {
+      "type": "float",
+      "default": 0.7,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "CONTEXT_ROTATE_RATIO": {
+      "type": "float",
+      "default": 0.7,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "CHECKPOINT_WARN_DIRTY_ENTRIES": {
+      "type": "int",
+      "default": 40,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "CHECKPOINT_BLOCK_DIRTY_ENTRIES": {
+      "type": "int",
+      "default": 120,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "CHECKPOINT_DRIFT_STREAK_THRESHOLD": {
+      "type": "int",
+      "default": 2,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "RESTART_STORM_WINDOW_SECS": {
+      "type": "int",
+      "default": 30,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "RESTART_STORM_COUNT": {
+      "type": "int",
+      "default": 4,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "PROCESS_CHURN_PEAK": {
+      "type": "int",
+      "default": 3,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "RESTART_STORM_OBSERVE_DELAY_SECS": {
+      "type": "int",
+      "default": 30,
+      "scope": "runtime-timing",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_NETWORK_PROXY_MODE": {
+      "type": "str",
+      "default": "inherit",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_NETWORK_PROXY_URL": {
+      "type": "str",
+      "default": "",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_HTTP_PROXY": {
+      "type": "str",
+      "default": "",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_HTTPS_PROXY": {
+      "type": "str",
+      "default": "",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_ALL_PROXY": {
+      "type": "str",
+      "default": "",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_NO_PROXY": {
+      "type": "str",
+      "default": "",
+      "scope": "network",
+      "required": false,
+      "consumers": [
+        "freely",
+        "network-proxy-resolver.sh"
+      ]
+    },
+    "FREELY_REPO_PLATFORMS": {
+      "type": "str",
+      "default": "",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely",
+        "platform-adapter.py",
+        "pr-create-guarded",
+        "pr-review-guarded",
+        "task-lifecycle-scan.py"
+      ]
+    },
+    "FREELY_SECURITY_REVIEW_POLICY": {
+      "type": "str",
+      "default": "advisory-on-high-risk-or-uncertainty",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_SECURITY_REVIEW_SCOPE": {
+      "type": "str",
+      "default": "execution-boundary-and-reviewer-support",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_AUTONOMY_PROFILE": {
+      "type": "str",
+      "default": "autonomous-default",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_INTERACTION_POSTURE": {
+      "type": "str",
+      "default": "non-interactive",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_APPROVAL_POSTURE": {
+      "type": "str",
+      "default": "automatic-where-supported",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_SAFEGUARD_GUIDANCE_POSTURE": {
+      "type": "str",
+      "default": "recommended-nonblocking",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_RUNTIME_DECISION_POSTURE": {
+      "type": "str",
+      "default": "internal-ai-escalation-before-stop",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_MINIMAL_RISK_POSTURE": {
+      "type": "str",
+      "default": "last-resort-safe-stop",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_ACTIVATION_CONSENT_REQUIRED": {
+      "type": "str",
+      "default": "true",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_ACTIVATION_CONSENT_STATUS": {
+      "type": "str",
+      "default": "accepted",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_ACTIVATION_CONSENT_RECORDED_AT": {
+      "type": "str",
+      "default": "",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_ACTIVATION_CONSENT_RECORDED_VIA": {
+      "type": "str",
+      "default": "",
+      "scope": "runtime-posture",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "FREELY_ACP_CLAUDE_BIN": {
+      "type": "str",
+      "default": "",
+      "scope": "acp-binary",
+      "required": false,
+      "consumers": [
+        "runtime/freely (indirect)"
+      ]
+    },
+    "FREELY_ACP_CODEX_BIN": {
+      "type": "str",
+      "default": "",
+      "scope": "acp-binary",
+      "required": false,
+      "consumers": [
+        "runtime/freely (indirect)"
+      ]
+    },
+    "FREELY_ACP_OPENCODE_BIN": {
+      "type": "str",
+      "default": "",
+      "scope": "acp-binary",
+      "required": false,
+      "consumers": [
+        "runtime/freely (indirect)"
+      ]
+    },
+    "FREELY_ACP_CLINE_BIN": {
+      "type": "str",
+      "default": "",
+      "scope": "acp-binary",
+      "required": false,
+      "consumers": [
+        "runtime/freely (indirect)"
+      ]
+    },
+    "AI_MODEL": {
+      "type": "str",
+      "default": "",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely",
+        "interruption-manager-handler",
+        "signal-intent-handler"
+      ]
+    },
+    "AI_REASONING_EFFORT": {
+      "type": "str",
+      "default": "",
+      "scope": "ai-adapter",
+      "required": false,
+      "consumers": [
+        "freely",
+        "interruption-manager-handler",
+        "signal-intent-handler"
+      ]
+    },
+    "AGENT_AI_TOOL_ADAPTER": {
+      "type": "str",
+      "default": "",
+      "scope": "agent-runtime",
+      "required": false,
+      "consumers": [
+        "freely",
+        "harness_status.py",
+        "monitor-ai-acp.sh"
+      ]
+    },
+    "AGENT_AI_TOOL_ADAPTER_POLICY": {
+      "type": "str",
+      "default": "",
+      "scope": "agent-runtime",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AGENT_AI_TOOL_CAPABILITIES": {
+      "type": "str",
+      "default": "",
+      "scope": "agent-runtime",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    },
+    "AGENT_AI_TOOL_POLICY": {
+      "type": "str",
+      "default": "",
+      "scope": "agent-runtime",
+      "required": false,
+      "consumers": [
+        "freely"
+      ]
+    }
+  },
+  "sections": {
+    "skip_ibm_gate": {
+      "name": "skip_ibm_gate",
+      "keys": {
+        "allowed_paths": {
+          "type": "list[str]",
+          "default": [
+            "templates/",
+            "docs/B1-docs/",
+            "docs/B2-docs/",
+            "docs/CONSTITUTION.md",
+            "docs/LAWS.md",
+            "docs/PROJECT_INTENT.md",
+            "docs/milestones.md",
+            "AGENTS.md"
+          ],
+          "scope": "gate-exemption",
+          "required": false,
+          "consumers": [
+            "governance-merge-gate"
+          ]
+        }
+      }
+    }
+  }
+}
