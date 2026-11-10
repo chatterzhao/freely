@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261109T074900Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261109T074900Z-A
 platform_ids:
   github:
     issue_id: '4239'
@@ -14,19 +14,20 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKU0CC
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/raw-20261109T074900Z/issues/I-20261109T074900Z-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-09T07:49:00Z'
-updated_at: '2026-11-09T07:49:07Z'
+updated_at: '2026-11-10T06:44:24Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
-source_candidate: ''
-completed_at: ''
+platform_state: closed
+promoted_children:
+- I-20261109T074900Z-A
+source_candidate: docs/B1-docs/raw-20261109T074900Z/candidates.md
+completed_at: '2026-11-10T06:44:21Z'
 closeout_note: ''
 ---
 
