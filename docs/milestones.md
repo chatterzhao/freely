@@ -1,3 +1,24 @@
+## M-20261108T141300Z-A
+- title: fix — 物化时保留 severity 优先级
+- status: active
+### candidate_issues
+1. `C-20261108T141300Z-A`
+- milestone: M-20261108T141300Z-A
+- status: promoted
+- promoted_issue_id: I-20261108T141300Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261108T141300Z/issues/I-20261108T141300Z-A.md
+### committed_issues
+1. `I-20261108T141300Z-A`
+- milestone: M-20261108T141300Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261108T141300Z/issues/I-20261108T141300Z-A.md
+### completed_issues
+1. `I-20261108T141300Z-A`
+- milestone: M-20261108T141300Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T07:35:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261108T141300Z/issues/I-20261108T141300Z-A.md
+
 ## M-20261109T074900Z-A
 - title: fix — pkill -f 项目路径正则转义
 - status: active
