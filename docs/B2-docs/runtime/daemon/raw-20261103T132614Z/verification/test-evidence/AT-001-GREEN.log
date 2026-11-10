@@ -1,0 +1,18 @@
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261103T132614Z-contract-single-source
+=== STATIC: single source wiring ===
+  [ok] deploy-skills uses the shared registry path and has no claude fallback
+  [ok] ACP tool setup reuses $TOOL_REGISTRY instead of a wrong local path
+  [ok] runtime/paths.sh owns the registry path constant
+  [ok] no production reference to the wrong registry path ([])
+  [ok] wt-create normalizes raw keys through the single owner
+  [ok] raw_key_canon.py understands legacy keys and is callable
+=== BEHAVIOR: registry present/missing ===
+  [ok] registry present: registry tools are read (cline detected)
+  [ok] registry missing: deploy-skills fails closed
+  [ok] explicit --tools still works
+=== BEHAVIOR: legacy raw-key normalization ===
+  [ok] legacy YYYYMMDD-HHMM pads seconds
+  [ok] legacy YYYYMMDD-HHMMSS keeps seconds
+  [ok] canonical key is unchanged
+  [ok] branch name yields canonical key
+SUMMARY: 13 ok, 0 failed

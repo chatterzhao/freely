@@ -60,7 +60,10 @@ _setup_repo() {
   local REPO="$TMP/repo"
   mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree" \
            "$REPO/docs/system/workspace/scripts/lifecycle" \
+           "$REPO/docs/system/workspace/scripts/runtime" \
            "$REPO/docs/B1-docs/raw-${KEY}" "$TMP/repo-worktrees"
+  # #4154: wt-create normalizes raw keys through runtime/raw_key_canon.py.
+  cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/raw_key_canon.py" "$REPO/docs/system/workspace/scripts/runtime/raw_key_canon.py"
   cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" "$REPO/docs/system/workspace/scripts/worktree/wt-create"
   cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/docs/system/workspace/scripts/worktree/worktree-common.sh"
   cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/worktree-common.sh"
