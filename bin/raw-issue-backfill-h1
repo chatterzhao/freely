@@ -31,7 +31,10 @@ import sys
 import tempfile
 from pathlib import Path
 
-H1 = re.compile(r"^#[ \t]+\S", re.MULTILINE)
+# #4269: H1 detection must ignore fenced code blocks. A bare `^#\s+` regex
+# matched `# -> StateFileError: ...` comments inside python code blocks, so a
+# historical document with no real H1 was skipped instead of being repaired.
+# The shared finder lives in raw_title_contract (loaded by _import_contract).
 
 
 def _import_contract(project: Path):
@@ -114,8 +117,8 @@ def main() -> int:
         if fm_block is None:
             print(f"SKIP no-frontmatter {issue.relative_to(project)}")
             continue
-        if H1.search(body):
-            continue  # already has a heading — never touch, even if malformed
+        if contract.find_local_heading(body) is not None:
+            continue  # already has a real H1 — never touch, even if malformed
         raw_key = issue.parent.name[4:]
         title = _frontmatter_title(fm_block)
         if not title and not args.no_platform:
@@ -137,7 +140,7 @@ def main() -> int:
         # Idempotent re-check in case the file changed during this run.
         current = issue.read_text(encoding="utf-8", errors="replace")
         _, current_body = _split_frontmatter(current)
-        if H1.search(current_body):
+        if contract.find_local_heading(current_body) is not None:
             print(f"SKIP already-h1 {issue.relative_to(project)}")
             continue
         new_text = f"---{fm_block}---\n\n# {heading}\n\n{current_body.lstrip()}"

@@ -13,8 +13,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SCRIPTS = HERE.parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(SCRIPTS / "sync"))
 from raw_metadata_contract import read_issue
 from raw_reconciliation import reconcile
+from raw_title_contract import find_local_heading
 
 
 def _load_adapter():
@@ -28,11 +30,15 @@ def _load_adapter():
 
 def _local_record(path: Path, raw_key: str) -> dict:
     metadata, body = read_issue(path)
+    # #4269: only a real Markdown H1 counts. A bare `^#\s+` regex also matched
+    # `# -> StateFileError: ...` comments INSIDE python code blocks, which made
+    # this gate borrow a code comment as the LOCAL title and drop every line
+    # before it — a healthy raw was then reported as content_diverged.
+    heading = find_local_heading(body)
     title = ""
-    match = re.search(r"^#\s+(.+)$", body, re.MULTILINE)
-    if match:
-        title = match.group(1).strip()
-        body = body[match.end():].lstrip()
+    if heading:
+        title, end_offset = heading
+        body = body[end_offset:].lstrip()
     declared = metadata.get("labels")
     # Labels are platform-side presentation state. A raw document only asserts
     # them when it explicitly declares a `labels` frontmatter field; deriving
@@ -76,6 +82,16 @@ def main() -> int:
     if args.require_local and local is None:
         receipt["ok"] = False
         receipt["diagnostics"].append({"scope": "local", "code": "missing_local", "detail": str(local_path)})
+    elif args.require_local and not local.get("title"):
+        # Fail with an actionable reason: the document has no real H1, so
+        # `raw-issue-pull` (or a manual edit) must restore it. Never silently
+        # fall back to a code comment and report a misleading divergence.
+        receipt["ok"] = False
+        receipt["diagnostics"].append({
+            "scope": "local", "code": "missing_local_title",
+            "detail": f"{local_path}: no H1 outside fenced code blocks; "
+                      f"re-materialize with raw-issue-pull",
+        })
     print(json.dumps(receipt, ensure_ascii=False, indent=2))
     return 0 if receipt["ok"] else 1
 

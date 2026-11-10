@@ -1,3 +1,24 @@
+## M-20261110T093145Z-A
+- title: fix — raw H1 判定改为代码块感知
+- status: active
+### candidate_issues
+1. `C-20261110T093145Z-A`
+- milestone: M-20261110T093145Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T093145Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261110T093145Z/issues/I-20261110T093145Z-A.md
+### committed_issues
+1. `I-20261110T093145Z-A`
+- milestone: M-20261110T093145Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261110T093145Z/issues/I-20261110T093145Z-A.md
+### completed_issues
+1. `I-20261110T093145Z-A`
+- milestone: M-20261110T093145Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T10:00:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261110T093145Z/issues/I-20261110T093145Z-A.md
+
 ## M-20261110T084522Z-A
 - title: fix — 状态键白名单由自动扫描 lint 守护
 - status: active
