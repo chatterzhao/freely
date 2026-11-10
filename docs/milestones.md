@@ -1,3 +1,24 @@
+## M-20261110T052506Z-A
+- title: fix — guarded PR plan 失败可诊断 + git 传输超时守卫
+- status: active
+### candidate_issues
+1. `C-20261110T052506Z-A`
+- milestone: M-20261110T052506Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T052506Z-A
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261110T052506Z/issues/I-20261110T052506Z-A.md
+### committed_issues
+1. `I-20261110T052506Z-A`
+- milestone: M-20261110T052506Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261110T052506Z/issues/I-20261110T052506Z-A.md
+### completed_issues
+1. `I-20261110T052506Z-A`
+- milestone: M-20261110T052506Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T05:42:00Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261110T052506Z/issues/I-20261110T052506Z-A.md
+
 ## M-20261104T075810Z-A
 - title: fix — config 契约化与 doctor 可观测类型校验
 - status: active
