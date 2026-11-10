@@ -1,0 +1,10 @@
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261103T132644Z-fail-semantics-preflight
+=== STATIC: failure semantics + Python preflight ===
+  [ok] supervisor 'will now stop' branch exits non-zero
+  [ok] bin/freely checks Python >= 3.11 before exec
+  [ok] preflight message names the required version
+=== BEHAVIOR: entrypoint preflight ===
+  [ok] old Python is rejected with a precise message
+  [ok] supported Python still reaches the runtime
+  [ok] real environment still starts normally
+SUMMARY: 6 ok, 0 failed

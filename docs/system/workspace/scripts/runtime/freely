@@ -24144,9 +24144,13 @@ print(ready)
       log_warn "${auto_recovery_reason} detected for this workcell; no auto-recovery path is ready, so local runtime will now stop"
       append_runtime_event "$project" "supervisor_stopping" \
         "supervisor_pid=$$" \
-        "reason=$auto_recovery_reason"
+        "reason=$auto_recovery_reason" \
+        "exit_kind=degraded_no_recovery"
       _trace_l042_out "TERM"
-      exit 0
+      # #4157: this is a failure, not a clean shutdown. The old zero status
+      # made systemd / tmux treat the dead workcell as a normal exit and never
+      # apply their restart policy. The event above records why.
+      exit 1
     fi
     if [[ -n "$restart_signal_reason" ]]; then
       observe_delay="${RESTART_STORM_OBSERVE_DELAY_SECS:-30}"
