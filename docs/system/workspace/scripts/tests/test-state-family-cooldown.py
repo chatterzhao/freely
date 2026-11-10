@@ -62,8 +62,13 @@ def static_checks(src: Path) -> None:
                        capture_output=True, text=True, timeout=120)
     count = re.search(r"call sites:\s*(\d+)", r.stdout)
     got = int(count.group(1)) if count else -1
-    expect(r.returncode == 0 and got == 54,
-           f"boundary lint passes and global state sources dropped 55 -> 54 (got {got}, rc={r.returncode})")
+    # Monotone guard, NOT an absolute count: #4261 migrated another family and
+    # lowered the global number again. Pinning 54 here would make every later
+    # family migration turn this AT red for no defect. The real family guard is
+    # the static check above (no `source` in the cooldown block).
+    expect(r.returncode == 0 and 0 < got < 55,
+           f"boundary lint passes and global state sources stay below the 55 baseline "
+           f"(got {got}, rc={r.returncode})")
 
 
 def _run_shell(src: Path, root: Path, body: str) -> tuple[int, str]:

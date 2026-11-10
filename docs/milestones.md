@@ -1,3 +1,24 @@
+## M-20261110T081029Z-A
+- title: fix — execution-network 族迁移到安全状态协议
+- status: active
+### candidate_issues
+1. `C-20261110T081029Z-A`
+- milestone: M-20261110T081029Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T081029Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261110T081029Z/issues/I-20261110T081029Z-A.md
+### committed_issues
+1. `I-20261110T081029Z-A`
+- milestone: M-20261110T081029Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T081029Z/issues/I-20261110T081029Z-A.md
+### completed_issues
+1. `I-20261110T081029Z-A`
+- milestone: M-20261110T081029Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T09:00:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T081029Z/issues/I-20261110T081029Z-A.md
+
 ## M-20261110T074344Z-A
 - title: fix — cooldown 族迁移到安全状态协议
 - status: active
