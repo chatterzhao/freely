@@ -200,9 +200,17 @@ class SQLiteTaskStore(BaseTaskStore):
     def get_all_dicts(self) -> list:
         return self._db_rpc("a2a_task.list", {}).get("rows", [])
 
-    def update_fields(self, task_id: str, **fields) -> bool:
+    def update_fields(self, task_id: str, *, expected_state: str = "", **fields) -> int:
+        """Update task fields; return affected rows.
+
+        #4254: when `expected_state` is set, the DB daemon performs the update
+        as a conditional state transition, so affected == 0 means the task was
+        already claimed by another dispatcher (or no longer exists).
+        """
         fields["task_id"] = task_id; fields["updated_at"] = _now_utc()
-        return self._db_rpc("a2a_task.update", fields).get("affected", 0) > 0
+        if expected_state:
+            fields["expected_state"] = expected_state
+        return self._db_rpc("a2a_task.update", fields).get("affected", 0)
 
     def raw_rpc(self, method: str, params: dict) -> dict:
         return self._db_rpc(method, params)
@@ -758,6 +766,14 @@ class A2AServer:
             body = await request.json()
             sm = {'submitted':'submitted','working':'working','completed':'completed',
                   'failed':'failed','input-required':'input-required','canceled':'canceled'}
+            # #4254: accept the legacy --expected-status vocabulary so existing
+            # callers can express a compare-and-swap without a read-modify-write.
+            legacy_sm = {'pending':'submitted','launched':'working',
+                         'blocked':'input-required','rejected':'failed',
+                         'consumed':'completed'}
+            expected_state = body.get("expected_state") or ""
+            if not expected_state and body.get("expected_status"):
+                expected_state = legacy_sm.get(body["expected_status"], body["expected_status"])
             fields = {}
             if "state" in body: fields["state"] = sm.get(body["state"])  # reject unknown states
             for k in ["completion_summary","evidence_paths","error",
@@ -768,7 +784,16 @@ class A2AServer:
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))
             if "evidence" in fields: fields.setdefault("evidence_paths", fields.pop("evidence"))
-            self.task_store.update_fields(task_id, **{k:v for k,v in fields.items() if v})
+            affected = self.task_store.update_fields(
+                task_id, expected_state=expected_state,
+                **{k:v for k,v in fields.items() if v})
+            if expected_state and affected == 0:
+                row_now = self.task_store.raw_rpc(
+                    "a2a_task.get", {"task_id": task_id}).get("record") or {}
+                return JSONResponse({"error": "state_conflict",
+                                     "expected_state": expected_state,
+                                     "current_state": row_now.get("state", "missing"),
+                                     "affected": 0}, status_code=409)
             # Notify SSE subscribers of state change
             if "state" in fields:
                 import asyncio as _asyncio
