@@ -26,6 +26,9 @@ make_fixture() {
   cp "$ISSUE_SYNC" "$FIX/bin/issue-sync"
   cp "$ROOT_DIR/docs/system/workspace/scripts/sync/raw_title_contract.py" \
      "$FIX/docs/system/workspace/scripts/sync/raw_title_contract.py"
+  # #4166: issue-sync writes through platform-adapter.py now.
+  cp "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+     "$FIX/docs/system/workspace/scripts/sync/platform-adapter.py"
   # Single-owner frontmatter CLI (#4148): without it every _fm_* call is a no-op.
   cp "$ROOT_DIR"/docs/system/workspace/scripts/lifecycle/*.py \
      "$FIX/docs/system/workspace/scripts/lifecycle/"

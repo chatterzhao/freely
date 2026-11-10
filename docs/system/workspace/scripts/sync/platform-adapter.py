@@ -279,7 +279,11 @@ class GitHubHandler(PlatformHandler):
         except Exception:
             return ""
 
-    def _repo(self) -> str: return self.detect_repo()
+    def _repo(self) -> str:
+        # #4166: shells that orchestrate a specific repo (issue-sync) pass it
+        # explicitly; fixtures and worktrees without a matching remote fall
+        # back to git detection.
+        return os.environ.get("FREELY_PLATFORM_REPO") or self.detect_repo()
 
     @staticmethod
     def _label_names(labels: str) -> list[str]:
@@ -633,7 +637,11 @@ class GiteeHandler(PlatformHandler):
             pass
         return ""
 
-    def _repo(self) -> str: return self.detect_repo()
+    def _repo(self) -> str:
+        # #4166: shells that orchestrate a specific repo (issue-sync) pass it
+        # explicitly; fixtures and worktrees without a matching remote fall
+        # back to git detection.
+        return os.environ.get("FREELY_PLATFORM_REPO") or self.detect_repo()
 
     def _run(self, *args):
         return subprocess.run([sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
@@ -1633,6 +1641,39 @@ if __name__ == "__main__":
         if result and len(created) == len(result):
             raise SystemExit(0)
         raise SystemExit(3 if created else 1)
+    elif len(a) > 1 and a[1] == "issue-write-one":
+        # #4166: single-platform write used by bin/issue-sync so the shell
+        # orchestrator never calls `gh` directly. Argument order:
+        #   issue-write-one <platform> <action> <number> <title> <body> <labels>
+        platform = a[2] if len(a) > 2 else ""
+        action = a[3] if len(a) > 3 else ""
+        number = a[4] if len(a) > 4 else ""
+        title = a[5] if len(a) > 5 else ""
+        body = a[6] if len(a) > 6 else ""
+        labels = a[7] if len(a) > 7 else ""
+        handler = next((h for h in _handlers() if h.name == platform), None)
+        if handler is None:
+            print(json.dumps({"status": "error", "error": f"unknown platform: {platform}"}))
+            raise SystemExit(1)
+        try:
+            if action == "create":
+                result = handler.create_issue(title, body, labels)
+            elif action == "comment":
+                result = handler.add_comment(number, body)
+            elif action == "close":
+                result = handler.close_issue(number)
+            elif action == "update":
+                result = handler.update_issue(number, title, body)
+                for lbl in [x for x in labels.split(",") if x]:
+                    add_label = getattr(handler, "add_label", None)
+                    if callable(add_label):
+                        add_label(number, lbl)
+            else:
+                result = {"status": "error", "error": f"unknown action: {action}"}
+        except Exception as exc:  # platform CLIs raise on malformed output
+            result = {"status": "error", "error": str(exc)[:200]}
+        print(json.dumps({platform: result}, indent=2))
+        raise SystemExit(0 if result.get("status") != "error" else 1)
     elif len(a) > 1 and a[1] == "get-issue-state":
         print(_resolve_issue_state(a[2]) if len(a) > 2 else "unknown")
     elif len(a) > 1 and a[1] == "comment":

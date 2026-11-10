@@ -1,0 +1,8 @@
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T080014Z-platform-sync-entrypoint
+=== STATIC: one platform-write implementation ===
+  [ok] issue-sync has no direct gh issue writes ([])
+  [ok] issue-sync writes through the adapter command
+  [ok] adapter exposes a single-platform write routed to the handler
+=== BEHAVIOR: adapter create-issue-one ===
+  [ok] adapter create reaches gh with labels
+SUMMARY: 4 ok, 0 failed

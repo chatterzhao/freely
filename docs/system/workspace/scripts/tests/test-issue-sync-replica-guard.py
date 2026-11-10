@@ -81,6 +81,23 @@ elif cmd == "close-multi":
 elif cmd == "create-issue":
     print(json.dumps({"github": {"status": "created", "issue_id": "999"},
                       "gitee": {"status": "created", "issue_id": "ZZ9"}}))
+elif cmd == "issue-write-one":
+    # #4166: issue-sync now writes one platform at a time through this command.
+    platform = argv[1] if len(argv) > 1 else ""
+    action = argv[2] if len(argv) > 2 else ""
+    if action == "create" and platform == "github":
+        print(json.dumps({"github": {"status": "created", "issue_id": "999",
+                                     "url": "https://github.com/o/r/issues/999"}}))
+    elif action == "create":
+        print(json.dumps({"gitee": {"status": "created", "issue_id": "ZZ9"}}))
+    elif action == "close":
+        print(json.dumps({platform: {"status": "closed"}}))
+    elif action == "comment":
+        print(json.dumps({platform: {"status": "created"}}))
+    elif action == "update":
+        print(json.dumps({platform: {"status": "updated"}}))
+    else:
+        print("{}")
 else:
     print("{}")
 '''
