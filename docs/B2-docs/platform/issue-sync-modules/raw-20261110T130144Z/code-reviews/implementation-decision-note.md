@@ -1,4 +1,11 @@
-# Implementation Decision Note — I-20261110T130144Z-A
+# Implementation Decision Note
+- issue_id: I-20261110T130144Z-A
+- issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261110T130144Z/issues/I-20261110T130144Z-A.md
+- decision: `bin/issue-sync` 拆为 dispatcher + `bin/issue-sync.d/*.sh`；`sync/issue_create_contract.py` 成为平台 body/标签的单所有者；`bootstrap --delete` 改走 adapter
+- why_this: 1330 行单文件让子命令无法独立 source/断言；两条 create 路径各自渲染 body 与标签（一处硬编码字面量、一处 `awk` 假剥离）；`bootstrap` 直连删是 adapter 之外唯一平台写。
+- alternatives_considered: ①只拆文件不动 body——缺陷原样留着；②把 frontmatter 从平台 body 移除——会让 `pull_raw_issue()` 对所有新 raw 走 legacy 分支，丢 intake_id/workflow_kind/severity；③让 `feedback` 先写本地 issue.md 再复用 `issue-sync create`——改动了 raw 所有权（平台是源、本地由 pull 物化）；④`feedback edit` 一并纳入契约——标题可能为空，语义需另行决定。
+- boundary_non_goals: 未改 `issue-write-one` 契约与 0/3/1 退出码、未改 promote/close 语义、未动 `raw_title_contract` 标题投影、未动 `feedback edit` 的拼装、未动 DEPRECATED 的 `bin/issue-sync-batch.py`。
+- residual_risk: ①平台 body 形态变化（围栏 frontmatter + 表格 + 去 comment 段），旧 issue 在下次 update 时会被重写为新形态；②模块间仍是函数级 + 全局变量耦合，未参数化；③6 个夹具新增 `issue-sync.d` 依赖，未来再加模块必须继续同步夹具；④`test-issue-sync-replica-guard.py` 4 项既有失败未修（基线相同）。
 
 ## 三个决定的真实依据
 
