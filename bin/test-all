@@ -23,6 +23,7 @@ done
 CORE=(
   test-a2a-task-cli-loadable.py
   test-fail-semantics-preflight.py
+  test-obs-ops-backlog.py
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
@@ -38,6 +39,7 @@ CORE=(
 CI_CORE=(
   test-a2a-task-cli-loadable.py
   test-fail-semantics-preflight.py
+  test-obs-ops-backlog.py
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
