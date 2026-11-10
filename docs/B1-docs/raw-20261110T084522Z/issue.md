@@ -34,6 +34,8 @@ closeout_note: ''
 severity: P1
 ---
 
+# fix: 状态协议 ALLOWED_KEYS 漏登记 21 个 heredoc 写入键（兼容读取会抛错）
+
 workflow_kind: fix
 
 ## 背景
