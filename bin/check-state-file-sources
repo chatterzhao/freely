@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Boundary lint for the state-file protocol migration (#4252, phase 1).
+
+Phase 1 delivers the safe reader/writer but deliberately does NOT rewrite the
+55 existing `source "$state_file"` call sites in one shot — that needs a
+per-family migration with its own regressions. This lint freezes the boundary
+so the migration can only move forward:
+
+1. the number of `source` calls on state files must never EXCEED the baseline;
+2. the safe module must exist and must not contain any evaluation primitive;
+3. every state file written by the new protocol must be readable by the module.
+
+Usage: python3 bin/check-state-file-sources [--project <path>]
+"""
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+# Baseline measured on develop ea9f5b38c. Lower is better; higher is a
+# regression (someone added another `source` of a state file).
+BASELINE_SOURCES = 55
+FORBIDDEN = ("eval(", "exec(", "os.system", "subprocess", "shell=True")
+SOURCE_STATE = re.compile(r'\bsource\s+"[^"]*state')
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="state-file boundary lint")
+    ap.add_argument("--project", default=str(Path(__file__).resolve().parents[1]))
+    args = ap.parse_args()
+    root = Path(args.project).resolve()
+    runtime = root / "docs/system/workspace/scripts/runtime"
+    freely = runtime / "freely"
+    module = runtime / "state_file.py"
+    failures: list[str] = []
+
+    if not module.is_file():
+        failures.append(f"safe state module missing: {module}")
+        module_text = ""
+    else:
+        module_text = module.read_text(errors="replace")
+        for token in FORBIDDEN:
+            if token in module_text:
+                failures.append(f"safe state module contains forbidden primitive {token!r}")
+        for required in ("def read_state", "def write_state", "def to_shell", "ALLOWED_KEYS"):
+            if required not in module_text:
+                failures.append(f"safe state module is missing {required}")
+
+    lines = freely.read_text(errors="replace").split("\n") if freely.is_file() else []
+    hits = [(i + 1, line.strip()) for i, line in enumerate(lines)
+            if SOURCE_STATE.search(line)]
+    print(f"[state-source] state-file `source` call sites: {len(hits)} "
+          f"(baseline {BASELINE_SOURCES})")
+    if len(hits) > BASELINE_SOURCES:
+        failures.append(f"{len(hits)} state sources exceeds baseline {BASELINE_SOURCES}")
+    print(f"[state-source] remaining sites (migrate family by family):")
+    for number, text in hits[:8]:
+        print(f"  - freely:{number} {text[:80]}")
+    if len(hits) > 8:
+        print(f"  ... and {len(hits) - 8} more")
+
+    if failures:
+        print("[state-source] FAIL:")
+        for item in failures:
+            print(f"  - {item}")
+        return 1
+    print("[state-source] OK: safe module present, no evaluation primitives, no new sources")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
