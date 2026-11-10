@@ -1,3 +1,24 @@
+## M-20261110T060553Z-A
+- title: fix — 状态文件安全协议（第一阶段）
+- status: active
+### candidate_issues
+1. `C-20261110T060553Z-A`
+- milestone: M-20261110T060553Z-A
+- status: promoted
+- promoted_issue_id: I-20261110T060553Z-A
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20261110T060553Z/issues/I-20261110T060553Z-A.md
+### committed_issues
+1. `I-20261110T060553Z-A`
+- milestone: M-20261110T060553Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T060553Z/issues/I-20261110T060553Z-A.md
+### completed_issues
+1. `I-20261110T060553Z-A`
+- milestone: M-20261110T060553Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T08:00:00Z
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261110T060553Z/issues/I-20261110T060553Z-A.md
+
 ## M-20261108T141300Z-A
 - title: fix — 物化时保留 severity 优先级
 - status: active
