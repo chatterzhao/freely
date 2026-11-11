@@ -1,0 +1,19 @@
+source: /private/tmp/r32-base
+  [FAIL] implementation and shim both exist and are executable — bin shim or the real implementation is missing / not executable
+  [FAIL] bin/ entry is a projection of the real source — 806 lines, exec=False, points-at-real=False
+  [FAIL] the moved body still holds the review logic — missing docs/system/workspace/scripts/worktree/pr-review-guarded
+  [FAIL] projection lint exists and is executable — missing bin/check-bin-projection
+  [FAIL] registry header is complete — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r32-base/docs/system/workspace/scripts/bin-projections.yaml'
+  [FAIL] the migrated command left the registry — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r32-base/docs/system/workspace/scripts/bin-projections.yaml'
+  [FAIL] no stale registry entries — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r32-base/docs/system/workspace/scripts/bin-projections.yaml'
+  [FAIL] no permanent exemptions — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r32-base/docs/system/workspace/scripts/bin-projections.yaml'
+  [FAIL] remaining debt points at the follow-up raw — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r32-base/docs/system/workspace/scripts/bin-projections.yaml'
+  [FAIL] inventory lists the bin/ entries — missing docs/system/workspace/scripts/bin-inventory.md
+  [FAIL] AT wired into CORE and CI_CORE — AT not wired into both CORE and CI_CORE
+  [FAIL] story registered in epics-map — story not registered in epics-map
+  [FAIL] lint passes on the real tree — missing bin/check-bin-projection
+  [FAIL] unregistered oversized bin file is refused — missing bin/check-bin-projection
+  [FAIL] stale exemption is refused — missing bin/check-bin-projection
+  [ok] the projection still dispatches
+
+SUMMARY: 1 ok, 15 failed

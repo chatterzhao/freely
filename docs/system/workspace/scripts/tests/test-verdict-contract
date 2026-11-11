@@ -17,7 +17,8 @@ HELPER="$ROOT_DIR/docs/system/workspace/scripts/worktree/review-verdict.sh"
 # wrapper. Static asserts about parsing must look at both halves.
 MODULE="$ROOT_DIR/docs/system/workspace/scripts/worktree/review_verdict.py"
 MERGE_GUARD="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-merge-guarded"
-REVIEW_GUARD="$ROOT_DIR/bin/pr-review-guarded"
+# #4175: bin/ is a projection; the verdict logic lives in workspace/scripts/.
+REVIEW_GUARD="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-review-guarded"
 GATE="$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate"
 PASS=0; FAIL=0
 ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }

@@ -1,0 +1,19 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T080200Z-pr-review-projection
+  [ok] implementation and shim both exist and are executable
+  [ok] bin/ entry is a projection of the real source
+  [ok] the moved body still holds the review logic
+  [ok] projection lint exists and is executable
+  [ok] registry header is complete
+  [ok] the migrated command left the registry
+  [ok] no stale registry entries
+  [ok] no permanent exemptions
+  [ok] remaining debt points at the follow-up raw
+  [ok] inventory lists the bin/ entries
+  [ok] AT wired into CORE and CI_CORE
+  [ok] story registered in epics-map
+  [ok] lint passes on the real tree
+  [ok] unregistered oversized bin file is refused
+  [ok] stale exemption is refused
+  [ok] the projection still dispatches
+
+SUMMARY: 16 ok, 0 failed

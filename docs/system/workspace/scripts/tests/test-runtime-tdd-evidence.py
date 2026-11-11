@@ -44,7 +44,9 @@ HARNESS = UNIT_DIR / "harness.sh"
 PR_BODY = SRC / "docs/system/workspace/scripts/worktree/pr_body.py"
 RED_GATE = SRC / "docs/system/workspace/scripts/quality/runtime_red_gate.py"
 PR_CREATE = SRC / "docs/system/workspace/scripts/worktree/pr-create-guarded"
-PR_REVIEW = SRC / "bin/pr-review-guarded"
+# #4175 moved the implementation into workspace/scripts/; bin/ is a projection
+# now, so the gate call must be asserted on the real source.
+PR_REVIEW = SRC / "docs/system/workspace/scripts/worktree/pr-review-guarded"
 RED_HEADER = "## RED 证据"
 
 OK = 0

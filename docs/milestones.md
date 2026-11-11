@@ -1,3 +1,24 @@
+## M-20261104T080200Z-A
+- title: refactor — pr-review-guarded 迁回 scripts/（投影层边界）
+- status: active
+### candidate_issues
+1. `C-20261104T080200Z-A`
+- milestone: M-20261104T080200Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T080200Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261104T080200Z/issues/I-20261104T080200Z-A.md
+### committed_issues
+1. `I-20261104T080200Z-A`
+- milestone: M-20261104T080200Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261104T080200Z/issues/I-20261104T080200Z-A.md
+### completed_issues
+1. `I-20261104T080200Z-A`
+- milestone: M-20261104T080200Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T13:20:00Z
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261104T080200Z/issues/I-20261104T080200Z-A.md
+
 ## M-20261104T075849Z-A
 - title: refactor — runtime 拆分第一阶段（helper 单源 + 3 子命令外移）
 - status: active
