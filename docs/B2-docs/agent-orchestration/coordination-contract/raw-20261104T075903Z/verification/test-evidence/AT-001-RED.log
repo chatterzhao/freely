@@ -1,0 +1,19 @@
+=== STATIC: coordination contract ===
+  [FAIL] coordination contract exists — missing /private/tmp/r29-base/contracts/coordination/contract.yaml
+  [FAIL] contract is stdlib-parseable JSON/YAML subset — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r29-base/contracts/coordination/contract.yaml'
+  [FAIL] contract declares states/reasons/topics/exit-contracts — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r29-base/contracts/coordination/contract.yaml'
+  [FAIL] coordination package owns the reason enum — coordination package incomplete
+  [FAIL] watchdog_sse.py has no agents sys.path hack — agents sys.path hack: ['sys.path.insert(0, os.path.join(PROJECT_ROOT, "docs", "system", "workspace", "agents"))']
+  [FAIL] no runtime file injects agents/ into sys.path — hits: ['docs/system/workspace/scripts/runtime/watchdog_sse.py:16']
+  [FAIL] watchdog imports from the coordination package — watchdog still uses bare import
+  [FAIL] reason enum moved out of agents/ — legacy agents/input_required_reason.py still present
+  [FAIL] contract reasons match the runtime enum — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r29-base/contracts/coordination/contract.yaml'
+  [FAIL] single-page doc lists state machine and exit contracts — missing single-page doc
+  [FAIL] coordination lint exists — missing lint
+=== BEHAVIOR: lint parity + import graph ===
+  [FAIL] lint refuses contract/enum drift — exception: FileNotFoundError: missing lint: /private/tmp/r29-base/bin/check-coordination-contract
+  [FAIL] lint accepts a compliant fixture — exception: FileNotFoundError: missing lint: /private/tmp/r29-base/bin/check-coordination-contract
+  [ok] coordination package has no reverse dependency on runtime/freely
+  [FAIL] AT wired into test-all CORE and CI_CORE — AT not in both suites
+  [FAIL] B2 story registered in epics-map.svg — story not registered
+SUMMARY: 1 ok, 15 failed

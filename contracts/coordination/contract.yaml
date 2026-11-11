@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "owner": "contracts/coordination/contract.yaml",
+  "note": "JSON-compatible YAML 1.2 subset (stdlib json.loads). Stage 1 records the values proven from the runtime truth below.",
+  "source_of_truth": {
+    "task_states": "a2a_task.py normalize_state (A2A standard states)",
+    "input_required_reasons": "scripts/runtime/coordination/input_required_reason.py (moved out of agents/)",
+    "sse_topics": "watchdog_sse.py / a2a_server.py SSE event names",
+    "exit_contracts": "runtime/freely manager_exit_contract_kind() + a2a-exit exit_kind"
+  },
+  "task_states": [
+    "submitted",
+    "working",
+    "input-required",
+    "completed",
+    "failed",
+    "canceled",
+    "unknown"
+  ],
+  "input_required_reasons": [
+    "needs-review:b1",
+    "needs-review:b2",
+    "needs-review:dev",
+    "needs-review:red",
+    "needs-review:test",
+    "needs-review:gate",
+    "needs-manager-decision",
+    "needs-worker-retry",
+    "needs-manager-scope",
+    "needs-worker-task",
+    "needs-human-input",
+    "unknown"
+  ],
+  "sse_topics": [
+    "input_required",
+    "task_state_update",
+    "stream_task",
+    "resubscribe"
+  ],
+  "exit_contracts": {
+    "delegate_workers": "submitted worker tasks exist -> delegate before exit",
+    "no_recovery": "no pending work, normal exit",
+    "degraded_no_recovery": "degraded runtime with no self-recovery (#4157)"
+  }
+}

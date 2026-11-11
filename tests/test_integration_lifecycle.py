@@ -21,12 +21,12 @@ from unittest.mock import patch, MagicMock, call
 
 TEST_PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "scripts", "runtime"))
-sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "agents"))
+sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "scripts", "runtime"))
 
 from watchdog_sse import (
     _acp_rpc, _handle_sse_event, _check_agent_liveness, _check_session_staleness,
 )
-from input_required_reason import InputRequiredReason
+from coordination.input_required_reason import InputRequiredReason
 # agent_working helpers are local to test modules — import the inline versions
 # _parse_pairs and _format_pairs are private in agent_working.py, replicate here
 

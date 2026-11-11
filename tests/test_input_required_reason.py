@@ -1,7 +1,7 @@
 """Unit tests for InputRequiredReason enum."""
 import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "docs", "system", "workspace", "agents"))
-from input_required_reason import InputRequiredReason
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "docs", "system", "workspace", "scripts", "runtime"))
+from coordination.input_required_reason import InputRequiredReason
 
 def test_all_values():
     assert len(list(InputRequiredReason)) == 12, f"Expected 12, got {len(list(InputRequiredReason))}"
