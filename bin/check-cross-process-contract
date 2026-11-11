@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Lint for the Bash↔Python data contract (#4161).
+
+Guards `contracts/cross-process/contract.yaml` against drift so the declared
+error model stays the one the boundary runner implements.
+
+Exit codes: 0 ok · 1 contract violation · 2 contract missing (fail-closed, the
+same convention as `bin/check-skill-frontmatter`).
+
+    bin/check-cross-process-contract
+    bin/check-cross-process-contract --json
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+CONTRACT = "contracts/cross-process/contract.yaml"
+RUNNER = "docs/system/workspace/scripts/quality/cross_process_boundary.py"
+REQUIRED_KINDS = {"missing_field", "type_error", "timeout"}
+REQUIRED_CODES = {"0", "1", "2", "3", "4"}
+ENVELOPE_FIELDS = {"ok", "error.kind", "error.message", "error.source"}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--project", default=str(ROOT))
+    ap.add_argument("--json", action="store_true")
+    args = ap.parse_args()
+    root = Path(args.project).resolve()
+
+    path = root / CONTRACT
+    if not path.is_file():
+        print(f"[cross-process] missing contract source: {CONTRACT}", file=__import__("sys").stderr)
+        return 2
+
+    errors: list[str] = []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"[cross-process] contract is not JSON: {exc}", file=__import__("sys").stderr)
+        return 1
+
+    if data.get("schema_version") != 1:
+        errors.append("schema_version must be 1")
+    if not data.get("owner"):
+        errors.append("owner must be set")
+
+    state = data.get("state_file") or {}
+    for field in ("format", "encoded_line", "legacy_line", "missing_key", "key_whitelist_owner"):
+        if not state.get(field):
+            errors.append(f"state_file.{field} is required")
+    if state.get("format") != "tabulator+json":
+        errors.append("state_file.format must be tabulator+json")
+
+    model = data.get("error_model") or {}
+    codes = model.get("exit_codes") or {}
+    missing_codes = sorted(REQUIRED_CODES - set(codes))
+    if missing_codes:
+        errors.append(f"error_model.exit_codes missing {missing_codes}")
+    kinds = set(model.get("kinds") or [])
+    if not REQUIRED_KINDS.issubset(kinds):
+        errors.append(f"error_model.kinds missing {sorted(REQUIRED_KINDS - kinds)}")
+    missing_env = sorted(ENVELOPE_FIELDS - set(model.get("envelope_fields") or []))
+    if missing_env:
+        errors.append(f"error_model.envelope_fields missing {missing_env}")
+
+    timeout = data.get("timeout") or {}
+    if timeout.get("exit_code") != 4:
+        errors.append("timeout.exit_code must be 4")
+    if timeout.get("distinguishable") is not True:
+        errors.append("timeout.distinguishable must be true")
+    if not float(timeout.get("default_seconds") or 0) > 0:
+        errors.append("timeout.default_seconds must be positive")
+    if str(timeout.get("exit_code")) not in codes:
+        errors.append("timeout.exit_code is not declared in error_model.exit_codes")
+
+    boundaries = data.get("boundaries") or []
+    if len(boundaries) < 3:
+        errors.append(f"at least 3 boundaries are required, found {len(boundaries)}")
+    for entry in boundaries:
+        name = entry.get("name") or "<unnamed>"
+        for field in ("name", "error_class", "producer", "consumer", "required_keys"):
+            if not entry.get(field):
+                errors.append(f"boundary {name}: {field} is required")
+        if entry.get("error_class") and entry["error_class"] not in kinds:
+            errors.append(f"boundary {name}: unknown error_class {entry['error_class']!r}")
+        producer = entry.get("producer") or ""
+        if producer and not (root / producer).is_file():
+            errors.append(f"boundary {name}: producer does not exist: {producer}")
+
+    runner = root / RUNNER
+    if not runner.is_file():
+        errors.append(f"boundary runner missing: {RUNNER}")
+    else:
+        text = runner.read_text(encoding="utf-8")
+        for token, want in (("EXIT_CONTRACT", "3"), ("EXIT_TIMEOUT", "4")):
+            match = re.search(rf"^{token} = (\d+)", text, re.MULTILINE)
+            if not match:
+                errors.append(f"runner does not declare {token}")
+            elif match.group(1) != want:
+                errors.append(f"runner {token}={match.group(1)} but the contract says {want}")
+        for kind in sorted(REQUIRED_KINDS):
+            if kind not in text:
+                errors.append(f"runner does not handle kind {kind}")
+
+    if args.json:
+        print(json.dumps({"ok": not errors, "errors": errors,
+                          "boundaries": len(boundaries)}, ensure_ascii=False))
+    elif errors:
+        print("[cross-process] contract violations:", file=__import__("sys").stderr)
+        for err in errors:
+            print(f"  - {err}", file=__import__("sys").stderr)
+    else:
+        print(f"ok ({len(boundaries)} boundaries)")
+    return 0 if not errors else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

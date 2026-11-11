@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "owner": "contracts/cross-process/contract.yaml",
+  "note": "JSON-compatible YAML 1.2 subset so stdlib json.loads can read it on installed machines (no PyYAML). Produced by raw-20261104T075857Z / #4161.",
+  "purpose": "Declare how Bash consumers and Python producers exchange data: the state-file protocol, the error envelope, the exit codes and the timeout semantics. Before this file every call site invented its own handling, so a missing field became an empty string, a wrong type was coerced and a hung child looked like a generic failure.",
+  "state_file": {
+    "format": "tabulator+json",
+    "encoded_line": "KEY<TAB>JSON-string  (non-executable, the only format write_state emits)",
+    "legacy_line": "KEY=VALUE  (read-only compatibility; one surrounding quote pair is stripped, nothing is expanded)",
+    "missing_key": "read_state omits the key; `values` returns the empty string for it. A consumer that needs the key MUST declare it in its boundary entry's required_keys so the boundary runner can fail closed.",
+    "key_whitelist_owner": "docs/system/workspace/scripts/runtime/state_file.py ALLOWED_KEYS",
+    "value_type": "every state value is a string; non-strings are rejected, never coerced"
+  },
+  "error_model": {
+    "exit_codes": {
+      "0": "ok",
+      "1": "runtime failure inside the producer (unexpected exception)",
+      "2": "usage error or missing contract source (not applicable)",
+      "3": "contract violation: missing_field, type_error or invalid_json",
+      "4": "timeout: the child exceeded the declared timeout"
+    },
+    "envelope_fields": [
+      "ok",
+      "error.kind",
+      "error.message",
+      "error.source"
+    ],
+    "kinds": [
+      "missing_field",
+      "type_error",
+      "invalid_json",
+      "timeout"
+    ],
+    "envelope_example": {
+      "ok": false,
+      "error": {
+        "kind": "missing_field",
+        "message": "LAST_TESTED_COMMIT is required but absent",
+        "source": "state-file"
+      }
+    },
+    "success_shape": "the producer's own stdout is passed through unchanged; success carries no envelope"
+  },
+  "timeout": {
+    "default_seconds": 30,
+    "exit_code": 4,
+    "distinguishable": true,
+    "rule": "a timeout MUST NOT be reported as 1 or 3: the caller has to tell 'took too long' from 'answered wrongly'."
+  },
+  "boundaries": [
+    {
+      "name": "state-file-read",
+      "error_class": "missing_field",
+      "producer": "docs/system/workspace/scripts/runtime/state_file.py",
+      "consumer": "bin/freely (runtime state sourcing)",
+      "required_keys": ["STATUS", "DESIRED_RUNTIME_STATE"],
+      "why": "`values` returns \"\" for an absent key, so 'missing' and 'empty' are indistinguishable to the caller."
+    },
+    {
+      "name": "issue-json-read",
+      "error_class": "missing_field",
+      "producer": "docs/system/workspace/scripts/runtime/gitee-issue.py",
+      "consumer": "bin/issue-sync.d/ (platform sync commands)",
+      "required_keys": ["number", "state"],
+      "why": "a dropped field used to surface as a silent no-op instead of a failed sync."
+    },
+    {
+      "name": "platform-adapter-json",
+      "error_class": "type_error",
+      "producer": "docs/system/workspace/scripts/sync/platform-adapter.py",
+      "consumer": "bin/issue-sync.d/ (issue write results)",
+      "required_keys": ["number", "url"],
+      "why": "the URL extractor must not coerce a missing url into an empty string."
+    },
+    {
+      "name": "red-evidence-read",
+      "error_class": "missing_field",
+      "producer": "docs/system/workspace/scripts/worktree/pr_body.py",
+      "consumer": "docs/system/workspace/scripts/quality/runtime_red_gate.py",
+      "required_keys": ["actual_RED_output", "red-green-status", "evidence_file"],
+      "why": "a gate that reads a half-filled pre-tests item would pass a change with no RED evidence."
+    }
+  ],
+  "known_gaps": [
+    "The 22 `source <file>.env` call sites under scripts/tests fixtures still use shell sourcing; they are test fixtures, not production producers, so they are not migrated in this stage.",
+    "The 33 `|| echo` fallbacks are not all error swallowing (most are JSON-decode retries); normalising them needs a per-site review and is left to a follow-up.",
+    "Consumers of declared boundaries are not yet machine-checked; the lint checks the producer and the declaration, not every call site."
+  ]
+}
