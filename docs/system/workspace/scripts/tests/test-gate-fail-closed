@@ -19,9 +19,11 @@ PASS=0; FAIL=0
 ok(){ echo "  [ok] $1"; PASS=$((PASS+1)); }
 bad(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
 
-# Shim family that delegates to a truth script. post-checkout is DELIBERATELY
-# excluded: it is a self-contained implementation with no truth script.
-SHIM_FAMILY=(pre-commit pre-merge-commit pre-push reference-transaction pre-rebase post-rewrite)
+# Shim family that delegates to a truth script.
+# #4179 moved post-checkout into workspace/hooks/ as well, so it now belongs to
+# the same family: the earlier "keep it self-contained" guard was a scope fence
+# for the shim-family fix, not a permanent architecture rule.
+SHIM_FAMILY=(pre-commit pre-merge-commit pre-push reference-transaction pre-rebase post-rewrite post-checkout)
 
 static_checks() {
   echo "=== STATIC: shim family is fail-closed ==="
@@ -31,11 +33,18 @@ static_checks() {
     if grep -qF '[[ -x ' "$f"; then bad "$name shim still requires the execute bit"; else ok "$name shim uses -f (bash file needs no +x)"; fi
     if grep -qF 'exit 2' "$f"; then ok "$name shim reports environment-unusable (2)"; else bad "$name shim has no exit 2"; fi
   done
-  # post-checkout must stay an independent implementation (no truth script).
-  if grep -qF 'freely_wt_assert_strict_root' "$HOOKS/post-checkout"; then
-    ok "post-checkout stays self-contained (unchanged by shim-family fix)"
+  # #4179: post-checkout delegates now; its worktree logic must live in the
+  # truth script, and the wrapper must stay fail-closed like its siblings.
+  if [[ -f "$ROOT_DIR/docs/system/workspace/hooks/post-checkout.sh" ]] \
+     && grep -qF 'freely_wt_assert_strict_root' "$ROOT_DIR/docs/system/workspace/hooks/post-checkout.sh"; then
+    ok "post-checkout worktree logic lives in its truth script"
   else
-    bad "post-checkout lost its self-contained logic"
+    bad "post-checkout truth script missing or lost its worktree logic"
+  fi
+  if grep -qF 'workspace/hooks/post-checkout.sh' "$HOOKS/post-checkout"; then
+    ok "post-checkout wrapper delegates to the truth script"
+  else
+    bad "post-checkout wrapper does not delegate"
   fi
 
   echo "=== STATIC: pre-commit.sh truth guards ==="
