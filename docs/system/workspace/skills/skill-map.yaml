@@ -92,19 +92,6 @@
         "candidate-acceptance-review"
       ]
     },
-    "freely-chat-issue-routing": {
-      "loop": "intake",
-      "owner": "manager",
-      "inputs": [
-        "raw-or-signal"
-      ],
-      "outputs": [
-        "decision-or-artifact"
-      ],
-      "triggers": [
-        "chat-issue-routing"
-      ]
-    },
     "freely-config-backup-guard": {
       "loop": "governance",
       "owner": "runtime",
@@ -274,19 +261,6 @@
         "laws-enforcer"
       ]
     },
-    "freely-mem9-continuity-bridge": {
-      "loop": "runtime",
-      "owner": "runtime",
-      "inputs": [
-        "raw-or-signal"
-      ],
-      "outputs": [
-        "decision-or-artifact"
-      ],
-      "triggers": [
-        "mem9-continuity-bridge"
-      ]
-    },
     "freely-milestone-planning-state-maintenance": {
       "loop": "b1",
       "owner": "workflow",
@@ -365,19 +339,6 @@
         "rust-tauri-toolchain-bootstrap"
       ]
     },
-    "freely-signal-intent-understanding": {
-      "loop": "intake",
-      "owner": "manager",
-      "inputs": [
-        "raw-or-signal"
-      ],
-      "outputs": [
-        "decision-or-artifact"
-      ],
-      "triggers": [
-        "signal-intent-understanding"
-      ]
-    },
     "freely-tdd-review": {
       "loop": "review",
       "owner": "reviewer",
@@ -415,19 +376,6 @@
       ],
       "triggers": [
         "test-execution"
-      ]
-    },
-    "freely-tool-cc-codex-mcp-runtime": {
-      "loop": "toolchain",
-      "owner": "runtime",
-      "inputs": [
-        "raw-or-signal"
-      ],
-      "outputs": [
-        "decision-or-artifact"
-      ],
-      "triggers": [
-        "tool-cc-codex-mcp-runtime"
       ]
     },
     "freely-url-content-intake": {
@@ -557,5 +505,38 @@
     "runtime": "freely-watchdog-control-plane",
     "governance": "freely-workflow-guarded-execution",
     "toolchain": "freely-rust-tauri-toolchain-bootstrap"
-  }
+  },
+  "aliases": {
+    "freely-signal-intent-understanding": "freely-human-interruption-manager-triage",
+    "freely-chat-issue-routing": "freely-human-interruption-manager-triage",
+    "freely-mem9-continuity-bridge": "freely-continuity-watchdog",
+    "freely-tool-cc-codex-mcp-runtime": "freely-ai-cli-availability-manager"
+  },
+  "merge_groups": [
+    {
+      "id": "intake-routing",
+      "entrypoint": "freely-human-interruption-manager-triage",
+      "retired": [
+        "freely-signal-intent-understanding",
+        "freely-chat-issue-routing"
+      ],
+      "reason": "意图收敛与 chat 消息路由都是 intake 首次 triage 的前置判断，合并到唯一 triage 入口，避免 agent 连读三份 SKILL.md。"
+    },
+    {
+      "id": "continuity",
+      "entrypoint": "freely-continuity-watchdog",
+      "retired": [
+        "freely-mem9-continuity-bridge"
+      ],
+      "reason": "mem9 连续性后端的接入边界属于 continuity 治理，合并到 continuity-watchdog 入口。"
+    },
+    {
+      "id": "toolchain",
+      "entrypoint": "freely-ai-cli-availability-manager",
+      "retired": [
+        "freely-tool-cc-codex-mcp-runtime"
+      ],
+      "reason": "Codex MCP 的注册与验证属于 AI CLI 工具可用性管理，合并到 availability-manager 入口。"
+    }
+  ]
 }

@@ -78,6 +78,18 @@ def run(skills_dir: Path, map_path: Path) -> int:
     orphan = sorted(set(entries) - {p.parent.name for p in files})
     if orphan:
         errors.append(f"skill-map.yaml orphans: {', '.join(orphan)}")
+
+    # Index compatibility period: retired names must stay resolvable, must not
+    # still exist as live skills, and their target must declare supersedes.
+    for alias, target in matrix.get("aliases", {}).items():
+        if target not in entries:
+            errors.append(f"alias {alias!r} points to unknown skill {target!r}")
+        if alias in entries:
+            errors.append(f"alias {alias!r} still exists as a live skill")
+        target_path = skills_dir / target / "SKILL.md"
+        if target_path.is_file() and alias not in frontmatter(target_path).get("supersedes", ""):
+            errors.append(f"{target}: supersedes is missing retired alias {alias}")
+
     for group in matrix.get("overlap_groups", []):
         if group.get("entrypoint") not in entries:
             errors.append(f"overlap group {group.get('id')!r} has an unknown entrypoint")
