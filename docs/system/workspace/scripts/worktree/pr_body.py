@@ -117,15 +117,17 @@ def render_body(
     project: Path,
 ) -> str:
     body = (base_body or "").strip()
-    if not body:
-        body = DEFAULT_BODY
+    # The caller's placeholder carries no information once the RED section
+    # exists; keeping it just pushes the evidence below noise.
+    if not body or body == DEFAULT_BODY:
+        body = ""
+
+    prefix = [body, ""] if body else []
 
     if evidence:
         item = evidence[0]
         artifacts = _existing_artifacts(project, item)
-        lines = [
-            body,
-            "",
+        lines = prefix + [
             RED_HEADER,
             f"- 验收项: {item.get('acceptance_id', 'AT-?')}（red-green-status: {item.get('red-green-status', 'unknown')}）",
             f"- 命令: `{item.get('test_command', 'n/a')}`",
@@ -150,9 +152,7 @@ def render_body(
         )
         raise SystemExit(REFUSE_EXIT)
 
-    return "\n".join([
-        body,
-        "",
+    return "\n".join(prefix + [
         RED_HEADER,
         "- 不适用：本次 diff 未触及 `docs/system/workspace/scripts/runtime/**` 或 `bin/freely`。",
     ]) + "\n"
