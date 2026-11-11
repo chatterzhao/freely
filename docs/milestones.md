@@ -1,3 +1,24 @@
+## M-20261104T075857Z-A
+- title: refactor — 跨进程数据契约（第一阶段）
+- status: active
+### candidate_issues
+1. `C-20261104T075857Z-A`
+- milestone: M-20261104T075857Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T075857Z-A
+- promoted_issue_path: docs/B2-docs/data-contracts/cross-process-contract/raw-20261104T075857Z/issues/I-20261104T075857Z-A.md
+### committed_issues
+1. `I-20261104T075857Z-A`
+- milestone: M-20261104T075857Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/data-contracts/cross-process-contract/raw-20261104T075857Z/issues/I-20261104T075857Z-A.md
+### completed_issues
+1. `I-20261104T075857Z-A`
+- milestone: M-20261104T075857Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T11:10:00Z
+- issue_path: docs/B2-docs/data-contracts/cross-process-contract/raw-20261104T075857Z/issues/I-20261104T075857Z-A.md
+
 ## M-20261104T075903Z-A
 - title: refactor — 协调契约与枚举迁出 agents/（第一阶段）
 - status: active

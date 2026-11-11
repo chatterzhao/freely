@@ -1,0 +1,20 @@
+source: /private/tmp/r30-base
+  [FAIL] contract file exists — missing contracts/cross-process/contract.yaml
+  [FAIL] contract parses as JSON — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] schema_version and owner declared — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] state_file protocol section complete — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] error_model codes and envelope declared — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] timeout semantics declared — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] >=3 boundaries each with required keys — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] error kinds cover the three boundary classes — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] single-page README documents all three classes — missing contracts/cross-process/README.md
+  [FAIL] lint exists and is executable — missing/executable: bin/check-cross-process-contract
+  [FAIL] boundary runner exposes the declared CLI — missing docs/system/workspace/scripts/quality/cross_process_boundary.py
+  [FAIL] AT wired into CORE and CI_CORE — AT not wired into both CORE and CI_CORE
+  [FAIL] story registered in epics-map — story not registered in epics-map
+  [FAIL] declared exit codes match the gates — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r30-base/contracts/cross-process/contract.yaml'
+  [FAIL] missing key fails closed with missing_field — rc=2 kind= stderr=/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/bin/python3: can't open file '/private/tmp/r30-base/docs/syste
+  [FAIL] wrong type fails closed with type_error — rc=2 kind= stderr=/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/bin/python3: can't open file '/private/tmp/r30-base/docs/syste
+  [FAIL] timeout is exit 4 and distinguishable — rc=2 kind= stderr=/Users/zhaoyu/.workbuddy/binaries/python/versions/3.13.12/bin/python3: can't open file '/private/tmp/r30-base/docs/syste
+
+SUMMARY: 0 ok, 17 failed

@@ -1,0 +1,20 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T075857Z-cross-process-contract
+  [ok] contract file exists
+  [ok] contract parses as JSON
+  [ok] schema_version and owner declared
+  [ok] state_file protocol section complete
+  [ok] error_model codes and envelope declared
+  [ok] timeout semantics declared
+  [ok] >=3 boundaries each with required keys
+  [ok] error kinds cover the three boundary classes
+  [ok] single-page README documents all three classes
+  [ok] lint exists and is executable
+  [ok] boundary runner exposes the declared CLI
+  [ok] AT wired into CORE and CI_CORE
+  [ok] story registered in epics-map
+  [ok] declared exit codes match the gates
+  [ok] missing key fails closed with missing_field
+  [ok] wrong type fails closed with type_error
+  [ok] timeout is exit 4 and distinguishable
+
+SUMMARY: 17 ok, 0 failed
