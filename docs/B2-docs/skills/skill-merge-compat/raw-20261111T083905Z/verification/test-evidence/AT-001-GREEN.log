@@ -1,0 +1,20 @@
+=== STATIC: merge + alias compatibility ===
+  [ok] matrix declares an alias compatibility section
+  [ok] four retired skills map to three surviving entrypoints
+  [ok] retired names removed from matrix skills
+  [ok] every alias target exists in matrix skills
+  [ok] retired skill directories are gone
+  [ok] skill count dropped from 37 (now 33)
+  [ok] route resolver exists
+=== BEHAVIOR: alias resolution, supersedes, lint ===
+  [ok] every alias resolves to its surviving entrypoint
+  [ok] route resolver answers a loop query
+  [ok] surviving entrypoints declare supersedes
+  [ok] retired knowledge merged as chapters, not dropped
+  [ok] skill index no longer lists retired skills
+  [ok] lint refuses a dangling alias
+  [ok] lint accepts a valid alias
+  [ok] no dangling references in executable truth
+  [ok] AT wired into test-all CORE and CI_CORE
+  [ok] B2 story registered in epics-map.svg
+SUMMARY: 17 ok, 0 failed

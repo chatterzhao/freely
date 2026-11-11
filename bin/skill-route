@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+"""skill-route — resolve a skill name (including retired aliases) or a loop.
+
+Single source: docs/system/workspace/skills/skill-map.yaml. Exit 0 with the
+surviving entrypoint on stdout, exit 1 for an unknown name/loop, exit 2 when
+the single source is missing (fail closed).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MAP = ROOT / "docs/system/workspace/skills/skill-map.yaml"
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("name", nargs="?")
+    ap.add_argument("--loop")
+    ap.add_argument("--map", default=str(DEFAULT_MAP))
+    args = ap.parse_args()
+    map_path = Path(args.map).resolve()
+    if not map_path.is_file():
+        print(f"skill-route: missing single source {map_path}", file=sys.stderr)
+        return 2
+    try:
+        matrix = json.loads(map_path.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        print(f"skill-route: unreadable single source: {exc}", file=sys.stderr)
+        return 2
+
+    skills = matrix.get("skills", {})
+    if args.loop:
+        target = matrix.get("routing", {}).get(args.loop)
+        if not isinstance(target, str) or target not in skills:
+            print(f"skill-route: unknown loop {args.loop!r}", file=sys.stderr)
+            return 1
+        print(target)
+        return 0
+
+    if not args.name:
+        print("skill-route: give a skill name or --loop", file=sys.stderr)
+        return 1
+    if args.name in skills:
+        print(args.name)
+        return 0
+    target = matrix.get("aliases", {}).get(args.name)
+    if isinstance(target, str) and target in skills:
+        print(target)
+        return 0
+    print(f"skill-route: unknown skill {args.name!r}", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

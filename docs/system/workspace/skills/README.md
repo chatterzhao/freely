@@ -39,11 +39,9 @@
 | M | `freely-watchdog-control-plane` | 外层监督与恢复控制面 |
 | M | `freely-continuity-watchdog` | 上下文连续性监督 |
 | M | `freely-ai-cli-availability-manager` | AI CLI 工具可用性管理 |
-| M | `freely-signal-intent-understanding` | signal 意图收敛 |
 | M | `freely-human-interruption-manager-triage` | 插话的主管级 routing |
 | M | `freely-human-interruption-handling` | 插话深度处理 |
 | M | `freely-human-interruption-direct-answer` | 插话直接回答(低价值) |
-| M | `freely-chat-issue-routing` | chat 消息路由到正确 issue |
 | M | `freely-recovery-subagent-governance` | 恢复耦合与子代理治理 |
 | M | `freely-module-interface-governance` | 模块接口版本治理 |
 | W | `freely-dev-loop-execution` | scan-selected / handoff-continued issue 的实现与测试 |
@@ -52,12 +50,14 @@
 | W | `freely-workflow-guarded-execution` | bug 快速修复流程 |
 | W | `freely-url-content-intake` | URL 内容抓取与结构化 |
 | W | `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |
-| W | `freely-tool-cc-codex-mcp-runtime` | Codex MCP 运行时安装配置 |
 | W | `freely-workspace-skill-governance` | skill 新增/拆分/重构/校准 |
-| W | `freely-mem9-continuity-bridge` | mem9 连续性后端接入 |
 
 执行顺序（默认）：
 1. `freely-constitution-guard`（预检门禁）
 2. `freely-laws-enforcer`（验收门禁）
 3. 领域工作流技能（`auto/doc/dev/branch/multi-worktree`）
 4. 异常技能（`freely-premerge-reconcile`）按需使用
+
+## 别名迁移（索引兼容期）
+
+部分 skill 已删并到保留入口，原目录不再存在。历史名字仍可作为别名由 `bin/skill-route` 解析到保留入口；别名表、合并分组与 supersedes 的唯一真源是同目录的 `skill-map.yaml`，由 `bin/check-skill-frontmatter` 守护悬空别名与未回填的 supersedes。保留入口的 SKILL.md 以「合并自」章节承接了原知识。

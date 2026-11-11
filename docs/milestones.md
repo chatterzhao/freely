@@ -1,3 +1,24 @@
+## M-20261111T083905Z-A
+- title: refactor — skill 删并的索引兼容期（第一阶段）
+- status: active
+### candidate_issues
+1. `C-20261111T083905Z-A`
+- milestone: M-20261111T083905Z-A
+- status: promoted
+- promoted_issue_id: I-20261111T083905Z-A
+- promoted_issue_path: docs/B2-docs/skills/skill-merge-compat/raw-20261111T083905Z/issues/I-20261111T083905Z-A.md
+### committed_issues
+1. `I-20261111T083905Z-A`
+- milestone: M-20261111T083905Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/skills/skill-merge-compat/raw-20261111T083905Z/issues/I-20261111T083905Z-A.md
+### completed_issues
+1. `I-20261111T083905Z-A`
+- milestone: M-20261111T083905Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T09:20:00Z
+- issue_path: docs/B2-docs/skills/skill-merge-compat/raw-20261111T083905Z/issues/I-20261111T083905Z-A.md
+
 ## M-20261104T075959Z-A
 - title: refactor — skill 重叠矩阵 + frontmatter 单一契约
 - status: active
