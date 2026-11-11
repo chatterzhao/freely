@@ -21,6 +21,7 @@ for arg in "$@"; do
 done
 
 CORE=(
+  test-bin-projection.py
   test-runtime-split.py
   test-cross-process-contract.py
   test-coordination-contract.py
@@ -46,6 +47,7 @@ CORE=(
   test-github-label-autocreate.py
 )
 CI_CORE=(
+  test-bin-projection.py
   test-runtime-split.py
   test-cross-process-contract.py
   test-coordination-contract.py

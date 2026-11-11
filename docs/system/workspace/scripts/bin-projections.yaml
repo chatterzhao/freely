@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "owner": "docs/system/workspace/scripts/bin-projections.yaml",
+  "note": "JSON-compatible YAML 1.2 subset. bin/ is a projection layer (#4175): any file over threshold_lines must be listed here with a reason, and the entry must be deleted as soon as the file becomes a projection. The lint enforces coverage and staleness, not the wording.",
+  "threshold_lines": 40,
+  "classes": [
+    "dispatcher",
+    "implementation-in-bin"
+  ],
+  "entries": [
+    {
+      "path": "bin/agent-table-query",
+      "lines": 336,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/batch-closeout-raw-issues",
+      "lines": 48,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/cache-baseline",
+      "lines": 125,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-bin-projection",
+      "lines": 93,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-coordination-contract",
+      "lines": 82,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-cross-process-contract",
+      "lines": 123,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-db-writers",
+      "lines": 102,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-epics-map",
+      "lines": 143,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-file-size",
+      "lines": 114,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-runtime-size",
+      "lines": 52,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-rust-toolchain",
+      "lines": 44,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-skill-frontmatter",
+      "lines": 117,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-state-file-keys",
+      "lines": 168,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-state-file-sources",
+      "lines": 74,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/check-tauri-probe-host",
+      "lines": 46,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/deploy-skills",
+      "lines": 216,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/evidence",
+      "lines": 48,
+      "class": "dispatcher",
+      "reason": "loads modules and resolves paths; holds no domain logic",
+      "followup": ""
+    },
+    {
+      "path": "bin/freely",
+      "lines": 43,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/freely-cycle",
+      "lines": 129,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/freely-package",
+      "lines": 270,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/freely-review",
+      "lines": 202,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/freely-watchdog",
+      "lines": 88,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/git-worktree-guard",
+      "lines": 111,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/issue-index",
+      "lines": 137,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/issue-migrate-intake",
+      "lines": 58,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/issue-sync",
+      "lines": 161,
+      "class": "dispatcher",
+      "reason": "loads modules and resolves paths; holds no domain logic",
+      "followup": ""
+    },
+    {
+      "path": "bin/issue-sync-batch.py",
+      "lines": 144,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/issue-sync-bootstrap",
+      "lines": 62,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/migrate-issue-phase-state",
+      "lines": 63,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/pre-init-runtime",
+      "lines": 71,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/raw-issue-backfill-h1",
+      "lines": 165,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/raw-issue-pull",
+      "lines": 145,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/skill-route",
+      "lines": 59,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/tauri-validate-probe-interactions",
+      "lines": 43,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/test-all",
+      "lines": 135,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/test-cache-hit",
+      "lines": 87,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    },
+    {
+      "path": "bin/test-gate",
+      "lines": 129,
+      "class": "dispatcher",
+      "reason": "loads modules and resolves paths; holds no domain logic",
+      "followup": ""
+    },
+    {
+      "path": "bin/test-pre-merge-selfhost",
+      "lines": 170,
+      "class": "implementation-in-bin",
+      "reason": "implementation still lives in bin/; judged case by case in the follow-up",
+      "followup": "raw-20261111T125724Z"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Lint: bin/ is a projection layer (#4175).
+
+`docs/system/workspace/scripts/README.md` says bin/ must not carry business
+logic — the real source belongs under `workspace/scripts/**`. Before this lint
+nothing enforced it, so `bin/pr-review-guarded` had grown to 806 lines with no
+counterpart in scripts/.
+
+The rule is deliberately narrow and machine-checkable:
+
+* a `bin/` file over `threshold_lines` must be listed in
+  `scripts/bin-projections.yaml` with a reason (coverage);
+* a listed file must still exist (no stale entries);
+* a listed file that is now a projection (≤ threshold) must be removed
+  (no permanent exemptions — this is what makes the debt shrink).
+
+Exit codes: 0 ok · 1 violation · 2 registry missing (fail-closed).
+
+    bin/check-bin-projection
+    bin/check-bin-projection --json
+    bin/check-bin-projection --project <root>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+REGISTRY = "docs/system/workspace/scripts/bin-projections.yaml"
+
+
+def line_count(path: Path) -> int:
+    return len(path.read_text(encoding="utf-8", errors="replace").splitlines())
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--project", default=str(ROOT))
+    ap.add_argument("--json", action="store_true")
+    args = ap.parse_args()
+    root = Path(args.project).resolve()
+
+    path = root / REGISTRY
+    if not path.is_file():
+        print(f"[bin-projection] missing registry: {REGISTRY}", file=sys.stderr)
+        return 2
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"[bin-projection] registry is not JSON: {exc}", file=sys.stderr)
+        return 1
+
+    threshold = int(doc.get("threshold_lines") or 40)
+    entries = {e.get("path"): e for e in (doc.get("entries") or []) if e.get("path")}
+    errors: list[str] = []
+
+    binfiles = {f"bin/{p.name}": p for p in (root / "bin").iterdir() if p.is_file()}
+
+    for rel, file in sorted(binfiles.items()):
+        size = line_count(file)
+        if size > threshold and rel not in entries:
+            errors.append(f"{rel}: {size} lines > {threshold} and not registered in {REGISTRY}")
+
+    for rel, entry in sorted(entries.items()):
+        file = root / rel
+        if not file.is_file():
+            errors.append(f"{rel}: registered but the file is gone (stale entry)")
+            continue
+        size = line_count(file)
+        if size <= threshold:
+            errors.append(f"{rel}: now {size} lines (<= {threshold}) — delete its registry entry")
+        if not str(entry.get("reason") or "").strip():
+            errors.append(f"{rel}: registry entry needs a reason")
+
+    total = len(binfiles)
+    registered = len(entries)
+    if args.json:
+        print(json.dumps({"ok": not errors, "errors": errors, "bin_files": total,
+                          "registered": registered, "threshold": threshold},
+                         ensure_ascii=False))
+    elif errors:
+        print("[bin-projection] violations:", file=sys.stderr)
+        for err in errors:
+            print(f"  - {err}", file=sys.stderr)
+    else:
+        print(f"ok ({total} bin entries, {registered} registered over {threshold} lines)")
+    return 0 if not errors else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
