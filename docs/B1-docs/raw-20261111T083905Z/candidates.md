@@ -16,7 +16,7 @@ milestone: M-20261111T083905Z-A
 - title: 引用普查 + alias 兼容层 + 3 组语义删并（37→33）+ supersedes 回填 + 路由/lint 守护
 - status: promoted
 - decision_reason: 四个候选 skill 无运行时引用且语义可归入三个保留入口；只删目录会丢知识，因此以「合并自」章节承接原文并保留 alias 解析，给历史引用一个可机检的兼容期。
-- next_action: AT-001（15 静态 + 2 行为）→ develop `faab26c14` 基线 RED `2 ok / 15 failed` → 实现 → GREEN `17 ok / 0 failed` → R28 AT 回归 21/0 + CI 16/0 → PR。
+- next_action: AT-001（16 静态 + 2 行为）→ develop `faab26c14` 基线 RED `2 ok / 16 failed` → 实现 → GREEN `18 ok / 0 failed` → R28 AT 回归 21/0 + CI 16/0 → PR。
 - revisit_trigger: 剩余 8 个删并（目标 ≤25）需重新做引用普查，不得照抄本轮名单；删并时同步 routing / aliases / supersedes / README / epics-map。
 - acceptance_criteria:
   - RED：无 aliases 段、无 `bin/skill-route`、4 个目录仍在、supersedes 全空、README 仍列全、lint 不校验 alias、AT 未进 CI、epics-map 无 story。

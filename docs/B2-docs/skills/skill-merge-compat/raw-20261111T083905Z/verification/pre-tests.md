@@ -12,13 +12,13 @@
 - promotion_gate: develop_merge
 - testing_layer: integration
 - target_environment: `git archive develop` 隔离基线 / 工位真源；lint 与 route 行为用临时 fixture 项目，不访问真实平台
-- required_evidence: 15 静态 + 2 行为 = 17 项全 GREEN；R28 AT 回归 21/0；`test-all --ci` 16/0
+- required_evidence: 16 静态 + 2 行为 = 18 项全 GREEN；R28 AT 回归 21/0；`test-all --ci` 16/0
 - evidence_level: integration
 - artifact_ref: docs/system/workspace/scripts/tests/test-skill-merge-compat.py
 - test_command: python3 docs/system/workspace/scripts/tests/test-skill-merge-compat.py
-- expected_output: SUMMARY: 17 ok, 0 failed
-- expected_RED_output: SUMMARY: 2 ok, 15 failed
-- actual_RED_output: develop `faab26c14` 基线 + 最终版 AT-001 → `2 ok, 15 failed`（AT-001-RED.log）：无 aliases 段、无 `bin/skill-route`、4 个目录仍在、supersedes 全空、README 仍列全、lint 不校验 alias、AT 未进 CI、epics-map 无 story。2 项 ok 是空集合/负向守卫（lint 接受合法 alias、可执行真源本就无 dangling 名），不是缺陷证据。
+- expected_output: SUMMARY: 18 ok, 0 failed
+- expected_RED_output: SUMMARY: 2 ok, 16 failed
+- actual_RED_output: develop `faab26c14` 基线 + 最终版 AT-001 → `2 ok, 16 failed`（AT-001-RED.log）：无 aliases 段、无 `bin/skill-route`、4 个目录仍在、supersedes 全空、README 仍列全、lint 不校验 alias、AT 未进 CI、epics-map 无 story。2 项 ok 是空集合/负向守卫（lint 接受合法 alias、可执行真源本就无 dangling 名），不是缺陷证据。
 - actual_output: 工位同一断言 → `17 ok, 0 failed`（AT-001-GREEN.log）；`bin/check-skill-frontmatter` → `ok (33 skills, 12 loops)`；R28 AT `21 ok / 0 failed`；`bin/test-all --ci` `16 ok / 0 failed`；`check-epics-map` 16 epics / 211 stories aligned。
 - evidence_file: docs/B2-docs/skills/skill-merge-compat/raw-20261111T083905Z/verification/test-evidence/AT-001-RED.log,docs/B2-docs/skills/skill-merge-compat/raw-20261111T083905Z/verification/test-evidence/AT-001-GREEN.log
 - red-green-status: green
@@ -34,9 +34,9 @@
 - acceptance_target: frontmatter supersedes 解析、alias 解析、枚举一致性
 - testing_layer: unit
 - target_environment: 工位真源 + 临时 fixture 项目
-- required_evidence: AT-001 静态 15 项 + `bin/skill-route` 5 次解析 + lint 两个 fixture 退出码
+- required_evidence: AT-001 静态 16 项 + `bin/skill-route` 5 次解析 + lint 两个 fixture 退出码
 - blocker_taxonomy: execution_pending_or_failed
-1. `python3 docs/system/workspace/scripts/tests/test-skill-merge-compat.py`（17/0）
+1. `python3 docs/system/workspace/scripts/tests/test-skill-merge-compat.py`（18/0）
 2. `python3 bin/check-skill-frontmatter`（33 skills / 12 loops，rc=0）
 3. 悬空 alias fixture → rc≠0；合法 alias fixture → rc=0
 

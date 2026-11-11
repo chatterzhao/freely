@@ -13,3 +13,7 @@
 README / skill-map / 历史 B1，无运行时、hooks、tests 引用；其余 skill 引用数
 ≥5 且包含 `AGENTS.md.example`、CONSTITUTION、LAWS、agents 配置或专门测试。
 删并名单由扫描结果决定，不是凭印象挑选。
+
+## 补记：references 语料一并承接
+
+提交前发现 `freely-tool-cc-codex-mcp-runtime/references/` 另有 4 份参考文档，只搬 SKILL.md 会丢知识；已以 `merged-*.md` 搬入保留入口 `freely-ai-cli-availability-manager/references/`，并新增 AT 断言守护（否则删并后无人发现）。

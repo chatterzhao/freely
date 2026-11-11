@@ -252,6 +252,25 @@ def main() -> int:
 
     check("B2 story registered in epics-map.svg", c17)
 
+    def c18():
+        # A retired skill had its own references/ corpus. Deleting the directory
+        # without carrying those docs would silently lose knowledge.
+        expected = {
+            "freely-ai-cli-availability-manager": [
+                "mcp-install.md", "provider-setup.md",
+                "runtime-policy.md", "verification-checklist.md",
+            ],
+        }
+        bad = []
+        for target, names in expected.items():
+            d = sd / target / "references"
+            for n in names:
+                if not (d / f"merged-{n}").is_file() and not (d / n).is_file():
+                    bad.append(f"{target}/references/merged-{n}")
+        return not bad, f"lost merged reference docs: {bad}"
+
+    check("retired reference docs carried into surviving entrypoints", c18)
+
     print(f"SUMMARY: {len(OK)} ok, {len(FAIL)} failed")
     return 1 if FAIL else 0
 

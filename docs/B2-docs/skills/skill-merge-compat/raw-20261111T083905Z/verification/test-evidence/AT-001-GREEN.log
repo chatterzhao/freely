@@ -17,4 +17,5 @@
   [ok] no dangling references in executable truth
   [ok] AT wired into test-all CORE and CI_CORE
   [ok] B2 story registered in epics-map.svg
-SUMMARY: 17 ok, 0 failed
+  [ok] retired reference docs carried into surviving entrypoints
+SUMMARY: 18 ok, 0 failed

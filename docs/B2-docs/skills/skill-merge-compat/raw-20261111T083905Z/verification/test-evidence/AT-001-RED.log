@@ -9,12 +9,13 @@
 === BEHAVIOR: alias resolution, supersedes, lint ===
   [FAIL] every alias resolves to its surviving entrypoint — alias resolution failures: ['freely-signal-intent-understanding: rc=2 out=', 'freely-chat-issue-routing: rc=2 out=']
   [FAIL] route resolver answers a loop query — rc=2 out=
-  [FAIL] surviving entrypoints declare supersedes — supersedes not backfilled: ["freely-continuity-watchdog: supersedes=[] want>=['freely-mem9-continuity-bridge']", "freely-human-interruption-manager-triage: supersedes=[] want>=['freely-chat-issue-routing', 'freely-signal-intent-understanding']"]
-  [FAIL] retired knowledge merged as chapters, not dropped — knowledge lost: ['freely-continuity-watchdog: no merged chapter', 'freely-human-interruption-manager-triage: no merged chapter']
-  [FAIL] skill index no longer lists retired skills — README still lists ['freely-mem9-continuity-bridge', 'freely-signal-intent-understanding', 'freely-tool-cc-codex-mcp-runtime', 'freely-chat-issue-routing'] or has no alias note
+  [FAIL] surviving entrypoints declare supersedes — supersedes not backfilled: ["freely-human-interruption-manager-triage: supersedes=[] want>=['freely-chat-issue-routing', 'freely-signal-intent-understanding']", "freely-ai-cli-availability-manager: supersedes=[] want>=['freely-tool-cc-codex-mcp-runtime']"]
+  [FAIL] retired knowledge merged as chapters, not dropped — knowledge lost: ['freely-human-interruption-manager-triage: no merged chapter', 'freely-ai-cli-availability-manager: no merged chapter']
+  [FAIL] skill index no longer lists retired skills — README still lists ['freely-signal-intent-understanding', 'freely-tool-cc-codex-mcp-runtime', 'freely-chat-issue-routing', 'freely-mem9-continuity-bridge'] or has no alias note
   [FAIL] lint refuses a dangling alias — lint returned 0 for a dangling alias
   [ok] lint accepts a valid alias
   [ok] no dangling references in executable truth
   [FAIL] AT wired into test-all CORE and CI_CORE — AT not in both suites
   [FAIL] B2 story registered in epics-map.svg — story not registered
-SUMMARY: 2 ok, 15 failed
+  [FAIL] retired reference docs carried into surviving entrypoints — lost merged reference docs: ['freely-ai-cli-availability-manager/references/merged-mcp-install.md', 'freely-ai-cli-availability-manager/references/merged-provider-setup.md', 'freely-ai-cli-availability-manager/references/merged-runtime-policy.md', 'freely-ai-cli-availability-manager/references/merged-verification-checklist.md']
+SUMMARY: 2 ok, 16 failed
