@@ -6,6 +6,9 @@ description: >-
 
   Use when: 需要整体理解或修改 watchdog 架构，排查自主运行异常。
   触发词："watchdog"、"监督"、"恢复"、"avail"、"runtime died"。
+loop: runtime
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-watchdog-control-plane

@@ -6,6 +6,9 @@ description: >-
 
   Use when: 首次配置或切换 AI 工具，需要注册 MCP server。
   触发词："配置工具"、"MCP"、"codex"、"切换 AI"、"安装 provider"。
+loop: toolchain
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-tool-cc-codex-mcp-runtime

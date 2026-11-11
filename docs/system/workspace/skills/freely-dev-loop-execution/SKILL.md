@@ -8,6 +8,9 @@ description: >-
   Use when: `freely-test-RED-execution` skill 确认全部 RED 之后，
   需要写实现代码。触发词："写代码"、"dev"、"实现"、"开发"、
   "开始写"、"coding"。
+loop: dev
+owner: worker
+supersedes: []
 ---
 
 # skill:freely-dev-loop-execution

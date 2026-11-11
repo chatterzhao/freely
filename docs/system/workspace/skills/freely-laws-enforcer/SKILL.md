@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI 需要将抽象约束转换为具体操作检查。
   触发词："laws check"、"法律检查"、"验收标准"、"操作检查"。
+loop: governance
+owner: governance
+supersedes: []
 ---
 
 # skill:freely-laws-enforcer

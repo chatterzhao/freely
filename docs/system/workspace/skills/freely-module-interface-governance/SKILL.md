@@ -6,6 +6,9 @@ description: >-
 
   Use when: 引入模块替换、版本化接口或模块间迁移。
   触发词："模块治理"、"接口版本"、"migration path"、"替换模块"。
+loop: governance
+owner: governance
+supersedes: []
 ---
 
 # skill:freely-module-interface-governance

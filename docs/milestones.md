@@ -1,3 +1,24 @@
+## M-20261104T075959Z-A
+- title: refactor — skill 重叠矩阵 + frontmatter 单一契约
+- status: active
+### candidate_issues
+1. `C-20261104T075959Z-A`
+- milestone: M-20261104T075959Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T075959Z-A
+- promoted_issue_path: docs/B2-docs/skills/skill-overlap-matrix/raw-20261104T075959Z/issues/I-20261104T075959Z-A.md
+### committed_issues
+1. `I-20261104T075959Z-A`
+- milestone: M-20261104T075959Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/skills/skill-overlap-matrix/raw-20261104T075959Z/issues/I-20261104T075959Z-A.md
+### completed_issues
+1. `I-20261104T075959Z-A`
+- milestone: M-20261104T075959Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T08:35:00Z
+- issue_path: docs/B2-docs/skills/skill-overlap-matrix/raw-20261104T075959Z/issues/I-20261104T075959Z-A.md
+
 ## M-20261104T080007Z-A
 - title: feat — 核心 runtime 函数级 RED→GREEN 证据链
 - status: active

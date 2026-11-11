@@ -6,6 +6,9 @@ description: >-
 
   Use when: Rust/Tauri 项目缺少工具链或默认 rustup 下载失败。
   触发词："rustup"、"cargo"、"toolchain"、"tauri build"、"rsproxy"。
+loop: toolchain
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-rust-tauri-toolchain-bootstrap

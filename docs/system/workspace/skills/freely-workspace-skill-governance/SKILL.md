@@ -6,6 +6,9 @@ description: >-
 
   Use when: 任务涉及修改 `docs/system/workspace/skills/**` 下的 skill。
   触发词："skill governance"、"修改 skill"、"新增 skill"、"重构 skill"。
+loop: governance
+owner: governance
+supersedes: []
 ---
 
 # skill:freely-workspace-skill-governance

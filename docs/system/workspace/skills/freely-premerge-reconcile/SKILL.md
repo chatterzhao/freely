@@ -6,6 +6,9 @@ description: >-
 
   Use when: test-pre-merge-* 合并失败或出现语义回归风险。
   触发词："合并冲突"、"premerge"、"语义回归"、"reconcile"。
+loop: green
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-premerge-reconcile

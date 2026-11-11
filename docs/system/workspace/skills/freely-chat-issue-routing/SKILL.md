@@ -6,6 +6,9 @@ description: >-
 
   Use when: `freely chat` 收到新消息需要路由判定。
   触发词："chat routing"、"路由消息"、"issue routing"、"这条消息归哪个 issue"。
+loop: intake
+owner: manager
+supersedes: []
 ---
 
 # freely-chat-issue-routing

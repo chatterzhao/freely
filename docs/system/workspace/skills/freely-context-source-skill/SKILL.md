@@ -6,6 +6,9 @@ description: >-
 
   Use when: manager 或 worker 需要判定输入来源和可执行性，决定下一跳。
   触发词："context source"、"来源判定"、"可执行性"、"输入分层"。
+loop: b1
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-context-source-skill

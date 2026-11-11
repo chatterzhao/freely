@@ -6,6 +6,9 @@ description: >-
 
   Use when: candidate 准备 promotion、影响边界大、或 milestone 关键节点。
   触发词："acceptance review"、"候选评审"、"promotion review"、"candidate 审查"。
+loop: b1
+owner: reviewer
+supersedes: []
 ---
 
 # skill:freely-candidate-acceptance-review

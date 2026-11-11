@@ -6,6 +6,9 @@ description: >-
 
   Use when: 配置或排查 mem9 连续性后端，或本地与远端状态不一致。
   触发词："mem9"、"continuity backend"、"连续性后端"、"state sync"。
+loop: runtime
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-mem9-continuity-bridge

@@ -1,0 +1,561 @@
+{
+  "schema_version": 1,
+  "owner": "docs/system/workspace/skills/skill-map.yaml",
+  "note": "JSON-compatible YAML 1.2 subset so stdlib json.loads can read it on installed machines.",
+  "enums": {
+    "loops": [
+      "intake",
+      "b1",
+      "b2",
+      "red",
+      "dev",
+      "green",
+      "review",
+      "merge",
+      "closeout",
+      "runtime",
+      "governance",
+      "toolchain"
+    ],
+    "owners": [
+      "workflow",
+      "manager",
+      "runtime",
+      "worker",
+      "reviewer",
+      "governance"
+    ]
+  },
+  "skills": {
+    "freely-agent-execution-safety-review": {
+      "loop": "review",
+      "owner": "reviewer",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "agent-execution-safety-review"
+      ]
+    },
+    "freely-ai-cli-availability-manager": {
+      "loop": "toolchain",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "ai-cli-availability-manager"
+      ]
+    },
+    "freely-auto-loop-orchestrator": {
+      "loop": "runtime",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "auto-loop-orchestrator"
+      ]
+    },
+    "freely-branch-management": {
+      "loop": "merge",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "branch-management"
+      ]
+    },
+    "freely-candidate-acceptance-review": {
+      "loop": "b1",
+      "owner": "reviewer",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "candidate-acceptance-review"
+      ]
+    },
+    "freely-chat-issue-routing": {
+      "loop": "intake",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "chat-issue-routing"
+      ]
+    },
+    "freely-config-backup-guard": {
+      "loop": "governance",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "config-backup-guard"
+      ]
+    },
+    "freely-constitution-guard": {
+      "loop": "governance",
+      "owner": "governance",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "constitution-guard"
+      ]
+    },
+    "freely-context-source-skill": {
+      "loop": "b1",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "context-source-skill"
+      ]
+    },
+    "freely-continuity-watchdog": {
+      "loop": "runtime",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "continuity-watchdog"
+      ]
+    },
+    "freely-dev-loop-execution": {
+      "loop": "dev",
+      "owner": "worker",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "dev-loop-execution"
+      ]
+    },
+    "freely-discuss-archive-execution": {
+      "loop": "intake",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "discuss-archive-execution"
+      ]
+    },
+    "freely-discuss-execution": {
+      "loop": "intake",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "discuss-execution"
+      ]
+    },
+    "freely-doc-B1_IBM-execution": {
+      "loop": "b1",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "doc-B1_IBM-execution"
+      ]
+    },
+    "freely-doc-B2_IBM-execution": {
+      "loop": "b2",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "doc-B2_IBM-execution"
+      ]
+    },
+    "freely-human-interruption-direct-answer": {
+      "loop": "intake",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "human-interruption-direct-answer"
+      ]
+    },
+    "freely-human-interruption-handling": {
+      "loop": "intake",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "human-interruption-handling"
+      ]
+    },
+    "freely-human-interruption-manager-triage": {
+      "loop": "intake",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "human-interruption-manager-triage"
+      ]
+    },
+    "freely-laws-enforcer": {
+      "loop": "governance",
+      "owner": "governance",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "laws-enforcer"
+      ]
+    },
+    "freely-mem9-continuity-bridge": {
+      "loop": "runtime",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "mem9-continuity-bridge"
+      ]
+    },
+    "freely-milestone-planning-state-maintenance": {
+      "loop": "b1",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "milestone-planning-state-maintenance"
+      ]
+    },
+    "freely-module-interface-governance": {
+      "loop": "governance",
+      "owner": "governance",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "module-interface-governance"
+      ]
+    },
+    "freely-multi-worktree-supervision": {
+      "loop": "governance",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "multi-worktree-supervision"
+      ]
+    },
+    "freely-premerge-reconcile": {
+      "loop": "green",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "premerge-reconcile"
+      ]
+    },
+    "freely-recovery-subagent-governance": {
+      "loop": "runtime",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "recovery-subagent-governance"
+      ]
+    },
+    "freely-rust-tauri-toolchain-bootstrap": {
+      "loop": "toolchain",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "rust-tauri-toolchain-bootstrap"
+      ]
+    },
+    "freely-signal-intent-understanding": {
+      "loop": "intake",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "signal-intent-understanding"
+      ]
+    },
+    "freely-tdd-review": {
+      "loop": "review",
+      "owner": "reviewer",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "tdd-review"
+      ]
+    },
+    "freely-test-RED-execution": {
+      "loop": "red",
+      "owner": "worker",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "test-RED-execution"
+      ]
+    },
+    "freely-test-execution": {
+      "loop": "green",
+      "owner": "worker",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "test-execution"
+      ]
+    },
+    "freely-tool-cc-codex-mcp-runtime": {
+      "loop": "toolchain",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "tool-cc-codex-mcp-runtime"
+      ]
+    },
+    "freely-url-content-intake": {
+      "loop": "intake",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "url-content-intake"
+      ]
+    },
+    "freely-watchdog-control-plane": {
+      "loop": "runtime",
+      "owner": "runtime",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "watchdog-control-plane"
+      ]
+    },
+    "freely-workflow-guarded-execution": {
+      "loop": "governance",
+      "owner": "workflow",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "workflow-guarded-execution"
+      ]
+    },
+    "freely-workspace-skill-governance": {
+      "loop": "governance",
+      "owner": "governance",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "workspace-skill-governance"
+      ]
+    },
+    "freely-worktree-hygiene-supervision": {
+      "loop": "governance",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "worktree-hygiene-supervision"
+      ]
+    },
+    "freely-worktree-maintenance-governance": {
+      "loop": "closeout",
+      "owner": "manager",
+      "inputs": [
+        "raw-or-signal"
+      ],
+      "outputs": [
+        "decision-or-artifact"
+      ],
+      "triggers": [
+        "worktree-maintenance-governance"
+      ]
+    }
+  },
+  "overlap_groups": [
+    {
+      "id": "human-interruption",
+      "members": [
+        "freely-human-interruption-direct-answer",
+        "freely-human-interruption-handling",
+        "freely-human-interruption-manager-triage"
+      ],
+      "decision": "keep_separate",
+      "entrypoint": "freely-human-interruption-manager-triage",
+      "reason": "triage 做首次 reaction 路由、handling 做 manager 深度解释、direct-answer 由 runtime dispatcher 直接 claim；三者是同一 intake 链路的不同 owner，合并会让 dispatcher 无法按 reaction 选择 claim 路径。"
+    },
+    {
+      "id": "worktree-governance",
+      "members": [
+        "freely-worktree-hygiene-supervision",
+        "freely-worktree-maintenance-governance",
+        "freely-multi-worktree-supervision"
+      ],
+      "decision": "keep_separate",
+      "entrypoint": "freely-multi-worktree-supervision",
+      "reason": "hygiene 判脏树阈值、maintenance 判 merge 顺序与退役、multi-worktree 判 fleet 批次；触发条件不同，本轮用矩阵登记唯一入口而非删文件，删并需索引兼容期（另立 raw）。"
+    },
+    {
+      "id": "execution-flow",
+      "members": [
+        "freely-dev-loop-execution",
+        "freely-test-execution",
+        "freely-test-RED-execution"
+      ],
+      "decision": "keep_separate",
+      "entrypoint": "freely-workflow-guarded-execution",
+      "reason": "RED / dev / GREEN 是 freely-workflow-guarded-execution 明确区分的三个阶段，每个 SKILL.md 头部都有全链路定位；合并即破坏 TDD 顺序，不是重叠。"
+    }
+  ],
+  "routing": {
+    "intake": "freely-human-interruption-manager-triage",
+    "b1": "freely-doc-B1_IBM-execution",
+    "b2": "freely-doc-B2_IBM-execution",
+    "red": "freely-test-RED-execution",
+    "dev": "freely-dev-loop-execution",
+    "green": "freely-test-execution",
+    "review": "freely-tdd-review",
+    "merge": "freely-branch-management",
+    "closeout": "freely-worktree-maintenance-governance",
+    "runtime": "freely-watchdog-control-plane",
+    "governance": "freely-workflow-guarded-execution",
+    "toolchain": "freely-rust-tauri-toolchain-bootstrap"
+  }
+}

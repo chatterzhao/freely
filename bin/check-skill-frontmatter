@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""check-skill-frontmatter — fail-closed guard for the workspace skill corpus.
+
+Single source: docs/system/workspace/skills/skill-map.yaml (JSON-compatible
+YAML 1.2 subset, stdlib json.loads). Exit codes: 0 ok, 1 contract violation,
+2 missing/broken single source (fail closed).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_SKILLS = ROOT / "docs/system/workspace/skills"
+DEFAULT_MAP = DEFAULT_SKILLS / "skill-map.yaml"
+PHRASE = "从 gate 源码提取"
+
+
+def frontmatter(path: Path) -> dict[str, str]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        return {}
+    out: dict[str, str] = {}
+    for line in lines[1:end]:
+        m = re.match(r"^([a-z_]+):\s*(.*)$", line)
+        if m:
+            out[m.group(1)] = m.group(2).strip()
+    return out
+
+
+def run(skills_dir: Path, map_path: Path) -> int:
+    if not map_path.is_file():
+        print(f"skill-frontmatter: FAIL missing single source {map_path}", flush=True)
+        return 2
+    try:
+        matrix = json.loads(map_path.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        print(f"skill-frontmatter: FAIL unreadable single source: {exc}", flush=True)
+        return 2
+
+    loops = set(matrix.get("enums", {}).get("loops", []))
+    owners = set(matrix.get("enums", {}).get("owners", []))
+    entries = matrix.get("skills", {})
+    errors: list[str] = []
+    files = sorted(skills_dir.glob("*/SKILL.md"))
+    if not files:
+        errors.append(f"no SKILL.md found under {skills_dir}")
+
+    for path in files:
+        name = path.parent.name
+        fm = frontmatter(path)
+        for key, allowed in (("loop", loops), ("owner", owners)):
+            value = fm.get(key)
+            if not value:
+                errors.append(f"{name}: missing frontmatter {key}")
+            elif allowed and value not in allowed:
+                errors.append(f"{name}: {key}='{value}' not in matrix enum")
+        if "supersedes" not in fm:
+            errors.append(f"{name}: missing frontmatter supersedes")
+        entry = entries.get(name)
+        if entry is None:
+            errors.append(f"{name}: absent from skill-map.yaml")
+        else:
+            for key in ("loop", "owner"):
+                if fm.get(key) != entry.get(key):
+                    errors.append(f"{name}: {key} drift frontmatter={fm.get(key)!r} matrix={entry.get(key)!r}")
+            for key in ("inputs", "outputs", "triggers"):
+                if key not in entry:
+                    errors.append(f"{name}: matrix entry missing {key}")
+        if PHRASE in path.read_text(encoding="utf-8", errors="replace"):
+            errors.append(f"{name}: duplicated gate-enum wording; cite the real source instead")
+
+    orphan = sorted(set(entries) - {p.parent.name for p in files})
+    if orphan:
+        errors.append(f"skill-map.yaml orphans: {', '.join(orphan)}")
+    for group in matrix.get("overlap_groups", []):
+        if group.get("entrypoint") not in entries:
+            errors.append(f"overlap group {group.get('id')!r} has an unknown entrypoint")
+        if group.get("decision") not in ("keep_separate", "merge"):
+            errors.append(f"overlap group {group.get('id')!r} has an illegal decision")
+
+    if errors:
+        for err in errors:
+            print(f"skill-frontmatter: FAIL {err}", flush=True)
+        print(f"skill-frontmatter: {len(errors)} violation(s)", flush=True)
+        return 1
+    print(f"skill-frontmatter: ok ({len(files)} skills, {len(loops)} loops)", flush=True)
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--skills-dir", default=str(DEFAULT_SKILLS))
+    ap.add_argument("--map", default=str(DEFAULT_MAP))
+    args = ap.parse_args()
+    return run(Path(args.skills_dir).resolve(), Path(args.map).resolve())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

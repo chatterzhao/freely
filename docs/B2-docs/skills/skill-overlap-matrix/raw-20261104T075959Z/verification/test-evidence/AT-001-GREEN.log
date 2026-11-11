@@ -1,0 +1,24 @@
+=== STATIC: matrix / frontmatter single source ===
+  [ok] skill-map.yaml exists as the single source
+  [ok] frontmatter lint exists
+  [ok] skill-map.yaml is stdlib-parseable JSON/YAML subset
+  [ok] matrix covers every SKILL.md
+  [ok] matrix entries carry loop/owner/inputs/outputs/triggers
+  [ok] three overlap groups are recorded with a decision
+  [ok] each overlap group has a legal decision, entrypoint and reason
+  [ok] routing gives exactly one entrypoint per loop
+  [ok] every SKILL.md frontmatter declares loop
+  [ok] every SKILL.md frontmatter declares owner
+  [ok] every SKILL.md frontmatter declares supersedes
+  [ok] frontmatter loop matches the matrix
+  [ok] frontmatter owner matches the matrix
+  [ok] loop values come from the matrix enum
+  [ok] owner values come from the matrix enum
+  [ok] matrix has no orphan entries
+  [ok] no duplicated gate-enum wording remains in capability docs
+  [ok] AT is wired into test-all CORE and CI_CORE
+  [ok] B2 story registered in epics-map.svg
+=== BEHAVIOR: lint fails closed on a missing contract ===
+  [ok] lint refuses a skill without loop/owner
+  [ok] lint accepts a compliant fixture
+SUMMARY: 21 ok, 0 failed

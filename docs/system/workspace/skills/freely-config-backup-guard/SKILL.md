@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI 修改任何配置文件（config.toml、settings.json 等）。
   触发词："改配置"、"备份配置"、"config backup"、"修改 settings"。
+loop: governance
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-config-backup-guard

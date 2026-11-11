@@ -6,6 +6,9 @@ description: >-
 
   Use when: 需要创建、切换、合并或删除 fix/feature 分支，或处理分支依赖。
   触发词："分支管理"、"创建分支"、"merge branch"、"派生 worktree"。
+loop: merge
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-branch-management

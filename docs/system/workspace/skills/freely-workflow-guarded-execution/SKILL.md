@@ -12,6 +12,9 @@ description: >-
   "开工位", "开发流程", "怎么开始", "反馈", "提 PR" without specifying
   which skill to use. Also use when the user describes a task without
   a clear workflow — this skill provides the canonical process.
+loop: governance
+owner: workflow
+supersedes: []
 ---
 
 # ═══════════════════════════════════════════════════════════════
