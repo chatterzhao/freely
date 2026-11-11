@@ -26,6 +26,8 @@ CORE=(
   test-obs-ops-backlog.py
   test-platform-sync-entrypoint.py
   test-issue-sync-modules.py
+  test-runtime-tdd-evidence.py
+  test-runtime-unit
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
@@ -44,6 +46,8 @@ CI_CORE=(
   test-obs-ops-backlog.py
   test-platform-sync-entrypoint.py
   test-issue-sync-modules.py
+  test-runtime-tdd-evidence.py
+  test-runtime-unit
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py

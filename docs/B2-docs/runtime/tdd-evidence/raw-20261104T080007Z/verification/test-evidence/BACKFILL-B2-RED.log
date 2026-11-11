@@ -1,0 +1,4 @@
+=== t-exit-04-prune-logs-by-count.sh
+  [FATAL] required function missing from runtime: _prune_logs_by_count
+=== unit: 1 file(s), 0 ok, 0 failed
+failing: t-exit-04-prune-logs-by-count.sh

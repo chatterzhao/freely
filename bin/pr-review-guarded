@@ -271,6 +271,37 @@ mkdir -p "$REVIEW_STATE_DIR"
 echo "Review document: $review_file"
 echo ""
 
+# ── Step 2.5: core-runtime RED evidence gate (#4165) ──
+# A change to the core runtime must ship a function-level failing test first.
+# SKIP (exit 2) means the diff does not touch the runtime, so review continues
+# unchanged; any other non-zero exit is `needs_changes`, not a warning.
+_runtime_gate_py="$ROOT_DIR/docs/system/workspace/scripts/quality/runtime_red_gate.py"
+if [[ -f "$_runtime_gate_py" ]] && [[ -n "${_raw_key:-}" ]]; then
+  set +e
+  python3 "$_runtime_gate_py" --project "$_wt_path" --raw-key "$_raw_key"
+  _runtime_gate_rc=$?
+  set -e
+  case "$_runtime_gate_rc" in
+    0)
+      echo "Step 2.5/5: core-runtime RED evidence ✓"
+      ;;
+    2)
+      echo "Step 2.5/5: core-runtime RED evidence skipped (no runtime change)"
+      ;;
+    *)
+      cat >&2 <<'RUNTIME_RED_GATE_FAILED'
+[pr-review-guarded] needs_changes: core-runtime change without RED→GREEN evidence.
+  Required:
+    1. at least one file under docs/system/workspace/scripts/tests/unit/
+    2. the owner pre-tests acceptance item must carry
+       red-green-status: green + actual_RED_output + an existing evidence_file
+  Fix (skill:freely-test-RED-execution), commit, then re-run pr-review-guarded.
+RUNTIME_RED_GATE_FAILED
+      exit 1
+      ;;
+  esac
+fi
+
 # ── Step 3: ACP availability check ──
 # Check BEFORE calling any ACP-dependent tool (freely-review or raw ACP client).
 _acp_available=0

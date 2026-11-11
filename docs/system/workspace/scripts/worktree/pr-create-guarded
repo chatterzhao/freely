@@ -428,6 +428,29 @@ echo "Step 3/4: pushing + PR on all platforms..."
 if [[ -z "${title:-}" ]]; then
   title="$(echo "$current_branch" | sed 's/.*raw-[0-9]*T[0-9]*Z-//; s/-/ /g')"
 fi
+
+# #4165: every PR body carries a `## RED 证据` section. When the diff touches
+# the core runtime the section is filled from the owner pre-tests, and the
+# composer fails closed (exit 3) if no failing-test record exists — so the PR
+# can never be opened without the RED half of the TDD chain.
+_pr_raw_key="$(printf '%s' "$current_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)"
+_pr_body_py="$ROOT_DIR/docs/system/workspace/scripts/worktree/pr_body.py"
+if [[ -n "$_pr_raw_key" && -f "$_pr_body_py" ]]; then
+  _pr_composed=""
+  _pr_compose_rc=0
+  _pr_composed="$(python3 "$_pr_body_py" render --project "$ROOT_DIR" \
+    --raw-key "$_pr_raw_key" --base-body "${body:-}" 2>&1)" || _pr_compose_rc=$?
+  if [[ "$_pr_compose_rc" -ne 0 ]]; then
+    printf '%s\n' "$_pr_composed" >&2
+    cat >&2 <<'RED_EVIDENCE_MISSING'
+[pr-create] refusing to open the PR: a core-runtime change needs RED evidence.
+  Record the failing test in the owner pre-tests (skill:freely-test-RED-execution),
+  commit the evidence log, then re-run freely pr-create-guarded.
+RED_EVIDENCE_MISSING
+    exit 1
+  fi
+  body="$_pr_composed"
+fi
 if [[ -z "${body:-}" ]]; then
   body="See commits for details."
 fi
