@@ -6,6 +6,9 @@ description: >-
 
   Use when: 收到 human interruption signal 需要做首次路由判定。
   触发词："interruption triage"、"插话路由"、"signal routing"。
+loop: intake
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-human-interruption-manager-triage

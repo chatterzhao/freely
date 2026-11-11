@@ -6,6 +6,9 @@ description: >-
 
   Use when: 同时管理 2 个以上 worktree，需要做优先级排序和批次规划。
   触发词："多工位"、"fleet"、"checkpoint"、"集成批次"、"supervision"。
+loop: governance
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-multi-worktree-supervision

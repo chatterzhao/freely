@@ -7,6 +7,9 @@ description: >-
   Use when: 主管面对 interruption、review、test、runtime anomaly 或
   standing-source derived signal 需要先理解意图再路由。
   触发词："signal intent"、"意图理解"、"triage"、"这条消息想干什么"。
+loop: intake
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-signal-intent-understanding

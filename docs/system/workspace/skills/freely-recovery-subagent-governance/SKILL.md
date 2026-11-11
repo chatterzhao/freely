@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI 恢复中断工作、委托子任务、或需要保持上下文所有权。
   触发词："恢复"、"recovery"、"subagent"、"委托"、"上下文所有权"。
+loop: runtime
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-recovery-subagent-governance

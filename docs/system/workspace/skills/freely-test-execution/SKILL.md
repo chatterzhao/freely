@@ -9,6 +9,9 @@ description: >-
   Use when: `freely-dev-loop-execution` skill 实现完成之后，提 PR 之前。
   触发词："GREEN"、"跑测试"、"验证"、"test"、"测试工位"、"全部通过"、
   "merge 同步"、 "cherry-pick 测试"。
+loop: green
+owner: worker
+supersedes: []
 ---
 
 # skill:freely-test-execution

@@ -8,6 +8,9 @@ description: >-
   Use when: `freely-doc-B2_IBM-execution` skill 完成之后，写代码之前。
   触发词："RED"、"测试先行"、"先跑测试"、"确认失败"、"复现 bug"、
   "TDD"、"red phase"。
+loop: red
+owner: worker
+supersedes: []
 ---
 
 # skill:freely-test-RED-execution

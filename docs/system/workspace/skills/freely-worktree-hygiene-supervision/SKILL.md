@@ -6,6 +6,9 @@ description: >-
 
   Use when: worktree 状态异常需要卫生检查和处理。
   触发词："hygiene"、"卫生检查"、"dirty"、"checkpoint"、"提交边界"。
+loop: governance
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-worktree-hygiene-supervision

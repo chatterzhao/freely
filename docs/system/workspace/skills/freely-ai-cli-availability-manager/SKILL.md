@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI CLI 工具报认证错误、限流、账号不可用，或需要切换账号。
   触发词："切号"、"限流"、"auth error"、"rate limit"、"认证失败"。
+loop: toolchain
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-ai-cli-availability-manager

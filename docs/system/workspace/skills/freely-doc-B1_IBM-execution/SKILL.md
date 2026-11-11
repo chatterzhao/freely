@@ -11,6 +11,9 @@ description: >-
   Use when: `freely wt-create` 命令建好工位之后，需要对 raw issue
   做根因分析、方案评估、scope 判定的预研阶段。触发词："B1"、"预研"、
   "brainstorm"、"candidate"、"分析这个 issue"、"评估方案"。
+loop: b1
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-doc-B1_IBM-execution

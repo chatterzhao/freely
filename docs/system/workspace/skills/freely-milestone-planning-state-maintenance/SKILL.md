@@ -11,6 +11,9 @@ description: >-
 
   Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
   触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
+loop: b1
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-milestone-planning-state-maintenance

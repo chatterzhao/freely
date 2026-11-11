@@ -7,6 +7,9 @@ description: >-
   Use when: 主管需要做 worktree 级别的维护决策和审计。
   触发词："worktree maintenance"、"工位维护"、"fleet audit"、
   "merge order"、"retire"、"salvage"。
+loop: closeout
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-worktree-maintenance-governance

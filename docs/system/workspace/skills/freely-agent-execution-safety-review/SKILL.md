@@ -5,6 +5,9 @@ description: >-
 
   Use when: 安全敏感变更需要 execution-boundary 独立审查。
   触发词："安全审查"、"execution review"、"boundary check"、"execution boundary"。
+loop: review
+owner: reviewer
+supersedes: []
 ---
 
 # skill:freely-agent-execution-safety-review

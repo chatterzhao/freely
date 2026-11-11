@@ -13,6 +13,9 @@ description: >-
   Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
   之后。触发词："B2"、"物化 issue"、"设计"、"pre-tests"、"写测试方案"、
   "PRD"、"分解任务"、"I-* 文档"。
+loop: b2
+owner: workflow
+supersedes: []
 ---
 
 # skill `freely-doc-B2_IBM-execution`
@@ -390,7 +393,9 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 | `## End-to-End` | 同上 | 同上 |
 | `## Real-Environment` | real_environment_status, real_environment_reason | real_environment_status 只能是 `pass` 或 `fail` |
 
-### 枚举值合法范围（从 gate 源码提取）
+### 枚举值合法范围（索引；真源 `docs/system/workspace/scripts/quality/pretests-gate`）
+
+下表只是便于阅读的索引，合法值以 `pretests-gate` 为准；新增枚举时只改真源，不要在 SKILL.md 里重复定义命令表或枚举。
 
 | 字段 | 合法值 |
 |------|--------|

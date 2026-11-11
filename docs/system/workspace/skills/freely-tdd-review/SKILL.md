@@ -9,6 +9,9 @@ description: >-
   Use when: PR review 阶段，或 B1/B2/dev 任一阶段完成后需要独立验证
   消化质量。触发词："review"、"审查"、"消化"、"fidelity"、"评审"、
   "检查质量"、"逐级审查"。
+loop: review
+owner: reviewer
+supersedes: []
 ---
 
 # skill:freely-tdd-review

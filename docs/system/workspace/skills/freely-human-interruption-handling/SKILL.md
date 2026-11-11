@@ -6,6 +6,9 @@ description: >-
 
   Use when: `freely-human-interruption-manager-triage` skill 委派后。
   触发词："interruption handling"、"处理插话"、"深度解释"。
+loop: intake
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-human-interruption-handling

@@ -6,6 +6,9 @@ description: >-
 
   Use when: 上下文超限预警、需要 rotate 或 fresh start、handoff 传递。
   触发词："上下文超了"、"context rotate"、"handoff"、"fresh start"。
+loop: runtime
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-continuity-watchdog

@@ -6,6 +6,9 @@ description: >-
 
   Use when: 用户提供 URL 需要抓取内容。
   触发词："抓取"、"fetch URL"、"读取链接"、"这个网址"。
+loop: intake
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-url-content-intake

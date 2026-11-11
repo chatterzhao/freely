@@ -1,0 +1,24 @@
+=== STATIC: matrix / frontmatter single source ===
+  [FAIL] skill-map.yaml exists as the single source — missing /private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml
+  [FAIL] frontmatter lint exists — missing /private/tmp/r28-base/bin/check-skill-frontmatter
+  [FAIL] skill-map.yaml is stdlib-parseable JSON/YAML subset — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] matrix covers every SKILL.md — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] matrix entries carry loop/owner/inputs/outputs/triggers — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] three overlap groups are recorded with a decision — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] each overlap group has a legal decision, entrypoint and reason — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] routing gives exactly one entrypoint per loop — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] every SKILL.md frontmatter declares loop — 37 skills lack loop: ['freely-agent-execution-safety-review', 'freely-ai-cli-availability-manager', 'freely-auto-loop-orchestrator', 'freely-branch-management']
+  [FAIL] every SKILL.md frontmatter declares owner — 37 skills lack owner: ['freely-agent-execution-safety-review', 'freely-ai-cli-availability-manager', 'freely-auto-loop-orchestrator', 'freely-branch-management']
+  [FAIL] every SKILL.md frontmatter declares supersedes — 37 skills lack supersedes: ['freely-agent-execution-safety-review', 'freely-ai-cli-availability-manager', 'freely-auto-loop-orchestrator', 'freely-branch-management']
+  [FAIL] frontmatter loop matches the matrix — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] frontmatter owner matches the matrix — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] loop values come from the matrix enum — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] owner values come from the matrix enum — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] matrix has no orphan entries — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r28-base/docs/system/workspace/skills/skill-map.yaml'
+  [FAIL] no duplicated gate-enum wording remains in capability docs — duplicated enum wording in ['system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md']
+  [FAIL] AT is wired into test-all CORE and CI_CORE — AT missing from CORE or CI_CORE
+  [FAIL] B2 story registered in epics-map.svg — story not registered in epics-map
+=== BEHAVIOR: lint fails closed on a missing contract ===
+  [FAIL] lint refuses a skill without loop/owner — exception: FileNotFoundError: missing lint: /private/tmp/r28-base/bin/check-skill-frontmatter
+  [FAIL] lint accepts a compliant fixture — exception: FileNotFoundError: missing lint: /private/tmp/r28-base/bin/check-skill-frontmatter
+SUMMARY: 0 ok, 21 failed

@@ -6,6 +6,9 @@ description: >-
 
   Use when: 用户问简单问题（状态查询、进度确认），无需进入长期主线。
   触发词："状态"、"进度"、"在干什么"、"查一下"。
+loop: intake
+owner: runtime
+supersedes: []
 ---
 
 # skill:freely-human-interruption-direct-answer

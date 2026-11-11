@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI 运行自主持续交付循环，或需要编排多 agent 协作。
   触发词："auto-loop"、"自主循环"、"持续交付"、"编排 agent"。
+loop: runtime
+owner: manager
+supersedes: []
 ---
 
 # skill:freely-auto-loop-orchestrator

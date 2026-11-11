@@ -6,6 +6,9 @@ description: >-
 
   Use when: AI 规划或完成开发、合并、发布、恢复操作。
   触发词："constitution"、"宪法检查"、"合规"、"约束校验"。
+loop: governance
+owner: governance
+supersedes: []
 ---
 
 # skill:freely-constitution-guard

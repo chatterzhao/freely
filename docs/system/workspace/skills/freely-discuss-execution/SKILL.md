@@ -6,6 +6,9 @@ description: >-
 
   Use when: 需要独立讨论技术方案、架构决策，或 AI 群聊讨论。
   触发词："讨论"、"discuss"、"头脑风暴"、"brainstorm"、"聊聊方案"。
+loop: intake
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-discuss-execution

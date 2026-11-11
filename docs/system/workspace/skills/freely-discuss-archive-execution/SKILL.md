@@ -6,6 +6,9 @@ description: >-
 
   Use when: `freely discuss --archive` 命令触发归档。
   触发词："归档讨论"、"archive discussion"、"关闭讨论"。
+loop: intake
+owner: workflow
+supersedes: []
 ---
 
 # skill:freely-discuss-archive-execution
