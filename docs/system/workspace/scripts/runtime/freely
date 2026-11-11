@@ -31,10 +31,17 @@ TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-_log_ts() { date -u +"[%Y-%m-%dT%H:%M:%SZ]" | tr -d '\n'; }
-log_info() { echo "$(_log_ts) [INFO] $*" >&2; }
-log_warn() { echo "$(_log_ts) [WARN] $*" >&2; }
-log_error() { echo "$(_log_ts) [ERROR] $*" >&2; }
+# ── Shared helpers (#4160) ──
+# log_*, current_timestamp_utc_for_machine, state_dir and run_dir_for_project
+# have a single owner so extracted bin/<cmd> projections can source the same
+# implementation instead of copying it or sourcing this 27k-line file.
+RUNTIME_COMMON_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/lib/common.sh"
+if [[ ! -f "$RUNTIME_COMMON_LIB" ]]; then
+  echo "[ERROR] runtime shared helpers missing: $RUNTIME_COMMON_LIB" >&2
+  [[ "$_FREELY_IS_SOURCED" == "1" ]] && return 1
+  false
+fi
+source "$RUNTIME_COMMON_LIB"
 
 # Record a library-load failure without an `exit` literal in the load section.
 # Direct execution runs under `set -e`, so the trailing `false` ends the process
@@ -534,10 +541,6 @@ format_timestamp_local_for_display() {
 
 current_timestamp_local_for_display() {
   format_epoch_local "$(date +%s)"
-}
-
-current_timestamp_utc_for_machine() {
-  date -u '+%Y-%m-%dT%H:%M:%SZ'
 }
 
 strip_simple_shell_quotes() {
@@ -1331,11 +1334,6 @@ parse_ai_spec() {
   echo "$tool|$model|$mode"
 }
 
-state_dir() {
-  local project="$1"
-  echo "$project/$STATE_DIR_NAME"
-}
-
 global_state_dir() {
   local requested project fallback_dir
   requested="${FREELY_HOME:-$HOME/.freely}"
@@ -1444,11 +1442,6 @@ PY
     return $?
   fi
   return 1
-}
-
-run_dir_for_project() {
-  local project="$1"
-  echo "$(state_dir "$project")/run"
 }
 
 project_db_path() {
@@ -8773,128 +8766,21 @@ EOF
 # Daemon start/stop must never touch it: they used to write "testing" and
 # "completed", which let a started-but-untested worktree pass the gate and let
 # a failed start be "completed" by the following stop (#4135 / #4216).
-_test_gate_file() {
-  echo "$(run_dir_for_project "$1")/test-gate.env"
-}
-
-_test_gate_write() {
-  local project="$1" status="$2" tested_commit="${3:-}"
-  local gate_file tmp
-  gate_file="$(_test_gate_file "$project")"
-  mkdir -p "$(dirname "$gate_file")"
-  tmp="$(mktemp "$(dirname "$gate_file")/.test-gate.XXXXXX")"
-  {
-    printf 'TEST_STATUS="%s"\n' "$status"
-    printf 'LAST_TESTED_AT="%s"\n' "$(current_timestamp_utc_for_machine)"
-    printf 'LAST_TESTED_COMMIT="%s"\n' "$tested_commit"
-  } >"$tmp"
-  mv "$tmp" "$gate_file"
-}
-
 # cmd_test_gate_run: execute the tests for real and record machine evidence.
 # `record` only writes an agent's claim; only this command can produce a verdict
 # the retirement gate trusts (real exit code + evidence sha256 + HEAD).
 cmd_test_gate_run() {
-  local target="" command=""
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --worktree|--project) target="${2:-}"; shift 2 || true ;;
-      --command) command="${2:-}"; shift 2 || true ;;
-      --) shift; command="$*"; break ;;
-      -h|--help)
-        printf '%s\n' "Usage: freely test-gate run --worktree <test worktree> --command <shell cmd> | -- <cmd...>"
-        return 0
-        ;;
-      *) log_error "test-gate run: unknown argument: $1"; return 2 ;;
-    esac
-  done
-  [[ -n "$target" && -n "$command" ]] || {
-    log_error "test-gate run: --worktree and --command are required"; return 2; }
-  [[ -d "$target" ]] || { log_error "test-gate run: no such worktree: $target"; return 2; }
-  local branch
-  branch="$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  [[ "$branch" == test-pre-merge-* ]] || {
-    log_error "test-gate run: '$target' is not a test-pre-merge-* worktree"; return 2; }
-  local helper="$SELF_ROOT/docs/system/workspace/scripts/quality/test-evidence.py"
-  [[ -f "$helper" ]] || { log_error "test-gate run: missing $helper"; return 2; }
-
-  local evidence="$target/.freely/run/test-evidence.log" rc=0 head status="completed"
-  mkdir -p "$(dirname "$evidence")"
-  ( cd "$target" && bash -c "$command" ) > "$evidence" 2>&1 || rc=$?
-  head="$(git -C "$target" rev-parse HEAD 2>/dev/null || true)"
-  [[ "$rc" -eq 0 ]] || status="failed"
-  python3 "$helper" write --gate "$(_test_gate_file "$target")" \
-    --status "$status" --command "$command" --exit-code "$rc" \
-    --evidence "$evidence" --head "$head" >/dev/null || return 1
-  echo "[test-gate] run: rc=$rc status=$status command=$command"
-  echo "[test-gate] evidence: $evidence"
-  return "$rc"
+  exec bash "$SELF_ROOT/bin/test-gate" run "$@"
 }
 
 # cmd_evidence_add: put a log/evidence file under version control without the
 # agent having to remember `git add -f`, and bind its sha256 in a manifest.
 cmd_evidence_add() {
-  local file="" project=""
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --file) file="${2:-}"; shift 2 || true ;;
-      --project) project="${2:-}"; shift 2 || true ;;
-      -h|--help)
-        printf '%s\n' "Usage: freely evidence add --file <path> [--project <abs_path>]"
-        return 0
-        ;;
-      *) log_error "evidence add: unknown argument: $1"; return 2 ;;
-    esac
-  done
-  project="${project:-$PWD}"
-  [[ -f "$file" ]] || { log_error "evidence add: no such file: $file"; return 2; }
-  local helper="$SELF_ROOT/docs/system/workspace/scripts/quality/test-evidence.py"
-  [[ -f "$helper" ]] || { log_error "evidence add: missing $helper"; return 2; }
-  git -C "$project" add -f -- "$file" || { log_error "evidence add: git add failed"; return 1; }
-  python3 "$helper" manifest-add --project "$project" --file "$file" || return 1
-  echo "[evidence] added $file (sha256 recorded)"
+  exec bash "$SELF_ROOT/bin/evidence" add "$@"
 }
 
 cmd_test_gate_record() {
-  local target="" status="" commit=""
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --worktree|--project) target="${2:-}"; shift 2 || true ;;
-      --status) status="${2:-}"; shift 2 || true ;;
-      --commit) commit="${2:-}"; shift 2 || true ;;
-      -h|--help)
-        printf '%s\n' "Usage: freely test-gate record --worktree <test worktree> --status started|completed|failed [--commit <sha>]"
-        return 0
-        ;;
-      *) log_error "test-gate record: unknown argument: $1"; return 2 ;;
-    esac
-  done
-  case "$status" in
-    started|completed|failed) ;;
-    *) log_error "test-gate record: --status must be one of started|completed|failed"; return 2 ;;
-  esac
-  target="${target:-$PWD}"
-  [[ -d "$target" ]] || { log_error "test-gate record: no such worktree: $target"; return 2; }
-  local branch
-  branch="$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  if [[ "$branch" != test-pre-merge-* ]]; then
-    log_error "test-gate record: '$target' is on branch '${branch:-<detached>}', not a test-pre-merge-* worktree"
-    log_error "  test evidence belongs to the test worktree; pass --worktree <test worktree>"
-    return 2
-  fi
-  if [[ "$status" == "completed" ]]; then
-    if [[ -n "$commit" ]]; then
-      if ! git -C "$target" rev-parse --verify --quiet "${commit}^{commit}" >/dev/null 2>&1; then
-        log_error "test-gate record: --commit '$commit' is not a commit of $target"
-        return 2
-      fi
-      commit="$(git -C "$target" rev-parse "${commit}^{commit}")"
-    else
-      commit="$(git -C "$target" rev-parse HEAD)"
-    fi
-  fi
-  _test_gate_write "$target" "$status" "$commit"
-  echo "[test-gate] $target: TEST_STATUS=$status LAST_TESTED_COMMIT=${commit:-<none>}"
+  exec bash "$SELF_ROOT/bin/test-gate" record "$@"
 }
 
 ensure_project_agents_md() {

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# bin/evidence — extracted from scripts/runtime/freely (#4160).
+#
+# `freely evidence add` registers a file with the evidence manifest and stages
+# it despite the `.log` ignore rule. The body moved here unchanged; the
+# monolith keeps a three-line projection.
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# shellcheck source=/dev/null
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/lib/common.sh"
+
+cmd_add() {
+  local file="" project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --file) file="${2:-}"; shift 2 || true ;;
+      --project) project="${2:-}"; shift 2 || true ;;
+      -h|--help)
+        printf '%s\n' "Usage: freely evidence add --file <path> [--project <abs_path>]"
+        return 0
+        ;;
+      *) log_error "evidence add: unknown argument: $1"; return 2 ;;
+    esac
+  done
+  project="${project:-$PWD}"
+  [[ -f "$file" ]] || { log_error "evidence add: no such file: $file"; return 2; }
+  local helper="$ROOT_DIR/docs/system/workspace/scripts/quality/test-evidence.py"
+  [[ -f "$helper" ]] || { log_error "evidence add: missing $helper"; return 2; }
+  git -C "$project" add -f -- "$file" || { log_error "evidence add: git add failed"; return 1; }
+  python3 "$helper" manifest-add --project "$project" --file "$file" || return 1
+  echo "[evidence] added $file (sha256 recorded)"
+}
+
+main() {
+  local sub="${1:-}"
+  shift || true
+  case "$sub" in
+    add) cmd_add "$@" ;;
+    -h|--help|"")
+      printf '%s\n' "Usage: bin/evidence add --file <path> [--project <abs_path>]"
+      [[ -n "$sub" ]] || exit 1
+      ;;
+    *) log_error "unknown evidence subcommand: $sub"; exit 1 ;;
+  esac
+}
+
+main "$@"

@@ -1,3 +1,24 @@
+## M-20261104T075849Z-A
+- title: refactor — runtime 拆分第一阶段（helper 单源 + 3 子命令外移）
+- status: active
+### candidate_issues
+1. `C-20261104T075849Z-A`
+- milestone: M-20261104T075849Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T075849Z-A
+- promoted_issue_path: docs/B2-docs/runtime/runtime-split/raw-20261104T075849Z/issues/I-20261104T075849Z-A.md
+### committed_issues
+1. `I-20261104T075849Z-A`
+- milestone: M-20261104T075849Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/runtime-split/raw-20261104T075849Z/issues/I-20261104T075849Z-A.md
+### completed_issues
+1. `I-20261104T075849Z-A`
+- milestone: M-20261104T075849Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T12:55:00Z
+- issue_path: docs/B2-docs/runtime/runtime-split/raw-20261104T075849Z/issues/I-20261104T075849Z-A.md
+
 ## M-20261104T075857Z-A
 - title: refactor — 跨进程数据契约（第一阶段）
 - status: active
