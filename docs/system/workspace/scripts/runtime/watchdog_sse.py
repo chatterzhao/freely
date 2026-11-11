@@ -13,7 +13,6 @@ from typing import Optional
 # Add project root for imports
 PROJECT_ROOT = os.environ.get("PROJECT_ROOT", os.getcwd())
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "docs", "system", "workspace", "scripts", "runtime"))
-sys.path.insert(0, os.path.join(PROJECT_ROOT, "docs", "system", "workspace", "agents"))
 
 from agent_working import (
     agent_list_by_raw_key, agent_next_free, agent_assign, agent_get_session,
@@ -22,7 +21,7 @@ from agent_working import (
 from agent_identity_value import (
     bare_agent_ids, first_agent_id, parse_agent_entries, session_entry,
 )
-from input_required_reason import InputRequiredReason
+from coordination.input_required_reason import InputRequiredReason
 
 
 import time as _time

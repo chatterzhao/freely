@@ -21,6 +21,7 @@ for arg in "$@"; do
 done
 
 CORE=(
+  test-coordination-contract.py
   test-skill-merge-compat.py
   test-skill-frontmatter-contract.py
   test-a2a-task-cli-loadable.py
@@ -43,6 +44,7 @@ CORE=(
   test-github-label-autocreate.py
 )
 CI_CORE=(
+  test-coordination-contract.py
   test-skill-merge-compat.py
   test-skill-frontmatter-contract.py
   test-a2a-task-cli-loadable.py

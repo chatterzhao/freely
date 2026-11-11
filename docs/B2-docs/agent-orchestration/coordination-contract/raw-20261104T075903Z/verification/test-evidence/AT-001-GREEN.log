@@ -1,0 +1,19 @@
+=== STATIC: coordination contract ===
+  [ok] coordination contract exists
+  [ok] contract is stdlib-parseable JSON/YAML subset
+  [ok] contract declares states/reasons/topics/exit-contracts
+  [ok] coordination package owns the reason enum
+  [ok] watchdog_sse.py has no agents sys.path hack
+  [ok] no runtime file injects agents/ into sys.path
+  [ok] watchdog imports from the coordination package
+  [ok] reason enum moved out of agents/
+  [ok] contract reasons match the runtime enum
+  [ok] single-page doc lists state machine and exit contracts
+  [ok] coordination lint exists
+=== BEHAVIOR: lint parity + import graph ===
+  [ok] lint refuses contract/enum drift
+  [ok] lint accepts a compliant fixture
+  [ok] coordination package has no reverse dependency on runtime/freely
+  [ok] AT wired into test-all CORE and CI_CORE
+  [ok] B2 story registered in epics-map.svg
+SUMMARY: 16 ok, 0 failed

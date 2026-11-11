@@ -14,14 +14,14 @@ from unittest.mock import patch, MagicMock
 # Add project root for imports
 TEST_PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "scripts", "runtime"))
-sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "agents"))
+sys.path.insert(0, os.path.join(TEST_PROJECT, "docs", "system", "workspace", "scripts", "runtime"))
 
 # Import watchdog helpers (does not start the main loop)
 from watchdog_sse import (
     _acp_bridge_socket, _acp_rpc,
     _handle_sse_event, _check_agent_liveness, _check_session_staleness,
 )
-from input_required_reason import InputRequiredReason
+from coordination.input_required_reason import InputRequiredReason
 
 
 class TestAcpBridgeSocket(unittest.TestCase):

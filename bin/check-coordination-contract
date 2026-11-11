@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""check-coordination-contract — fail-closed guard for agent coordination semantics.
+
+Verifies contract.yaml <-> InputRequiredReason parity, absence of the agents/
+sys.path hack, package import direction, and watchdog's package import.
+Exit 0 ok, 1 contract violation, 2 missing/broken single source.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+RUNTIME_REL = "docs/system/workspace/scripts/runtime"
+
+
+def enum_values(path: Path) -> set[str]:
+    return set(re.findall(r'=\s*"([a-z][a-z0-9:\-]+)"', path.read_text(encoding="utf-8")))
+
+
+def run(root: Path) -> int:
+    contract = root / "contracts/coordination/contract.yaml"
+    if not contract.is_file():
+        print(f"coordination: FAIL missing single source {contract}", flush=True)
+        return 2
+    try:
+        matrix = json.loads(contract.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        print(f"coordination: FAIL unreadable single source: {exc}", flush=True)
+        return 2
+
+    errors: list[str] = []
+    enum_path = root / RUNTIME_REL / "coordination/input_required_reason.py"
+    if not enum_path.is_file():
+        errors.append(f"missing coordination enum {enum_path}")
+    else:
+        want = set(matrix.get("input_required_reasons", []))
+        got = enum_values(enum_path)
+        if not want:
+            errors.append("contract declares no input_required_reasons")
+        elif want != got:
+            errors.append(f"reason drift contract-only={sorted(want - got)} enum-only={sorted(got - want)}")
+
+    runtime = root / RUNTIME_REL
+    for path in runtime.rglob("*.py"):
+        for i, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            if "sys.path.insert" in line and "agents" in line:
+                errors.append(f"{path.relative_to(root)}:{i} injects agents/ into sys.path")
+
+    cod = runtime / "coordination"
+    for path in cod.rglob("*.py"):
+        if re.search(r"import\s+runtime\.freely|from\s+runtime\s+import\s+freely",
+                     path.read_text(encoding="utf-8", errors="replace")):
+            errors.append(f"{path.relative_to(root)} reverse-depends on runtime/freely")
+
+    watchdog = runtime / "watchdog_sse.py"
+    if watchdog.is_file():
+        text = watchdog.read_text(encoding="utf-8")
+        if "from coordination.input_required_reason import" not in text:
+            errors.append("watchdog_sse.py does not import from the coordination package")
+    else:
+        errors.append("watchdog_sse.py missing")
+
+    if errors:
+        for err in errors:
+            print(f"coordination: FAIL {err}", flush=True)
+        print(f"coordination: {len(errors)} violation(s)", flush=True)
+        return 1
+    print(f"coordination: ok ({len(matrix.get('input_required_reasons', []))} reasons)", flush=True)
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", default=str(ROOT))
+    return run(Path(ap.parse_args().root).resolve())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
