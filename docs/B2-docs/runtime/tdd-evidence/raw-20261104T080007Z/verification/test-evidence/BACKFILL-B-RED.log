@@ -1,0 +1,12 @@
+=== t-event-01-severity-trace.sh
+  [ok] runtime events log is created on demand
+  [ok] event name is recorded
+  [FAIL] failure events are severity=error (missing [severity=error] in [2026-11-11T01:46:33Z event=probe_failed detail=boom])
+  [FAIL] warning events are severity=warn (missing [severity=warn] in [2026-11-11T01:46:33Z event=probe_warn])
+  [FAIL] ordinary events are severity=info (missing [severity=info] in [2026-11-11T01:46:33Z event=probe_started])
+  [FAIL] every line carries a trace_id (missing [trace_id=] in [2026-11-11T01:46:33Z event=probe_failed detail=boom])
+  [FAIL] FREELY_TRACE_ID overrides the trace id (missing [trace_id=trace-abc123] in [2026-11-11T01:46:33Z event=probe_tagged])
+  [ok] caller key/value pairs survive
+SUMMARY: 3 ok, 5 failed
+=== unit: 1 file(s), 3 ok, 5 failed
+failing: t-event-01-severity-trace.sh

@@ -1,3 +1,24 @@
+## M-20261104T080007Z-A
+- title: feat — 核心 runtime 函数级 RED→GREEN 证据链
+- status: active
+### candidate_issues
+1. `C-20261104T080007Z-A`
+- milestone: M-20261104T080007Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T080007Z-A
+- promoted_issue_path: docs/B2-docs/runtime/tdd-evidence/raw-20261104T080007Z/issues/I-20261104T080007Z-A.md
+### committed_issues
+1. `I-20261104T080007Z-A`
+- milestone: M-20261104T080007Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/tdd-evidence/raw-20261104T080007Z/issues/I-20261104T080007Z-A.md
+### completed_issues
+1. `I-20261104T080007Z-A`
+- milestone: M-20261104T080007Z-A
+- phase_state: completed
+- completed_at: 2026-11-10T14:40:00Z
+- issue_path: docs/B2-docs/runtime/tdd-evidence/raw-20261104T080007Z/issues/I-20261104T080007Z-A.md
+
 ## M-20261110T130144Z-A
 - title: refactor — issue-sync 拆子命令模块 + 平台投影单一契约
 - status: active

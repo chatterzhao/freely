@@ -1,0 +1,28 @@
+AT-001 source: /private/tmp/r28-base
+=== STATIC: unit corpus exists and covers the three contracts ===
+  [FAIL] tests/unit/harness.sh exists
+  [FAIL] tests/unit/run.sh exists
+  [FAIL] at least 10 function-level tests (got 0)
+  [ok] every test sources the harness ([])
+  [ok] every shell-runtime test loads the runtime ([])
+  [FAIL] state contract has >= 3 tests (got 0)
+  [FAIL] lock contract has >= 3 tests (got 0)
+  [FAIL] exit contract has >= 3 tests (got 0)
+=== STATIC: RED evidence is wired into PR create + review ===
+  [FAIL] worktree/pr_body.py exists
+  [FAIL] quality/runtime_red_gate.py exists
+  [FAIL] pr-create-guarded composes the body through pr_body.py
+  [FAIL] the RED-evidence composer runs before the bare-body fallback
+  [FAIL] pr-review-guarded calls the core-runtime RED gate
+=== BEHAVIOR: unit runner ===
+  [FAIL] unit runner discovers and passes every test
+  [FAIL] unit runner fails when a test fails
+=== BEHAVIOR: PR body carries RED evidence ===
+  [FAIL] non-runtime diff marks RED as not applicable
+  [FAIL] runtime diff without evidence refuses the PR
+  [FAIL] runtime diff with evidence quotes the RED output
+=== BEHAVIOR: review gate refuses runtime changes without RED ===
+  [FAIL] non-runtime diff is skipped
+  [FAIL] runtime diff without unit test is refused
+  [FAIL] runtime diff with unit test + evidence passes
+SUMMARY: 2 ok, 19 failed

@@ -1,0 +1,28 @@
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T080007Z-runtime-tdd-evidence
+=== STATIC: unit corpus exists and covers the three contracts ===
+  [ok] tests/unit/harness.sh exists
+  [ok] tests/unit/run.sh exists
+  [ok] at least 10 function-level tests (got 14)
+  [ok] every test sources the harness ([])
+  [ok] every shell-runtime test loads the runtime ([])
+  [ok] state contract has >= 3 tests (got 4)
+  [ok] lock contract has >= 3 tests (got 4)
+  [ok] exit contract has >= 3 tests (got 4)
+=== STATIC: RED evidence is wired into PR create + review ===
+  [ok] worktree/pr_body.py exists
+  [ok] quality/runtime_red_gate.py exists
+  [ok] pr-create-guarded composes the body through pr_body.py
+  [ok] the RED-evidence composer runs before the bare-body fallback
+  [ok] pr-review-guarded calls the core-runtime RED gate
+=== BEHAVIOR: unit runner ===
+  [ok] unit runner discovers and passes every test (=== unit: 14 file(s), 68 ok, 0 failed)
+  [ok] unit runner fails when a test fails
+=== BEHAVIOR: PR body carries RED evidence ===
+  [ok] non-runtime diff marks RED as not applicable
+  [ok] runtime diff without evidence refuses the PR
+  [ok] runtime diff with evidence quotes the RED output
+=== BEHAVIOR: review gate refuses runtime changes without RED ===
+  [ok] non-runtime diff is skipped
+  [ok] runtime diff without unit test is refused
+  [ok] runtime diff with unit test + evidence passes
+SUMMARY: 21 ok, 0 failed

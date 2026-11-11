@@ -1,0 +1,16 @@
+=== t-db-01-schema-version.sh
+  [FAIL] schema version constant is 1 (missing [SCHEMA=1] in [SCHEMA=missing
+VERSION=0
+REFUSED=0])
+  [FAIL] a fresh database records user_version=1 (missing [VERSION=1] in [SCHEMA=missing
+VERSION=0
+REFUSED=0])
+  [FAIL] a newer database is refused (missing [REFUSED=1] in [SCHEMA=missing
+VERSION=0
+REFUSED=0])
+  [FAIL] refusal names the version mismatch (missing [newer than this build] in [SCHEMA=missing
+VERSION=0
+REFUSED=0])
+SUMMARY: 0 ok, 4 failed
+=== unit: 1 file(s), 0 ok, 4 failed
+failing: t-db-01-schema-version.sh

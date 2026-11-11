@@ -1,0 +1,16 @@
+=== t-lock-01-sse-claim-live-owner.sh
+  [FATAL] required function missing from runtime: sse_watchdog_claim_pid
+=== t-lock-02-sse-claim-stale-takeover.sh
+  [FATAL] required function missing from runtime: sse_watchdog_claim_pid
+=== t-lock-03-sse-claim-creates-dir.sh
+  [FATAL] required function missing from runtime: sse_watchdog_claim_pid
+=== t-lock-04-interruption-triage.sh
+  [ok] first triage acquires the lock
+  [ok] lock state records the owner
+  [ok] second triage is refused while held
+  [ok] release succeeds
+  [ok] lock dir removed on release
+  [ok] intake can be triaged again after release
+SUMMARY: 6 ok, 0 failed
+=== unit: 4 file(s), 6 ok, 0 failed
+failing: t-lock-01-sse-claim-live-owner.sh t-lock-02-sse-claim-stale-takeover.sh t-lock-03-sse-claim-creates-dir.sh

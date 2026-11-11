@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Aggregator entry for `bin/test-all` (#4165): the unit corpus lives in
+# tests/unit/ (one file per contract), but test-all enumerates a flat directory.
+set -uo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+exec bash "$ROOT_DIR/docs/system/workspace/scripts/tests/unit/run.sh" "$@"
