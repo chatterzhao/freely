@@ -1,0 +1,19 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T075849Z-runtime-split
+  [ok] extracted commands exist and are executable
+  [ok] runtime/lib/common.sh defines the moved helpers
+  [ok] monolith sources the shared lib
+  [ok] monolith no longer defines moved helpers
+  [ok] monolith no longer defines moved private helpers
+  [ok] three commands are exec projections
+  [ok] check-runtime-size and budget file exist
+  [ok] split-plan matrix covers every cmd_*
+  [ok] Rust PoC documents boundary/cost/rollback
+  [ok] AT wired into CORE and CI_CORE
+  [ok] story registered in epics-map
+  [ok] budget is below baseline and not above actual
+  [ok] check-runtime-size honours the budget
+  [ok] test-gate refuses non-test worktrees
+  [ok] evidence add refuses a missing file
+  [ok] extracted entrypoints reject unknown subcommands
+
+SUMMARY: 16 ok, 0 failed

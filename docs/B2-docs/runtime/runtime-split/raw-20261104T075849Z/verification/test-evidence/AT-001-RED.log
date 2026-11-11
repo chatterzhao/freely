@@ -1,0 +1,19 @@
+source: /private/tmp/r31-base
+  [FAIL] extracted commands exist and are executable — missing=['bin/test-gate', 'bin/evidence'] not-executable=[]
+  [FAIL] runtime/lib/common.sh defines the moved helpers — missing docs/system/workspace/scripts/runtime/lib/common.sh
+  [FAIL] monolith sources the shared lib — monolith does not source runtime/lib/common.sh
+  [FAIL] monolith no longer defines moved helpers — monolith still defines moved helpers: ['_log_ts', 'log_info', 'log_warn', 'log_error', 'current_timestamp_utc_for_machine', 'state_dir', 'run_dir_for_project']
+  [FAIL] monolith no longer defines moved private helpers — monolith still defines: ['_test_gate_file', '_test_gate_write']
+  [FAIL] three commands are exec projections — cmd_test_gate_run is not a projection; cmd_test_gate_record is not a projection; cmd_evidence_add is not a projection
+  [FAIL] check-runtime-size and budget file exist — check-runtime-size or budget file missing
+  [FAIL] split-plan matrix covers every cmd_* — missing docs/system/workspace/scripts/runtime/split-plan.md
+  [FAIL] Rust PoC documents boundary/cost/rollback — missing docs/system/workspace/scripts/runtime/rust-migration-poc.md
+  [FAIL] AT wired into CORE and CI_CORE — AT not wired into both CORE and CI_CORE
+  [FAIL] story registered in epics-map — story not registered in epics-map
+  [FAIL] budget is below baseline and not above actual — budget file or monolith missing
+  [FAIL] check-runtime-size honours the budget — check-runtime-size missing
+  [FAIL] test-gate refuses non-test worktrees — bin/test-gate missing
+  [FAIL] evidence add refuses a missing file — bin/evidence missing
+  [FAIL] extracted entrypoints reject unknown subcommands — bin/test-gate missing
+
+SUMMARY: 0 ok, 16 failed

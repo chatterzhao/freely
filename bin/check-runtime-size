@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# bin/check-runtime-size — keep the runtime monolith from growing back (#4160).
+#
+# `scripts/runtime/freely` is a 27k-line monolith being split by subcommand.
+# `bin/check-file-size` cannot police it because it carries a `file-size: skip`
+# marker, so this guard owns the specific promise instead: the file may only
+# get smaller.
+#
+# The budget lives in the file itself (`.size-budget` next to the monolith) so
+# a reviewer sees the number next to the code it constrains.
+#
+#   bin/check-runtime-size            # exit 1 when the monolith exceeds budget
+#   bin/check-runtime-size --json
+#
+# Exit codes: 0 within budget · 1 over budget · 2 budget file missing (fail-closed).
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+RUNTIME="docs/system/workspace/scripts/runtime/freely"
+BUDGET_FILE="docs/system/workspace/scripts/runtime/.size-budget"
+
+json=0
+case "${1:-}" in
+  --json) json=1 ;;
+  "") ;;
+  *) echo "[check-runtime-size] unknown arg: $1" >&2; exit 2 ;;
+esac
+
+budget_path="$ROOT_DIR/$BUDGET_FILE"
+if [[ ! -f "$budget_path" ]]; then
+  echo "[check-runtime-size] missing budget file: $BUDGET_FILE" >&2
+  exit 2
+fi
+
+budget="$(tr -dc '0-9' < "$budget_path")"
+actual="$(wc -l < "$ROOT_DIR/$RUNTIME" | tr -d ' ')"
+
+if (( actual > budget )); then
+  if (( json == 1 )); then
+    printf '{"ok": false, "lines": %d, "budget": %d}\n' "$actual" "$budget"
+  else
+    echo "[check-runtime-size] $RUNTIME grew: $actual lines > budget $budget" >&2
+    echo "[check-runtime-size] extract a subcommand into bin/<cmd>; do not raise the budget" >&2
+  fi
+  exit 1
+fi
+
+if (( json == 1 )); then
+  printf '{"ok": true, "lines": %d, "budget": %d}\n' "$actual" "$budget"
+else
+  echo "ok ($actual lines, budget $budget)"
+fi

@@ -30,6 +30,16 @@ CONTRACT_REL = "contracts/cross-process/contract.yaml"
 RUNNER_REL = "docs/system/workspace/scripts/quality/cross_process_boundary.py"
 LINT_REL = "bin/check-cross-process-contract"
 
+def array_has(text: str, marker: str, entry: str) -> bool:
+    """True when `entry` is a line of the array that starts at `marker`.
+
+    Matching adjacency to `CORE=(` instead would break the moment another test
+    is prepended - which is exactly what happened when R31 added one (#4160).
+    """
+    i = text.index(marker) + len(marker)
+    j = text.index(")", i)
+    return entry in [line.strip() for line in text[i:j].splitlines()]
+
 OK: list[str] = []
 FAIL: list[str] = []
 
@@ -147,9 +157,8 @@ def main() -> int:
 
     def c12():
         ta = (src / "bin/test-all").read_text(encoding="utf-8")
-        core = "CORE=(\n  " + AT_NAME
-        ci = "CI_CORE=(\n  " + AT_NAME
-        return core in ta and ci in ta, "AT not wired into both CORE and CI_CORE"
+        wired = array_has(ta, "\nCORE=(", AT_NAME) and array_has(ta, "\nCI_CORE=(", AT_NAME)
+        return wired, "AT not wired into both CORE and CI_CORE"
 
     def c13():
         svg = (src / "docs/epics-map.svg").read_text(encoding="utf-8")
