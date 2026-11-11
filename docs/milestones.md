@@ -1,3 +1,24 @@
+## M-20261104T080259Z-A
+- title: refactor — 投影一致性检查（hooks/skills/bin/AGENTS）
+- status: active
+### candidate_issues
+1. `C-20261104T080259Z-A`
+- milestone: M-20261104T080259Z-A
+- status: promoted
+- promoted_issue_id: I-20261104T080259Z-A
+- promoted_issue_path: docs/B2-docs/gate/projection-consistency/raw-20261104T080259Z/issues/I-20261104T080259Z-A.md
+### committed_issues
+1. `I-20261104T080259Z-A`
+- milestone: M-20261104T080259Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/projection-consistency/raw-20261104T080259Z/issues/I-20261104T080259Z-A.md
+### completed_issues
+1. `I-20261104T080259Z-A`
+- milestone: M-20261104T080259Z-A
+- phase_state: completed
+- completed_at: 2026-11-11T14:20:00Z
+- issue_path: docs/B2-docs/gate/projection-consistency/raw-20261104T080259Z/issues/I-20261104T080259Z-A.md
+
 ## M-20261104T080200Z-A
 - title: refactor — pr-review-guarded 迁回 scripts/（投影层边界）
 - status: active

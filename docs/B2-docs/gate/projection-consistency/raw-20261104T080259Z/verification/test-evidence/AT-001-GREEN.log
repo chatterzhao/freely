@@ -1,0 +1,23 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20261104T080259Z-projection-consistency
+  [ok] dead hook copies removed
+  [ok] .githooks holds wrappers only
+  [ok] all eight wrappers present
+  [ok] every wrapper delegates to its truth script
+  [ok] projection.lock exists
+  [ok] lock header is complete
+  [ok] lock covers hooks/skills/bin/agents
+  [ok] every entry records kind/source/target/sha256
+  [ok] every recorded path exists
+  [ok] every recorded hash matches its source
+  [ok] verifier exists and is executable
+  [ok] runtime exposes `freely projections`
+  [ok] no ghost skill names in generator or template
+  [ok] template quotes only real skill names
+  [ok] AT wired into CORE and CI_CORE
+  [ok] story registered in epics-map
+  [ok] verify exits 0 on a consistent tree
+  [ok] verify refuses a tampered projection
+  [ok] verify refuses a missing lock
+  [ok] freely projections verify dispatches
+
+SUMMARY: 20 ok, 0 failed

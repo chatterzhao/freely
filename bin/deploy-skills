@@ -192,6 +192,17 @@ yaml.safe_load(m.group(1))
   done
 
   echo "  deployed=$deployed  updated=$updated  skipped=$skipped  failed=$failed"
+
+  # #4179: a deployed skill is a projection of workspace/skills/<name>. Record
+  # its hash so `freely projections verify` can prove the copy still matches;
+  # without this, a stale deployed skill is invisible.
+  if [[ "$dry_run" -eq 0 ]]; then
+    local verifier="$ROOT_DIR/docs/system/workspace/scripts/quality/projection_verify.py"
+    if [[ -f "$verifier" ]]; then
+      python3 "$verifier" record --project "$ROOT_DIR" --skills-root "$dst" >/dev/null 2>&1 \
+        || echo "  WARNING: could not refresh projection.lock for $dst" >&2
+    fi
+  fi
   echo ""
 }
 

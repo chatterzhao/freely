@@ -1,98 +1,11 @@
 #!/usr/bin/env bash
+# .githooks/post-checkout — delegates to docs/system/workspace/hooks/post-checkout.sh
 set -euo pipefail
-
-# Args: <old-ref> <new-ref> <is-branch-checkout>
-if [[ "${3:-0}" != "1" ]]; then
-  exit 0
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || { cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P; })"
+HOOK_SCRIPT="$ROOT_DIR/docs/system/workspace/hooks/post-checkout.sh"
+if [[ -f "$HOOK_SCRIPT" ]]; then
+  exec bash "$HOOK_SCRIPT" "$@"
 fi
-
-if [[ "${FREELY_WT_AUTOCREATE_INTERNAL:-0}" == "1" ]]; then
-  exit 0
-fi
-
-[[ -f "./bin/worktree-common.sh" ]] || exit 0
-# shellcheck disable=SC1091
-source ./bin/worktree-common.sh
-
-branch="$(freely_wt_current_branch)"
-[[ -n "$branch" ]] || exit 0
-
-# main/develop/test-pre-merge-* 不需要 worktree，直接退出
-if freely_wt_is_test_pre_merge_branch "$branch"; then
-  exit 0
-fi
-
-case "$branch" in
-  main|develop)
-    exit 0
-    ;;
-esac
-
-freely_wt_assert_strict_root || exit 1
-freely_wt_assert_existing_in_strict_root "$branch" || exit 1
-
-if ! freely_wt_is_primary_worktree; then
-  exit 0
-fi
-
-parking_branch="$(freely_wt_pick_parking_branch)"
-
-if ! freely_wt_validate_branch_base "$branch"; then
-  FREELY_WT_AUTOCREATE_INTERNAL=1 git checkout "$parking_branch" >/dev/null 2>&1 || true
-  cat <<MSG
-[HOOK] Branch '$branch' base check failed.
-Expected:
-  feature/* from develop (or from dependent feature when the issue explicitly depends on unmerged parent changes)
-  feature/premerge-* from an active test-pre-merge-* batch (or develop when no test batch is active)
-  release/* from develop
-  hotfix/* from main
-Primary worktree switched back to '$parking_branch'.
-MSG
-  exit 0
-fi
-
-existing_for_branch="$(freely_wt_existing_for_branch "$branch")"
-# If branch is currently attached to primary worktree, treat as "no dedicated worktree yet".
-if [[ -n "$existing_for_branch" && "$existing_for_branch" == "$(freely_wt_primary_worktree)" ]]; then
-  existing_for_branch=""
-fi
-if [[ -n "$existing_for_branch" ]]; then
-  rel_target="$(freely_wt_relative_target_for_branch "$branch")"
-  FREELY_WT_AUTOCREATE_INTERNAL=1 git checkout "$parking_branch" >/dev/null 2>&1 || true
-  cat <<MSG
-[HOOK] Branch '$branch' already has a worktree:
-  $existing_for_branch
-Primary worktree switched back to '$parking_branch'.
-Worktree list:
-MSG
-  git worktree list
-  echo "[HOOK] To continue in that worktree:"
-  echo "  cd \"$existing_for_branch\""
-  echo "[HOOK] Standard cleanup after merge:"
-  echo "  freely wt-close \"$branch\""
-  exit 0
-fi
-
-raw_target="$(freely_wt_target_path_for_branch "$branch")"
-target_path="$(freely_wt_resolve_target_path "$branch")"
-if [[ "$raw_target" != "$target_path" ]]; then
-  echo "[HOOK] Path collision at '$raw_target' (not bound to branch '$branch')."
-  echo "[HOOK] Creating with hash suffix."
-fi
-
-mkdir -p "$(freely_wt_root_dir)"
-FREELY_WT_AUTOCREATE_INTERNAL=1 git checkout "$parking_branch" >/dev/null 2>&1
-FREELY_WT_AUTOCREATE_INTERNAL=1 git worktree add "$target_path" "$branch" >/dev/null
-if [[ -x "./bin/freely" ]]; then
-  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "freely freely" sync-tooling --source-project "$(freely_wt_primary_worktree)" --project "$target_path" >/dev/null 2>&1 || true
-fi
-
-cat <<MSG
-[HOOK] Auto-created worktree for branch '$branch':
-  $target_path
-Primary worktree switched back to '$parking_branch'.
-[HOOK] Worktree mode is required for this branch. Continue there with:
-  cd "$target_path"
-[HOOK] Standard cleanup after merge:
-  freely wt-close "$branch"
-MSG
+# 0 = pass, 1 = fail, 2 = environment unusable (treated as NOT passing).
+echo "[HOOK] BLOCKED: ${HOOK_NAME:-shim} truth script missing: $HOOK_SCRIPT" >&2
+exit 2
