@@ -101,6 +101,8 @@
   <text x="65" y="1063" fill="#333">projection-consistency</text>
   <rect id="story-test-lane-routing-and-enforcement-governance" x="55" y="1068" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="1081" fill="#333">test-lane-routing-and-enforcement-governance</text>
+  <rect id="story-ci-machine-independence" x="55" y="1086" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
+  <text x="65" y="1099" fill="#333">ci-machine-independence</text>
   <rect id="story-test-pre-merge-family-promotion-gate-enforcement-governance" x="55" y="1104" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="1117" fill="#333">test-pre-merge-family-promotion-gate-enforcement-governance</text>
   <rect id="epic-git-worktree" x="35" y="1112" width="730" height="170" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="4"/>

@@ -1,0 +1,17 @@
+AT-001 source: /private/tmp/r335-base.0rVcfs
+=== STATIC: environment premise is self-contained ===
+  [FAIL] S1 test builds its own private stub directory
+  [FAIL] S2 three subprocess.run calls share a copied env
+  [FAIL] S3 stub is named cline and made executable
+  [ok] S4 no hard-coded machine paths
+  [ok] S5 global os.environ is never assigned
+  [ok] S6 fail-closed and explicit-tools assertions preserved
+  [ok] S7 bin/deploy-skills unchanged from develop e003532b5
+  [ok] S8 CI_CORE keeps the contract test
+  [FAIL] S9 AT wired into both CORE and CI_CORE
+  [FAIL] S10 epic gate / story ci-machine-independence registered
+=== BEHAVIOR: clean PATH, no external shim ===
+  [FAIL] B1 clean PATH: contract test 13 ok / 0 failed
+  [FAIL] B2 clean PATH: test-all --ci 22 ok / 0 failed
+  [FAIL] B3 negative control: registry mutation still fails the assertion
+SUMMARY: 5 ok, 8 failed
