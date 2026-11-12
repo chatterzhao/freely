@@ -80,8 +80,13 @@ def clean_env() -> dict[str, str]:
 
 
 def run(cmd: list[str], cwd: Path, env: dict[str, str]) -> subprocess.CompletedProcess:
+    # This probe runs the WHOLE verified subset (`test-all --ci`), so its budget
+    # must scale with the subset, not with a single test. 300s was enough for 22
+    # members; onboarding more (raw-20261112T031638Z added two) pushed the nested
+    # run past it and surfaced as a timeout instead of a test failure. The
+    # assertion is about "all green", never about speed.
     return subprocess.run(cmd, cwd=str(cwd), env=env, capture_output=True,
-                          text=True, timeout=300)
+                          text=True, timeout=1200)
 
 
 def static_checks() -> None:
