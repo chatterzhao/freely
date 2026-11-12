@@ -75,7 +75,18 @@
 1. `bin/test-all --ci`
 2. `./bin/freely test-gate run --worktree <test 工位> --command '<标准命令串>'`
 
-## Real Environment
+## End-to-End
 
-- real_environment_status: passed
+- acceptance_target: 真实收口链路上引导文案与调用路径都不再产生误导或噪音
+- testing_layer: end-to-end
+- target_environment: 本 issue 自身的 `freely pr-create-guarded` / `pr-review-guarded` / `pr-merge-guarded` / `wt-close`，以及合并后的一次真实 `wt-create`
+- required_evidence: `test-gate.env` 的 `TEST_STATUS=completed` / `TEST_EXIT_CODE=0`；`pr-create-guarded` 的 `[PRETESTS-GATE] pretests execution evidence: OK`；合并后真实 `wt-create` 输出无 `refuses to run on protected branch` 与 `issue-sync create failed`（B3b）
+- blocker_taxonomy: execution_pending_or_failed
+1. `freely test-gate run --worktree <test 工位> --command <标准命令串>` → rc=0
+2. `freely pr-create-guarded` → pretests execution evidence OK
+3. `freely pr-merge-guarded develop <branch>` → 合并；合并后真实 `wt-create` 验证 B3b → `wt-close` → `done ✓`
+
+## Real-Environment
+
+- real_environment_status: pass
 - real_environment_reason: 真机已验证两件事：①修复后的 raw-issue-pull 在 fix 工位内 rc=0 且无 guard 噪音（B3）；②guard 未被削弱——主仓 develop 上直接调 issue-sync create 仍 exit 1 并打印修正后的指引（B1/B4，guard_fired=True）。端到端 wt-create 因 ROOT_DIR 重绑主仓须待合并后生效，已列为合并后补证项。

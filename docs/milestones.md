@@ -13,11 +13,11 @@
 ### committed_issues
 1. `I-20261112T031638Z-A`
 - milestone: M-20261112T031638Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-A.md
 2. `I-20261112T031638Z-B`
 - milestone: M-20261112T031638Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-B.md
 
 ## M-20261112T015715Z-A
