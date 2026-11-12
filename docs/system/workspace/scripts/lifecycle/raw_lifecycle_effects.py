@@ -146,9 +146,80 @@ def close_platforms(arguments: list[str]) -> int:
     return 0
 
 
+def close_linked(arguments: list[str]) -> int:
+    """Close every platform replica of a kind=linked (I-*) document.
+
+    A linked document carries its own field set (kind: linked, promoted_from,
+    pre_tests_path, ...), so it cannot go through the strict RAW validator that
+    close-platforms uses - that mismatch made every "`issue-sync close I-*`"
+    fail with "raw metadata fields are missing, extra, or reordered" and left
+    every linked replica OPEN forever.
+
+    The platform write is identical (adapter close-multi); the only local state
+    that changes is status: closed (+ updated_at), written back without
+    re-validating the raw schema.
+    """
+    file_path, root_dir = arguments
+    metadata, body = read_issue(file_path)
+    if str(metadata.get("kind")) != "linked":
+        raise ValueError("close-linked requires a kind: linked document")
+    platform_ids = metadata.get("platform_ids")
+    if not isinstance(platform_ids, dict) or not platform_ids:
+        raise ValueError("linked issue has no platform_ids to close")
+
+    from datetime import datetime, timezone
+
+    adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
+    environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
+    result = subprocess.run(
+        [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+    if result.stdout.strip():
+        print(result.stdout.strip())
+    if result.stderr.strip():
+        print(result.stderr.strip(), file=sys.stderr)
+
+    try:
+        payload = json.loads(result.stdout.strip() or "{}")
+    except json.JSONDecodeError:
+        payload = {}
+
+    all_closed = (
+        isinstance(payload, dict)
+        and payload
+        and all(
+            isinstance(item, dict) and item.get("status") == "closed"
+            for item in payload.values()
+        )
+    )
+    code = result.returncode
+    if code == 0 and not all_closed:
+        code = 1
+    if code != 0:
+        _report_platform_statuses(payload)
+        print(
+            "[raw-lifecycle] linked platform close did not finish; local status left unchanged",
+            file=sys.stderr,
+        )
+        return code
+
+    import yaml
+
+    metadata["status"] = "closed"
+    metadata["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rendered = yaml.safe_dump(
+        dict(metadata), default_flow_style=False, allow_unicode=True, sort_keys=False
+    ).strip()
+    Path(file_path).write_text(f"---\n{rendered}\n---{body}", encoding="utf-8")
+    return 0
+
+
 def main(arguments: list[str]) -> int:
     if not arguments:
-        raise SystemExit("usage: raw_lifecycle_effects.py transition|finalize|close-platforms ...")
+        raise SystemExit("usage: raw_lifecycle_effects.py transition|finalize|close-platforms|close-linked ...")
     command, *payload = arguments
     try:
         if command == "transition" and len(payload) == 8:
@@ -157,6 +228,8 @@ def main(arguments: list[str]) -> int:
             return finalize(payload)
         if command == "close-platforms" and len(payload) == 2:
             return close_platforms(payload)
+        if command == "close-linked" and len(payload) == 2:
+            return close_linked(payload)
     except (MetadataValidationError, ValueError) as error:
         print(f"[raw-lifecycle] {error}", file=sys.stderr)
         return 1
