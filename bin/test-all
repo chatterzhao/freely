@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-wt-close-dryrun-safety.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
@@ -53,6 +54,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-wt-close-dryrun-safety.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
