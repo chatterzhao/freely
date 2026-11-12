@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "owner": "docs/system/workspace/scripts/quality/projection_verify.py",
+  "note": "JSON-compatible YAML 1.2 subset. Each entry records the truth path, its sha256 and the projection target. `agents` entries hash the sorted skill-name set because a generated AGENTS.md is project specific, not a byte copy.",
+  "kinds": [
+    "hooks",
+    "skills",
+    "bin",
+    "agents"
+  ],
+  "entries": [
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/commit-msg.sh",
+      "target": ".githooks/commit-msg",
+      "sha256": "2831679abb8b317d4e8e0012ff5f5a3f75972b9223c52572bfef7b8db6d36281",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/post-checkout.sh",
+      "target": ".githooks/post-checkout",
+      "sha256": "10b8e535ec9d50c5a9fa87200559d1254415433f4564fe327a9f882200ab20b9",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/post-rewrite.sh",
+      "target": ".githooks/post-rewrite",
+      "sha256": "9259285345fc654bc2036fb1900f2c6924f056b9a6e68be440450e9fcb576529",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/pre-commit.sh",
+      "target": ".githooks/pre-commit",
+      "sha256": "121fe13962e70e8f6053a73b25443b9a9cc37250043eba28050621d847fc6f8a",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/pre-merge-commit.sh",
+      "target": ".githooks/pre-merge-commit",
+      "sha256": "45a2352892476aaeaa0ffa9ef8f1acfc40864ba99595fe4a9a42ba3b5766868d",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/pre-push.sh",
+      "target": ".githooks/pre-push",
+      "sha256": "bac6e2c01b71f3722ca423e78d40f536057071b69cb9b2b7b67963cdbafabf41",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/pre-rebase.sh",
+      "target": ".githooks/pre-rebase",
+      "sha256": "24b0d12118dd51b7501eb296832db5281a5bc86a5973fb13f94cf08b438f0d9c",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "hooks",
+      "source": "docs/system/workspace/hooks/reference-transaction.sh",
+      "target": ".githooks/reference-transaction",
+      "sha256": "145271f0acb4af03a10fb9061a0b100f1dceab99687e37c928f892b11670d27e",
+      "mode": "delegate",
+      "note": "wrapper must exec this truth script"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/a2a_report_cli.py",
+      "target": "bin/a2a-report",
+      "sha256": "31aa61230dd670ca89164abfc01efb2b20efb0c97c338e5e20158df49a8a8444",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/ai-cli",
+      "target": "bin/ai",
+      "sha256": "c33a25e06b8ad2d1d63c2114b11af92263dda8297ad127f8837e4627b39dcd5d",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/check-build-artifact-exposure",
+      "target": "bin/check-build-artifact-exposure",
+      "sha256": "dfb500ad118f80a8c647a4592701dfee058b86aef5cfc6bdc030b563adc98f31",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/check-supply-chain-baseline",
+      "target": "bin/check-supply-chain-baseline",
+      "sha256": "c2aded65e2dbc949de121f91635139f6583aca2827e5fd486feb66051e29bf18",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/checkpoint-guard",
+      "target": "bin/checkpoint-guard",
+      "sha256": "84739dbafca6fa37837d5d60177022539fb58f6624de953674d083a58f3f2bf0",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/gitee-issue.py",
+      "target": "bin/gitee-issue",
+      "sha256": "e043fe453ff68b2a7faf4b106b9c20f136a44b9ba73035a4090cdb28a5eff352",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/governance-check",
+      "target": "bin/governance-check",
+      "sha256": "bb495abbf54b49299899fa750c72056e8e43d7c31479df28130293e828fb443b",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/governance-closeout-gate",
+      "target": "bin/governance-closeout-gate",
+      "sha256": "43b8ceea3999d61d8f555cd6e5f26579cef738a004dac5427e56fd04b33a67ce",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/governance-merge-gate",
+      "target": "bin/governance-merge-gate",
+      "sha256": "ffa2b29fb231e5af8bf51577b61b13f36504163ea03426b7d8623784f4995a21",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/governance-promotion-gate",
+      "target": "bin/governance-promotion-gate",
+      "sha256": "e4594bb5e883027e04e5686f4d73b48159cb2ba90ea84ab7ca6b7c19fa896ad3",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/harness_select.py",
+      "target": "bin/harness-select",
+      "sha256": "8af6f5a41c7a10203e53de4895aad828e51a050116d2d7d826432e9a88c3b357",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/harness_status.py",
+      "target": "bin/harness-status",
+      "sha256": "1a7e0bdae495c303d5441509be71b2c0923b7b32eca4bc78f30acd5d4379bc42",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/new-review",
+      "target": "bin/new-review",
+      "sha256": "7769ea925ec15867b09c589f3e01a8a6587dbb47554fe0687158c87e01c35edb",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/pr-create-guarded",
+      "target": "bin/pr-create-guarded",
+      "sha256": "dd073f4a01fc1114ffb8438871bb471867314cc2ab1c1d6282d1646d70582d4c",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/pr-merge-guarded",
+      "target": "bin/pr-merge-guarded",
+      "sha256": "9ab7bf4c5c9f3c7e2377c18018d4ebc2aca3098d148d27e48192d4653d6dc87b",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/pr-review-guarded",
+      "target": "bin/pr-review-guarded",
+      "sha256": "678090a20aeb2723e261ceecbc08e6e7bccd76c151760d5ffacefac600522cf8",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/pretests-gate",
+      "target": "bin/pretests-gate",
+      "sha256": "b572f3132c616bd4d20791689e8ca3df80ff60c827b3205eb6d9ac9c91b83ecd",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/pretests-retirement-gate",
+      "target": "bin/pretests-retirement-gate",
+      "sha256": "b29e8558f940c9ab229b5a3b4d1856973aa93a567dfb90629c6f87e533deb18f",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/projection_verify.py",
+      "target": "bin/projections",
+      "sha256": "db18a2c7f532e02074e4bb13108f79c17ffed4137072aaaf1c4c8eeeeb0c06b0",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-acp-binary-check-require-available",
+      "target": "bin/test-acp-binary-check-require-available",
+      "sha256": "73ace631308a0b1eaf30440bdd4489dab80af063a779bc5bcd0e8e1d5b0ca146",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-ai-cli-login-triggers-auth-change-wake",
+      "target": "bin/test-ai-cli-login-triggers-auth-change-wake",
+      "sha256": "5d7451e784de3a0d7968ac656e4f3ebc4727a98dfbd911b3a6682077cc6d1bd3",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-ai-cli-switch-triggers-auth-change-wake",
+      "target": "bin/test-ai-cli-switch-triggers-auth-change-wake",
+      "sha256": "7e1cb663a100ff40afd908ed463679b6d88a8fb649164d5424cef5579c16599f",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-checkpoint-guard",
+      "target": "bin/test-checkpoint-guard",
+      "sha256": "0d5a50755fe803f4b6dbe229dd1b2308208a957cd86408c12e0b6838154c89e6",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-ai-account-switch",
+      "target": "bin/test-freely-ai-account-switch",
+      "sha256": "21c228d526eba8cf3886e90e2b41443ddbbf1d47f6ec69889b90ace2dade04af",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-auth-change-wake-fans-out-running-projects",
+      "target": "bin/test-freely-auth-change-wake-fans-out-running-projects",
+      "sha256": "505a18c780c0bb4460a6e085ed74273325a483f1660d98fcd1ef6bd914f4c1fb",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-checkpoint-governance",
+      "target": "bin/test-freely-checkpoint-governance",
+      "sha256": "f3c2fc9fa44f53ef3567666fabfe8f5e0cc2c71e3aebc3fdb44ab3a55c92f7cb",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-fleet-status",
+      "target": "bin/test-freely-fleet-status",
+      "sha256": "7011a14e1a80531310d1d4ad564dbd86b20dcefc32e0e1f5e591311be301b3fb",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-manager-project-registration",
+      "target": "bin/test-freely-manager-project-registration",
+      "sha256": "45e02fe8bfe81d8b1fc7a28e72b4951acc4454187497811dc37f6496ff5ecdbe",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log",
+      "target": "bin/test-freely-runtime-supervisor-event-log",
+      "sha256": "e0959458550d203037eded023ffae11389db22e64c038c56f614682cef78de89",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-session-rotation",
+      "target": "bin/test-freely-session-rotation",
+      "sha256": "e8ce7a3e11a224263f1796860082da63ada60ebdc2fe15813c6efc73f98f878c",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-supervisor-loop",
+      "target": "bin/test-freely-supervisor-loop",
+      "sha256": "7f10247c17730c5e28b73cf545aafdd616f90bd02a7b6d77025aaa2a2e403e35",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-task-source-scan-provider-hints",
+      "target": "bin/test-freely-task-source-scan-provider-hints",
+      "sha256": "96cc6d1be4bef41318965e181ab4d7550f71fa267fc4f6110000b00859173aed",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-freely-workspace-root-fallback",
+      "target": "bin/test-freely-workspace-root-fallback",
+      "sha256": "06fa7c4af7931e5b95f17f7da6b0eecc187de985338ee09b7946d8ee0cf1b2c8",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-gitee-issue",
+      "target": "bin/test-gitee-issue",
+      "sha256": "7d720c50caa141b7d6fde76bda035ece8150b736ab05630baae99651081f2ef5",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-human-chat-routing",
+      "target": "bin/test-human-chat-routing",
+      "sha256": "4d12418d9ffcca6d60e3404b7ebd6dfbf1b39078508e92c153fa07d7152bf539",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-issue-sync-protected-branch-guard",
+      "target": "bin/test-issue-sync-protected-branch-guard",
+      "sha256": "cd364d90dfc7c6234b1dc117add6f4514c0b7e9ff9ca19e4d646390f1dc0333c",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/quality/test-lane",
+      "target": "bin/test-lane",
+      "sha256": "ff201b616869d3897addb76468190c9a3dcbb40207188b0e92a5600364b7985a",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-merge-guarded",
+      "target": "bin/test-merge-guarded",
+      "sha256": "9b8bf32bc17bd087ab8ae6163b0bc8c24c65cb0884ba8801a1c69fce4d26b153",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args",
+      "target": "bin/test-monitor-ai-cli-codex-args",
+      "sha256": "f82905cb56595945a73b3de0694aad4294c7639bd78e279ef30ccd4976cd98b6",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid",
+      "target": "bin/test-monitor-ai-cli-pid",
+      "sha256": "96afe4013cff8351418a0306a2f727937bcc5e6e72a775088916ca4e986846d1",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-pre-merge-commit-hook",
+      "target": "bin/test-pre-merge-commit-hook",
+      "sha256": "579a733dca9e35c65ca3692a33be4a6a7f77b18a430393f3f0d2b5a82d007acd",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-pre-push-hook",
+      "target": "bin/test-pre-push-hook",
+      "sha256": "80cba79d2dde68cc347096876d6a3e47515f413c7478caf13c0febe51117486f",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-routing-foundation-loop",
+      "target": "bin/test-routing-foundation-loop",
+      "sha256": "5c7bd87e85e4dc3c4863d3efaa9d7a30922cee833802c9f523745e7c586875cb",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-rust-toolchain-preflight",
+      "target": "bin/test-rust-toolchain-preflight",
+      "sha256": "c25218850ac45a6d3d3700177a1856e2fd59019812b084e32d87ee15c03e97ff",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-test-lane",
+      "target": "bin/test-test-lane",
+      "sha256": "ffbd331eb27ae39c82ee66a85ab6298b21e383368475b09bdb4b695ee1dc37f8",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-worktree-entry-flow",
+      "target": "bin/test-worktree-entry-flow",
+      "sha256": "5654d9eba447ddf1df71f3f5d3256d7ee06b20bd3d10ef942412622e384e3eec",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-wt-close-protected-branch-guard",
+      "target": "bin/test-wt-close-protected-branch-guard",
+      "sha256": "91a7d742e93bedf63a7bc33e16d6709680b19d89d7a756aee206fe3ed99a73c0",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-wt-create-source-local",
+      "target": "bin/test-wt-create-source-local",
+      "sha256": "455230670ab874b0b88949d215693c9cf464345b2ec3ac3b61a73447bef48ec5",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/tests/test-wt-fleet-status",
+      "target": "bin/test-wt-fleet-status",
+      "sha256": "25c90924f76d64a6422ecce9f0c360a7f423ea493c2604d72ea3d8caa8732893",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/wt-close",
+      "target": "bin/wt-close",
+      "sha256": "2214c4e5ec6a71da8bcdc8e581f0a79bba5e50dbc16c039cb3c29afd146c7e33",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/wt-create",
+      "target": "bin/wt-create",
+      "sha256": "8cc16e23cac14b98c4c7ea0101d77fd1ee6c1887c1b02d570219afe623fca4d0",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/wt-fleet-status",
+      "target": "bin/wt-fleet-status",
+      "sha256": "dba70e13505af24b3a09f8ad965bf0739871e478eb482905dd0b1efeea872c4b",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/worktree/wt-status-all",
+      "target": "bin/wt-status-all",
+      "sha256": "fb7fe6ddc1e43c844f7271f8e5f618782a55a00c9033795a8785efaf68210925",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "agents",
+      "source": "docs/system/workspace/skills",
+      "target": "docs/system/workspace/AGENTS.md.example",
+      "sha256": "810acdbcf552b7a61a4a3d718511d48b49983460a88b052f2d047f83801ddef8",
+      "mode": "copy",
+      "note": "quoted skill names must exist"
+    },
+    {
+      "kind": "agents",
+      "source": "docs/system/workspace/skills",
+      "target": "docs/system/workspace/scripts/runtime/freely",
+      "sha256": "810acdbcf552b7a61a4a3d718511d48b49983460a88b052f2d047f83801ddef8",
+      "mode": "copy",
+      "note": "generated AGENTS section quotes skill names"
+    }
+  ]
+}

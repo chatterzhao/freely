@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-echo "HOOK CALLED: state=$1" >> /tmp/hook-debug.log
-set -euo pipefail
-ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || { cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P; })"
-HOOK_NAME="$(basename "$0")"
-if [[ -x "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
-  exec bash "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
-fi
-...

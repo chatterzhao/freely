@@ -1,0 +1,24 @@
+source: /private/tmp/r33-base
+  [FAIL] dead hook copies removed — dead hook copies still present: ['pre-commit.sh', 'pre-merge-commit.sh', 'pre-push.sh', 'reference-transaction.sh']
+  [FAIL] .githooks holds wrappers only — non-wrapper files in .githooks/: ['pre-commit.sh', 'pre-merge-commit.sh', 'pre-push.bak.20260228-223112', 'pre-push.sh', 'reference-transaction.debug', 'reference-transaction.sh']
+  [ok] all eight wrappers present
+  [FAIL] every wrapper delegates to its truth script — wrappers that do not delegate to the truth script: ['post-checkout']
+  [FAIL] projection.lock exists — missing projection.lock
+  [FAIL] lock header is complete — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r33-base/projection.lock'
+  [FAIL] lock covers hooks/skills/bin/agents — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r33-base/projection.lock'
+  [FAIL] every entry records kind/source/target/sha256 — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r33-base/projection.lock'
+  [FAIL] every recorded path exists — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r33-base/projection.lock'
+  [FAIL] every recorded hash matches its source — exception: FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/r33-base/projection.lock'
+  [FAIL] verifier exists and is executable — missing docs/system/workspace/scripts/quality/projection_verify.py
+  [FAIL] runtime exposes `freely projections` — dispatch=False bin/projections->False
+  [FAIL] no ghost skill names in generator or template — non-existent skill names still quoted: ['docs/system/workspace/AGENTS.md.example:freely-fix-execution', 'docs/system/workspace/AGENTS.md.example:freely-feat-execution', 'docs/system/workspace/scripts/runtime/freely:freely-fix-execution', 'docs/system/workspace/scripts/runtime/freely:freely-feature-execution']
+  [FAIL] template quotes only real skill names — template quotes unknown skills: ['freely-feat-execution', 'freely-fix-execution']
+  [FAIL] AT wired into CORE and CI_CORE — AT not wired into both CORE and CI_CORE
+  [FAIL] story registered in epics-map — story not registered in epics-map
+  [FAIL] verify exits 0 on a consistent tree — missing docs/system/workspace/scripts/quality/projection_verify.py
+  [FAIL] verify refuses a tampered projection — missing docs/system/workspace/scripts/quality/projection_verify.py
+  [FAIL] verify refuses a missing lock — missing docs/system/workspace/scripts/quality/projection_verify.py
+  [FAIL] freely projections verify dispatches — rc=1 out=Usage:
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--
+
+SUMMARY: 1 ok, 19 failed

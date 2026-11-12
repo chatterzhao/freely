@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Projection only — implementation lives in workspace/scripts/quality/ (#4179).
+exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/docs/system/workspace/scripts/quality/projection_verify.py" "$@"

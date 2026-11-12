@@ -8829,15 +8829,14 @@ EOF
 
 ### Skill 体系
 所有 skill 以 `freely-` 前缀命名:
-- `freely-fix-execution` — bug 修复工作流
-- `freely-feature-execution` — 功能开发工作流
-- `freely-dev-loop-execution` — 开发循环（code review + pre-tests）
+- `freely-workflow-guarded-execution` — 全链路权威（fix 与 feature 共用同一条门禁链）
+- `freely-test-RED-execution` / `freely-dev-loop-execution` / `freely-test-execution` — RED → 实现 → GREEN 三阶段
 - `freely-doc-B1_IBM-execution` / `freely-doc-B2_IBM-execution` — IBM 治理
 - `freely-branch-management` — 分支管理
 - `freely-auto-loop-orchestrator` — 自主循环编排
 
 ### 工位与分支
-- 创建工位: `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 创建工位: `wt-create --raw-key <key> --source <source> --kind fix|feature --slug <slug>`
 - 分支命名: `fix/raw-{ts}-{slug}` 或 `feature/raw-{ts}-{slug}`
 - 合并链: `fix/feature → test-pre-merge-* → develop`
 - test-pre-merge-* 是临时测试面，用完即删
@@ -11200,9 +11199,9 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
         printf -- '- 路径: `%s`\n' "$companion_wt"
         printf -- '- 分支: `%s`\n' "$companion_branch"
         if [[ "$companion_branch" == fix/* ]]; then
-          printf 'freely-fix-execution 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
+          printf 'fix 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
         elif [[ "$companion_branch" == feature/* ]]; then
-          printf 'freely-feature-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
+          printf 'feature 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
         fi
       fi
     fi
@@ -11400,7 +11399,7 @@ worker_prompt_launchable_for_manager_project() {
       fi
       # develop cleanup is theoretically allowed but practically blocked:
       # develop is the protected manager worktree. Cleanups must run from a dedicated worktree.
-      LAUNCH_REJECT_REASON="develop is protected: cleanup workers cannot run on develop — create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>} --skill freely-fix-execution --slug <slug>"
+      LAUNCH_REJECT_REASON="develop is protected: cleanup workers cannot run on develop — create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>} --kind fix --slug <slug>"
       log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
       return 1
       ;;
@@ -25671,11 +25670,11 @@ cmd_intake_chat() {
     echo ""
     echo "[chat] To create a raw issue from this intake:"
     echo "[chat]   1. freely feedback --help   (review usage, then create the raw issue)"
-    echo "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
+    echo "[chat]   2. wt-create --raw-key <returned-key> --source platform --kind fix --slug <slug>"
     echo "[chat]"
     echo "[chat] Then follow the skill to complete the work:"
-    echo "[chat]   skill:freely-fix-execution  — Fix first, govern later"
-    echo "[chat]   skill:freely-feature-execution — Govern first, then code"
+    echo "[chat]   skill:freely-workflow-guarded-execution — guarded chain for fix and feature alike"
+    echo "[chat]   fix: govern after test; feature: B1/B2 before code (same gate chain)"
   fi
 }
 
@@ -27145,6 +27144,7 @@ main() {
         *) log_error "unknown evidence subcommand: $evidence_subcmd"; usage; exit 1 ;;
       esac
       ;;
+    projections) exec bash "$SELF_ROOT/bin/projections" "$@" ;;
     pretests-gate) cmd_pretests_gate "$@" ;;
     pretests-retirement-gate) cmd_pretests_retirement_gate "$@" ;;
     stop) cmd_stop "$@" ;;

@@ -25,8 +25,8 @@ Freely 能力通过 `skill:<name>` 引用。skill 内部包含完整工作流，
 |---|---|
 | 每次启动，判定来源和下一跳 | `freely-context-source-skill` |
 | Manager 持续 patrol → 判断 → 委派 | `freely-auto-loop-orchestrator` |
-| Bug 修复 | `freely-fix-execution` |
-| 功能开发 | `freely-feat-execution` |
+| Bug 修复 / 功能开发（同一条门禁链） | `freely-workflow-guarded-execution` |
+| RED → 实现 → GREEN 三阶段 | `freely-test-RED-execution` / `freely-dev-loop-execution` / `freely-test-execution` |
 | 实现 + code-review + pre-tests | `freely-dev-loop-execution` |
 | raw issue → Brainstorm → candidate → milestone | `freely-doc-B1_IBM-execution` |
 | milestone I-issue → Brainstorm → prd/pre-tests/code-review | `freely-doc-B2_IBM-execution` |
@@ -96,7 +96,7 @@ feedback → wt-create → B1_IBM → B2_IBM → dev实现 → pr-create-guarded
 | 步骤 | 命令 / Skill | Loop |
 |------|-------------|------|
 | 1. 创建 raw issue | `freely feedback --repo ... --title ... --body ...` | 人类操作 |
-| 2. 创建工位 | `wt-create --raw-key <key> --source platform --skill freely-feat-execution --slug <slug>` | auto |
+| 2. 创建工位 | `wt-create --raw-key <key> --source platform --kind feature --slug <slug>` | auto |
 | 3. 预研（Brainstorm → Candidate） | `skill:freely-doc-B1_IBM-execution` | doc |
 | 4. 实现设计（Map: prd/pre-tests/tasks） | `skill:freely-doc-B2_IBM-execution` | doc |
 | 5. 代码实现 + code-review + pre-tests | `skill:freely-dev-loop-execution` | dev |
@@ -110,7 +110,7 @@ feedback → wt-create → B1_IBM → B2_IBM → dev实现 → pr-create-guarded
 wt-create → dev → test → B1 → B2 → pr-create → pr-merge → wt-close
 ```
 
-与 Feat 区别：B1/B2 后置于 test 之后，用 `test-pre-merge-*` 沙箱快测。详见 `skill:freely-fix-execution`。
+与 Feat 区别：B1/B2 后置于 test 之后，用 `test-pre-merge-*` 沙箱快测。两者共用 `skill:freely-workflow-guarded-execution` 的门禁链。
 
 ### Doc-only（纯文档/模板/config）
 
