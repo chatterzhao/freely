@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261112T131115Z
 kind: raw
-phase_state: absorbed
-absorbed_into: I-20261112T131115Z-A
+phase_state: proposed
+absorbed_into: ''
 platform_ids:
   github:
     issue_id: '4315'
@@ -14,22 +14,19 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKUZ17
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261112T131115Z/issues/I-20261112T131115Z-A.md
-last_synced_comment_at:
-  github: '2026-11-12T13:56:29Z'
-  gitee: '2026-11-12T13:56:29Z'
+canonical_issue_path: ''
+last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-12T13:11:15Z'
-updated_at: '2026-11-12T13:56:34Z'
+updated_at: '2026-11-12T13:56:40Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
-promoted_children:
-- I-20261112T131115Z-A
+platform_state: open
+promoted_children: []
 source_candidate: ''
-completed_at: '2026-11-12T13:56:29Z'
+completed_at: ''
 closeout_note: ''
 severity: P1
 ---
@@ -94,11 +91,3 @@ workflow_kind: fix
 - 不放宽 raw 的 `validate()`（kind 必须仍是 raw）；
 - 不动 promote / promote-finalize 语义；
 - 平台关单仍必须经 adapter，禁止手工 gh/gitee 直接关。
-
-### comment-20261112T135629Z
-- source: system
-- event: promote_finalized
-- children: ["I-20261112T131115Z-A"]
-
-拆解为以下任务:
-1. [I-20261112T131115Z-A](will-be-updated)
