@@ -46,9 +46,9 @@ workflow_kind: fix
 | local_id | `raw-20261112T031638Z` |
 | kind | `raw` |
 | phase_state | `absorbed` |
-| canonical | `none` |
+| canonical | `docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-A.md` |
 | created | 2026-11-12T03:16:38Z |
-| updated | 2026-11-12T03:16:38Z |
+| updated | 2026-11-12T05:48:14Z |
 
 ---
 
