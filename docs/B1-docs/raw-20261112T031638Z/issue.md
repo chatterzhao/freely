@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261112T031638Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261112T031638Z-A
 platform_ids:
   github:
     issue_id: '4310'
@@ -14,19 +14,23 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKUSRE
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-A.md
+last_synced_comment_at:
+  github: '2026-11-12T05:48:09Z'
+  gitee: '2026-11-12T05:48:09Z'
 hash: ''
 created_at: '2026-11-12T03:16:38Z'
-updated_at: '2026-11-12T03:48:18Z'
+updated_at: '2026-11-12T05:48:14Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261112T031638Z-A
+- I-20261112T031638Z-B
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-12T05:48:08Z'
 closeout_note: ''
 severity: P2
 ---
@@ -85,3 +89,12 @@ R33 的验收只检查了 AGENTS 生成器与模板的特定位置，没覆盖 b
 ## 评审结论
 
 真实、可复现（本轮 wt-create 输出即为证据）、与既有验收结论矛盾，应作为独立 fix raw 登记。R33.5 已合并收口，本条不回灌其代码。
+
+### comment-20261112T054808Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261112T031638Z-A", "I-20261112T031638Z-B"]
+
+拆解为以下任务:
+1. [I-20261112T031638Z-A](will-be-updated)
+2. [I-20261112T031638Z-B](will-be-updated)
