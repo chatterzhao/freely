@@ -1,3 +1,37 @@
+## M-20261112T031638Z-A
+- title: fix — 指引文案全域去幽灵名 + raw-issue-pull 显式传 --project
+- status: active
+### candidate_issues
+1. `C-20261112T031638Z-A`
+- milestone: M-20261112T031638Z-A
+- status: promoted
+- promoted_issue_id: `I-20261112T031638Z-A`
+2. `C-20261112T031638Z-B`
+- milestone: M-20261112T031638Z-A
+- status: promoted
+- promoted_issue_id: `I-20261112T031638Z-B`
+### committed_issues
+1. `I-20261112T031638Z-A`
+- milestone: M-20261112T031638Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-A.md
+2. `I-20261112T031638Z-B`
+- milestone: M-20261112T031638Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-B.md
+
+### completed_issues
+1. `I-20261112T031638Z-A`
+- milestone: M-20261112T031638Z-A
+- phase_state: completed
+- completed_at: 2026-11-12T06:40:00Z
+- issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-A.md
+2. `I-20261112T031638Z-B`
+- milestone: M-20261112T031638Z-A
+- phase_state: completed
+- completed_at: 2026-11-12T06:40:00Z
+- issue_path: docs/B2-docs/command-wrapper/guidance-text-single-source/raw-20261112T031638Z/issues/I-20261112T031638Z-B.md
+
 ## M-20261112T015715Z-A
 - title: fix — registry 契约测试机器无关化（自建 cline stub）
 - status: active

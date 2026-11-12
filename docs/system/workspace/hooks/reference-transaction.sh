@@ -115,7 +115,7 @@ while read -r old_oid new_oid refname; do
 
   阶段2: 创建 raw issue → freely feedback --repo <user/repo> --title '...' --body '...'
   阶段3: 创建工位   → freely wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
-                          --skill <freely-workflow-guarded-execution|freely-workflow-guarded-execution> --slug <slug>
+                          --kind <fix|feature|hotfix> --slug <slug>
 
 MSG
         exit 1

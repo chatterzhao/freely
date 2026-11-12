@@ -1107,7 +1107,7 @@ Usage:
   freely develop-push attempt [--project <abs_path>]
   freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
   freely develop-push clear [--project <abs_path>]
-  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely wt-create [--raw-key <key>] [--source platform] [--kind <fix|feature|hotfix>] [--slug <slug>] [--base <branch>]
   freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
   freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
   freely pr-merge-guarded complete <target-branch> <source-branch>
@@ -10768,7 +10768,7 @@ materialize_worker_prompt_worktree_if_needed() {
     if ! bash "$manager_project/bin/wt-create" "$target_branch" --base develop 2>&1; then
       log_warn "worker worktree auto-materialize blocked: wt-create failed for branch=$target_branch"
       log_warn "  Manager must create the worktree before delegating:"
-      log_warn "  freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+      log_warn "  freely wt-create --raw-key <key> --source <source> --kind <fix|feature|hotfix> --slug <slug>"
       return 1
     fi
   else
@@ -11358,7 +11358,7 @@ worker_prompt_launchable_for_manager_project() {
     if worker_prompt_can_materialize_missing_worktree "$manager_project" "$prompt_file"; then
       return 0
     fi
-    LAUNCH_REJECT_REASON="worktree missing: '${resolved_worktree:-<empty>}' — create it with: wt-create --raw-key ${raw_key_hint:-<key>} --source platform --skill <skill> --slug <slug>"
+    LAUNCH_REJECT_REASON="worktree missing: '${resolved_worktree:-<empty>}' — create it with: wt-create --raw-key ${raw_key_hint:-<key>} --source platform --kind <fix|feature|hotfix> --slug <slug>"
     log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
     return 1
   fi
@@ -11393,7 +11393,7 @@ worker_prompt_launchable_for_manager_project() {
     hotfix/*) ;;  # emergency fixes
     develop)
       if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" != "cleanup" ]]; then
-        LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got '$(worker_prompt_normalized_intent_kind "$prompt_file")' — for edit/feature work, create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>}"
+        LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got '$(worker_prompt_normalized_intent_kind "$prompt_file")' — for edit/feature work, create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>} --source platform --kind <fix|feature|hotfix> --slug <slug>"
         log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
         return 1
       fi
@@ -11404,7 +11404,7 @@ worker_prompt_launchable_for_manager_project() {
       return 1
       ;;
     *)
-      LAUNCH_REJECT_REASON="branch='$target_branch' not in fix/*|feature/*|hotfix/* — create a worktree with: wt-create --raw-key ${raw_key_hint:-<key>} --source platform --skill <skill> --slug <slug>"
+      LAUNCH_REJECT_REASON="branch='$target_branch' not in fix/*|feature/*|hotfix/* — create a worktree with: wt-create --raw-key ${raw_key_hint:-<key>} --source platform --kind <fix|feature|hotfix> --slug <slug>"
       log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
       return 1
       ;;
@@ -13427,7 +13427,7 @@ launch_worker_from_manager_prompt_if_needed() {
   if [[ -z "$target_project" || ! -d "$target_project" ]]; then
     log_warn "worker launch BLOCKED: worktree does not exist (target=$target_project)"
     log_warn "  Manager must create the worktree before delegating workers."
-    log_warn "  Use: freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+    log_warn "  Use: freely wt-create --raw-key <key> --source <source> --kind <fix|feature|hotfix> --slug <slug>"
     append_runtime_event "$manager_project" "worker_launch_blocked_worktree_missing" \
       "prompt_file=$prompt_file" \
       "target=$target_project"

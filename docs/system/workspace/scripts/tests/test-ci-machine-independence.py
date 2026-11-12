@@ -80,8 +80,13 @@ def clean_env() -> dict[str, str]:
 
 
 def run(cmd: list[str], cwd: Path, env: dict[str, str]) -> subprocess.CompletedProcess:
+    # This probe runs the WHOLE verified subset (`test-all --ci`), so its budget
+    # must scale with the subset, not with a single test. 300s was enough for 22
+    # members; onboarding more (raw-20261112T031638Z added two) pushed the nested
+    # run past it and surfaced as a timeout instead of a test failure. The
+    # assertion is about "all green", never about speed.
     return subprocess.run(cmd, cwd=str(cwd), env=env, capture_output=True,
-                          text=True, timeout=300)
+                          text=True, timeout=1200)
 
 
 def static_checks() -> None:
@@ -161,8 +166,16 @@ def behavior_checks(tmp: Path) -> None:
         nested["FREELY_AT_NESTED"] = "1"
         r2 = run(["bash", str(TEST_ALL), "--ci"], SRC, nested)
         out2 = r2.stdout + r2.stderr
-        expect(r2.returncode == 0 and "SUMMARY: 22 ok, 0 failed" in out2,
-               "B2 clean PATH: test-all --ci 22 ok / 0 failed")
+        # Assert the STABLE property ("the whole verified subset is green"),
+        # not the exact member count: hard-coding "22 ok" made this AT red the
+        # moment any test was onboarded to CI_CORE, which is a maintenance trap
+        # rather than a regression signal. The subset can only grow (§S8 pins
+        # that no existing member was removed).
+        m = re.search(r"SUMMARY: (\d+) ok, (\d+) failed", out2)
+        green = bool(m) and int(m.group(2)) == 0 and int(m.group(1)) >= 22
+        expect(r2.returncode == 0 and green,
+               f"B2 clean PATH: test-all --ci all green, >=22 ok "
+               f"({m.group(0) if m else 'no SUMMARY line'})")
 
     # Negative control: changing the registry's cline probe word must make the
     # "cline detected" assertion fail even though the stub exists. This is what

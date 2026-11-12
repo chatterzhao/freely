@@ -68,21 +68,33 @@ for branch in "fix/raw-20260522-demo" "feature/raw-20260522-demo" "hotfix/critic
 done
 
 # Test 5: guard message contains workflow guidance (syntax check on actual script)
+# The assertion must match the text wt-close actually prints. It used to look for
+# "wt-close refuses to modify files on protected branch", a string that does not
+# exist in the script, so this test was permanently red on every machine.
 echo "=== Test 5: guard message exists in actual script ==="
 GUARD_FILE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-close"
-if grep -q "wt-close refuses to modify files on protected branch" "$GUARD_FILE"; then
+if grep -qE "is a protected branch, cannot close" "$GUARD_FILE"; then
   echo "[PASS] guard message found in wt-close"
 else
   echo "[FAIL] guard message not found"
   failures=$((failures+1))
 fi
 
-# Test 6: guard references skills
-echo "=== Test 6: guard references skills ==="
-if grep -q "freely-fix-execution\|freely-feature-execution" "$GUARD_FILE"; then
-  echo "[PASS] skill reference found in guard message"
+# Test 6: guard references the REAL workflow skill and no ghost names.
+# This used to assert the opposite (a ghost name had to be present), which froze
+# the historical bug into the acceptance criteria. It also used `grep -q "a\|b"`,
+# and BSD grep does not support \| in basic regex, so it never matched on macOS.
+echo "=== Test 6: guard references the real skill, no ghosts ==="
+if grep -qE "freely-fix-execution|freely-feature-execution|freely-feat-execution" "$GUARD_FILE"; then
+  echo "[FAIL] ghost skill name still referenced in guard message"
+  failures=$((failures+1))
 else
-  echo "[FAIL] skill reference not found"
+  echo "[PASS] no ghost skill names in guard message"
+fi
+if grep -qE "skill:freely-workflow-guarded-execution" "$GUARD_FILE"; then
+  echo "[PASS] real workflow skill referenced in guard message"
+else
+  echo "[FAIL] real workflow skill not referenced in guard message"
   failures=$((failures+1))
 fi
 

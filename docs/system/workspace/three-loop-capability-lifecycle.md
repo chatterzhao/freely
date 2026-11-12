@@ -203,7 +203,7 @@ intake → routing → dispatch → test → pr-create → pr-review → CI chec
 #### routing gate（阶段2-3）
 - 触发: intake 有新 item 需要创建工位
 - 执行: `freely feedback` → 创建 raw issue → GitHub 平台
-- 继续: `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 继续: `wt-create --raw-key <key> --source <source> --kind <fix|feature|hotfix> --slug <slug>`
 - 命令封装: `wt-create` 内部自动执行 `git fetch origin develop` + `git update-ref` + `git worktree add` + test-pre-merge worktree 创建
 
 #### dispatch gate（阶段4-6 入口）
@@ -356,7 +356,7 @@ dev:             │           └── RED→实现 ──→ test-GREEN ─�
 | 命令 | 内部步骤 |
 |------|---------|
 | `freely feedback --repo <repo> --title "..." --body "..."` | 在 GitHub 创建 raw issue（raw issue 不存在时需要） |
-| `wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
+| `wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
 | `pr-create-guarded` | `git pull origin develop` → `pr-merge-guarded --dry-run` → `git push origin HEAD` → `platform-adapter create-pr` |
 | `pr-review-guarded` | 6 维独立 review (correctness / security / performance / reuse / governance / testing) → verdict 文档 (pass/fail) |
 | `pr-merge-guarded develop <pr-branch>` | `git fetch origin develop` → validate direction → PR gate (check PR + approval) → promotion gate → `git merge --no-ff` → issue-sync → `develop-push` → `platform-adapter close-pr` |

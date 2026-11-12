@@ -123,12 +123,11 @@ main() {
         "Protected branches (main, develop, test-pre-merge-*) must not be modified directly." \
         "All code and issue changes go through worktrees:" \
         "" \
-        "  Bug fix:   skill:freely-fix-execution" \
-        "  Feature:   skill:freely-feature-execution" \
+        "  Workflow:  skill:freely-workflow-guarded-execution (fix and feature share it)" \
         "" \
         "Workflow:" \
         "  1. feedback → create raw issue in docs/B1-docs/" \
-        "  2. wt-create --raw-key <key> --skill <freely-fix-execution|freely-feature-execution> --slug <slug>" \
+        "  2. wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>" \
         "  3. Fix/develop in fix/* or feature/* worktree → git commit" \
         "  4. pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create" \
         "  5. pr-merge-guarded develop <branch> → PR gate → promotion gate → merge" \
