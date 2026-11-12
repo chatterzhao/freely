@@ -155,7 +155,8 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   fi
   if [[ "$gate_rc" -ne 0 ]]; then
 	    # Determine the authoritative skill from branch prefix.
-	    # wt-create derives prefix from --skill: freely-workflow-guarded-execution → fix/raw-*, freely-workflow-guarded-execution → feature/raw-*
+	    # wt-create derives the prefix from --kind: fix → fix/raw-*, feature → feature/raw-*.
+	    # Both kinds share skill:freely-workflow-guarded-execution.
 	    _primary_skill=""; _flow_desc=""
 	    case "$current_branch" in
 	      fix/*)

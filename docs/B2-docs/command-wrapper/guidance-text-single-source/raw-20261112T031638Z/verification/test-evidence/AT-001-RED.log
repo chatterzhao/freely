@@ -1,0 +1,27 @@
+=== AT-001/AT-002 guidance-text-single-source (source=/private/tmp/r336-base.SRDRrf) ===
+--- AT-001 static: guidance text invariants ---
+  [FAIL] S1 bin/issue-sync guard quotes only the real workflow skill
+  [FAIL] S2 bin/issue-sync wt-create hint includes required --kind
+  [FAIL] S3 pretests-gate red_green_not_green message has no ghost skill
+  [FAIL] S4 wt-close UNMERGED warning quotes only the real workflow skill
+  [FAIL] S5 runtime/freely wt-create hints all include --kind (missing: ['freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [', 'log_warn "  freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slu', 'LAUNCH_REJECT_REASON="worktree missing: \'${resolved_worktree:-<empty>}\' — create it with: ', 'LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got \'$(worker_prompt_', 'LAUNCH_REJECT_REASON="branch=\'$target_branch\' not in fix/*|feature/*|hotfix/* — create a w', 'log_warn "  Use: freely wt-create --raw-key <key> --source <source> --skill <skill> --slug'])
+  [FAIL] S6 reference-transaction hook: no ghosts, no duplicated identical option, has --kind
+  [FAIL] S7 AGENTS.md.example + three-loop doc hints include --kind (['docs/system/workspace/AGENTS.md.example: - 创建：`wt-create --raw-key <key> --source <source> --skill <skill> --sl', 'docs/system/workspace/three-loop-capability-lifecycle.md: - 继续: `wt-create --raw-key <key> --source <source> --skill <skill> --s', 'docs/system/workspace/three-loop-capability-lifecycle.md: | `wt-create --raw-key <key> --source platform --skill <skill> --slug '])
+  [FAIL] S8 pr-create-guarded comment attributes prefix to --kind, no duplicated name
+  [FAIL] S9 repo-wide scan: zero ghost names outside whitelist (['bin/issue-sync:freely-fix-execution,freely-feature-execution', 'docs/system/workspace/scripts/quality/pretests-gate:freely-fix-execution,freely-feature-execution', 'docs/system/workspace/scripts/tests/test-wt-close-protected-branch-guard:freely-fix-execution,freely-feature-execution', 'docs/system/workspace/scripts/worktree/wt-close:freely-fix-execution,freely-feature-execution'])
+  [ok] S10 whitelist entries all exist and never exempt must-fix files (missing=[], leaked=[])
+  [FAIL] S11 AT wired into both CORE and CI_CORE of bin/test-all
+  [FAIL] S12 epics story dir exists and is registered in epics-map.svg
+  [FAIL] S13 wt-close guard test asserts absence of ghosts via grep -E and presence of real skill
+  [FAIL] S14 function-level unit test t-guidance-01.sh exists and is executable (Step 2.5)
+--- AT-001 behavioural ---
+  [FAIL] B1 real guard still refuses on develop AND prints clean guidance (rc=1, guarded=True, ghosts=['freely-fix-execution', 'freely-feature-execution'])
+  [ok] B2 negative control: a ghost in a non-whitelisted live file is detected
+--- AT-002 static: caller path invariants ---
+  [FAIL] S15 raw-issue-pull passes --project when calling issue-sync create (call='issue-sync" create "$local_id"')
+  [ok] S16 raw-issue-pull ROOT_DIR default derivation unchanged (script location still locates the binary)
+  [ok] S17 issue-sync ROOT_DIR default derivation unchanged (no blast radius on 14 modules)
+--- AT-002 behavioural ---
+  [SKIP] B3 real wt-create output has no protected-root noise — nested run: creating a worktree + platform issue would recurse
+  [ok] B4 issue-sync still refuses on protected branch (rc=1, guard_fired=True)
+SUMMARY: 5 ok, 15 failed, 1 skipped

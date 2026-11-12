@@ -143,7 +143,7 @@ raw issue → B1_IBM → candidate → B2_IBM → I-issue → dev-loop → merge
 ## 分支规范
 
 - 命名：`fix/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}` / `feature/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}`
-- 创建：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 创建：`wt-create --raw-key <key> --source <source> --kind <fix|feature|hotfix> --slug <slug>`
 - 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直达 develop）
 - `test-pre-merge-*` 临时测试面，用完即删，不可 commit/push
 

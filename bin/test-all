@@ -22,6 +22,7 @@ done
 
 CORE=(
   test-ci-machine-independence.py
+  test-guidance-text-single-source.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
@@ -36,6 +37,7 @@ CORE=(
   test-issue-sync-modules.py
   test-runtime-tdd-evidence.py
   test-runtime-unit
+  test-wt-close-protected-branch-guard
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
@@ -50,6 +52,7 @@ CORE=(
 )
 CI_CORE=(
   test-ci-machine-independence.py
+  test-guidance-text-single-source.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
@@ -64,6 +67,7 @@ CI_CORE=(
   test-issue-sync-modules.py
   test-runtime-tdd-evidence.py
   test-runtime-unit
+  test-wt-close-protected-branch-guard
   test-contract-single-source.py
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py

@@ -51,6 +51,14 @@ esac
 ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 [[ -z "$target" ]] && target="$(pwd)/docs/B1-docs/raw-${raw_key}"
 
+# The CALLER's repo root, not the script's physical location. wt-create cd's into
+# the dev worktree before invoking us, but $ROOT_DIR still points at the main repo
+# (that is where bin/ lives). issue-sync derives its own ROOT_DIR from its script
+# path too, so without --project its protected-branch guard always sees the main
+# repo's develop and refuses — skipping platform title normalization entirely.
+# See issue-sync's own guard comment: "Callers on develop must use --project".
+caller_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
+
 # ── Worktree / branch interception ─────────────────────────
 # Only allow pull from fix/* or feature/* worktree whose branch contains the raw-key.
 current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
@@ -130,7 +138,7 @@ if [[ -f "$target/issue.md" ]]; then
   if [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
     # STDOUT must remain exactly one JSON document: wt-create parses it to
     # verify the materialized identity. Route every diagnostic to STDERR.
-    if ! "$ROOT_DIR/bin/issue-sync" create "$local_id" >&2; then
+    if ! "$ROOT_DIR/bin/issue-sync" --project "$caller_root" create "$local_id" >&2; then
       echo "[WARN] raw-issue-pull: issue-sync create failed for $local_id (platform title normalization may be incomplete)" >&2
     fi
   else

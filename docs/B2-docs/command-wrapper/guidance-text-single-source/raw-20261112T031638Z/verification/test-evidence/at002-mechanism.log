@@ -1,0 +1,20 @@
+=== raw-issue-pull 的真实调用机制对照（AT-002 / raw-20261112T031638Z）===
+cwd: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261112T031638Z-issue-sync-ghost-skill-names (fix/* worktree)
+date: 2026-11-12T05:08:52Z
+
+--- [BASELINE BEHAVIOUR] issue-sync 脚本在主仓、不给 --project：ROOT_DIR 由脚本位置推导 => 主仓 develop => guard 命中 ---
+[ERROR] issue-sync refuses to run on protected branch: develop
+
+Protected branches (main, develop, test-pre-merge-*) must not be modified directly.
+All code and issue changes go through worktrees:
+
+  Bug fix:   skill:freely-fix-execution
+  Feature:   skill:freely-feature-execution
+
+rc=1
+
+--- [FIXED BEHAVIOUR] 同一脚本、显式 --project <调用方工位>：guard 放行，title 归一化正常执行 ---
+[issue-sync] skip create: raw-20261112T031638Z already on GitHub
+[issue-sync] skip create: raw-20261112T031638Z already on Gitee
+[issue-sync] create complete: raw-20261112T031638Z
+rc=0

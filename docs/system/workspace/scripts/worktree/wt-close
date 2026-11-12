@@ -1149,18 +1149,17 @@ else
 	  echo "wt-close: --discard-unmerged, using -D..." >&2
 	  git branch -D "$branch" 2>/dev/null || true
 	else
-	  _wt_skill=""; _wt_skill_name=""
+	  # fix and feature share one workflow skill; only the RED-phase semantics
+	  # differ (see skill:freely-workflow-guarded-execution §fix 与 feature 的唯一差异).
+	  _wt_skill="freely-workflow-guarded-execution"
 	  case "$branch" in
 	    fix/*)
-	      _wt_skill="freely-fix-execution"
-	      _wt_skill_name="Fix first, govern later"
+	      _wt_skill_name="fix 分支 — 先复现 RED，再实现"
 	      ;;
 	    feature/*)
-	      _wt_skill="freely-feature-execution"
-	      _wt_skill_name="Govern first, code later"
+	      _wt_skill_name="feature 分支 — 先设计验收，再实现"
 	      ;;
 	    *)
-	      _wt_skill="freely-fix-execution"
 	      _wt_skill_name="无法从分支名判断"
 	      ;;
 	  esac

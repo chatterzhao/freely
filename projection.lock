@@ -69,7 +69,7 @@
       "kind": "hooks",
       "source": "docs/system/workspace/hooks/reference-transaction.sh",
       "target": ".githooks/reference-transaction",
-      "sha256": "145271f0acb4af03a10fb9061a0b100f1dceab99687e37c928f892b11670d27e",
+      "sha256": "33a6f462a22f8e3685ef9d27b0f2063f9a227ef924add11097df9556e37a03a8",
       "mode": "delegate",
       "note": "wrapper must exec this truth script"
     },
@@ -181,7 +181,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-create-guarded",
       "target": "bin/pr-create-guarded",
-      "sha256": "dd073f4a01fc1114ffb8438871bb471867314cc2ab1c1d6282d1646d70582d4c",
+      "sha256": "76cd737036f32f4314ff2936a4e66bf42e2a04d35ea59beb41c302f3fd8cdfa7",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -205,7 +205,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/quality/pretests-gate",
       "target": "bin/pretests-gate",
-      "sha256": "b572f3132c616bd4d20791689e8ca3df80ff60c827b3205eb6d9ac9c91b83ecd",
+      "sha256": "f2ae805104c969c2dde4474a2955c0f7d7457153d3620afa3d82eb7ea9ac3aea",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -445,7 +445,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/tests/test-wt-close-protected-branch-guard",
       "target": "bin/test-wt-close-protected-branch-guard",
-      "sha256": "91a7d742e93bedf63a7bc33e16d6709680b19d89d7a756aee206fe3ed99a73c0",
+      "sha256": "8deefbe5b43ee266f0e3f8c01cb157c15180554dd958cdd39faa4a0930446589",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -469,7 +469,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-close",
       "target": "bin/wt-close",
-      "sha256": "2214c4e5ec6a71da8bcdc8e581f0a79bba5e50dbc16c039cb3c29afd146c7e33",
+      "sha256": "5d10a3d70feb8859dad4619b75631651e3219de3145ea26c9f07f86c3f16e1ea",
       "mode": "delegate",
       "note": "exec projection"
     },

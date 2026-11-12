@@ -567,7 +567,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "red_green_not_green",
                 f"{pre_tests_path}: {fields.get('id', title_line)} red-green-status is '{rg_status}', must be 'green' or 'not_applicable' before PR. "
                 "Complete RED(red) → dev → GREEN(green) cycle before creating PR. "
-                "Read skill `freely-fix-execution` or skill `freely-feature-execution` §阶段3-5.",
+                "Read skill `freely-workflow-guarded-execution` §阶段3-5 (fix and feature share it).",
             )
         for key in ("status", "artifact_ref"):
             if not fields.get(key):

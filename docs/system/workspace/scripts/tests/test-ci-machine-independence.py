@@ -161,8 +161,16 @@ def behavior_checks(tmp: Path) -> None:
         nested["FREELY_AT_NESTED"] = "1"
         r2 = run(["bash", str(TEST_ALL), "--ci"], SRC, nested)
         out2 = r2.stdout + r2.stderr
-        expect(r2.returncode == 0 and "SUMMARY: 22 ok, 0 failed" in out2,
-               "B2 clean PATH: test-all --ci 22 ok / 0 failed")
+        # Assert the STABLE property ("the whole verified subset is green"),
+        # not the exact member count: hard-coding "22 ok" made this AT red the
+        # moment any test was onboarded to CI_CORE, which is a maintenance trap
+        # rather than a regression signal. The subset can only grow (§S8 pins
+        # that no existing member was removed).
+        m = re.search(r"SUMMARY: (\d+) ok, (\d+) failed", out2)
+        green = bool(m) and int(m.group(2)) == 0 and int(m.group(1)) >= 22
+        expect(r2.returncode == 0 and green,
+               f"B2 clean PATH: test-all --ci all green, >=22 ok "
+               f"({m.group(0) if m else 'no SUMMARY line'})")
 
     # Negative control: changing the registry's cline probe word must make the
     # "cline detected" assertion fail even though the stub exists. This is what
