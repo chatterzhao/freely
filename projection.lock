@@ -469,7 +469,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-close",
       "target": "bin/wt-close",
-      "sha256": "5d10a3d70feb8859dad4619b75631651e3219de3145ea26c9f07f86c3f16e1ea",
+      "sha256": "976745efc34c6cbb692c63700794aec5a4e2544f04d33eaeee90b730dcd1d6ae",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -477,7 +477,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-create",
       "target": "bin/wt-create",
-      "sha256": "8cc16e23cac14b98c4c7ea0101d77fd1ee6c1887c1b02d570219afe623fca4d0",
+      "sha256": "0c0d1ac7c23f8fadf02d4ecadacb1f052bf01be8b4f3823ce0bd1d9ef24ca1fa",
       "mode": "delegate",
       "note": "exec projection"
     },

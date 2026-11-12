@@ -1196,7 +1196,15 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
     _tp_branch="test-pre-merge-${_tp_raw_key}-${_tp_slug}"
     _tp_wt="$PROJECT_WORKTREES_ROOT/test-pre-merge-${_tp_raw_key}-${_tp_slug}"
     if git show-ref --verify --quiet "refs/heads/$_tp_branch" 2>/dev/null; then
-      if [[ "$FORCE" == true ]]; then
+      # --dry-run must be side-effect free here too: this phase removes a real
+      # worktree/branch AND releases agent rows (Phase 5/6/7 already branch on
+      # DRY_RUN; Phase 6b was the gap, and it destroyed the only test-gate
+      # evidence during a rehearsal).
+      if [[ "$DRY_RUN" == true ]]; then
+        _dry "git worktree remove $_tp_wt"
+        _dry "git branch -D $_tp_branch"
+        _dry "release agent_working rows for raw-${_tp_raw_key}"
+      elif [[ "$FORCE" == true ]]; then
         echo "wt-close: 严重警告 —— 已经用 --force 参数彻底丢弃了所有修改"
         [[ -d "$_tp_wt" ]] && git worktree remove --force "$_tp_wt" 2>/dev/null || true
         git branch -D "$_tp_branch" 2>/dev/null || echo "wt-close: warning - test-pre-merge branch deletion failed" >&2
@@ -1213,6 +1221,9 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
       fi
     fi
 	    # Release agent from agent_working table (replaces agent-id.env cleanup).
+	    if [[ "$DRY_RUN" == true ]]; then
+	      :  # --dry-run: nothing released; the plan is printed above
+	    else
 	    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
 	    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
 	    # Phase 1: close ACP sessions + release agent_working table
@@ -1248,6 +1259,7 @@ agent_release_all('$_dev_wt', 'raw-${_tp_raw_key}')
 	    _agent_env="$_dev_wt/.freely/agent-id.env"
 	    if [[ -f "$_agent_env" ]]; then
 	      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true; rm -f "$_agent_env.bak"
+	    fi
 	    fi
   fi
 fi

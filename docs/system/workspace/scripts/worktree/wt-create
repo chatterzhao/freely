@@ -24,6 +24,9 @@ Optional:
                       Pin the raw issue read source. Default: first READABLE
                       configured platform; an unreadable platform is recorded
                       as sync debt and worktree creation continues.
+  --reopen            Explicitly reopen a finished raw (absorbed/completed/
+                      dropped) for more work. Without it such a raw is refused
+                      instead of being reopened behind your back.
 
 ── --kind 选择指南 ──────────────────────────────────────────
 
@@ -83,6 +86,7 @@ skill_path="docs/system/workspace/skills/freely-workflow-guarded-execution/SKILL
 branch_kind=""
 slug=""
 base="develop"
+REOPEN=false
 legacy_branch=""
 
 while [[ $# -gt 0 ]]; do
@@ -129,6 +133,10 @@ while [[ $# -gt 0 ]]; do
         *) echo "Invalid --source-platform '$source_platform' (expected github|gitee)" >&2; exit 1 ;;
       esac
       shift 2
+      ;;
+    --reopen)
+      REOPEN=true
+      shift
       ;;
     --*)
       echo "Unknown argument: $1" >&2
@@ -437,20 +445,33 @@ FUZZY_BLOCK
 fi
 
 # ── Raw issue state check ────────────────────────────────
-# If the raw issue was previously closed (absorbed/completed/dropped),
-# automatically reopen it by setting phase_state → proposed.
-# This avoids forcing the user to manually edit develop.
+# If the raw issue was previously closed (absorbed/completed/dropped) we DO NOT
+# touch it here. This block used to rewrite a relative path before any worktree
+# existed, so it edited the caller's tree (develop); in resume mode it also
+# flipped a perfectly normal "absorbed" raw back to "proposed" - the inline
+# comment claiming "never on develop" was wrong.
+# Reopening is now explicit (--reopen) and the write happens inside the dev
+# worktree created further down.
+_need_reopen=0
 _issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
 if [[ -f "$_issue_file" ]]; then
   _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"" || true)
   case "$_phase" in
     absorbed|completed|dropped)
-      echo "[wt-create] raw-${raw_key} phase_state=${_phase} → proposed (auto-reopen)" >&2
-      # Change phase_state in-place on the worktree branch (never on develop)
-      if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i.bak "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"; rm -f "$_issue_file.bak"
+      if [[ "$resume_mode" -eq 1 ]]; then
+        echo "[wt-create] raw-${raw_key} phase_state=${_phase}; resume mode keeps it unchanged (no write)" >&2
+      elif [[ "$REOPEN" == true ]]; then
+        _need_reopen=1
+        echo "[wt-create] raw-${raw_key} phase_state=${_phase} → proposed (explicit --reopen; written inside the dev worktree)" >&2
       else
-        sed -i "s/phase_state: ${_phase}/phase_state: proposed/" "$_issue_file"
+        cat >&2 <<REOPEN_BLOCK
+拒绝创建工位: raw-${raw_key} 已是 ${_phase}
+
+  已终态的 raw 不会被隐式重开（旧行为会改写调用方工作树里的文档）。
+  确需在该 raw 上重开工位时，显式加上 --reopen：
+    freely wt-create --raw-key ${raw_key} --source platform --kind <fix|feature> --slug <slug> --reopen
+REOPEN_BLOCK
+        exit 1
       fi
       ;;
   esac
@@ -1032,6 +1053,22 @@ fi
     git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
     exit 1
+  fi
+
+  # Explicit reopen (--reopen): the write lands inside the dev worktree, never
+  # in the caller's tree (that was the bug: absorbed -> proposed on develop).
+  if [[ "$_need_reopen" -eq 1 ]]; then
+    _reopen_file="$fix_target/docs/B1-docs/raw-${raw_key}/issue.md"
+    if [[ -f "$_reopen_file" ]]; then
+      if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i.bak "s/phase_state: ${_phase}/phase_state: proposed/" "$_reopen_file"; rm -f "$_reopen_file.bak"
+      else
+        sed -i "s/phase_state: ${_phase}/phase_state: proposed/" "$_reopen_file"
+      fi
+      echo "[wt-create] reopened raw-${raw_key} inside the dev worktree ($_reopen_file)" >&2
+    else
+      echo "[wt-create] warning: --reopen given but $_reopen_file is missing; phase left untouched" >&2
+    fi
   fi
 
   cat <<MSG
