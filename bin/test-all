@@ -21,6 +21,7 @@ for arg in "$@"; do
 done
 
 CORE=(
+  test-ci-machine-independence.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
@@ -48,6 +49,7 @@ CORE=(
   test-github-label-autocreate.py
 )
 CI_CORE=(
+  test-ci-machine-independence.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py

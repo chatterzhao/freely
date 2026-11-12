@@ -1,0 +1,76 @@
+=== AT-001 GREEN / fix worktree / clean PATH / NO external shim ===
+clines on PATH: none
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261112T015715Z-contract-test-cline-stub
+=== STATIC: environment premise is self-contained ===
+  [ok] S1 test builds its own private stub directory
+  [ok] S2 three subprocess.run calls share a copied env
+  [ok] S3 stub is named cline and made executable
+  [ok] S4 no hard-coded machine paths
+  [ok] S5 global os.environ is never assigned
+  [ok] S6 fail-closed and explicit-tools assertions preserved
+  [ok] S7 bin/deploy-skills unchanged from develop e003532b5
+  [ok] S8 CI_CORE keeps the contract test
+  [ok] S9 AT wired into both CORE and CI_CORE
+  [ok] S10 epic gate / story ci-machine-independence registered
+=== BEHAVIOR: clean PATH, no external shim ===
+  [ok] B1 clean PATH: contract test 13 ok / 0 failed
+  [ok] B2 clean PATH: test-all --ci 22 ok / 0 failed
+  [ok] B3 negative control: registry mutation still fails the assertion
+SUMMARY: 13 ok, 0 failed
+=== contract test under clean PATH ===
+AT-001 source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261112T015715Z-contract-test-cline-stub
+=== STATIC: single source wiring ===
+  [ok] deploy-skills uses the shared registry path and has no claude fallback
+  [ok] ACP tool setup reuses $TOOL_REGISTRY instead of a wrong local path
+  [ok] runtime/paths.sh owns the registry path constant
+  [ok] no production reference to the wrong registry path ([])
+  [ok] wt-create normalizes raw keys through the single owner
+  [ok] raw_key_canon.py understands legacy keys and is callable
+=== BEHAVIOR: registry present/missing ===
+  [ok] registry present: registry tools are read (cline detected)
+  [ok] registry missing: deploy-skills fails closed
+  [ok] explicit --tools still works
+=== BEHAVIOR: legacy raw-key normalization ===
+  [ok] legacy YYYYMMDD-HHMM pads seconds
+  [ok] legacy YYYYMMDD-HHMMSS keeps seconds
+  [ok] canonical key is unchanged
+  [ok] branch name yields canonical key
+SUMMARY: 13 ok, 0 failed
+=== bin/test-all --ci under clean PATH ===
+[test-all] mode=ci
+[test-all] verified subset: 22 tests
+  [ok] test-ci-machine-independence.py
+  [ok] test-projection-consistency.py
+  [ok] test-bin-projection.py
+  [ok] test-runtime-split.py
+  [ok] test-cross-process-contract.py
+  [ok] test-coordination-contract.py
+  [ok] test-skill-merge-compat.py
+  [ok] test-skill-frontmatter-contract.py
+  [ok] test-a2a-task-cli-loadable.py
+  [ok] test-fail-semantics-preflight.py
+  [ok] test-obs-ops-backlog.py
+  [ok] test-platform-sync-entrypoint.py
+  [ok] test-issue-sync-modules.py
+  [ok] test-runtime-tdd-evidence.py
+  [ok] test-runtime-unit
+  [ok] test-contract-single-source.py
+  [ok] test-dispatch-cas-sse-singleton.py
+  [ok] test-raw-reconciliation.py
+  [ok] test-raw-replica-degraded.py
+  [ok] test-command-lifecycle-raw-metadata.py
+  [ok] test-command-lifecycle-materialization.py
+  [ok] test-scan-frontmatter-nested.py
+[test-all] known-broken / not-yet-onboarded: 591 test files (TODO: triage and onboard)
+  - test-a2a-report-cli.py
+  - test-acp-binary-check-require-available
+  - test-acp-handoff.py
+  - test-acp-session-routing.py
+  - test-agent-execution-safety-review-skill
+  - test-agent-lifecycle.sh
+  - test-agent-protocol.py
+  - test-ai-cli-codex-apikey-slot-bundle-switch
+  - test-ai-cli-codex-whoami-status-ignore-stale-active-slot
+  - test-ai-cli-generic-tool-login-creates-slot-container
+  ... and 581 more
+SUMMARY: 22 ok, 0 failed, known-broken=591

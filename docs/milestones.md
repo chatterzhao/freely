@@ -1,3 +1,23 @@
+## M-20261112T015715Z-A
+- title: fix — registry 契约测试机器无关化（自建 cline stub）
+- status: active
+### candidate_issues
+1. `C-20261112T015715Z-A`
+- milestone: M-20261112T015715Z-A
+- status: promoted
+- promoted_issue_id: `I-20261112T015715Z-A`
+### committed_issues
+1. `I-20261112T015715Z-A`
+- milestone: M-20261112T015715Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/ci-machine-independence/raw-20261112T015715Z/issues/I-20261112T015715Z-A.md
+### completed_issues
+1. `I-20261112T015715Z-A`
+- milestone: M-20261112T015715Z-A
+- phase_state: completed
+- completed_at: 2026-11-12T02:30:00Z
+- issue_path: docs/B2-docs/gate/ci-machine-independence/raw-20261112T015715Z/issues/I-20261112T015715Z-A.md
+
 ## M-20261104T080259Z-A
 - title: refactor — 投影一致性检查（hooks/skills/bin/AGENTS）
 - status: active

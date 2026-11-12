@@ -130,6 +130,19 @@ def _build_deploy_tree(tmp: Path) -> Path:
 
 def registry_checks(tmp: Path) -> None:
     print("=== BEHAVIOR: registry present/missing ===")
+
+    # #4307: the assertion below proves deploy-skills READS the registry, not
+    # that this machine happens to have cline installed. Supply the probe
+    # binary from a test-private temp dir and inject it per subprocess, so the
+    # result is machine-independent and the global environment stays intact.
+    stub = tmp / "tool-probe-bin"
+    stub.mkdir(parents=True, exist_ok=True)
+    probe = stub / "cline"
+    probe.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    probe.chmod(0o755)
+    env = dict(os.environ)
+    env["PATH"] = f"{stub}{os.pathsep}{env.get('PATH', '')}"
+
     tree = _build_deploy_tree(tmp)
     script = tree / "bin/deploy-skills"
     reg = tree / "docs/system/workspace/tools/tool-registry.toml"
@@ -141,10 +154,10 @@ def registry_checks(tmp: Path) -> None:
         return
 
     present = subprocess.run(["bash", str(script), "--dry-run"], capture_output=True,
-                             text=True, timeout=60)
+                             text=True, timeout=60, env=env)
     combined_present = (present.stdout + present.stderr).lower()
-    # `cline` only appears because it is read from the real registry; the old
-    # fallback path never looked at the file and printed only claude.
+    # `cline` appears only because deploy-skills read it from the registry;
+    # the old fallback path never looked at the file and printed only claude.
     expect("cline" in combined_present,
            "registry present: registry tools are read (cline detected)")
 
@@ -152,7 +165,7 @@ def registry_checks(tmp: Path) -> None:
         reg.rename(reg.with_suffix(".toml.away"))
     try:
         missing = subprocess.run(["bash", str(script), "--dry-run"], capture_output=True,
-                                 text=True, timeout=60)
+                                 text=True, timeout=60, env=env)
     finally:
         if reg.with_suffix(".toml.away").is_file():
             reg.with_suffix(".toml.away").rename(reg)
@@ -162,7 +175,7 @@ def registry_checks(tmp: Path) -> None:
            "registry missing: deploy-skills fails closed")
 
     explicit = subprocess.run(["bash", str(script), "--dry-run", "--tools", "claude"],
-                              capture_output=True, text=True, timeout=60)
+                              capture_output=True, text=True, timeout=60, env=env)
     expect(explicit.returncode == 0, "explicit --tools still works")
 
 
