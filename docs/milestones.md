@@ -2258,3 +2258,24 @@
 - milestone: M-20260720T023136Z-A
 - completed_at: 2026-11-03T05:44:47Z
 - issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/raw-20260720T023136Z/issues/I-20260720T023136Z-A.md
+
+## M-20261111T125724Z-A
+- title: feature — bin 投影注册表分类落地（C-A）
+- status: active
+### candidate_issues
+1. `C-20261111T125724Z-A`
+- milestone: M-20261111T125724Z-A
+- status: promoted
+- promoted_issue_id: I-20261111T125724Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261111T125724Z/issues/I-20261111T125724Z-A.md
+### committed_issues
+1. `I-20261111T125724Z-A`
+- milestone: M-20261111T125724Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261111T125724Z/issues/I-20261111T125724Z-A.md
+
+### completed_issues
+1. `I-20261111T125724Z-A`
+- milestone: M-20261111T125724Z-A
+- completed_at: 2026-11-13T10:52:00Z
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261111T125724Z/issues/I-20261111T125724Z-A.md
