@@ -2279,3 +2279,24 @@
 - milestone: M-20261111T125724Z-A
 - completed_at: 2026-11-13T10:52:00Z
 - issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261111T125724Z/issues/I-20261111T125724Z-A.md
+
+## M-20261113T113100Z-A
+- title: feature — 评审 skill 新增 L0 项目意图一致性锚点
+- status: active
+### candidate_issues
+1. `C-20261113T113100Z-A`
+- milestone: M-20261113T113100Z-A
+- status: promoted
+- promoted_issue_id: I-20261113T113100Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T113100Z/issues/I-20261113T113100Z-A.md
+### committed_issues
+1. `I-20261113T113100Z-A`
+- milestone: M-20261113T113100Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T113100Z/issues/I-20261113T113100Z-A.md
+
+### completed_issues
+1. `I-20261113T113100Z-A`
+- milestone: M-20261113T113100Z-A
+- completed_at: 2026-11-13T11:45:00Z
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T113100Z/issues/I-20261113T113100Z-A.md
