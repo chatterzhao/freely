@@ -5,7 +5,7 @@
 
 ### acceptance-1
 - id: AT-001
-- requirement: batch 能处理 linked 并在首次同步关闭 completed+未关闭者；wt-close 只读检查（未就绪拒绝、零平台写入）；两条入口判据一致；基线红
+- requirement: batch 能处理 linked 并在首次同步关闭 completed+未关闭者；wt-close 只读检查 children 是否 completed（未完成拒绝、零平台写入、不依赖 platform_state）；基线红
 - acceptance_target: 本地终态与平台状态可幂等对齐，且只有一条收口判据
 - surface_kind: end_to_end
 - target_lane: premerge-integration
