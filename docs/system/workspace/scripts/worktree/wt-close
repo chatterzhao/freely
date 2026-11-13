@@ -1002,12 +1002,22 @@ PYCHILD
           *) _wt_unfinished="${_wt_unfinished}  - ${_wt_cid} (phase_state=${_wt_cphase})"$'\n' ;;
         esac
       done <<< "$_wt_children_report"
-      if [[ -n "$_wt_unfinished" ]]; then
+      _wt_unclosed=""
+      if [[ "$SKIP_PLATFORM" != true ]]; then
+        while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
+          [[ -n "$_wt_cid" ]] || continue
+          [[ "$_wt_cstate" == "closed" ]] && continue
+          _wt_unclosed="${_wt_unclosed}  - ${_wt_cid} (platform_state=${_wt_cstate})"$'\n'
+        done <<< "$_wt_children_report"
+      fi
+      if [[ -n "$_wt_unfinished" || -n "$_wt_unclosed" ]]; then
         cat >&2 <<WTC_CHILDREN
 [wt-close] 拒绝关闭：I-* 尚未就绪
 
 未完成（phase_state 必须是 completed）：
 ${_wt_unfinished}
+未关闭（platform_state 必须是 closed）：
+${_wt_unclosed}
 一个 raw 只有一个 worktree；删除后这些 I-* 将无法再实现。
 收口由 issue-sync 完成（唯一平台写入口）。在本工位内执行：
 

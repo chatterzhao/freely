@@ -179,8 +179,8 @@ def static_checks() -> None:
           "S7 the block points at issue-sync batch as the single platform writer")
     check("_close_platform_ids_readonly" not in block,
           "S8 wt-close performs NO platform write for children")
-    check("_wt_unclosed" not in block,
-          "S9 the pre-check does not depend on linked platform_state")
+    check('"$_wt_cstate" == "closed"' in block,
+          "S9 the pre-check requires platform_state == closed")
 
 
 def behaviour_checks() -> None:
@@ -194,16 +194,16 @@ def behaviour_checks() -> None:
           "B2 an unfinished child blocks the closeout, zero platform writes")
 
     p, calls = run(SRC, child_b_state="open")
-    check(p.returncode == 0 and calls == 0,
-          "B3 an unclosed child does not block (platform closure is batch's job)")
+    check(p.returncode != 0 and CHILD_B in (p.stdout + p.stderr) and calls == 0,
+          "B3 an unclosed child blocks the closeout, zero platform writes")
 
     p, calls = run(SRC, child_b_state="")
-    check(p.returncode == 0 and calls == 0,
-          "B4 a missing platform_state is not a blocking condition")
+    check(p.returncode != 0 and calls == 0,
+          "B4 a missing platform_state counts as unclosed")
 
     p, calls = run(SRC, child_b_state="open", skip=True)
     check(p.returncode == 0 and calls == 0,
-          "B5 --skip-platform behaves the same (wt-close never touches platforms)")
+          "B5 --skip-platform skips the platform check")
 
     p, calls = run(SRC, child_b_phase="in_dev", skip=True)
     check(p.returncode != 0 and calls == 0,

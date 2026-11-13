@@ -3,6 +3,7 @@
 # `issue-sync batch` — sync every changed issue.
 
 cmd_batch() {
+  local filter_key="${1:-}"
   local last_scan total=0 synced=0 batch_size=10 batch_count=0
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never}"
@@ -27,6 +28,10 @@ cmd_batch() {
 	      *) local_id=$(basename "$dir") ;;
 	    esac
 	    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+	    # Scope filter: a raw-owning worktree may only sync its own issue and
+	    # children (GATE 1). Cross-raw sync belongs to the governance-only lane
+	    # (raw-20261103T091157Z established that mechanism).
+	    [[ -n "$filter_key" && "$issue_file" != *"$filter_key"* ]] && continue
 	    # Skip fully-synced: platform_state=closed means both sides agree
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
 	    if [[ "$_pstate" == "closed" ]]; then
