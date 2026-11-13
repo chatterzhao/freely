@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261113T130925Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261113T130925Z-A
 platform_ids:
   github:
     issue_id: '4349'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKV7VC
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261113T130925Z/issues/I-20261113T130925Z-A.md
+last_synced_comment_at:
+  github: '2026-11-13T13:28:50Z'
+  gitee: '2026-11-13T13:28:50Z'
 hash: ''
 created_at: '2026-11-13T13:09:25Z'
-updated_at: '2026-11-13T13:09:31Z'
+updated_at: '2026-11-13T13:28:54Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261113T130925Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-13T13:28:49Z'
 closeout_note: ''
 severity: P1
 ---
@@ -113,3 +116,11 @@ workflow_kind: fix
 - 不放宽 raw 的 strict 契约与 `cmd_close_linked` 的 Phase 1 校验；
 - 不改 `_raw_effect` / adapter；
 - 修复后用它完成一次真实对齐（#4330 / #4332 / #4334 / #4340 等）。
+
+### comment-20261113T132850Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261113T130925Z-A"]
+
+拆解为以下任务:
+1. [I-20261113T130925Z-A](will-be-updated)
