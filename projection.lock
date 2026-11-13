@@ -469,7 +469,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-close",
       "target": "bin/wt-close",
-      "sha256": "1351b384100739ede5ef24ceaa758e7a9bd91bc4cec3c95656a5558b734868c9",
+      "sha256": "3d77fae8a8d1c4789f18837688a26bea27dac990f2bcc6da63da665df8199ab7",
       "mode": "delegate",
       "note": "exec projection"
     },

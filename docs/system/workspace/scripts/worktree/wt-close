@@ -986,8 +986,11 @@ for child in children:
     ctext = open(cfile, encoding="utf-8").read()
     cparts = ctext.split("---", 2)
     cfm = yaml.safe_load(cparts[1]) if len(cparts) >= 3 else {}
-    print("%s\t%s\t%s\t%s" % (child, cfm.get("phase_state", ""),
-                                 cfm.get("platform_state", ""), cfile))
+    # Empty fields MUST NOT be emitted as empty TSV columns: bash IFS=$'\t'
+    # collapses consecutive whitespace delimiters, which shifted the path into
+    # the platform_state column and broke the close (raw-20261113T122411Z).
+    print("%s\t%s\t%s\t%s" % (child, cfm.get("phase_state", "") or "-",
+                                 cfm.get("platform_state", "") or "-", cfile))
 PYCHILD
 )"
     if [[ -n "$_wt_children_report" ]]; then
