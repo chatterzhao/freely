@@ -2300,3 +2300,24 @@
 - milestone: M-20261113T113100Z-A
 - completed_at: 2026-11-13T11:45:00Z
 - issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T113100Z/issues/I-20261113T113100Z-A.md
+
+## M-20261113T115957Z-A
+- title: fix — wt-close 收口全部 I-* children
+- status: active
+### candidate_issues
+1. `C-20261113T115957Z-A`
+- milestone: M-20261113T115957Z-A
+- status: promoted
+- promoted_issue_id: I-20261113T115957Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T115957Z/issues/I-20261113T115957Z-A.md
+### committed_issues
+1. `I-20261113T115957Z-A`
+- milestone: M-20261113T115957Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T115957Z/issues/I-20261113T115957Z-A.md
+
+### completed_issues
+1. `I-20261113T115957Z-A`
+- milestone: M-20261113T115957Z-A
+- completed_at: 2026-11-13T12:12:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T115957Z/issues/I-20261113T115957Z-A.md
