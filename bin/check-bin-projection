@@ -13,6 +13,10 @@ The rule is deliberately narrow and machine-checkable:
 * a listed file must still exist (no stale entries);
 * a listed file that is now a projection (≤ threshold) must be removed
   (no permanent exemptions — this is what makes the debt shrink).
+* every entry declares a class from `classes` and a CONCRETE reason.
+  `standalone-tool` is only a classification label: coverage, staleness and
+  shrink apply to it exactly as to `implementation-in-bin`. Adding the class
+  must never become a permanent exemption (raw-20261111T125724Z).
 
 Exit codes: 0 ok · 1 violation · 2 registry missing (fail-closed).
 
@@ -53,6 +57,7 @@ def main() -> int:
         return 1
 
     threshold = int(doc.get("threshold_lines") or 40)
+    classes = {str(c) for c in (doc.get("classes") or [])}
     entries = {e.get("path"): e for e in (doc.get("entries") or []) if e.get("path")}
     errors: list[str] = []
 
@@ -71,8 +76,14 @@ def main() -> int:
         size = line_count(file)
         if size <= threshold:
             errors.append(f"{rel}: now {size} lines (<= {threshold}) — delete its registry entry")
-        if not str(entry.get("reason") or "").strip():
+        reason = str(entry.get("reason") or "").strip()
+        if not reason:
             errors.append(f"{rel}: registry entry needs a reason")
+        elif "case by case" in reason.lower() or reason.startswith("implementation still lives in bin/"):
+            errors.append(f"{rel}: reason must state a concrete classification decision, not a placeholder")
+        cls = str(entry.get("class") or "")
+        if classes and cls not in classes:
+            errors.append(f"{rel}: class {cls!r} is not declared in registry classes {sorted(classes)}")
 
     total = len(binfiles)
     registered = len(entries)
