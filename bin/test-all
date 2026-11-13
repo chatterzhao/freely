@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-issue-sync-batch-closeout.py
   test-wt-close-children.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
@@ -61,6 +62,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-issue-sync-batch-closeout.py
   test-wt-close-children.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py

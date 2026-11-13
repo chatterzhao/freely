@@ -998,40 +998,36 @@ PYCHILD
       while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
         [[ -n "$_wt_cid" ]] || continue
         case "$_wt_cphase" in
-          completed|dropped) ;;
-          *) _wt_unfinished="${_wt_unfinished}  - ${_wt_cid} (phase_state=${_wt_cphase:-missing})"$'\n' ;;
+          completed) ;;
+          *) _wt_unfinished="${_wt_unfinished}  - ${_wt_cid} (phase_state=${_wt_cphase})"$'\n' ;;
         esac
       done <<< "$_wt_children_report"
-      if [[ -n "$_wt_unfinished" ]]; then
+      _wt_unclosed=""
+      if [[ "$SKIP_PLATFORM" != true ]]; then
+        while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
+          [[ -n "$_wt_cid" ]] || continue
+          [[ "$_wt_cstate" == "closed" ]] && continue
+          _wt_unclosed="${_wt_unclosed}  - ${_wt_cid} (platform_state=${_wt_cstate})"$'\n'
+        done <<< "$_wt_children_report"
+      fi
+      if [[ -n "$_wt_unfinished" || -n "$_wt_unclosed" ]]; then
         cat >&2 <<WTC_CHILDREN
-[wt-close] 拒绝关闭：以下 I-* 尚未完成
+[wt-close] 拒绝关闭：I-* 尚未就绪
 
+未完成（phase_state 必须是 completed）：
 ${_wt_unfinished}
+未关闭（platform_state 必须是 closed）：
+${_wt_unclosed}
 一个 raw 只有一个 worktree；删除后这些 I-* 将无法再实现。
-  - 回到工位继续实现，直到 phase_state 到达 completed / dropped
-  - 或按流程把不再需要的 I-* 标记 dropped
+收口由 issue-sync 完成（唯一平台写入口）。在本工位内执行：
+
+  freely issue-sync --project <本工位> batch
+
+它会关闭所有 completed 且未关闭的 I-*，并把 platform_state 写成 closed；
+提交该变更、走 pr-merge-guarded 之后，再执行 wt-close。
 WTC_CHILDREN
         exit 1
       fi
-      while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
-        [[ -n "$_wt_cid" ]] || continue
-        [[ "$_wt_cstate" == "closed" ]] && continue
-        if [[ "$SKIP_PLATFORM" == true ]]; then
-          echo "wt-close: --skip-platform, leaving I-* $_wt_cid open"
-          continue
-        fi
-        if [[ "$DRY_RUN" == true ]]; then
-          _dry "freely issue-sync close $_wt_cid (platform close-multi)"
-          continue
-        fi
-        echo "wt-close: closing I-* issue: $_wt_cid"
-        if _close_platform_ids_readonly "$_wt_cpath" "$_wt_cid" 2>&1; then
-          echo "wt-close: I-* closed ✓ ($_wt_cid)"
-        else
-          echo "Error: platform close failed for $_wt_cid; cleanup stopped" >&2
-          exit 1
-        fi
-      done <<< "$_wt_children_report"
     fi
   fi
 fi
