@@ -68,7 +68,9 @@ cmd_batch() {
           echo "[issue-sync] batch: update $local_id (phase=$phase)"
           cmd_update "$local_id" || true
           if [[ "$phase" == "completed" ]]; then
-            cmd_close "$local_id" "completed" || true
+            # linked retirement is batch-only (single policy); cmd_close
+            # refuses linked documents on purpose.
+            cmd_close_linked "$local_id" || true
           fi
         fi
         # Always check for unsynced comments

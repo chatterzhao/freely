@@ -20,18 +20,16 @@ cmd_close() {
     # first, so close-platforms closes every real replica. No-op on healthy
     # (all-ids-present) docs; never fabricates an id from a degraded read.
     _backfill_close_replicas "$file" "$local_id"
-    # kind=linked carries its own field set, so the strict RAW validator inside
-    # close-platforms rejects it ("raw metadata fields are missing, extra, or
-    # reordered") - every I-* close failed and linked replicas stayed OPEN.
-    local _effect_kind _effect_cmd
-    _effect_kind="$(_fm_get "$file" "kind")"
-    if [[ "$_effect_kind" == "linked" ]]; then
-      _effect_cmd="close-linked"
-    else
-      _effect_cmd="close-platforms"
+    # A linked (I-*) issue is retired by `issue-sync batch`, which owns the
+    # phase_state == completed predicate. Direct `issue-sync close I-*` must
+    # NOT be a second channel: refusing it keeps one policy instead of two
+    # drifting predicates (raw-20261113T084729Z).
+    if [[ "$(_fm_get "$file" "kind")" == "linked" ]]; then
+      echo "[ERROR] issue-sync close: linked issues are retired by 'issue-sync batch' (phase_state=completed), not by direct close" >&2
+      return 1
     fi
     local _effect_rc=0
-    _raw_effect "$_effect_cmd" "$file" "$ROOT_DIR" || _effect_rc=$?
+    _raw_effect close-platforms "$file" "$ROOT_DIR" || _effect_rc=$?
     if [[ "$_effect_rc" -eq 0 ]]; then
       echo "[issue-sync] close complete: $local_id"
       return 0
@@ -124,4 +122,37 @@ cmd_close() {
 
   _fm_set_str "$file" "platform_state" "closed"
   echo "[issue-sync] close complete: $local_id"
+}
+
+# Retire a completed I-* issue. Called ONLY by `issue-sync batch`'s linked
+# branch; the CLI `close` action refuses linked documents above. The strict
+# local validation lives in raw_lifecycle_effects.close_linked (Phase 1, zero
+# platform writes on failure) and uses the same phase_state == completed
+# predicate as the batch driver, so there is a single retirement policy.
+cmd_close_linked() {
+  local local_id="$1" file
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync batch: cannot resolve linked document for $local_id" >&2
+    return 1
+  fi
+  if [[ "$(_fm_get "$file" "schema_version")" != "1" ]]; then
+    echo "[ERROR] issue-sync batch: linked $local_id has no strict schema_version" >&2
+    return 1
+  fi
+  if [[ "$(_fm_get "$file" "phase_state")" != "completed" ]]; then
+    echo "[ERROR] issue-sync batch: linked $local_id is not completed" >&2
+    return 1
+  fi
+  local _linked_rc=0
+  _raw_effect close-linked "$file" "$ROOT_DIR" || _linked_rc=$?
+  if [[ "$_linked_rc" -eq 0 ]]; then
+    echo "[issue-sync] batch: linked close complete: $local_id"
+    return 0
+  fi
+  if [[ "$_linked_rc" -eq 3 ]]; then
+    echo "[ERROR] issue-sync batch: partial linked close for $local_id; rerun to finish" >&2
+    return 3
+  fi
+  echo "[ERROR] issue-sync batch: linked close failed for $local_id" >&2
+  return 1
 }

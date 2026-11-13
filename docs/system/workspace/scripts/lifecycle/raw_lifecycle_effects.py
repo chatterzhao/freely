@@ -155,17 +155,44 @@ def close_linked(arguments: list[str]) -> int:
     fail with "raw metadata fields are missing, extra, or reordered" and left
     every linked replica OPEN forever.
 
-    The platform write is identical (adapter close-multi); the only local state
-    that changes is status: closed (+ updated_at), written back without
-    re-validating the raw schema.
+    The local validation is deliberately as strict as close_platforms' Phase 1:
+    a linked issue is only retireable once B2 has completed it. `issue-sync
+    batch` drives the retirement with the SAME phase_state == completed
+    predicate, so there is one policy rather than a second bypass channel.
+
+    The platform write is identical (adapter close-multi). Local state is
+    retired through the fields the project actually drives on: phase_state and
+    platform_state.
     """
     file_path, root_dir = arguments
     metadata, body = read_issue(file_path)
     if str(metadata.get("kind")) != "linked":
         raise ValueError("close-linked requires a kind: linked document")
+
+    # Phase 1 - validate locally, with ZERO platform writes on failure.
+    phase = str(metadata.get("phase_state", "") or "")
+    if phase != "completed":
+        raise ValueError(
+            f"linked issue is not completed (phase_state={phase!r}); "
+            "only completed I-* issues may be retired"
+        )
+    root = Path(root_dir)
+    for field, kind in (("pre_tests_path", "file"),
+                        ("verification_artifact_dir", "dir")):
+        value = str(metadata.get(field, "") or "")
+        if not value:
+            raise ValueError(f"linked issue has no {field}")
+        candidate = root / value
+        if kind == "file" and not candidate.is_file():
+            raise ValueError(f"linked issue {field} does not resolve: {value}")
+        if kind == "dir" and not candidate.is_dir():
+            raise ValueError(f"linked issue {field} does not resolve: {value}")
     platform_ids = metadata.get("platform_ids")
     if not isinstance(platform_ids, dict) or not platform_ids:
         raise ValueError("linked issue has no platform_ids to close")
+    for name, ref in platform_ids.items():
+        if not isinstance(ref, dict) or not str(ref.get("issue_id", "") or ""):
+            raise ValueError(f"linked issue platform_ids.{name} has no issue_id")
 
     from datetime import datetime, timezone
 
@@ -201,14 +228,18 @@ def close_linked(arguments: list[str]) -> int:
     if code != 0:
         _report_platform_statuses(payload)
         print(
-            "[raw-lifecycle] linked platform close did not finish; local status left unchanged",
+            "[raw-lifecycle] linked platform close did not finish; local state left unchanged",
             file=sys.stderr,
         )
         return code
 
     import yaml
 
-    metadata["status"] = "closed"
+    # Retire through the fields the project actually drives on: phase_state is
+    # the batch predicate, platform_state is the batch skip predicate. Do NOT
+    # introduce a `status: closed` second source of truth.
+    metadata["phase_state"] = "completed"
+    metadata["platform_state"] = "closed"
     metadata["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     rendered = yaml.safe_dump(
         dict(metadata), default_flow_style=False, allow_unicode=True, sort_keys=False
