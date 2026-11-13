@@ -1435,6 +1435,9 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
         # historical primary when every replica is healthy.
         platform = next(iter(readable))
 
+    import yaml
+    yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
+
     my_login = os.environ.get("GIT_AUTHOR_NAME", "") or os.environ.get("USER", "unknown")
     for plat, info in readable.items():
         ok, msg = check_and_claim_assignee(plat, info["issue_id"], my_login)
@@ -1485,6 +1488,25 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
     for label in details.get("labels", []):
         if label.startswith("phase/"): phase = label.replace("phase/", ""); break
 
+    # A platform phase/* label is a CREATION-TIME snapshot: the platforms never
+    # update it when the local raw is absorbed/closed (see canonical_projection
+    # in raw_reconciliation.py). Re-materializing must not roll a local terminal
+    # state back to "proposed" - that regression forced manual frontmatter
+    # surgery before pr-create-guarded (raw-20261113T084851Z).
+    existing_file = target_dir / "issue.md"
+    existing_terminal = {}
+    if existing_file.is_file():
+        try:
+            old_parts = existing_file.read_text(encoding="utf-8").split("---", 2)
+            if len(old_parts) >= 3:
+                old_fm = yaml.safe_load(old_parts[1]) or {}
+                if str(old_fm.get("phase_state", "")) in ("absorbed", "closed", "dropped"):
+                    existing_terminal = old_fm
+        except Exception:
+            pass
+    if existing_terminal:
+        phase = existing_terminal["phase_state"]
+
     # Priority must survive materialization: platform severity/* labels are the
     # authoritative source. A cross-platform conflict is fatal (never guess).
     severity, severity_warnings = severity_from_replicas(readable)
@@ -1515,6 +1537,15 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
         fm["updated_at"] = details.get("updated_at", "") or fm["updated_at"]
         if severity:
             fm["severity"] = severity
+        if existing_terminal:
+            # Terminal lifecycle facts are owned locally. Keep them verbatim so
+            # a pull cannot silently demote an absorbed raw (and so the strict
+            # contract still has absorbed_into / platform_state to validate).
+            for _key in ("phase_state", "platform_state", "absorbed_into",
+                         "canonical_issue_path", "completed_at",
+                         "promoted_children", "closeout_note", "source_candidate"):
+                if _key in existing_terminal:
+                    fm[_key] = existing_terminal[_key]
         validate(fm, require_canonical_file=False)
     else:
         fm = {"local_id": f"raw-{raw_key}", "kind": "raw", "phase_state": phase,
@@ -1536,6 +1567,27 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
     else:
         heading = local_heading_title(raw_key, title)
         rendered_body = f"# {heading}\n\n{body.strip()}" if body.strip() else f"# {heading}"
+
+    # Platform comments live in a SEPARATE field, not in the issue body. Mirror
+    # them into the local document so _comments() in raw_reconciliation sees the
+    # same set on both sides. Without this, every pull drops the local
+    # `### comment-*` blocks written by promote-finalize and the fail-closed
+    # replica gate reports content_diverged, which previously tempted callers
+    # to hand-edit the doc back into shape (raw-20261113T084851Z).
+    # The meta lines are stripped by _strip_meta(), leaving exactly the remote
+    # comment text in the canonical projection.
+    for _idx, _comment in enumerate(details.get("comments") or [], 1):
+        _text_comment = str(_comment).strip()
+        if not _text_comment:
+            continue
+        if " ".join(_text_comment.split()) in " ".join(rendered_body.split()):
+            continue
+        rendered_body = (
+            rendered_body.rstrip()
+            + f"\n\n### comment-platform-{_idx}\n"
+            + "- source: platform\n- event: mirrored\n\n"
+            + _text_comment + "\n"
+        )
     (target_dir / "issue.md").write_text(
         f"---\n{fm_str}\n---\n\n{rendered_body}\n", encoding="utf-8"
     )
