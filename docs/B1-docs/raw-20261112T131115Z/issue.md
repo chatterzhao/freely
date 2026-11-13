@@ -94,3 +94,11 @@ workflow_kind: fix
 - 不放宽 raw 的 `validate()`（kind 必须仍是 raw）；
 - 不动 promote / promote-finalize 语义；
 - 平台关单仍必须经 adapter，禁止手工 gh/gitee 直接关。
+
+### comment-20261112T135640Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261112T131115Z-A"]
+
+拆解为以下任务:
+1. [I-20261112T131115Z-A](will-be-updated)
