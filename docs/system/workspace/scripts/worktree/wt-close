@@ -429,10 +429,22 @@ if [[ -z "$PROJECT_WORKTREE_PATH" ]] && [[ -n "$branch" ]]; then
 fi
 ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/B1-docs"
 
-# ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
+# ── Guard: protected branch ──
+# main/develop are never closable. A test-pre-merge-* sandbox IS disposable:
+# when its dev worktree is already gone, the only way to retire it is an
+# explicit --force --discard-unmerged --reason (the reason gate above already
+# validated the prefix). Refusing it unconditionally made Phase 7 dead code and
+# forced manual `git worktree remove` / `branch -D` (raw-20261113T074432Z).
 if _is_protected_branch "$branch"; then
-  echo "Error: '$branch' is a protected branch, cannot close" >&2
-  exit 1
+  if [[ "$branch" == test-pre-merge-* && "$FORCE" == true && "$DISCARD_UNMERGED" == true ]]; then
+    echo "wt-close: retiring disposable test sandbox '$branch' (--force --discard-unmerged)"
+  else
+    echo "Error: '$branch' is a protected branch, cannot close" >&2
+    if [[ "$branch" == test-pre-merge-* ]]; then
+      echo "  test-pre-merge sandboxes require --force --discard-unmerged --reason <合规前缀>" >&2
+    fi
+    exit 1
+  fi
 fi
 
 # ── Resolve worktree path ──
