@@ -947,34 +947,90 @@ WTPLATFORM_MISSING
       fi
     fi
 
-    # Also close the absorbed I-* issue if it has its own platform_ids.
-    # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
-    # may have been pushed to GitHub as a separate issue.  wt-close must close
-    # it too — otherwise completed I-* issues accumulate as open on GitHub.
-    _wt_i_absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
-    if [[ -n "$_wt_i_absorbed_i" ]]; then
-      # Read from the worktree copy first, fall back to develop
-      _wt_i_file="$wt_path/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
-      [[ -f "$_wt_i_file" ]] || _wt_i_file="$PROJECT_ROOT/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
-      if [[ -f "$_wt_i_file" ]]; then
-        _wt_i_phase="$(_fm_get "$_wt_i_file" "phase_state")"
-        _wt_i_platform_state="$(_fm_get "$_wt_i_file" "platform_state")"
-        if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
-          if [[ "$_wt_i_platform_state" != "closed" ]]; then
-            echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
-            if _close_platform_ids_readonly "$_wt_i_file" "$_wt_i_absorbed_i" 2>&1; then
-              echo "wt-close: absorbed I-* closed ✓"
-            else
-              echo "Error: platform close failed for $_wt_i_absorbed_i; cleanup stopped" >&2
-              exit 1
-            fi
-          fi
-        fi
-      fi
-    fi
   fi
 elif [[ "$SKIP_PLATFORM" == true ]]; then
   echo "wt-close: --skip-platform, skipping platform close"
+fi
+
+# ── Phase 2.5: linked children closeout ──
+# A raw is 1:N (promoted_children) but owns exactly ONE worktree. Deleting the
+# worktree therefore requires every child to be terminal, and every completed
+# child must have its platform replica closed - otherwise linked issues
+# accumulate as OPEN forever (raw-20261113T115957Z).
+# The children documents live under docs/B2-docs/{epic}/{story}/raw-{key}/issues/,
+# NOT docs/B1-docs (the old path never existed, so the previous block was dead code).
+if [[ "$FORCE" != true || -n "${wt_path:-}" ]]; then
+  if [[ -n "${issue_file:-}" && -f "${issue_file:-}" ]]; then
+    _wt_children_report="$(python3 - "$PROJECT_ROOT" "$issue_file" <<'PYCHILD'
+import glob
+import os
+import sys
+
+import yaml
+
+root, raw_file = sys.argv[1], sys.argv[2]
+text = open(raw_file, encoding="utf-8").read()
+parts = text.split("---", 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+children = [str(c) for c in (fm.get("promoted_children") or [])]
+absorbed = str(fm.get("absorbed_into") or "")
+if absorbed and absorbed not in children:
+    children.append(absorbed)
+for child in children:
+    matches = sorted(glob.glob(os.path.join(
+        root, "docs/B2-docs", "*", "*", "raw-*", "issues", child + ".md")))
+    if not matches:
+        print("%s\tMISSING\t\t" % child)
+        continue
+    cfile = matches[0]
+    ctext = open(cfile, encoding="utf-8").read()
+    cparts = ctext.split("---", 2)
+    cfm = yaml.safe_load(cparts[1]) if len(cparts) >= 3 else {}
+    print("%s\t%s\t%s\t%s" % (child, cfm.get("phase_state", ""),
+                                 cfm.get("platform_state", ""), cfile))
+PYCHILD
+)"
+    if [[ -n "$_wt_children_report" ]]; then
+      _wt_unfinished=""
+      while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
+        [[ -n "$_wt_cid" ]] || continue
+        case "$_wt_cphase" in
+          completed|dropped) ;;
+          *) _wt_unfinished="${_wt_unfinished}  - ${_wt_cid} (phase_state=${_wt_cphase:-missing})"$'\n' ;;
+        esac
+      done <<< "$_wt_children_report"
+      if [[ -n "$_wt_unfinished" ]]; then
+        cat >&2 <<WTC_CHILDREN
+[wt-close] 拒绝关闭：以下 I-* 尚未完成
+
+${_wt_unfinished}
+一个 raw 只有一个 worktree；删除后这些 I-* 将无法再实现。
+  - 回到工位继续实现，直到 phase_state 到达 completed / dropped
+  - 或按流程把不再需要的 I-* 标记 dropped
+WTC_CHILDREN
+        exit 1
+      fi
+      while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cstate _wt_cpath; do
+        [[ -n "$_wt_cid" ]] || continue
+        [[ "$_wt_cstate" == "closed" ]] && continue
+        if [[ "$SKIP_PLATFORM" == true ]]; then
+          echo "wt-close: --skip-platform, leaving I-* $_wt_cid open"
+          continue
+        fi
+        if [[ "$DRY_RUN" == true ]]; then
+          _dry "freely issue-sync close $_wt_cid (platform close-multi)"
+          continue
+        fi
+        echo "wt-close: closing I-* issue: $_wt_cid"
+        if _close_platform_ids_readonly "$_wt_cpath" "$_wt_cid" 2>&1; then
+          echo "wt-close: I-* closed ✓ ($_wt_cid)"
+        else
+          echo "Error: platform close failed for $_wt_cid; cleanup stopped" >&2
+          exit 1
+        fi
+      done <<< "$_wt_children_report"
+    fi
+  fi
 fi
 
 # ── Phase 3: Lifecycle ownership boundary ──
