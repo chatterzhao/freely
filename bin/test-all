@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-wt-close-test-premerge-guard.py
   test-wt-close-branch-count.py
   test-issue-sync-close-linked.py
   test-wt-close-dryrun-safety.py
@@ -56,6 +57,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-wt-close-test-premerge-guard.py
   test-wt-close-branch-count.py
   test-issue-sync-close-linked.py
   test-wt-close-dryrun-safety.py
