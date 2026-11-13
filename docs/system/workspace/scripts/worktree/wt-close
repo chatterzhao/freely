@@ -300,8 +300,24 @@ _resolve_branch_from_raw_key() {
   if [[ -z "$match_list" ]]; then
     match_list=$(git branch --list "*raw-${raw_key}-*" "*raw-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | grep -E "(^fix/|^feature/|^hotfix/)" | sort -u || true)
   fi
+  if [[ -z "$match_list" ]]; then
+    # A round whose dev worktree was already retired can still own a
+    # test-pre-merge sandbox for the same raw key. Resolve it too, so wt-close
+    # can clean it instead of reporting "no branch found" (raw-20261112T131130Z).
+    match_list=$(git branch --list "test-pre-merge-${raw_key}-*" "test-pre-merge-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | sort -u || true)
+  fi
+  # `grep -c` prints "0" AND exits 1 when nothing matches. Adding `|| echo 0`
+  # appended a SECOND "0", so _count became $'0\n0' and `[[ ... -eq 0 ]]` was a
+  # syntax error; the function then returned 0 with no output, making the caller
+  # believe a branch had been resolved. Take the first line and validate it.
   _count=$(printf '%s
-' "$match_list" | grep -c . 2>/dev/null || echo 0)
+' "$match_list" | grep -c . 2>/dev/null || true)
+  _count="${_count%%$'\n'*}"
+  _count="${_count:-0}"
+  if ! [[ "$_count" =~ ^[0-9]+$ ]]; then
+    echo "[closeout-gate] branch count is not numeric: '$_count'" >&2
+    return 1
+  fi
   if [[ "$_count" -eq 0 ]]; then return 0
   elif [[ "$_count" -eq 1 ]]; then printf '%s
 ' "$match_list"; return 0; fi
