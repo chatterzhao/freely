@@ -2321,3 +2321,24 @@
 - milestone: M-20261113T115957Z-A
 - completed_at: 2026-11-13T12:12:00Z
 - issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T115957Z/issues/I-20261113T115957Z-A.md
+
+## M-20261113T122411Z-A
+- title: fix — children 报告的空字段不再折叠 TSV 列
+- status: active
+### candidate_issues
+1. `C-20261113T122411Z-A`
+- milestone: M-20261113T122411Z-A
+- status: promoted
+- promoted_issue_id: I-20261113T122411Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T122411Z/issues/I-20261113T122411Z-A.md
+### committed_issues
+1. `I-20261113T122411Z-A`
+- milestone: M-20261113T122411Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T122411Z/issues/I-20261113T122411Z-A.md
+
+### completed_issues
+1. `I-20261113T122411Z-A`
+- milestone: M-20261113T122411Z-A
+- completed_at: 2026-11-13T12:36:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T122411Z/issues/I-20261113T122411Z-A.md

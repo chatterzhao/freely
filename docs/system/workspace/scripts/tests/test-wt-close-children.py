@@ -93,6 +93,7 @@ promoted_children:
 
 
 def child_doc(cid: str, phase: str, platform_state: str) -> str:
+    ps_line = f"platform_state: {platform_state}\n" if platform_state else ""
     return f"""---
 schema_version: '1'
 issue_id: {cid}
@@ -105,8 +106,7 @@ platform_ids:
     issue_id: '9001'
   gitee:
     issue_id: 'IKTEST1'
-platform_state: {platform_state}
-pre_tests_path: docs/B2-docs/x/y/raw-{KEY}/verification/pre-tests.md
+{ps_line}pre_tests_path: docs/B2-docs/x/y/raw-{KEY}/verification/pre-tests.md
 verification_artifact_dir: docs/B2-docs/x/y/raw-{KEY}/code-reviews
 ---
 
@@ -204,18 +204,25 @@ def behaviour_checks() -> None:
     check(p.returncode == 0 and calls == 0,
           "B7 already-closed children are not re-closed")
 
+    # Empty platform_state is the REAL shape left by promote-finalize. An empty
+    # TSV column makes bash IFS collapse tabs and shifts the path away.
+    p, calls = run(SRC, child_a_state="", child_b_state="")
+    check(p.returncode == 0 and calls == 2,
+          "B8 empty platform_state still closes both children (no TSV collapse)")
+
 
 def baseline_checks() -> None:
     if BASE is None:
         return
     print("=== BASELINE CONTROL: develop block ===")
     base_text = read(BASE / WT_CLOSE)
-    check("# ── Phase 2.5" not in base_text,
-          "R1 develop has no children-closeout phase at all (RED is real)")
-    check("docs/B1-docs/$_wt_i_absorbed_i/issue.md" in base_text,
-          "R2 develop really builds the non-existent docs/B1-docs child path")
-    check("promoted_children" not in base_text,
-          "R3 develop never reads promoted_children (only absorbed_into)")
+    check("# ── Phase 2.5" in base_text,
+          "R1 develop already carries R33.15's children-closeout phase")
+    check('or "-"' not in base_text,
+          "R2 develop still emits empty TSV columns (no placeholder yet)")
+    p, calls = run(BASE, child_a_state="", child_b_state="")
+    check(p.returncode != 0 or calls != 2,
+          "R3 develop really fails on missing platform_state (RED is real)")
 
 
 def main() -> None:
