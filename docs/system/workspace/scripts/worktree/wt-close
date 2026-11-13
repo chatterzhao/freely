@@ -300,12 +300,10 @@ _resolve_branch_from_raw_key() {
   if [[ -z "$match_list" ]]; then
     match_list=$(git branch --list "*raw-${raw_key}-*" "*raw-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | grep -E "(^fix/|^feature/|^hotfix/)" | sort -u || true)
   fi
-  if [[ -z "$match_list" ]]; then
-    # A round whose dev worktree was already retired can still own a
-    # test-pre-merge sandbox for the same raw key. Resolve it too, so wt-close
-    # can clean it instead of reporting "no branch found" (raw-20261112T131130Z).
-    match_list=$(git branch --list "test-pre-merge-${raw_key}-*" "test-pre-merge-${raw_key}" 2>/dev/null | sed 's/^[*+ ]*//' | sort -u || true)
-  fi
+  # test-pre-merge-* is a DISPOSABLE sandbox, never a close target. When its
+  # dev worktree is already gone it is retired by the dedicated companion-only
+  # path below, not by resolving it into `branch` (that made it run the full
+  # raw lifecycle and triggered platform/develop side effects).
   # `grep -c` prints "0" AND exits 1 when nothing matches. Adding `|| echo 0`
   # appended a SECOND "0", so _count became $'0\n0' and `[[ ... -eq 0 ]]` was a
   # syntax error; the function then returned 0 with no output, making the caller
@@ -334,6 +332,44 @@ _resolve_branch_from_raw_key() {
   exit 1
 }
 
+# Retire a leftover test-pre-merge sandbox whose dev worktree is already gone.
+# This is a COMPANION-ONLY retirement: it deletes the worktree + branch and does
+# NOT run the raw lifecycle (no platform issue close, no Phase 7 develop sync).
+# main/develop/test-pre-merge stay protected as close targets in the main path.
+# The destructive gate is the same: --force + --discard-unmerged with a reason
+# already validated by _require_reason before this function is called.
+_wt_retire_orphan_test_sandbox() {
+  local key="$1" candidates count target_branch target_wt
+  candidates=$(git branch --list "test-pre-merge-${key}-*" "test-pre-merge-${key}" 2>/dev/null | sed 's/^[*+ ]*//' | sort -u || true)
+  [[ -z "$candidates" ]] && return 1
+  count=$(printf '%s\n' "$candidates" | grep -c . 2>/dev/null || true)
+  count="${count%%$'\n'*}"
+  if [[ "$count" -ne 1 ]]; then
+    echo "[closeout-gate] DENIED ambiguous orphan test sandboxes for raw-${key}: $candidates" >&2
+    exit 1
+  fi
+  target_branch="$candidates"
+  if [[ "$FORCE" != true || "$DISCARD_UNMERGED" != true ]]; then
+    echo "[closeout-gate] orphan test sandbox '$target_branch' requires --force --discard-unmerged --reason <合规前缀>" >&2
+    exit 1
+  fi
+  target_wt="$(git worktree list --porcelain 2>/dev/null | awk -v b="refs/heads/$target_branch" '
+      $1=="worktree" { wt=$2 }
+      $1=="branch" && $2==b { print wt; exit }')"
+  if [[ "$DRY_RUN" == true ]]; then
+    _dry "git worktree remove ${target_wt:-<none>}"
+    _dry "git branch -D $target_branch"
+    _dry "no platform close / no Phase 7 develop sync (companion-only)"
+    return 0
+  fi
+  if [[ -n "$target_wt" && -d "$target_wt" ]]; then
+    git worktree remove "$target_wt" --force || { echo "wt-close: 删除 test 工位失败" >&2; exit 1; }
+  fi
+  git branch -D "$target_branch" || { echo "wt-close: 删除 test 分支失败" >&2; exit 1; }
+  echo "wt-close: retired orphan test sandbox '$target_branch' (companion-only; no platform/develop side effects) ✓"
+  return 0
+}
+
 # ── Determine input from --raw-key ──
 if [[ -n "${RAW_KEY:-}" ]]; then
   _raw_key="$(_extract_raw_key "$RAW_KEY")"
@@ -351,14 +387,15 @@ if [[ -n "${RAW_KEY:-}" ]]; then
   else
     _matched="$(_resolve_branch_from_raw_key "$_raw_key")"
     if [[ -z "$_matched" ]]; then
-      echo "Error: no fix/feature branch found for raw key '${_raw_key}'" >&2
-      echo "  Searched: fix/raw-${_raw_key}-* and feature/raw-${_raw_key}-*" >&2
-      echo "  Check available branches:" >&2
-      echo "    git branch --list \"fix/raw-${_raw_key}-*\" \"feature/raw-${_raw_key}-*\"" >&2
-      exit 1
+      # No dev worktree left. An orphan test sandbox must be retired by the
+      # companion-only path AFTER the reason gate - never by resolving it into
+      # `branch` and running the full raw lifecycle.
+      ORPHAN_SANDBOX_KEY="$_raw_key"
+      input="raw-${_raw_key}"
+    else
+      input="$_matched"
+      echo "wt-close: raw key '${_raw_key}' → branch '${input}'"
     fi
-    input="$_matched"
-    echo "wt-close: raw key '${_raw_key}' → branch '${input}'"
   fi
 else
   echo "Error: --raw-key is required" >&2
@@ -408,6 +445,17 @@ GATE
   _require_reason DISCARD_UNMERGED "--discard-unmerged"
 fi
 
+# Companion-only retirement runs here so it inherits the reason gate above but
+# never reaches the protected-branch guard, platform close or Phase 7.
+if [[ -n "${ORPHAN_SANDBOX_KEY:-}" ]]; then
+  _wt_retire_orphan_test_sandbox "$ORPHAN_SANDBOX_KEY" && exit 0
+  echo "Error: no fix/feature branch found for raw key '${ORPHAN_SANDBOX_KEY}'" >&2
+  echo "  Searched: fix/raw-${ORPHAN_SANDBOX_KEY}-* and feature/raw-${ORPHAN_SANDBOX_KEY}-*" >&2
+  echo "  Check available branches:" >&2
+  echo "    git branch --list \"fix/raw-${ORPHAN_SANDBOX_KEY}-*\" \"feature/raw-${ORPHAN_SANDBOX_KEY}-*\"" >&2
+  exit 1
+fi
+
 if [[ -z "$input" ]]; then
   echo "Error: --raw-key is required" >&2
   usage
@@ -429,22 +477,15 @@ if [[ -z "$PROJECT_WORKTREE_PATH" ]] && [[ -n "$branch" ]]; then
 fi
 ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/B1-docs"
 
-# ── Guard: protected branch ──
-# main/develop are never closable. A test-pre-merge-* sandbox IS disposable:
-# when its dev worktree is already gone, the only way to retire it is an
-# explicit --force --discard-unmerged --reason (the reason gate above already
-# validated the prefix). Refusing it unconditionally made Phase 7 dead code and
-# forced manual `git worktree remove` / `branch -D` (raw-20261113T074432Z).
+# ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
+# main / develop / test-pre-merge-* are ALL protected as close targets. This is
+# asserted by test-wt-close-protected-branch-guard Test 1-3. A leftover
+# test-pre-merge sandbox is retired by the companion-only path in the
+# --raw-key resolution above, which does NOT go through the raw lifecycle
+# (no platform close, no Phase 7 develop sync). Never widen this guard.
 if _is_protected_branch "$branch"; then
-  if [[ "$branch" == test-pre-merge-* && "$FORCE" == true && "$DISCARD_UNMERGED" == true ]]; then
-    echo "wt-close: retiring disposable test sandbox '$branch' (--force --discard-unmerged)"
-  else
-    echo "Error: '$branch' is a protected branch, cannot close" >&2
-    if [[ "$branch" == test-pre-merge-* ]]; then
-      echo "  test-pre-merge sandboxes require --force --discard-unmerged --reason <合规前缀>" >&2
-    fi
-    exit 1
-  fi
+  echo "Error: '$branch' is a protected branch, cannot close" >&2
+  exit 1
 fi
 
 # ── Resolve worktree path ──

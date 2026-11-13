@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""AT-001 (raw-20261112T131130Z): wt-close must resolve branches without a
-broken count, including test-pre-merge-only leftovers.
+"""AT-001 (raw-20261113T084813Z): wt-close must resolve branches without a
+broken count, and must NOT resolve test-pre-merge sandboxes as close targets
+(those are retired by the companion-only path).
 
 Bug: `_resolve_branch_from_raw_key` used
 
@@ -93,7 +94,7 @@ def run_resolver(source: Path, branches: list[str]) -> subprocess.CompletedProce
 
 
 def static_checks() -> None:
-    print("=== STATIC: count guard and test-pre-merge fallback ===")
+    print("=== STATIC: count guard without sandbox resolution ===")
     text = read(WT_CLOSE)
     fn = resolver(text)
     check(bool(fn), "S1 resolver function found")
@@ -102,8 +103,9 @@ def static_checks() -> None:
     check("grep -c . 2>/dev/null || true" in fn,
           "S3 count capture tolerates grep's exit 1 without appending")
     check("^[0-9]+$" in fn, "S4 count is validated as a single number")
-    check("test-pre-merge-${raw_key}-*" in fn,
-          "S5 test-pre-merge-only worktrees are resolvable")
+    check("test-pre-merge-${raw_key}-*" not in fn
+          and "_wt_retire_orphan_test_sandbox() {" in text,
+          "S5 sandbox retirement lives in the companion-only path, not the resolver")
     check("return 1" in fn, "S6 an unparsable count fails loudly")
 
 
@@ -123,8 +125,8 @@ def behaviour_checks() -> None:
           "B3 a single fix branch is still resolved")
 
     p = run_resolver(WT_CLOSE, [tp])
-    check(p.returncode == 0 and p.stdout.strip() == tp,
-          "B4 a test-pre-merge-only leftover is resolved")
+    check(p.returncode == 0 and p.stdout.strip() == "",
+          "B4 a test-pre-merge sandbox is NOT resolved into a close target")
 
     other = "fix/raw-" + KEY + "-abcd"
     p = run_resolver(WT_CLOSE, [fix, other])
@@ -137,9 +139,10 @@ def baseline_checks() -> None:
     base = Path(sys.argv[sys.argv.index("--baseline") + 1]) if "--baseline" in sys.argv else None
     if base is None:
         return
-    p = run_resolver(base / "docs/system/workspace/scripts/worktree/wt-close", [])
-    check("syntax error in expression" in (p.stdout + p.stderr),
-          "R1 develop resolver really does raise the syntax error (RED is real)")
+    tp = "test-pre-merge-" + KEY + "-slug"
+    p = run_resolver(base / "docs/system/workspace/scripts/worktree/wt-close", [tp])
+    check(p.returncode == 0 and p.stdout.strip() == tp,
+          "R1 develop resolver really did resolve a sandbox into a close target (RED is real)")
 
 
 def main() -> None:
