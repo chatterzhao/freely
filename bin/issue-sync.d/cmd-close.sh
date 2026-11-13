@@ -20,8 +20,18 @@ cmd_close() {
     # first, so close-platforms closes every real replica. No-op on healthy
     # (all-ids-present) docs; never fabricates an id from a degraded read.
     _backfill_close_replicas "$file" "$local_id"
+    # kind=linked carries its own field set, so the strict RAW validator inside
+    # close-platforms rejects it ("raw metadata fields are missing, extra, or
+    # reordered") - every I-* close failed and linked replicas stayed OPEN.
+    local _effect_kind _effect_cmd
+    _effect_kind="$(_fm_get "$file" "kind")"
+    if [[ "$_effect_kind" == "linked" ]]; then
+      _effect_cmd="close-linked"
+    else
+      _effect_cmd="close-platforms"
+    fi
     local _effect_rc=0
-    _raw_effect close-platforms "$file" "$ROOT_DIR" || _effect_rc=$?
+    _raw_effect "$_effect_cmd" "$file" "$ROOT_DIR" || _effect_rc=$?
     if [[ "$_effect_rc" -eq 0 ]]; then
       echo "[issue-sync] close complete: $local_id"
       return 0
