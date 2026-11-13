@@ -11,48 +11,51 @@
 |---|---|---|
 | projection | 47 | `exec` 投影，真源在 `workspace/scripts/**` |
 | dispatcher | 3 | 只做模块加载与路径解析 |
-| implementation-in-bin | 35 | 实现仍在 `bin/`，由后续 raw 判定 |
-| leaf | 14 | 未超阈值，无需豁免 |
+| standalone-tool | 22 | 自包含 lint / 聚合 / one-shot 工具，按 raw 修复方案保留在 `bin/`；**不是豁免**，coverage/staleness/shrink 三条门禁规则照常生效 |
+| implementation-in-bin | 13 | 判定应迁移，按域分批投影化（C-B/C-C/C-D） |
+| leaf | 14 | 未超阈值，无需登记 |
 
-## implementation-in-bin（35 个，承接 issue `raw-20261111T125724Z`）
+> 分类依据见 `docs/B1-docs/raw-20261111T125724Z/brainstorms.md` §2。`standalone-tool` 只是标签 + 具体 reason 要求，`bin/check-bin-projection` 对它同样要求「>40 行必须登记」「文件必须存在」「变成投影就删条目」。
 
-| 文件 | 行数 | 处理方式 |
-|---|---|---|
-| `bin/agent-table-query` | 336 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/freely-package` | 270 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/deploy-skills` | 216 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/freely-review` | 202 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/test-pre-merge-selfhost` | 170 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-state-file-keys` | 168 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/raw-issue-backfill-h1` | 165 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/raw-issue-pull` | 145 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/issue-sync-batch.py` | 144 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-epics-map` | 143 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/issue-index` | 137 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/test-all` | 135 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/freely-cycle` | 129 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/cache-baseline` | 125 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-cross-process-contract` | 123 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-skill-frontmatter` | 117 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-file-size` | 114 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/git-worktree-guard` | 111 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-db-writers` | 102 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-bin-projection` | 93 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/freely-watchdog` | 88 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/test-cache-hit` | 87 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-coordination-contract` | 82 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-state-file-sources` | 74 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/pre-init-runtime` | 71 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/migrate-issue-phase-state` | 63 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/issue-sync-bootstrap` | 62 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/skill-route` | 59 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/issue-migrate-intake` | 58 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-runtime-size` | 52 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/batch-closeout-raw-issues` | 48 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-tauri-probe-host` | 46 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/check-rust-toolchain` | 44 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/freely` | 43 | implementation still lives in bin/; judged case by case in the follow-up |
-| `bin/tauri-validate-probe-interactions` | 43 | implementation still lives in bin/; judged case by case in the follow-up |
+## 分类清单（35 个，承接 issue `raw-20261111T125724Z`）
+
+| 文件 | 行数 | class | 判定 |
+|---|---|---|---|
+| `bin/agent-table-query` | 336 | implementation-in-bin | business implementation still in bin/; migrate to scripts/agents or scripts/runtime in a later batch |
+| `bin/freely-package` | 270 | implementation-in-bin | business implementation still in bin/; migrate to scripts/packaging in a later batch |
+| `bin/deploy-skills` | 216 | implementation-in-bin | business implementation still in bin/; migrate to scripts/skills in a later batch |
+| `bin/freely-review` | 202 | implementation-in-bin | business implementation still in bin/; migrate to scripts/worktree in a later batch |
+| `bin/test-pre-merge-selfhost` | 170 | implementation-in-bin | business implementation still in bin/; migrate to scripts/tests in a later batch |
+| `bin/check-state-file-keys` | 168 | standalone-tool | self-contained lint for the state-key contract |
+| `bin/raw-issue-backfill-h1` | 165 | standalone-tool | one-shot dry-run-first H1 backfill utility |
+| `bin/raw-issue-pull` | 145 | implementation-in-bin | business implementation still in bin/; migrate to scripts/sync in a later batch |
+| `bin/issue-sync-batch.py` | 144 | standalone-tool | DEPRECATED reference copy with no callers; not a runtime entry |
+| `bin/check-epics-map` | 143 | standalone-tool | self-contained lint validating epics-map.svg against docs/B2-docs |
+| `bin/issue-index` | 137 | implementation-in-bin | business implementation still in bin/; migrate to scripts/lifecycle in a later batch |
+| `bin/test-all` | 135 | standalone-tool | aggregate test runner; explicitly kept in bin/ by the raw's repair plan |
+| `bin/freely-cycle` | 129 | implementation-in-bin | business implementation still in bin/; migrate to scripts/runtime in a later batch |
+| `bin/cache-baseline` | 125 | implementation-in-bin | business implementation still in bin/; migrate to scripts/runtime in a later batch |
+| `bin/check-cross-process-contract` | 123 | standalone-tool | self-contained lint for the Bash-Python data contract |
+| `bin/check-skill-frontmatter` | 117 | standalone-tool | self-contained fail-closed lint over the skill corpus |
+| `bin/check-file-size` | 114 | standalone-tool | self-contained generic line-count lint |
+| `bin/git-worktree-guard` | 111 | implementation-in-bin | business implementation still in bin/; migrate to scripts/worktree in a later batch |
+| `bin/check-db-writers` | 102 | standalone-tool | self-contained boundary lint for DB write ownership |
+| `bin/check-bin-projection` | 93 | standalone-tool | self-contained lint for the projection registry itself; no business logic |
+| `bin/freely-watchdog` | 88 | implementation-in-bin | business implementation still in bin/; migrate to scripts/runtime in a later batch |
+| `bin/test-cache-hit` | 87 | standalone-tool | self-contained cache hit-rate diagnostic |
+| `bin/check-coordination-contract` | 82 | standalone-tool | self-contained contract lint over contracts/coordination |
+| `bin/check-state-file-sources` | 74 | standalone-tool | self-contained lint for the state-file protocol migration |
+| `bin/pre-init-runtime` | 71 | implementation-in-bin | business implementation still in bin/; migrate to scripts/runtime in a later batch |
+| `bin/migrate-issue-phase-state` | 63 | standalone-tool | one-shot audit that never rewrites lifecycle state |
+| `bin/issue-sync-bootstrap` | 62 | implementation-in-bin | business implementation still in bin/; migrate to scripts/sync in a later batch |
+| `bin/skill-route` | 59 | standalone-tool | self-contained skill alias/loop resolution query tool |
+| `bin/issue-migrate-intake` | 58 | standalone-tool | one-time historical intake migration script |
+| `bin/check-runtime-size` | 52 | standalone-tool | self-contained runtime size budget lint |
+| `bin/batch-closeout-raw-issues` | 48 | standalone-tool | read-only closeout drift report; produces no lifecycle facts |
+| `bin/check-tauri-probe-host` | 46 | standalone-tool | self-contained Tauri probe host lint |
+| `bin/check-rust-toolchain` | 44 | standalone-tool | self-contained toolchain probe lint |
+| `bin/freely` | 43 | standalone-tool | CLI dispatch entry point; contains no business implementation |
+| `bin/tauri-validate-probe-interactions` | 43 | standalone-tool | self-contained probe interaction validator |
 
 ## dispatcher（3 个）
 

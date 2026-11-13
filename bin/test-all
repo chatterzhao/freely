@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
   test-wt-close-test-premerge-guard.py
   test-wt-close-branch-count.py
@@ -58,6 +59,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
   test-wt-close-test-premerge-guard.py
   test-wt-close-branch-count.py
