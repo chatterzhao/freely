@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261112T131115Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261112T131115Z-A
 platform_ids:
   github:
     issue_id: '4315'
@@ -14,8 +14,10 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKUZ17
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261112T131115Z/issues/I-20261112T131115Z-A.md
+last_synced_comment_at:
+  github: '2026-11-13T06:15:00Z'
+  gitee: '2026-11-13T06:15:00Z'
 hash: ''
 created_at: '2026-11-12T13:11:15Z'
 updated_at: '2026-11-12T13:56:40Z'
@@ -23,10 +25,11 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261112T131115Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-12T13:56:40Z'
 closeout_note: ''
 severity: P1
 ---
