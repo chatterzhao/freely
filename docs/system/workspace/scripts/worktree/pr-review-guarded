@@ -785,7 +785,7 @@ elif [[ "$_review_verdict" == "manual_required" ]]; then
   echo "       Q3 能力降级、Q4 第二套语义、Q5 设计漂移；改门禁须给四段证据。"
   echo "       L0 任一不过 → verdict 直接 fail，不必再看四层。"
   echo "    3. 四层审查：从 raw issue 开始，逐级向下，检查下层是否忠实消化上层"
-  echo "    4. 审查结论写入 $review_file，必须含 '## L0：项目意图一致性' 段"
+  echo "    4. 审查结论写入 ${review_file}，必须含 '## L0：项目意图一致性' 段"
   echo "    5. git add $review_file && git commit -m 'review: manual review verdict=pass'"
   echo "    6. 重新运行 freely pr-merge-guarded $base $review_branch"
   exit 1
