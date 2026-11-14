@@ -20,6 +20,7 @@ fi
 FORCE=false
 DISCARD_UNMERGED=false
 FORCE_REASON=""
+EXTRACTED_INTO=""
 SKIP_PLATFORM=false
 PLATFORM_ONLY=false
 DRY_RUN=false
@@ -49,6 +50,12 @@ Options (按场景选择):
                       (unfinished/foreign block),使用既有 kill-and-continue 路径。
                       正常自治关闭不需要此标志——gate 会自动判定放行条件。
   --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
+                      PR 已 merge 后的追加提交: 仅当内容已等价落盘，
+                      或工作已另行抽取（--extracted-into）时才放行。
+  --extracted-into <raw-key>
+                      声明这些追加提交的工作已由另一个 raw issue 承接。
+                      必须真实存在 docs/B1-docs/raw-<key>/issue.md；
+                      与 --force --discard-unmerged --reason 同时使用。
 
   ── 仅操作平台，不管本地 ──
   --platform-only    只关闭平台 issue。必须配合 --raw-key 和 --reason。
@@ -162,6 +169,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=true; shift ;;
     --discard-unmerged) DISCARD_UNMERGED=true; shift ;;
+    --extracted-into) EXTRACTED_INTO="$2"; shift 2 ;;
     --reason) FORCE_REASON="$2"; shift 2 ;;
     --skip-platform) SKIP_PLATFORM=true; shift ;;
     --raw-key) RAW_KEY="$2"; shift 2 ;;
@@ -426,6 +434,8 @@ if true; then  # --raw-key always passes through reason check
     - 工位目录已损坏或丢失，仅剩分支引用需清理
   --discard-unmerged 合法业务理由:
     - 该方案已被否决，未合并的提交确认不再需要（需同时使用 --force）
+    - PR 已 merge 后的追加提交内容已等价落盘（判定器逐提交比对通过）
+    - 追加提交的工作已由另一个 raw issue 承接（需 --extracted-into <key>）
   --platform-only 合法业务理由:
     - 工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口
     - 孤儿 raw issue——工位和分支已清理，仅剩平台 issue 未同步关闭
@@ -780,16 +790,75 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
 fi
 
 # ── Unmerged commits guard (--force) ──
+# raw-20261114T065554Z: distinguish "never merged" from "merged, then appended".
+# The old prompt claimed the PR was not merged and offered only --force, which
+# destroyed correct post-merge work (R33.16: PR #4442 merged, commit 712e7550c
+# appended, fix was follow-up PR #4641 -- no force needed).
 if [[ "$FORCE" == true ]]; then
   _ahead=$(git -C "$PROJECT_ROOT" rev-list --count develop.."$branch" 2>/dev/null || echo 0)
   if [[ "$_ahead" -gt 0 ]]; then
-    echo "wt-close: WARNING — $branch has $_ahead unmerged commit(s) ahead of develop:"
-    git -C "$PROJECT_ROOT" log --oneline --no-decorate "develop..$branch" 2>/dev/null | while read -r line; do
-      echo "          $line"
+    _WT_SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+    _GUARD_SCRIPT=""
+    for _cand in "$_WT_SELF_DIR/postmerge_commit_guard.py" \
+                 "$PROJECT_ROOT/docs/system/workspace/scripts/worktree/postmerge_commit_guard.py"; do
+      [[ -f "$_cand" ]] && { _GUARD_SCRIPT="$_cand"; break; }
     done
-    echo ""
-    if [[ "$DISCARD_UNMERGED" != true ]]; then
-      cat >&2 <<UNMERGED_BLOCK
+    _guard_json=""
+    [[ -n "$_GUARD_SCRIPT" ]] && _guard_json=$(python3 "$_GUARD_SCRIPT" \
+      --project "$PROJECT_ROOT" --branch "$branch" --target develop 2>/dev/null || true)
+    _pm_scenario="never_merged"
+    _pm_allow=false
+    if [[ -n "$_guard_json" ]]; then
+      _pm_scenario=$(printf '%s' "$_guard_json" | python3 -c \
+        "import json,sys;print(json.load(sys.stdin).get('scenario','never_merged'))" 2>/dev/null || echo never_merged)
+      _pm_allow=$(printf '%s' "$_guard_json" | python3 -c \
+        "import json,sys;print('true' if json.load(sys.stdin).get('allow_discard') else 'false')" 2>/dev/null || echo false)
+      printf '%s' "$_guard_json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+print('wt-close: %s (scenario=%s, has_merge=%s):' % (d['branch'], d['scenario'], d['has_merge']))
+for c in d['commits']:
+    print('  %s  %-11s  %s' % (c['sha'][:12], 'equivalent' if c['equivalent_in_develop'] else 'NOT-EQUIV', c['subject']))
+" 2>/dev/null || true
+    fi
+
+    if [[ "$_pm_scenario" == "post_merge_additions" ]]; then
+      # The raw WAS merged; the commits above are additions made after merge.
+      _pm_extracted_ok=false
+      if [[ -n "$EXTRACTED_INTO" ]] && [[ -f "$PROJECT_ROOT/docs/B1-docs/raw-$EXTRACTED_INTO/issue.md" ]]; then
+        _pm_extracted_ok=true
+      fi
+      if [[ "$DISCARD_UNMERGED" != true || ( "$_pm_allow" != true && "$_pm_extracted_ok" != true ) ]]; then
+        cat >&2 <<UNMERGED_BLOCK
+[wt-close] BLOCKED: '$branch' was MERGED, but has $_ahead appended commit(s).
+
+  ⚠️  这不是「没有 merge」。上面按 patch-id 逐提交比对过 develop（equivalent / NOT-EQUIV）。
+
+  首选 —— 补合并 PR，把这些提交正式落到 develop：
+    1. cd <本工位> && git merge --no-edit develop
+       # two-dot diff 坑: governance-merge-gate --range develop..HEAD 在分支落后时
+       # 会把 develop 的新提交算成反向差异，看着像夹带实现；先 merge develop 再判即可
+    2. ./bin/freely pr-create-guarded
+    3. ./bin/freely pr-review-guarded <branch>
+    4. ./bin/freely pr-merge-guarded develop <branch>
+    5. ./bin/freely wt-close --raw-key <key>    # 正常收口，无需 --force
+
+  仅当这些提交全部 equivalent（内容已等价落盘、零损失）时才允许丢弃：
+    ./bin/freely wt-close --force --discard-unmerged --reason "..." <branch>
+
+  若工作已另行抽取（而不是补合并）：用 --extracted-into <raw-key> 声明，
+  且 docs/B1-docs/raw-<key>/issue.md 必须真实存在；
+  本次 extracted_into='${EXTRACTED_INTO:-}' valid=$_pm_extracted_ok
+
+  顺序铁律：先落盘、再丢弃。不要用 --force 绕过这个判断。
+UNMERGED_BLOCK
+        exit 1
+      fi
+      echo "wt-close: post-merge additions are zero-loss (all equivalent) or extracted; discarding $_ahead commit(s)"
+    else
+      # Never merged: keep the original refusal strength unchanged.
+      if [[ "$DISCARD_UNMERGED" != true ]]; then
+        cat >&2 <<UNMERGED_BLOCK
 [wt-close] BLOCKED: '$branch' has unmerged commits that would be lost.
 
   ⚠️  --force 只有一个目标: 彻底丢弃。如果意图不是丢弃，STOP。
@@ -806,9 +875,10 @@ if [[ "$FORCE" == true ]]; then
   3. Then re-run with --discard-unmerged to confirm:
      freely wt-close --force --discard-unmerged --reason "..." $branch
 UNMERGED_BLOCK
-      exit 1
+        exit 1
+      fi
+      echo "wt-close: --discard-unmerged confirmed, discarding $_ahead unmerged commit(s)"
     fi
-    echo "wt-close: --discard-unmerged confirmed, discarding $_ahead unmerged commit(s)"
   fi
 fi
 
@@ -1287,7 +1357,29 @@ else
 	      _wt_skill_name="无法从分支名判断"
 	      ;;
 	  esac
-	  cat >&2 <<UNMERGED
+	  if [[ "${_pm_scenario:-never_merged}" == "post_merge_additions" ]]; then
+	    cat >&2 <<UNMERGED
+
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  该 raw 已 merge，但分支上有 merge 之后追加的提交            ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  不是 pr-merge-guarded 失败。按 skill:freely-workflow-         ║
+║  guarded-execution 阶段 9「merge 后残留提交」决策树处理：        ║
+║                                                              ║
+║  1. 逐提交判定：有用 → 补合并 PR；等价已落盘 → 可丢弃；          ║
+║     无用 → 必须说明该提交 hash 与具体理由。                     ║
+║  2. 补合并：git merge develop 后 pr-create-guarded → review →   ║
+║     pr-merge-guarded → 正常 wt-close（无需 --force）。           ║
+║     注意 two-dot diff：先 merge develop 再判，否则               ║
+║     develop..HEAD 会把 develop 的新提交算成反向差异。            ║
+║  3. 顺序铁律：先落盘、再丢弃。                                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+UNMERGED
+	  else
+	    cat >&2 <<UNMERGED
 
 ╔══════════════════════════════════════════════════════════════╗
 ║  ⚠️  严重警告：分支未合并到 develop，无法安全删除                ║
@@ -1300,12 +1392,13 @@ else
 ║  按 skill 工作流完成 merge 后再关闭工位。                        ║
 ║                                                              ║
 ║  如果确定要丢弃未合并的提交（不可恢复）：                         ║
-║    wt-close $branch --force --discard-unmerged \\
+║    wt-close $branch --force --discard-unmerged \               ║
 ║      --reason "违规绕过门禁中，理由充分，是：<业务理由>"           ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 
 UNMERGED
+	  fi
 	  exit 1
 	fi
 fi

@@ -274,6 +274,28 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 2. freely wt-close <branch>                      # 再关开发工位
 ```
 
+#### merge 后残留提交（权威规范，raw-20261114T065554Z）
+
+`wt-close` 报「未合并提交」时，**不得直接推断「PR 没有 merge」**。先分情形：
+
+| 情形 | 判据 | 处理 |
+|---|---|---|
+| **A 从未 merge** | develop 中没有该 raw key 的 merge commit | 保持原流程：完成 merge；方案确被否决才用 `--force --discard-unmerged --reason` |
+| **B 已 merge + 追加提交** | develop 中有该 raw key 的 merge commit，但 `develop..branch` 非空 | 走下面的决策树 |
+
+**决策树（逐提交，不能一刀切）**：
+
+1. `wt-close` 会按 patch-id 逐提交比对 develop 并打印 `equivalent / NOT-EQUIV`；
+2. **有用**（NOT-EQUIV，内容未落盘）→ **优先补合并 PR**：
+   `git merge --no-edit develop` → `pr-create-guarded` → `pr-review-guarded` → `pr-merge-guarded` → 正常 `wt-close`（无需 `--force`）；
+3. **等价已落盘**（全部 equivalent）→ 内容零损失，允许丢弃，且输出比对证据；
+4. **确无用** → 必须说明**哪个 hash、为什么无价值**，不能套「方案已被否决」模板；若工作已另行抽取，用 `--extracted-into <raw-key>` 声明，且 `docs/B1-docs/raw-<key>/issue.md` 必须真实存在；
+5. **顺序铁律：先落盘、再丢弃**。顺序反了就是真丢数据。
+
+**two-dot diff 坑**：`governance-merge-gate --range develop..HEAD` 在分支落后 develop 时，会把 develop 的新提交算成反向差异，看着像夹带 `bin/`、`runtime/` 等实现改动。**先 `git merge develop` 再判**，diff 就只剩真实改动（R33.16 实测 rc=0，无需任何 skip）。
+
+> 反例（本轮真实事故）：R33.16 的 PR #4442 已合并，追加提交 `712e7550c` 只有正确的副本状态，却差点被 `--discard-unmerged` 丢掉；正解是补合并 PR #4641。
+
 ---
 
 ## Gate 处理
