@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Thin projection: the single source of truth is quality/install_state.py.
+# Deliberately NOT wired into docs/system/workspace/scripts/runtime/freely:
+# that monolith sits exactly at its 27158-line budget (check-runtime-size).
+set -euo pipefail
+_SCRIPT="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
+ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
+exec python3 "$ROOT_DIR/docs/system/workspace/scripts/quality/install-state-check.py" "$@"

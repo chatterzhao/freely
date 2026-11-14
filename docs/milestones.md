@@ -2468,3 +2468,24 @@
 - milestone: M-20261114T031605Z-A
 - completed_at: 2026-11-14T08:35:00Z
 - issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261114T031605Z/issues/I-20261114T031605Z-A.md
+
+## M-20261114T080106Z-A
+- title: fix — 安装态自检一等入口 + 文档对齐
+- status: active
+### candidate_issues
+1. `C-20261114T080106Z-A`
+- milestone: M-20261114T080106Z-A
+- status: promoted
+- promoted_issue_id: I-20261114T080106Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261114T080106Z/issues/I-20261114T080106Z-A.md
+### committed_issues
+1. `I-20261114T080106Z-A`
+- milestone: M-20261114T080106Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261114T080106Z/issues/I-20261114T080106Z-A.md
+
+### completed_issues
+1. `I-20261114T080106Z-A`
+- milestone: M-20261114T080106Z-A
+- completed_at: 2026-11-14T09:10:00Z
+- issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261114T080106Z/issues/I-20261114T080106Z-A.md
