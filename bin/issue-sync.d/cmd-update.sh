@@ -10,11 +10,11 @@ cmd_update() {
     exit 1
   fi
 
-  # Dedup: skip if content hasn't changed since last sync
-  if ! _changed_since_last_sync "$local_id" "$file"; then
-    echo "[issue-sync] skip update: $local_id unchanged since last sync"
-    return 0
-  fi
+  # No de-duplication here. `update` is an explicit, single-issue operator
+  # command — the caller's intent IS the change. The batch paths (`scan`,
+  # `batch`) keep the change-detection heuristic so they do not rewrite every
+  # healthy replica. (#4653: gating this command made it a permanent no-op, so
+  # a platform title or body could never be normalised.)
 
   title=$(_platform_title "$local_id" "$file")
   body=$(_issue_body "$file" "$local_id")

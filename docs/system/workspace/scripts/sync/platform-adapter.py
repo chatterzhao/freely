@@ -326,9 +326,11 @@ class GitHubHandler(PlatformHandler):
         url = r.stdout.strip()
         return {"issue_id": url.split("/")[-1], "url": url, "status": "created"}
 
-    def close_issue(self, issue_number):
-        r = subprocess.run(["gh", "issue", "close", "--repo", self._repo(), issue_number],
-                          capture_output=True, text=True)
+    def close_issue(self, issue_number, close_reason="", comment_body=""):
+        args = ["gh", "issue", "close", "--repo", self._repo(), issue_number]
+        if close_reason:
+            args += ["--reason", close_reason]
+        r = subprocess.run(args, capture_output=True, text=True)
         return {"status": "closed" if r.returncode == 0 else "error",
                 "error": r.stderr[:200] if r.returncode != 0 else ""}
 
@@ -668,8 +670,11 @@ class GiteeHandler(PlatformHandler):
         m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', r.stdout.strip())
         return {"issue_id": m.group(1) if m else "?", "status": "created"}
 
-    def close_issue(self, issue_number):
-        r = self._run("close", issue_number)
+    def close_issue(self, issue_number, close_reason="", comment_body=""):
+        args = ["close", issue_number]
+        if comment_body:
+            args += ["--comment", comment_body]
+        r = self._run(*args)
         return {"status": "closed" if r.returncode == 0 else "error"}
 
     def add_comment(self, issue_number, comment_body):
@@ -895,7 +900,7 @@ def create_issue(local_id: str, title: str, body: str, labels: str = "") -> dict
         )
     return results
 
-def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
+def close_issue(local_id: str, platform_ids: dict = None, close_reason: str = "", comment_body: str = "") -> dict[str, dict]:
     results = {}
     for platform in configured_platforms():
         h = _handler_for(platform)
@@ -907,8 +912,70 @@ def close_issue(local_id: str, platform_ids: dict = None) -> dict[str, dict]:
         if not issue_id:
             results[platform] = {'status': 'error', 'error': f'no issue_id for {platform}'}
             continue
-        results[platform] = _safe(h.close_issue, issue_id)
+        results[platform] = _safe(h.close_issue, issue_id, close_reason, comment_body)
     return results
+
+
+# Platforms whose close command can carry the closing note themselves.  They
+# must not also receive an explicit add_comment, or the audit note is posted
+# twice on the same issue.
+_CLOSE_WITH_COMMENT_PLATFORMS = {"gitee"}
+
+
+def close_dropped(raw_key: str, platform_ids: dict = None, comment_body: str = "") -> dict[str, dict]:
+    """Drop a raw: comment the closing reason on every OPEN replica, then close
+    each as ``not planned``.
+
+    Atomic on the comment step — this is the fail-atomic contract from
+    raw-20261114T101138Z (#4653): if any platform comment fails, no platform is
+    closed, so the caller (wt-close --force) can abort without deleting the
+    worktree.  The returned mapping carries a ``_dropped`` marker when the
+    comment step failed, which the CLI turns into a non-zero exit code.
+    """
+    resolved: dict[str, dict] = {}
+    failures: dict[str, dict] = {}
+    platforms = configured_platforms()
+    for platform in platforms:
+        handler = _handler_for(platform)
+        if not handler:
+            failures[platform] = {"status": "error", "error": _unavailable_error(platform)}
+            continue
+        issue_id, error = _unique_raw_issue(handler, raw_key)
+        if error:
+            failures[platform] = {"status": "error", "error": error}
+            continue
+        resolved[platform] = {"issue_id": issue_id}
+    if failures:
+        return {
+            platform: failures.get(
+                platform,
+                {"status": "blocked", "error": "raw key resolution failed on another configured platform"},
+            )
+            for platform in platforms
+        }
+    # Step A: comment first on platforms whose close command cannot carry the
+    # closing note.  Gitee closes with `--comment`, so an extra add_comment
+    # there would duplicate the audit note.
+    comment_targets = {
+        platform: ref for platform, ref in resolved.items()
+        if platform not in _CLOSE_WITH_COMMENT_PLATFORMS
+    }
+    comment_results = (
+        add_comment(f"raw-{raw_key}", comment_targets, comment_body)
+        if comment_targets else {}
+    )
+    for platform, res in comment_results.items():
+        if res.get("status") not in ("created", "skipped"):
+            comment_results["_dropped"] = {
+                "status": "comment_failed",
+                "error": f"comment blocked on {platform}: {res.get('error', '')}",
+            }
+            return comment_results
+    # Step B: close every replica as not-planned.
+    close_results = close_issue(
+        f"raw-{raw_key}", resolved, close_reason="not planned", comment_body=comment_body
+    )
+    return {**comment_results, **close_results}
 
 
 def _issue_id(reference: object) -> str:
@@ -1424,6 +1491,17 @@ def pull_raw_issue(raw_key: str, target_dir: Path,
         print(f"FATAL: raw-{raw_key} replicas are unresolved: {replicas}", file=sys.stderr)
         return None
 
+    # Fail-closed against re-materializing a CLOSED raw.  Once every configured
+    # replica is CLOSED, the local doc has been deleted (wt-close --force drops
+    # the worktree) and re-creating it would silently re-open an abandoned
+    # issue.  Reopen explicitly on the platform if that was intended.
+    _closed = [str(i.get("state", "")).upper() for i in readable.values()]
+    if _closed and all(state == "CLOSED" for state in _closed):
+        print(f"FATAL: raw-{raw_key} is CLOSED on every configured platform "
+              f"(state={_closed}); refusing to re-materialize. "
+              f"To reopen, change the platform issue state first.", file=sys.stderr)
+        return None
+
     if preferred_platform:
         if preferred_platform not in readable:
             print(f"FATAL: requested platform '{preferred_platform}' is not readable "
@@ -1666,6 +1744,13 @@ if __name__ == "__main__":
         result = close_issue_by_raw_key(raw_key, platform_ids)
         print(json.dumps(result, indent=2))
         raise SystemExit(_close_exit_code(result))
+    elif len(a) > 1 and a[1] == "close-dropped":
+        raw_key = a[2] if len(a) > 2 else ""
+        platform_ids = json.loads(a[3]) if len(a) > 3 else {}
+        comment_body = a[4] if len(a) > 4 else ""
+        result = close_dropped(raw_key, platform_ids, comment_body)
+        print(json.dumps(result, indent=2))
+        raise SystemExit(1 if "_dropped" in result else _close_exit_code(result))
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":

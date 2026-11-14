@@ -15,7 +15,7 @@ _COMMENT = re.compile(r"^#{3,4}\s+(?:comment|resolution)-[^\n]+$", re.IGNORECASE
 # so the body comparison must ignore them and the comment comparison must look at
 # their content — otherwise a documented raw can never match its platform copies.
 _COMMENT_BLOCK = re.compile(
-    r"^#{3,4}[ \t]+(?:comment|resolution)-[^\n]*\n(.*?)(?=^#{1,4}[ \t]+|\Z)",
+    r"^#{3,4}[ \t]+(?:comment|resolution)-[^\n]*\n(.*?)(?=^#{3,4}[ \t]+(?:comment|resolution)-|\Z)",
     re.IGNORECASE | re.MULTILINE | re.DOTALL,
 )
 _META_LINE = re.compile(r"^(?:-\s+[A-Za-z_][\w-]*:.*|\{.*\})\s*$")

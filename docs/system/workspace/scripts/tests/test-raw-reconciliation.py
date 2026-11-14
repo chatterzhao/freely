@@ -48,6 +48,39 @@ class RawReconciliationTests(unittest.TestCase):
         self.assertEqual([item["scope"] for item in receipt["degraded"]], ["gitee"])
         self.assertNotIn("gitee", receipt["observations"])
 
+    def test_mirrored_comment_starting_with_a_heading_is_not_body_content(self):
+        """A mirrored platform comment may itself start with a `##` heading.
+
+        `### comment-platform-N` blocks live inside the local body, so the body
+        projection has to drop them entirely. Delimiting a block at "the next
+        heading of any level" truncated such a comment to its metadata bullets
+        and left its prose in the body, which made a healthy raw look
+        `content_diverged` against every platform copy (#4653).
+        """
+        platform = {
+            **self.record,
+            "body": "Required behavior.",
+            "comments": ["## 方案修正\n\n补充说明。"],
+        }
+        local = {
+            **self.record,
+            "body": (
+                "Required behavior.\n\n"
+                "### comment-platform-1\n"
+                "- source: platform\n"
+                "- event: mirrored\n\n"
+                "## 方案修正\n\n补充说明。\n"
+            ),
+            "comments": [],
+        }
+        receipt = self.subject.reconcile(
+            raw_key="20260725T030511Z",
+            configured_platforms=["github"],
+            replicas={"github": platform},
+            local=local,
+        )
+        self.assertTrue(receipt["ok"], receipt.get("diagnostics"))
+
     def test_blocks_divergent_local_or_platform_content(self):
         changed = {**self.record, "body": "different scope"}
         receipt = self.subject.reconcile(

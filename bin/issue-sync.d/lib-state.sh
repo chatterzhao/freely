@@ -35,7 +35,7 @@ if os.path.exists('$SCAN_STATE'):
   with open('$SCAN_STATE') as f: state = json.load(f)
 state['last_sync_at'] = '$ts'
 state.setdefault('synced_issues', {})
-state['synced_issues']['$local_id'] = {'mtime': $mtime, 'synced_at': '$ts'}
+state['synced_issues']['$local_id'] = {'mtime': $mtime, 'synced_at': '$ts', 'hash': '$(_content_hash "$file")'}
 with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
 " 2>/dev/null || true
 }
@@ -81,9 +81,21 @@ if os.path.exists('$SCAN_STATE'):
   synced = state.get('synced_issues', {}).get('$local_id', {})
   print(synced.get('hash', ''))
 " 2>/dev/null || true)
-  # No previous hash = first sync of this issue. Consider it unchanged
-  # to avoid spamming updates on initial batch run.
-  [[ -z "$last_hash" || "$last_hash" == "None" ]] && return 1
+  # No record at all = first sync of this issue. Consider it unchanged to
+  # avoid spamming updates on the initial batch run. A record that exists but
+  # carries no hash predates hash bookkeeping (the writer used to store only
+  # `mtime`/`synced_at`), which made every such issue permanently "unchanged";
+  # treat it as changed so one ordinary sync can repair it.
+  if [[ -z "$last_hash" || "$last_hash" == "None" ]]; then
+    python3 -c "
+import json, os, sys
+if not os.path.exists('$SCAN_STATE'):
+    sys.exit(1)
+with open('$SCAN_STATE') as f: state = json.load(f)
+sys.exit(0 if state.get('synced_issues', {}).get('$local_id') else 1)
+" 2>/dev/null
+    return $?
+  fi
   current_hash=$(_content_hash "$file")
   [[ "$last_hash" != "$current_hash" ]]
 }
