@@ -3,6 +3,7 @@
 # `issue-sync batch` — sync every changed issue.
 
 cmd_batch() {
+  local filter_key="${1:-}"
   local last_scan total=0 synced=0 batch_size=10 batch_count=0
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never}"
@@ -18,8 +19,19 @@ cmd_batch() {
 	    [[ -n "$issue_file" ]] || continue
 	    local dir local_id
 	    dir=$(dirname "$issue_file")
-	    local_id=$(basename "$dir")
+	    # raw docs are <key>/issue.md (id = parent dir); linked docs are
+	    # <...>/issues/<I-id>.md (id = file name). Using basename(dirname) for
+	    # both yielded "issues", so EVERY linked document was filtered out by
+	    # the raw-*/I-* guard below and never processed (raw-20261113T130925Z).
+	    case "$issue_file" in
+	      */issues/I-*.md) local_id=$(basename "$issue_file" .md) ;;
+	      *) local_id=$(basename "$dir") ;;
+	    esac
 	    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+	    # Scope filter: a raw-owning worktree may only sync its own issue and
+	    # children (GATE 1). Cross-raw sync belongs to the governance-only lane
+	    # (raw-20261103T091157Z established that mechanism).
+	    [[ -n "$filter_key" && "$issue_file" != *"$filter_key"* ]] && continue
 	    # Skip fully-synced: platform_state=closed means both sides agree
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
 	    if [[ "$_pstate" == "closed" ]]; then
@@ -41,7 +53,10 @@ cmd_batch() {
   for issue_file in "${issue_files[@]}"; do
     local dir local_id
     dir=$(dirname "$issue_file")
-    local_id=$(basename "$dir")
+    case "$issue_file" in
+      */issues/I-*.md) local_id=$(basename "$issue_file" .md) ;;
+      *) local_id=$(basename "$dir") ;;
+    esac
 
     local kind
     kind=$(_fm_get "$issue_file" "kind")
@@ -63,15 +78,19 @@ cmd_batch() {
           echo "[issue-sync] batch: create $local_id (linked, not on platform)"
           cmd_create "$local_id" || true
         fi
+        # Terminal closure is a STATE predicate, not a change predicate: a
+        # completed I-* must close even on its first sync (no hash yet). Close is
+        # idempotent, so it does not need the anti-spam gate that update has
+        # (raw-20261113T130925Z).
+        local phase; phase=$(_fm_get "$issue_file" "phase_state")
+        local pstate; pstate=$(_fm_get "$issue_file" "platform_state")
+        if [[ "$phase" == "completed" && "$pstate" != "closed" ]]; then
+          echo "[issue-sync] batch: close $local_id (completed, platform=$pstate)"
+          cmd_close_linked "$local_id" || true
+        fi
         if _changed_since_last_sync "$local_id" "$issue_file"; then
-          local phase; phase=$(_fm_get "$issue_file" "phase_state")
           echo "[issue-sync] batch: update $local_id (phase=$phase)"
           cmd_update "$local_id" || true
-          if [[ "$phase" == "completed" ]]; then
-            # linked retirement is batch-only (single policy); cmd_close
-            # refuses linked documents on purpose.
-            cmd_close_linked "$local_id" || true
-          fi
         fi
         # Always check for unsynced comments
         cmd_comment "$local_id" || true

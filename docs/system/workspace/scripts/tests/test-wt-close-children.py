@@ -123,7 +123,7 @@ ADAPTER = (
 
 
 def run(source: Path, child_a_phase="completed", child_b_phase="completed",
-        child_a_state="open", child_b_state="open", dry=False, skip=False) -> tuple:
+        child_a_state="closed", child_b_state="closed", dry=False, skip=False) -> tuple:
     text = read(source / WT_CLOSE)
     fmg, closeh, block = fn(text, "_fm_get"), fn(text, "_close_platform_ids_readonly"), phase25(text)
     if not fmg or not closeh or not block:
@@ -173,42 +173,45 @@ def static_checks() -> None:
     check("docs/B2-docs" in block, "S4 block resolves children under docs/B2-docs")
     check("wt_path/docs/B1-docs" not in block and "PROJECT_ROOT/docs/B1-docs" not in block,
           "S5 block no longer builds the old docs/B1-docs path")
-    check("phase_state=" in block and "completed|dropped" in block,
-          "S6 block gates deletion on terminal phase_state")
-    check("_close_platform_ids_readonly" in block, "S7 block reuses the single close helper")
-    check("_dry " in block, "S8 dry-run path present")
+    check('completed) ;;' in block and "dropped" not in block,
+          "S6 linked terminal phase is completed only (raw's dropped is not reused)")
+    check("freely issue-sync --project" in block and "batch" in block,
+          "S7 the block points at issue-sync batch as the single platform writer")
+    check("_close_platform_ids_readonly" not in block,
+          "S8 wt-close performs NO platform write for children")
+    check('"$_wt_cstate" == "closed"' in block,
+          "S9 the pre-check requires platform_state == closed")
 
 
 def behaviour_checks() -> None:
-    print("=== BEHAVIOUR: real block against a sandbox project ===")
+    print("=== BEHAVIOUR: read-only pre-check ===")
     p, calls = run(SRC)
-    check(p.returncode == 0 and calls == 2,
-          f"B1 both completed children are closed (rc={p.returncode}, calls={calls})")
-    check(CHILD_A in p.stdout and CHILD_B in p.stdout,
-          "B2 both child ids appear in the closeout output")
+    check(p.returncode == 0 and calls == 0,
+          f"B1 completed+closed children let wt-close proceed (rc={p.returncode}, calls={calls})")
 
     p, calls = run(SRC, child_b_phase="in_dev")
-    check(p.returncode != 0 and "尚未完成" in (p.stdout + p.stderr) and calls == 0,
-          "B3 an unfinished child blocks the closeout with zero platform writes")
-    check(CHILD_B in p.stdout + p.stderr, "B4 the blocking child is named")
+    check(p.returncode != 0 and CHILD_B in (p.stdout + p.stderr) and calls == 0,
+          "B2 an unfinished child blocks the closeout, zero platform writes")
+
+    p, calls = run(SRC, child_b_state="open")
+    check(p.returncode != 0 and CHILD_B in (p.stdout + p.stderr) and calls == 0,
+          "B3 an unclosed child blocks the closeout, zero platform writes")
+
+    p, calls = run(SRC, child_b_state="")
+    check(p.returncode != 0 and calls == 0,
+          "B4 a missing platform_state counts as unclosed")
+
+    p, calls = run(SRC, child_b_state="open", skip=True)
+    check(p.returncode == 0 and calls == 0,
+          "B5 --skip-platform skips the platform check")
+
+    p, calls = run(SRC, child_b_phase="in_dev", skip=True)
+    check(p.returncode != 0 and calls == 0,
+          "B6 --skip-platform still requires terminal phase")
 
     p, calls = run(SRC, dry=True)
-    check(p.returncode == 0 and calls == 0 and "[DRY-RUN]" in p.stdout,
-          "B5 dry-run plans the closes without calling the adapter")
-
-    p, calls = run(SRC, skip=True)
     check(p.returncode == 0 and calls == 0,
-          "B6 --skip-platform keeps the children open")
-
-    p, calls = run(SRC, child_a_state="closed", child_b_state="closed")
-    check(p.returncode == 0 and calls == 0,
-          "B7 already-closed children are not re-closed")
-
-    # Empty platform_state is the REAL shape left by promote-finalize. An empty
-    # TSV column makes bash IFS collapse tabs and shifts the path away.
-    p, calls = run(SRC, child_a_state="", child_b_state="")
-    check(p.returncode == 0 and calls == 2,
-          "B8 empty platform_state still closes both children (no TSV collapse)")
+          "B7 dry-run performs the same read-only check")
 
 
 def baseline_checks() -> None:
@@ -216,13 +219,11 @@ def baseline_checks() -> None:
         return
     print("=== BASELINE CONTROL: develop block ===")
     base_text = read(BASE / WT_CLOSE)
-    check("# ── Phase 2.5" in base_text,
-          "R1 develop already carries R33.15's children-closeout phase")
-    check('or "-"' not in base_text,
-          "R2 develop still emits empty TSV columns (no placeholder yet)")
-    p, calls = run(BASE, child_a_state="", child_b_state="")
-    check(p.returncode != 0 or calls != 2,
-          "R3 develop really fails on missing platform_state (RED is real)")
+    check("_close_platform_ids_readonly" in phase25(base_text),
+          "R1 develop closes children itself instead of only checking (RED is real)")
+    p, calls = run(BASE, child_b_state="open")
+    check(calls > 0,
+          "R2 develop really writes the platform for an unclosed child")
 
 
 def main() -> None:

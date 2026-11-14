@@ -150,7 +150,7 @@ main() {
     promote) cmd_promote "$local_id" "$extra" ;;
     promote-finalize) cmd_promote_finalize "$local_id" ;;
     status)  cmd_status "$local_id" ;;
-    batch)   cmd_batch ;;
+    batch)   cmd_batch "$local_id" ;;
     scan)    cmd_scan ;;
   esac
 }

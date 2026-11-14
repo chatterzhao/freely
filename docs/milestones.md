@@ -2342,3 +2342,24 @@
 - milestone: M-20261113T122411Z-A
 - completed_at: 2026-11-13T12:36:00Z
 - issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261113T122411Z/issues/I-20261113T122411Z-A.md
+
+## M-20261113T130925Z-A
+- title: fix — linked 平台状态投影与收口判据单一化
+- status: active
+### candidate_issues
+1. `C-20261113T130925Z-A`
+- milestone: M-20261113T130925Z-A
+- status: promoted
+- promoted_issue_id: I-20261113T130925Z-A
+- promoted_issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261113T130925Z/issues/I-20261113T130925Z-A.md
+### committed_issues
+1. `I-20261113T130925Z-A`
+- milestone: M-20261113T130925Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261113T130925Z/issues/I-20261113T130925Z-A.md
+
+### completed_issues
+1. `I-20261113T130925Z-A`
+- milestone: M-20261113T130925Z-A
+- completed_at: 2026-11-13T13:50:00Z
+- issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261113T130925Z/issues/I-20261113T130925Z-A.md
