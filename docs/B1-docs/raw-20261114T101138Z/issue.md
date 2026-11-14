@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKVBNJ
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
+canonical_issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
 last_synced_comment_at:
   github: '2026-11-14T12:08:54Z'
   gitee: '2026-11-14T12:08:54Z'
@@ -45,7 +45,7 @@ workflow_kind: fix
 | local_id | `raw-20261114T101138Z` |
 | kind | `raw` |
 | phase_state | `absorbed` |
-| canonical | `docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md` |
+| canonical | `docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md` |
 | created | 2026-11-14T10:11:38Z |
 | updated | 2026-11-14T12:09:00Z |
 

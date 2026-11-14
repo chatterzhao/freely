@@ -188,6 +188,95 @@ def test_body_projection_does_not_re_emit_the_local_h1() -> None:
         check(body_lines == [], f"no duplicated H1 in platform body (found {body_lines})")
 
 
+def test_body_projection_is_idempotent() -> None:
+    """Re-projecting an already-projected document must not add a second header.
+
+    A document materialised from a platform copy already carries the generated
+    header (`## <title>` + metadata table + `---` + governance note). The
+    projector must recognise it and emit exactly one header, otherwise every
+    `issue-sync update` doubles the header and the replica gate reports
+    `content_diverged` again (#4653).
+    """
+    print("AT-5: body projection is idempotent for a materialised document")
+    contract = SRC / "docs/system/workspace/scripts/sync/issue_create_contract.py"
+    if not contract.is_file():
+        check(False, "issue_create_contract.py exists")
+        return
+
+    front = (
+        "---\nlocal_id: raw-20260101T000000Z\nkind: raw\n"
+        "phase_state: proposed\n---\n\n"
+    )
+    plain = front + "# feat: demo title\n\n## 现象\n\ntext\n"
+    # Same document after one materialisation round: H1 + generated header.
+    rendered = (
+        front
+        + "# feat: demo title\n\n"
+        + "## feat: demo title\n\n"
+        + "| Field | Value |\n|-------|-------|\n"
+        + "| local_id | `raw-20260101T000000Z` |\n| kind | `raw` |\n"
+        + "| phase_state | `proposed` |\n| canonical | `none` |\n"
+        + "| created | unknown |\n| updated | unknown |\n\n"
+        + "---\n\n"
+        + "> **Freely 治理**：这是 raw issue `raw-20260101T000000Z`。实现前请用 "
+          "`wt-create --raw-key 20260101T000000Z` 创建专属工位，确保代码修改在包含此 "
+          "raw-key 的分支上进行。\n\n"
+        + "## 现象\n\ntext\n"
+    )
+
+    def render(text: str) -> str:
+        with tempfile.TemporaryDirectory() as tmp:
+            doc = Path(tmp) / "issue.md"
+            doc.write_text(text, encoding="utf-8")
+            proc = subprocess.run(
+                [sys.executable, str(contract), "body", "--file", str(doc),
+                 "--local-id", "raw-20260101T000000Z", "--title", "feat: demo title"],
+                capture_output=True, text=True,
+            )
+            return proc.stdout
+
+    plain_body, rendered_body = render(plain), render(rendered)
+    check(plain_body.count("| Field | Value |") == 1, "plain document yields one header")
+    check(rendered_body.count("| Field | Value |") == 1,
+          f"materialised document yields one header (got {rendered_body.count('| Field | Value |')})")
+    check(plain_body == rendered_body, "both document shapes project to the same body")
+
+
+def test_mirrored_comment_does_not_leak_into_the_body() -> None:
+    """A mirrored comment whose text starts with `##` stays out of the body.
+
+    Comment blocks are delivered as real platform comments. Ending the skip at
+    "any `###`/`##` heading" let a comment that opens with `## 方案修正` fall
+    back into the body, so the body projection disagreed with the local
+    projection forever (#4653).
+    """
+    print("AT-6: a mirrored comment that starts with a heading stays out of the body")
+    contract = SRC / "docs/system/workspace/scripts/sync/issue_create_contract.py"
+    if not contract.is_file():
+        check(False, "issue_create_contract.py exists")
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        doc = Path(tmp) / "issue.md"
+        doc.write_text(
+            "---\nlocal_id: raw-20260101T000000Z\nkind: raw\n"
+            "phase_state: proposed\n---\n\n"
+            "# feat: demo title\n\n"
+            "## 现象\n\ntext\n\n"
+            "### comment-platform-1\n- source: platform\n- event: mirrored\n\n"
+            "## 方案修正\n\n补充说明。\n",
+            encoding="utf-8",
+        )
+        proc = subprocess.run(
+            [sys.executable, str(contract), "body", "--file", str(doc),
+             "--local-id", "raw-20260101T000000Z", "--title", "feat: demo title"],
+            capture_output=True, text=True,
+        )
+        out = proc.stdout
+        check("## 现象" in out, "human body is kept")
+        check("补充说明" not in out, "mirrored comment text is not published as body")
+        check("comment-platform-1" not in out, "comment marker is not published as body")
+
+
 def main() -> int:
     print(f"source: {SRC}")
     if not LIB_STATE.is_file():
@@ -198,8 +287,10 @@ def main() -> int:
     test_legacy_entry_is_treated_as_changed()
     test_explicit_update_is_not_gated()
     test_body_projection_does_not_re_emit_the_local_h1()
+    test_body_projection_is_idempotent()
+    test_mirrored_comment_does_not_leak_into_the_body()
     failed = len(FAILURES)
-    ok = 16 - failed
+    ok = 23 - failed
     print(f"SUMMARY: {ok} ok, {failed} failed")
     return 0 if failed == 0 else 1
 

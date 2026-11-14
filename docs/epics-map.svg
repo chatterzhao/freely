@@ -459,7 +459,7 @@
   <text x="65" y="4379" fill="#333">skill-overlap-matrix</text>
   <rect id="story-skill-yaml-frontmatter" x="55" y="4384" width="690" height="18" fill="#fff" stroke="#f57f17" stroke-width="1" rx="2"/>
   <text x="65" y="4397" fill="#333">skill-yaml-frontmatter</text>
-  <rect id="epic-worktree-lifecycle" x="35" y="4410" width="730" height="116" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
+  <rect id="epic-worktree-lifecycle" x="35" y="4410" width="730" height="134" fill="#ede7f6" stroke="#4527a0" stroke-width="2" rx="4"/>
   <text x="50" y="4426" font-size="14" font-weight="bold" fill="#4527a0">worktree-lifecycle</text>
   <rect id="story-merge-guard-issue-sync-scope" x="55" y="4436" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
   <text x="65" y="4449" fill="#333">merge-guard-issue-sync-scope</text>
@@ -471,4 +471,6 @@
   <text x="65" y="4503" fill="#333">worktree-seed</text>
   <rect id="story-wt-create-resume-test-worktree" x="55" y="4508" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
   <text x="65" y="4521" fill="#333">wt-create-resume-test-worktree</text>
+  <rect id="story-wt-close" x="55" y="4526" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
+  <text x="65" y="4539" fill="#333">wt-close</text>
 </svg>

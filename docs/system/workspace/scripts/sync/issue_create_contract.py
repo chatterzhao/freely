@@ -44,6 +44,7 @@ DEFAULT_SEVERITY = "P2"
 BODY_MAX_LINES = 80
 
 _WORKFLOW_KIND = re.compile(r"^workflow_kind:\s*(\S+)\s*$", re.MULTILINE)
+_COMMENT_HEADING = re.compile(r"^#{3,4}\s+(?:comment|resolution)-", re.IGNORECASE)
 
 
 def strip_frontmatter(text: str) -> tuple[dict, str]:
@@ -105,16 +106,17 @@ def drop_comment_channel(markdown_body: str) -> list[str]:
     skipping = False
     for line in markdown_body.splitlines():
         stripped = line.strip()
-        if stripped == "## Comments":
+        if stripped == "## Comments" or _COMMENT_HEADING.match(stripped):
             skipping = True
             continue
-        if skipping and (stripped.startswith("## ") or stripped.startswith("### ")):
-            skipping = False
-        if stripped.startswith("### comment-"):
-            skipping = True
+        # A comment body may itself start with `##`/`###` headings. Ending the
+        # skip there published the comment text inside the body, so the body
+        # projection could never agree with the local projection (#4653).
+        # Blocks therefore run until the next comment marker or the end, which
+        # is exactly how raw_reconciliation._COMMENT_BLOCK cuts them.
+        if skipping:
             continue
-        if not skipping:
-            kept.append(line)
+        kept.append(line)
     return kept
 
 
@@ -141,6 +143,37 @@ def strip_local_h1(markdown_body: str) -> str:
     return markdown_body
 
 
+def strip_repeated_header(markdown_body: str, title: str) -> str:
+    """Drop a previously generated header from a materialised document.
+
+    A document pulled back from a platform copy already carries ``## <title>``,
+    the metadata table, the ``---`` rule and the governance note. Emitting them
+    again on the next ``issue-sync update`` doubled the header, and the replica
+    gate then reported ``content_diverged`` against every platform copy
+    (#4653). Projection has to be idempotent: same input meaning -> same body.
+    """
+    lines = str(markdown_body or "").splitlines()
+    index = 0
+    while index < len(lines) and not lines[index].strip():
+        index += 1
+    if index >= len(lines) or lines[index].strip() != f"## {title.strip()}":
+        return markdown_body
+    if not any(line.strip() == "| Field | Value |" for line in lines[index:index + 14]):
+        return markdown_body
+    cursor = index
+    while cursor < len(lines) and not lines[cursor].strip().startswith("---"):
+        cursor += 1
+    if cursor < len(lines):
+        cursor += 1  # the horizontal rule that closes the metadata table
+    while cursor < len(lines) and not lines[cursor].strip():
+        cursor += 1
+    if cursor < len(lines) and lines[cursor].lstrip().startswith("> **Freely 治理**"):
+        cursor += 1
+        while cursor < len(lines) and not lines[cursor].strip():
+            cursor += 1
+    return "\n".join(lines[cursor:]).lstrip("\n")
+
+
 def platform_body(
     local_id: str,
     title: str,
@@ -156,6 +189,7 @@ def platform_body(
     updated = str(metadata.get("updated_at") or "unknown")
     workflow_kind, human_body = split_workflow_kind(markdown_body)
     human_body = strip_local_h1(human_body)
+    human_body = strip_repeated_header(human_body, title)
 
     lines: list[str] = []
     if metadata:

@@ -4,7 +4,7 @@
 
 - status: promoted
 - promoted_issue_id: I-20261114T101138Z-A
-- promoted_issue_path: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
 - milestone: M-20261114T101138Z-A
 - kind: fix
 - decision: 方案 A——复用 `wt-close --force --discard-unmerged` 骨架（不新造 flag、不走正常 close 分支），在 `--force` 分支内部编排 `transition("dropped")` + 平台 `close-dropped`；adapter 新增 `close_dropped`（先写关闭评论再 `not planned` 关单），并给 `pull_raw_issue` 加全 CLOSED 副本 fail-closed。**不改 `runtime/freely`**（27158 行预算）。

@@ -22,7 +22,7 @@
 - expected_RED_output: AttributeError / TypeError（close_dropped 不存在或 close_issue 无 reason 参数）；补测后为 ModuleNotFoundError + 重复 comment 断言失败
 - actual_RED_output: develop 基线无 close_dropped、无 `--reason`、无 dropped transition 片段（1 ok / 9 failed）；修复前实现对补测用例 7 ok / 3 failed，其中 `test_transition_snippet_writes_valid_dropped_state` 真实报 `ModuleNotFoundError: No module named 'raw_metadata_contract'`
 - actual_output: Ran 10 tests / OK（10 ok, 0 failed）
-- evidence_file: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-001-BASELINE-RED.log,AT-001-RED.log,AT-001-GREEN.log
+- evidence_file: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-001-BASELINE-RED.log,AT-001-RED.log,AT-001-GREEN.log
 - red-green-status: green
 - status: passed
 - blocker: ''
@@ -90,20 +90,72 @@
 | `github / ambiguous: 3 matches` | `_resolve_raw_identity()` 只认标题前缀 `[RAW-<key>]`；GitHub #4653 标题缺前缀，回退到 #4654/#4655 共 3 个 body 匹配 |
 | `local / content_diverged` | ① `raw_reconciliation._COMMENT_BLOCK` 以「下一个 1–4 级标题」切块，而镜像评论正文本身以 `## 开头`，块被截断成空、正文残留进 body；② `_scan_state_record_sync()` 只写 `mtime`/`synced_at` 从不写 `hash`，而 `_changed_since_last_sync()` 只读 `hash` → `issue-sync update` 对所有 issue 恒为 no-op，平台标题/正文永远无法归一 |
 
-### 实现修复（4 处，均带基线红）
+**实现修复（4 处，均带基线红）**
 
 - `bin/issue-sync.d/lib-state.sh`：`_scan_state_record_sync` 记录 `hash`；历史条目（有 `synced_at` 无 `hash`）视为已变更，使一次普通同步即可修复；无任何记录的首次同步仍判 unchanged，保留「初始批量不刷屏」语义。
 - `bin/issue-sync.d/cmd-update.sh`：移除批量 dedup。`update` 是操作者显式单条命令，意图即变更；`scan`/`batch` 仍走变更检测。
 - `docs/system/workspace/scripts/lifecycle/raw_reconciliation.py`：`_COMMENT_BLOCK` 块边界改为「下一个 comment/resolution 标记」，镜像评论正文以 `##` 开头也能被完整归入评论、并从 body 中剔除。
 - `docs/system/workspace/scripts/sync/issue_create_contract.py`：新增 `strip_local_h1()`，正文投影不再重复输出本地 `# 标题`（平台侧已由 `## <title>` + 元数据表承载；真实平台正文如 #4654 亦无 H1）。
 
-### 证据
+### acceptance-2
+
+- id: AT-002
+- requirement: 平台副本能被封装命令真正归一：`_scan_state_record_sync` 记录内容 hash；历史条目（有 `synced_at` 无 `hash`）视为已变更；显式 `issue-sync update` 不受批量 dedup 约束；正文投影不再重复输出本地 H1，且对已物化文档幂等；镜像评论正文以 `##` 开头时不得泄漏进正文
+- acceptance_target: `freely feedback edit` / `issue-sync update` 可归一平台标题与正文，无需手工改平台
+- surface_kind: unit
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- testing_layer: unit
+- target_environment: 本地 bash（source `bin/issue-sync.d/lib-state.sh`）+ `issue_create_contract.py` CLI
+- required_evidence: AT-002 GREEN 23 ok / 0 failed；develop 基线 RED 10 ok / 6 failed
+- evidence_level: integration
+- artifact_ref: docs/system/workspace/scripts/tests/test-issue-sync-update-not-noop.py
+- test_command: python3 docs/system/workspace/scripts/tests/test-issue-sync-update-not-noop.py
+- expected_output: SUMMARY: 23 ok, 0 failed
+- expected_RED_output: 条目无 `hash`；历史条目判 unchanged；`cmd-update.sh` 调用 dedup；正文含重复 H1 与重复头部；镜像评论文本出现在正文
+- actual_RED_output: 基线（HEAD 版 `lib-state.sh`/`cmd-update.sh`/`issue_create_contract.py`）10 ok / 6 failed，见 `AT-002-BASELINE-RED.log`；修复过程中 7 ok / 5 failed，见 `AT-002-RED.log`
+- actual_output: SUMMARY: 23 ok, 0 failed
+- evidence_file: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-002-BASELINE-RED.log,AT-002-RED.log,AT-002-GREEN.log
+- red-green-status: green
+- status: passed
+- blocker: ''
+- task_refs: T8
+- case_design: AT-1 用真实临时目录调 `_scan_state_record_sync` 并校验落盘 `hash` 等于 `_content_hash`；AT-2 造历史条目断言「有记录无 hash → CHANGED」且「无记录 → UNCHANGED」；AT-3 静态断言 `cmd-update.sh` 不再引用 dedup；AT-4/AT-5 用合成文档断言正文不重复 H1、且「原始形态」与「已物化形态」投影出完全相同的 body；AT-6 造以 `## 方案修正` 开头的镜像评论，断言其文本与标记都不出现在正文。
+- red_how: fix RED — `--source-dir` 指向由 `git show HEAD:<path>` 还原的基线文件树，跑同一套 AT。
+
+### acceptance-3
+
+- id: AT-003
+- requirement: 副本一致性投影把「正文以标题开头的镜像评论」完整归入 comments，并从 body 剔除
+- acceptance_target: 健康的 raw 不再被误判 `content_diverged`
+- surface_kind: unit
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- testing_layer: unit
+- target_environment: `raw_reconciliation.py` 纯函数
+- required_evidence: `test-raw-reconciliation.py` GREEN 4/4；新增用例在修复前 RED
+- evidence_level: integration
+- artifact_ref: docs/system/workspace/scripts/tests/test-raw-reconciliation.py
+- test_command: python3 docs/system/workspace/scripts/tests/test-raw-reconciliation.py
+- expected_output: Ran 4 tests / OK
+- expected_RED_output: 新增用例 `content_diverged`（body 残留镜像评论正文）
+- actual_RED_output: 1 failed，见 `AT-003-RED.log`
+- actual_output: Ran 4 tests / OK，见 `AT-003-GREEN.log`
+- evidence_file: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-003-RED.log,AT-003-GREEN.log
+- red-green-status: green
+- status: passed
+- blocker: ''
+- task_refs: T8
+- case_design: 构造 platform 记录（body 干净、评论单列）与 local 记录（body 内嵌 `### comment-platform-1` + `## 方案修正` 正文），断言 `reconcile(require local)` 返回 ok。
+- red_how: fix RED — 修复 `_COMMENT_BLOCK` 块边界前运行同一用例，本地 body 残留评论正文导致 diverged。
+
+**证据**
 
 - 新增 AT `docs/system/workspace/scripts/tests/test-issue-sync-update-not-noop.py`：基线 RED 10 ok / 6 failed（`AT-002-BASELINE-RED.log`），修复前 RED 7 ok / 5 failed（`AT-002-RED.log`），GREEN 16 ok / 0 failed（`AT-002-GREEN.log`）。
 - 扩展 `test-raw-reconciliation.py`：新增「镜像评论以标题开头」用例，RED 1 failed（`AT-003-RED.log`），GREEN 4/4 OK（`AT-003-GREEN.log`）。
 - 回归：`test-issue-sync-modules.py` 35 ok / 0 failed（含「issue-sync 与 contract 渲染同一 body」）。
 
-### 平台侧归一（全部走封装命令，无手工 gh/gitee）
+**平台侧归一（全部走封装命令，无手工 gh/gitee）**
 
 1. `freely feedback edit --raw-key 20261114T101138Z --title "fix: dropped 收口应自动写关闭理由并防重新物化"` → 两平台标题归一为 `[RAW-20261114T101138Z] …`（命令内部走 `canonical_raw_title()`）。
 2. `freely issue-sync update raw-20261114T101138Z` → 两平台标题/正文/标签按同一投影重写。
