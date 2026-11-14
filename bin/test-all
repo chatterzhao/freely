@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-replica-metadata-decision.py
   test-install-state-cli.py
   test-b1-design-intent-audit.py
   test-postmerge-commit-guard.py
@@ -68,6 +69,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-replica-metadata-decision.py
   test-install-state-cli.py
   test-b1-design-intent-audit.py
   test-postmerge-commit-guard.py
