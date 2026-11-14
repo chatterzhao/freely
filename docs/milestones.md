@@ -2489,3 +2489,24 @@
 - milestone: M-20261114T080106Z-A
 - completed_at: 2026-11-14T09:10:00Z
 - issue_path: docs/B2-docs/platform/issue-sync-entrypoint/raw-20261114T080106Z/issues/I-20261114T080106Z-A.md
+
+## M-20261114T034750Z-A
+- title: feature — replica 元数据归属的设计判决（选项 A）
+- status: active
+### candidate_issues
+1. `C-20261114T034750Z-A`
+- milestone: M-20261114T034750Z-A
+- status: promoted
+- promoted_issue_id: I-20261114T034750Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-parity/raw-20261114T034750Z/issues/I-20261114T034750Z-A.md
+### committed_issues
+1. `I-20261114T034750Z-A`
+- milestone: M-20261114T034750Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261114T034750Z/issues/I-20261114T034750Z-A.md
+
+### completed_issues
+1. `I-20261114T034750Z-A`
+- milestone: M-20261114T034750Z-A
+- completed_at: 2026-11-14T09:45:00Z
+- issue_path: docs/B2-docs/platform/issue-parity/raw-20261114T034750Z/issues/I-20261114T034750Z-A.md
