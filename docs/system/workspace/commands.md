@@ -38,6 +38,20 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | 部署 skills 到 AI 工具 | `freely deploy-skills` | 手动 cp |
 | 查看当前项目状态 | `freely live-status` | — |
 | 查看所有工位状态 | `freely fleet-status` | git worktree list |
+| 核对安装态是否与 develop 一致（吃狗粮前提） | `./bin/install-state-check --json` | 手工比对 `~/.freely/versions/*`、裸跑 `install-state-check --json` |
+
+### `./bin/install-state-check`
+
+安装态自检的**一等入口**。薄投影，唯一真源是
+`docs/system/workspace/scripts/quality/install_state.py`（经 `install-state-check.py` 转发）；
+`freely doctor` 也调用同一真源，不产生第二套判定。
+
+- `--json` 输出 `ok / project_head / active_version / packaged_from / command_path`；
+- 不一致时返回非 0，并提示 `freely-package --version auto --activate`；
+- **不做自动修复**：打包/激活仍由 `pr-merge-guarded` followthrough 或显式 `freely-package` 负责。
+
+> 刻意不加入 `./bin/freely` 的子命令：`runtime/freely` 正处 27158 行预算上限，
+> 加分派行会撑爆 `check-runtime-size`。
 
 ## 每个命令的详细说明
 

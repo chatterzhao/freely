@@ -171,6 +171,14 @@
     },
     {
       "kind": "bin",
+      "source": "docs/system/workspace/scripts/runtime/freely",
+      "target": "bin/install-state-check",
+      "sha256": "aea7ec51415c1bc7a89fb75136b043c7c5ceb28be37943801f6a161420843ca9",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
       "source": "docs/system/workspace/scripts/quality/new-review",
       "target": "bin/new-review",
       "sha256": "7769ea925ec15867b09c589f3e01a8a6587dbb47554fe0687158c87e01c35edb",
