@@ -1008,12 +1008,54 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
 WTPLATFORM_MISSING
         exit 1
       fi
-      echo "wt-close: --force, closing platform issue for $issue_id..."
-      if _close_issue_platforms_readonly "$_raw_key" "$issue_file" "$issue_id" 2>&1; then
-        echo "wt-close: platform issue closed ✓"
+      echo "wt-close: --force, dropping raw issue $issue_id..."
+      # 1) transient local terminal state (dropped).  The worktree is deleted
+      #    afterwards, so this only fixes the closeout reason as a single source
+      #    and gives an AT checkpoint; the durable audit trail is the platform
+      #    closing comment written in step 3.
+      _drop_reason="$FORCE_REASON"
+      _drop_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      if [[ "$DRY_RUN" == true ]]; then
+        _dry "transition raw-$raw_key -> dropped (reason=\"$_drop_reason\")"
+        _dry "platform-adapter close-dropped raw-$raw_key (comment + not-planned)"
       else
-        echo "Error: platform close failed for $issue_id; cleanup stopped" >&2
-        exit 1
+        if python3 - "$issue_file" "$_drop_reason" "$_drop_at" <<'PY'
+import sys
+sys.path.insert(0, "$PROJECT_ROOT/docs/system/workspace/scripts/lifecycle")
+from raw_metadata_contract import transition_issue
+try:
+    transition_issue(sys.argv[1], "dropped", at=sys.argv[3], reason=sys.argv[2])
+except Exception as e:
+    print("FATAL: transition to dropped failed: %s" % e, file=sys.stderr)
+    sys.exit(2)
+PY
+        then
+          echo "wt-close: local state -> dropped ✓"
+        else
+          echo "Error: transition to dropped failed; cleanup stopped" >&2
+          exit 1
+        fi
+
+        # 2) assemble closing comment = reason + uncommitted B1 research
+        _close_comment="$_drop_reason"
+        for _f in "$ISSUES_DIR/raw-$_raw_key/brainstorms.md" "$ISSUES_DIR/raw-$_raw_key/candidates.md"; do
+          if [[ -f "$_f" ]]; then
+            _close_comment+=$'\n\n'"$(cat "$_f")"
+          fi
+        done
+
+        # 3) comment-then-close on the platform (not-planned), fail-atomic: a
+        #    platform drop failure leaves the worktree intact for manual recovery.
+        _wt_platform_ids="$(_fm_get "$issue_file" "platform_ids")"
+        [[ -n "$_wt_platform_ids" && "$_wt_platform_ids" != "None" ]] || _wt_platform_ids="{}"
+        if FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
+            "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" \
+            close-dropped "$_raw_key" "$_wt_platform_ids" "$_close_comment" 2>&1; then
+          echo "wt-close: platform issue dropped (commented + closed not-planned) ✓"
+        else
+          echo "Error: platform drop failed for $issue_id; cleanup stopped (worktree NOT deleted)" >&2
+          exit 1
+        fi
       fi
     fi
 

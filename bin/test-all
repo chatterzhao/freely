@@ -39,6 +39,7 @@ CORE=(
   test-wt-close-branch-count.py
   test-issue-sync-close-linked.py
   test-wt-close-dryrun-safety.py
+  test-wt-close-dropped-closeout.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
@@ -85,6 +86,7 @@ CI_CORE=(
   test-wt-close-branch-count.py
   test-issue-sync-close-linked.py
   test-wt-close-dryrun-safety.py
+  test-wt-close-dropped-closeout.py
   test-projection-consistency.py
   test-bin-projection.py
   test-runtime-split.py
