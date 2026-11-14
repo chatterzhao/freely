@@ -532,7 +532,10 @@ fi
 
 # Build review prompt
 cat > "$REVIEW_PROMPT_FILE" << PROMPT
-You are the Freely TDD Reviewer. Follow skill:freely-tdd-review (TDD four-question review).
+You are the Freely TDD Reviewer. Follow skill:freely-tdd-review.
+
+You MUST run L0 (project-intent consistency) BEFORE the four-layer review.
+L0 failing means the whole verdict fails, no matter how green the four layers are.
 
 ## Context
 - Raw issue: $_issue_file
@@ -545,12 +548,35 @@ You reviewed this PR in round $((_review_round - 1)) and found issues.
 Focus on whether the issues from YOUR previous review have been fixed."; fi)
 
 ## Instructions
-Read the pre-tests.md and git diff, then output a JSON verdict:
+Read the pre-tests.md and git diff, then output a JSON verdict.
+
+Step 0 (MANDATORY, before the four layers): L0 project-intent consistency.
+Quote the ACTUAL text of these anchors, not a paraphrase:
+  - design docs (README / LAWS / CONSTITUTION / scripts/README / contracts)
+  - existing acceptance tests, especially ones asserting "must reject/block"
+  - gate source comments and their stated rationale
+  - existing implementations of the same capability
+Then answer, one by one:
+  Q1 conflict: does this diff contradict an existing assertion (and if so, is it explained)?
+  Q2 gate strength: is any gate loosened/bypassed/deleted without evidence the original design was wrong?
+  Q3 capability downgrade: anything forced->optional, fail-closed->fail-open, stricter->looser?
+  Q4 second source of truth: a second semantics/channel for the same concept?
+  Q5 design drift: the design changed under the name of "fixing the implementation"?
+If this diff touches a gate, contract or security boundary, also give the four-part
+burden of proof, one answer per line:
+  1. why it was designed that way (cite the commit / raw / test text)
+  2. why it must change now
+  3. implementation defect or design error (pick one, with evidence)
+  4. strength is not reduced (and any compensating control)
+Never answer Q1-Q5 with "B1/B2 already decided it" - the round cannot prove itself.
+
+Then run the four layers (raw->B1, B1->B2, B2->implementation, implementation->tests).
 
 {
   "verdict": "pass" | "fail",
   "round": $_review_round,
   "dimensions": {
+    "intent": {"status": "pass"|"fail", "note": "L0 anchors quoted + Q1-Q5 answers"},
     "red": {"status": "pass"|"fail", "note": "..."},
     "green": {"status": "pass"|"fail", "note": "..."},
     "adequacy": {"status": "pass"|"fail", "note": "..."},
@@ -559,6 +585,8 @@ Read the pre-tests.md and git diff, then output a JSON verdict:
   "summary": "...",
   "required_fixes": ["..."]
 }
+
+"intent": "fail" forces "verdict": "fail".
 
 Review the following files for evidence:
 $([[ -n "$_pre_tests_file" ]] && echo "Pre-tests: $(cat "$_pre_tests_file" 2>/dev/null || echo 'not found')")
@@ -752,9 +780,12 @@ elif [[ "$_review_verdict" == "manual_required" ]]; then
   echo ""
   echo "  审查步骤:"
   echo "    1. 加载 skill:freely-tdd-review"
-  echo "    2. 从 raw issue 开始，逐级向下审查"
-  echo "    3. 每级检查：下层是否忠实消化了上层？"
-  echo "    4. 审查结论写入 $review_file"
+  echo "    2. **先做 L0（项目意图一致性）**：引用外部锚点原文（设计文档 / 既有验收测试 /"
+  echo "       门禁源码注释与理由 / 既有同类实现），逐条回答 Q1 冲突、Q2 门禁强度、"
+  echo "       Q3 能力降级、Q4 第二套语义、Q5 设计漂移；改门禁须给四段证据。"
+  echo "       L0 任一不过 → verdict 直接 fail，不必再看四层。"
+  echo "    3. 四层审查：从 raw issue 开始，逐级向下，检查下层是否忠实消化上层"
+  echo "    4. 审查结论写入 $review_file，必须含 '## L0：项目意图一致性' 段"
   echo "    5. git add $review_file && git commit -m 'review: manual review verdict=pass'"
   echo "    6. 重新运行 freely pr-merge-guarded $base $review_branch"
   exit 1
