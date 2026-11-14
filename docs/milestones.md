@@ -2363,3 +2363,24 @@
 - milestone: M-20261113T130925Z-A
 - completed_at: 2026-11-13T13:50:00Z
 - issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261113T130925Z/issues/I-20261113T130925Z-A.md
+
+## M-20261113T115950Z-A
+- title: feature — pr-review-guarded 引导同步 L0
+- status: active
+### candidate_issues
+1. `C-20261113T115950Z-A`
+- milestone: M-20261113T115950Z-A
+- status: promoted
+- promoted_issue_id: I-20261113T115950Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T115950Z/issues/I-20261113T115950Z-A.md
+### committed_issues
+1. `I-20261113T115950Z-A`
+- milestone: M-20261113T115950Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T115950Z/issues/I-20261113T115950Z-A.md
+
+### completed_issues
+1. `I-20261113T115950Z-A`
+- milestone: M-20261113T115950Z-A
+- completed_at: 2026-11-14T02:42:00Z
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261113T115950Z/issues/I-20261113T115950Z-A.md
