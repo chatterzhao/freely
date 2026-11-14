@@ -197,7 +197,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-review-guarded",
       "target": "bin/pr-review-guarded",
-      "sha256": "678090a20aeb2723e261ceecbc08e6e7bccd76c151760d5ffacefac600522cf8",
+      "sha256": "6f4387191cff32b662ae15793b01d59c0eafe247490620da4ba567f7f805271c",
       "mode": "delegate",
       "note": "exec projection"
     },
