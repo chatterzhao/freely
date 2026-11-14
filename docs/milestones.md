@@ -1,3 +1,17 @@
+## M-20261114T101138Z-A
+- title: fix — dropped 收口自动写关闭理由并防重新物化
+- status: active
+### candidate_issues
+1. `C-20261114T101138Z-A`
+- milestone: M-20261114T101138Z-A
+- status: promoted
+- promoted_issue_id: `I-20261114T101138Z-A`
+### committed_issues
+1. `I-20261114T101138Z-A`
+- milestone: M-20261114T101138Z-A
+- phase_state: in_progress
+- issue_path: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
+
 ## M-20261112T031638Z-A
 - title: fix — 指引文案全域去幽灵名 + raw-issue-pull 显式传 --project
 - status: active
