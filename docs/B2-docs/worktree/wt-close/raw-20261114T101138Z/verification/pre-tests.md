@@ -7,35 +7,47 @@
 ### acceptance-1
 
 - id: AT-001
-- requirement: `close_dropped` 评论先于关闭；GitHub 以 `not planned` 关闭；Gitee 关闭带 `--comment`；评论失败不关任何平台；`close_issue` 扩展默认参数后既有 `close-raw`/`close-multi`/CLI `close` 行为不变；`pull_raw_issue` 全 CLOSED 副本返回 None；`wt-close --force --reason` 关单前本地瞬时 `phase_state=dropped` 且 `completed_at`/`closeout_note` 齐全、`validate()` 通过
+- requirement: `close_dropped` 评论先于关闭；GitHub 以 `not planned` 关闭；Gitee 关闭带 `--comment`；评论失败不关任何平台；`close_issue` 扩展默认参数后既有 `close-raw`/`close-multi`/CLI `close` 行为不变；`pull_raw_issue` 全 CLOSED 副本返回 None；`wt-close --force --reason` 关单前本地瞬时 `phase_state=dropped` 且 `completed_at`/`closeout_note` 齐全、`validate()` 通过；Gitee 关闭理由不重复写两次
 - acceptance_target: dropped 收口把关闭理由落盘到平台评论并以 not-planned 关闭，且不破坏既有关闭路径
 - surface_kind: end_to_end
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - testing_layer: unit
-- target_environment: 真实执行 adapter 与 wt-close 编排
-- required_evidence: AT-001 GREEN 7/0；基线 0/7
+- target_environment: 真实执行 adapter、wt-close 内嵌 Python 片段与 raw 元数据契约
+- required_evidence: AT-001 GREEN 10/0；develop 基线 RED 1 ok / 9 failed；实现评审补测 RED 7 ok / 3 failed
 - evidence_level: integration
 - artifact_ref: docs/system/workspace/scripts/tests/test-wt-close-dropped-closeout.py
 - test_command: python3 docs/system/workspace/scripts/tests/test-wt-close-dropped-closeout.py
-- expected_output: SUMMARY: 7 ok, 0 failed
-- expected_RED_output: AttributeError / TypeError（close_dropped 不存在或 close_issue 无 reason 参数）
-- actual_RED_output: develop 无 close_dropped、GitHub close_issue 无 --reason
-- actual_output: SUMMARY: 7 ok, 0 failed
-- evidence_file: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log
+- expected_output: Ran 10 tests / OK
+- expected_RED_output: AttributeError / TypeError（close_dropped 不存在或 close_issue 无 reason 参数）；补测后为 ModuleNotFoundError + 重复 comment 断言失败
+- actual_RED_output: develop 基线无 close_dropped、无 `--reason`、无 dropped transition 片段（1 ok / 9 failed）；修复前实现对补测用例 7 ok / 3 failed，其中 `test_transition_snippet_writes_valid_dropped_state` 真实报 `ModuleNotFoundError: No module named 'raw_metadata_contract'`
+- actual_output: Ran 10 tests / OK（10 ok, 0 failed）
+- evidence_file: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/verification/test-evidence/AT-001-BASELINE-RED.log,AT-001-RED.log,AT-001-GREEN.log
 - red-green-status: green
 - status: passed
 - blocker: ''
 - task_refs: T1
-- case_design: 用 FakeHandler 记录每次平台调用顺序，断言 comment 先于 close、GitHub 传 `--reason not planned`、Gitee 传入 comment_body、评论失败时无平台关闭；monkeypatch discover 全 CLOSED 验证 pull fail-closed；对 GitHub handler 直接断言 `--reason` 出现/缺失。
-- red_how: fix RED — 对 develop 基线运行同一 AT。
+- case_design: S1–S7 用 FakeHandler 记录每次平台调用顺序，断言 comment 先于 close、GitHub 传 `--reason not planned`、Gitee 传入 comment_body、评论失败时 `_dropped` 标记与无平台关闭、handler 默认参数不退化、discover 全 CLOSED 时 pull fail-closed；S8 断言 Gitee 不重复写 comment（其 close 命令已带 `--comment`）；S9 从 `wt-close` 抽取 `<<'PY'` 片段并断言不含未展开的 `"$PROJECT_ROOT`；S10 用 `new_raw_metadata` 造真实 proposed raw 文档，在子进程执行该片段，断言 `phase_state=dropped`、`completed_at`、`closeout_note` 齐全且 `validate()` 通过。
+- red_how: fix RED — ① develop 基线用 `FREELY_PA_PATH`/`FREELY_WT_CLOSE_PATH` 指向 `git show develop:...` 导出物跑同一 AT；② 实现评审补测后在修复前实现上重跑同一 AT，制造可复现的三条失败。
+
+## 实现评审补记（2026-11-14T12:27Z）
+
+首版 AT 只覆盖 adapter 层，7/0「绿」不能证明功能可用。补测后暴露三项实现问题，均已在同一 raw scope 内修复、不新开 issue：
+
+| # | 问题 | 证据 | 修复 |
+|---|---|---|---|
+| 1 | `wt-close` 的 `<<'PY'` heredoc 内写 `"$PROJECT_ROOT/..."`，单引号 heredoc 不展开 shell 变量 → `ModuleNotFoundError`，`--force` dropped 收口第一步即失败 | AT-001-RED.log `test_transition_snippet_writes_valid_dropped_state` 真实 traceback | 项目根改由 `argv[4]` 传入，`sys.path.insert(0, sys.argv[4] + "/...")` |
+| 2 | `close_dropped` Step A 对双平台 `add_comment`、Step B 又给 Gitee `close --comment`，关闭理由重复写两次 | AT-001-RED.log `test_gitee_closing_note_written_once` | 新增 `_CLOSE_WITH_COMMENT_PLATFORMS`，Step A 只对不能随关闭携带评论的平台写 |
+| 3 | 失败标记未断言；原 `test_comment_failure_blocks_close` 依赖 Gitee 评论失败，与修复后的分流不匹配 | 补全断言 | 改由 GitHub 的 add_comment 作为 fail-atomic 检查点，并断言 `_dropped` 标记传到 CLI |
+
+不退化边界不变：不新造 flag、不走正常 close 分支、不写 `phase/dropped` 标签、不改 `runtime/freely`、不改 `validate()`/GATE 1。
 
 ## Unit
 
-- acceptance_target: close_dropped / handler 签名 / pull guard
+- acceptance_target: close_dropped / handler 签名 / pull guard / wt-close transition 片段
 - testing_layer: unit
 - target_environment: fix/raw-20261114T101138Z-dropped-closeout
-- required_evidence: AT-001 S1–S7
+- required_evidence: AT-001 S1–S10
 - blocker_taxonomy: execution_pending_or_failed
 1. python3 docs/system/workspace/scripts/tests/test-wt-close-dropped-closeout.py
 
@@ -44,7 +56,7 @@
 - acceptance_target: 既有 adapter / wt-close 测试不退化
 - testing_layer: integration
 - target_environment: test-pre-merge 工位
-- required_evidence: bin/test-all 相关用例全绿（test-platform-adapter-raw-identity / test-command-lifecycle-raw-metadata / test-issue-sync-close-linked / test-wt-close-dryrun-safety）
+- required_evidence: bin/test-all 相关用例全绿（test-platform-adapter-raw-identity / test-command-lifecycle-raw-metadata / test-issue-sync-close-linked / test-wt-close-dryrun-safety / test-wt-close-dropped-closeout）
 - blocker_taxonomy: execution_pending_or_failed
 1. bin/test-all --ci
 
@@ -60,5 +72,4 @@
 ## Real-Environment
 
 - real_environment_status: pass
-- real_environment_reason: 本轮 AT 在本地以 FakeHandler 验证 close_dropped 的评论先于关闭、GitHub not-planned、Gitee --comment、评论失败不关任何平台；并实测 `transition("dropped")` 写出的 phase_state=dropped + completed_at + closeout_note 通过 validate()；`pull_raw_issue` 全 CLOSED 副本 fail-closed 已断言。真实平台关闭评论/关闭动作由 wt-close --force 编排，待下一轮真实 raw 端到端验证。
-
+- real_environment_reason: AT S1–S8 以 FakeHandler 验证 close_dropped 的评论顺序、GitHub not-planned、Gitee `--comment` 且不重复、评论失败不关任何平台；S10 用真实 `raw_metadata_contract.new_raw_metadata` / `write_issue` / `validate()` 在子进程执行 wt-close 内嵌片段，确认 dropped 终态可落盘；`pull_raw_issue` 全 CLOSED 副本 fail-closed 已断言。真实平台的关闭评论/关闭动作仍由 `wt-close --force` 编排，待下一轮真实 raw 端到端验证（对应上一节 End-to-End）。

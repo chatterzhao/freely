@@ -916,6 +916,12 @@ def close_issue(local_id: str, platform_ids: dict = None, close_reason: str = ""
     return results
 
 
+# Platforms whose close command can carry the closing note themselves.  They
+# must not also receive an explicit add_comment, or the audit note is posted
+# twice on the same issue.
+_CLOSE_WITH_COMMENT_PLATFORMS = {"gitee"}
+
+
 def close_dropped(raw_key: str, platform_ids: dict = None, comment_body: str = "") -> dict[str, dict]:
     """Drop a raw: comment the closing reason on every OPEN replica, then close
     each as ``not planned``.
@@ -947,8 +953,17 @@ def close_dropped(raw_key: str, platform_ids: dict = None, comment_body: str = "
             )
             for platform in platforms
         }
-    # Step A: comment first (replicas are still OPEN under --force).
-    comment_results = add_comment(f"raw-{raw_key}", resolved, comment_body)
+    # Step A: comment first on platforms whose close command cannot carry the
+    # closing note.  Gitee closes with `--comment`, so an extra add_comment
+    # there would duplicate the audit note.
+    comment_targets = {
+        platform: ref for platform, ref in resolved.items()
+        if platform not in _CLOSE_WITH_COMMENT_PLATFORMS
+    }
+    comment_results = (
+        add_comment(f"raw-{raw_key}", comment_targets, comment_body)
+        if comment_targets else {}
+    )
     for platform, res in comment_results.items():
         if res.get("status") not in ("created", "skipped"):
             comment_results["_dropped"] = {

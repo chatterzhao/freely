@@ -1019,9 +1019,11 @@ WTPLATFORM_MISSING
         _dry "transition raw-$raw_key -> dropped (reason=\"$_drop_reason\")"
         _dry "platform-adapter close-dropped raw-$raw_key (comment + not-planned)"
       else
-        if python3 - "$issue_file" "$_drop_reason" "$_drop_at" <<'PY'
+        if python3 - "$issue_file" "$_drop_reason" "$_drop_at" "$PROJECT_ROOT" <<'PY'
 import sys
-sys.path.insert(0, "$PROJECT_ROOT/docs/system/workspace/scripts/lifecycle")
+# <<'PY' deliberately disables shell expansion: the project root arrives
+# through argv[4] so the lifecycle module resolves on every worktree.
+sys.path.insert(0, sys.argv[4] + "/docs/system/workspace/scripts/lifecycle")
 from raw_metadata_contract import transition_issue
 try:
     transition_issue(sys.argv[1], "dropped", at=sys.argv[3], reason=sys.argv[2])

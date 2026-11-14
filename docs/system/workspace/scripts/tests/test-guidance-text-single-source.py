@@ -429,6 +429,16 @@ def b3_real_raw_pull() -> None:
     out = proc.stdout + proc.stderr
     noisy = ("refuses to run on protected branch" in out
              or "issue-sync create failed" in out)
+    # raw-20261114T101138Z (#4653): pull_raw_issue now fails closed when every
+    # readable platform replica is CLOSED, so an absorbed/dropped raw can no
+    # longer be re-materialized from a stale platform copy.  On such a branch
+    # the old "create complete" expectation is obsolete; assert the new
+    # fail-closed contract instead of weakening the guard.
+    if "refusing to re-materialize" in out:
+        expect(proc.returncode != 0 and not noisy,
+               f"B3 CLOSED raw is refused by pull_raw_issue "
+               f"(rc={proc.returncode}, noisy={noisy})")
+        return
     expect(proc.returncode == 0 and not noisy and "create complete" in out,
            f"B3 fixed raw-issue-pull runs clean in a fix worktree "
            f"(rc={proc.returncode}, noisy={noisy}, reached_issue_sync={'create complete' in out})")
