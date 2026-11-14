@@ -23,6 +23,7 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-b1-design-intent-audit.py
   test-postmerge-commit-guard.py
   test-batch-scope-filter.py
   test-closeout-chain.py
@@ -66,6 +67,7 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-b1-design-intent-audit.py
   test-postmerge-commit-guard.py
   test-batch-scope-filter.py
   test-closeout-chain.py

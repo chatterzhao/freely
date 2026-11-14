@@ -2447,3 +2447,24 @@
 - milestone: M-20261114T065554Z-A
 - completed_at: 2026-11-14T07:35:00Z
 - issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261114T065554Z/issues/I-20261114T065554Z-A.md
+
+## M-20261114T031605Z-A
+- title: feature — B1 增设计意图审计层
+- status: active
+### candidate_issues
+1. `C-20261114T031605Z-A`
+- milestone: M-20261114T031605Z-A
+- status: promoted
+- promoted_issue_id: I-20261114T031605Z-A
+- promoted_issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261114T031605Z/issues/I-20261114T031605Z-A.md
+### committed_issues
+1. `I-20261114T031605Z-A`
+- milestone: M-20261114T031605Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261114T031605Z/issues/I-20261114T031605Z-A.md
+
+### completed_issues
+1. `I-20261114T031605Z-A`
+- milestone: M-20261114T031605Z-A
+- completed_at: 2026-11-14T08:35:00Z
+- issue_path: docs/B2-docs/command-wrapper/pr-review-projection/raw-20261114T031605Z/issues/I-20261114T031605Z-A.md
