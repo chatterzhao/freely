@@ -2426,3 +2426,24 @@
 - milestone: M-20261114T031043Z-A
 - completed_at: 2026-11-14T05:25:00Z
 - issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261114T031043Z/issues/I-20261114T031043Z-A.md
+
+## M-20261114T065554Z-A
+- title: fix — merge 后残留提交的补合并优先规范
+- status: active
+### candidate_issues
+1. `C-20261114T065554Z-A`
+- milestone: M-20261114T065554Z-A
+- status: promoted
+- promoted_issue_id: I-20261114T065554Z-A
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261114T065554Z/issues/I-20261114T065554Z-A.md
+### committed_issues
+1. `I-20261114T065554Z-A`
+- milestone: M-20261114T065554Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261114T065554Z/issues/I-20261114T065554Z-A.md
+
+### completed_issues
+1. `I-20261114T065554Z-A`
+- milestone: M-20261114T065554Z-A
+- completed_at: 2026-11-14T07:35:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-create-resume-test-worktree/raw-20261114T065554Z/issues/I-20261114T065554Z-A.md
