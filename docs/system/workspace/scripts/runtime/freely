@@ -24142,11 +24142,11 @@ REASON_GATE
     FREELY_REPO_PLATFORMS="$_detected_platforms"
   fi
 	  # ── Issue-sync batch: clear deterministic sync tasks before scan ──
-	  # Handles close/update/pull without AI, leaving only novel cases for Manager.
+	  # --auto scopes to THIS lane and refuses on protected/keyless branches: an
+	  # unscoped batch is a cross-raw write (GATE 1) (raw-20261114T031043Z).
 	  local _sync_bin="$project/bin/issue-sync"
 	  if [[ -x "$_sync_bin" ]]; then
-	    log_info "running issue-sync batch before daemon scan"
-	    bash "$_sync_bin" batch 2>&1 | while IFS= read -r _line; do
+	    bash "$_sync_bin" batch --auto 2>&1 | while IFS= read -r _line; do
 	      log_info "issue-sync: $_line"
 	    done || log_warn "issue-sync batch completed with warnings"
 	  fi
