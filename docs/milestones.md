@@ -2405,3 +2405,24 @@
 - milestone: M-20261114T033013Z-A
 - completed_at: 2026-11-14T03:52:00Z
 - issue_path: docs/B2-docs/platform-sync/close-merged/raw-20261114T033013Z/issues/I-20261114T033013Z-A.md
+
+## M-20261114T031043Z-A
+- title: fix — batch 范围过滤修复与 daemon 只限定范围
+- status: active
+### candidate_issues
+1. `C-20261114T031043Z-A`
+- milestone: M-20261114T031043Z-A
+- status: promoted
+- promoted_issue_id: I-20261114T031043Z-A
+- promoted_issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261114T031043Z/issues/I-20261114T031043Z-A.md
+### committed_issues
+1. `I-20261114T031043Z-A`
+- milestone: M-20261114T031043Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261114T031043Z/issues/I-20261114T031043Z-A.md
+
+### completed_issues
+1. `I-20261114T031043Z-A`
+- milestone: M-20261114T031043Z-A
+- completed_at: 2026-11-14T05:25:00Z
+- issue_path: docs/B2-docs/platform/issue-sync-modules/raw-20261114T031043Z/issues/I-20261114T031043Z-A.md

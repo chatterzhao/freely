@@ -24143,12 +24143,31 @@ REASON_GATE
   fi
 	  # ── Issue-sync batch: clear deterministic sync tasks before scan ──
 	  # Handles close/update/pull without AI, leaving only novel cases for Manager.
+	  #
+	  # SCOPE IS MANDATORY (raw-20261114T031043Z). An unscoped batch is a cross-raw
+	  # write: it violates GATE 1 and previously rewrote 100+ documents belonging to
+	  # other lanes. This hook may only sweep the lane it is running in; a full
+	  # sweep belongs to the governance lane, never to a random 'freely' invocation.
 	  local _sync_bin="$project/bin/issue-sync"
+	  local _sync_branch _sync_key
+	  _sync_branch=$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+	  _sync_key=$(printf '%s' "$_sync_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 	  if [[ -x "$_sync_bin" ]]; then
-	    log_info "running issue-sync batch before daemon scan"
-	    bash "$_sync_bin" batch 2>&1 | while IFS= read -r _line; do
-	      log_info "issue-sync: $_line"
-	    done || log_warn "issue-sync batch completed with warnings"
+	    case "$_sync_branch" in
+	      main|develop|test-pre-merge-*)
+	        log_info "skipping issue-sync batch on $_sync_branch: a full sweep belongs to the governance lane"
+	        ;;
+	      *)
+	        if [[ -z "$_sync_key" ]]; then
+	          log_info "skipping issue-sync batch: branch '$_sync_branch' carries no raw key; a full sweep belongs to the governance lane"
+	        else
+	          log_info "running issue-sync batch before daemon scan (scope=$_sync_key)"
+	          bash "$_sync_bin" batch "$_sync_key" 2>&1 | while IFS= read -r _line; do
+	            log_info "issue-sync: $_line"
+	          done || log_warn "issue-sync batch completed with warnings"
+	        fi
+	        ;;
+	    esac
 	  fi
 	  # ── End issue-sync batch ─────────────────────────────────────────
 

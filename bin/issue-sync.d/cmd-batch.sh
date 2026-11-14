@@ -6,7 +6,7 @@ cmd_batch() {
   local filter_key="${1:-}"
   local last_scan total=0 synced=0 batch_size=10 batch_count=0
   last_scan=$(_scan_state_get "last_sync_at")
-  echo "[issue-sync] batch: last sync = ${last_scan:-never}"
+  echo "[issue-sync] batch: last sync = ${last_scan:-never} scope=${filter_key:-ALL}"
 
 	  # Collect all issue files into an array first (use temp file to preserve null bytes)
 	  # Filter: skip issues where local platform_state is already closed
@@ -31,7 +31,17 @@ cmd_batch() {
 	    # Scope filter: a raw-owning worktree may only sync its own issue and
 	    # children (GATE 1). Cross-raw sync belongs to the governance-only lane
 	    # (raw-20261103T091157Z established that mechanism).
-	    [[ -n "$filter_key" && "$issue_file" != *"$filter_key"* ]] && continue
+	    #
+	    # Compare the path BELOW /docs/, never the absolute path: the worktree
+	    # directory itself is named fix-raw-<key>-<slug>, so an absolute-path match
+	    # made every document in the tree look like "this lane" and the filter was
+	    # a no-op (raw-20261114T031043Z).
+	    if [[ -n "$filter_key" ]]; then
+	      case "${issue_file#*/docs/}" in
+	        *"$filter_key"*) ;;
+	        *) continue ;;
+	      esac
+	    fi
 	    # Skip fully-synced: platform_state=closed means both sides agree
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
 	    if [[ "$_pstate" == "closed" ]]; then
