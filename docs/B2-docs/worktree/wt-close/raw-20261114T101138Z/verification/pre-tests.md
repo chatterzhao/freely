@@ -69,6 +69,13 @@
 - blocker_taxonomy: execution_pending_or_failed
 1. 下一轮开工前用真实 raw 验证一次
 
+## GREEN 验证（test-pre-merge 工位，2026-11-14T12:59Z）
+
+- dev 提交同步方式：`git -C <test-pre-merge> merge --no-edit fix/raw-20261114T101138Z-dropped-closeout`（fast-forward），dev/test 同为 `764e29df1`，两边 `git status` 干净。
+- `./bin/freely test-gate run --worktree <test-pre-merge> --command "bin/test-all --ci"` → `rc=0`、`SUMMARY: 41 ok, 0 failed, known-broken=590`。
+- `.freely/run/test-gate.env`：`TEST_STATUS=completed`、`LAST_TESTED_COMMIT=764e29df159296a4db703af6fc8f19c9b2f50a20`、`EVIDENCE_HEAD` 同值；证据日志 `.freely/run/test-evidence.log`。
+- `bin/pretests-retirement-gate --project <dev> --worktree-path <test>` → rc=0；`bin/governance-merge-gate --range develop..HEAD` → rc=0（一条顺序警告已在 code-review 如实登记）。
+
 ## Real-Environment
 
 - real_environment_status: pass
