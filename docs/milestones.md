@@ -6,10 +6,11 @@
 - milestone: M-20261114T101138Z-A
 - status: promoted
 - promoted_issue_id: `I-20261114T101138Z-A`
-### committed_issues
+### completed_issues
 1. `I-20261114T101138Z-A`
 - milestone: M-20261114T101138Z-A
 - phase_state: completed
+- completed_at: 2026-11-14T12:08:53Z
 - issue_path: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
 
 ## M-20261112T031638Z-A
