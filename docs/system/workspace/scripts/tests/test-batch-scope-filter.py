@@ -133,19 +133,18 @@ def behaviour_checks() -> None:
 
 def static_checks() -> None:
     print("=== STATIC: daemon sweep is scoped or skipped ===")
-    text = read(BATCH)
-    check("${issue_file#*/docs/}" in text,
-          "S1 the filter compares the path below /docs/")
-    check("scope=${filter_key:-ALL}" in text, "S2 batch prints scope=<key|ALL>")
-
+    batch_text = read(BATCH)
     runtime = read(RUNTIME)
-    check('batch "$_sync_key"' in runtime,
-          "S3 the daemon passes the lane raw key to batch")
-    check("main|develop|test-pre-merge-*)" in runtime.replace(" ", ""),
-          "S4 protected branches are handled explicitly")
-    check("governance lane" in runtime,
-          "S5 the skip path names the governance lane")
-    bare = re.findall(r'bash "\$_sync_bin" batch(?![ \t]+")', runtime)
+    check("${issue_file#*/docs/}" in batch_text,
+          "S1 the filter compares the path below /docs/")
+    check("scope=${filter_key:-ALL}" in batch_text, "S2 batch prints scope=<key|ALL>")
+    check('batch --auto' in runtime,
+          "S3 the daemon delegates scope resolution to batch --auto")
+    check("main|develop|test-pre-merge-*)" in batch_text.replace(" ", ""),
+          "S4 protected branches are refused inside batch --auto")
+    check("governance lane" in batch_text,
+          "S5 the skip message names the governance lane")
+    bare = re.findall(r'bash "\$_sync_bin" batch(?![ \t]+-\-auto)', runtime)
     check(not bare, "S6 no unscoped batch call remains in the daemon hook")
 
 
