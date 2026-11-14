@@ -44,10 +44,10 @@ workflow_kind: fix
 |-------|-------|
 | local_id | `raw-20261114T101138Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
-| canonical | `none` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md` |
 | created | 2026-11-14T10:11:38Z |
-| updated | 2026-11-14T10:11:38Z |
+| updated | 2026-11-14T12:09:00Z |
 
 ---
 

@@ -80,3 +80,32 @@
 
 - real_environment_status: pass
 - real_environment_reason: AT S1–S8 以 FakeHandler 验证 close_dropped 的评论顺序、GitHub not-planned、Gitee `--comment` 且不重复、评论失败不关任何平台；S10 用真实 `raw_metadata_contract.new_raw_metadata` / `write_issue` / `validate()` 在子进程执行 wt-close 内嵌片段，确认 dropped 终态可落盘；`pull_raw_issue` 全 CLOSED 副本 fail-closed 已断言。真实平台的关闭评论/关闭动作仍由 `wt-close --force` 编排，待下一轮真实 raw 端到端验证（对应上一节 End-to-End）。
+
+## 副本一致性门禁（pr-create Step 0b）解除阻塞 — 2026-11-14T13:50Z
+
+`pr-create-guarded` 首次执行时 Step 0b 返回 `block`，两个 fact 都不是本 issue 的实现问题，而是归一化链路自身失效：
+
+| fact | 根因 |
+|---|---|
+| `github / ambiguous: 3 matches` | `_resolve_raw_identity()` 只认标题前缀 `[RAW-<key>]`；GitHub #4653 标题缺前缀，回退到 #4654/#4655 共 3 个 body 匹配 |
+| `local / content_diverged` | ① `raw_reconciliation._COMMENT_BLOCK` 以「下一个 1–4 级标题」切块，而镜像评论正文本身以 `## 开头`，块被截断成空、正文残留进 body；② `_scan_state_record_sync()` 只写 `mtime`/`synced_at` 从不写 `hash`，而 `_changed_since_last_sync()` 只读 `hash` → `issue-sync update` 对所有 issue 恒为 no-op，平台标题/正文永远无法归一 |
+
+### 实现修复（4 处，均带基线红）
+
+- `bin/issue-sync.d/lib-state.sh`：`_scan_state_record_sync` 记录 `hash`；历史条目（有 `synced_at` 无 `hash`）视为已变更，使一次普通同步即可修复；无任何记录的首次同步仍判 unchanged，保留「初始批量不刷屏」语义。
+- `bin/issue-sync.d/cmd-update.sh`：移除批量 dedup。`update` 是操作者显式单条命令，意图即变更；`scan`/`batch` 仍走变更检测。
+- `docs/system/workspace/scripts/lifecycle/raw_reconciliation.py`：`_COMMENT_BLOCK` 块边界改为「下一个 comment/resolution 标记」，镜像评论正文以 `##` 开头也能被完整归入评论、并从 body 中剔除。
+- `docs/system/workspace/scripts/sync/issue_create_contract.py`：新增 `strip_local_h1()`，正文投影不再重复输出本地 `# 标题`（平台侧已由 `## <title>` + 元数据表承载；真实平台正文如 #4654 亦无 H1）。
+
+### 证据
+
+- 新增 AT `docs/system/workspace/scripts/tests/test-issue-sync-update-not-noop.py`：基线 RED 10 ok / 6 failed（`AT-002-BASELINE-RED.log`），修复前 RED 7 ok / 5 failed（`AT-002-RED.log`），GREEN 16 ok / 0 failed（`AT-002-GREEN.log`）。
+- 扩展 `test-raw-reconciliation.py`：新增「镜像评论以标题开头」用例，RED 1 failed（`AT-003-RED.log`），GREEN 4/4 OK（`AT-003-GREEN.log`）。
+- 回归：`test-issue-sync-modules.py` 35 ok / 0 failed（含「issue-sync 与 contract 渲染同一 body」）。
+
+### 平台侧归一（全部走封装命令，无手工 gh/gitee）
+
+1. `freely feedback edit --raw-key 20261114T101138Z --title "fix: dropped 收口应自动写关闭理由并防重新物化"` → 两平台标题归一为 `[RAW-20261114T101138Z] …`（命令内部走 `canonical_raw_title()`）。
+2. `freely issue-sync update raw-20261114T101138Z` → 两平台标题/正文/标签按同一投影重写。
+3. 本地 `issue.md` 内嵌元数据表由 `proposed`/`none` 校正为当前 frontmatter（`absorbed` + `canonical_issue_path`），属派生快照对齐。
+4. 最终 `raw-reconciliation-gate --require-local` → `ok=true, decision=allow`，`diagnostics=[]`、`degraded=[]`。

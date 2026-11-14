@@ -118,6 +118,29 @@ def drop_comment_channel(markdown_body: str) -> list[str]:
     return kept
 
 
+def strip_local_h1(markdown_body: str) -> str:
+    """Drop the document's own H1 from the platform projection.
+
+    A raw document carries a real ``# <title>`` H1 so the replica gate can read
+    the local title, but the platform body already declares that title as
+    ``## <title>`` plus the metadata table. Re-emitting the H1 duplicated the
+    header in every pushed body; because the gate strips the local H1 before
+    comparing, a healthy raw could then never match its platform copies
+    (#4653).
+    """
+    lines = str(markdown_body or "").splitlines()
+    for index, line in enumerate(lines):
+        if not line.strip():
+            continue
+        if line.startswith("# "):
+            rest = lines[index + 1:]
+            while rest and not rest[0].strip():
+                rest.pop(0)
+            return "\n".join(rest)
+        return markdown_body
+    return markdown_body
+
+
 def platform_body(
     local_id: str,
     title: str,
@@ -132,6 +155,7 @@ def platform_body(
     created = str(metadata.get("created_at") or "unknown")
     updated = str(metadata.get("updated_at") or "unknown")
     workflow_kind, human_body = split_workflow_kind(markdown_body)
+    human_body = strip_local_h1(human_body)
 
     lines: list[str] = []
     if metadata:
