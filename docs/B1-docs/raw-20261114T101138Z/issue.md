@@ -243,3 +243,15 @@ dirty 检查的报错文案是「这些修改**没用** → 带 --force 直接�
 
 拆解为以下任务:
 1. [I-20261114T101138Z-A](will-be-updated)
+
+#### resolution-20261114T135500Z
+- status: adopted
+- reason: 「方案修正（追加）」采纳：dropped 研究不提交时没有未合并语义，收口只需丢工位并在平台留关闭理由；该结论已落入 `wt-close --force` 分支编排（内部 `transition("dropped")` + 自动关闭评论 + 失败原子）。
+- resolved_by: freely-agent
+- comment_ref: comment-platform-1
+
+#### resolution-20261114T135600Z
+- status: adopted
+- reason: 「方案收敛（最终）」采纳：复用 `--force --discard-unmerged` 骨架，不新增 `--drop` flag、不改正常 close 分支；实现与 AT-001 S8/S9 均按此收敛。
+- resolved_by: freely-agent
+- comment_ref: comment-platform-2
