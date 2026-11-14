@@ -525,74 +525,54 @@ _sync_issues_changed_in_merge() {
   fi
   [[ -z "$_wt_path" ]] && _wt_path="$PWD"
 
-  # Read issue files from the fix worktree, not develop ($PWD).
-  # Before merge, issue.md only exists on the worktree branch — develop
-  # does not have it yet.  Fall back to $PWD for orphaned-branch scenarios.
-  local issues_dir="$_wt_path/docs/B1-docs"
-  [[ -d "$issues_dir" ]] || issues_dir="$PWD/docs/B1-docs"
-  [[ -d "$issues_dir" ]] || return 0
+  # Read issue documents from the fix worktree, not develop ($PWD): before the
+  # merge the branch holds the only authoritative copy.  Fall back to $PWD for
+  # orphaned-branch scenarios.
   [[ -x "$PWD/bin/issue-sync" ]] || return 0
+  local _sync_helper="$PROJECT_ROOT/docs/system/workspace/scripts/worktree/merge_issue_sync.py"
+  [[ -f "$_sync_helper" ]] || return 0
 
-  # Compare source branch against target (pre-merge), not HEAD vs HEAD^ (post-merge)
-  local changed_issues synced=0
-  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "docs/B1-docs" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/B1-docs/||' | sed 's|/issue\.md$||' | sort -u || true)
-  [[ -n "$changed_issues" ]] || return 0
-
-  # Only the lane's own raw issue may be advanced/closed by merge sync.  A diff
-  # can legitimately touch other raw docs (platform parity materialization or
-  # platform_ids backfill); those are governance data, not this lane's lifecycle.
-  # Closing them here mass-closed unrelated open issues (2026-11-03 incident).
+  # The helper discovers BOTH trees: raw documents under docs/B1-docs and linked
+  # documents under docs/B2-docs/**/issues/I-*.md.  The previous inline loop
+  # diffed only docs/B1-docs, which made every linked/* case below dead code:
+  # completed I-* were never closed at merge time and their documents were never
+  # committed (raw-20261114T033013Z).
+  local _sync_rows synced=0
   if [[ -n "$_raw_key" ]]; then
-    changed_issues=$(printf '%s\n' "$changed_issues" | python3 "$PROJECT_ROOT/docs/system/workspace/scripts/worktree/issue-sync-scope.py" --raw-key "$_raw_key")
+    _sync_rows=$(python3 "$_sync_helper" --project "$_wt_path" --target "$_target" --src "$_src_branch" --raw-key "$_raw_key" --apply 2>/dev/null || true)
+  else
+    _sync_rows=$(python3 "$_sync_helper" --project "$_wt_path" --target "$_target" --src "$_src_branch" --apply 2>/dev/null || true)
   fi
-  [[ -n "$changed_issues" ]] || return 0
+  [[ -n "$_sync_rows" ]] || return 0
 
-  for local_id in $changed_issues; do
-    local issue_file="$issues_dir/$local_id/issue.md"
-    [[ -f "$issue_file" ]] || continue
+  local -a _touched=()
+  local _rel _kind _phase _action
+  while IFS=$'\t' read -r _rel _kind _phase _action; do
+    [[ -n "$_rel" && -n "$_action" && "$_action" != "none" ]] || continue
+    echo "[MERGE-GUARD] issue-sync $_kind ($_phase) -> $_action: $_rel"
+    _touched+=("$_rel")
+  done <<< "$_sync_rows"
+  [[ ${#_touched[@]} -gt 0 ]] || return 0
 
-    local kind phase_status
-    kind=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('kind',''))" 2>/dev/null || true)
-    phase_status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('phase_state', fm.get('status','')))" 2>/dev/null || true)
+  # Single retirement driver: batch owns the phase_state == completed predicate and
+  # the platform write.  `issue-sync close` on an I-* is refused on purpose, and an
+  # unscoped batch would touch other raws (GATE 1).
+  if [[ -n "$_raw_key" ]]; then
+    echo "[MERGE-GUARD] issue-sync batch $_raw_key (linked retirement + platform_state)"
+    "$PWD/bin/issue-sync" --project "$_wt_path" batch "$_raw_key" || true
+  fi
+  synced=${#_touched[@]}
 
-    case "$kind/$phase_status" in
-      raw/proposed|raw/"")
-        _update_issue_phase "$issue_file" "absorbed"
-        echo "[MERGE-GUARD] issue-sync close $local_id (phase=absorbed)"
-        "$PWD/bin/issue-sync" --project "$_wt_path" close "$local_id" "completed" || true
-        synced=$((synced + 1))
-        ;;
-      linked/in_dev|linked/in_b2_ibm|linked/done_b2_ibm)
-        _update_issue_phase "$issue_file" "in_verification"
-        echo "[MERGE-GUARD] issue-sync update $local_id (phase=in_verification)"
-        "$PWD/bin/issue-sync" --project "$_wt_path" update "$local_id" || true
-        synced=$((synced + 1))
-        ;;
-      raw/absorbed|raw/dropped)
-        echo "[MERGE-GUARD] issue-sync close $local_id (phase=$phase_status)"
-        "$PWD/bin/issue-sync" --project "$_wt_path" close "$local_id" "completed" || true
-        synced=$((synced + 1))
-        ;;
-      linked/completed)
-        echo "[MERGE-GUARD] issue-sync update + close $local_id (phase=completed)"
-        "$PWD/bin/issue-sync" --project "$_wt_path" update "$local_id" || true
-        "$PWD/bin/issue-sync" --project "$_wt_path" close "$local_id" "completed" || true
-        synced=$((synced + 1))
-        ;;
-      linked/*)
-        echo "[MERGE-GUARD] issue-sync update $local_id"
-        "$PWD/bin/issue-sync" --project "$_wt_path" update "$local_id" || true
-        synced=$((synced + 1))
-        ;;
-    esac
-  done
 
   if [[ "$synced" -gt 0 ]]; then
     echo "[MERGE-GUARD] synced $synced issue(s) to platforms"
     # Auto-commit + push in source worktree so it stays clean for wt-close.
     # Mirrors pr-review-guarded: review → commit → push → merge.
     if [[ -d "$_wt_path" ]]; then
-      git -C "$_wt_path" add docs/B1-docs/ 2>/dev/null || true
+      # Only the documents this hook actually touched.  A blanket
+      # `git add docs/B2-docs/` would drag in every other raw's replica updates
+      # (daemon batch noise) and fail GATE 1 (raw-20261114T033013Z).
+      git -C "$_wt_path" add -- "${_touched[@]}" 2>/dev/null || true
       if ! git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
 	        git -C "$_wt_path" commit -m "chore: issue-sync before merge
 
