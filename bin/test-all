@@ -23,6 +23,8 @@ done
 CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-batch-scope-filter.py
+  test-closeout-chain.py
   test-review-guidance-l0.py
   test-issue-sync-batch-closeout.py
   test-wt-close-children.py
@@ -63,6 +65,8 @@ CORE=(
 CI_CORE=(
   test-ci-machine-independence.py
   test-guidance-text-single-source.py
+  test-batch-scope-filter.py
+  test-closeout-chain.py
   test-review-guidance-l0.py
   test-issue-sync-batch-closeout.py
   test-wt-close-children.py

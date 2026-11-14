@@ -4,9 +4,28 @@
 
 cmd_batch() {
   local filter_key="${1:-}"
+  # --auto: the daemon's pre-scan sweep. Scope belongs to the CALLER's lane, so
+  # resolve it from the current branch and refuse to run anywhere else. An
+  # unscoped batch is a cross-raw write (GATE 1) and used to rewrite 100+
+  # documents of other lanes (raw-20261114T031043Z).
+  if [[ "$filter_key" == "--auto" ]]; then
+    local _auto_branch
+    _auto_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+    case "$_auto_branch" in
+      main|develop|test-pre-merge-*)
+        echo "[issue-sync] batch: skipped on $_auto_branch (a full sweep belongs to the governance lane)"
+        return 0
+        ;;
+    esac
+    filter_key=$(printf '%s' "$_auto_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+    if [[ -z "$filter_key" ]]; then
+      echo "[issue-sync] batch: skipped: branch '$_auto_branch' carries no raw key (a full sweep belongs to the governance lane)"
+      return 0
+    fi
+  fi
   local last_scan total=0 synced=0 batch_size=10 batch_count=0
   last_scan=$(_scan_state_get "last_sync_at")
-  echo "[issue-sync] batch: last sync = ${last_scan:-never}"
+  echo "[issue-sync] batch: last sync = ${last_scan:-never} scope=${filter_key:-ALL}"
 
 	  # Collect all issue files into an array first (use temp file to preserve null bytes)
 	  # Filter: skip issues where local platform_state is already closed
@@ -31,7 +50,17 @@ cmd_batch() {
 	    # Scope filter: a raw-owning worktree may only sync its own issue and
 	    # children (GATE 1). Cross-raw sync belongs to the governance-only lane
 	    # (raw-20261103T091157Z established that mechanism).
-	    [[ -n "$filter_key" && "$issue_file" != *"$filter_key"* ]] && continue
+	    #
+	    # Compare the path BELOW /docs/, never the absolute path: the worktree
+	    # directory itself is named fix-raw-<key>-<slug>, so an absolute-path match
+	    # made every document in the tree look like "this lane" and the filter was
+	    # a no-op (raw-20261114T031043Z).
+	    if [[ -n "$filter_key" ]]; then
+	      case "${issue_file#*/docs/}" in
+	        *"$filter_key"*) ;;
+	        *) continue ;;
+	      esac
+	    fi
 	    # Skip fully-synced: platform_state=closed means both sides agree
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
 	    if [[ "$_pstate" == "closed" ]]; then

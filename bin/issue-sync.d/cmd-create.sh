@@ -119,11 +119,13 @@ cmd_create() {
   # batch scanner then skips the issue forever (#793 uses the same field).
   if [[ ${#_failed[@]} -eq 0 ]]; then
     _scan_state_record_sync "$local_id" "$file"
-    # `platform_state` is a raw-issue field; linked I-* documents do not declare
-    # it and adding it would silently change their schema.
-    if _fm_has_key "$file" "platform_state"; then
-      _fm_set_str "$file" "platform_state" "open"
-    fi
+    # `platform_state` covers BOTH kinds. ibm-framework.md's field table says it is
+    # "managed by issue-sync create/close" for raw and I-* alike, and the closeout
+    # predicate (completed && platform_state != closed) needs it on linked too.
+    # Guarding it on _fm_has_key left every new I-* without the field, so wt-close
+    # could never pass its pre-check without a manual batch run
+    # (raw-20261114T033013Z).
+    _fm_set_str "$file" "platform_state" "open"
     echo "[issue-sync] create complete: $local_id"
     return 0
   fi
