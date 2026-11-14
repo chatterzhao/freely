@@ -9,7 +9,7 @@
 ### committed_issues
 1. `I-20261114T101138Z-A`
 - milestone: M-20261114T101138Z-A
-- phase_state: in_progress
+- phase_state: completed
 - issue_path: docs/B2-docs/worktree/wt-close/raw-20261114T101138Z/issues/I-20261114T101138Z-A.md
 
 ## M-20261112T031638Z-A

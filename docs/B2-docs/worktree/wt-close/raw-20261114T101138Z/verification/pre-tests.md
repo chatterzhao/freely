@@ -47,3 +47,18 @@
 - required_evidence: bin/test-all 相关用例全绿（test-platform-adapter-raw-identity / test-command-lifecycle-raw-metadata / test-issue-sync-close-linked / test-wt-close-dryrun-safety）
 - blocker_taxonomy: execution_pending_or_failed
 1. bin/test-all --ci
+
+## End-to-End
+
+- acceptance_target: dropped 收口在真实工位按 --force --reason 跑通，平台评论 + not-planned 关闭落地
+- testing_layer: end-to-end
+- target_environment: 下一轮开工或独立验证工位
+- required_evidence: 对一个 proposed raw 执行 `freely wt-close --raw-key <key> --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：<业务理由>"`，确认平台出现关闭评论且 issue 以 not planned 关闭
+- blocker_taxonomy: execution_pending_or_failed
+1. 下一轮开工前用真实 raw 验证一次
+
+## Real-Environment
+
+- real_environment_status: pass
+- real_environment_reason: 本轮 AT 在本地以 FakeHandler 验证 close_dropped 的评论先于关闭、GitHub not-planned、Gitee --comment、评论失败不关任何平台；并实测 `transition("dropped")` 写出的 phase_state=dropped + completed_at + closeout_note 通过 validate()；`pull_raw_issue` 全 CLOSED 副本 fail-closed 已断言。真实平台关闭评论/关闭动作由 wt-close --force 编排，待下一轮真实 raw 端到端验证。
+
