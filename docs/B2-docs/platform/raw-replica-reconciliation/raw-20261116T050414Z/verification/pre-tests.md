@@ -48,7 +48,7 @@
 - expected_RED_output: receipt 无 `non_canonical_title` 诊断；pr-create 仍只打印「resolve explicitly」
 - actual_RED_output: 未实现状态同一 AT 为 2 ok / 5 failed：规范化模块 ImportError；gate 无 non_canonical_title；scan 与 pr-create 无 preflight。见 AT-001-RED.log
 - actual_output: 20 ok / 0 failed：端到端 scan preflight、from→to、幂等、dry-run、部分失败、只读边界、gate 诊断、pr-create 接线全部通过；`bin/test-all --ci` 43 ok / 0 failed。见 AT-001-GREEN.log
-- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/verification/test-evidence/AT-002-RED.log,AT-002-GREEN.log
+- evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log
 - red-green-status: green
 - status: pass
 - blocker: ''
