@@ -2538,5 +2538,5 @@
 ### committed_issues
 1. `I-20261116T050414Z-A`
 - milestone: M-20261116T050414Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/issues/I-20261116T050414Z-A.md
