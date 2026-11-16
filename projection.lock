@@ -189,7 +189,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-create-guarded",
       "target": "bin/pr-create-guarded",
-      "sha256": "c8e9b0a4088ab9509eeb7ea79fb5758e9cccd75c86d458ab1abb439308b252e2",
+      "sha256": "98d3b53b442b99eb10ff8b3fe57c8a07bd1e357870fdc63f898e27f7ec094e9e",
       "mode": "delegate",
       "note": "exec projection"
     },
