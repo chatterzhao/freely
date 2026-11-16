@@ -15,7 +15,7 @@ SCRIPTS = HERE.parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(SCRIPTS / "sync"))
 from raw_metadata_contract import read_issue
-from raw_reconciliation import reconcile
+from raw_reconciliation import non_canonical_title_diagnostic, reconcile
 from raw_title_contract import find_local_heading
 
 
@@ -79,6 +79,15 @@ def main() -> int:
         local=local if args.require_local else None,
         allow_degraded=args.allow_degraded,
     )
+    # Title identity is a fact just like divergence, but it stays a separate
+    # diagnostic: callers may normalise it externally and re-run this gate.
+    for platform, replica in replicas.items():
+        diagnostic = non_canonical_title_diagnostic(platform, replica, args.raw_key)
+        if diagnostic:
+            receipt["diagnostics"].append(diagnostic)
+    if any(item.get("code") == "non_canonical_title" for item in receipt["diagnostics"]):
+        receipt["ok"] = False
+        receipt["decision"] = "block"
     if args.require_local and local is None:
         receipt["ok"] = False
         receipt["diagnostics"].append({"scope": "local", "code": "missing_local", "detail": str(local_path)})

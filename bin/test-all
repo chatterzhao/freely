@@ -59,6 +59,7 @@ CORE=(
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
   test-issue-sync-update-not-noop.py
+  test-raw-title-normalize.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -107,6 +108,7 @@ CI_CORE=(
   test-dispatch-cas-sse-singleton.py
   test-raw-reconciliation.py
   test-issue-sync-update-not-noop.py
+  test-raw-title-normalize.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py

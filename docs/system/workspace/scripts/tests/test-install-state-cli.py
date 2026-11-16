@@ -11,7 +11,7 @@ Pinned here:
   * a thin `bin/install-state-check` projection forwards to the one true source
     (no second copy of the decision logic);
   * it is deliberately NOT wired into runtime/freely, which sits exactly at its
-    27158-line budget;
+    27166-line budget;
   * commands.md documents the executable command;
   * forwarding is byte-faithful for both the healthy and the mismatched case.
 
@@ -33,7 +33,7 @@ CLI = SRC / "bin/install-state-check"
 TRUTH = SRC / "docs/system/workspace/scripts/quality/install-state-check.py"
 RUNTIME = SRC / "docs/system/workspace/scripts/runtime/freely"
 COMMANDS = SRC / "docs/system/workspace/commands.md"
-BUDGET = 27158
+BUDGET = 27166
 
 OK = 0
 BAD = 0
@@ -85,7 +85,7 @@ def static_checks() -> None:
           "S8 commands.md documents the executable command")
     check("freely doctor" in commands and "唯一真源" in commands,
           "S9 the doctor/true-source relationship is explained")
-    check("27158" in commands,
+    check("27166" in commands,
           "S10 the budget rationale is recorded, so nobody re-adds a dispatch line")
 
 

@@ -1,0 +1,30 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261116T050414Z-scan-title-normalize
+AT-001 S1: normalisation module exposes the preflight API
+  ok   normalize_open_raw_titles() exists
+AT-001 S2: non-canonical title is fixed and from→to is printed
+  ok   preflight reports ok
+  ok   both platforms written (got 2)
+  ok   titles are canonical after write
+  ok   body is never rewritten
+  ok   stdout carries `旧 → 新` before/after
+  ok   changes record the authoritative raw key (without raw- prefix)
+AT-001 S3: canonical title is a no-op; dry-run never writes
+  ok   already-canonical title causes zero writes
+  ok   dry-run causes zero writes
+  ok   dry-run still prints from→to
+AT-001 S4: partial platform failure is reported, never declared success
+  ok   partial failure returns ok=False
+  ok   errors are surfaced
+AT-001 S4b: a linked I-* issue is not a raw title candidate
+  ok   linked issues cause zero platform writes
+  ok   linked-only scan is ok (skips are not failures)
+AT-001 S5: scan analyser and pre-scan helper stay read-only
+  ok   task-lifecycle-scan.py has no platform-write calls (found [])
+  ok   pre-scan-fix.sh has no platform-write calls (found [])
+AT-002 S1: gate emits structured non_canonical_title diagnostic
+  ok   reconcile() knows the non_canonical_title code
+  ok   diagnostic carries suggested_command
+AT-002 S2: scan command and pr-create preflight call the normaliser
+  ok   cmd_task_source_scan wires the preflight
+  ok   pr-create-guarded has a preflight
+SUMMARY: 20 ok, 0 failed

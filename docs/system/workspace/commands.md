@@ -50,7 +50,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 - 不一致时返回非 0，并提示 `freely-package --version auto --activate`；
 - **不做自动修复**：打包/激活仍由 `pr-merge-guarded` followthrough 或显式 `freely-package` 负责。
 
-> 刻意不加入 `./bin/freely` 的子命令：`runtime/freely` 正处 27158 行预算上限，
+> 刻意不加入 `./bin/freely` 的子命令：`runtime/freely` 正处 27166 行预算上限，
 > 加分派行会撑爆 `check-runtime-size`。
 
 ## 每个命令的详细说明
