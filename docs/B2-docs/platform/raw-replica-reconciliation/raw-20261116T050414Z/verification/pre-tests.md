@@ -20,11 +20,11 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-raw-title-normalize.py
 - expected_output: SUMMARY with 0 failed, including scan-preflight E2E and read-only boundary assertions
 - expected_RED_output: ImportError/AttributeError（normalize_open_raw_titles 不存在）或标题仍为旧值、无 from→to 输出
-- actual_RED_output: (RED 阶段填写)
-- actual_output: (GREEN 阶段填写)
+- actual_RED_output: 未实现状态同一 AT 为 2 ok / 5 failed：规范化模块 ImportError；gate 无 non_canonical_title；scan 与 pr-create 无 preflight。见 AT-001-RED.log
+- actual_output: 20 ok / 0 failed：端到端 scan preflight、from→to、幂等、dry-run、部分失败、只读边界、gate 诊断、pr-create 接线全部通过；`bin/test-all --ci` 43 ok / 0 failed。见 AT-001-GREEN.log
 - evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/verification/test-evidence/AT-001-RED.log,AT-001-GREEN.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker: ''
 - task_refs: T1,T2
 - case_design: 用 FakeHandler 注入两条平台 OPEN 记录（标题缺前缀但 body 含 `raw-<key>`、另一条已达标），断言只有前者触发写、标题变为 canonical、stdout 含 from→to、重复执行零写；另断言 task-lifecycle-scan.py 与 pre-scan-fix.sh 的调用记录无平台写。
@@ -46,11 +46,11 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-raw-title-normalize.py
 - expected_output: SUMMARY with 0 failed, including gate diagnostic and pr-create preflight cases
 - expected_RED_output: receipt 无 `non_canonical_title` 诊断；pr-create 仍只打印「resolve explicitly」
-- actual_RED_output: (RED 阶段填写)
-- actual_output: (GREEN 阶段填写)
+- actual_RED_output: 未实现状态同一 AT 为 2 ok / 5 failed：规范化模块 ImportError；gate 无 non_canonical_title；scan 与 pr-create 无 preflight。见 AT-001-RED.log
+- actual_output: 20 ok / 0 failed：端到端 scan preflight、from→to、幂等、dry-run、部分失败、只读边界、gate 诊断、pr-create 接线全部通过；`bin/test-all --ci` 43 ok / 0 failed。见 AT-001-GREEN.log
 - evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/verification/test-evidence/AT-002-RED.log,AT-002-GREEN.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: pass
 - blocker: ''
 - task_refs: T3,T4
 - case_design: 构造带非达标标题的 replica 记录跑 `reconcile()`，断言诊断 code/字段；构造 pr-create Step 0b 的 preflight 分支，断言只调用一次规范化并重跑 gate；content_diverged/ambiguous 场景断言零平台写且 rc≠0。

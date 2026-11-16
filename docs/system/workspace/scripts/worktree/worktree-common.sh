@@ -280,6 +280,29 @@ FREELY_CONSISTENCY_ERR
 
 # ── Configured-platform raw reconciliation gate ───────────
 # Read-only: no local metadata or remote platform mutation is permitted here.
+# Print an actionable summary instead of dumping a multi-KB JSON receipt
+# (including full issue bodies) into the operator's terminal.
+_freely_print_replica_receipt_summary() {
+  python3 - "$1" <<'PY'
+import json, sys
+path = sys.argv[1]
+try:
+    with open(path, encoding="utf-8") as stream:
+        receipt = json.load(stream)
+except Exception:
+    print(open(path, encoding="utf-8", errors="replace").read()[:2000], file=sys.stderr)
+    raise SystemExit(0)
+print(f"[raw-reconciliation] decision={receipt.get('decision')} ok={receipt.get('ok')}", file=sys.stderr)
+for item in receipt.get("diagnostics") or []:
+    scope, code = item.get("scope", "?"), item.get("code", "?")
+    print(f"[raw-reconciliation] {scope}: {code} — {str(item.get('detail') or '')[:240]}", file=sys.stderr)
+    command = item.get("suggested_command")
+    if command:
+        print(f"[raw-reconciliation] 修复命令: {command}", file=sys.stderr)
+print(f"[raw-reconciliation] full receipt: {path}", file=sys.stderr)
+PY
+}
+
 freely_wt_assert_raw_reconciled_readonly() {
   local _raw_key="$1" _project="${2:-$(git rev-parse --show-toplevel)}"
   [[ -n "$_raw_key" ]] || return 0
@@ -303,7 +326,7 @@ freely_wt_assert_raw_reconciled_readonly() {
     _verdict=$(python3 - "$_receipt" <<'PY'
 import json, sys
 facts = {"missing", "missing_replica", "content_diverged", "ambiguous",
-         "raw_key_mismatch", "no_configured_platforms"}
+         "non_canonical_title", "raw_key_mismatch", "no_configured_platforms"}
 try:
     with open(sys.argv[1]) as stream:
         receipt = json.load(stream)
@@ -315,13 +338,11 @@ else:
 PY
 )
     if [[ "$_verdict" == "facts" ]]; then
-      cat "$_receipt" >&2
-      rm -f "$_receipt"
+      _freely_print_replica_receipt_summary "$_receipt"
       return 1
     fi
     [[ "$_attempt" -lt 3 ]] && sleep 1
   done
-  cat "$_receipt" >&2
-  rm -f "$_receipt"
+  _freely_print_replica_receipt_summary "$_receipt"
   return 1
 }

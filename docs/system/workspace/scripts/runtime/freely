@@ -26103,6 +26103,14 @@ cmd_task_source_scan() {
   scan_dir="$(task_source_scan_dir_for_project "$project")"
   latest_file="$(task_source_scan_latest_file_for_project "$project")"
   mkdir -p "$scan_dir"
+  # Normalise platform raw titles BEFORE scan builds its raw-key index: every
+  # task derived from this scan must see a canonical `[RAW-<key>]` title.
+  # Non-fatal — a title problem is recorded debt, not a reason to drop scanning.
+  local _title_normalize="$SELF_ROOT/docs/system/workspace/scripts/runtime/raw_title_normalize.py"
+  if [[ -f "$_title_normalize" ]]; then
+    python3 "$_title_normalize" --project "$project" ||
+      log_warn "title normalisation preflight failed; scan continues"
+  fi
   python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$project" >"$latest_file"
   if [[ "$emit_json" == "1" ]]; then
     cat "$latest_file"

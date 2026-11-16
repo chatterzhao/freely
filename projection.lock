@@ -173,7 +173,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/runtime/freely",
       "target": "bin/install-state-check",
-      "sha256": "aea7ec51415c1bc7a89fb75136b043c7c5ceb28be37943801f6a161420843ca9",
+      "sha256": "82a6e9cdbb972dd9b6f7142facf2707c8cee36c302781c7bb8b345c1725f1d62",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -189,7 +189,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-create-guarded",
       "target": "bin/pr-create-guarded",
-      "sha256": "76cd737036f32f4314ff2936a4e66bf42e2a04d35ea59beb41c302f3fd8cdfa7",
+      "sha256": "c8e9b0a4088ab9509eeb7ea79fb5758e9cccd75c86d458ab1abb439308b252e2",
       "mode": "delegate",
       "note": "exec projection"
     },

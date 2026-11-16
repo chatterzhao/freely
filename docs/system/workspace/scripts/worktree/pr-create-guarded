@@ -87,6 +87,13 @@ PHASE
     fi
     echo "Step 0b/4: phase_state=absorbed ✓"
     echo "Step 0b/4: raw replica reconciliation..."
+    # Fallback for absorbed/CLOSED raws that scan never sees: normalise a
+    # non-canonical title first, then re-run the read-only gate. Other facts
+    # (ambiguous / content_diverged / missing) are never auto-repaired.
+    local _title_normalize="$ROOT_DIR/docs/system/workspace/scripts/runtime/raw_title_normalize.py"
+    if [[ -f "$_title_normalize" ]]; then
+      python3 "$_title_normalize" --project "$ROOT_DIR" --raw-key "$_raw_key" || true
+    fi
     freely_wt_assert_raw_reconciled_readonly "$_raw_key" "$ROOT_DIR" || {
       echo "[PR-CREATE] raw replicas are inconsistent; resolve explicitly, then retry." >&2
       exit 1

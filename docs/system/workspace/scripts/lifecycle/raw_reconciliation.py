@@ -4,8 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 from collections.abc import Iterable, Mapping
+from pathlib import Path
 from typing import Any
+
+_SYNC = Path(__file__).resolve().parents[1] / "sync"
+if str(_SYNC) not in sys.path:
+    sys.path.insert(0, str(_SYNC))
+from raw_title_contract import canonical_raw_title, is_canonical_raw_title  # noqa: E402
 
 _RAW_PREFIX = re.compile(r"^raw-", re.IGNORECASE)
 _SPACE = re.compile(r"\s+")
@@ -97,6 +104,32 @@ def canonical_projection(record: Mapping[str, Any]) -> dict[str, Any]:
     ).hexdigest()
     return {**projection, "fingerprint": fingerprint,
             "fingerprint_no_labels": fingerprint_no_labels}
+
+
+def non_canonical_title_diagnostic(
+    platform: str, replica: Mapping[str, Any], raw_key: str,
+) -> dict | None:
+    """Actionable, write-free diagnostic for a platform title lacking identity.
+
+    Kept separate from ``reconcile()`` so the pure comparison contract stays
+    unchanged: a title defect is a fact, but callers decide when to repair it.
+    """
+    if not isinstance(replica, Mapping):
+        return None
+    if str(replica.get("status", "ok")).lower() != "ok":
+        return None
+    observed = str(replica.get("title") or "")
+    if not observed or is_canonical_raw_title(observed, raw_key):
+        return None
+    expected = canonical_raw_title(raw_key, observed)
+    return {
+        "scope": platform,
+        "code": "non_canonical_title",
+        "detail": f"observed={observed!r} expected={expected!r}",
+        "observed_title": observed,
+        "expected_title": expected,
+        "suggested_command": f"freely issue-sync normalize-titles --raw-key {raw_key}",
+    }
 
 
 def reconcile(

@@ -118,8 +118,8 @@ def test_fixes_title_and_prints_from_to(module):
     text = out.getvalue()
     check("fix: 标题缺前缀" in text and "→" in text and expected in text,
           "stdout carries `旧 → 新` before/after")
-    check(all("raw-20260101T000000Z" in str(c.get("raw_key", "")) for c in result.get("changes", [])),
-          "changes record the authoritative raw key")
+    check(all(str(c.get("raw_key", "")) == "20260101T000000Z" for c in result.get("changes", [])),
+          "changes record the authoritative raw key (without raw- prefix)")
 
 
 def test_idempotent_and_dry_run(module):
@@ -137,6 +137,29 @@ def test_idempotent_and_dry_run(module):
         module.normalize_open_raw_titles(str(PROJECT), dry_run=True, adapter_module=fake_dry)
     check(fake_dry.writes == [], "dry-run causes zero writes")
     check("→" in out.getvalue(), "dry-run still prints from→to")
+
+
+def test_linked_issue_is_never_normalised(module):
+    if module is None:
+        return
+    print("AT-001 S4b: a linked I-* issue is not a raw title candidate")
+    body = (
+        "---\nissue_id: I-20260101T000000Z-C\nkind: linked\n"
+        "promoted_from: raw-20260101T000000Z\n"
+        "source_candidate: docs/B1-docs/raw-20260101T000000Z/candidates.md\n---\n\n"
+        "# I-20260101T000000Z-C: 讨论入口\n"
+    )
+    records = {
+        "42": {"platform": "github", "title": "[I-20260101T000000Z-C] 讨论入口",
+               "body": body, "state": "OPEN"},
+        "IKV9ZK": {"platform": "gitee", "title": "[I-20260101T000000Z-C] 讨论入口",
+                   "body": body, "state": "OPEN"},
+    }
+    fake = FakeAdapter(records)
+    with contextlib.redirect_stdout(io.StringIO()):
+        result = module.normalize_open_raw_titles(str(PROJECT), adapter_module=fake)
+    check(fake.writes == [], "linked issues cause zero platform writes")
+    check(result.get("ok") is True, "linked-only scan is ok (skips are not failures)")
 
 
 def test_partial_failure(module):
@@ -185,6 +208,7 @@ def main() -> int:
     test_fixes_title_and_prints_from_to(module)
     test_idempotent_and_dry_run(module)
     test_partial_failure(module)
+    test_linked_issue_is_never_normalised(module)
     test_readonly_boundaries()
     test_gate_diagnostic()
     test_scan_and_prcreate_wiring()
