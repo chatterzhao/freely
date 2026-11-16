@@ -2540,3 +2540,9 @@
 - milestone: M-20261116T050414Z-A
 - phase_state: completed
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/issues/I-20261116T050414Z-A.md
+
+### completed_issues
+1. `I-20261116T050414Z-A`
+- milestone: M-20261116T050414Z-A
+- completed_at: 2026-11-16T07:09:42Z
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/issues/I-20261116T050414Z-A.md
