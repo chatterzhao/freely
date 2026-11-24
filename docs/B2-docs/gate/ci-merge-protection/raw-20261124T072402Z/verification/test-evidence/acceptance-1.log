@@ -1,0 +1,7 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+  ok   workflow file exists
+  FAIL no misleading 'sets it to success' claim in comment
+  FAIL comment states in_progress is the designed state
+  FAIL comment points merges to local pr-merge-guarded
+  ok   no call site wiring a self-signed success check
+SUMMARY: 2 ok, 3 failed

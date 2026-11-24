@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T072402Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T072402Z-A
 platform_ids:
   github:
     issue_id: '4675'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXMQR
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/ci-merge-protection/raw-20261124T072402Z/issues/I-20261124T072402Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T07:59:38Z'
+  gitee: '2026-11-24T07:59:38Z'
 hash: ''
 created_at: '2026-11-24T07:24:03Z'
-updated_at: '2026-11-24T07:24:11Z'
+updated_at: '2026-11-24T07:59:43Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T072402Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T07:59:37Z'
 closeout_note: ''
 severity: P0
 ---
@@ -71,3 +74,11 @@ GitHub 分支保护要求 merge 前 check=success；但治理 check 应在 pr-me
 ## 与前一条的关系
 
 raw-20261124T054145Z（#4669）只修了权限与 fail-closed，分支保护因本缺陷无法安全落地并已回退。本条是它的前置依赖。
+
+### comment-20261124T075937Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T072402Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T072402Z-A](will-be-updated)
