@@ -41,10 +41,10 @@ workflow_kind: fix
 |-------|-------|
 | local_id | `raw-20261114T111702Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
+| phase_state | `absorbed` |
 | canonical | `none` |
 | created | 2026-11-14T11:17:02Z |
-| updated | 2026-11-14T11:17:02Z |
+| updated | 2026-11-14T11:17:09Z |
 
 ---
 
