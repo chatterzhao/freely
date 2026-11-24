@@ -153,6 +153,8 @@
   <text x="65" y="1527" fill="#333">url-content-intake-skill-and-wechat-fetch-governance</text>
   <rect id="epic-ibm" x="35" y="1540" width="730" height="1826" fill="#fff9c4" stroke="#f9a825" stroke-width="2" rx="4"/>
   <text x="50" y="1556" font-size="14" font-weight="bold" fill="#f9a825">ibm</text>
+  <rect id="story-b0-keyword-broad-search" x="55" y="1548" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
+  <text x="65" y="1561" fill="#333">b0-keyword-broad-search</text>
   <rect id="story-absorbed-merged-lane-routing-followthrough-governance" x="55" y="1566" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>
   <text x="65" y="1579" fill="#333">absorbed-merged-lane-routing-followthrough-governance</text>
   <rect id="story-active-lifecycle-boundary-and-dogfooding-capability-discovery" x="55" y="1584" width="690" height="18" fill="#fff" stroke="#f9a825" stroke-width="1" rx="2"/>

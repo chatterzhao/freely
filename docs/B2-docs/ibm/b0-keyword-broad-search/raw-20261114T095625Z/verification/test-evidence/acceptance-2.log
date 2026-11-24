@@ -1,0 +1,64 @@
+[test-all] mode=ci
+[test-all] verified subset: 49 tests
+  [ok] test-ci-machine-independence.py
+  [ok] test-guidance-text-single-source.py
+  [ok] test-replica-metadata-decision.py
+  [ok] test-install-state-cli.py
+  [ok] test-b1-design-intent-audit.py
+  [ok] test-postmerge-commit-guard.py
+  [ok] test-batch-scope-filter.py
+  [ok] test-closeout-chain.py
+  [ok] test-review-guidance-l0.py
+  [ok] test-issue-sync-batch-closeout.py
+  [ok] test-wt-close-children.py
+  [ok] test-review-intent-anchor.py
+  [ok] test-bin-projection-classification.py
+  [ok] test-raw-issue-pull-parity.py
+  [ok] test-wt-close-test-premerge-guard.py
+  [ok] test-wt-close-branch-count.py
+  [ok] test-issue-sync-close-linked.py
+  [ok] test-wt-close-dryrun-safety.py
+  [ok] test-wt-close-dropped-closeout.py
+  [ok] test-projection-consistency.py
+  [ok] test-bin-projection.py
+  [ok] test-runtime-split.py
+  [ok] test-cross-process-contract.py
+  [ok] test-coordination-contract.py
+  [ok] test-skill-merge-compat.py
+  [ok] test-skill-frontmatter-contract.py
+  [ok] test-a2a-task-cli-loadable.py
+  [ok] test-fail-semantics-preflight.py
+  [ok] test-obs-ops-backlog.py
+  [ok] test-platform-sync-entrypoint.py
+  [ok] test-issue-sync-modules.py
+  [ok] test-runtime-tdd-evidence.py
+  [ok] test-runtime-unit
+  [ok] test-wt-close-protected-branch-guard
+  [ok] test-contract-single-source.py
+  [ok] test-dispatch-cas-sse-singleton.py
+  [ok] test-raw-reconciliation.py
+  [ok] test-issue-sync-update-not-noop.py
+  [ok] test-raw-title-normalize.py
+  [ok] test-ci-merge-protection.py
+  [ok] test-governance-check-doc-alignment.py
+  [ok] test-test-all-diagnostics.py
+  [ok] test-issue-sync-write-result.py
+  [ok] test-session-restore-exit-code.py
+  [ok] test-b0-keyword-broad-search.py
+  [ok] test-raw-replica-degraded.py
+  [ok] test-command-lifecycle-raw-metadata.py
+  [ok] test-command-lifecycle-materialization.py
+  [ok] test-scan-frontmatter-nested.py
+[test-all] known-broken / not-yet-onboarded: 590 test files (TODO: triage and onboard)
+  - test-a2a-report-cli.py
+  - test-acp-binary-check-require-available
+  - test-acp-handoff.py
+  - test-acp-session-routing.py
+  - test-agent-execution-safety-review-skill
+  - test-agent-lifecycle.sh
+  - test-agent-protocol.py
+  - test-ai-cli-codex-apikey-slot-bundle-switch
+  - test-ai-cli-codex-whoami-status-ignore-stale-active-slot
+  - test-ai-cli-generic-tool-login-creates-slot-container
+  ... and 580 more
+SUMMARY: 49 ok, 0 failed, known-broken=590

@@ -1,3 +1,12 @@
+## M-20261114T095625Z-A
+- title: feat — B0 关键词广搜与二元决策
+- status: active
+### candidate_issues
+1. `C-20261114T095625Z-A`
+- milestone: M-20261114T095625Z-A
+- status: promoted
+- promoted_issue_id: `I-20261114T095625Z-A`
+
 ## M-20261124T054241Z-A
 - title: fix — session restore 失败退出码
 - status: active

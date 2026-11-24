@@ -65,7 +65,7 @@ CORE=(
   test-test-all-diagnostics.py
   test-issue-sync-write-result.py
   test-session-restore-exit-code.py
-  test-session-restore-exit-code.py
+  test-b0-keyword-broad-search.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -120,7 +120,7 @@ CI_CORE=(
   test-test-all-diagnostics.py
   test-issue-sync-write-result.py
   test-session-restore-exit-code.py
-  test-session-restore-exit-code.py
+  test-b0-keyword-broad-search.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py

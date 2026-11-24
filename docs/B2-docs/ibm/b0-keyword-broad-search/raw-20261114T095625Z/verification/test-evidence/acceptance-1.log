@@ -1,0 +1,11 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+  ok   B1 skill exists
+  FAIL B0 requires keyword broad-search
+  FAIL keyword families search docs/ and bin/
+  FAIL B0 requires three-way document layering
+  FAIL B0 requires contradiction cross-check
+  FAIL B0 requires explicit continue/dropped binary decision field
+  FAIL dropped must cite covering-issue evidence (explicit rule)
+  ok   no-hard-gate stance preserved
+  FAIL self-check includes keyword broad-search item
+SUMMARY: 2 ok, 7 failed
