@@ -1,0 +1,13 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+=== STATIC: workflow permissions ===
+  ok   workflow file exists
+  FAIL workflow declares a top-level permissions: block
+  FAIL permissions block grants checks: write
+  FAIL permissions block grants contents: read
+=== STATIC: pr-merge-guarded fail-closed ===
+  ok   pr-merge-guarded implementation exists
+  ok   locate _set_governance_check_pass() body
+  FAIL no self-created success check fallback
+  FAIL no `|| true` swallowing API failures in check helper
+  FAIL check helper has an explicit non-zero fail-closed path
+SUMMARY: 3 ok, 6 failed
