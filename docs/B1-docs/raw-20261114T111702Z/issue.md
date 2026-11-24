@@ -26,7 +26,7 @@ session_refs: []
 platform_state: open
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T13:57:00Z'
 closeout_note: ''
 severity: P2
 ---
