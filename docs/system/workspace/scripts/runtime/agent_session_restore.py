@@ -75,9 +75,28 @@ def main(argv: list[str] | None = None) -> int:
     if len(args) != 1:
         print("usage: agent_session_restore.py <project>", file=sys.stderr)
         return 2
-    for outcome in resume_persisted_sessions(os.path.abspath(args[0])):
+    outcomes = resume_persisted_sessions(os.path.abspath(args[0]))
+    for outcome in outcomes:
         print(json.dumps(outcome, ensure_ascii=False, sort_keys=True))
-    return 0
+
+    # Aggregate restore health (raw-20261124T054241Z / #4672). The exit code is
+    # the contract external callers use to decide whether the runtime came back
+    # healthy — a failed session/resume must never look like overall success.
+    counts = {"resumed": 0, "failed": 0, "slot_unavailable": 0}
+    for outcome in outcomes:
+        status = outcome.get("status", "")
+        if status in counts:
+            counts[status] += 1
+    health = "degraded" if counts["failed"] else (
+        "partial" if counts["slot_unavailable"] else "healthy"
+    )
+    print(json.dumps(
+        {"summary": "session_restore", "resumed": counts["resumed"],
+         "failed": counts["failed"],
+         "slot_unavailable": counts["slot_unavailable"], "health": health},
+        ensure_ascii=False, sort_keys=True,
+    ))
+    return 1 if counts["failed"] else 0
 
 
 if __name__ == "__main__":

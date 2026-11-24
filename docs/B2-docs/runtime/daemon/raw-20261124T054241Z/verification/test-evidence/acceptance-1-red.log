@@ -1,0 +1,8 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+  ok   agent_session_restore.py exists
+  FAIL failed outcome → non-zero exit
+  FAIL structured summary with counts and health printed
+  ok   all resumed → exit 0
+  ok   per-outcome JSON line preserved
+  ok   usage error still returns 2
+SUMMARY: 4 ok, 2 failed

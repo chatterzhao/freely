@@ -1,3 +1,17 @@
+## M-20261124T054241Z-A
+- title: fix — session restore 失败退出码
+- status: active
+### candidate_issues
+1. `C-20261124T054241Z-A`
+- milestone: M-20261124T054241Z-A
+- status: promoted
+- promoted_issue_id: `I-20261124T054241Z-A`
+### committed_issues
+1. `I-20261124T054241Z-A`
+- milestone: M-20261124T054241Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/runtime/daemon/raw-20261124T054241Z/issues/I-20261124T054241Z-A.md
+
 ## M-20261124T054217Z-A
 - title: fix — issue-sync update 双平台写结果汇总
 - status: active
