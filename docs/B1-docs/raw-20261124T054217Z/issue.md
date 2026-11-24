@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T054217Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T054217Z-A
 platform_ids:
   github:
     issue_id: '4671'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXKYB
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/platform/raw-20261124T054217Z/issues/I-20261124T054217Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T10:23:46Z'
+  gitee: '2026-11-24T10:23:46Z'
 hash: ''
 created_at: '2026-11-24T05:42:18Z'
-updated_at: '2026-11-24T05:42:26Z'
+updated_at: '2026-11-24T10:23:52Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T054217Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T10:23:46Z'
 closeout_note: ''
 severity: P1
 ---
@@ -67,3 +70,11 @@ workflow_kind: fix
 
 - RED：mock Gitee 更新失败，命令非零退出且输出部分失败汇总。
 - GREEN：双平台均成功时行为与当前一致。
+
+### comment-20261124T102346Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T054217Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T054217Z-A](will-be-updated)

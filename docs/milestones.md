@@ -6,6 +6,11 @@
 - milestone: M-20261124T054217Z-A
 - status: promoted
 - promoted_issue_id: `I-20261124T054217Z-A`
+### committed_issues
+1. `I-20261124T054217Z-A`
+- milestone: M-20261124T054217Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/platform/raw-20261124T054217Z/issues/I-20261124T054217Z-A.md
 
 ## M-20261124T054201Z-A
 - title: fix — test-all 失败诊断输出
