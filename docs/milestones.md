@@ -1,3 +1,17 @@
+## M-20261124T054201Z-A
+- title: fix — test-all 失败诊断输出
+- status: active
+### candidate_issues
+1. `C-20261124T054201Z-A`
+- milestone: M-20261124T054201Z-A
+- status: promoted
+- promoted_issue_id: `I-20261124T054201Z-A`
+### committed_issues
+1. `I-20261124T054201Z-A`
+- milestone: M-20261124T054201Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261124T054201Z/issues/I-20261124T054201Z-A.md
+
 ## M-20261124T072402Z-A
 - title: docs — 更正 governance check 文档断言（in_progress 是设计态）
 - status: active
