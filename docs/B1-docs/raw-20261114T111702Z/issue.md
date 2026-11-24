@@ -3,7 +3,7 @@ schema_version: '1'
 local_id: raw-20261114T111702Z
 kind: raw
 phase_state: absorbed
-absorbed_into: 'I-20261114T111702Z-A'
+absorbed_into: I-20261114T111702Z-A
 platform_ids:
   github:
     issue_id: '4654'
@@ -18,12 +18,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-14T11:17:02Z'
-updated_at: '2026-11-14T11:17:09Z'
+updated_at: '2026-11-24T14:00:09Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
 completed_at: '2026-11-24T13:57:00Z'
