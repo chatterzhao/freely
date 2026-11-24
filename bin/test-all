@@ -60,6 +60,7 @@ CORE=(
   test-raw-reconciliation.py
   test-issue-sync-update-not-noop.py
   test-raw-title-normalize.py
+  test-ci-merge-protection.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -109,6 +110,7 @@ CI_CORE=(
   test-raw-reconciliation.py
   test-issue-sync-update-not-noop.py
   test-raw-title-normalize.py
+  test-ci-merge-protection.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py

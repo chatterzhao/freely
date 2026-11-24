@@ -297,35 +297,46 @@ _set_governance_check_pass() {
   # Update the governance/pr-merge-guard check run (created by CI workflow)
   # from "in_progress" to "success". This satisfies GitHub branch protection's
   # required status check, allowing gh pr merge (without --admin) to proceed.
+  #
+  # FAIL-CLOSED (raw-20261124T054145Z): this helper may only flip a check that
+  # CI actually created. It must never mint its own success check — that would
+  # let the executor self-issue the acceptance stamp. Any missing check or API
+  # failure is a hard error, never a silent success.
   local source_branch="$1"
   local head_sha
-  head_sha="$(git rev-parse "$source_branch" 2>/dev/null)" || return 0
-  if ! command -v gh &>/dev/null; then return 0; fi
+  head_sha="$(git rev-parse "$source_branch" 2>/dev/null)" || {
+    echo "[governance-check] FAIL: cannot resolve head_sha for $source_branch" >&2
+    return 1
+  }
+  if ! command -v gh &>/dev/null; then
+    echo "[governance-check] FAIL: gh CLI unavailable; cannot set governance check" >&2
+    return 1
+  fi
 
-  # Find the existing check run created by the CI workflow, update it to success.
+  # Find the existing check run created by the CI workflow.
   local check_run_id
-  check_run_id=$(gh api "repos/{owner}/{repo}/commits/$head_sha/check-runs" \
-    --jq '.check_runs[] | select(.name == "governance/pr-merge-guard") | .id' 2>/dev/null | head -1)
+  if ! check_run_id=$(gh api "repos/{owner}/{repo}/commits/$head_sha/check-runs" \
+    --jq '.check_runs[] | select(.name == "governance/pr-merge-guard") | .id' 2>&1 | head -1); then
+    echo "[governance-check] FAIL: cannot query check runs: $check_run_id" >&2
+    return 1
+  fi
 
-  if [[ -n "$check_run_id" ]]; then
-    gh api -X PATCH "repos/{owner}/{repo}/check-runs/$check_run_id" \
+  if [[ -z "$check_run_id" ]]; then
+    echo "[governance-check] FAIL: no governance/pr-merge-guard check on $head_sha; " >&2
+    echo "[governance-check] CI must create it first — refusing to self-issue success." >&2
+    return 1
+  fi
+
+  if ! gh api -X PATCH "repos/{owner}/{repo}/check-runs/$check_run_id" \
       --field status="completed" \
       --field conclusion="success" \
       --field 'output[title]=Governance gates passed' \
       --field 'output[summary]=All pr-merge-guarded governance gates passed.' \
-      >/dev/null 2>&1 || true
-  else
-    # No existing check run (CI hasn't run yet or branch protection not configured).
-    # Create one so gh pr merge (without --admin) can succeed.
-    gh api "repos/{owner}/{repo}/check-runs" \
-      --field name="governance/pr-merge-guard" \
-      --field head_sha="$head_sha" \
-      --field status="completed" \
-      --field conclusion="success" \
-      --field 'output[title]=Governance gates passed' \
-      --field 'output[summary]=All pr-merge-guarded governance gates passed (created locally).' \
-      >/dev/null 2>&1 || true
+      >/dev/null 2>&1; then
+    echo "[governance-check] FAIL: could not set check $check_run_id to success" >&2
+    return 1
   fi
+  return 0
 }
 
 render_merge_message() {
