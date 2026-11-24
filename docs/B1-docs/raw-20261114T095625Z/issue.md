@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261114T095625Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261114T095625Z-A
 platform_ids:
   github:
     issue_id: '4652'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKVBLF
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/ibm/b0-keyword-broad-search/raw-20261114T095625Z/issues/I-20261114T095625Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T12:30:12Z'
+  gitee: '2026-11-24T12:30:12Z'
 hash: ''
 created_at: '2026-11-14T09:56:25Z'
-updated_at: '2026-11-14T09:56:32Z'
+updated_at: '2026-11-24T12:30:17Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261114T095625Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T12:30:11Z'
 closeout_note: ''
 severity: P1
 ---
@@ -114,3 +117,11 @@ workflow_kind: feature
 
 - 「外部锚点已要求引用原文，等于搜过了」→ 否：列锚点是**读**，广搜是**找**；本轮正是靠 C 组关键词发现术语只在本会话文档里。
 - 「这会把 B1 拖长」→ 否：关键词族与三类分层是结构化表格，纯文档 typo 类 raw 可写「不适用 + 理由」；价值在于防「实现后方向错误」。
+
+### comment-20261124T123012Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261114T095625Z-A"]
+
+拆解为以下任务:
+1. [I-20261114T095625Z-A](will-be-updated)
