@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T054241Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T054241Z-A
 platform_ids:
   github:
     issue_id: '4672'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXKZ8
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/runtime/daemon/raw-20261124T054241Z/issues/I-20261124T054241Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T11:20:49Z'
+  gitee: '2026-11-24T11:20:49Z'
 hash: ''
 created_at: '2026-11-24T05:42:41Z'
-updated_at: '2026-11-24T05:42:50Z'
+updated_at: '2026-11-24T11:21:00Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T054241Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T11:20:48Z'
 closeout_note: ''
 severity: P1
 ---
@@ -68,3 +71,11 @@ Runtime 重启后若部分 Worker/Reviewer 的 ACP `session/resume` 失败，进
 
 - RED：mock 一条 resume 抛异常，main() 非零退出。
 - GREEN：全部 resumed 时行为与当前一致，退出码 0。
+
+### comment-20261124T112049Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T054241Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T054241Z-A](will-be-updated)
