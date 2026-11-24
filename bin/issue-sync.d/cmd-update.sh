@@ -20,17 +20,44 @@ cmd_update() {
   body=$(_issue_body "$file" "$local_id")
   labels=$(_labels "$file")
 
+  # Aggregate both platform write results (raw-20261124T054217Z / #4671).
+  # A partial success must never be reported as overall success — the runtime
+  # consumes this exit code to decide whether replicas are consistent.
+  local gh_result="skipped" gitee_result="skipped" write_failed=0
+
   gh_id=$(_gh_issue_number "$file")
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: updating #$gh_id"
-    _gh_update "$gh_id" "$title" "$body" "$labels"
+    if _gh_update "$gh_id" "$title" "$body" "$labels"; then
+      gh_result="success"
+    else
+      gh_result="failure"
+      write_failed=1
+      echo "[issue-sync] GitHub: update FAILED" >&2
+    fi
   fi
 
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
   if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
     echo "[issue-sync] Gitee: updating $gitee_id"
-    _gitee_update "$gitee_id" "$title" "$body" >/dev/null || echo "[issue-sync] Gitee: update FAILED" >&2
+    if _gitee_update "$gitee_id" "$title" "$body" >/dev/null; then
+      gitee_result="success"
+    else
+      gitee_result="failure"
+      write_failed=1
+      echo "[issue-sync] Gitee: update FAILED" >&2
+    fi
+  fi
+
+  local overall="success"
+  [[ "$write_failed" -ne 0 ]] && overall="partial_failure"
+  echo "[issue-sync] result: github=$gh_result gitee=$gitee_result overall=$overall"
+
+  if [[ "$write_failed" -ne 0 ]]; then
+    echo "[issue-sync] update FAILED (partial): $local_id" >&2
+    return 1
   fi
 
   echo "[issue-sync] update complete: $local_id"
+  return 0
 }

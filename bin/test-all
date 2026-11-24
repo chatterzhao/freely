@@ -63,7 +63,7 @@ CORE=(
   test-ci-merge-protection.py
   test-governance-check-doc-alignment.py
   test-test-all-diagnostics.py
-  test-test-all-diagnostics.py
+  test-issue-sync-write-result.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -116,7 +116,7 @@ CI_CORE=(
   test-ci-merge-protection.py
   test-governance-check-doc-alignment.py
   test-test-all-diagnostics.py
-  test-test-all-diagnostics.py
+  test-issue-sync-write-result.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py

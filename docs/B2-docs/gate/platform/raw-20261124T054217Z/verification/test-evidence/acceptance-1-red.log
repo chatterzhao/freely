@@ -1,0 +1,7 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+  ok   cmd-update.sh exists
+  FAIL GitHub update return value is checked
+  FAIL Gitee failure is not swallowed by bare `|| echo FAILED`
+  FAIL per-platform result summary exists
+  ok   non-zero exit path on failure exists
+SUMMARY: 2 ok, 3 failed
