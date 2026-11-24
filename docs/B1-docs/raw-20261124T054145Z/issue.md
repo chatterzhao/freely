@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T054145Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T054145Z-A
 platform_ids:
   github:
     issue_id: '4669'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXKY8
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/ci-merge-protection/raw-20261124T054145Z/issues/I-20261124T054145Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T06:41:56Z'
+  gitee: '2026-11-24T06:41:56Z'
 hash: ''
 created_at: '2026-11-24T05:41:45Z'
-updated_at: '2026-11-24T05:41:54Z'
+updated_at: '2026-11-24T06:42:02Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T054145Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T06:41:56Z'
 closeout_note: ''
 severity: P0
 ---
@@ -71,3 +74,11 @@ workflow_kind: fix
 - CI run guard job success，目标 commit 上存在 `governance/pr-merge-guard` check。
 - 分支保护 API 返回 required_status_checks 含该 check 且 enforce_admins 为真。
 - RED 测试证明：check 缺失或 API 失败时 pr-merge-guarded 非零退出，不自签。
+
+### comment-20261124T064156Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T054145Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T054145Z-A](will-be-updated)
