@@ -9,7 +9,7 @@
 ### committed_issues
 1. `I-20261124T054145Z-A`
 - milestone: M-20261124T054145Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/gate/ci-merge-protection/raw-20261124T054145Z/issues/I-20261124T054145Z-A.md
 
 ## M-20261114T101138Z-A
