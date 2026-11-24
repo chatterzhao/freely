@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T054201Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T054201Z-A
 platform_ids:
   github:
     issue_id: '4670'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXKY9
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261124T054201Z/issues/I-20261124T054201Z-A.md
+last_synced_comment_at:
+  github: '2026-11-24T09:19:22Z'
+  gitee: '2026-11-24T09:19:22Z'
 hash: ''
 created_at: '2026-11-24T05:42:01Z'
-updated_at: '2026-11-24T05:42:09Z'
+updated_at: '2026-11-24T09:19:27Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T054201Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-24T09:19:21Z'
 closeout_note: ''
 severity: P1
 ---
@@ -70,3 +73,11 @@ Freely 的目标是让 AI 自主发现→修复→验证。CI 不提供失败诊
 
 - RED：构造必然失败的测试，CI 输出含其断言信息而非只有 `[FAIL]`。
 - GREEN：43 ok 时 SUMMARY 格式不变。
+
+### comment-20261124T091922Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T054201Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T054201Z-A](will-be-updated)
