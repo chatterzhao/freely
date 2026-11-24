@@ -1,3 +1,17 @@
+## M-20261124T072402Z-A
+- title: docs — 更正 governance check 文档断言（in_progress 是设计态）
+- status: active
+### candidate_issues
+1. `C-20261124T072402Z-A`
+- milestone: M-20261124T072402Z-A
+- status: promoted
+- promoted_issue_id: `I-20261124T072402Z-A`
+### committed_issues
+1. `I-20261124T072402Z-A`
+- milestone: M-20261124T072402Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/ci-merge-protection/raw-20261124T072402Z/issues/I-20261124T072402Z-A.md
+
 ## M-20261124T054145Z-A
 - title: fix — CI 合并保护链 fail-closed 收口（权限 + 分支保护 + 去自签）
 - status: active

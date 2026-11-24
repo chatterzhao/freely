@@ -3,8 +3,13 @@
 # ── How this works ──────────────────────────────────────────────
 #   1. This workflow creates a check "governance/pr-merge-guard" (in_progress).
 #   2. Branch protection on develop REQUIRES this check to pass.
-#   3. Only pr-merge-guarded sets it to "success" via GitHub API.
-#   4. Result: GitHub UI merge button is greyed out.
+#   3. The check STAYS in_progress by design — it is intentionally never set
+#      to success. There is no API call anywhere that flips it.
+#   4. Result: GitHub UI merge button stays disabled. Merges go through the
+#      local pr-merge-guarded path (git merge + git push), which does not
+#      consult check status; this is the design that blocks UI merges.
+#   5. Do NOT "fix" the in_progress check by adding a success-setting call:
+#      that would re-enable the UI Merge button and defeat this guard.
 #
 # ── One-time setup (after `freely init`) ────────────────────────
 #   Run this ONCE to enable branch protection on develop:
