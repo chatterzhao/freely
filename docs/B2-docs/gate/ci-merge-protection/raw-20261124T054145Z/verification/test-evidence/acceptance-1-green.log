@@ -1,0 +1,13 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261124T054145Z-ci-merge-guard-chain
+=== STATIC: workflow permissions ===
+  ok   workflow file exists
+  ok   workflow declares a top-level permissions: block
+  ok   permissions block grants checks: write
+  ok   permissions block grants contents: read
+=== STATIC: pr-merge-guarded fail-closed ===
+  ok   pr-merge-guarded implementation exists
+  ok   locate _set_governance_check_pass() body
+  ok   no self-created success check fallback
+  ok   no `|| true` swallowing API failures in check helper
+  ok   check helper has an explicit non-zero fail-closed path
+SUMMARY: 9 ok, 0 failed

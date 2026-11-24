@@ -40,6 +40,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
+# The guard job calls github.rest.checks.create(), which requires checks:write.
+# Without an explicit grant the job token only has read scopes and the create
+# call fails with 403 "Resource not accessible by integration" (verified on
+# run 43827151395 / raw-20261124T054145Z).
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   guard:
     runs-on: ubuntu-latest

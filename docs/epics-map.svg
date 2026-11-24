@@ -75,6 +75,8 @@
   <text x="65" y="813" fill="#333">freely-host</text>
   <rect id="epic-gate" x="35" y="826" width="730" height="296" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
   <text x="50" y="842" font-size="14" font-weight="bold" fill="#e65100">gate</text>
+  <rect id="story-ci-merge-protection" x="55" y="834" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
+  <text x="65" y="847" fill="#333">ci-merge-protection</text>
   <rect id="story-checkpoint-commit-and-multi-worktree-supervision-governance" x="55" y="852" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
   <text x="65" y="865" fill="#333">checkpoint-commit-and-multi-worktree-supervision-governance</text>
   <rect id="story-doc-gate-governance" x="55" y="870" width="690" height="18" fill="#fff" stroke="#e65100" stroke-width="1" rx="2"/>
