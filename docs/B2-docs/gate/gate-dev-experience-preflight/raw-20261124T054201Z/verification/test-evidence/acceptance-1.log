@@ -1,0 +1,8 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely
+  ok   bin/test-all exists
+  FAIL test execution does not discard stdout/stderr to /dev/null
+  FAIL per-test log directory is defined
+  FAIL test output is written to a per-test log
+  FAIL failing test log is surfaced on failure
+  ok   SUMMARY line format preserved
+SUMMARY: 2 ok, 4 failed

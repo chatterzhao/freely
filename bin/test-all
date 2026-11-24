@@ -62,6 +62,8 @@ CORE=(
   test-raw-title-normalize.py
   test-ci-merge-protection.py
   test-governance-check-doc-alignment.py
+  test-test-all-diagnostics.py
+  test-test-all-diagnostics.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -113,6 +115,8 @@ CI_CORE=(
   test-raw-title-normalize.py
   test-ci-merge-protection.py
   test-governance-check-doc-alignment.py
+  test-test-all-diagnostics.py
+  test-test-all-diagnostics.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
   test-command-lifecycle-materialization.py
@@ -135,6 +139,15 @@ esac
 
 echo "[test-all] mode=$MODE"
 echo "[test-all] verified subset: ${#selected[@]} tests"
+
+# Per-test diagnostic logs (raw-20261124T054201Z / #4670). Keep the SUCCESS
+# path quiet (only [ok] + SUMMARY) but preserve full stdout/stderr for FAILURES
+# so CI and AI agents can diagnose without re-running tests manually.
+LOG_DIR="$ROOT_DIR/.freely/run/test-all-logs"
+rm -rf "$LOG_DIR" 2>/dev/null || true
+mkdir -p "$LOG_DIR" 2>/dev/null || true
+FAIL_TAIL_LINES="${TEST_ALL_FAIL_TAIL:-40}"
+
 passed=0
 failed=0
 failed_names=()
@@ -146,17 +159,24 @@ for name in "${selected[@]}"; do
     failed_names+=("$name")
     continue
   fi
+  log_file="$LOG_DIR/${name}.log"
   rc=0
+  start_ts=$(date +%s 2>/dev/null || echo 0)
   if [[ "$name" == *.py ]]; then
-    python3 "$path" >/dev/null 2>&1 || rc=$?
+    python3 "$path" >"$log_file" 2>&1 || rc=$?
   else
-    bash "$path" >/dev/null 2>&1 || rc=$?
+    bash "$path" >"$log_file" 2>&1 || rc=$?
   fi
+  elapsed=$(( $(date +%s 2>/dev/null || echo 0) - start_ts ))
   if [[ "$rc" -eq 0 ]]; then
     echo "  [ok] $name"
+    rm -f "$log_file" 2>/dev/null || true
     passed=$((passed + 1))
   else
     echo "  [FAIL] $name (rc=$rc)"
+    echo "  ----- diagnostic tail ($log_file, ${elapsed}s) -----"
+    tail -n "$FAIL_TAIL_LINES" "$log_file" 2>/dev/null | sed 's/^/  | /' || true
+    echo "  ----- end diagnostic -----"
     failed=$((failed + 1))
     failed_names+=("$name")
   fi
