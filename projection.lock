@@ -197,7 +197,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-merge-guarded",
       "target": "bin/pr-merge-guarded",
-      "sha256": "8fceb6a49f124da29a5e1916ab76fa483af031b35090dbc5d47a79f54ea6b19f",
+      "sha256": "3f22cd148e876f1ff130843ecd4e4533318516b1aeb0c0f320a63ff5bda9b603",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -477,7 +477,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-close",
       "target": "bin/wt-close",
-      "sha256": "50d2d5b58aa0cb9f8b7d90d25416e89369ef9c195480af16ff90228c3a0add1c",
+      "sha256": "75b1d07c43bd9ed5786a706be6aaacf117aa399ef1e8cd3f8ae1c2178ad8779b",
       "mode": "delegate",
       "note": "exec projection"
     },

@@ -53,7 +53,6 @@ GIT_FETCH_TIMEOUT_SECS = 30
 sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
 sys.path.insert(0, str(_LIFECYCLE_DIR))
-from replica_truth import summarize as _replica_summary
 from freely_user_env import value as freely_env_value
 from freely_config import read_config
 from raw_title_contract import (canonical_raw_title, find_local_heading,
@@ -1247,6 +1246,15 @@ def list_open_issue_records(platforms: list[str] = None) -> dict[str, dict]:
 def get_assignees(platform: str, issue_number: str) -> list[str]:
     h = _handler_for(platform)
     return h.get_assignees(issue_number) if h else []
+
+
+def _replica_summary(records: dict, local_id: str) -> dict:
+    """Lazy import: embedders that only need create/close must not be forced to
+    package the lifecycle tree alongside the adapter (issue-sync-bootstrap does
+    exactly that)."""
+    from replica_truth import summarize
+
+    return summarize(records, local_id)
 
 
 def find_open_replicas_by_local_id(local_id: str) -> dict:
