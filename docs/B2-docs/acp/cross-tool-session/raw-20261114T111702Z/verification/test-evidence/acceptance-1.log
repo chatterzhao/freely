@@ -1,0 +1,12 @@
+source: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20261114T111702Z-comment-project-root-unbound
+  ok   runtime/freely exists
+  ok   cmd_comment() body extracted
+  ok   cmd_comment() has no ${PROJECT_ROOT}
+  ok   notification block reuses ${SELF_ROOT} (>=4 refs)
+  ok   SELF_ROOT defined globally at runtime head
+  ok   agent_working lookup preserved
+  ok   ACP worker notification preserved
+  ok   platform-adapter comment write preserved
+  ok   bash -n runtime/freely rc=0
+  ok   runtime lines 27166 <= budget 27166
+SUMMARY: 10 ok, 0 failed

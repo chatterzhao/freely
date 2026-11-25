@@ -173,7 +173,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/runtime/freely",
       "target": "bin/install-state-check",
-      "sha256": "82a6e9cdbb972dd9b6f7142facf2707c8cee36c302781c7bb8b345c1725f1d62",
+      "sha256": "9648b6108f9d68821879906c0b49b30393e752e7edb19beed962ef4a218c868b",
       "mode": "delegate",
       "note": "exec projection"
     },

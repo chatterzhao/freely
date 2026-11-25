@@ -2630,3 +2630,24 @@
 - milestone: M-20261116T050414Z-A
 - completed_at: 2026-11-16T07:09:42Z
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261116T050414Z/issues/I-20261116T050414Z-A.md
+
+## M-20261114T111702Z-A
+- title: fix — freely comment 复用 SELF_ROOT 修复 ACP worker 通知
+- status: active
+### candidate_issues
+1. `C-20261114T111702Z-A`
+- milestone: M-20261114T111702Z-A
+- status: promoted
+- promoted_issue_id: `I-20261114T111702Z-A`
+- promoted_issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261114T111702Z/issues/I-20261114T111702Z-A.md
+### committed_issues
+1. `I-20261114T111702Z-A`
+- milestone: M-20261114T111702Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261114T111702Z/issues/I-20261114T111702Z-A.md
+
+### completed_issues
+1. `I-20261114T111702Z-A`
+- milestone: M-20261114T111702Z-A
+- completed_at: 2026-11-25T05:50:00Z
+- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261114T111702Z/issues/I-20261114T111702Z-A.md

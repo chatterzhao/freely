@@ -25092,9 +25092,9 @@ HELP
 
   # Notify active worker via ACP session/prompt if worktree is active
   local _wt_path
-  _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${PROJECT_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
+  _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${SELF_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${SELF_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
   if [[ -n "$_wt_path" ]]; then
-    _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${PROJECT_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
+    _wt_path=$(python3 -c "import sys; sys.path.insert(0, '${SELF_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_list_by_raw_key; r=agent_list_by_raw_key('${SELF_ROOT}', '${_raw_key}'); print(r.get('worktree',''))" 2>/dev/null || true)
     if [[ -n "$_wt_path" && -d "$_wt_path" ]]; then
       local _session_id
       _session_id=$(python3 -c "
