@@ -507,6 +507,41 @@ _sync_prs_across_platforms() {
   done
 }
 
+# _push_source_branch_to_all_remotes: push the source branch to every
+# configured platform remote and aggregate results (#4702).  A single
+# `git push all` with `|| true` swallowed failures and printed an unconditional
+# "pushed" receipt — a partial-success lie.  This helper mirrors the
+# develop-push policy in do_initial_merge (:401-423): iterate real remotes
+# (skip the aggregate 'all'), record failures, and fail closed.
+# Args: $1 = source worktree path, $2 = source branch name.
+# Returns 0 only when every remote accepted the push.
+_push_source_branch_to_all_remotes() {
+  local wt="$1" branch="$2"
+  local remotes remote failed="" ok=""
+  remotes=$(git -C "$wt" remote 2>/dev/null || true)
+  for remote in $remotes; do
+    [[ "$remote" == "all" ]] && continue
+    if git -C "$wt" push "$remote" "$branch" 2>&1; then
+      ok="$ok $remote"
+      echo "[MERGE-GUARD] source push $remote: ok"
+    else
+      failed="$failed $remote"
+      echo "[MERGE-GUARD] source push $remote: FAILED" >&2
+    fi
+  done
+  if [[ -n "$failed" ]]; then
+    echo "[MERGE-GUARD] source branch push FAILED on:$failed" >&2
+    echo "[MERGE-GUARD] retry: git -C '$wt' push <remote> '$branch' for each failed remote above" >&2
+    return 1
+  fi
+  if [[ -z "$ok" ]]; then
+    echo "[MERGE-GUARD] no configured remote accepted the source push for $branch" >&2
+    return 1
+  fi
+  echo "[MERGE-GUARD] source branch pushed to:$ok"
+  return 0
+}
+
 # _sync_issues_changed_in_merge: BEFORE merge, update issue phase_state
 # in the fix|feature worktree, then commit + push so the worktree stays clean.
 # Mirrors pr-review-guarded: review → commit → push → merge.
@@ -620,13 +655,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
 	              echo "[MERGE-GUARD] test worktree synced with issue-sync commit" || true
 	          fi
 	        fi
-	        # ── Push to all remotes ──
-	        if git -C "$_wt_path" remote | grep -q "^all$"; then
-	          git -C "$_wt_path" push all "$_src_branch" 2>/dev/null || true
-	        else
-	          git -C "$_wt_path" push origin "$_src_branch" 2>/dev/null || true
+	        # ── Push source branch to every configured remote (#4702) ──
+	        # A partial push must abort the merge instead of reporting a
+	        # false "pushed" while some platform's source branch lags behind
+	        # the issue-sync commit (observed on #4699: github stayed at the
+	        # previous HEAD). fail-closed; no `|| true`.
+	        if ! _push_source_branch_to_all_remotes "$_wt_path" "$_src_branch"; then
+	          echo "[MERGE-GUARD] aborting merge: source branch push failed for $_src_branch" >&2
+	          return 1
 	        fi
-	        echo "[MERGE-GUARD] issue-sync committed + pushed to $_src_branch"
         # Refresh source branch ref after push
         git fetch origin "$_src_branch" 2>/dev/null || true
       fi

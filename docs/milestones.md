@@ -1,3 +1,25 @@
+## M-20261125T094104Z-A
+- title: fix — pr-merge issue-sync 源分支 push 回执 fail-closed
+- status: active
+### candidate_issues
+1. `C-20261125T094104Z-A`
+- milestone: M-20261125T094104Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T094104Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+### committed_issues
+1. `I-20261125T094104Z-A`
+- milestone: M-20261125T094104Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+
+### completed_issues
+1. `I-20261125T094104Z-A`
+- milestone: M-20261125T094104Z-A
+- phase_state: completed
+- completed_at: 2026-11-25T10:42:00Z
+- issue_path: docs/B2-docs/worktree-lifecycle/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+
 ## M-20261125T071429Z-A
 - title: fix — I-* 终态判据改为平台取证，关闭通道按 local_id 对账
 - status: active
