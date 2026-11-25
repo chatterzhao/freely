@@ -568,9 +568,28 @@ _sync_issues_changed_in_merge() {
   # Single retirement driver: batch owns the phase_state == completed predicate and
   # the platform write.  `issue-sync close` on an I-* is refused on purpose, and an
   # unscoped batch would touch other raws (GATE 1).
+  #
+  # FAIL-CLOSED (raw-20261125T071429Z): this call used to end in `|| true`. A
+  # partial close (one platform closed, one still OPEN, or an unmapped replica)
+  # therefore merged anyway, and the later wt-close trusted the local cache. If
+  # batch cannot certify closure, the merge must not happen.
   if [[ -n "$_raw_key" ]]; then
     echo "[MERGE-GUARD] issue-sync batch $_raw_key (linked retirement + platform_state)"
-    "$PWD/bin/issue-sync" --project "$_wt_path" batch "$_raw_key" || true
+    local _sync_rc=0
+    "$PWD/bin/issue-sync" --project "$_wt_path" batch "$_raw_key" || _sync_rc=$?
+    if [[ "$_sync_rc" -ne 0 ]]; then
+      cat >&2 <<BATCH_FAILED
+[MERGE-GUARD] issue-sync batch $_raw_key failed (rc=$_sync_rc) — merge aborted.
+
+A completed I-* still has an OPEN platform replica (or a platform is unreadable).
+Merging now would let the worktree be deleted while the issue stays open
+(raw-20261125T071429Z). Repair in the worktree, then retry the merge:
+
+  cd $_wt_path
+  freely issue-sync --project . batch $_raw_key
+BATCH_FAILED
+      return 1
+    fi
   fi
   synced=${#_touched[@]}
 
@@ -758,7 +777,10 @@ LOCAL_REMOTE_SYNC
   # commit + push so the worktree stays clean for wt-close.
   # Mirrors pr-review-guarded: review → commit → push → merge.
   echo "[MERGE-GUARD] issue-sync before merge..."
-  _sync_issues_changed_in_merge "$source_branch" "$target" || true
+  if ! _sync_issues_changed_in_merge "$source_branch" "$target"; then
+    echo "[MERGE-GUARD] aborting merge: issue-sync did not certify closure (see above)" >&2
+    exit 1
+  fi
   # ── Worktree cleanliness check (最后防线) ──
   _dirty_files=$(git status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
   _untracked=$(git ls-files --others --exclude-standard 2>/dev/null | head -20 || true)

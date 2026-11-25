@@ -42,6 +42,50 @@ with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
 
 # Check if platform_ids already has a live issue for a platform.
 # Returns 0 (already exists) if found, 1 (needs create) otherwise.
+# True when the platform already holds an OPEN replica of this local id, even
+# if the document's platform_ids never recorded it (raw-20261125T071429Z).
+# Without this, a document with `platform_ids: {}` made every batch run create
+# ANOTHER replica: the original stayed OPEN forever and the new one was mapped.
+_platform_has_open_replica() {
+  # $1 = local id, $2 = platform. PER-PLATFORM on purpose: asking "does ANY
+  # platform hold an OPEN replica" made the gitee branch of cmd-create skip
+  # creation because the github replica (created a moment earlier) matched.
+  local local_id="$1" platform="${2:-}" rc=0 out
+  case "$local_id" in
+    I-*) ;;
+    *) return 1 ;;   # raw documents are matched by raw key, not by this path
+  esac
+  out=$(FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    verify-local-id "$local_id" 2>/dev/null) || rc=$?
+  # 1 = a platform could not be read: refuse to create on top of an unknown
+  # state (that is how duplicates were born).
+  [[ "$rc" == "1" ]] && return 0
+  [[ -n "$out" ]] || return 1
+  printf '%s' "$out" | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(1)
+replicas = data.get("replicas") or {}
+raise SystemExit(0 if (replicas.get(sys.argv[1]) if sys.argv[1] else any(replicas.values())) else 1)
+' "$platform"
+}
+
+# True when the platform holds NO OPEN replica of this local id (readable + clean).
+_no_open_replicas() {
+  local local_id="$1" rc=0
+  case "$local_id" in
+    I-*) ;;
+    *) return 0 ;;
+  esac
+  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    verify-local-id "$local_id" >/dev/null 2>&1 || rc=$?
+  [[ "$rc" == "0" ]]
+}
+
 _already_on_platform() {
   local file="$1" platform="$2"
   local pid
@@ -57,7 +101,14 @@ if len(parts) >= 3:
   val = p.get('issue_id', '')
   print(val)
 " 2>/dev/null || true)
-  [[ -n "$pid" && "$pid" != "None" ]]
+  [[ -n "$pid" && "$pid" != "None" ]] && return 0
+  # Not mapped locally: ask the platform before creating a second replica.
+  local _lid
+  case "$file" in
+    */issues/I-*.md) _lid="$(basename "$file" .md)" ;;
+    *) _lid="$(basename "$(dirname "$file")")" ;;
+  esac
+  _platform_has_open_replica "$_lid" "$platform"
 }
 # Content hash for change detection.
 _content_hash() {

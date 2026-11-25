@@ -32,6 +32,7 @@ CORE=(
   test-review-guidance-l0.py
   test-issue-sync-batch-closeout.py
   test-wt-close-children.py
+  test-wt-close-platform-truth.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
@@ -88,6 +89,7 @@ CI_CORE=(
   test-review-guidance-l0.py
   test-issue-sync-batch-closeout.py
   test-wt-close-children.py
+  test-wt-close-platform-truth.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py

@@ -114,19 +114,30 @@ verification_artifact_dir: docs/B2-docs/x/y/raw-{KEY}/code-reviews
 """
 
 
+# verify-local-id is a READ (the platform-truth gate); close-* are WRITES.
+# The log counts writes only, so "zero platform writes" stays meaningful while
+# the read is still observable through ADAPTER_READ_LOG.
 ADAPTER = (
     "import sys, json, os\n"
-    "with open(os.environ['ADAPTER_LOG'], 'a') as f: f.write(sys.argv[1] + '\\n')\n"
+    "cmd = sys.argv[1]\n"
+    "if cmd == 'verify-local-id':\n"
+    "    with open(os.environ['ADAPTER_READ_LOG'], 'a') as f: f.write(sys.argv[2] + '\\n')\n"
+    "    reps = {'github': [{'issue_id': '4694', 'title': sys.argv[2] + ': duplicate'}]} if os.environ.get('ADAPTER_OPEN') == '1' else {}\n"
+    "    print(json.dumps({'ok': True, 'local_id': sys.argv[2], 'replicas': reps, 'open_count': sum(len(v) for v in reps.values()), 'degraded': []}))\n"
+    "    sys.exit(3 if reps else 0)\n"
+    "with open(os.environ['ADAPTER_LOG'], 'a') as f: f.write(cmd + '\\n')\n"
     "print(json.dumps({'github': {'status': 'closed'}, 'gitee': {'status': 'closed'}}))\n"
     "sys.exit(0)\n"
 )
 
 
 def run(source: Path, child_a_phase="completed", child_b_phase="completed",
-        child_a_state="closed", child_b_state="closed", dry=False, skip=False) -> tuple:
+        child_a_state="closed", child_b_state="closed", dry=False, skip=False,
+        open_replica=False) -> tuple:
     text = read(source / WT_CLOSE)
     fmg, closeh, block = fn(text, "_fm_get"), fn(text, "_close_platform_ids_readonly"), phase25(text)
-    if not fmg or not closeh or not block:
+    openrep = fn(text, "_local_id_open_replicas")
+    if not fmg or not closeh or not block or not openrep:
         return subprocess.CompletedProcess([], 99, "", "helpers/block not found"), 0
     with tempfile.TemporaryDirectory(prefix="at-children-") as td:
         root = Path(td)
@@ -142,21 +153,25 @@ def run(source: Path, child_a_phase="completed", child_b_phase="completed",
         sync_dir.mkdir(parents=True)
         (sync_dir / "platform-adapter.py").write_text(ADAPTER, encoding="utf-8")
         log = root / "adapter.log"
+        read_log = root / "adapter-read.log"
         probe = root / "probe.sh"
         probe.write_text(
             "set -uo pipefail\n"
-            + fmg + "\n" + closeh + "\n"
+            + fmg + "\n" + closeh + "\n" + openrep + "\n"
             + "_dry() { printf '[DRY-RUN] %s\\n' \"$*\"; }\n"
             + f"PROJECT_ROOT='{root}'\n"
             + f"issue_file='{raw_dir / 'issue.md'}'\n"
             + f"wt_path='{root / 'fake-wt'}'\n"
             + "FORCE=false\n"
+            + f"_raw_key='{KEY}'\n"
             + f"DRY_RUN={'true' if dry else 'false'}\n"
             + f"SKIP_PLATFORM={'true' if skip else 'false'}\n"
             + block,
             encoding="utf-8",
         )
-        env = dict(os.environ, ADAPTER_LOG=str(log))
+        env = dict(os.environ, ADAPTER_LOG=str(log), ADAPTER_READ_LOG=str(read_log))
+        if open_replica:
+            env["ADAPTER_OPEN"] = "1"
         proc = subprocess.run(["bash", str(probe)], capture_output=True, text=True,
                               timeout=120, env=env, cwd=str(root))
         calls = len([x for x in read(log).splitlines() if x.strip()])
@@ -208,6 +223,10 @@ def behaviour_checks() -> None:
     p, calls = run(SRC, child_b_phase="in_dev", skip=True)
     check(p.returncode != 0 and calls == 0,
           "B6 --skip-platform still requires terminal phase")
+
+    p, calls = run(SRC, open_replica=True)
+    check(p.returncode != 0 and "4694" in (p.stdout + p.stderr) and calls == 0,
+          "B8 an OPEN replica on the platform blocks even though platform_state says closed")
 
     p, calls = run(SRC, dry=True)
     check(p.returncode == 0 and calls == 0,

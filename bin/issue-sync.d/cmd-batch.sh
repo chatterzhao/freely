@@ -24,6 +24,10 @@ cmd_batch() {
     fi
   fi
   local last_scan total=0 synced=0 batch_size=10 batch_count=0
+  # Closure failures must surface: pr-merge-guarded aborts on a non-zero batch
+  # (raw-20261125T071429Z). They used to be swallowed by `|| true`, so a partial
+  # close merged as if the I-* had been retired.
+  local _batch_fail=0
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never} scope=${filter_key:-ALL}"
 
@@ -61,9 +65,11 @@ cmd_batch() {
 	        *) continue ;;
 	      esac
 	    fi
-	    # Skip fully-synced: platform_state=closed means both sides agree
+	    # Fast path for a FULL sweep only. A scoped batch (a lane, or the repair
+	    # command wt-close prints) must re-verify closed documents, because the
+	    # cache being wrong is precisely the defect this guards against.
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
-	    if [[ "$_pstate" == "closed" ]]; then
+	    if [[ "$_pstate" == "closed" && -z "$filter_key" ]]; then
 	      _skipped=$((_skipped + 1))
 	      continue
 	    fi
@@ -95,17 +101,17 @@ cmd_batch() {
         local phase_state; phase_state=$(_fm_get "$issue_file" "phase_state")
         if [[ "$phase_state" == "absorbed" || "$phase_state" == "dropped" ]]; then
           echo "[issue-sync] batch: close $local_id (phase_state=$phase_state)"
-          cmd_close "$local_id" "completed" || true
+          cmd_close "$local_id" "completed" || _batch_fail=$((_batch_fail + 1))
         elif ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
           echo "[issue-sync] batch: create $local_id (raw, not on platform)"
-          cmd_create "$local_id" || true
+          cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
         fi
         ;;
       linked)
         # Create on platform if missing (e.g. I-* items with no github.issue_id)
         if ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
           echo "[issue-sync] batch: create $local_id (linked, not on platform)"
-          cmd_create "$local_id" || true
+          cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
         fi
         # Terminal closure is a STATE predicate, not a change predicate: a
         # completed I-* must close even on its first sync (no hash yet). Close is
@@ -113,9 +119,17 @@ cmd_batch() {
         # (raw-20261113T130925Z).
         local phase; phase=$(_fm_get "$issue_file" "phase_state")
         local pstate; pstate=$(_fm_get "$issue_file" "platform_state")
-        if [[ "$phase" == "completed" && "$pstate" != "closed" ]]; then
-          echo "[issue-sync] batch: close $local_id (completed, platform=$pstate)"
-          cmd_close_linked "$local_id" || true
+        if [[ "$phase" == "completed" ]]; then
+          # platform_state is a cache. When it says closed, ask the platform
+          # before trusting it; a stale "closed" is what let an OPEN replica
+          # survive the worktree (raw-20261125T071429Z).
+          if [[ "$pstate" != "closed" ]]; then
+            echo "[issue-sync] batch: close $local_id (completed, platform=$pstate)"
+            cmd_close_linked "$local_id" || _batch_fail=$((_batch_fail + 1))
+          elif ! _no_open_replicas "$local_id"; then
+            echo "[issue-sync] batch: re-close $local_id (cache says closed, platform disagrees)"
+            cmd_close_linked "$local_id" || _batch_fail=$((_batch_fail + 1))
+          fi
         fi
         if _changed_since_last_sync "$local_id" "$issue_file"; then
           echo "[issue-sync] batch: update $local_id (phase=$phase)"
@@ -148,4 +162,11 @@ if os.path.exists('$SCAN_STATE'):
 state['last_scan_at'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
 " 2>/dev/null || true
+
+  if [[ "$_batch_fail" -gt 0 ]]; then
+    echo "[issue-sync] batch: $_batch_fail closure operation(s) failed — local platform_state was NOT advanced" >&2
+    echo "[issue-sync] batch: inspect the platform state above, fix it, and re-run:" >&2
+    echo "[issue-sync] batch:   freely issue-sync --project <worktree> batch ${filter_key}" >&2
+    return 1
+  fi
 }

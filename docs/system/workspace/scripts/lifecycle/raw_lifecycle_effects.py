@@ -93,8 +93,15 @@ def close_platforms(arguments: list[str]) -> int:
     # Phase 2 — perform the platform write.
     adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
     environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
+    # Same reconciliation as the linked path. `close-multi` reported
+    # "no issue_id for <platform>" for every raw whose mapping predates a
+    # platform being configured (544 raws only ever mapped github), which now
+    # aborts the merge instead of being ignored. `close-local-id` resolves the
+    # raw by title on each platform and treats "no replica here" as absent.
+    local_id = str(metadata.get("local_id") or f"raw-{Path(file_path).parent.name}")
     result = subprocess.run(
-        [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
+        [sys.executable, str(adapter), "close-local-id", local_id,
+         json.dumps(platform_ids), "raw"],
         env=environment,
         capture_output=True,
         text=True,
@@ -116,7 +123,7 @@ def close_platforms(arguments: list[str]) -> int:
         isinstance(payload, dict)
         and payload
         and all(
-            isinstance(item, dict) and item.get("status") == "closed"
+            isinstance(item, dict) and item.get("status") in ("closed", "absent")
             for item in payload.values()
         )
     )
@@ -187,19 +194,29 @@ def close_linked(arguments: list[str]) -> int:
             raise ValueError(f"linked issue {field} does not resolve: {value}")
         if kind == "dir" and not candidate.is_dir():
             raise ValueError(f"linked issue {field} does not resolve: {value}")
+    # An EMPTY mapping is exactly the case close-local-id exists for: the
+    # replica was created before platform_ids existed (or by a duplicate run).
+    # Refusing here made those documents unreachable by any packaged command,
+    # so the gate's repair instruction could never succeed (raw-20261125T071429Z).
     platform_ids = metadata.get("platform_ids")
-    if not isinstance(platform_ids, dict) or not platform_ids:
-        raise ValueError("linked issue has no platform_ids to close")
+    if not isinstance(platform_ids, dict):
+        platform_ids = {}
     for name, ref in platform_ids.items():
         if not isinstance(ref, dict) or not str(ref.get("issue_id", "") or ""):
             raise ValueError(f"linked issue platform_ids.{name} has no issue_id")
 
     from datetime import datetime, timezone
 
+    local_id = str(metadata.get("local_id") or Path(file_path).stem)
     adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
     environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
+    # close-local-id reconciles the document mapping with what the platform
+    # actually holds: replicas created before the mapping existed (or duplicated
+    # by an unscoped run) are closed too (raw-20261125T071429Z). `close-multi`
+    # only ever saw the mapping, so those replicas stayed OPEN while the local
+    # cache was written `closed`.
     result = subprocess.run(
-        [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
+        [sys.executable, str(adapter), "close-local-id", local_id, json.dumps(platform_ids)],
         env=environment,
         capture_output=True,
         text=True,
@@ -214,11 +231,13 @@ def close_linked(arguments: list[str]) -> int:
     except json.JSONDecodeError:
         payload = {}
 
+    # "absent" = platform readable, no replica exists: nothing to close, healthy.
+    # Only "error" blocks certification.
     all_closed = (
         isinstance(payload, dict)
         and payload
         and all(
-            isinstance(item, dict) and item.get("status") == "closed"
+            isinstance(item, dict) and item.get("status") in ("closed", "absent")
             for item in payload.values()
         )
     )

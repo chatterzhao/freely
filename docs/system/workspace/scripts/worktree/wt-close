@@ -123,6 +123,27 @@ _close_platform_ids_readonly() {
     close-multi "$platform_ids"
 }
 
+_local_id_open_replicas() {
+  # READ-ONLY platform truth for one I-* (raw-20261125T071429Z).
+  # rc: 0 = readable, no OPEN replica; 3 = OPEN replica exists; 1 = unreadable.
+  local local_id="$1" kind="${2:-linked}" out rc=0
+  out="$(FREELY_PROJECT_ROOT="$PROJECT_ROOT" python3 \
+    "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    verify-local-id "$local_id" "$kind" 2>&1)" || rc=$?
+  if [[ "$rc" == "0" || "$rc" == "3" ]]; then
+    printf '%s' "$out" | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(0)
+print(", ".join(p + "#" + item["issue_id"]
+                for p, items in (data.get("replicas") or {}).items() for item in items))
+' 2>/dev/null || true
+  fi
+  return "$rc"
+}
+
 # ── Branch/issue resolution ──
 
 _resolve_branch() {
@@ -185,6 +206,26 @@ if [[ ${#args[@]} -gt 0 ]]; then
   set -- "${args[@]}"
 else
   set --
+fi
+
+# ── Bypass hardening (raw-20261125T071429Z) ──
+# --skip-platform skips the ONLY check that compares the local cache with the
+# platform. It used to be silent (raw-20260621T185519Z flagged it). Requiring a
+# reason makes the bypass an explicit, auditable decision instead of a quiet
+# default.
+if [[ "$SKIP_PLATFORM" == true && -z "${FORCE_REASON:-}" ]]; then
+  cat >&2 <<'SKIP_REASON'
+[wt-close] 拒绝执行：--skip-platform requires --reason
+
+--skip-platform 会跳过「平台 issue 是否真的关闭」的取证，只允许在平台不可用
+且已人工确认时使用。请写明理由后重试：
+
+  freely wt-close --raw-key <key> --skip-platform --reason "<为什么跳过平台检查>"
+
+若平台只是暂时不可读，先重试正常收口（不要绕门禁）：
+  freely wt-close --raw-key <key>
+SKIP_REASON
+  exit 1
 fi
 
 # ── Ownership guard (raw-20260717T103359Z) ────────────────────────────────
@@ -978,7 +1019,39 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     # If that field is already present, issue-sync close is redundant — skip it.
     _wt_existing_platform_state="$(_fm_get "$issue_file" "platform_state")"
     if [[ "$_wt_existing_platform_state" == "closed" ]]; then
-      echo "wt-close: platform_state already closed (pr-merge-guarded synced), skipping issue-sync"
+      # The cache is not evidence (raw-20261125T071429Z): verify the raw itself
+      # before trusting "closed". A stale cache here is how an OPEN raw issue
+      # outlived its worktree.
+      _wt_raw_rc=0
+      _wt_raw_open="$(_local_id_open_replicas "$issue_id" raw)" || _wt_raw_rc=$?
+      if [[ "$_wt_raw_rc" == "3" ]]; then
+        cat >&2 <<WT_RAW_OPEN
+[wt-close] 拒绝关闭：raw 所在平台仍有 OPEN 副本
+
+本地 platform_state=closed，但平台不认：
+  - ${issue_id}: ${_wt_raw_open}
+
+本地字段只是缓存。用封装命令对账关闭后再收口：
+
+  cd <本工位> && freely issue-sync --project . batch ${_raw_key}
+
+若平台只是暂时不可读，重试正常收口；确需人工跳过，必须显式记录理由：
+  freely wt-close --raw-key ${_raw_key} --skip-platform --reason "<理由>"
+WT_RAW_OPEN
+        exit 1
+      elif [[ "$_wt_raw_rc" == "1" ]]; then
+        cat >&2 <<WT_RAW_UNREADABLE
+[wt-close] 拒绝关闭：无法读取平台，故无法证明 ${issue_id} 已关闭（fail-closed）
+
+重试正常收口（不要绕门禁）：
+  freely wt-close --raw-key ${_raw_key}
+
+平台长期不可用时，才允许显式跳过并留下理由：
+  freely wt-close --raw-key ${_raw_key} --skip-platform --reason "<理由>"
+WT_RAW_UNREADABLE
+        exit 1
+      fi
+      echo "wt-close: raw platform verified closed (no OPEN replica), skipping issue-sync"
     else
       # platform_state is NOT closed.  In normal flow pr-merge-guarded should have
       # handled this.  Reaching here means the sync was missed — tell the user to
@@ -1090,6 +1163,16 @@ children = [str(c) for c in (fm.get("promoted_children") or [])]
 absorbed = str(fm.get("absorbed_into") or "")
 if absorbed and absorbed not in children:
     children.append(absorbed)
+# A raw owns exactly ONE worktree and the dev loop must finish EVERY I-* it
+# produced. Enumerate by raw key as well, so an I-* that is missing from
+# promoted_children/absorbed_into cannot slip past the gate.
+key = str(fm.get("local_id") or "").replace("raw-", "")
+if key:
+    for match in sorted(glob.glob(os.path.join(
+            root, "docs/B2-docs", "*", "*", f"raw-{key}", "issues", f"I-{key}-*.md"))):
+        cid = os.path.basename(match)[:-3]
+        if cid not in children:
+            children.append(cid)
 for child in children:
     matches = sorted(glob.glob(os.path.join(
         root, "docs/B2-docs", "*", "*", "raw-*", "issues", child + ".md")))
@@ -1124,21 +1207,55 @@ PYCHILD
           _wt_unclosed="${_wt_unclosed}  - ${_wt_cid} (platform_state=${_wt_cstate})"$'\n'
         done <<< "$_wt_children_report"
       fi
-      if [[ -n "$_wt_unfinished" || -n "$_wt_unclosed" ]]; then
+      # Platform truth (raw-20261125T071429Z). The frontmatter above is a CACHE
+      # written by the closing code; judging deletion safety from it let OPEN
+      # replicas survive the worktree. Ask the platform, and treat an unreadable
+      # platform as "not proven closed" instead of "no replicas".
+      _wt_platform_open=""
+      _wt_platform_error=""
+      if [[ "$SKIP_PLATFORM" != true ]]; then
+        while IFS=$'\t' read -r _wt_cid _wt_cphase _wt_cststate _wt_cpath; do
+          [[ -n "$_wt_cid" ]] || continue
+          [[ "$_wt_cphase" == "completed" ]] || continue
+          _wt_verify_rc=0
+          _wt_open_list="$(_local_id_open_replicas "$_wt_cid")" || _wt_verify_rc=$?
+          case "$_wt_verify_rc" in
+            0) ;;
+            3) _wt_platform_open="${_wt_platform_open}  - ${_wt_cid}: ${_wt_open_list}"$'\n' ;;
+            *) _wt_platform_error="${_wt_platform_error}  - ${_wt_cid}: 平台读取失败（fail-closed）"$'\n' ;;
+          esac
+        done <<< "$_wt_children_report"
+      fi
+      if [[ -n "$_wt_unfinished" || -n "$_wt_unclosed" || -n "$_wt_platform_open" || -n "$_wt_platform_error" ]]; then
         cat >&2 <<WTC_CHILDREN
-[wt-close] 拒绝关闭：I-* 尚未就绪
+[wt-close] 拒绝关闭：raw-${_raw_key} 产出的 I-* 尚未全部完成
 
-未完成（phase_state 必须是 completed）：
+规则：一个 raw issue 只有一个 worktree；B2-IBM 会把该 raw 拆成多个 I-*，
+dev loop 必须实现完这些 I-* 才能收口。工位删除后，未完成的 I-* 将无处实现。
+
+① 未完成（phase_state 必须是 completed，或文档已丢失）：
 ${_wt_unfinished}
-未关闭（platform_state 必须是 closed）：
+② 本地缓存显示未关闭（platform_state 必须是 closed）：
 ${_wt_unclosed}
-一个 raw 只有一个 worktree；删除后这些 I-* 将无法再实现。
-收口由 issue-sync 完成（唯一平台写入口）。在本工位内执行：
+③ 平台仍有 OPEN 副本（本地 platform_state 只是缓存，不能作为放行证据）：
+${_wt_platform_open}
+④ 平台不可读，无法证明已关闭（fail-closed，不做猜测）：
+${_wt_platform_error}
 
-  freely issue-sync --project <本工位> batch
+按上述分类排查：
+  · ① 说明实现还没做完 → 回到工位继续 dev loop，不要收口。
+  · ②③④ 说明实现已完成、只差关闭 → 用封装命令（唯一平台写入口）对账关闭：
 
-它会关闭所有 completed 且未关闭的 I-*，并把 platform_state 写成 closed；
-提交该变更、走 pr-merge-guarded 之后，再执行 wt-close。
+      cd <本工位> && freely issue-sync --project . batch <raw-key>
+
+    它会按 local_id 枚举并关闭该 raw 与该 raw 的全部 I-* 的真实副本（含未映射的
+    孤儿与重复副本）；全部成功才写 platform_state: closed。提交该变更、走
+    pr-merge-guarded 之后，再执行 wt-close。
+
+  · 平台只是暂时不可读（网络/凭据）→ 重试正常收口，不要绕门禁。
+    确需人工跳过平台取证，必须显式记录理由：
+
+      freely wt-close --raw-key ${_raw_key} --skip-platform --reason "<理由>"
 WTC_CHILDREN
         exit 1
       fi
