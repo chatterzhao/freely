@@ -65,9 +65,11 @@ cmd_batch() {
 	        *) continue ;;
 	      esac
 	    fi
-	    # Skip fully-synced: platform_state=closed means both sides agree
+	    # Fast path for a FULL sweep only. A scoped batch (a lane, or the repair
+	    # command wt-close prints) must re-verify closed documents, because the
+	    # cache being wrong is precisely the defect this guards against.
 	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
-	    if [[ "$_pstate" == "closed" ]]; then
+	    if [[ "$_pstate" == "closed" && -z "$filter_key" ]]; then
 	      _skipped=$((_skipped + 1))
 	      continue
 	    fi
@@ -101,23 +103,15 @@ cmd_batch() {
           echo "[issue-sync] batch: close $local_id (phase_state=$phase_state)"
           cmd_close "$local_id" "completed" || _batch_fail=$((_batch_fail + 1))
         elif ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
-          if _platform_has_open_replica "$local_id"; then
-            echo "[issue-sync] batch: skip create $local_id (a replica exists on the platform but is not mapped; close reconciles it)"
-          else
-            echo "[issue-sync] batch: create $local_id (raw, not on platform)"
-            cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
-          fi
+          echo "[issue-sync] batch: create $local_id (raw, not on platform)"
+          cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
         fi
         ;;
       linked)
         # Create on platform if missing (e.g. I-* items with no github.issue_id)
         if ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
-          if _platform_has_open_replica "$local_id"; then
-            echo "[issue-sync] batch: skip create $local_id (a replica exists on the platform but is not mapped; close-local-id will reconcile it)"
-          else
-            echo "[issue-sync] batch: create $local_id (linked, not on platform)"
-            cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
-          fi
+          echo "[issue-sync] batch: create $local_id (linked, not on platform)"
+          cmd_create "$local_id" || _batch_fail=$((_batch_fail + 1))
         fi
         # Terminal closure is a STATE predicate, not a change predicate: a
         # completed I-* must close even on its first sync (no hash yet). Close is
@@ -125,9 +119,17 @@ cmd_batch() {
         # (raw-20261113T130925Z).
         local phase; phase=$(_fm_get "$issue_file" "phase_state")
         local pstate; pstate=$(_fm_get "$issue_file" "platform_state")
-        if [[ "$phase" == "completed" && "$pstate" != "closed" ]]; then
-          echo "[issue-sync] batch: close $local_id (completed, platform=$pstate)"
-          cmd_close_linked "$local_id" || _batch_fail=$((_batch_fail + 1))
+        if [[ "$phase" == "completed" ]]; then
+          # platform_state is a cache. When it says closed, ask the platform
+          # before trusting it; a stale "closed" is what let an OPEN replica
+          # survive the worktree (raw-20261125T071429Z).
+          if [[ "$pstate" != "closed" ]]; then
+            echo "[issue-sync] batch: close $local_id (completed, platform=$pstate)"
+            cmd_close_linked "$local_id" || _batch_fail=$((_batch_fail + 1))
+          elif ! _no_open_replicas "$local_id"; then
+            echo "[issue-sync] batch: re-close $local_id (cache says closed, platform disagrees)"
+            cmd_close_linked "$local_id" || _batch_fail=$((_batch_fail + 1))
+          fi
         fi
         if _changed_since_last_sync "$local_id" "$issue_file"; then
           echo "[issue-sync] batch: update $local_id (phase=$phase)"

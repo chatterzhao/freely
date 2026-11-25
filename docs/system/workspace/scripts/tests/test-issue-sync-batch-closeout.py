@@ -145,8 +145,17 @@ def static_checks() -> None:
     hash_pos = linked.find("_changed_since_last_sync")
     check(close_pos >= 0 and hash_pos >= 0 and close_pos < hash_pos,
           "S2 close is decided before (and independently of) the change hash")
-    check('"$phase" == "completed" && "$pstate" != "closed"' in linked.replace("  ", " "),
-          "S3 the closure predicate is completed && platform_state != closed")
+    # The predicate gained a second arm: a completed I-* whose cache says
+    # closed is re-checked against the platform before being trusted
+    # (raw-20261125T071429Z). Both arms must exist and must call the same
+    # single retirement path.
+    squashed = linked.replace("  ", " ")
+    check('"$phase" == "completed"' in squashed
+          and '"$pstate" != "closed"' in squashed
+          and "_no_open_replicas" in squashed,
+          "S3 the closure predicate is completed && (cache open || platform disagrees)")
+    check(squashed.count("cmd_close_linked") >= 2,
+          "S3b both predicate arms retire through cmd_close_linked")
     check("batch: close" in linked, "S4 the close is reported with its id")
 
 

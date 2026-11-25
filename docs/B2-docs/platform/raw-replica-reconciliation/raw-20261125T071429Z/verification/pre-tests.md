@@ -15,8 +15,8 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-wt-close-platform-truth.py
 - expected_output: SUMMARY: N ok, 0 failed
 - expected_RED_output: SUMMARY: <N-M> ok, M failed — 基线无 find_open_replicas_by_local_id / wt-close 无 verify-local-id 调用 / batch 与 pr-merge 仍有 `|| true`
-- actual_RED_output: "SUMMARY: 0 ok, 12 failed — develop 基线无 replica_truth 模块、wt-close 无 verify-local-id、batch/pr-merge 仍吞错（证据 acceptance-1-red.log）"
-- actual_output: "SUMMARY: 18 ok, 0 failed；另 test-wt-close-children.py 17 ok/0 failed（含 B8 平台 OPEN 副本阻断）（证据 acceptance-1.log）"
+- actual_RED_output: "SUMMARY: 1 ok, 14 failed — develop 基线无 replica_truth 模块、wt-close 无 platform 取证、batch/pr-merge 仍吞错（证据 acceptance-1-red.log）"
+- actual_output: "SUMMARY: 21 ok, 0 failed；test-wt-close-children.py 17 ok/0 failed（含 B8 平台 OPEN 副本阻断）；test-issue-sync-batch-closeout 9 ok/0（证据 acceptance-1.log）"
 - evidence_file: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T071429Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed

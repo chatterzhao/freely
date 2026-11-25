@@ -548,7 +548,7 @@ class GitHubHandler(PlatformHandler):
         errors: list[str] = []
         for attempt in range(2):
             try:
-                r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "200",
+                r = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "open", "--limit", "1000",
                                     "--json", "number,title,body,state"], capture_output=True, text=True, timeout=30)
                 if r.returncode == 0 and r.stdout.strip():
                     self.read_health = {"ok": True, "error": "", "partial": False}
@@ -840,14 +840,33 @@ class GiteeHandler(PlatformHandler):
         return {}
 
     def list_open_issue_records(self):
+        # Paginated: a single 50-row page made every replica outside the window
+        # invisible, and an invisible replica reads as "closed" to the gate
+        # (raw-20261125T071429Z).
         self.read_health = {"ok": True, "error": "", "partial": False}
+        records: dict[str, dict] = {}
         try:
-            r = self._run("list", "--state", "open", "--per-page", "50")
-            if r.returncode != 0:
-                self.read_health = {"ok": False, "partial": True,
-                                    "error": f"gitee CLI list failed: {(r.stderr or 'empty response')[:200]}"}
-                return {}
-            return {str(issue.get("number", issue.get("id", ""))): {"platform": self.name, "title": issue.get("title", ""), "body": issue.get("body", ""), "state": issue.get("state", "OPEN")} for issue in json.loads(r.stdout or "[]")}
+            for page in range(1, 21):
+                r = self._run("list", "--state", "open", "--per-page", "100", "--page", str(page))
+                if r.returncode != 0:
+                    self.read_health = {"ok": False, "partial": True,
+                                        "error": f"gitee CLI list failed: {(r.stderr or 'empty response')[:200]}"}
+                    return {}
+                batch = json.loads(r.stdout or "[]")
+                if not isinstance(batch, list):
+                    self.read_health = {"ok": False, "partial": True,
+                                        "error": "gitee CLI list returned a non-list"}
+                    return {}
+                for issue in batch:
+                    records[str(issue.get("number", issue.get("id", "")))] = {
+                        "platform": self.name,
+                        "title": issue.get("title", ""),
+                        "body": issue.get("body", ""),
+                        "state": issue.get("state", "OPEN"),
+                    }
+                if len(batch) < 100:
+                    break
+            return records
         except Exception as exc:
             self.read_health = {"ok": False, "partial": True,
                                 "error": f"gitee CLI list failed: {str(exc)[:200]}"}
@@ -1266,7 +1285,20 @@ def find_open_replicas_by_local_id(local_id: str) -> dict:
     unavailable platform as clean is exactly how an OPEN issue survived
     ``wt-close``.
     """
-    return _replica_summary(list_open_issue_records(), local_id)
+    configured = configured_platforms()
+    summary = _replica_summary(list_open_issue_records(configured or None), local_id)
+    # `_handlers()` only contains platforms that probed successfully. A platform
+    # that is CONFIGURED but unavailable must not vanish from the check: an
+    # unreadable platform is not an empty one.
+    detected = {handler.name for handler in _handlers()}
+    missing = [platform for platform in configured if platform not in detected]
+    if missing:
+        summary["ok"] = False
+        summary["degraded"] = list(summary.get("degraded") or []) + [
+            {"platform": platform, "error": "configured but handler unavailable"}
+            for platform in missing
+        ]
+    return summary
 
 
 def close_local_id(local_id: str, platform_ids: dict = None,

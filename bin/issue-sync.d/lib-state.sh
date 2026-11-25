@@ -47,17 +47,43 @@ with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
 # Without this, a document with `platform_ids: {}` made every batch run create
 # ANOTHER replica: the original stayed OPEN forever and the new one was mapped.
 _platform_has_open_replica() {
-  local local_id="$1" rc=0
+  # $1 = local id, $2 = platform. PER-PLATFORM on purpose: asking "does ANY
+  # platform hold an OPEN replica" made the gitee branch of cmd-create skip
+  # creation because the github replica (created a moment earlier) matched.
+  local local_id="$1" platform="${2:-}" rc=0 out
   case "$local_id" in
     I-*) ;;
     *) return 1 ;;   # raw documents are matched by raw key, not by this path
   esac
+  out=$(FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    verify-local-id "$local_id" 2>/dev/null) || rc=$?
+  # 1 = a platform could not be read: refuse to create on top of an unknown
+  # state (that is how duplicates were born).
+  [[ "$rc" == "1" ]] && return 0
+  [[ -n "$out" ]] || return 1
+  printf '%s' "$out" | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(1)
+replicas = data.get("replicas") or {}
+raise SystemExit(0 if (replicas.get(sys.argv[1]) if sys.argv[1] else any(replicas.values())) else 1)
+' "$platform"
+}
+
+# True when the platform holds NO OPEN replica of this local id (readable + clean).
+_no_open_replicas() {
+  local local_id="$1" rc=0
+  case "$local_id" in
+    I-*) ;;
+    *) return 0 ;;
+  esac
   FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
     "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
     verify-local-id "$local_id" >/dev/null 2>&1 || rc=$?
-  # 3 = an OPEN replica exists. 1 = a platform could not be read: refuse to
-  # create on top of an unknown state (that is how duplicates were born).
-  [[ "$rc" == "3" || "$rc" == "1" ]]
+  [[ "$rc" == "0" ]]
 }
 
 _already_on_platform() {
@@ -82,7 +108,7 @@ if len(parts) >= 3:
     */issues/I-*.md) _lid="$(basename "$file" .md)" ;;
     *) _lid="$(basename "$(dirname "$file")")" ;;
   esac
-  _platform_has_open_replica "$_lid"
+  _platform_has_open_replica "$_lid" "$platform"
 }
 # Content hash for change detection.
 _content_hash() {

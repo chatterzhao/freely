@@ -187,9 +187,13 @@ def close_linked(arguments: list[str]) -> int:
             raise ValueError(f"linked issue {field} does not resolve: {value}")
         if kind == "dir" and not candidate.is_dir():
             raise ValueError(f"linked issue {field} does not resolve: {value}")
+    # An EMPTY mapping is exactly the case close-local-id exists for: the
+    # replica was created before platform_ids existed (or by a duplicate run).
+    # Refusing here made those documents unreachable by any packaged command,
+    # so the gate's repair instruction could never succeed (raw-20261125T071429Z).
     platform_ids = metadata.get("platform_ids")
-    if not isinstance(platform_ids, dict) or not platform_ids:
-        raise ValueError("linked issue has no platform_ids to close")
+    if not isinstance(platform_ids, dict):
+        platform_ids = {}
     for name, ref in platform_ids.items():
         if not isinstance(ref, dict) or not str(ref.get("issue_id", "") or ""):
             raise ValueError(f"linked issue platform_ids.{name} has no issue_id")

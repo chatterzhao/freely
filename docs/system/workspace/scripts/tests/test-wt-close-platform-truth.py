@@ -104,9 +104,14 @@ def main() -> int:
     batch = read(root, "bin/issue-sync.d/cmd-batch.sh")
     check("batch does not swallow linked close failures",
           'cmd_close_linked "$local_id" || true' not in batch)
-    check("batch reconciles through close-local-id", "close-local-id" in batch or "close-linked-all" in batch)
-    check("batch verifies platform presence before create",
-          "_platform_has_open_replica" in batch)
+    # batch delegates retirement to cmd_close_linked; the reconciliation itself
+    # lives in raw_lifecycle_effects (asserted below), so this checks the chain,
+    # not an echo string.
+    check("batch delegates linked retirement to cmd_close_linked",
+          'cmd_close_linked "$local_id"' in batch)
+    check("create dedupe is per-platform (not 'any platform')",
+          '_platform_has_open_replica "$_lid" "$platform"'
+          in read(root, "bin/issue-sync.d/lib-state.sh"))
 
     merge = read(root, "docs/system/workspace/scripts/worktree/pr-merge-guarded")
     check("pr-merge does not swallow batch failures",
@@ -116,6 +121,13 @@ def main() -> int:
 
     effects = read(root, "docs/system/workspace/scripts/lifecycle/raw_lifecycle_effects.py")
     check("close_linked reconciles by local id", "close-local-id" in effects)
+    check("empty platform_ids is still reconcilable (no hard refusal)",
+          "linked issue has no platform_ids to close" not in effects)
+    check("batch re-verifies a stale platform_state",
+          "_no_open_replicas" in batch and "_no_open_replicas" in
+          read(root, "bin/issue-sync.d/lib-state.sh"))
+    check("a scoped batch does not fast-skip closed documents",
+          '[[ "$_pstate" == "closed" && -z "$filter_key" ]]' in batch)
 
     state = read(root, "bin/issue-sync.d/lib-state.sh")
     check("_already_on_platform consults the platform",
