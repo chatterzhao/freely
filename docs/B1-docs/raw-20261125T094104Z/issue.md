@@ -18,15 +18,15 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-25T09:41:04Z'
-updated_at: '2026-11-25T09:41:13Z'
+updated_at: '2026-11-25T11:05:19Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children: []
 source_candidate: ''
-completed_at: 2026-11-25T10:42:00Z
+completed_at: 2026-11-25 10:42:00+00:00
 closeout_note: ''
 severity: P1
 ---
