@@ -10,7 +10,14 @@
 ### committed_issues
 1. `I-20261125T071429Z-A`
 - milestone: M-20261125T071429Z-A
-- phase_state: in_dev
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T071429Z/issues/I-20261125T071429Z-A.md
+
+### completed_issues
+1. `I-20261125T071429Z-A`
+- milestone: M-20261125T071429Z-A
+- phase_state: completed
+- completed_at: 2026-11-25T08:36:00Z
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T071429Z/issues/I-20261125T071429Z-A.md
 
 ## M-20261114T095625Z-A
