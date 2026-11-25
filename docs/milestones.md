@@ -2633,7 +2633,7 @@
 
 ## M-20261114T111702Z-A
 - title: fix — freely comment 复用 SELF_ROOT 修复 ACP worker 通知
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20261114T111702Z-A`
 - milestone: M-20261114T111702Z-A
@@ -2643,11 +2643,5 @@
 ### committed_issues
 1. `I-20261114T111702Z-A`
 - milestone: M-20261114T111702Z-A
-- phase_state: completed
-- issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261114T111702Z/issues/I-20261114T111702Z-A.md
-
-### completed_issues
-1. `I-20261114T111702Z-A`
-- milestone: M-20261114T111702Z-A
-- completed_at: 2026-11-24T13:30:00Z
+- phase_state: in_dev
 - issue_path: docs/B2-docs/acp/cross-tool-session/raw-20261114T111702Z/issues/I-20261114T111702Z-A.md
