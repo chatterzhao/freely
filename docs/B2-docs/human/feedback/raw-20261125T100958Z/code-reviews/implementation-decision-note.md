@@ -1,11 +1,11 @@
 ---
 issue_id: I-20261125T100958Z-A
-issue_path: docs/B2-docs/acp/freely-host/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+issue_path: docs/B2-docs/human/feedback/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
 phase_state: completed
 ---
 
 - issue_id: I-20261125T100958Z-A
-- issue_path: docs/B2-docs/acp/freely-host/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+- issue_path: docs/B2-docs/human/feedback/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
 
 # Implementation Decision Note
 - decision: 缺本地文件时用 adapter search 按 raw key 发现 ids → update-issue；仅显式参数，不写本地文件。
