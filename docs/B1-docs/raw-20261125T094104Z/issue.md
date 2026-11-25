@@ -44,7 +44,7 @@ workflow_kind: fix
 | phase_state | `absorbed` |
 | canonical | `none` |
 | created | 2026-11-25T09:41:04Z |
-| updated | 2026-11-25T09:41:13Z |
+| updated | 2026-11-25T11:05:19Z |
 
 ---
 
