@@ -10,7 +10,14 @@
 ### committed_issues
 1. `I-20261125T100958Z-A`
 - milestone: M-20261125T100958Z-A
-- phase_state: in_dev
+- phase_state: completed
+- issue_path: docs/B2-docs/acp/freely-host/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+
+### completed_issues
+1. `I-20261125T100958Z-A`
+- milestone: M-20261125T100958Z-A
+- phase_state: completed
+- completed_at: 2026-11-25T12:35:00Z
 - issue_path: docs/B2-docs/acp/freely-host/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
 
 ## M-20261125T094104Z-A

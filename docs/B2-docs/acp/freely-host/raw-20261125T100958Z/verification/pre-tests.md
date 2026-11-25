@@ -14,11 +14,11 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-feedback-edit-platform-discovery.py
 - expected_output: SUMMARY: N ok, 0 failed
 - expected_RED_output: SUMMARY: <N-M> ok, M failed — 基线缺本地文件时直接 return 1
-- actual_RED_output: ""（待 RED）
-- actual_output: ""（待 GREEN）
+- actual_RED_output: "SUMMARY: 5 ok, 3 failed（develop 基线缺平台发现分支）"
+- actual_output: "SUMMARY: 8 ok, 0 failed；函数级单测 5/5（evidence acceptance-1.log）"
 - evidence_file: docs/B2-docs/acp/freely-host/raw-20261125T100958Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: 对 develop 源码跑同一 AT，缺平台发现分支必然命中。
 - surface_kind: end_to_end
 - target_lane: premerge-integration
