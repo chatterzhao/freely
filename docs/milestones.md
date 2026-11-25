@@ -7,6 +7,11 @@
 - status: promoted
 - promoted_issue_id: `I-20261125T094104Z-A`
 - promoted_issue_path: docs/B2-docs/worktree/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+### committed_issues
+1. `I-20261125T094104Z-A`
+- milestone: M-20261125T094104Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/worktree/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
 
 ## M-20261125T071429Z-A
 - title: fix — I-* 终态判据改为平台取证，关闭通道按 local_id 对账
