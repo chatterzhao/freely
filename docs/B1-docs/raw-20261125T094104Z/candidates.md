@@ -5,6 +5,7 @@
 - candidate_format_version: v2
 - title: 逐 remote push 源分支并汇总失败，消除虚假成功回执
 - status: promoted
+- milestone: M-20261125T094104Z-A
 - decision_reason: 同文件 develop-push 段已有逐 remote 校验范式，issue-sync 段用 push all + || true + 无条件回执，是实现偏差；#4699 合并现场实证 github 源分支落后一个 commit 而回执未报失败
 - next_action: 修改 pr-merge-guarded 的 _sync_issues_changed_in_merge push 块 → B2 → RED → dev → GREEN → PR
 - revisit_trigger: 若 develop-push 段范式变更需同步

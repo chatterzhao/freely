@@ -1,3 +1,12 @@
+---
+issue_id: I-20261125T094104Z-A
+issue_path: docs/B2-docs/worktree-lifecycle/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+phase_state: completed
+---
+
+- issue_id: I-20261125T094104Z-A
+- issue_path: docs/B2-docs/worktree-lifecycle/pr-merge-push-receipt/raw-20261125T094104Z/issues/I-20261125T094104Z-A.md
+
 # Implementation Decision Note: I-20261125T094104Z-A
 
 - decision: 仅改 `_sync_issues_changed_in_merge` 的 push 块，逐 configured remote（跳过 all）push 源分支并汇总结果；失败 → 非零 + failed_remotes + 重试命令，成功 → 逐 remote 回执。不抽公共 helper、不动 develop-push 段。
