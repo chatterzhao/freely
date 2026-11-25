@@ -1267,16 +1267,16 @@ def get_assignees(platform: str, issue_number: str) -> list[str]:
     return h.get_assignees(issue_number) if h else []
 
 
-def _replica_summary(records: dict, local_id: str) -> dict:
+def _replica_summary(records: dict, local_id: str, kind: str = "linked") -> dict:
     """Lazy import: embedders that only need create/close must not be forced to
     package the lifecycle tree alongside the adapter (issue-sync-bootstrap does
     exactly that)."""
     from replica_truth import summarize
 
-    return summarize(records, local_id)
+    return summarize(records, local_id, kind)
 
 
-def find_open_replicas_by_local_id(local_id: str) -> dict:
+def find_open_replicas_by_local_id(local_id: str, kind: str = "linked") -> dict:
     """READ-ONLY: every OPEN platform replica that belongs to ``local_id``.
 
     This is the truth the worktree gate must use instead of the local
@@ -1286,7 +1286,7 @@ def find_open_replicas_by_local_id(local_id: str) -> dict:
     ``wt-close``.
     """
     configured = configured_platforms()
-    summary = _replica_summary(list_open_issue_records(configured or None), local_id)
+    summary = _replica_summary(list_open_issue_records(configured or None), local_id, kind)
     # `_handlers()` only contains platforms that probed successfully. A platform
     # that is CONFIGURED but unavailable must not vanish from the check: an
     # unreadable platform is not an empty one.
@@ -1302,7 +1302,7 @@ def find_open_replicas_by_local_id(local_id: str) -> dict:
 
 
 def close_local_id(local_id: str, platform_ids: dict = None,
-                   close_reason: str = "completed") -> dict:
+                   close_reason: str = "completed", kind: str = "linked") -> dict:
     """Close EVERY OPEN replica of ``local_id``, mapped or not.
 
     ``close_issue``/``close-multi`` only close ids listed in the document's
@@ -1315,7 +1315,7 @@ def close_local_id(local_id: str, platform_ids: dict = None,
     healthy). A platform that cannot be read reports ``error`` and the caller
     MUST NOT certify closure.
     """
-    truth = find_open_replicas_by_local_id(local_id)
+    truth = find_open_replicas_by_local_id(local_id, kind)
     results: dict[str, dict] = {}
     if not truth.get("ok"):
         detail = str((truth.get("degraded") or [{}])[0].get("error", "platform unreadable"))[:200]
@@ -1871,7 +1871,8 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "verify-local-id":
         # READ-ONLY gate input. 0 = readable and no OPEN replica,
         # 3 = OPEN replica exists, 1 = a platform could not be read.
-        summary = find_open_replicas_by_local_id(a[2] if len(a) > 2 else "")
+        summary = find_open_replicas_by_local_id(a[2] if len(a) > 2 else "",
+                                                 a[3] if len(a) > 3 else "linked")
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         if not summary.get("ok"):
             raise SystemExit(1)
@@ -1879,7 +1880,8 @@ if __name__ == "__main__":
     elif len(a) > 1 and a[1] == "close-local-id":
         local_id = a[2] if len(a) > 2 else ""
         platform_ids = json.loads(a[3]) if len(a) > 3 else {}
-        result = close_local_id(local_id, platform_ids)
+        result = close_local_id(local_id, platform_ids, "completed",
+                                a[4] if len(a) > 4 else "linked")
         print(json.dumps(result, indent=2, ensure_ascii=False))
         raise SystemExit(_close_local_id_exit_code(result))
     elif len(a) > 1 and a[1] == "close":

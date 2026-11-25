@@ -163,6 +163,7 @@ def run(source: Path, child_a_phase="completed", child_b_phase="completed",
             + f"issue_file='{raw_dir / 'issue.md'}'\n"
             + f"wt_path='{root / 'fake-wt'}'\n"
             + "FORCE=false\n"
+            + f"_raw_key='{KEY}'\n"
             + f"DRY_RUN={'true' if dry else 'false'}\n"
             + f"SKIP_PLATFORM={'true' if skip else 'false'}\n"
             + block,

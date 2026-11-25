@@ -93,8 +93,15 @@ def close_platforms(arguments: list[str]) -> int:
     # Phase 2 — perform the platform write.
     adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
     environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
+    # Same reconciliation as the linked path. `close-multi` reported
+    # "no issue_id for <platform>" for every raw whose mapping predates a
+    # platform being configured (544 raws only ever mapped github), which now
+    # aborts the merge instead of being ignored. `close-local-id` resolves the
+    # raw by title on each platform and treats "no replica here" as absent.
+    local_id = str(metadata.get("local_id") or f"raw-{Path(file_path).parent.name}")
     result = subprocess.run(
-        [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
+        [sys.executable, str(adapter), "close-local-id", local_id,
+         json.dumps(platform_ids), "raw"],
         env=environment,
         capture_output=True,
         text=True,
@@ -116,7 +123,7 @@ def close_platforms(arguments: list[str]) -> int:
         isinstance(payload, dict)
         and payload
         and all(
-            isinstance(item, dict) and item.get("status") == "closed"
+            isinstance(item, dict) and item.get("status") in ("closed", "absent")
             for item in payload.values()
         )
     )

@@ -89,6 +89,15 @@ def main() -> int:
 
         degraded = dict(records)
         degraded["__degraded__"] = {"platform": "github", "error": "read failed"}
+        raw_records = {
+            "github:9": {"issue_id": "9", "title": "[RAW-20260101T000000Z] fix: something"},
+            "gitee:IK9": {"issue_id": "IK9", "title": "[RAW-20260101T000000Z] fix: dup"},
+        }
+        check("kind=raw matches raw titles",
+              set(module.filter_open_replicas(raw_records, "raw-20260101T000000Z", "raw")) == {"github", "gitee"})
+        check("kind=linked ignores raw-only titles",
+              module.filter_open_replicas(raw_records, "raw-20260101T000000Z") == {})
+
         summary = module.summarize(degraded, "I-20260101T000000Z-A")
         check("read failure is not reported as clean", summary.get("ok") is False, str(summary))
 
@@ -97,6 +106,12 @@ def main() -> int:
     check("wt-close consults verify-local-id", "verify-local-id" in wt)
     check("wt-close refuses when a replica is still open",
           "_wt_platform_open" in wt and "平台仍有 OPEN 副本" in wt)
+    check("wt-close enumerates every I-* by raw key (not only frontmatter lists)",
+          'f"raw-{key}"' in wt and 'f"I-{key}-*.md"' in wt)
+    check("wt-close states the one-raw-one-worktree rule in its refusal",
+          "一个 raw issue 只有一个 worktree" in wt)
+    check("wt-close verifies the raw document itself against the platform",
+          '_local_id_open_replicas "$issue_id" raw' in wt)
     check("wt-close requires --reason for --skip-platform",
           "--skip-platform" in wt and "SKIP_PLATFORM" in wt and "requires --reason" in wt or
           "skip-platform requires --reason" in wt)

@@ -46,14 +46,24 @@ def _issue_id_of(key: str, record: dict) -> str:
     return key.split(":", 1)[1] if ":" in key else key
 
 
-def title_carries_local_id(title: str, local_id: str) -> bool:
+def title_carries_local_id(title: str, local_id: str, kind: str = "linked") -> bool:
     """True when a title is a replica of ``local_id`` (not merely a mention).
 
-    Replicas carry the id in their canonical title: ``[I-<key>-A] I-<key>-A: …``
-    (linked) or ``[RAW-<key>] [I-<key>-A] …`` (promoted). A raw issue title
-    without an ``[I-`` marker is the B1 document, not an I-* replica.
+    linked replicas carry the id in their canonical title:
+    ``[I-<key>-A] I-<key>-A: …`` or ``[RAW-<key>] [I-<key>-A] …`` (promoted).
+    A raw issue title without an ``[I-`` marker is the B1 document, not an I-*
+    replica — EXCEPT when we are asking about the raw document itself
+    (``kind="raw"``), where ``raw-<key>`` in the title is the identity.
     """
-    if not local_id or local_id not in title:
+    if not local_id:
+        return False
+    if kind == "raw":
+        # Document ids are lowercase (raw-<key>); the canonical title is
+        # [RAW-<key>]. Compare case-insensitively or the raw is never found.
+        # Promoted linked replicas carry "[RAW-<key>] [I-<key>-A] ..." — they are
+        # I-* replicas, covered by their own id, not by the raw document.
+        return local_id.lower() in title.lower() and "[I-" not in title
+    if local_id not in title:
         return False
     return "[I-" in title
 
@@ -66,13 +76,14 @@ def _is_open(record: dict) -> bool:
     return state not in _CLOSED_STATES
 
 
-def filter_open_replicas(records: dict, local_id: str) -> dict[str, list[dict]]:
+def filter_open_replicas(records: dict, local_id: str,
+                         kind: str = "linked") -> dict[str, list[dict]]:
     found: dict[str, list[dict]] = {}
     for key, record in (records or {}).items():
         if key == DEGRADED_KEY or not isinstance(record, dict):
             continue
         title = str(record.get("title") or "")
-        if not title_carries_local_id(title, local_id):
+        if not title_carries_local_id(title, local_id, kind):
             continue
         if not _is_open(record):
             continue
@@ -92,23 +103,24 @@ def degraded_platforms(records: dict) -> list[dict]:
     return [item for item in marker if isinstance(item, dict)]
 
 
-def summarize(records: dict, local_id: str) -> dict:
-    replicas = filter_open_replicas(records, local_id)
+def summarize(records: dict, local_id: str, kind: str = "linked") -> dict:
+    replicas = filter_open_replicas(records, local_id, kind)
     degraded = degraded_platforms(records)
     return {
         "ok": not degraded,
         "local_id": local_id,
+        "kind": kind,
         "replicas": replicas,
         "open_count": sum(len(items) for items in replicas.values()),
         "degraded": degraded,
     }
 
 
-def has_any_replica(records: dict, local_id: str) -> bool:
+def has_any_replica(records: dict, local_id: str, kind: str = "linked") -> bool:
     """Any replica at all (OPEN or not) — used to refuse duplicate creation."""
     for key, record in (records or {}).items():
         if key == DEGRADED_KEY or not isinstance(record, dict):
             continue
-        if title_carries_local_id(str(record.get("title") or ""), local_id):
+        if title_carries_local_id(str(record.get("title") or ""), local_id, kind):
             return True
     return False

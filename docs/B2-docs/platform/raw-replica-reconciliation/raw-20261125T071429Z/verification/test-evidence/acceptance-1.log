@@ -5,9 +5,14 @@ ok   excludes sibling I-* ids
 ok   excludes raw titles
 ok   excludes CLOSED replicas
 ok   empty when local id absent
+ok   kind=raw matches raw titles
+ok   kind=linked ignores raw-only titles
 ok   read failure is not reported as clean
 ok   wt-close consults verify-local-id
 ok   wt-close refuses when a replica is still open
+ok   wt-close enumerates every I-* by raw key (not only frontmatter lists)
+ok   wt-close states the one-raw-one-worktree rule in its refusal
+ok   wt-close verifies the raw document itself against the platform
 ok   wt-close requires --reason for --skip-platform
 ok   batch does not swallow linked close failures
 ok   batch delegates linked retirement to cmd_close_linked
@@ -19,4 +24,4 @@ ok   empty platform_ids is still reconcilable (no hard refusal)
 ok   batch re-verifies a stale platform_state
 ok   a scoped batch does not fast-skip closed documents
 ok   _already_on_platform consults the platform
-SUMMARY: 21 ok, 0 failed
+SUMMARY: 26 ok, 0 failed

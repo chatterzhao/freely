@@ -24,7 +24,13 @@ created_at: 2026-11-25
 
 ### 2.1 门禁（wt-close，只读）
 
-- 对 raw 下每个 `promoted_children` / `absorbed_into` 的 I-*：
+核心机制：**一个 raw 只有一个 worktree**；B2-IBM 会把该 raw 拆成多个 I-*，dev loop 必须实现完全部 I-* 才能收口。因此门禁的检查集合按 **raw key** 枚举，而不是只信 frontmatter 的 `promoted_children` / `absorbed_into`：
+
+- 以 `docs/B2-docs/*/*/raw-<key>/issues/I-<key>-*.md` glob 取并集，frontmatter 少写、写错的 I-* 也必须进入检查；
+- raw 文档自身也要取证（`verify-local-id raw-<key> raw`）：它同样不能靠 `platform_state` 缓存放行；
+- 任一 I-* 或 raw 本体的平台 OPEN 副本非空 → 拒绝，并按「未完成 / 缓存未关 / 平台仍开 / 平台不可读」四类打印原因与对应封装命令。
+
+- 对上述集合中每个 I-*：
   - `phase_state` 必须 `completed`（既有规则不变）；
   - 调 `platform-adapter verify-local-id <I-id>`：返回的 OPEN 副本必须为空；
   - 平台不可读（degraded / error）→ 拒绝，错误信息包含重试命令。
