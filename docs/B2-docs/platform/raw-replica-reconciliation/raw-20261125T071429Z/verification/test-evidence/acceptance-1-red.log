@@ -1,0 +1,13 @@
+FAIL replica_truth module exists — /Users/zhaoyu/Downloads/code/my-freely/freely/docs/system/workspace/scripts/lifecycle/replica_truth.py
+FAIL replica_truth exposes filter_open_replicas
+FAIL wt-close consults verify-local-id
+FAIL wt-close refuses when a replica is still open
+FAIL wt-close requires --reason for --skip-platform
+FAIL batch does not swallow linked close failures
+FAIL batch reconciles through close-local-id
+FAIL batch verifies platform presence before create
+FAIL pr-merge does not swallow batch failures
+FAIL pr-merge aborts when batch fails
+FAIL close_linked reconciles by local id
+FAIL _already_on_platform consults the platform
+SUMMARY: 0 ok, 12 failed

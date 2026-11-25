@@ -1,3 +1,18 @@
+## M-20261125T071429Z-A
+- title: fix — I-* 终态判据改为平台取证，关闭通道按 local_id 对账
+- status: active
+### candidate_issues
+1. `C-20261125T071429Z-A`
+- milestone: M-20261125T071429Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T071429Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T071429Z/issues/I-20261125T071429Z-A.md
+### committed_issues
+1. `I-20261125T071429Z-A`
+- milestone: M-20261125T071429Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T071429Z/issues/I-20261125T071429Z-A.md
+
 ## M-20261114T095625Z-A
 - title: feat — B0 关键词广搜与二元决策
 - status: active

@@ -1,0 +1,19 @@
+ok   replica_truth module exists
+ok   replica_truth exposes filter_open_replicas
+ok   includes OPEN replica for the local id
+ok   excludes sibling I-* ids
+ok   excludes raw titles
+ok   excludes CLOSED replicas
+ok   empty when local id absent
+ok   read failure is not reported as clean
+ok   wt-close consults verify-local-id
+ok   wt-close refuses when a replica is still open
+ok   wt-close requires --reason for --skip-platform
+ok   batch does not swallow linked close failures
+ok   batch reconciles through close-local-id
+ok   batch verifies platform presence before create
+ok   pr-merge does not swallow batch failures
+ok   pr-merge aborts when batch fails
+ok   close_linked reconciles by local id
+ok   _already_on_platform consults the platform
+SUMMARY: 18 ok, 0 failed

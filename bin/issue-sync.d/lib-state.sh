@@ -42,6 +42,24 @@ with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
 
 # Check if platform_ids already has a live issue for a platform.
 # Returns 0 (already exists) if found, 1 (needs create) otherwise.
+# True when the platform already holds an OPEN replica of this local id, even
+# if the document's platform_ids never recorded it (raw-20261125T071429Z).
+# Without this, a document with `platform_ids: {}` made every batch run create
+# ANOTHER replica: the original stayed OPEN forever and the new one was mapped.
+_platform_has_open_replica() {
+  local local_id="$1" rc=0
+  case "$local_id" in
+    I-*) ;;
+    *) return 1 ;;   # raw documents are matched by raw key, not by this path
+  esac
+  FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
+    "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" \
+    verify-local-id "$local_id" >/dev/null 2>&1 || rc=$?
+  # 3 = an OPEN replica exists. 1 = a platform could not be read: refuse to
+  # create on top of an unknown state (that is how duplicates were born).
+  [[ "$rc" == "3" || "$rc" == "1" ]]
+}
+
 _already_on_platform() {
   local file="$1" platform="$2"
   local pid
@@ -57,7 +75,14 @@ if len(parts) >= 3:
   val = p.get('issue_id', '')
   print(val)
 " 2>/dev/null || true)
-  [[ -n "$pid" && "$pid" != "None" ]]
+  [[ -n "$pid" && "$pid" != "None" ]] && return 0
+  # Not mapped locally: ask the platform before creating a second replica.
+  local _lid
+  case "$file" in
+    */issues/I-*.md) _lid="$(basename "$file" .md)" ;;
+    *) _lid="$(basename "$(dirname "$file")")" ;;
+  esac
+  _platform_has_open_replica "$_lid"
 }
 # Content hash for change detection.
 _content_hash() {

@@ -196,10 +196,16 @@ def close_linked(arguments: list[str]) -> int:
 
     from datetime import datetime, timezone
 
+    local_id = str(metadata.get("local_id") or Path(file_path).stem)
     adapter = Path(root_dir) / "docs/system/workspace/scripts/sync/platform-adapter.py"
     environment = dict(os.environ, FREELY_PROJECT_ROOT=root_dir)
+    # close-local-id reconciles the document mapping with what the platform
+    # actually holds: replicas created before the mapping existed (or duplicated
+    # by an unscoped run) are closed too (raw-20261125T071429Z). `close-multi`
+    # only ever saw the mapping, so those replicas stayed OPEN while the local
+    # cache was written `closed`.
     result = subprocess.run(
-        [sys.executable, str(adapter), "close-multi", json.dumps(platform_ids)],
+        [sys.executable, str(adapter), "close-local-id", local_id, json.dumps(platform_ids)],
         env=environment,
         capture_output=True,
         text=True,
@@ -214,11 +220,13 @@ def close_linked(arguments: list[str]) -> int:
     except json.JSONDecodeError:
         payload = {}
 
+    # "absent" = platform readable, no replica exists: nothing to close, healthy.
+    # Only "error" blocks certification.
     all_closed = (
         isinstance(payload, dict)
         and payload
         and all(
-            isinstance(item, dict) and item.get("status") == "closed"
+            isinstance(item, dict) and item.get("status") in ("closed", "absent")
             for item in payload.values()
         )
     )

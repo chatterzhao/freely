@@ -44,6 +44,7 @@ from typing import Optional
 _ADAPTER_DIR = Path(__file__).resolve().parent
 _SCRIPTS_DIR = _ADAPTER_DIR.parent
 _RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
+_LIFECYCLE_DIR = _SCRIPTS_DIR / "lifecycle"
 # Single source of truth for git transport timeouts (#4250). A half-open
 # network used to hang `git fetch` indefinitely and stall the whole guarded
 # command for minutes with no diagnostic. Keep this in one place; do not
@@ -51,6 +52,8 @@ _RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
 GIT_FETCH_TIMEOUT_SECS = 30
 sys.path.insert(0, str(_ADAPTER_DIR))
 sys.path.insert(0, str(_RUNTIME_DIR))
+sys.path.insert(0, str(_LIFECYCLE_DIR))
+from replica_truth import summarize as _replica_summary
 from freely_user_env import value as freely_env_value
 from freely_config import read_config
 from raw_title_contract import (canonical_raw_title, find_local_heading,
@@ -1245,6 +1248,80 @@ def get_assignees(platform: str, issue_number: str) -> list[str]:
     h = _handler_for(platform)
     return h.get_assignees(issue_number) if h else []
 
+
+def find_open_replicas_by_local_id(local_id: str) -> dict:
+    """READ-ONLY: every OPEN platform replica that belongs to ``local_id``.
+
+    This is the truth the worktree gate must use instead of the local
+    ``platform_state`` cache (raw-20261125T071429Z). A platform read failure is
+    reported as ``ok: False`` — never as "no replicas" — because treating an
+    unavailable platform as clean is exactly how an OPEN issue survived
+    ``wt-close``.
+    """
+    return _replica_summary(list_open_issue_records(), local_id)
+
+
+def close_local_id(local_id: str, platform_ids: dict = None,
+                   close_reason: str = "completed") -> dict:
+    """Close EVERY OPEN replica of ``local_id``, mapped or not.
+
+    ``close_issue``/``close-multi`` only close ids listed in the document's
+    ``platform_ids``. A replica created before the mapping existed (or created
+    twice by an unscoped run) therefore stayed OPEN forever while the local
+    cache claimed ``closed``. This resolver unions the platform truth with the
+    document mapping, so the retirement step and the gate agree on the same set.
+
+    A platform with no replica reports ``absent`` (nothing to close, still
+    healthy). A platform that cannot be read reports ``error`` and the caller
+    MUST NOT certify closure.
+    """
+    truth = find_open_replicas_by_local_id(local_id)
+    results: dict[str, dict] = {}
+    if not truth.get("ok"):
+        detail = str((truth.get("degraded") or [{}])[0].get("error", "platform unreadable"))[:200]
+        return {platform: {"status": "error", "error": f"platform unreadable: {detail}"}
+                for platform in configured_platforms()}
+    for platform in configured_platforms():
+        handler = _handler_for(platform)
+        if not handler:
+            results[platform] = {"status": "error", "error": _unavailable_error(platform)}
+            continue
+        ids = [item["issue_id"] for item in truth["replicas"].get(platform, [])]
+        mapped = _issue_id((platform_ids or {}).get(platform, {}))
+        if mapped and mapped not in ids:
+            ids.append(mapped)
+        if not ids:
+            results[platform] = {"status": "absent", "issue_ids": []}
+            continue
+        closed: list[str] = []
+        failures: list[str] = []
+        for issue_id in ids:
+            outcome = _safe(handler.close_issue, issue_id, close_reason, "")
+            if isinstance(outcome, dict) and outcome.get("status") == "closed":
+                closed.append(issue_id)
+            else:
+                error = outcome.get("error", "") if isinstance(outcome, dict) else str(outcome)
+                failures.append(f"{issue_id}: {error}")
+        if failures:
+            results[platform] = {"status": "error", "issue_ids": closed,
+                                 "error": "; ".join(failures)[:300]}
+        else:
+            results[platform] = {"status": "closed", "issue_ids": closed}
+    return results
+
+
+def _close_local_id_exit_code(results: object) -> int:
+    """0 = every platform closed or had nothing to close; 3 = mixed; 1 = all failed."""
+    if not isinstance(results, dict) or not results:
+        return 1
+    healthy = {"closed", "absent"}
+    statuses = [item.get("status") if isinstance(item, dict) else None
+                for item in results.values()]
+    good = [status for status in statuses if status in healthy]
+    if len(good) == len(statuses):
+        return 0
+    return 3 if good else 1
+
 def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, str]:
     h = _handler_for(platform)
     return h.set_assignee(issue_number, login) if h else (False, f"Unknown platform: {platform}")
@@ -1751,6 +1828,20 @@ if __name__ == "__main__":
         result = close_dropped(raw_key, platform_ids, comment_body)
         print(json.dumps(result, indent=2))
         raise SystemExit(1 if "_dropped" in result else _close_exit_code(result))
+    elif len(a) > 1 and a[1] == "verify-local-id":
+        # READ-ONLY gate input. 0 = readable and no OPEN replica,
+        # 3 = OPEN replica exists, 1 = a platform could not be read.
+        summary = find_open_replicas_by_local_id(a[2] if len(a) > 2 else "")
+        print(json.dumps(summary, indent=2, ensure_ascii=False))
+        if not summary.get("ok"):
+            raise SystemExit(1)
+        raise SystemExit(3 if summary.get("open_count") else 0)
+    elif len(a) > 1 and a[1] == "close-local-id":
+        local_id = a[2] if len(a) > 2 else ""
+        platform_ids = json.loads(a[3]) if len(a) > 3 else {}
+        result = close_local_id(local_id, platform_ids)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        raise SystemExit(_close_local_id_exit_code(result))
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":
