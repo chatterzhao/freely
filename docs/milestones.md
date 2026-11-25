@@ -1,3 +1,18 @@
+## M-20261125T094413Z-A
+- title: feat — 元数据等价提交免重测 + 证据沿袭
+- status: active
+### candidate_issues
+1. `C-20261125T094413Z-A`
+- milestone: M-20261125T094413Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T094413Z-A`
+- promoted_issue_path: docs/B2-docs/gate/test-evidence-equivalence/raw-20261125T094413Z/issues/I-20261125T094413Z-A.md
+### committed_issues
+1. `I-20261125T094413Z-A`
+- milestone: M-20261125T094413Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/test-evidence-equivalence/raw-20261125T094413Z/issues/I-20261125T094413Z-A.md
+
 ## M-20261125T100958Z-A
 - title: fix — feedback edit 与 wt-create 解耦，平台发现 ids
 - status: active

@@ -27,6 +27,16 @@ FIELDS = (
     "TEST_STATUS", "LAST_TESTED_AT", "LAST_TESTED_COMMIT",
     "TEST_COMMAND", "TEST_EXIT_CODE", "EVIDENCE_FILE", "EVIDENCE_SHA256", "EVIDENCE_HEAD",
 )
+# Optional fields present only when evidence was carried forward through
+# metadata-equivalent commits (raw-20261125T094413Z). Never written by hand.
+EQUIV_FIELDS = ("EQUIVALENCE_CHAIN", "EQUIVALENCE_SENSITIVE_PATHS")
+
+# Paths that can NEVER be treated as metadata-only, regardless of the caller's
+# declaration. Touching one of these requires a real `test-gate run`.
+HARD_EXCLUDED = (
+    "pre-tests.md", "tasks.md", "bin/", "runtime/", "docs/system/",
+    "tests/", "contracts/", ".githooks/", "projection.lock",
+)
 
 
 def sha256(path: Path) -> str:
@@ -58,8 +68,9 @@ def _atomic_env(path: Path, values: dict[str, str]) -> None:
     fd, tmp = tempfile.mkstemp(prefix=".test-evidence.", dir=str(path.parent))
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            for key in FIELDS:
-                handle.write(f'{key}="{values.get(key, "")}"\n')
+            for key in (*FIELDS, *EQUIV_FIELDS):
+                if key in values:
+                    handle.write(f'{key}="{values.get(key, "")}"\n')
         os.replace(tmp, path)
     finally:
         if os.path.exists(tmp):
@@ -122,16 +133,85 @@ def validate(gate: Path, worktree: Path) -> dict:
         errors.append("hash binding failed: evidence sha256 mismatch (tampered or stale)")
 
     head = head_of(worktree)
+    verdict = "current"
     if not head:
         errors.append("cannot resolve worktree HEAD")
+    elif values.get("LAST_TESTED_COMMIT") == head:
+        pass  # exact match: tests ran on this very commit
     else:
-        if values.get("LAST_TESTED_COMMIT") != head:
+        # Equality is no longer the only truth: a chain of metadata-only
+        # commits may carry evidence forward. Verify the chain includes HEAD
+        # and is rooted at the originally tested commit.
+        chain = [c for c in values.get("EQUIVALENCE_CHAIN", "").split(",") if c]
+        if (chain and chain[0] == values.get("LAST_TESTED_COMMIT")
+                and chain[-1] == head):
+            verdict = "equivalent"
+        else:
             errors.append("LAST_TESTED_COMMIT does not match worktree HEAD")
-        if values.get("EVIDENCE_HEAD") != head:
             errors.append("EVIDENCE_HEAD does not match worktree HEAD")
 
-    return {"ok": not errors, "errors": errors,
+    return {"ok": not errors, "verdict": verdict if not errors else "stale",
+            "errors": errors,
             "details": {k: values.get(k, "") for k in FIELDS}}
+
+
+def _diff_paths(worktree: Path, base: str, head: str) -> list[str]:
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(worktree), "diff", "--name-only", base, head],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+        return [ln.strip() for ln in out.splitlines() if ln.strip()]
+    except (OSError, subprocess.CalledProcessError):
+        return []
+
+
+def attest_meta(gate: Path, worktree: Path, sensitive_paths: str,
+                test_definition_fingerprint: str = "") -> dict:
+    """Carry test evidence forward across metadata-equivalent commits.
+
+    The caller declares which paths the lane's tests actually depend on
+    (`evidence_sensitive_paths`). Every path changed between the tested commit
+    and HEAD is checked against that set; hard-excluded paths and an explicit
+    test-definition fingerprint change always invalidate. On success the
+    original evidence (including its sha256 binding) is preserved and a
+    verifiable chain is appended.
+    """
+    values = parse_env(gate)
+    head = head_of(worktree)
+    tested = values.get("LAST_TESTED_COMMIT", "")
+    if not head or not tested:
+        raise ValueError("cannot resolve tested commit or worktree HEAD")
+    if head == tested:
+        return {"ok": True, "verdict": "current", "detail": "HEAD equals tested commit"}
+
+    sensitive = [s.strip() for s in sensitive_paths.split(",") if s.strip()]
+    if not sensitive:
+        raise ValueError("no sensitive paths declared — conservative default requires real test-gate run")
+
+    changed = _diff_paths(worktree, tested, head)
+    hits = []
+    for path in changed:
+        if any(x in path for x in HARD_EXCLUDED):
+            hits.append(path)
+            continue
+        for pattern in sensitive:
+            p = pattern[:-2] if pattern.endswith("/**") else pattern.rstrip("*").rstrip("/")
+            if path == p or path.startswith(p + "/") or path.startswith(p):
+                hits.append(path)
+                break
+    if test_definition_fingerprint and test_definition_fingerprint != values.get("TEST_DEFINITION_FINGERPRINT", test_definition_fingerprint):
+        hits.append("<test-definition-fingerprint>")
+    if hits:
+        raise ValueError("sensitive paths changed; must re-run test-gate: " + ", ".join(sorted(set(hits))))
+
+    prior = [c for c in values.get("EQUIVALENCE_CHAIN", "").split(",") if c]
+    chain = ([prior[0]] if prior else [tested]) + [head]
+    values["EQUIVALENCE_CHAIN"] = ",".join(dict.fromkeys(chain))
+    values["EQUIVALENCE_SENSITIVE_PATHS"] = ",".join(sensitive)
+    _atomic_env(gate, values)
+    return {"ok": True, "verdict": "equivalent", "chain": values["EQUIVALENCE_CHAIN"],
+            "changed_paths": changed}
 
 
 def manifest_add(project: Path, file: Path) -> dict:
@@ -174,6 +254,12 @@ def main(argv: list[str] | None = None) -> int:
     v.add_argument("--worktree", required=True)
     v.add_argument("--json", action="store_true")
 
+    a = sub.add_parser("attest-meta")
+    a.add_argument("--gate", required=True)
+    a.add_argument("--worktree", required=True)
+    a.add_argument("--sensitive-paths", required=True)
+    a.add_argument("--test-definition-fingerprint", default="")
+
     m = sub.add_parser("manifest-add")
     m.add_argument("--project", required=True)
     m.add_argument("--file", required=True)
@@ -189,6 +275,17 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 2
         print(json.dumps({"ok": True, "recorded": payload}, ensure_ascii=False))
+        return 0
+    if args.action == "attest-meta":
+        try:
+            payload = attest_meta(
+                Path(args.gate), Path(args.worktree), args.sensitive_paths,
+                args.test_definition_fingerprint,
+            )
+        except ValueError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps({"ok": True, **payload}, ensure_ascii=False))
         return 0
     if args.action == "validate":
         payload = validate(args.gate, args.worktree)
