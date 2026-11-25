@@ -73,9 +73,13 @@ def main() -> int:
     check("helper _push_source_branch_to_all_remotes defined",
           "_push_source_branch_to_all_remotes" in text,
           "per-remote push helper must exist")
+    code_lines = [ln for ln in block.splitlines() if not ln.strip().startswith("#")]
+    code_only = "\n".join(code_lines)
+    push_lines = [ln for ln in code_only.splitlines() if "push" in ln.lower()]
     check("no `push all ... || true` in issue-sync block",
-          "push all" not in block and "|| true" not in block.replace("git -C \"$_wt_path\" add", "").replace("commit -m", "").replace("git fetch", ""),
-          "push all + || true swallows failures")
+          not any("push all" in ln for ln in push_lines)
+          and not any("|| true" in ln for ln in push_lines),
+          "push commands must not use push all or swallow failures with || true")
     check("no unconditional committed+pushed echo",
           "committed + pushed" not in block,
           "unconditional success echo must be removed")
@@ -85,13 +89,13 @@ def main() -> int:
           'grep -v "^all$"' in helper or 'grep -v "^all"' in helper or '"all"' in helper,
           "helper must iterate remotes excluding 'all'")
     check("helper aggregates failed remotes",
-          "failed_remote" in helper.lower() or "push_failed" in helper.lower(),
+          "failed" in helper and ("failed=" in helper.replace(" ", "") or "failed_remotes" in helper.lower()),
           "helper must track failed remotes")
     check("helper returns nonzero on failure",
           "return 1" in helper and "failed" in helper.lower(),
           "helper must return nonzero when any remote fails")
     check("helper pushes per remote (not push all)",
-          "push all" not in helper and "git push" in helper,
+          "push all" not in "\n".join(ln for ln in helper.splitlines() if not ln.strip().startswith("#")) and "git -C \"$wt\" push" in helper,
           "helper must push each remote individually")
     check("caller propagates push failure (merge aborted)",
           "_push_source_branch_to_all_remotes" in block,

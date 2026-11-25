@@ -15,11 +15,11 @@
 - test_command: python3 docs/system/workspace/scripts/tests/test-pr-merge-push-receipt.py
 - expected_output: SUMMARY: N ok, 0 failed
 - expected_RED_output: SUMMARY: <N-M> ok, M failed — 基线 push all + || true + 无条件 pushed 回执
-- actual_RED_output: ""（待 RED 阶段填入）
-- actual_output: ""（待 GREEN 阶段填入）
+- actual_RED_output: "SUMMARY: 5 ok, 9 failed（develop 基线：helper 缺失、push all || true、无条件回执）"
+- actual_output: "SUMMARY: 14 ok, 0 failed；bash -n rc=0（证据 acceptance-1.log）"
 - evidence_file: docs/B2-docs/worktree/pr-merge-push-receipt/raw-20261125T094104Z/verification/test-evidence/acceptance-1.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: 对 develop 源码跑同一 AT（--source-dir <develop>）；基线含 push all || true 与无条件回执，行为断言必然命中。
 - surface_kind: end_to_end
 - target_lane: premerge-integration
