@@ -1,3 +1,25 @@
+## M-20261125T100958Z-A
+- title: fix — feedback edit 与 wt-create 解耦，平台发现 ids
+- status: active
+### candidate_issues
+1. `C-20261125T100958Z-A`
+- milestone: M-20261125T100958Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T100958Z-A`
+- promoted_issue_path: docs/B2-docs/human/feedback/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+### committed_issues
+1. `I-20261125T100958Z-A`
+- milestone: M-20261125T100958Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/human/feedback/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+
+### completed_issues
+1. `I-20261125T100958Z-A`
+- milestone: M-20261125T100958Z-A
+- phase_state: completed
+- completed_at: 2026-11-25T12:35:00Z
+- issue_path: docs/B2-docs/human/feedback/raw-20261125T100958Z/issues/I-20261125T100958Z-A.md
+
 ## M-20261125T094104Z-A
 - title: fix — pr-merge issue-sync 源分支 push 回执 fail-closed
 - status: active
