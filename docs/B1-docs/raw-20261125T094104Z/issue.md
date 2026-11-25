@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261125T094104Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261125T094104Z-A
 platform_ids:
   github:
     issue_id: '4702'
@@ -26,7 +26,7 @@ session_refs: []
 platform_state: open
 promoted_children: []
 source_candidate: ''
-completed_at: ''
+completed_at: 2026-11-25T10:42:00Z
 closeout_note: ''
 severity: P1
 ---
