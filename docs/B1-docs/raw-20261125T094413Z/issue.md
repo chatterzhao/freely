@@ -31,6 +31,8 @@ closeout_note: ''
 severity: P1
 ---
 
+workflow_kind: feature
+
 # feat: 元数据等价提交免重测，test-gate 证据沿袭机制
 
 workflow_kind: feature
@@ -41,10 +43,10 @@ workflow_kind: feature
 |-------|-------|
 | local_id | `raw-20261125T094413Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
+| phase_state | `absorbed` |
 | canonical | `none` |
 | created | 2026-11-25T09:44:13Z |
-| updated | 2026-11-25T09:44:13Z |
+| updated | 2026-11-25T10:02:27Z |
 
 ---
 
@@ -129,4 +131,3 @@ raw-20261125T094104Z（#4702）覆盖 pr-merge 源分支 push 回执；本条覆
 ### 非目标
 
 不改变 test-gate run 真实执行语义；不放宽任何「被测对象/用例定义」变更的强制重测；不改 pr-create/pr-merge 门禁顺序；不夹带 #4702（push 吞错）、#4698、#4687。
-
