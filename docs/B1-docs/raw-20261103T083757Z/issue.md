@@ -18,7 +18,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-03T08:37:58Z'
-updated_at: '2026-11-03T08:38:02Z'
+updated_at: '2026-11-03T12:09:56Z'
 intake_id: ''
 author: platform
 channel: github
@@ -29,6 +29,8 @@ source_candidate: ''
 completed_at: ''
 closeout_note: ''
 ---
+
+# fix: gitee-issue.py delete-branch 使用错误 API 路径导致恒 404
 
 workflow_kind: fix
 

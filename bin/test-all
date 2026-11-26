@@ -39,6 +39,7 @@ CORE=(
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
   test-wt-close-boundary.py
+  test-gitee-delete-branch-path.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
@@ -102,6 +103,7 @@ CI_CORE=(
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
   test-wt-close-boundary.py
+  test-gitee-delete-branch-path.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
