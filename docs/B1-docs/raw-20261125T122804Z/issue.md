@@ -45,7 +45,7 @@ workflow_kind: fix
 | local_id | `raw-20261125T122804Z` |
 | kind | `raw` |
 | phase_state | `absorbed` |
-| canonical | `none` |
+| canonical | `docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T122804Z/issues/I-20261125T122804Z-A.md` |
 | created | 2026-11-25T12:28:05Z |
 | updated | 2026-11-25T12:28:05Z |
 
