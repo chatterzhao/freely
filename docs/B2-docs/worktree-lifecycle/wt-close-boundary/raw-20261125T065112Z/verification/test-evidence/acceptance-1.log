@@ -1,0 +1,24 @@
+=== GREEN ===
+ok   commands.md states write-free normal path
+ok   AGENTS.md states write-free normal path
+ok   workflow skill uses single --raw-key entry
+ok   workflow skill no longer claims platform close on normal path
+ok   runtime hint uses scoped batch
+ok   gate defines linked frontmatter validator
+ok   gate requires schema_version on touched linked docs
+ok   strict linked frontmatter accepted
+ok   bullet-only frontmatter rejected
+ok   untouched legacy linked doc not blocked
+SUMMARY: 10 ok, 0 failed
+=== RED ===
+FAIL commands.md states write-free normal path
+FAIL AGENTS.md states write-free normal path
+FAIL workflow skill uses single --raw-key entry
+FAIL workflow skill no longer claims platform close on normal path
+ok   runtime hint uses scoped batch
+FAIL gate defines linked frontmatter validator
+FAIL gate requires schema_version on touched linked docs
+FAIL strict linked frontmatter accepted — validator missing on develop
+FAIL bullet-only frontmatter rejected — validator missing on develop
+FAIL untouched legacy linked doc not blocked — validator missing on develop
+SUMMARY: 1 ok, 9 failed
