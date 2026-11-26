@@ -1,0 +1,33 @@
+=== GREEN ===
+ok   command module readable
+ok   packaged close-orphans defined
+ok   dispatcher registers close-orphans
+ok   commands.md documents close-orphans
+ok   no caller-side adapter import
+ok   delegates to adapter close-local-id
+ok   retry command is actionable
+ok   adapter rc=0 propagates
+ok   success receipt
+ok   adapter rc=3 propagates
+ok   rc=3 prints actionable retry
+ok   adapter rc=1 propagates
+ok   rc=1 prints actionable retry
+SUMMARY: 13 ok, 0 failed
+=== RED ===
+ok   command module readable
+FAIL packaged close-orphans defined
+FAIL dispatcher registers close-orphans
+FAIL commands.md documents close-orphans
+ok   no caller-side adapter import
+FAIL delegates to adapter close-local-id
+FAIL retry command is actionable
+FAIL adapter rc=0 propagates — got 127: bash: line 6: cmd_close_orphans: command not found
+
+FAIL success receipt
+FAIL adapter rc=3 propagates — got 127: bash: line 6: cmd_close_orphans: command not found
+
+FAIL rc=3 prints actionable retry
+FAIL adapter rc=1 propagates — got 127: bash: line 6: cmd_close_orphans: command not found
+
+FAIL rc=1 prints actionable retry
+SUMMARY: 2 ok, 11 failed
