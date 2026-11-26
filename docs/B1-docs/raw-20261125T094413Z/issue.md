@@ -31,8 +31,6 @@ closeout_note: ''
 severity: P1
 ---
 
-workflow_kind: feature
-
 # feat: 元数据等价提交免重测，test-gate 证据沿袭机制
 
 workflow_kind: feature
