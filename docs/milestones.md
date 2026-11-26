@@ -1,3 +1,24 @@
+## M-20261126T114403Z-A
+- title: feat — close-orphans 批量模式复用平台读取
+- status: active
+### candidate_issues
+1. `C-20261126T114403Z-A`
+- milestone: M-20261126T114403Z-A
+- status: promoted
+- promoted_issue_id: `I-20261126T114403Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261126T114403Z/issues/I-20261126T114403Z-A.md
+### committed_issues
+1. `I-20261126T114403Z-A`
+- milestone: M-20261126T114403Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261126T114403Z/issues/I-20261126T114403Z-A.md
+
+### completed_issues
+1. `I-20261126T114403Z-A`
+- milestone: M-20261126T114403Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261126T114403Z/issues/I-20261126T114403Z-A.md
+
 ## M-20261103T083757Z-A
 - title: fix — Gitee delete-branch 端点纠正
 - status: active
