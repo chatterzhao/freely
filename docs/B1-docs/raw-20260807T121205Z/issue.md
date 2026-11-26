@@ -37,6 +37,21 @@ closeout_note: ''
 
 workflow_kind: fix
 
+## fix: reviewer assign FAIL-CLOSED missing raw_key in SSE event
+
+| Field | Value |
+|-------|-------|
+| local_id | `raw-20260807T121205Z` |
+| kind | `raw` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/a2a/reviewer-agent/raw-20260807T121205Z/issues/I-20260807T121205Z-A.md` |
+| created | 2026-08-07T12:12:05Z |
+| updated | 2026-08-07T12:12:30Z |
+
+---
+
+> **Freely 治理**：这是 raw issue `raw-20260807T121205Z`。实现前请用 `wt-create --raw-key 20260807T121205Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+
 ## Symptom
 Workers request phase reviews via a2a-exit --state input-required --reason needs-review:<phase>, but NO reviewer is ever spawned. watchdog_sse.log shows repeated:
     [watchdog] input-required: reason=needs-review:b1 needs_role=reviewer
