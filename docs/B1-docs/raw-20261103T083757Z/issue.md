@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T083757Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T083757Z-A
 platform_ids:
   github:
     issue_id: '4137'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSN3S
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md
+last_synced_comment_at:
+  github: '2026-11-26T10:01:24Z'
+  gitee: '2026-11-26T10:01:24Z'
 hash: ''
 created_at: '2026-11-03T08:37:58Z'
-updated_at: '2026-11-03T12:09:56Z'
+updated_at: '2026-11-26T10:01:29Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261103T083757Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-26T10:01:23Z'
 closeout_note: ''
 ---
 
@@ -55,3 +58,11 @@ workflow_kind: fix
 
 ## 发现场景
 2026-11-03 清理 2026-06/07 遗留 Gitee 远程分支时复现（4/4 分支均 404，fallback 成功）。
+
+### comment-20261126T100124Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261103T083757Z-A"]
+
+拆解为以下任务:
+1. [I-20261103T083757Z-A](will-be-updated)
