@@ -55,6 +55,7 @@ CORE=(
   test-skill-merge-compat.py
   test-skill-frontmatter-contract.py
   test-a2a-task-cli-loadable.py
+  test-reviewer-assign-raw-key.py
   test-fail-semantics-preflight.py
   test-obs-ops-backlog.py
   test-platform-sync-entrypoint.py
@@ -118,6 +119,7 @@ CI_CORE=(
   test-skill-merge-compat.py
   test-skill-frontmatter-contract.py
   test-a2a-task-cli-loadable.py
+  test-reviewer-assign-raw-key.py
   test-fail-semantics-preflight.py
   test-obs-ops-backlog.py
   test-platform-sync-entrypoint.py
