@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261125T065112Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261125T065112Z-A
 platform_ids:
   github:
     issue_id: '4698'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXVXF
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/worktree-lifecycle/wt-close-boundary/raw-20261125T065112Z/issues/I-20261125T065112Z-A.md
+last_synced_comment_at:
+  github: '2026-11-26T08:45:20Z'
+  gitee: '2026-11-26T08:45:20Z'
 hash: ''
 created_at: '2026-11-25T06:51:12Z'
-updated_at: '2026-11-25T06:51:20Z'
+updated_at: '2026-11-26T08:45:29Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261125T065112Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-26T08:45:19Z'
 closeout_note: ''
 severity: P1
 ---
@@ -41,8 +44,8 @@ workflow_kind: fix
 |-------|-------|
 | local_id | `raw-20261125T065112Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
-| canonical | `none` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/worktree-lifecycle/wt-close-boundary/raw-20261125T065112Z/issues/I-20261125T065112Z-A.md` |
 | created | 2026-11-25T06:51:12Z |
 | updated | 2026-11-25T06:51:12Z |
 
@@ -66,3 +69,11 @@ workflow_kind: fix
 3. 同步 commands.md / AGENTS.md / workflow SKILL 的步骤与职责描述。
 4. 为 B2 I-* 文档加 frontmatter schema 硬门禁（schema_version + YAML --- block），与 wt-close/issue-sync 解析器对齐。
 5. 清理 Phase 7 死代码，统一 dev↔test 一致性与 merge 证据判定为单一真源。
+
+### comment-20261126T084519Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261125T065112Z-A"]
+
+拆解为以下任务:
+1. [I-20261125T065112Z-A](will-be-updated)
