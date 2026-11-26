@@ -1,0 +1,18 @@
+=== GREEN ===
+ok   gate source readable
+ok   generated updated row normalized in body projection
+ok   updated-only drift yields identical fingerprint
+ok   human body change still diverges
+ok   lifecycle table row still diverges
+ok   reconcile ok with updated-only drift
+ok   reconcile still blocks real body change
+SUMMARY: 7 ok, 0 failed
+=== RED (develop baseline) ===
+ok   gate source readable
+FAIL generated updated row normalized in body projection
+FAIL updated-only drift yields identical fingerprint — f45ea3362b50 vs 54ee2881d0fc
+ok   human body change still diverges
+ok   lifecycle table row still diverges
+FAIL reconcile ok with updated-only drift — [{'scope': 'local', 'code': 'content_diverged', 'detail': 'local canonical content differs from platforms'}]
+ok   reconcile still blocks real body change
+SUMMARY: 4 ok, 3 failed

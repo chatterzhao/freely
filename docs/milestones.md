@@ -1,3 +1,21 @@
+## M-20261125T122804Z-A
+- title: fix — 生成型 updated 行不参与副本内容判定
+- status: active
+### candidate_issues
+1. `C-20261125T122804Z-A`
+- milestone: M-20261125T122804Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T122804Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T122804Z/issues/I-20261125T122804Z-A.md
+### committed_issues
+1. `I-20261125T122804Z-A`
+- milestone: M-20261125T122804Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T122804Z/issues/I-20261125T122804Z-A.md
+
+### completed_issues
+1. `I-20261125T122804Z-A`
+
 ## M-20261125T094413Z-A
 - title: feat — 元数据等价提交免重测 + 证据沿袭
 - status: active

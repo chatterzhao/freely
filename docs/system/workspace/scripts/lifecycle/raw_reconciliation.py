@@ -26,6 +26,14 @@ _COMMENT_BLOCK = re.compile(
     re.IGNORECASE | re.MULTILINE | re.DOTALL,
 )
 _META_LINE = re.compile(r"^(?:-\s+[A-Za-z_][\w-]*:.*|\{.*\})\s*$")
+# The `| updated | <ts> |` row is a projection of frontmatter `updated_at`
+# (issue_create_contract.platform_body:213). It has several legitimate writers
+# (lifecycle transitions, comments, platform pull) and none of them rewrites the
+# local Markdown table, so comparing its value reports a permanent fake drift.
+# Require the row to exist, but compare a fixed placeholder instead of its value.
+# Every other table row — including phase_state and created — stays strict.
+_UPDATED_ROW = re.compile(r"(\|\s*updated\s*\|\s*)[^|\n]*(\|)", re.IGNORECASE)
+_UPDATED_ROW_PLACEHOLDER = "<generated>"
 
 
 def normalize_raw_key(value: object) -> str:
@@ -65,6 +73,9 @@ def _body(value: object) -> str:
     # Comment blocks live in the body but are compared separately, so the body
     # projection must exclude them (platform copies never inline them).
     text = _COMMENT_BLOCK.sub("", text)
+    text = _UPDATED_ROW.sub(
+        lambda match: match.group(1) + _UPDATED_ROW_PLACEHOLDER + match.group(2), text
+    )
     return _text(text)
 
 
