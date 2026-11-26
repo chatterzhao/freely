@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261124T131119Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261124T131119Z-A
 platform_ids:
   github:
     issue_id: '4687'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKXQN7
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261124T131119Z/issues/I-20261124T131119Z-A.md
+last_synced_comment_at:
+  github: '2026-11-26T07:37:02Z'
+  gitee: '2026-11-26T07:37:02Z'
 hash: ''
 created_at: '2026-11-24T13:11:19Z'
-updated_at: '2026-11-24T13:11:29Z'
+updated_at: '2026-11-26T07:37:07Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261124T131119Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-26T07:37:01Z'
 closeout_note: ''
 severity: P2
 ---
@@ -41,8 +44,8 @@ workflow_kind: fix
 |-------|-------|
 | local_id | `raw-20261124T131119Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
-| canonical | `none` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/platform/raw-replica-reconciliation/raw-20261124T131119Z/issues/I-20261124T131119Z-A.md` |
 | created | 2026-11-24T13:11:19Z |
 | updated | 2026-11-24T13:11:19Z |
 
@@ -58,3 +61,11 @@ R60.1 的 linked issue I-20261124T054201Z-A 留下 GitHub 孤儿副本 #4678（�
 
 ## 期望
 提供封装入口：按 local_id 枚举并关闭平台上所有真实副本（含 title 前缀不符的 stale linked 孤儿），双平台结果汇总、任一失败非零退出；诊断必须可操作（打印可直接执行的封装命令）。严禁手工调用内层 adapter / 子命令 / 自拼 platform_ids 来兜底。
+
+### comment-20261126T073701Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261124T131119Z-A"]
+
+拆解为以下任务:
+1. [I-20261124T131119Z-A](will-be-updated)
