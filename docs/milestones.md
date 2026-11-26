@@ -1,3 +1,21 @@
+## M-20261124T131119Z-A
+- title: fix — stale linked 孤儿副本关闭封装入口
+- status: active
+### candidate_issues
+1. `C-20261124T131119Z-A`
+- milestone: M-20261124T131119Z-A
+- status: promoted
+- promoted_issue_id: `I-20261124T131119Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261124T131119Z/issues/I-20261124T131119Z-A.md
+### committed_issues
+1. `I-20261124T131119Z-A`
+- milestone: M-20261124T131119Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261124T131119Z/issues/I-20261124T131119Z-A.md
+
+### completed_issues
+1. `I-20261124T131119Z-A`
+
 ## M-20261125T122804Z-A
 - title: fix — 生成型 updated 行不参与副本内容判定
 - status: active

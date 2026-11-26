@@ -260,6 +260,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | `update <local_id>` | 更新平台 issue（跳过未变更） |
 | `comment <local_id>` | 推送未同步的评论 |
 | `close <local_id> [reason]` | 关闭平台 issue |
+| `close-orphans <local_id> [linked\|raw]` | 按 local_id 关闭全部平台副本（含 stale linked 孤儿），逐平台汇总；失败非零并打印重试命令 |
 | `promote <raw_id> <I_id>` | 关闭 raw，创建 I-* 并交叉引用 |
 | `promote-finalize <local_id>` | 所有子 issue promote 后关闭 raw |
 | `status <local_id>` | 显示同步状态 |
