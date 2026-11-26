@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T083757Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T083757Z-A
 platform_ids:
   github:
     issue_id: '4137'
@@ -14,23 +14,43 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSN3S
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md
+last_synced_comment_at:
+  github: '2026-11-26T10:01:24Z'
+  gitee: '2026-11-26T10:01:24Z'
 hash: ''
 created_at: '2026-11-03T08:37:58Z'
-updated_at: '2026-11-03T08:38:02Z'
+updated_at: '2026-11-26T12:04:21Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261103T083757Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-26T10:01:23Z'
 closeout_note: ''
 ---
 
+# fix: gitee-issue.py delete-branch 使用错误 API 路径导致恒 404
+
 workflow_kind: fix
+
+## fix: gitee-issue.py delete-branch 使用错误 API 路径导致恒 404
+
+| Field | Value |
+|-------|-------|
+| local_id | `raw-20261103T083757Z` |
+| kind | `raw` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md` |
+| created | 2026-11-03T08:37:58Z |
+| updated | 2026-11-26T10:01:29Z |
+
+---
+
+> **Freely 治理**：这是 raw issue `raw-20261103T083757Z`。实现前请用 `wt-create --raw-key 20261103T083757Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 
 ## 现象
 清理远程分支时调用 `python3 docs/system/workspace/scripts/runtime/gitee-issue.py delete-branch <branch>`，四个分支全部返回：
@@ -53,3 +73,11 @@ workflow_kind: fix
 
 ## 发现场景
 2026-11-03 清理 2026-06/07 遗留 Gitee 远程分支时复现（4/4 分支均 404，fallback 成功）。
+
+### comment-20261126T101921Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261103T083757Z-A"]
+
+拆解为以下任务:
+1. [I-20261103T083757Z-A](will-be-updated)

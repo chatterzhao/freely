@@ -1,0 +1,20 @@
+=== GREEN ===
+ok   helper source readable
+ok   no GitHub git-ref path remains
+ok   Gitee branch endpoint present
+ok   repo_path_branch uses canonical endpoint
+ok   delete-branch sends DELETE
+ok   delete-branch sends canonical path
+ok   delete-branch still requires auth
+ok   delete-branch returns adapter result
+SUMMARY: 8 ok, 0 failed
+=== RED ===
+ok   helper source readable
+FAIL no GitHub git-ref path remains
+FAIL Gitee branch endpoint present
+FAIL repo_path_branch uses canonical endpoint — /repos/zhaoquan/freely/git/refs/heads/fix/raw-20261103T083757Z-demo
+ok   delete-branch sends DELETE
+FAIL delete-branch sends canonical path — {'method': 'DELETE', 'path': '/repos/zhaoquan/freely/git/refs/heads/fix/raw-20261103T083757Z-demo', 'auth_required': True}
+ok   delete-branch still requires auth
+ok   delete-branch returns adapter result
+SUMMARY: 4 ok, 4 failed

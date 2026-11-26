@@ -1,3 +1,20 @@
+## M-20261103T083757Z-A
+- title: fix — Gitee delete-branch 端点纠正
+- status: active
+### candidate_issues
+1. `C-20261103T083757Z-A`
+- milestone: M-20261103T083757Z-A
+- status: promoted
+- promoted_issue_id: `I-20261103T083757Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md
+### committed_issues
+1. `I-20261103T083757Z-A`
+- milestone: M-20261103T083757Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md
+
+### completed_issues
+1. `I-20261103T083757Z-A`
 ## M-20260807T121205Z-A
 - title: fix — reviewer assign FAIL-CLOSED missing raw_key in SSE event
 - status: active

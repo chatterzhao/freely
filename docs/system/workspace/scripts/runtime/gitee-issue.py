@@ -162,9 +162,14 @@ def repo_name(repo: str) -> str:
 
 
 def repo_path_branch(repo: str, branch: str) -> str:
-    """Path for branch ref operations (DELETE)."""
+    """Gitee API v5 branch deletion endpoint.
+
+    The former GitHub-style ref path does not exist on Gitee v5 and returned
+    HTTP 404 for every branch (#4137). Gitee's canonical endpoint is
+    `DELETE /repos/{owner}/{repo}/branches/{branch}`.
+    """
     owner, name = repo.split("/", 1)
-    return f"/repos/{owner}/{name}/git/refs/heads/{branch}"
+    return f"/repos/{owner}/{name}/branches/{branch}"
 
 
 def cmd_delete_branch(args: argparse.Namespace) -> object:
