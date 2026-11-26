@@ -18,17 +18,17 @@ canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-26T11:44:04Z'
-updated_at: '2026-11-26T11:44:15Z'
+updated_at: '2026-11-26T12:32:44Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children:
 - I-20261126T114403Z-A
 source_candidate: docs/B1-docs/raw-20261126T114403Z/candidates.md#C-20261126T114403Z-A
 completed_at: '2026-11-26T12:20:00Z'
-closeout_note: '已由 I-20261126T114403Z-A 完整实现并 GREEN'
+closeout_note: 已由 I-20261126T114403Z-A 完整实现并 GREEN
 severity: P2
 ---
 
