@@ -13,6 +13,9 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/gate/test-evidence-equivalence/raw-20261125T094413Z/issues/I-20261125T094413Z-A.md
 
+### completed_issues
+1. `I-20261125T094413Z-A`
+
 ## M-20261125T100958Z-A
 - title: fix — feedback edit 与 wt-create 解耦，平台发现 ids
 - status: active
