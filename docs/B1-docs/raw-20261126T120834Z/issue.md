@@ -69,3 +69,24 @@ workflow_kind: fix
 - fixture：测试 HEAD = A（证据 ok），追加只改 `docs/B2-docs/**/code-reviews/*.md` 的提交 B → `attest-meta` 后 `pretests-retirement-gate` rc=0；
 - 追加改 `bin/freely` 的提交 C → `attest-meta` 拒绝，退役门禁 rc=1；
 - 仓库现有 `test-evidence.py` 三态单测全绿。
+
+### comment-20261126T124546Z
+- source: system
+- event: root_cause_correction
+
+## 根因更正（2026-11-26，本会话自查）
+
+先前立项描述「退役门禁不认元数据等价证据」经源码复查**不成立**，更正如下：
+
+- `docs/system/workspace/scripts/quality/pretests-retirement-gate:122-124` 使用 `_sp.check_output(...)` / `_sp.DEVNULL`，但脚本只 `import subprocess`（:40），从未定义 `_sp`；`try/except Exception: pass` 把 NameError 吞掉，`_latest_commit` 恒空 → 那段自造 HEAD 相等判据（`:140-149`）是死代码，从未生效。
+- 真正拦截 wt-close 的是其后的 `test-evidence.py validate --json`（#4703 三态判据），该判据对 equivalent 放行、stale 拦截，行为正确。
+- 实测 develop 基线：做完 `attest-meta` 后退役门禁 rc=0；只有真代码变更（未重跑）才 rc=1。
+
+## 本 issue 的真正范围
+
+修复死代码与静默吞异常：删除整段自造 freshness check（`:120-149`），以 `test-evidence.py validate --json` 的 verdict 为唯一新鲜度判据；保留 not_tested、evidence sha256 绑定与 pretests-gate 校验。不改 `test-evidence.py` 的判据与 HARD_EXCLUDED，不放宽 stale/not_tested。
+
+## 验收
+
+- AT：gate 源码无 `pretests_stale` / `_sp.check_output`；fixture 三态 equivalent rc=0、stale rc=1、not_tested rc=1。
+- 既有 `test-evidence.py` 三态单测与 #4137 收口证据回归。
