@@ -1,6 +1,6 @@
 ## M-20261125T122804Z-A
 - title: fix — 生成型 updated 行不参与副本内容判定
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20261125T122804Z-A`
 - milestone: M-20261125T122804Z-A
