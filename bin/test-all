@@ -39,6 +39,7 @@ CORE=(
   test-retirement-gate-equivalence.py
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
+  test-close-orphans-batch.py
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
   test-review-intent-anchor.py
@@ -105,6 +106,7 @@ CI_CORE=(
   test-retirement-gate-equivalence.py
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
+  test-close-orphans-batch.py
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
   test-review-intent-anchor.py

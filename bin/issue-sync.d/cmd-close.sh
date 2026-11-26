@@ -197,3 +197,62 @@ cmd_close_linked() {
   echo "[ERROR] issue-sync batch: linked close failed for $local_id" >&2
   return 1
 }
+
+# Enumerate local ids whose phase is terminal (completed/dropped). The same
+# predicate drives `issue-sync batch`; this helper never decides replica truth.
+_terminal_local_ids() {
+  local kind="${1:-linked}"
+  python3 - "$ROOT_DIR" "$ISSUES_DIR" "$kind" <<'PY'
+import sys
+from pathlib import Path
+import yaml
+
+root, issues_dir, kind = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+files = sorted(issues_dir.glob("raw-*/issue.md"))
+if kind == "linked":
+    files += sorted((root / "docs/B2-docs").glob("**/issues/I-*.md"))
+seen = set()
+for path in files:
+    try:
+        parts = path.read_text(encoding="utf-8", errors="replace").split("---\n", 2)
+        meta = yaml.safe_load(parts[1]) if len(parts) > 2 else {}
+    except Exception:
+        continue
+    if not isinstance(meta, dict) or meta.get("phase_state") not in ("completed", "dropped"):
+        continue
+    local_id = meta.get("local_id") or path.stem
+    if local_id and local_id not in seen:
+        seen.add(local_id)
+        print(local_id)
+PY
+}
+
+# Batch sibling of cmd_close_orphans: ONE platform read for all terminal ids.
+# The adapter owns replica truth and the dual-platform accounting; this function
+# only enumerates candidates and formats an actionable retry receipt (#4722).
+cmd_close_orphans_all() {
+  local kind="${1:-linked}" ids ids_json adapter result rc=0
+  case "$kind" in linked|raw) ;; *)
+    echo "[ERROR] issue-sync close-orphans --all-completed: kind must be linked or raw" >&2
+    return 2 ;;
+  esac
+  ids="$(_terminal_local_ids "$kind")" || {
+    echo "[ERROR] issue-sync close-orphans --all-completed: cannot enumerate local ids" >&2
+    return 1
+  }
+  if [[ -z "$ids" ]]; then
+    echo "[issue-sync] close-orphans --all-completed: no terminal local ids ($kind)"
+    return 0
+  fi
+  ids_json=$(printf '%s\n' "$ids" | python3 -c 'import json,sys; print(json.dumps([x.strip() for x in sys.stdin if x.strip()]))') || return 1
+  adapter="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+  result=$(python3 "$adapter" close-local-ids "$ids_json" "$kind" 2>&1) || rc=$?
+  printf '%s\n' "$result"
+  if [[ "$rc" -eq 0 ]]; then
+    echo "[issue-sync] close-orphans --all-completed: done ($kind)"
+    return 0
+  fi
+  echo "[ERROR] issue-sync close-orphans --all-completed: rc=$rc — not all platforms verified closed" >&2
+  echo "  retry: freely issue-sync close-orphans --all-completed $kind" >&2
+  return "$rc"
+}
