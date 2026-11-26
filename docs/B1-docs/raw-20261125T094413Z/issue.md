@@ -129,3 +129,7 @@ raw-20261125T094104Z（#4702）覆盖 pr-merge 源分支 push 回执；本条覆
 ### 非目标
 
 不改变 test-gate run 真实执行语义；不放宽任何「被测对象/用例定义」变更的强制重测；不改 pr-create/pr-merge 门禁顺序；不夹带 #4702（push 吞错）、#4698、#4687。
+#### resolution-20261126T053117Z
+- status: adopted
+- reason: 采纳平台设计修正评论——以语义影响而非路径白名单判据；实现 test-evidence.py attest-meta + 三态 validate + 测试定义指纹 fail-closed，AT 正反用例覆盖（13/0 GREEN、3/10 RED）。
+- resolved_by: worker_01
