@@ -11,7 +11,7 @@
 | 代码写完了准备提 PR | `freely pr-create-guarded` | pull develop → 冲突处理 → dry-run gate → 双平台 push → 双平台创建 PR | gh pr create, git push |
 | 请人 review PR | `freely pr-review-guarded <branch>` | 6 维独立 review → verdict 文档 | — |
 | review 通过想合并 | `freely pr-merge-guarded develop <branch>` | PR gate → promotion gate → merge → develop-push → 双平台同步 | gh pr merge, git merge |
-| 合并完了收工 | `freely wt-close --raw-key <key>` | 关闭 test + dev worktree → 双平台 close issue → 清理分支 | git worktree remove, git branch -D |
+| 合并完了收工 | `freely wt-close --raw-key <key>` | 终态门禁 + 删 test/dev 工位与分支（正常路径不写平台，issue 已在 pr-merge 阶段关闭） | git worktree remove, git branch -D |
 | 只关双平台 issue | `freely wt-close --raw-key <key> --platform-only` | 双平台 close issue（GitHub + Gitee） | gh issue close |
 | 同步 develop 到远程 | `freely develop-push attempt` | 受控 develop push → 审计日志 | git push --no-verify, git push --force |
 | 查看当前状态 | `freely live-status`, `freely fleet-status` | 工位/分支/运行时状态一览 | — |

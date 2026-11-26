@@ -982,6 +982,29 @@ def candidate_has_canonical_owner_line(
 VALID_RAW_PHASES = {"proposed", "absorbed", "dropped"}
 
 
+def _validate_linked_strict_frontmatter(issue: IssueRecord, changed_paths: list) -> list[str]:
+    """Touched linked I-* documents must carry a parseable YAML `---` block.
+
+    Historical docs predate the schema and must not be rewritten wholesale;
+    only the linked issues this branch actually touches have to be strict.
+    """
+    if not issue.path.startswith("docs/B2-docs/") or issue.path not in set(changed_paths or []):
+        return []
+    text = read_repo_text(issue.path)
+    parts = text.split("---", 2)
+    if len(parts) < 3 or parts[0].strip():
+        return [f"{issue.issue_id} in {issue.path}: linked issue needs a leading YAML '---' frontmatter block (schema_version: '1')"]
+    try:
+        metadata = yaml.safe_load(parts[1]) or {}
+    except yaml.YAMLError as error:
+        return [f"{issue.issue_id} in {issue.path}: invalid YAML frontmatter: {error}"]
+    if not isinstance(metadata, dict) or str(metadata.get("schema_version", "")) != "1":
+        return [f"{issue.issue_id} in {issue.path}: touched linked issue must declare schema_version: '1' with a real YAML frontmatter block"]
+    return []
+
+
+
+
 def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None, issues_index: dict = None) -> list[str]:
     """Validate a raw-* issue meets B1 entry-point requirements.
 
@@ -1770,6 +1793,7 @@ def main() -> int:
             continue
 
         phase = normalized_phase(issue.phase_state)
+        errors.extend(_validate_linked_strict_frontmatter(issue, changed_paths))
 
         source_candidate_path = anchorless_source_candidate(issue.source_candidate)
         if not source_candidate_path or not path_exists(source_candidate_path):

@@ -11,7 +11,7 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 | `freely pr-create-guarded` | pull develop → 冲突处理 → dry-run gate → 双平台 push → 双平台创建 PR |
 | `freely pr-review-guarded` | 6 维独立 review → verdict 文档 |
 | `freely pr-merge-guarded` | PR gate → promotion gate → merge → develop-push → 双平台同步 |
-| `freely wt-close` | 关闭 test-pre-merge + dev worktree → 双平台 close issue → 清理分支 |
+| `freely wt-close` | 终态门禁 + 不可逆清理：`--raw-key` 单入口，正常路径 write-free（只删工位/分支），平台写由 pr-review / pr-merge / issue-sync 负责 |
 | `freely develop-push` | 受控 develop push → 审计日志 |
 | `freely issue-sync` | 双平台 issue 同步（create/update/comment/close/promote/batch） |
 | `freely deploy-skills` | 部署 workspace skills 到 AI 工具目录 |
