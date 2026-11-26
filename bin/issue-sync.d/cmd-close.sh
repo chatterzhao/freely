@@ -124,6 +124,47 @@ cmd_close() {
   echo "[issue-sync] close complete: $local_id"
 }
 
+# Close every OPEN platform replica of a local id, including stale linked
+# orphans whose title no longer matches the document mapping (#4687).
+# This is a PACKAGED command: callers never import the adapter or assemble
+# platform_ids by hand. The adapter still owns the dual-platform accounting;
+# a partial result keeps a non-zero exit and prints the exact retry command.
+cmd_close_orphans() {
+  local local_id="$1" kind="${2:-linked}" file platform_ids result rc=0
+  [[ -n "$local_id" && "$local_id" != -* ]] || {
+    echo "[ERROR] issue-sync close-orphans: <local_id> is required" >&2
+    return 2
+  }
+  case "$kind" in linked|raw) ;; *)
+    echo "[ERROR] issue-sync close-orphans: kind must be linked or raw" >&2
+    return 2 ;;
+  esac
+  if ! file="$(_issue_file_for "$local_id")"; then
+    echo "[ERROR] issue-sync close-orphans: no local document for $local_id" >&2
+    return 1
+  fi
+  # The mapping is only a hint: the adapter unions it with platform truth.
+  platform_ids=$(python3 - "$file" <<'PY'
+import json, sys
+import yaml
+content = open(sys.argv[1], encoding="utf-8").read()
+parts = content.split("---\n", 2)
+meta = yaml.safe_load(parts[1]) if len(parts) > 2 else {}
+print(json.dumps((meta or {}).get("platform_ids") or {}))
+PY
+  ) || { echo "[ERROR] issue-sync close-orphans: cannot read platform_ids for $local_id" >&2; return 1; }
+  local adapter="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+  result=$(python3 "$adapter" close-local-id "$local_id" "$platform_ids" "completed" "$kind" 2>&1) || rc=$?
+  printf '%s\n' "$result"
+  if [[ "$rc" -eq 0 ]]; then
+    echo "[issue-sync] close-orphans complete: $local_id"
+    return 0
+  fi
+  echo "[ERROR] issue-sync close-orphans: rc=$rc for $local_id — not all platforms verified closed" >&2
+  echo "  retry: freely issue-sync close-orphans $local_id $kind" >&2
+  return "$rc"
+}
+
 # Retire a completed I-* issue. Called ONLY by `issue-sync batch`'s linked
 # branch; the CLI `close` action refuses linked documents above. The strict
 # local validation lives in raw_lifecycle_effects.close_linked (Phase 1, zero
