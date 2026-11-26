@@ -1,3 +1,21 @@
+## M-20260807T121205Z-A
+- title: fix — reviewer assign FAIL-CLOSED missing raw_key in SSE event
+- status: active
+### candidate_issues
+1. `C-20260807T121205Z-A`
+- milestone: M-20260807T121205Z-A
+- status: promoted
+- promoted_issue_id: `I-20260807T121205Z-A`
+- promoted_issue_path: docs/B2-docs/a2a/reviewer-agent/raw-20260807T121205Z/issues/I-20260807T121205Z-A.md
+### committed_issues
+1. `I-20260807T121205Z-A`
+- milestone: M-20260807T121205Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/a2a/reviewer-agent/raw-20260807T121205Z/issues/I-20260807T121205Z-A.md
+
+### completed_issues
+1. `I-20260807T121205Z-A`
+
 ## M-20261125T065112Z-A
 - title: fix — wt-close 职责边界与提示语漂移
 - status: active

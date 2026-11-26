@@ -1,0 +1,8 @@
+=== BEHAVIOR: real a2a-exit CLI, needs-review raw_key routing ===
+  [ok] raw_key resolved from task record is emitted in SSE payload (payload_raw_key='raw-20260807T121205Z', ok=True)
+  [ok] missing raw_key is rejected (no PATCH, no SSE event) (ok=False, updates=0)
+  [ok] explicit --raw-key wins over task record (field='raw-20260807T121205Z')
+  [ok] non-review transition unchanged (no raw_key added)
+  [ok] watchdog FAIL-CLOSED assertion preserved
+  [ok] AT wired into bin/test-all CORE and CI_CORE (occurrences=2)
+SUMMARY: 6 ok, 0 failed

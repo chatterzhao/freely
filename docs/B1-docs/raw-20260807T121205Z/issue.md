@@ -18,7 +18,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-08-07T12:12:05Z'
-updated_at: '2026-08-07T12:12:30Z'
+updated_at: '2026-11-03T12:09:49Z'
 intake_id: ''
 author: platform
 channel: github
@@ -29,6 +29,8 @@ source_candidate: ''
 completed_at: ''
 closeout_note: ''
 ---
+
+# fix: reviewer assign FAIL-CLOSED missing raw_key in SSE event
 
 workflow_kind: fix
 
