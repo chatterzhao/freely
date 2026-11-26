@@ -481,4 +481,6 @@
   <text x="65" y="4557" fill="#333">wt-create-resume-test-worktree</text>
   <rect id="story-wt-close" x="55" y="4562" width="690" height="18" fill="#fff" stroke="#4527a0" stroke-width="1" rx="2"/>
   <text x="65" y="4575" fill="#333">wt-close</text>
+  <rect id="story-wt-close-boundary" x="55" y="4580" width="690" height="18" fill="#fff" stroke="#1565c0" stroke-width="1" rx="2"/>
+  <text x="65" y="4593" fill="#333">wt-close-boundary</text>
 </svg>
