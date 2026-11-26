@@ -141,7 +141,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/quality/governance-merge-gate",
       "target": "bin/governance-merge-gate",
-      "sha256": "ffa2b29fb231e5af8bf51577b61b13f36504163ea03426b7d8623784f4995a21",
+      "sha256": "9ffa2c53639d0ae0b863c324c50abe1039e9b25af603be50a6625ffa99467398",
       "mode": "delegate",
       "note": "exec projection"
     },

@@ -1,3 +1,21 @@
+## M-20261125T065112Z-A
+- title: fix — wt-close 职责边界与提示语漂移
+- status: active
+### candidate_issues
+1. `C-20261125T065112Z-A`
+- milestone: M-20261125T065112Z-A
+- status: promoted
+- promoted_issue_id: `I-20261125T065112Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-close-boundary/raw-20261125T065112Z/issues/I-20261125T065112Z-A.md
+### committed_issues
+1. `I-20261125T065112Z-A`
+- milestone: M-20261125T065112Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-close-boundary/raw-20261125T065112Z/issues/I-20261125T065112Z-A.md
+
+### completed_issues
+1. `I-20261125T065112Z-A`
+
 ## M-20261124T131119Z-A
 - title: fix — stale linked 孤儿副本关闭封装入口
 - status: active

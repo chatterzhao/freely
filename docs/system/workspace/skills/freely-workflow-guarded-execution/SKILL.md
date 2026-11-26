@@ -270,8 +270,7 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 ### 阶段 9：`freely wt-close` 命令收口
 
 ```
-1. freely wt-close test-pre-merge-<key>-<slug>  # 先关测试工位
-2. freely wt-close <branch>                      # 再关开发工位
+1. freely wt-close --raw-key <key>   # 单入口：一次收口 test + dev 两个工位与分支；正常路径不写平台
 ```
 
 #### merge 后残留提交（权威规范，raw-20261114T065554Z）
@@ -334,7 +333,7 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 | 代码写完了提 PR | `freely pr-create-guarded` | `gh pr create`, `git push` | pr-create-guarded 先 pull develop、跑 dry-run gate、双平台同步 |
 | 请人 review | `freely pr-review-guarded <branch>` | — | 6 维独立 review + verdict 文档 |
 | review 通过想合并 | `freely pr-merge-guarded develop <branch>` | `gh pr merge`, `git merge` | pr-merge-guarded 跑全部门禁 + 双平台同步 |
-| 合并完了收工 | `freely wt-close --raw-key <key>` | `git worktree remove`, `git branch -D` | wt-close 同时关 test + dev 工位 + 双平台 close issue |
+| 合并完了收工 | `freely wt-close --raw-key <key>` | `git worktree remove`, `git branch -D` | wt-close 同时清理 test + dev 工位；平台 issue 已由 pr-merge / issue-sync 关闭，正常路径 write-free |
 | 同步 develop 到远程 | `freely develop-push attempt` | `git push --no-verify`, `git push --force` | 受控 push + 审计日志 |
 | 查看当前状态 | `freely live-status`, `freely fleet-status` | — | 工位/分支/运行时一览 |
 
