@@ -12,9 +12,9 @@
 - artifact_ref: docs/B2-docs/gate/test-evidence-equivalence/raw-20261125T094413Z/verification/test-evidence/acceptance-1.log
 - test_command: python3 docs/system/workspace/scripts/tests/test-evidence-equivalence.py
 - expected_output: SUMMARY: N ok, 0 failed
-- expected_RED_output: SUMMARY: 4 ok, 5 failed — develop 无 attest-meta/三态
-- actual_RED_output: "SUMMARY: 4 ok, 5 failed（develop 基线）"
-- actual_output: "SUMMARY: 9 ok, 0 failed（strict 断言）"
+- expected_RED_output: SUMMARY: 3 ok, 10 failed — develop 无 attest-meta/三态/指纹持久化
+- actual_RED_output: "SUMMARY: 3 ok, 10 failed（develop 基线）"
+- actual_output: "SUMMARY: 13 ok, 0 failed（strict 断言）"
 - evidence_file: docs/B2-docs/gate/test-evidence-equivalence/raw-20261125T094413Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
@@ -30,3 +30,4 @@
   2. 硬排除路径无条件拒绝。
   3. 沿袭保留 EVIDENCE_SHA256（不伪造）。
   4. validate 输出 current/equivalent/stale。
+  5. TEST_DEFINITION_FINGERPRINT 必须持久化；变更或未登记均拒绝沿袭。

@@ -29,7 +29,9 @@ FIELDS = (
 )
 # Optional fields present only when evidence was carried forward through
 # metadata-equivalent commits (raw-20261125T094413Z). Never written by hand.
-EQUIV_FIELDS = ("EQUIVALENCE_CHAIN", "EQUIVALENCE_SENSITIVE_PATHS")
+EQUIV_FIELDS = (
+    "EQUIVALENCE_CHAIN", "EQUIVALENCE_SENSITIVE_PATHS", "TEST_DEFINITION_FINGERPRINT",
+)
 
 # Paths that can NEVER be treated as metadata-only, regardless of the caller's
 # declaration. Touching one of these requires a real `test-gate run`.
@@ -88,7 +90,8 @@ def head_of(worktree: Path) -> str:
 
 
 def write_evidence(gate: Path, *, status: str, command: str, exit_code: int,
-                   evidence: Path, head: str) -> dict[str, str]:
+                   evidence: Path, head: str,
+                   test_definition_fingerprint: str = "") -> dict[str, str]:
     evidence = Path(evidence).resolve()
     if not evidence.is_file():
         raise ValueError(f"evidence file is missing: {evidence}")
@@ -102,6 +105,8 @@ def write_evidence(gate: Path, *, status: str, command: str, exit_code: int,
         "EVIDENCE_SHA256": sha256(evidence),
         "EVIDENCE_HEAD": head,
     }
+    if test_definition_fingerprint:
+        values["TEST_DEFINITION_FINGERPRINT"] = test_definition_fingerprint
     _atomic_env(gate, values)
     return values
 
@@ -200,8 +205,13 @@ def attest_meta(gate: Path, worktree: Path, sensitive_paths: str,
             if path == p or path.startswith(p + "/") or path.startswith(p):
                 hits.append(path)
                 break
-    if test_definition_fingerprint and test_definition_fingerprint != values.get("TEST_DEFINITION_FINGERPRINT", test_definition_fingerprint):
-        hits.append("<test-definition-fingerprint>")
+    # The fingerprint must be persisted by `write` (or a previous attestation)
+    # to be comparable. A caller-supplied fingerprint with no stored baseline
+    # is treated as changed — fail-closed, never silently accepted.
+    if test_definition_fingerprint:
+        stored_fingerprint = values.get("TEST_DEFINITION_FINGERPRINT", "")
+        if stored_fingerprint != test_definition_fingerprint:
+            hits.append("<test-definition-fingerprint>")
     if hits:
         raise ValueError("sensitive paths changed; must re-run test-gate: " + ", ".join(sorted(set(hits))))
 
@@ -209,6 +219,8 @@ def attest_meta(gate: Path, worktree: Path, sensitive_paths: str,
     chain = ([prior[0]] if prior else [tested]) + [head]
     values["EQUIVALENCE_CHAIN"] = ",".join(dict.fromkeys(chain))
     values["EQUIVALENCE_SENSITIVE_PATHS"] = ",".join(sensitive)
+    if test_definition_fingerprint:
+        values["TEST_DEFINITION_FINGERPRINT"] = test_definition_fingerprint
     _atomic_env(gate, values)
     return {"ok": True, "verdict": "equivalent", "chain": values["EQUIVALENCE_CHAIN"],
             "changed_paths": changed}
@@ -248,6 +260,7 @@ def main(argv: list[str] | None = None) -> int:
     w.add_argument("--exit-code", required=True, type=int)
     w.add_argument("--evidence", required=True)
     w.add_argument("--head", required=True)
+    w.add_argument("--test-definition-fingerprint", default="")
 
     v = sub.add_parser("validate")
     v.add_argument("--gate", required=True)
@@ -270,6 +283,7 @@ def main(argv: list[str] | None = None) -> int:
             payload = write_evidence(
                 args.gate, status=args.status, command=args.command,
                 exit_code=args.exit_code, evidence=args.evidence, head=args.head,
+                test_definition_fingerprint=args.test_definition_fingerprint,
             )
         except ValueError as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
