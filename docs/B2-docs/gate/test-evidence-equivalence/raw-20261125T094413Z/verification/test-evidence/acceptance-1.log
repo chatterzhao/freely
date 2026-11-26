@@ -1,0 +1,34 @@
+=== GREEN ===
+ok   helper readable
+ok   attest-meta subcommand present
+ok   validate emits three-state verdict
+ok   hard-excluded paths present
+ok   fingerprint is persisted, not compared in memory
+ok   baseline exact HEAD validates
+ok   metadata commit goes stale without attestation
+ok   attest-meta succeeds for non-sensitive diff
+ok   validated as equivalent
+ok   attest-meta rejects sensitive diff with reason
+ok   changed test-definition fingerprint rejected
+ok   matching fingerprint attests
+ok   fingerprint attestation validates as equivalent
+SUMMARY: 13 ok, 0 failed
+=== RED (develop baseline) ===
+ok   helper readable
+FAIL attest-meta subcommand present
+FAIL validate emits three-state verdict
+FAIL hard-excluded paths present
+FAIL fingerprint is persisted, not compared in memory
+ok   baseline exact HEAD validates
+ok   metadata commit goes stale without attestation
+FAIL attest-meta succeeds for non-sensitive diff — usage: test-evidence.py [-h] {write,validate,manifest-add} ...
+test-evidence.py: error: argument action: invalid choice:
+FAIL validated as equivalent — {"ok": false, "errors": ["LAST_TESTED_COMMIT does not match worktree HEAD", "EVIDENCE_HEAD does not match worktree HEAD"
+FAIL attest-meta rejects sensitive diff with reason — usage: test-evidence.py [-h] {write,validate,manifest-add} ...
+test-evidence.py: error: argument action: invalid choice: 'attest-meta' (choose from write, valid
+FAIL changed test-definition fingerprint rejected — usage: test-evidence.py [-h] {write,validate,manifest-add} ...
+test-evidence.py: error: argument action: invalid choice: 'attest-meta' (choose from write, valid
+FAIL matching fingerprint attests — usage: test-evidence.py [-h] {write,validate,manifest-add} ...
+test-evidence.py: error: argument action: invalid choice: 'attest-meta' (choose from write, valid
+FAIL fingerprint attestation validates as equivalent — {"ok": false, "errors": ["LAST_TESTED_COMMIT does not match worktree HEAD", "EVIDENCE_HEAD does not match worktree HEAD"
+SUMMARY: 3 ok, 10 failed

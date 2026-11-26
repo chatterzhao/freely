@@ -35,6 +35,7 @@ CORE=(
   test-wt-close-platform-truth.py
   test-pr-merge-push-receipt.py
   test-feedback-edit-platform-discovery.py
+  test-evidence-equivalence.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
@@ -94,6 +95,7 @@ CI_CORE=(
   test-wt-close-platform-truth.py
   test-pr-merge-push-receipt.py
   test-feedback-edit-platform-discovery.py
+  test-evidence-equivalence.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
