@@ -37,6 +37,21 @@ closeout_note: ''
 
 workflow_kind: fix
 
+## fix: gitee-issue.py delete-branch 使用错误 API 路径导致恒 404
+
+| Field | Value |
+|-------|-------|
+| local_id | `raw-20261103T083757Z` |
+| kind | `raw` |
+| phase_state | `absorbed` |
+| canonical | `docs/B2-docs/platform/raw-replica-reconciliation/raw-20261103T083757Z/issues/I-20261103T083757Z-A.md` |
+| created | 2026-11-03T08:37:58Z |
+| updated | 2026-11-26T10:01:29Z |
+
+---
+
+> **Freely 治理**：这是 raw issue `raw-20261103T083757Z`。实现前请用 `wt-create --raw-key 20261103T083757Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+
 ## 现象
 清理远程分支时调用 `python3 docs/system/workspace/scripts/runtime/gitee-issue.py delete-branch <branch>`，四个分支全部返回：
 
@@ -58,11 +73,3 @@ workflow_kind: fix
 
 ## 发现场景
 2026-11-03 清理 2026-06/07 遗留 Gitee 远程分支时复现（4/4 分支均 404，fallback 成功）。
-
-### comment-20261126T100124Z
-- source: system
-- event: promote_finalized
-- children: ["I-20261103T083757Z-A"]
-
-拆解为以下任务:
-1. [I-20261103T083757Z-A](will-be-updated)
