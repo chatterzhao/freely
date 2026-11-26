@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261125T122804Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261125T122804Z-A
 platform_ids:
   github:
     issue_id: '4707'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKY048
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261125T122804Z/issues/I-20261125T122804Z-A.md
+last_synced_comment_at:
+  github: '2026-11-26T06:31:50Z'
+  gitee: '2026-11-26T06:31:50Z'
 hash: ''
 created_at: '2026-11-25T12:28:05Z'
-updated_at: '2026-11-25T12:28:13Z'
+updated_at: '2026-11-26T06:31:55Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261125T122804Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-26T06:31:49Z'
 closeout_note: ''
 severity: P1
 ---
@@ -41,7 +44,7 @@ workflow_kind: fix
 |-------|-------|
 | local_id | `raw-20261125T122804Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
+| phase_state | `absorbed` |
 | canonical | `none` |
 | created | 2026-11-25T12:28:05Z |
 | updated | 2026-11-25T12:28:05Z |
@@ -73,3 +76,11 @@ workflow_kind: fix
 
 ## 非目标
 不改 platform_body 的其他字段语义；不夹带 #4702（已合并）、#4703、#4704、#4698、#4687。
+
+### comment-20261126T063150Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261125T122804Z-A"]
+
+拆解为以下任务:
+1. [I-20261125T122804Z-A](will-be-updated)
