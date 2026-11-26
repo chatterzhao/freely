@@ -1315,7 +1315,17 @@ def close_local_id(local_id: str, platform_ids: dict = None,
     healthy). A platform that cannot be read reports ``error`` and the caller
     MUST NOT certify closure.
     """
-    truth = find_open_replicas_by_local_id(local_id, kind)
+    return _close_from_truth(find_open_replicas_by_local_id(local_id, kind),
+                             platform_ids, close_reason)
+
+
+def _close_from_truth(truth: dict, platform_ids: dict = None,
+                      close_reason: str = "completed") -> dict:
+    """Closure body shared by single-id and batch entry points.
+
+    ``truth`` is always produced by ``replica_truth.summarize`` — the single
+    source of replica identity. Callers never assemble ``platform_ids`` by hand.
+    """
     results: dict[str, dict] = {}
     if not truth.get("ok"):
         detail = str((truth.get("degraded") or [{}])[0].get("error", "platform unreadable"))[:200]
@@ -1361,6 +1371,41 @@ def _close_local_id_exit_code(results: object) -> int:
     if len(good) == len(statuses):
         return 0
     return 3 if good else 1
+
+
+def close_local_ids(local_ids: list, kind: str = "linked",
+                    close_reason: str = "completed") -> dict:
+    """Close every OPEN replica of many local ids with ONE platform read.
+
+    The OPEN records are fetched once and reused through ``_replica_summary`` —
+    the same truth function the single-id path uses. A configured but unreadable
+    platform still fails closed for every id; it is never treated as empty.
+    """
+    configured = configured_platforms()
+    records = list_open_issue_records(configured or None)
+    detected = {handler.name for handler in _handlers()}
+    missing = [p for p in configured if p not in detected]
+    results: dict[str, dict] = {}
+    for local_id in local_ids:
+        if missing:
+            summary = {"ok": False, "degraded": [
+                {"platform": p, "error": "configured but handler unavailable"}
+                for p in missing]}
+        else:
+            summary = _replica_summary(records, local_id, kind)
+        results[local_id] = _close_from_truth(summary, {}, close_reason)
+    return results
+
+
+def _close_local_ids_exit_code(results: object) -> int:
+    """Aggregate per-id 0/3/1 into one exit code (0 all, 3 mixed, 1 all failed)."""
+    if not isinstance(results, dict) or not results:
+        return 0
+    codes = [_close_local_id_exit_code(v) for v in results.values()]
+    if all(code == 0 for code in codes):
+        return 0
+    return 3 if any(code == 0 for code in codes) else 1
+
 
 def set_assignee(platform: str, issue_number: str, login: str) -> tuple[bool, str]:
     h = _handler_for(platform)
@@ -1884,6 +1929,12 @@ if __name__ == "__main__":
                                 a[4] if len(a) > 4 else "linked")
         print(json.dumps(result, indent=2, ensure_ascii=False))
         raise SystemExit(_close_local_id_exit_code(result))
+    elif len(a) > 1 and a[1] == "close-local-ids":
+        local_ids = json.loads(a[2]) if len(a) > 2 else []
+        kind = a[3] if len(a) > 3 else "linked"
+        result = close_local_ids(local_ids, kind, "completed")
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        raise SystemExit(_close_local_ids_exit_code(result))
     elif len(a) > 1 and a[1] == "close":
         print(json.dumps(close_issue("", a[3]), indent=2))
     elif len(a) > 1 and a[1] == "pull":

@@ -105,6 +105,11 @@ main() {
 
   local_id="${1:-}"
   extra="${2:-}"
+  # Batch sibling: one platform read for every terminal local id (#4722).
+  if [[ "$action" == "close-orphans" && "$local_id" == "--all-completed" ]]; then
+    cmd_close_orphans_all "${extra:-linked}"
+    return $?
+  fi
   [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|close|close-orphans|promote|status|batch|scan> <local_id> [extra]" >&2; exit 1; }
   if [[ "$action" != "batch" && "$action" != "scan" ]]; then
     [[ -n "$local_id" ]] || { echo "[ERROR] missing local_id" >&2; exit 1; }
