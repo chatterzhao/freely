@@ -1,3 +1,24 @@
+## M-20261126T120834Z-A
+- title: fix — 退役门禁删除失效的 freshness check
+- status: active
+### candidate_issues
+1. `C-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- status: promoted
+- promoted_issue_id: `I-20261126T120834Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+### committed_issues
+1. `I-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+
+### completed_issues
+1. `I-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+
 ## M-20261103T083757Z-A
 - title: fix — Gitee delete-branch 端点纠正
 - status: active
