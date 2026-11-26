@@ -695,6 +695,40 @@ def normalize_state(raw: str) -> str:
     s = raw.strip().lower().replace('-', '_').replace(' ', '_')
     return STATE_ALIASES.get(s, s)
 
+
+def _a2a_exit_update_fields(state: str, reason: str, args,
+                            client=None, task_id: str = "") -> dict:
+    """Fields for the a2a-exit PATCH (and therefore the state_update SSE event).
+
+    A needs-review input-required transition routes to the reviewer via the
+    SSE event. That event MUST carry raw_key: watchdog_sse.py fails closed on
+    a missing raw_key, so omitting it silently skips every phase review.
+    Resolve from --raw-key first, then from the stored task record by task_id.
+    Refuse the transition when neither source has it (fail-closed).
+    """
+    fields = {
+        "state": state,
+        "summary": getattr(args, "summary", "") or "",
+        "next": getattr(args, "next", "") or "",
+        "evidence": getattr(args, "evidence", "") or "",
+        "reason": reason,
+    }
+    if state == "input-required" and reason.strip().startswith("needs-review:"):
+        raw_key = (getattr(args, "raw_key", "") or "").strip()
+        if not raw_key and task_id and client is not None:
+            try:
+                row = client.get(task_id) or {}
+                raw_key = str(row.get("raw_key") or "").strip()
+            except Exception:
+                raw_key = ""
+        if not raw_key:
+            raise ValueError(
+                "needs-review requires raw_key (fail-closed): "
+                "pass --raw-key or ensure the task record carries raw_key")
+        fields["raw_key"] = raw_key
+    return fields
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def _main() -> int:
@@ -1133,11 +1167,13 @@ def _main() -> int:
                 existing_task_id = getattr(args, 'task_id', '') or ''
                 reason = getattr(args, 'reason', '') or ""
                 if existing_task_id:
-                    r = c.update(existing_task_id, state=state,
-                                 summary=getattr(args, 'summary', '') or "",
-                                 next=getattr(args, 'next', '') or "",
-                                 evidence=getattr(args, 'evidence', '') or "",
-                                 reason=reason)
+                    try:
+                        update_fields = _a2a_exit_update_fields(
+                            state, reason, args, c, existing_task_id)
+                    except ValueError as e:
+                        print(json.dumps({"ok": False, "error": str(e)}))
+                        return
+                    r = c.update(existing_task_id, **update_fields)
                     task_id = existing_task_id
                 else:
                     # ── L1: validate new worker task required fields ──
