@@ -86,7 +86,9 @@ Freely 的每条封装命令内部都执行了多个关键步骤。直接用 `gi
 
 ### `freely wt-create`
 
-**语法**: `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>] [--skill <name>]`
+**语法**: `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>] [--skill <name>] [--source-platform <github|gitee>]`
+
+`--source-platform` 仅用于历史单平台 raw：显式指定读取来源，跳过全副本前置校验，物化后由 `issue-sync create` 补齐缺失平台副本；任一平台失败即拒绝创建工位。
 
 **执行位置**: `cd <project-root>`（develop 工位）。wt-create 会在 develop 上创建新的 fix/feature worktree 并提示 cd 进入。
 **选项**:

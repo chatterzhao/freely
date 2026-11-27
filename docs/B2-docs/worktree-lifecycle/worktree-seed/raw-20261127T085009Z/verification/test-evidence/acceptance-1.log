@@ -1,0 +1,24 @@
+=== GREEN ===
+ok   wt-create source readable
+ok   replica gate respects explicit source platform
+ok   explicit bypass is audited on stderr
+ok   missing replicas filled via issue-sync wrapper
+ok   partial replica failure is fatal
+ok   commands.md documents --source-platform
+ok   no adapter import in worktree wrapper
+ok   issue-sync rc=0 propagated
+ok   issue-sync rc=1 propagated
+ok   failure prints actionable refusal
+SUMMARY: 10 ok, 0 failed
+=== RED ===
+ok   wt-create source readable
+FAIL replica gate respects explicit source platform
+FAIL explicit bypass is audited on stderr
+FAIL missing replicas filled via issue-sync wrapper
+FAIL partial replica failure is fatal
+FAIL commands.md documents --source-platform
+ok   no adapter import in worktree wrapper
+ok   issue-sync rc=0 propagated
+ok   issue-sync rc=1 propagated
+ok   failure prints actionable refusal
+SUMMARY: 5 ok, 5 failed
