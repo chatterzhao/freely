@@ -386,7 +386,9 @@ if [[ "$using_new" -eq 1 ]]; then
 fi
 
 # 恢复模式无需重复校验平台 raw replicas（工位与 raw issue 已在本地）。
-if [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 ]]; then
+# An explicit --source-platform is an audited operator decision to materialize a
+# legacy single-platform raw; the missing replica is created after pull below.
+if [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 && -z "$source_platform" ]]; then
   echo "wt-create: verifying configured raw replicas..." >&2
   _replica_receipt="$(mktemp -t freely-replica-receipt.XXXXXX)"
   if ! FREELY_PROJECT_ROOT="$ROOT_DIR" python3 \
@@ -405,6 +407,8 @@ if [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 ]]; then
     echo "wt-create: 有平台读取失败，已记入待对账（sync-debt list 查看）；工位创建继续" >&2
   fi
   rm -f "$_replica_receipt"
+elif [[ "$using_new" -eq 1 && "$resume_mode" -eq 0 && -n "$source_platform" ]]; then
+  echo "wt-create: --source-platform $source_platform 已显式指定；跳过全副本一致性前置校验，物化后由 issue-sync create 补齐缺失副本" >&2
 fi
 
 # ── Validate base exists ─────────────────────────────────
@@ -1027,6 +1031,17 @@ fi
       exit 1
     fi
     _fill_platform_ids "$raw_key"
+    if [[ -n "$source_platform" ]]; then
+      # Explicit single-platform materialization: fill every missing replica
+      # through the only platform-writing wrapper. Partial failure is fatal.
+      if ! "$ROOT_DIR/bin/issue-sync" --project "$fix_target" create "raw-$raw_key"; then
+        echo "拒绝创建工位: issue-sync create 未能补齐缺失平台副本（$raw_key）" >&2
+        git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
+        git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
+        exit 1
+      fi
+      _fill_platform_ids "$raw_key"
+    fi
 	    _update_scan_state "$raw_key" "working" "$fix_target"
   fi
 

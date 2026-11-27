@@ -43,6 +43,7 @@ CORE=(
   test-close-orphans-batch.py
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
+  test-single-platform-materialize.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
@@ -111,6 +112,7 @@ CI_CORE=(
   test-close-orphans-batch.py
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
+  test-single-platform-materialize.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
