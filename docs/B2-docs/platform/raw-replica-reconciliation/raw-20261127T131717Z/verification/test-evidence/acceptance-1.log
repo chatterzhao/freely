@@ -1,0 +1,26 @@
+=== GREEN ===
+ok   adapter source readable
+ok   identity helper defined
+ok   GitHub title query only
+ok   no body search in identity path
+ok   canonical RAW prefix accepted
+ok   canonical linked prefix accepted
+ok   case-insensitive prefix accepted
+ok   body mention with no prefix rejected
+ok   different key rejected
+ok   only canonical title matches returned
+ok   body-only candidate ignored
+SUMMARY: 11 ok, 0 failed
+=== RED ===
+ok   adapter source readable
+FAIL identity helper defined
+FAIL GitHub title query only
+FAIL no body search in identity path
+FAIL canonical RAW prefix accepted — identity helper missing on develop
+FAIL canonical linked prefix accepted — identity helper missing on develop
+FAIL case-insensitive prefix accepted — identity helper missing on develop
+FAIL body mention with no prefix rejected — identity helper missing on develop
+FAIL different key rejected — identity helper missing on develop
+FAIL only canonical title matches returned — identity helper missing on develop
+FAIL body-only candidate ignored — identity helper missing on develop
+SUMMARY: 1 ok, 10 failed
