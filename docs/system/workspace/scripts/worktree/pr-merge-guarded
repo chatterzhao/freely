@@ -546,7 +546,7 @@ _attest_test_evidence_equivalent() {
   helper="$wt/docs/system/workspace/scripts/quality/test-evidence.py"; sensitive=$(grep '^EQUIVALENCE_SENSITIVE_PATHS=' "$gate" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"')
   sensitive=${sensitive:-docs/system/workspace/scripts/,bin/,docs/B2-docs/**/verification/}; [[ -f "$gate" && -f "$helper" ]] || { echo "[MERGE-GUARD] evidence not carried; run test-gate" >&2; return 1; }
   result=$(python3 "$helper" attest-meta --gate "$gate" --worktree "$wt" --sensitive-paths "$sensitive" 2>&1) || rc=$?
-  if [[ $rc -eq 0 ]]; then echo "[MERGE-GUARD] evidence carried: $result"; return 0; fi
+  if [[ $rc -eq 0 ]]; then echo "[MERGE-GUARD] evidence carried forward: $result"; return 0; fi
   echo "[MERGE-GUARD] evidence stale; run: freely test-gate run --worktree $wt --command 'bin/test-all --ci'" >&2; printf '%s\n' "$result" >&2; return "$rc"
 }
 # _sync_issues_changed_in_merge: BEFORE merge, update issue phase_state
