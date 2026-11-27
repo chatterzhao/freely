@@ -1,0 +1,30 @@
+=== GREEN ===
+ok   cmd-comment source readable
+ok   Gitee closed state checked before comment
+ok   actionable closed-issue guidance printed
+ok   last_synced only records successful platforms
+ok   promote-finalize guards duplicate comment
+ok   Gitee 401 translated with cause
+ok   closed-issue POST is refused
+ok   error names the real cause
+ok   error gives an actionable fix
+ok   promote-finalize comment pushed once on retry
+ok   retry prints skip guidance
+SUMMARY: 11 ok, 0 failed
+=== RED ===
+ok   cmd-comment source readable
+FAIL Gitee closed state checked before comment
+FAIL actionable closed-issue guidance printed
+FAIL last_synced only records successful platforms
+FAIL promote-finalize guards duplicate comment
+FAIL Gitee 401 translated with cause
+ok   closed-issue POST is refused
+FAIL error names the real cause — POST /repos/zhaoquan/freely/issues/IKYK8N/comments failed: HTTP 401: {"error": "当前issue已关闭评论功能"}
+
+FAIL error gives an actionable fix — POST /repos/zhaoquan/freely/issues/IKYK8N/comments failed: HTTP 401: {"error": "当前issue已关闭评论功能"}
+
+FAIL promote-finalize comment pushed once on retry — count=2; stderr=
+FAIL retry prints skip guidance — [issue-sync] promote-finalize complete: raw-20261127T110239Z closed with ["I-20261127T110239Z-A"]
+[issue-sync] promote-finalize complete: raw-20261127T110239Z closed with ["I-20261127T110239Z-A"]
+
+SUMMARY: 2 ok, 9 failed
