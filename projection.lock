@@ -197,7 +197,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/pr-merge-guarded",
       "target": "bin/pr-merge-guarded",
-      "sha256": "e807282e78115203aae8069254833aedaff1d1f09b1b077e39c375f9967e616f",
+      "sha256": "95c40f989b6b868827f1789a021be0f0e14330a01e93b57fb486ba6b8bae0427",
       "mode": "delegate",
       "note": "exec projection"
     },
