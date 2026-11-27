@@ -36,6 +36,7 @@ CORE=(
   test-pr-merge-push-receipt.py
   test-feedback-edit-platform-discovery.py
   test-evidence-equivalence.py
+  test-retirement-gate-equivalence.py
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
   test-close-orphans-batch.py
@@ -102,6 +103,7 @@ CI_CORE=(
   test-pr-merge-push-receipt.py
   test-feedback-edit-platform-discovery.py
   test-evidence-equivalence.py
+  test-retirement-gate-equivalence.py
   test-updated-row-reconciliation.py
   test-close-orphans-command.py
   test-close-orphans-batch.py

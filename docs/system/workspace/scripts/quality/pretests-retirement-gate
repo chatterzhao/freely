@@ -116,15 +116,10 @@ if not gate_file.exists():
     sys.exit(1)
 
 # ── Test-gate freshness check ──
-
-_latest_commit = ""
-try:
-    _latest_commit = _sp.check_output(
-        ["git", "-C", str(worktree), "rev-parse", "HEAD"],
-        text=True, stderr=_sp.DEVNULL
-    ).strip()
-except Exception:
-    pass
+# Freshness is decided by `test-evidence.py validate` below (three-state
+# current/equivalent/stale, #4703). A former hand-rolled HEAD comparison was
+# dead code: it called `_sp` (never imported) and swallowed the NameError.
+# Do not reintroduce a second freshness predicate here.
 
 if _test_status == "not_tested" or not _last_tested_at or _last_tested_at == "1970-01-01T00:00:00Z":
     print(f"[pretests_not_tested] 测试工位还没有执行过测试", file=sys.stderr)
@@ -134,19 +129,6 @@ if _test_status == "not_tested" or not _last_tested_at or _last_tested_at == "19
     print(f"  cd {worktree}  # 进入测试工位", file=sys.stderr)
     print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
     print(f"  按 pre-tests.md 的指导执行测试。", file=sys.stderr)
-    print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
-    sys.exit(1)
-
-if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_commit:
-    print(f"[pretests_stale] 测试工位有新提交但未重新跑测试", file=sys.stderr)
-    print(f"  测试工位: {worktree}", file=sys.stderr)
-    print(f"  当前 HEAD:  {_latest_commit[:12]}", file=sys.stderr)
-    print(f"  上次测试时: {_last_tested_commit[:12] if _last_tested_commit else '<empty>'}", file=sys.stderr)
-    print(f"  上次测试时间: {_last_tested_at}", file=sys.stderr)
-    print(f"", file=sys.stderr)
-    print(f"  cd {worktree}  # 进入测试工位", file=sys.stderr)
-    print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
-    print(f"  按 pre-tests.md 的指导重新执行测试。", file=sys.stderr)
     print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
