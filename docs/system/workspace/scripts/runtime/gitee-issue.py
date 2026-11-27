@@ -142,6 +142,18 @@ def api_request(
                 f"{detail} hint: repo may be private or restricted; set GITEE_ACCESS_TOKEN in "
                 f"{freely_env_path_hint()}"
             )
+        # #4737: Gitee reports closed-issue comments with a bare 401 and a
+        # Chinese business message. Translate it into the actual cause instead
+        # of forcing callers to guess between auth, path and repo settings.
+        if exc.code == 401 and "当前issue已关闭评论功能" in detail:
+            raise SystemExit(
+                f"{method} {path} refused: the issue is CLOSED and this repository's "
+                "`issue_comment` setting is false (Gitee default: closed issues do not "
+                "accept comments). `can_comment` may still be true, so the web UI looks "
+                "normal. Fix: reopen the issue before commenting, or enable "
+                "`issue_comment=true` on the repository via PATCH /repos/{owner}/{repo}. "
+                f"raw upstream: HTTP {exc.code}: {detail}"
+            ) from exc
         raise SystemExit(f"{method} {path} failed: HTTP {exc.code}: {detail}") from exc
 
 

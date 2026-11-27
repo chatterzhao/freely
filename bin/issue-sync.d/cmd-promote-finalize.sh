@@ -50,7 +50,16 @@ COMMENT
 
   # Platform synchronization follows the local terminal transition. A failed close
   # leaves absorbed/open state for an idempotent batch retry.
-  cmd_comment "$raw_id"
+  # #4737: do not push the closing comment twice on a retry. The local event is
+  # append-guarded above; the platform side is guarded by last_synced_comment_at.
+  local _synced
+  _synced=$(_fm_get "$raw_file" "last_synced_comment_at")
+  if grep -q '^- event: promote_finalized$' "$raw_file" \
+     && [[ -n "$_synced" && "$_synced" != "None" && "$_synced" != "{}" ]]; then
+    echo "[issue-sync] promote-finalize: closing comment already synced; skip duplicate push"
+  else
+    cmd_comment "$raw_id"
+  fi
   cmd_close "$raw_id" "completed"
 
   echo "[issue-sync] promote-finalize complete: $raw_id closed with $promoted_json"
