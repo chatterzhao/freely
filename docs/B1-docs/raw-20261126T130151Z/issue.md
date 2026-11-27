@@ -18,7 +18,7 @@ canonical_issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-sco
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-26T13:01:51Z'
-updated_at: '2026-11-27T07:38:43Z'
+updated_at: '2026-11-27T08:32:09Z'
 intake_id: ''
 author: platform
 channel: github
