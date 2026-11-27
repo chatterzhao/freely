@@ -1,3 +1,21 @@
+## M-20261127T100325Z-A
+- title: fix — 全角标点变量边界
+- status: active
+### candidate_issues
+1. `C-20261127T100325Z-A`
+- milestone: M-20261127T100325Z-A
+- status: promoted
+- promoted_issue_id: `I-20261127T100325Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261127T100325Z/issues/I-20261127T100325Z-A.md
+### committed_issues
+1. `I-20261127T100325Z-A`
+- milestone: M-20261127T100325Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261127T100325Z/issues/I-20261127T100325Z-A.md
+
+### completed_issues
+1. `I-20261127T100325Z-A`
+
 ## M-20261127T085009Z-A
 - title: fix — 单平台 legacy raw 物化互锁
 - status: active

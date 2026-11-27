@@ -1035,7 +1035,7 @@ fi
       # Explicit single-platform materialization: fill every missing replica
       # through the only platform-writing wrapper. Partial failure is fatal.
       if ! "$ROOT_DIR/bin/issue-sync" --project "$fix_target" create "raw-$raw_key"; then
-        echo "拒绝创建工位: issue-sync create 未能补齐缺失平台副本（$raw_key）" >&2
+        echo "拒绝创建工位: issue-sync create 未能补齐缺失平台副本（${raw_key}）" >&2
         git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
         git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
         exit 1
