@@ -62,11 +62,3 @@ workflow_kind: fix
 
 拆解为以下任务:
 1. [I-20261127T100325Z-A](will-be-updated)
-
-### comment-20261127T104600Z
-- source: system
-- event: promote_finalized
-- children: ["I-20261127T100325Z-A"]
-
-拆解为以下任务:
-1. [I-20261127T100325Z-A](will-be-updated)
