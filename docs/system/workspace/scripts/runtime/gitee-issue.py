@@ -19,7 +19,8 @@ from freely_user_env import value as freely_env_value
 
 
 DEFAULT_API_BASE = "https://gitee.com/api/v5"
-COMMAND_NAMES = {"list", "get", "create", "update", "comment", "close", "reopen", "delete-branch"}
+COMMAND_NAMES = {"list", "get", "create", "update", "comment", "close", "reopen",
+                 "delete-comment", "delete-branch"}
 DEFAULT_API_TIMEOUT_SECS = 15.0
 
 
@@ -273,6 +274,17 @@ def cmd_comment(args: argparse.Namespace) -> object:
     )
 
 
+def cmd_delete_comment(args: argparse.Namespace) -> object:
+    """Delete one issue comment (#4740). Gitee v5 uses the repo-level
+    /issues/comments/{id} endpoint, not the issue-level comments collection."""
+    repo = detect_repo(args.repo)
+    return api_request(
+        method="DELETE",
+        path=repo_path(repo, f"/comments/{args.comment_id}"),
+        auth_required=True,
+    )
+
+
 def cmd_close(args: argparse.Namespace) -> object:
     repo = detect_repo(args.repo)
     if args.comment:
@@ -366,6 +378,10 @@ def build_parser() -> argparse.ArgumentParser:
     comment_parser.add_argument("--body")
     comment_parser.add_argument("--body-file")
     comment_parser.set_defaults(func=cmd_comment)
+
+    delete_comment_parser = subparsers.add_parser("delete-comment")
+    delete_comment_parser.add_argument("comment_id", type=str)
+    delete_comment_parser.set_defaults(func=cmd_delete_comment)
 
     close_parser = subparsers.add_parser("close")
     close_parser.add_argument("number")

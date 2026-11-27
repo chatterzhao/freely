@@ -1,3 +1,21 @@
+## M-20261127T120426Z-A
+- title: fix — 封装 comment-delete 入口
+- status: active
+### candidate_issues
+1. `C-20261127T120426Z-A`
+- milestone: M-20261127T120426Z-A
+- status: promoted
+- promoted_issue_id: `I-20261127T120426Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T120426Z/issues/I-20261127T120426Z-A.md
+### committed_issues
+1. `I-20261127T120426Z-A`
+- milestone: M-20261127T120426Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T120426Z/issues/I-20261127T120426Z-A.md
+
+### completed_issues
+1. `I-20261127T120426Z-A`
+
 ## M-20261127T110239Z-A
 - title: fix — 可操作的评论失败诊断
 - status: active

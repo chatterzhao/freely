@@ -54,6 +54,7 @@ _ISSUE_SYNC_MODULES=(
   cmd-create.sh
   cmd-update.sh
   cmd-comment.sh
+  cmd-comment-delete.sh
   cmd-close.sh
   cmd-promote.sh
   cmd-promote-finalize.sh
@@ -92,12 +93,12 @@ _issue_sync_load_modules
 # ── main ─────────────────────────────────────────────────
 
 main() {
-  local action="" local_id="" extra=""
+  local action="" local_id="" extra="" extra2=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) ROOT_DIR="$2"; _issue_sync_rebind_paths; shift 2 ;;
-      create|update|comment|close|close-orphans|promote|promote-finalize|status|batch|scan)
+      create|update|comment|comment-delete|close|close-orphans|promote|promote-finalize|status|batch|scan)
         action="$1"; shift; break ;;
       *) echo "[ERROR] unknown action: $1" >&2; exit 1 ;;
     esac
@@ -105,12 +106,13 @@ main() {
 
   local_id="${1:-}"
   extra="${2:-}"
+  extra2="${3:-}"
   # Batch sibling: one platform read for every terminal local id (#4722).
   if [[ "$action" == "close-orphans" && "$local_id" == "--all-completed" ]]; then
     cmd_close_orphans_all "${extra:-linked}"
     return $?
   fi
-  [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|close|close-orphans|promote|status|batch|scan> <local_id> [extra]" >&2; exit 1; }
+  [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|comment-delete|close|close-orphans|promote|status|batch|scan> <local_id> [extra]" >&2; exit 1; }
   if [[ "$action" != "batch" && "$action" != "scan" ]]; then
     [[ -n "$local_id" ]] || { echo "[ERROR] missing local_id" >&2; exit 1; }
   fi
@@ -151,6 +153,7 @@ main() {
     create)  cmd_create "$local_id" ;;
     update)  cmd_update "$local_id" ;;
     comment) cmd_comment "$local_id" ;;
+    comment-delete) cmd_comment_delete "$local_id" "$extra" "$extra2" ;;
     close)   cmd_close "$local_id" "$extra" ;;
     close-orphans) cmd_close_orphans "$local_id" "$extra" ;;
     promote) cmd_promote "$local_id" "$extra" ;;

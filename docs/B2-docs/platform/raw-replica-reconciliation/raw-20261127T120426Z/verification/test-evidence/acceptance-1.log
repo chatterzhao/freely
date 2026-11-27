@@ -1,0 +1,34 @@
+=== GREEN ===
+ok   dispatcher registers comment-delete
+ok   wrapper module loaded
+ok   wrapper requires explicit platform/id
+ok   wrapper prints actionable retry
+ok   no caller-side gh/curl in wrapper
+ok   adapter owns GitHub comment delete
+ok   adapter validates local mapping
+ok   Gitee delete-comment CLI exists
+ok   commands.md documents command
+ok   mapped platform delete succeeds
+ok   delete called with mapped issue id
+ok   non-numeric comment id refused
+ok   refusal did not delete
+ok   unavailable handler refused
+ok   no extra delete on refusal
+SUMMARY: 15 ok, 0 failed
+=== RED ===
+FAIL dispatcher registers comment-delete
+FAIL wrapper module loaded
+FAIL wrapper requires explicit platform/id
+FAIL wrapper prints actionable retry
+ok   no caller-side gh/curl in wrapper
+FAIL adapter owns GitHub comment delete
+FAIL adapter validates local mapping
+FAIL Gitee delete-comment CLI exists
+FAIL commands.md documents command
+FAIL mapped platform delete succeeds — adapter function missing on develop
+FAIL delete called with mapped issue id — adapter function missing on develop
+FAIL non-numeric comment id refused — adapter function missing on develop
+FAIL refusal did not delete — adapter function missing on develop
+FAIL unavailable handler refused — adapter function missing on develop
+FAIL no extra delete on refusal — adapter function missing on develop
+SUMMARY: 1 ok, 14 failed
