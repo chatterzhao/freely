@@ -86,6 +86,9 @@ class PlatformHandler(ABC):
     def delete_issue(self, issue_number: str) -> dict:
         """Optional: not every platform can delete an issue (#4166)."""
         return {"status": "error", "error": "not implemented"}
+    def delete_comment(self, issue_number: str, comment_id: str) -> dict:
+        """Optional: single-comment deletion (#4740)."""
+        return {"status": "error", "error": "not implemented"}
     def get_issue_state(self, issue_number: str) -> Optional[str]: return None
     def search_raw_issue(self, raw_key: str) -> Optional[dict]: return None
     def fetch_issue(self, issue_number: str) -> dict: return {}
@@ -354,6 +357,13 @@ class GitHubHandler(PlatformHandler):
         r = subprocess.run(["gh", "issue", "delete", issue_number,
                             "--repo", self._repo(), "--yes"],
                            capture_output=True, text=True)
+        return {"status": "deleted" if r.returncode == 0 else "error",
+                "error": r.stderr[:200] if r.returncode != 0 else ""}
+
+    def delete_comment(self, issue_number, comment_id):
+        # #4740: the only GitHub comment write path stays inside the adapter.
+        r = subprocess.run(["gh", "api", f"repos/{self._repo()}/issues/comments/{comment_id}",
+                            "-X", "DELETE"], capture_output=True, text=True)
         return {"status": "deleted" if r.returncode == 0 else "error",
                 "error": r.stderr[:200] if r.returncode != 0 else ""}
 
@@ -682,6 +692,11 @@ class GiteeHandler(PlatformHandler):
     def add_comment(self, issue_number, comment_body):
         r = self._run("comment", issue_number, "--body", comment_body)
         return {"status": "created" if r.returncode == 0 else "error"}
+
+    def delete_comment(self, issue_number, comment_id):
+        r = self._run("delete-comment", str(comment_id))
+        return {"status": "deleted" if r.returncode == 0 else "error",
+                "error": r.stderr[:200] if r.returncode != 0 else ""}
 
     def update_issue(self, issue_number, title="", body=""):
         args = ["update", issue_number]
@@ -1577,6 +1592,38 @@ def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict
         results[h.name] = _safe(h.add_comment, str(num), comment_body)
     return results
 
+def delete_comment(local_id: str, platform: str, comment_id: str) -> dict:
+    """Delete one comment from a mapped platform issue (#4740).
+
+    The platform must be explicit and the local document/platform mapping must
+    resolve to that platform's issue before any write happens. No implicit
+    platform narrowing and no caller-side gh/curl.
+    """
+    comment_id = str(comment_id or "").strip()
+    if not comment_id or not comment_id.isdigit():
+        return {"status": "error", "error": "comment_id must be a numeric platform comment id"}
+    if platform not in configured_platforms():
+        return {"status": "error", "error": f"platform not configured: {platform}"}
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
+    issue_id = ""
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        m = re.search(rf"{platform}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
+        if m:
+            issue_id = m.group(1).strip()
+    if not issue_id:
+        found = search_raw_issue(raw_key).get(platform, {})
+        issue_id = str(found.get("issue_number", "") or "").strip()
+    if not issue_id or issue_id == "?":
+        return {"status": "error", "error": f"no {platform} issue_id mapped for {local_id}"}
+    handler = _handler_for(platform)
+    if not handler:
+        return {"status": "error", "error": f"platform handler unavailable: {platform}"}
+    return _safe(handler.delete_comment, issue_id, comment_id)
+
+
 # ── Issue state resolution ──
 
 def _resolve_issue_state(local_id: str) -> str:
@@ -2018,6 +2065,12 @@ if __name__ == "__main__":
         raise SystemExit(0 if result.get("status") != "error" else 1)
     elif len(a) > 1 and a[1] == "get-issue-state":
         print(_resolve_issue_state(a[2]) if len(a) > 2 else "unknown")
+    elif len(a) > 1 and a[1] == "delete-comment":
+        result = delete_comment(a[2] if len(a) > 2 else "",
+                                a[3] if len(a) > 3 else "",
+                                a[4] if len(a) > 4 else "")
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        raise SystemExit(0 if isinstance(result, dict) and result.get("status") == "deleted" else 1)
     elif len(a) > 1 and a[1] == "comment":
         print(json.dumps(_comment_via_local_issue(a[2], a[3] if len(a) > 3 else ""), indent=2))
     elif len(a) > 1 and a[1] == "update-issue":
