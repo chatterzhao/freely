@@ -1,3 +1,24 @@
+## M-20261126T130151Z-A
+- title: fix — pr-merge followthrough 自动沿袭证据
+- status: active
+### candidate_issues
+1. `C-20261126T130151Z-A`
+- milestone: M-20261126T130151Z-A
+- status: promoted
+- promoted_issue_id: `I-20261126T130151Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261126T130151Z/issues/I-20261126T130151Z-A.md
+### committed_issues
+1. `I-20261126T130151Z-A`
+- milestone: M-20261126T130151Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261126T130151Z/issues/I-20261126T130151Z-A.md
+
+### completed_issues
+1. `I-20261126T130151Z-A`
+- milestone: M-20261126T130151Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261126T130151Z/issues/I-20261126T130151Z-A.md
+
 ## M-20261126T114403Z-A
 - title: feat — close-orphans 批量模式复用平台读取
 - status: active

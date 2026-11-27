@@ -541,7 +541,14 @@ _push_source_branch_to_all_remotes() {
   echo "[MERGE-GUARD] source branch pushed to:$ok"
   return 0
 }
-
+_attest_test_evidence_equivalent() {
+  local wt="$1" gate="$1/.freely/run/test-gate.env" helper result rc=0 sensitive
+  helper="$wt/docs/system/workspace/scripts/quality/test-evidence.py"; sensitive=$(grep '^EQUIVALENCE_SENSITIVE_PATHS=' "$gate" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"')
+  sensitive=${sensitive:-docs/system/workspace/scripts/,bin/,docs/B2-docs/**/verification/}; [[ -f "$gate" && -f "$helper" ]] || { echo "[MERGE-GUARD] evidence not carried; run test-gate" >&2; return 1; }
+  result=$(python3 "$helper" attest-meta --gate "$gate" --worktree "$wt" --sensitive-paths "$sensitive" 2>&1) || rc=$?
+  if [[ $rc -eq 0 ]]; then echo "[MERGE-GUARD] evidence carried: $result"; return 0; fi
+  echo "[MERGE-GUARD] evidence stale; run: freely test-gate run --worktree $wt --command 'bin/test-all --ci'" >&2; printf '%s\n' "$result" >&2; return "$rc"
+}
 # _sync_issues_changed_in_merge: BEFORE merge, update issue phase_state
 # in the fix|feature worktree, then commit + push so the worktree stays clean.
 # Mirrors pr-review-guarded: review → commit → push → merge.
@@ -651,8 +658,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
 	            $1=="branch" && $2 ~ k { print wt; exit }
 	          ')
 	          if [[ -n "$_test_wt" && -d "$_test_wt" ]]; then
-	            git -C "$_test_wt" merge "$_src_branch" 2>/dev/null && \
-	              echo "[MERGE-GUARD] test worktree synced with issue-sync commit" || true
+	            if git -C "$_test_wt" merge "$_src_branch" 2>/dev/null; then
+	              echo "[MERGE-GUARD] test worktree synced with issue-sync commit"
+	              # The merge commit is content-equivalent to the tested PR head.
+	              # Carry the evidence chain forward through the OWNED CLI instead
+	              # of forcing a full re-run at wt-close (#4703 / #4726).
+	              _attest_test_evidence_equivalent "$_test_wt" || true
+	            fi
 	          fi
 	        fi
 	        # ── Push source branch to every configured remote (#4702) ──
