@@ -485,7 +485,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/worktree/wt-create",
       "target": "bin/wt-create",
-      "sha256": "0c0d1ac7c23f8fadf02d4ecadacb1f052bf01be8b4f3823ce0bd1d9ef24ca1fa",
+      "sha256": "be7efef92d1c7797b7b80ca18b871d85478c8e5336e4055ef00cde71275e58f9",
       "mode": "delegate",
       "note": "exec projection"
     },
