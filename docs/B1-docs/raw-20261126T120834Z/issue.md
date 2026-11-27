@@ -18,7 +18,7 @@ canonical_issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T1208
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-26T12:08:34Z'
-updated_at: '2026-11-26T13:06:34Z'
+updated_at: '2026-11-27T06:56:28Z'
 intake_id: ''
 author: platform
 channel: github
