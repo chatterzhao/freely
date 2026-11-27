@@ -117,7 +117,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/runtime/gitee-issue.py",
       "target": "bin/gitee-issue",
-      "sha256": "5df833decd4ae6b8652a38d580f29b98eb2038a6dded95fc97154fda78c45ae6",
+      "sha256": "0f8a2810c361e34a679afd61c7b9256e408dbc380d79696eef189bebdfb342ea",
       "mode": "delegate",
       "note": "exec projection"
     },

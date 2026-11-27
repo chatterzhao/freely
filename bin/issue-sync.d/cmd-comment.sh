@@ -26,7 +26,7 @@ cmd_comment() {
     return 0
   fi
 
-  local gh_id gitee_id ts
+  local gh_id gitee_id ts gitee_state synced_gh=0 synced_gitee=0
   gh_id=$(_gh_issue_number "$file")
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
   ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -34,11 +34,31 @@ cmd_comment() {
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: adding comment to #$gh_id"
     _gh_comment "$gh_id" "$last_comment"
+    synced_gh=1
   fi
 
   if [[ -n "${GITEE_REPO:-}" && -n "$gitee_id" ]]; then
-    echo "[issue-sync] Gitee: adding comment to $gitee_id"
-    _gitee_comment "$gitee_id" "$last_comment" >/dev/null || echo "[issue-sync] Gitee: comment FAILED" >&2
+    # #4737: Gitee rejects comments on CLOSED issues when the repo's
+    # `issue_comment` setting is false (the default). `can_comment` may still
+    # be true, so the UI looks normal and the bare HTTP 401 is misleading.
+    # Read the state first and report the real cause instead of posting blind.
+    gitee_state=$(_gitee_cli get "$gitee_id" 2>/dev/null | python3 -c '
+import json, sys
+try:
+    print((json.load(sys.stdin).get("state") or "unknown").lower())
+except Exception:
+    print("unknown")
+' 2>/dev/null || echo unknown)
+    if [[ "$gitee_state" == "closed" ]]; then
+      echo "[issue-sync] Gitee: skip comment on $gitee_id — issue is CLOSED and repo setting issue_comment=false rejects closed-issue comments (can_comment may be true). Reopen the issue or enable issue_comment=true via PATCH /repos/{owner}/{repo}." >&2
+    else
+      echo "[issue-sync] Gitee: adding comment to $gitee_id"
+      if _gitee_comment "$gitee_id" "$last_comment" >/dev/null; then
+        synced_gitee=1
+      else
+        echo "[issue-sync] Gitee: comment FAILED" >&2
+      fi
+    fi
   fi
 
   # Update last_synced_comment_at
@@ -49,8 +69,8 @@ with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
 fm.setdefault('last_synced_comment_at', {})
-fm['last_synced_comment_at']['github'] = '$ts'
-fm['last_synced_comment_at']['gitee'] = '$ts'
+if '$synced_gh' == '1': fm['last_synced_comment_at']['github'] = '$ts'
+if '$synced_gitee' == '1': fm['last_synced_comment_at']['gitee'] = '$ts'
 fm['updated_at'] = '$ts'
 new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
 body_text = parts[2] if len(parts) >= 3 else ''

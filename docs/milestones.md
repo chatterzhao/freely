@@ -1,3 +1,21 @@
+## M-20261127T110239Z-A
+- title: fix — 可操作的评论失败诊断
+- status: active
+### candidate_issues
+1. `C-20261127T110239Z-A`
+- milestone: M-20261127T110239Z-A
+- status: promoted
+- promoted_issue_id: `I-20261127T110239Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T110239Z/issues/I-20261127T110239Z-A.md
+### committed_issues
+1. `I-20261127T110239Z-A`
+- milestone: M-20261127T110239Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T110239Z/issues/I-20261127T110239Z-A.md
+
+### completed_issues
+1. `I-20261127T110239Z-A`
+
 ## M-20261127T085009Z-A
 - title: fix — 单平台 legacy raw 物化互锁
 - status: active
