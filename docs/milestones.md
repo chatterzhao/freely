@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## M-20261126T130151Z-A
 - title: fix — pr-merge followthrough 自动沿袭证据
 - status: active
@@ -19,6 +20,28 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-scope/raw-20261126T130151Z/issues/I-20261126T130151Z-A.md
 
+=======
+## M-20261126T120834Z-A
+- title: fix — 退役门禁删除失效的 freshness check
+- status: active
+### candidate_issues
+1. `C-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- status: promoted
+- promoted_issue_id: `I-20261126T120834Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+### committed_issues
+1. `I-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+
+### completed_issues
+1. `I-20261126T120834Z-A`
+- milestone: M-20261126T120834Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/wt-close/raw-20261126T120834Z/issues/I-20261126T120834Z-A.md
+>>>>>>> 2ae5b99e812538cdb5ce4f2e7bcf5e14fcee6084
 ## M-20261126T114403Z-A
 - title: feat — close-orphans 批量模式复用平台读取
 - status: active

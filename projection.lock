@@ -221,7 +221,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/quality/pretests-retirement-gate",
       "target": "bin/pretests-retirement-gate",
-      "sha256": "b29e8558f940c9ab229b5a3b4d1856973aa93a567dfb90629c6f87e533deb18f",
+      "sha256": "0b001391e2ff48af91ea2aa6df19d970f7048110fa6f2bcdc41615954faa4edb",
       "mode": "delegate",
       "note": "exec projection"
     },
