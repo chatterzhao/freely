@@ -45,6 +45,8 @@ CORE=(
   test-gitee-delete-branch-path.py
   test-single-platform-materialize.py
   test-fullwidth-variable-boundary.py
+  test-actionable-comment-error.py
+  test-comment-delete-command.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
@@ -115,6 +117,8 @@ CI_CORE=(
   test-gitee-delete-branch-path.py
   test-single-platform-materialize.py
   test-fullwidth-variable-boundary.py
+  test-actionable-comment-error.py
+  test-comment-delete-command.py
   test-review-intent-anchor.py
   test-bin-projection-classification.py
   test-raw-issue-pull-parity.py
