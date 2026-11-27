@@ -42,6 +42,15 @@ from pathlib import Path
 from typing import Optional
 
 _ADAPTER_DIR = Path(__file__).resolve().parent
+# #4743: platform identity comes ONLY from a canonical title prefix. A raw
+# key mentioned in an issue body is a reference, not a replica; treating it as
+# one made discover-raw report false ambiguity and blocked issue creation.
+def is_identity_title(title: object, raw_key: str) -> bool:
+    pattern = re.compile(r"^\[(?:RAW|I)-" + re.escape(str(raw_key or "")) + r"(?:-[A-Z])?\]\s",
+                         re.IGNORECASE)
+    return bool(pattern.match(str(title or "")))
+
+
 _SCRIPTS_DIR = _ADAPTER_DIR.parent
 _RUNTIME_DIR = _SCRIPTS_DIR / "runtime"
 _LIFECYCLE_DIR = _SCRIPTS_DIR / "lifecycle"
@@ -382,19 +391,17 @@ class GitHubHandler(PlatformHandler):
             return None
         try:
             matches = {}
-            for field in ("title", "body"):
-                result = subprocess.run(
-                    ["gh", "issue", "list", "--repo", repo, "--state", "all",
-                     "--search", f"raw-{raw_key} in:{field}", "--limit", "20",
-                     "--json", "number,title,url,body"],
-                    capture_output=True, text=True, timeout=15,
-                )
-                if result.returncode != 0 or not result.stdout.strip():
-                    continue
+            # #4743: query by title only and require the canonical identity
+            # prefix. Body references are not replicas.
+            result = subprocess.run(
+                ["gh", "issue", "list", "--repo", repo, "--state", "all",
+                 "--search", f"raw-{raw_key} in:title", "--limit", "20",
+                 "--json", "number,title,url"],
+                capture_output=True, text=True, timeout=15,
+            )
+            if result.returncode == 0 and result.stdout.strip():
                 for issue in json.loads(result.stdout):
-                    haystack = str(issue.get(field, "") or "")
-                    needle = f"raw-{raw_key}".lower()
-                    if needle not in haystack.lower():
+                    if not is_identity_title(issue.get("title", ""), raw_key):
                         continue
                     issue_id = str(issue.get("number", "") or "")
                     if issue_id:
@@ -733,8 +740,7 @@ class GiteeHandler(PlatformHandler):
                 return None
             for issue in issues:
                 title = issue.get("title", "") or ""
-                body = issue.get("body", "") or ""
-                if needle not in title.lower() and needle not in body.lower():
+                if not is_identity_title(title, raw_key):
                     continue
                 issue_id = str(issue.get("number", issue.get("id", "")) or "")
                 if issue_id:

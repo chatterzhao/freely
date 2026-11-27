@@ -1,3 +1,21 @@
+## M-20261127T131717Z-A
+- title: fix — 平台身份只由规范标题前缀决定
+- status: active
+### candidate_issues
+1. `C-20261127T131717Z-A`
+- milestone: M-20261127T131717Z-A
+- status: promoted
+- promoted_issue_id: `I-20261127T131717Z-A`
+- promoted_issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T131717Z/issues/I-20261127T131717Z-A.md
+### committed_issues
+1. `I-20261127T131717Z-A`
+- milestone: M-20261127T131717Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T131717Z/issues/I-20261127T131717Z-A.md
+
+### completed_issues
+1. `I-20261127T131717Z-A`
+
 ## M-20261127T100325Z-A
 - title: fix — 全角标点变量边界
 - status: active
