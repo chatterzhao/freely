@@ -44,6 +44,7 @@ CORE=(
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
   test-single-platform-materialize.py
+  test-fullwidth-variable-boundary.py
   test-actionable-comment-error.py
   test-comment-delete-command.py
   test-review-intent-anchor.py
@@ -115,6 +116,7 @@ CI_CORE=(
   test-wt-close-boundary.py
   test-gitee-delete-branch-path.py
   test-single-platform-materialize.py
+  test-fullwidth-variable-boundary.py
   test-actionable-comment-error.py
   test-comment-delete-command.py
   test-review-intent-anchor.py
