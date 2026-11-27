@@ -18,12 +18,12 @@ canonical_issue_path: docs/B2-docs/worktree-lifecycle/merge-guard-issue-sync-sco
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-11-26T13:01:51Z'
-updated_at: '2026-11-26T13:02:05Z'
+updated_at: '2026-11-27T07:38:43Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 promoted_children:
 - I-20261126T130151Z-A
 source_candidate: docs/B1-docs/raw-20261126T130151Z/candidates.md#C-20261126T130151Z-A
