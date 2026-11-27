@@ -16,11 +16,11 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261127T100325Z/issues/I-20261127T100325Z-A.md
 last_synced_comment_at:
-  github: '2026-11-27T10:31:13Z'
-  gitee: '2026-11-27T10:31:13Z'
+  github: '2026-11-27T10:40:49Z'
+  gitee: '2026-11-27T10:40:49Z'
 hash: ''
 created_at: '2026-11-27T10:03:25Z'
-updated_at: '2026-11-27T10:31:19Z'
+updated_at: '2026-11-27T10:40:54Z'
 intake_id: ''
 author: platform
 channel: github
