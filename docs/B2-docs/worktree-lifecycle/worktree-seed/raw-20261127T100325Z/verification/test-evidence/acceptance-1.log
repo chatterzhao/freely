@@ -1,0 +1,16 @@
+=== GREEN ===
+ok   wt-create source readable
+ok   no full-width punctuation glued to a variable
+ok   failure receipt uses explicit boundary
+ok   nonzero wrapper fails closed
+ok   no unbound variable in stderr
+ok   actionable refusal printed
+SUMMARY: 6 ok, 0 failed
+=== RED ===
+ok   wt-create source readable
+FAIL no full-width punctuation glued to a variable — ['$raw_key）']
+FAIL failure receipt uses explicit boundary
+ok   nonzero wrapper fails closed
+ok   no unbound variable in stderr
+ok   actionable refusal printed
+SUMMARY: 4 ok, 2 failed
