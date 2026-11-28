@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261108T134701Z-A`
 - milestone: M-20261108T134701Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/issues/I-20261108T134701Z-A.md
 
 ## M-20261127T131717Z-A
@@ -29,6 +29,7 @@
 - issue_path: docs/B2-docs/platform/raw-replica-reconciliation/raw-20261127T131717Z/issues/I-20261127T131717Z-A.md
 
 ### completed_issues
+1. `I-20261108T134701Z-A`
 1. `I-20261127T131717Z-A`
 
 ## M-20261127T100325Z-A
