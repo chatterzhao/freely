@@ -10,8 +10,11 @@
 ### committed_issues
 1. `I-20261113T110656Z-A`
 - milestone: M-20261113T110656Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/command-wrapper/implementation-projection/raw-20261113T110656Z/issues/I-20261113T110656Z-A.md
+
+### completed_issues
+1. `I-20261113T110656Z-A`
 
 ## M-20261113T141456Z-A
 - title: fix — governance-only lane 接线

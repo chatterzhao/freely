@@ -1,7 +1,7 @@
 ---
 issue_id: I-20261113T110656Z-A
 issue_path: docs/B2-docs/command-wrapper/implementation-projection/raw-20261113T110656Z/issues/I-20261113T110656Z-A.md
-phase_state: in_b2_ibm
+phase_state: completed
 ---
 
 # Implementation Decision Note
