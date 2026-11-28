@@ -13,6 +13,9 @@
 - phase_state: completed
 - issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/issues/I-20261108T134701Z-A.md
 
+### completed_issues
+1. `I-20261108T134701Z-A`
+
 ## M-20261127T131717Z-A
 - title: fix — 平台身份只由规范标题前缀决定
 - status: active

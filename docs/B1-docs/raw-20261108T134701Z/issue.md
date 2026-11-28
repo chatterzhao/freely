@@ -2,9 +2,6 @@
 schema_version: '1'
 local_id: raw-20261108T134701Z
 kind: raw
-labels:
-- kind/raw
-- severity/p2
 phase_state: absorbed
 absorbed_into: I-20261108T134701Z-A
 platform_ids:

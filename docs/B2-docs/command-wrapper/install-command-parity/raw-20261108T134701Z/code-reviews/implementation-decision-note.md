@@ -1,4 +1,12 @@
+---
+issue_id: I-20261108T134701Z-A
+issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/issues/I-20261108T134701Z-A.md
+phase_state: completed
+---
+
 # Implementation Decision Note — I-20261108T134701Z-A
+- issue_id: I-20261108T134701Z-A
+- issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/issues/I-20261108T134701Z-A.md
 
 - decision: 删除 `bin/freely` 中未实现的 `freely install` / 自动移除 marker 承诺；新增只读静态命令名契约检查；不新增 runtime 分派。
 - why_this: `freely-package --activate` 已是唯一安装真相源（R16/#4194 的 IDN 明确排除 install 命令），runtime/freely 恰好 27166 行预算，任何新分派都会破坏 `check-runtime-size`。
