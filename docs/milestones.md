@@ -1,3 +1,18 @@
+## M-20261113T141512Z-A
+- title: fix — status 只读视图空表降级
+- status: active
+### candidate_issues
+1. `C-20261113T141512Z-A`
+- milestone: M-20261113T141512Z-A
+- status: promoted
+- promoted_issue_id: `I-20261113T141512Z-A`
+- promoted_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
+### committed_issues
+1. `I-20261113T141512Z-A`
+- milestone: M-20261113T141512Z-A
+- phase_state: in_b2_ibm
+- issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
+
 ## M-20261103T063354Z-A
 - title: fix — pr-merge 收尾平台名对齐
 - status: active
