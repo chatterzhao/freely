@@ -37,7 +37,7 @@ for _i, _arg in enumerate(sys.argv):
 
 ISSUE_SYNC = SRC / "bin/issue-sync"
 MODULE_DIR = SRC / "bin/issue-sync.d"
-BOOTSTRAP = SRC / "bin/issue-sync-bootstrap"
+BOOTSTRAP = SRC / "docs/system/workspace/scripts/sync/issue-sync-bootstrap"
 ADAPTER = SRC / "docs/system/workspace/scripts/sync/platform-adapter.py"
 CONTRACT = SRC / "docs/system/workspace/scripts/sync/issue_create_contract.py"
 RUNTIME = SRC / "docs/system/workspace/scripts/runtime/freely"
@@ -265,7 +265,9 @@ def behavior_bootstrap() -> None:
         subprocess.run(["git", "-C", str(repo), "remote", "add", "origin",
                         "https://github.com/acme/demo.git"], check=False)
         (repo / "bin").mkdir()
-        shutil.copy(BOOTSTRAP, repo / "bin" / "issue-sync-bootstrap")
+        truth_dir = repo / "docs/system/workspace/scripts/sync"
+        truth_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(BOOTSTRAP, truth_dir / "issue-sync-bootstrap")
         # The adapter imports freely_user_env from scripts/runtime; a fixture
         # without it fails on import, which would look like a product defect.
         for rel in ("docs/system/workspace/scripts/sync",
@@ -291,7 +293,7 @@ def behavior_bootstrap() -> None:
         env["PATH"] = f"{bindir}:" + env.get("PATH", "")
         env.pop("FREELY_PLATFORM_REPO", None)
         proc = subprocess.run(
-            ["bash", str(repo / "bin" / "issue-sync-bootstrap"), "--delete",
+            ["bash", str(truth_dir / "issue-sync-bootstrap"), "--delete",
              "https://github.com/acme/demo/issues/42"],
             cwd=str(repo), env=env, capture_output=True, text=True, timeout=120,
         )

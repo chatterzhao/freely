@@ -11,7 +11,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 ROOT="$(git rev-parse --show-toplevel)"
 RUNTIME="$ROOT/docs/system/workspace/scripts/runtime/freely"
 ISSUE_SYNC="$ROOT/bin/issue-sync"
-RAW_PULL="$ROOT/bin/raw-issue-pull"
+RAW_PULL="$ROOT/docs/system/workspace/scripts/sync/raw-issue-pull"
 SKILLS="$ROOT/docs/system/workspace/skills"
 REAL_SKILL="freely-workflow-guarded-execution"
 

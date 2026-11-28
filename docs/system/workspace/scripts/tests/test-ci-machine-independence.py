@@ -33,7 +33,7 @@ for _i, _arg in enumerate(sys.argv):
 
 CONTRACT = SRC / "docs/system/workspace/scripts/tests/test-contract-single-source.py"
 TEST_ALL = SRC / "bin/test-all"
-DEPLOY = SRC / "bin/deploy-skills"
+DEPLOY = SRC / "docs/system/workspace/scripts/skills/deploy-skills"
 SVG = SRC / "docs/epics-map.svg"
 STORY = SRC / "docs/B2-docs/gate/ci-machine-independence"
 
@@ -113,7 +113,7 @@ def static_checks() -> None:
 
     digest = hashlib.sha256(DEPLOY.read_bytes()).hexdigest() if DEPLOY.is_file() else ""
     expect(digest == BASELINE_DEPLOY_SHA256,
-           "S7 bin/deploy-skills unchanged from develop e003532b5")
+           "S7 deploy-skills truth unchanged from develop e003532b5")
 
     ta = read(TEST_ALL)
     expect("test-contract-single-source.py" in ta,
@@ -128,6 +128,7 @@ def _sandbox(tmp: Path) -> Path:
     sb = tmp / "negative-control"
     rels = (
         "bin/deploy-skills",
+        "docs/system/workspace/scripts/skills/deploy-skills",
         "docs/system/workspace/tools/tool-registry.toml",
         "docs/system/workspace/scripts/runtime/freely",
         "docs/system/workspace/scripts/runtime/paths.sh",

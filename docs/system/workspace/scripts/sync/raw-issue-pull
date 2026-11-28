@@ -48,7 +48,7 @@ case "$platform" in
   *) echo "Invalid --platform '$platform' (expected github|gitee)" >&2; exit 1 ;;
 esac
 
-ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
+ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)}"
 [[ -z "$target" ]] && target="$(pwd)/docs/B1-docs/raw-${raw_key}"
 
 # The CALLER's repo root, not the script's physical location. wt-create cd's into

@@ -62,7 +62,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 SRC="$ROOT_DIR/docs/system/workspace/skills"
 [[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
 

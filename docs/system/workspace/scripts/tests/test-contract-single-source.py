@@ -71,7 +71,7 @@ def read(path: Path) -> str:
 
 def static_checks() -> None:
     print("=== STATIC: single source wiring ===")
-    deploy = read(SRC / "bin/deploy-skills")
+    deploy = read(SRC / "docs/system/workspace/scripts/skills/deploy-skills")
     freely = read(RUNTIME / "freely")
     wt_create = read(SRC / "docs/system/workspace/scripts/worktree/wt-create")
     canon = read(RUNTIME / "raw_key_canon.py")
@@ -89,7 +89,7 @@ def static_checks() -> None:
 
     offenders = []
     for rel, text in (
-        ("bin/deploy-skills", deploy),
+        ("scripts/skills/deploy-skills", deploy),
         ("runtime/freely", freely),
         ("worktree/wt-create", wt_create),
     ):
@@ -115,6 +115,9 @@ def _build_deploy_tree(tmp: Path) -> Path:
     runtime.mkdir(parents=True)
 
     shutil.copy2(SRC / "bin/deploy-skills", tree / "bin/deploy-skills")
+    (tree / "docs/system/workspace/scripts/skills").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(SRC / "docs/system/workspace/scripts/skills/deploy-skills",
+                 tree / "docs/system/workspace/scripts/skills/deploy-skills")
     for rel in (
         "docs/system/workspace/scripts/runtime/paths.sh",
         "docs/system/workspace/scripts/runtime/tool-registry-query.py",
