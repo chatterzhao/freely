@@ -1,7 +1,7 @@
 ---
 issue_id: I-20261113T141512Z-A
 issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
-phase_state: in_b2_ibm
+phase_state: completed
 ---
 
 # Implementation Decision Note

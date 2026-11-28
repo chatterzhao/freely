@@ -13,6 +13,9 @@
 - phase_state: in_b2_ibm
 - issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
 
+### completed_issues
+1. `I-20261113T141512Z-A`
+
 ## M-20261103T063354Z-A
 - title: fix — pr-merge 收尾平台名对齐
 - status: active
