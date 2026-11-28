@@ -16,10 +16,10 @@
 - expected_output: SUMMARY: N ok, 0 failed
 - expected_RED_output: SUMMARY: 至少 1 failed（仍按 git remote 循环 / 无 configured-platforms 动作）
 - actual_RED_output: "SUMMARY: 4 ok, 7 failed（S2/S3/S4/S6/S7/S8/B3 failed）"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "SUMMARY: 11 ok, 0 failed（含 adapter configured-platforms 实调）"
 - evidence_file: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: develop 基线 `_sync_prs_across_platforms` 遍历 `git remote` 并传 origin 给 close-pr；AT 必然失败。
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -38,7 +38,7 @@
 - expected_output: SUMMARY: 0 failed
 - expected_RED_output: regression-only
 - actual_RED_output: regression-only
-- actual_output: (GREEN 阶段填写)
+- actual_output: "SUMMARY: 14 ok, 0 failed"
 - evidence_file: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/verification/test-evidence/acceptance-2.log
 - red-green-status: not_applicable
 - status: not_applicable
@@ -72,5 +72,5 @@
 - blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
-- real_environment_status: pending
-- real_environment_reason: 待 GREEN 阶段填写
+- real_environment_status: pass
+- real_environment_reason: fix worktree 内 AT 11/0、unit 6/0、push 回归 14/0；adapter configured-platforms 实调返回 github/gitee。
