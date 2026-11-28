@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261128T065937Z-A`
 - milestone: M-20261128T065937Z-A
-- phase_state: in_b2_ibm
+- phase_state: in_dev
 - issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261128T065937Z/issues/I-20261128T065937Z-A.md
 
 ## M-20261108T134701Z-A

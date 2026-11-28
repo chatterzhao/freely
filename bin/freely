@@ -21,7 +21,7 @@ ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
 # ── dev vs prod detection ──
 # dev mode: running from a git checkout (not an installed package).
 # prod mode: running from a packaged release installed by
-# `freely-package --version auto --activate` (see docs/system/workspace/commands.md).
+# `freely-package --version auto --activate`.
 _is_dev=false
 if [[ "${FREELY_DEV_MODE:-}" == "1" ]]; then
   _is_dev=true

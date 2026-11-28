@@ -16,10 +16,10 @@
 - expected_output: "ok: true, undeclared: []"
 - expected_RED_output: "ok: false, undeclared: ['docs/system/workspace/commands.md']"
 - actual_RED_output: "rc=1; undeclared=['docs/system/workspace/commands.md']; ok=false（develop 基线）"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "ok=true, undeclared=[]（9 runtime-referenced 文件全部在 allowlist）"
 - evidence_file: docs/B2-docs/command-wrapper/install-command-parity/raw-20261128T065937Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: develop 基线 bin/freely 与 quality checker 字面引用 commands.md，parity 必然失败。
 - surface_kind: end_to_end
 - target_lane: premerge-integration
@@ -39,7 +39,7 @@
 - expected_output: 两个 SUMMARY 均为 0 failed
 - expected_RED_output: 不适用（本项为回归保护，基线已绿）
 - actual_RED_output: regression-only
-- actual_output: (GREEN 阶段填写)
+- actual_output: "test-command-name-contract.py SUMMARY: 10 ok, 0 failed; t-command-name-contract-01.sh SUMMARY: 4 ok, 0 failed"
 - evidence_file: docs/B2-docs/command-wrapper/install-command-parity/raw-20261128T065937Z/verification/test-evidence/acceptance-2.log
 - red-green-status: not_applicable
 - status: not_applicable
@@ -73,5 +73,5 @@
 - blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
-- real_environment_status: pending
-- real_environment_reason: 待 GREEN 阶段实测填写
+- real_environment_status: pass
+- real_environment_reason: fix worktree 内 parity rc=0；命令名契约 AT 10/0 与单测 4/0；打包实测在 develop merge 后执行。
