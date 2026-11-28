@@ -4531,14 +4531,14 @@ load_config() {
     local _my_id=""
 
     # Resolve agent identity via agent_working table (single source of truth).
-    # Fail-closed: no silent manager_01 fallback.
+    [[ "${FREELY_READONLY_VIEW:-0}" == "1" ]] && export AGENT_AI_TOOL="${AGENT_AI_TOOL:-none}"  # no silent manager_01 fallback
     _my_id="$(_resolve_current_agent_id "$PROJECT_ROOT" || true)"
-    if [[ -z "$_my_id" ]]; then
+    if [[ -z "$_my_id" && "${FREELY_READONLY_VIEW:-0}" != "1" ]]; then
       log_error "agent-table: unable to resolve agent identity (agent_working empty) — fail-closed"
       return 1
     fi
 
-    if [[ -f "$_at" && -x "$_aq" ]]; then
+    if [[ -n "$_my_id" && -f "$_at" && -x "$_aq" ]]; then
       local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
       if [[ -n "$_slot" ]]; then
         local _tool="${_slot%%-*}"
@@ -4551,7 +4551,7 @@ load_config() {
         fi
       fi
     fi
-    if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
+    if [[ -z "${AGENT_AI_TOOL:-}" && "${FREELY_READONLY_VIEW:-0}" != "1" ]]; then
       log_error "AGENT_AI_TOOL not set. Configure .freely/agent-table.toml:"
       log_error "  [[agents]]"
       log_error "  manager_slot = \"<tool>-apikey-<slot>\""
@@ -25878,7 +25878,7 @@ cmd_baseline_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  project="$(resolve_project_or_fail "$project")"
+  project="$(resolve_project_or_fail "$project")"; FREELY_READONLY_VIEW=1
   load_config "$project"
   local sdir run_dir
   local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
@@ -26182,7 +26182,7 @@ cmd_live_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  project="$(resolve_project_or_fail "$project")"
+  project="$(resolve_project_or_fail "$project")"; FREELY_READONLY_VIEW=1
   startup_self_heal_machine_state_if_needed "$project" "live_status"
   load_config "$project"
   load_session_state_or_defaults "$project"
@@ -26716,7 +26716,7 @@ cmd_fleet_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  project="$(resolve_project_or_fail "$project")"
+  project="$(resolve_project_or_fail "$project")"; FREELY_READONLY_VIEW=1
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || { log_error "not a git repo: $project"; exit 1; }
   entries="$(git -C "$repo_root" worktree list --porcelain 2>/dev/null || true)"
