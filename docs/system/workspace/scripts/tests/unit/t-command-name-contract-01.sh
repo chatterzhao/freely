@@ -4,7 +4,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/harness.sh"
 
 ROOT="$UT_PROJECT_ROOT"
-CHECKER="$ROOT/docs/system/workspace/scripts/quality/command_name_contract.py"
+CHECKER="$ROOT/docs/system/workspace/scripts/tests/command_name_contract.py"
 
 assert_file "$CHECKER" "command name contract checker exists"
 

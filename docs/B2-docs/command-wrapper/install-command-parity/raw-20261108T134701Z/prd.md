@@ -5,7 +5,7 @@
 
 ## 实现方案
 - 修改 `bin/freely` 头部三段注释：prod mode 描述、PATH 示例、marker 说明。
-- 新增 `docs/system/workspace/scripts/quality/command_name_contract.py`（只读 + 自测反例）。
+- 新增 `docs/system/workspace/scripts/tests/command_name_contract.py`（只读 + 自测反例）。
 - 新增 AT `docs/system/workspace/scripts/tests/test-command-name-contract.py`，注册进 `bin/test-all`。
 
 ## Dev-Loop Handoff

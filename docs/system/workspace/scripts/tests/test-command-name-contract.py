@@ -22,7 +22,7 @@ if "--source-dir" in sys.argv:
 BIN_FREELY = SRC / "bin/freely"
 COMMANDS = SRC / "docs/system/workspace/commands.md"
 RUNTIME = SRC / "docs/system/workspace/scripts/runtime/freely"
-CHECKER = SRC / "docs/system/workspace/scripts/quality/command_name_contract.py"
+CHECKER = SRC / "docs/system/workspace/scripts/tests/command_name_contract.py"
 BUDGET = 27166
 
 OK = 0
