@@ -1,3 +1,18 @@
+## M-20261113T110656Z-A
+- title: feat — 批次① sync+skills 投影化
+- status: active
+### candidate_issues
+1. `C-20261113T110656Z-A`
+- milestone: M-20261113T110656Z-A
+- status: promoted
+- promoted_issue_id: `I-20261113T110656Z-A`
+- promoted_issue_path: docs/B2-docs/command-wrapper/implementation-projection/raw-20261113T110656Z/issues/I-20261113T110656Z-A.md
+### committed_issues
+1. `I-20261113T110656Z-A`
+- milestone: M-20261113T110656Z-A
+- phase_state: in_dev
+- issue_path: docs/B2-docs/command-wrapper/implementation-projection/raw-20261113T110656Z/issues/I-20261113T110656Z-A.md
+
 ## M-20261113T141456Z-A
 - title: fix — governance-only lane 接线
 - status: active

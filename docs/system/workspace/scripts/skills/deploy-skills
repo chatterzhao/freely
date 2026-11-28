@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# deploy-skills: deploy project skills to AI tool skill directories
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage: freely deploy-skills [--tools <name,...>] [--force] [--dry-run]
+
+Deploy all skills from docs/system/workspace/skills/ to AI tool skill directories
+so tools can invoke them via skill:<name>.
+
+Options:
+  --tools <tools>  Comma-separated tool names (default: all installed tools from
+                    tool-registry.toml, auto-detected via command availability)
+  --force          Force overwrite even if content is identical
+  --dry-run        Show what would be deployed without writing.
+
+Supported tools (from tool-registry.toml):
+  claude*     → ~/.claude/skills/
+  codex*      → ~/.codex/skills/
+  oc-*        → ~/.config/opencode/skills/  (if project .opencode/ not found)
+  opencode*   → ~/.config/opencode/skills/  (if project .opencode/ not found)
+  cc*         → ~/.claude/skills/
+  iflow*      → (not yet supported)
+  kiro-cli*   → (not yet supported)
+
+Project-local override: if tool directory exists under <project-root>/.opencode/skills/,
+skills are deployed there instead of global config.
+
+Examples:
+  freely deploy-skills --tools claude,codex
+  freely deploy-skills --tools opencode-apikey-ds-flash-auto --force
+  freely deploy-skills --dry-run
+USAGE
+}
+
+dry_run=0
+force=0
+tools=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tools)
+      tools="${2:-}"
+      [[ -n "$tools" ]] || { echo "Missing value for --tools" >&2; exit 1; }
+      shift 2
+      ;;
+    --force)
+      force=1
+      shift
+      ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    --help|-h)
+      usage; exit 0
+      ;;
+    *)
+      echo "Unknown: $1" >&2; usage; exit 1
+      ;;
+  esac
+done
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+SRC="$ROOT_DIR/docs/system/workspace/skills"
+[[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
+
+# Resolve default tools: --tools flag > tool-registry.toml (all installed)
+# #4154: the registry path has one owner (runtime/paths.sh). The previous copy
+# pointed at a non-existent scripts/runtime copy; when it was missing the script
+# silently fell back to the claude default instead of reporting a broken install.
+_PATHS_LIB="$ROOT_DIR/docs/system/workspace/scripts/runtime/paths.sh"
+[[ -f "$_PATHS_LIB" ]] || { echo "Runtime path library not found: $_PATHS_LIB" >&2; exit 1; }
+source "$_PATHS_LIB"
+
+if [[ -z "$tools" ]]; then
+  _reg_file="$(freely_tool_registry_path "$ROOT_DIR")"
+  _reg_query="$(freely_tool_registry_query_path "$ROOT_DIR")"
+  [[ -f "$_reg_file" ]] || {
+    echo "tool-registry.toml not found: $_reg_file" >&2
+    echo "Pass --tools <name,...> explicitly or repair the installation." >&2
+    exit 1
+  }
+  [[ -f "$_reg_query" ]] || { echo "tool-registry-query.py not found: $_reg_query" >&2; exit 1; }
+
+  _installed_tools=""
+  while IFS= read -r _tool_key; do
+    [[ -z "$_tool_key" ]] && continue
+    # Determine binary to check: use first word of test_command via registry query
+    _test_bin=$(python3 "$_reg_query" "$_reg_file" "$_tool_key" "test_command" 2>/dev/null | awk '{print $1}')
+    if [[ -n "$_test_bin" ]] && command -v "$_test_bin" >/dev/null 2>&1; then
+      [[ -n "$_installed_tools" ]] && _installed_tools="$_installed_tools,"
+      _installed_tools="$_installed_tools$_tool_key"
+    fi
+  done < <(python3 "$_reg_query" "$_reg_file" --list 2>/dev/null)
+  tools="$_installed_tools"
+fi
+# An empty set after a successful registry read is a legitimate "nothing
+# installed" state, not a reason to guess claude.
+if [[ -z "$tools" ]]; then
+  echo "No installed tools detected from tool-registry.toml; nothing to deploy." >&2
+  exit 0
+fi
+
+# Map tool name to skill directory
+tool_dir() {
+  local tool="$1"
+  case "$tool" in
+    claude*) echo "${HOME}/.claude/skills" ;;
+    codex*)  echo "${HOME}/.codex/skills" ;;
+    oc-*|opencode*)
+      # Prefer project-local .opencode/skills/ over global
+      if [[ -d "$ROOT_DIR/.opencode/skills" ]]; then
+        echo "$ROOT_DIR/.opencode/skills"
+      else
+        echo "${HOME}/.config/opencode/skills"
+      fi
+      ;;
+    cc*)     echo "${HOME}/.claude/skills" ;;
+    iflow*)  echo "" ;;
+    kiro-cli*) echo "" ;;
+    *)       echo "" ;;
+  esac
+}
+
+deploy_to() {
+  local tool_name="$1" dst="$2"
+  local deployed=0 failed=0 updated=0 skipped=0
+
+  echo "=== $tool_name → $dst ==="
+
+  for skill_dir in "$SRC"/*/; do
+    skill_md="${skill_dir}SKILL.md"
+    [[ -f "$skill_md" ]] || continue
+
+    name=$(head -20 "$skill_md" | grep "^name:" | head -1 | sed 's/^name:\s*//' | xargs)
+    [[ -z "$name" ]] && { echo "SKIP ${skill_dir}: missing name in frontmatter" >&2; failed=$((failed + 1)); continue; }
+
+    if ! python3 -c "
+import sys, yaml, re
+text = open('$skill_md', encoding='utf-8').read()
+m = re.match(r'^---\n(.*?)\n---', text, re.S)
+if not m: sys.exit(1)
+yaml.safe_load(m.group(1))
+" 2>/dev/null; then
+      echo "SKIP ${skill_dir}: invalid frontmatter YAML" >&2
+      failed=$((failed + 1)); continue
+    fi
+
+    local_dst="$dst/$name"
+
+    if [[ "$dry_run" -eq 1 ]]; then
+      if [[ -d "$local_dst" ]]; then
+        if ! diff -rq "$skill_dir" "$local_dst" >/dev/null 2>&1; then
+          echo "  UPDATE  $name"
+        elif [[ "$force" -eq 1 ]]; then
+          echo "  UPDATE  $name (force)"
+        else
+          echo "  OK     $name"
+        fi
+      else
+        echo "  CREATE  $name"
+      fi
+      deployed=$((deployed + 1))
+      continue
+    fi
+
+    if [[ -d "$local_dst" ]]; then
+      if ! diff -rq "$skill_dir" "$local_dst" >/dev/null 2>&1; then
+        rm -rf "$local_dst"
+        mkdir -p "$local_dst"
+        cp -r "$skill_dir"* "$local_dst/"
+        echo "  UPDATE  $name"
+        updated=$((updated + 1))
+      elif [[ "$force" -eq 1 ]]; then
+        rm -rf "$local_dst"
+        mkdir -p "$local_dst"
+        cp -r "$skill_dir"* "$local_dst/"
+        echo "  UPDATE  $name (force)"
+        updated=$((updated + 1))
+      else
+        echo "  OK     $name"
+        skipped=$((skipped + 1))
+      fi
+    else
+      mkdir -p "$local_dst"
+      cp -r "$skill_dir"* "$local_dst/"
+      echo "  CREATE  $name"
+    fi
+    deployed=$((deployed + 1))
+  done
+
+  echo "  deployed=$deployed  updated=$updated  skipped=$skipped  failed=$failed"
+
+  # #4179: a deployed skill is a projection of workspace/skills/<name>. Record
+  # its hash so `freely projections verify` can prove the copy still matches;
+  # without this, a stale deployed skill is invisible.
+  if [[ "$dry_run" -eq 0 ]]; then
+    local verifier="$ROOT_DIR/docs/system/workspace/scripts/quality/projection_verify.py"
+    if [[ -f "$verifier" ]]; then
+      python3 "$verifier" record --project "$ROOT_DIR" --skills-root "$dst" >/dev/null 2>&1 \
+        || echo "  WARNING: could not refresh projection.lock for $dst" >&2
+    fi
+  fi
+  echo ""
+}
+
+# Parse comma-separated tools and deploy to each
+unknown_tools=""
+IFS=',' read -ra TOOL_LIST <<< "$tools"
+for t in "${TOOL_LIST[@]}"; do
+  t=$(echo "$t" | xargs)  # trim whitespace
+  d=$(tool_dir "$t")
+  if [[ -z "$d" ]]; then
+    unknown_tools="$unknown_tools $t"
+    continue
+  fi
+  deploy_to "$t" "$d"
+done
+
+if [[ -n "$unknown_tools" ]]; then
+  echo "WARNING: unsupported tools:$unknown_tools" >&2
+  echo "Supported tools: claude*, codex*, oc-*, opencode*, cc*" >&2
+  echo "Unsupported (no mapping): iflow*, kiro-cli*" >&2
+  exit 1
+fi

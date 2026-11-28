@@ -115,6 +115,14 @@
     },
     {
       "kind": "bin",
+      "source": "docs/system/workspace/scripts/skills/deploy-skills",
+      "target": "bin/deploy-skills",
+      "sha256": "1c8a6dd09bb3c06f85c75edaf11c006223515c928c10fc034dc1c4b9ef9f8e7e",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
       "source": "docs/system/workspace/scripts/runtime/gitee-issue.py",
       "target": "bin/gitee-issue",
       "sha256": "d762cf6fe472555a7490ae9f8ec7d3d4ac29319636ea96f40ac9e2c90f797847",
@@ -179,6 +187,14 @@
     },
     {
       "kind": "bin",
+      "source": "docs/system/workspace/scripts/sync/issue-sync-bootstrap",
+      "target": "bin/issue-sync-bootstrap",
+      "sha256": "8bd5dffe6d5a59c5b56a1f74e0e783337881971e6c1e40d9d7e1414dcf42eaa5",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
       "source": "docs/system/workspace/scripts/quality/new-review",
       "target": "bin/new-review",
       "sha256": "7769ea925ec15867b09c589f3e01a8a6587dbb47554fe0687158c87e01c35edb",
@@ -230,6 +246,14 @@
       "source": "docs/system/workspace/scripts/quality/projection_verify.py",
       "target": "bin/projections",
       "sha256": "db18a2c7f532e02074e4bb13108f79c17ffed4137072aaaf1c4c8eeeeb0c06b0",
+      "mode": "delegate",
+      "note": "exec projection"
+    },
+    {
+      "kind": "bin",
+      "source": "docs/system/workspace/scripts/sync/raw-issue-pull",
+      "target": "bin/raw-issue-pull",
+      "sha256": "b9664aaaf95bd8f67f968204146d80f1396526d37256255831f9ff57ced07d7e",
       "mode": "delegate",
       "note": "exec projection"
     },
