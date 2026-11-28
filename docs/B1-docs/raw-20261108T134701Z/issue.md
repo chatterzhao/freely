@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261108T134701Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261108T134701Z-A
 platform_ids:
   gitee:
     issue_id: IKTSRS
@@ -14,19 +14,22 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/4746
     synced_at: '2026-11-27T13:59:35Z'
 primary_platform: gitee
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/issues/I-20261108T134701Z-A.md
+last_synced_comment_at:
+  github: '2026-11-28T05:34:08Z'
+  gitee: '2026-11-28T05:34:08Z'
 hash: ''
 created_at: '2026-11-08T13:47:01Z'
-updated_at: '2026-11-27T13:59:35Z'
+updated_at: '2026-11-28T05:34:18Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261108T134701Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-28T05:34:07Z'
 closeout_note: ''
 severity: P2
 ---
@@ -68,3 +71,11 @@ workflow_kind: fix
 - GREEN：代码、usage、文档投影中不再出现任何未实现的命令名；`freely doctor` 与打包入口被正确描述。
 - GREEN：新增「命令名必须在 dispatcher 中存在」的静态契约检查，防止同类脱线再次发生。
 - GREEN：既有 doctor / package / dispatch 相关回归 worktree 与 develop 基线退出码一致。
+
+### comment-20261128T053408Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261108T134701Z-A"]
+
+拆解为以下任务:
+1. [I-20261108T134701Z-A](will-be-updated)
