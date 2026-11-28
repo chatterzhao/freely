@@ -1,3 +1,21 @@
+## M-20261113T141456Z-A
+- title: fix — governance-only lane 接线
+- status: active
+### candidate_issues
+1. `C-20261113T141456Z-A`
+- milestone: M-20261113T141456Z-A
+- status: promoted
+- promoted_issue_id: `I-20261113T141456Z-A`
+- promoted_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141456Z/issues/I-20261113T141456Z-A.md
+### committed_issues
+1. `I-20261113T141456Z-A`
+- milestone: M-20261113T141456Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141456Z/issues/I-20261113T141456Z-A.md
+
+### completed_issues
+1. `I-20261113T141456Z-A`
+
 ## M-20261113T141512Z-A
 - title: fix — status 只读视图空表降级
 - status: active
