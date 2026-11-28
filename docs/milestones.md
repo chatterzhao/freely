@@ -10,7 +10,7 @@
 ### committed_issues
 1. `I-20261113T141512Z-A`
 - milestone: M-20261113T141512Z-A
-- phase_state: in_b2_ibm
+- phase_state: completed
 - issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
 
 ### completed_issues
