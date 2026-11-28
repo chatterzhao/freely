@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261113T141456Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261113T141456Z-A
 platform_ids:
   github:
     issue_id: '4435'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKV85U
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141456Z/issues/I-20261113T141456Z-A.md
+last_synced_comment_at:
+  github: '2026-11-28T10:15:59Z'
+  gitee: '2026-11-28T10:15:59Z'
 hash: ''
 created_at: '2026-11-13T14:14:56Z'
-updated_at: '2026-11-13T14:15:03Z'
+updated_at: '2026-11-28T10:16:06Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261113T141456Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-28T10:15:58Z'
 closeout_note: ''
 severity: P1
 ---
@@ -96,3 +99,11 @@ raw-20261103T091157Z（platform issue-parity）的 prd / IDN / code-review 明�
 - 不放宽 implementation 路径的跨 raw 限制；不改 `docs/LAWS.md` 的「一个工位一个 issue」；
 - 不放宽 reason 前缀校验；不新增第三种 lane；
 - 不把「补字段/造数据」当作放行手段。
+
+### comment-20261128T101559Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261113T141456Z-A"]
+
+拆解为以下任务:
+1. [I-20261113T141456Z-A](will-be-updated)
