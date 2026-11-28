@@ -106,7 +106,7 @@ def static_checks() -> None:
     standalone = [e for e in entries if e["class"] == "standalone-tool"]
     migrate = [e for e in entries if e["class"] == "implementation-in-bin"]
     check(len(standalone) == 22, "S2 22 entries classified standalone-tool (got " + str(len(standalone)) + ")")
-    check(len(migrate) == 13, "S3 13 entries remain for later migration (got " + str(len(migrate)) + ")")
+    check(len(migrate) == 10, "S3 10 entries remain after batch 1 migration (got " + str(len(migrate)) + ")")
     placeholders = [e["path"] for e in entries
                     if "case by case" in str(e["reason"]).lower()
                     or str(e["reason"]).startswith("implementation still lives in bin/")]

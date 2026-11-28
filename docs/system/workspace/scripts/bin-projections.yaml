@@ -102,13 +102,6 @@
       "reason": "self-contained Tauri probe host lint"
     },
     {
-      "path": "bin/deploy-skills",
-      "lines": 216,
-      "class": "implementation-in-bin",
-      "reason": "business implementation still in bin/; migrate to scripts/skills in a later batch",
-      "followup": "raw-20261111T125724Z"
-    },
-    {
       "path": "bin/evidence",
       "lines": 48,
       "class": "dispatcher",
@@ -183,13 +176,6 @@
       "reason": "DEPRECATED reference copy with no callers; not a runtime entry"
     },
     {
-      "path": "bin/issue-sync-bootstrap",
-      "lines": 62,
-      "class": "implementation-in-bin",
-      "reason": "business implementation still in bin/; migrate to scripts/sync in a later batch",
-      "followup": "raw-20261111T125724Z"
-    },
-    {
       "path": "bin/migrate-issue-phase-state",
       "lines": 63,
       "class": "standalone-tool",
@@ -207,13 +193,6 @@
       "lines": 165,
       "class": "standalone-tool",
       "reason": "one-shot dry-run-first H1 backfill utility"
-    },
-    {
-      "path": "bin/raw-issue-pull",
-      "lines": 145,
-      "class": "implementation-in-bin",
-      "reason": "business implementation still in bin/; migrate to scripts/sync in a later batch",
-      "followup": "raw-20261111T125724Z"
     },
     {
       "path": "bin/skill-route",

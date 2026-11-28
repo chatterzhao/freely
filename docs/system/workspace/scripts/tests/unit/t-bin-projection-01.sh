@@ -7,13 +7,13 @@ ROOT="$(git rev-parse --show-toplevel)"
 REG="$ROOT/docs/system/workspace/scripts/bin-projections.yaml"
 LINT="$ROOT/bin/check-bin-projection"
 
-python3 - "$REG" <<'PY' && ut_ok "22 standalone / 13 to-migrate classification" || ut_bad "classification counts wrong"
+python3 - "$REG" <<'PY' && ut_ok "22 standalone / 10 to-migrate classification" || ut_bad "classification counts wrong"
 import json, sys
 d = json.load(open(sys.argv[1]))
 e = [x for x in d["entries"] if x["class"] != "dispatcher"]
 assert "standalone-tool" in d["classes"]
 assert sum(1 for x in e if x["class"] == "standalone-tool") == 22
-assert sum(1 for x in e if x["class"] == "implementation-in-bin") == 13
+assert sum(1 for x in e if x["class"] == "implementation-in-bin") == 10
 assert all("case by case" not in str(x["reason"]).lower() for x in e)
 PY
 

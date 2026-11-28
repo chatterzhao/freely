@@ -102,7 +102,7 @@ grep -q "projection_verify.py" "$ROOT/bin/projections" \
   || ut_bad "bin/projections does not point at the verifier"
 
 # ── deploy-skills writes the hash back ──
-grep -q "projection_verify.py" "$ROOT/bin/deploy-skills" \
+grep -q "projection_verify.py" "$ROOT/docs/system/workspace/scripts/skills/deploy-skills" \
   && ut_ok "deploy-skills records projection hashes" \
   || ut_bad "deploy-skills does not record projection hashes"
 

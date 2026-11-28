@@ -33,7 +33,7 @@ for _i, _arg in enumerate(sys.argv):
 
 CONTRACT = SRC / "docs/system/workspace/scripts/tests/test-contract-single-source.py"
 TEST_ALL = SRC / "bin/test-all"
-DEPLOY = SRC / "bin/deploy-skills"
+DEPLOY = SRC / "docs/system/workspace/scripts/skills/deploy-skills"
 SVG = SRC / "docs/epics-map.svg"
 STORY = SRC / "docs/B2-docs/gate/ci-machine-independence"
 
@@ -111,9 +111,18 @@ def static_checks() -> None:
            and "explicit --tools still works" in t,
            "S6 fail-closed and explicit-tools assertions preserved")
 
-    digest = hashlib.sha256(DEPLOY.read_bytes()).hexdigest() if DEPLOY.is_file() else ""
-    expect(digest == BASELINE_DEPLOY_SHA256,
-           "S7 bin/deploy-skills unchanged from develop e003532b5")
+    # Batch-1 migration changes only the ROOT_DIR derivation (bin/ -> scripts/skills/).
+    # Compare normalized bodies instead of pinning a stale byte hash (#4338).
+    def _normalize_root(text: str) -> str:
+        return re.sub(r'ROOT_DIR="\$\(cd "\$\(dirname "\$\{BASH_SOURCE\[0\]\}"\)/[^"]*" && pwd -P\)"',
+                      'ROOT_DIR=<project-root>', text)
+
+    baseline = subprocess.run(
+        ["git", "show", "e003532b5:bin/deploy-skills"], cwd=str(SRC),
+        capture_output=True, text=True,
+    ).stdout if DEPLOY.is_file() else ""
+    expect(bool(baseline) and _normalize_root(read(DEPLOY)) == _normalize_root(baseline),
+           "S7 deploy-skills truth unchanged except ROOT_DIR derivation")
 
     ta = read(TEST_ALL)
     expect("test-contract-single-source.py" in ta,
@@ -128,6 +137,7 @@ def _sandbox(tmp: Path) -> Path:
     sb = tmp / "negative-control"
     rels = (
         "bin/deploy-skills",
+        "docs/system/workspace/scripts/skills/deploy-skills",
         "docs/system/workspace/tools/tool-registry.toml",
         "docs/system/workspace/scripts/runtime/freely",
         "docs/system/workspace/scripts/runtime/paths.sh",

@@ -55,7 +55,7 @@ for _i, _arg in enumerate(sys.argv):
 WS = SRC / "docs/system/workspace"
 SCRIPTS = WS / "scripts"
 ISSUE_SYNC = SRC / "bin/issue-sync"
-RAW_PULL = SRC / "bin/raw-issue-pull"
+RAW_PULL = SRC / "docs/system/workspace/scripts/sync/raw-issue-pull"
 PRETESTS_GATE = SCRIPTS / "quality/pretests-gate"
 WT_CLOSE = SCRIPTS / "worktree/wt-close"
 RUNTIME = SCRIPTS / "runtime/freely"
@@ -377,8 +377,8 @@ def s15_raw_pull_project() -> None:
 
 def s16_root_dir_untouched() -> None:
     t = read(RAW_PULL)
-    expect('ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"' in t,
-           "S16 raw-issue-pull ROOT_DIR default derivation unchanged (script location still locates the binary)")
+    expect('ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)}"' in t,
+           "S16 raw-issue-pull ROOT_DIR derives project root from scripts/sync truth")
 
 
 def s17_issue_sync_root_untouched() -> None:
