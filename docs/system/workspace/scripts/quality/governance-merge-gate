@@ -2,6 +2,7 @@
 import argparse
 import atexit
 import json
+import ast
 import os
 import re
 import sqlite3
@@ -360,9 +361,7 @@ def is_governance_only_path(rel_path: str) -> bool:
     """Paths where FREELY_SKIP_IBM_GATE=1 is allowed.
 
     Authority: .freely/config.toml [skip_ibm_gate].allowed_paths is the
-    single source of truth when configured. If the config has entries,
-    only those paths skip the IBM gate. The hardcoded defaults below
-    are a fallback for projects without [skip_ibm_gate] configuration.
+    single source of truth (#4435). No config means no governance-only lane.
 
     Per LAWS.md §3: only docs/cleanup/format changes that structurally
     do not require IBM lifecycle evidence.
@@ -375,33 +374,9 @@ def is_governance_only_path(rel_path: str) -> bool:
                 return True
         return False
 
-    # ── L2: hardcoded defaults (fallback when config is absent/empty) ──
-    if rel_path in {
-        "AGENTS.md",
-        "CLAUDE.md",
-        "README.md",
-        "docs/CONSTITUTION.md",
-        "docs/LAWS.md",
-        "docs/PROJECT_INTENT.md",
-        "docs/milestones.md",
-        "docs/B2-docs-map.svg",
-        "docs/epics-map.svg",
-        "docs/system/workspace/ibm-framework.md",
-        "docs/system/workspace/three-loop-capability-lifecycle.md",
-        "docs/system/workspace/scan-lifecycle-design.md",
-    }:
-        return True
-    if rel_path.startswith(("docs/B1-docs/", "docs/B2-docs/", "docs/B2-docs/ibm/_legacy-progress/")):
-        return True
-    if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
-        return True
-    if rel_path.startswith("templates/"):
-        return True
-    if rel_path.startswith("docs/system/workspace/scripts/quality/"):
-        return True
-    if rel_path.startswith("docs/system/workspace/hooks/") and rel_path.endswith(".md"):
-        return True
-
+    # Single source: config.toml [skip_ibm_gate].allowed_paths (#4435).
+    # Without a configured list there is no governance-only lane; fail closed
+    # rather than keeping a second, drifting hardcoded allowlist.
     return False
 
 
@@ -426,6 +401,14 @@ def _load_skip_ibm_allowed_paths() -> List[str]:
         skip_cfg = cfg.get("skip_ibm_gate", {})
         if isinstance(skip_cfg, dict):
             raw = skip_cfg.get("allowed_paths", [])
+            # Some legacy configs serialize the list as a string; accept both
+            # forms but never evaluate arbitrary expressions (literal_eval only).
+            if isinstance(raw, str):
+                try:
+                    parsed = ast.literal_eval(raw)
+                except (ValueError, SyntaxError):
+                    parsed = None
+                raw = parsed if isinstance(parsed, list) else []
             if isinstance(raw, list):
                 for item in raw:
                     if isinstance(item, str) and item.strip():
@@ -1298,6 +1281,10 @@ def main() -> int:
                 f"     - 用 wt-create --raw-key <被混入的key> 创建独立工位\n"
                 f"     - 将属于该 issue 的实现迁移到新工位\n"
                 f"     - 从当前工位移除不属于本工位的 issue 文件\n"
+                f"  4. 如确认是跨 raw 的纯文档/状态同步（治理变更），走 governance-only lane:\n"
+                f"     FREELY_SKIP_IBM_GATE=\"违规绕过门禁中，理由充分，是：<业务理由>\"\n"
+                f"     仅 docs/B1-docs/、docs/B2-docs/、docs/milestones.md 等 config 白名单路径可放行；\n"
+                f"     bin/ 与 docs/system/workspace/scripts/ 等实现路径永远拒绝。\n"
             )
 
         branch_ts = _extract_ts(branch_issue_key)

@@ -4,6 +4,7 @@
 
 cmd_batch() {
   local filter_key="${1:-}"
+  [[ "$filter_key" == "--raw-key" ]] && filter_key="${2:-}"
   # --auto: the daemon's pre-scan sweep. Scope belongs to the CALLER's lane, so
   # resolve it from the current branch and refuse to run anywhere else. An
   # unscoped batch is a cross-raw write (GATE 1) and used to rewrite 100+
@@ -30,6 +31,9 @@ cmd_batch() {
   local _batch_fail=0
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never} scope=${filter_key:-ALL}"
+  if [[ -z "$filter_key" ]]; then
+    echo "[issue-sync] batch: 全量同步跨 raw，必须走 governance-only lane（FREELY_SKIP_IBM_GATE + config 白名单）；本 raw 工位请用 batch --raw-key <key>" >&2
+  fi
 
 	  # Collect all issue files into an array first (use temp file to preserve null bytes)
 	  # Filter: skip issues where local platform_state is already closed
