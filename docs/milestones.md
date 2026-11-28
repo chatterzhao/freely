@@ -10,8 +10,11 @@
 ### committed_issues
 1. `I-20261113T141456Z-A`
 - milestone: M-20261113T141456Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141456Z/issues/I-20261113T141456Z-A.md
+
+### completed_issues
+1. `I-20261113T141456Z-A`
 
 ## M-20261113T141512Z-A
 - title: fix — status 只读视图空表降级
