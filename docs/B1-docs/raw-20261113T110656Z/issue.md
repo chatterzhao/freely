@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261113T110656Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261113T110656Z-A
 platform_ids:
   github:
     issue_id: '4338'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKV7AS
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/command-wrapper/implementation-projection/raw-20261113T110656Z/issues/I-20261113T110656Z-A.md
+last_synced_comment_at:
+  github: '2026-11-28T12:01:58Z'
+  gitee: '2026-11-28T12:01:58Z'
 hash: ''
 created_at: '2026-11-13T11:06:56Z'
-updated_at: '2026-11-13T11:07:02Z'
+updated_at: '2026-11-28T12:02:04Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261113T110656Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-28T12:01:57Z'
 closeout_note: ''
 severity: P2
 ---
@@ -89,3 +92,11 @@ R32.5 / #4302 的 C-A 已合并（`52b095892`）：把 `docs/system/workspace/sc
 - `standalone-tool` 22 条不动；3 个 dispatcher 与 14 个 leaf 不动；
 - 不改平台 adapter / 生命周期 / wt-close；
 - 禁止一个 PR 夹带所有批次（R32.5 的修复方案明确「每批独立可合并」）。
+
+### comment-20261128T120158Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261113T110656Z-A"]
+
+拆解为以下任务:
+1. [I-20261113T110656Z-A](will-be-updated)
