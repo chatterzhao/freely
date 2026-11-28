@@ -117,7 +117,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/skills/deploy-skills",
       "target": "bin/deploy-skills",
-      "sha256": "1c8a6dd09bb3c06f85c75edaf11c006223515c928c10fc034dc1c4b9ef9f8e7e",
+      "sha256": "156885e87538fb46fc99f852ea1802f04fda092df461fd45076d383b3de3eb38",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -189,7 +189,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/sync/issue-sync-bootstrap",
       "target": "bin/issue-sync-bootstrap",
-      "sha256": "8bd5dffe6d5a59c5b56a1f74e0e783337881971e6c1e40d9d7e1414dcf42eaa5",
+      "sha256": "7570a590c2f10a53ff42d4af66dabe1b5094675a82cf41b05a78420409b1a2ba",
       "mode": "delegate",
       "note": "exec projection"
     },
@@ -253,7 +253,7 @@
       "kind": "bin",
       "source": "docs/system/workspace/scripts/sync/raw-issue-pull",
       "target": "bin/raw-issue-pull",
-      "sha256": "b9664aaaf95bd8f67f968204146d80f1396526d37256255831f9ff57ced07d7e",
+      "sha256": "44f5baba6878ce8c357dd1495a15b404d22097a926ac3702b4459a7fafc4cdbc",
       "mode": "delegate",
       "note": "exec projection"
     },
