@@ -10,8 +10,11 @@
 ### committed_issues
 1. `I-20261103T063354Z-A`
 - milestone: M-20261103T063354Z-A
-- phase_state: in_dev
+- phase_state: completed
 - issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/issues/I-20261103T063354Z-A.md
+
+### completed_issues
+1. `I-20261103T063354Z-A`
 
 ## M-20261128T065937Z-A
 - title: fix — 打包 parity 回归收口
