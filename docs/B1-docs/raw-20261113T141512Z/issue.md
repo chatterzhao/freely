@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261113T141512Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261113T141512Z-A
 platform_ids:
   github:
     issue_id: '4436'
@@ -14,19 +14,22 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKV86B
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/gate/gate-dev-experience-preflight/raw-20261113T141512Z/issues/I-20261113T141512Z-A.md
+last_synced_comment_at:
+  github: '2026-11-28T09:09:18Z'
+  gitee: '2026-11-28T09:09:18Z'
 hash: ''
 created_at: '2026-11-13T14:15:12Z'
-updated_at: '2026-11-13T14:15:21Z'
+updated_at: '2026-11-28T09:09:25Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261113T141512Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-28T09:09:17Z'
 closeout_note: ''
 severity: P2
 ---
@@ -83,3 +86,11 @@ workflow_kind: fix
 
 - 不改 `issue-sync batch` 的收口判据（那是 #4349 / R33.18 的范围）；
 - 不放宽任何门禁；不引入新的平台写通道。
+
+### comment-20261128T090918Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261113T141512Z-A"]
+
+拆解为以下任务:
+1. [I-20261113T141512Z-A](will-be-updated)
