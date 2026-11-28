@@ -1,7 +1,7 @@
 ---
 issue_id: I-20261128T065937Z-A
 issue_path: docs/B2-docs/command-wrapper/install-command-parity/raw-20261128T065937Z/issues/I-20261128T065937Z-A.md
-phase_state: in_b2_ibm
+phase_state: completed
 ---
 
 # Implementation Decision Note
