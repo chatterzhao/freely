@@ -1,3 +1,21 @@
+## M-20261103T063354Z-A
+- title: fix — pr-merge 收尾平台名对齐
+- status: active
+### candidate_issues
+1. `C-20261103T063354Z-A`
+- milestone: M-20261103T063354Z-A
+- status: promoted
+- promoted_issue_id: `I-20261103T063354Z-A`
+- promoted_issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/issues/I-20261103T063354Z-A.md
+### committed_issues
+1. `I-20261103T063354Z-A`
+- milestone: M-20261103T063354Z-A
+- phase_state: completed
+- issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/issues/I-20261103T063354Z-A.md
+
+### completed_issues
+1. `I-20261103T063354Z-A`
+
 ## M-20261128T065937Z-A
 - title: fix — 打包 parity 回归收口
 - status: active

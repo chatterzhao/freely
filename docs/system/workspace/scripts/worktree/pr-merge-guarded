@@ -489,21 +489,21 @@ GATE_BLOCKED
 # GitHub PRs are already closed by `gh pr merge --merge`.
 # Source branch deletion is handled by wt-close.
 _sync_prs_across_platforms() {
-  local source_branch="$1"
-  [[ -n "$source_branch" ]] || return 0
-
-  # Use platform-adapter to close PRs on all non-GitHub platforms.
-  # GitHub PRs are auto-closed by the merge commit push.
-  local _adapter="$PWD/docs/system/workspace/scripts/sync/platform-adapter.py"
-  for platform in $(git remote | grep -v "^all$"); do
-    case "$(git remote get-url "$platform" 2>/dev/null || true)" in
-      *github.com*|*github-*|*github*) continue ;;
+  local source_branch="$1"; [[ -n "$source_branch" ]] || return 0
+  # #4136: use configured platform names, never git remote names; skip github.
+  local _adapter="$PWD/docs/system/workspace/scripts/sync/platform-adapter.py" platforms_json platforms platform result status
+  [[ -f "$_adapter" ]] || { echo "[MERGE-GUARD] WARNING: adapter missing: $_adapter" >&2; return 1; }
+  platforms_json="$(python3 "$_adapter" configured-platforms)" || { echo "[MERGE-GUARD] WARNING: cannot read configured platforms; retry: python3 \"$_adapter\" configured-platforms" >&2; return 1; }
+  platforms="$(python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)))' <<<"$platforms_json")" || { echo "[MERGE-GUARD] WARNING: invalid configured-platforms payload: $platforms_json" >&2; return 1; }
+  for platform in $platforms; do
+    [[ "$platform" == "github" ]] && continue
+    echo "[MERGE-GUARD] closing PR on platform=$platform branch=$source_branch"
+    result="$(python3 "$_adapter" close-pr "$platform" "$source_branch" 2>&1)"
+    status="$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status",""))' 2>/dev/null)"
+    case "$status" in
+      closed|skipped) echo "[MERGE-GUARD] $platform: $status" ;;
+      *) echo "[MERGE-GUARD] WARNING: close-pr $platform failed: $result; retry: python3 \"$_adapter\" close-pr \"$platform\" \"$source_branch\"" >&2 ;;
     esac
-    echo "[MERGE-GUARD] closing $platform PRs via platform-adapter..."
-    if [[ -f "$_adapter" ]]; then
-      python3 "$_adapter" close-pr "$platform" "$source_branch" 2>/dev/null || true
-    fi
-    echo "[MERGE-GUARD] remote branch cleanup deferred to wt-close for $source_branch on $platform"
   done
 }
 

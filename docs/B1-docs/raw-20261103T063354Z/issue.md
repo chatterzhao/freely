@@ -2,8 +2,8 @@
 schema_version: '1'
 local_id: raw-20261103T063354Z
 kind: raw
-phase_state: proposed
-absorbed_into: ''
+phase_state: absorbed
+absorbed_into: I-20261103T063354Z-A
 platform_ids:
   github:
     issue_id: '4136'
@@ -14,21 +14,26 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IKSKV4
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
-last_synced_comment_at: {}
+canonical_issue_path: docs/B2-docs/worktree-lifecycle/worktree-seed/raw-20261103T063354Z/issues/I-20261103T063354Z-A.md
+last_synced_comment_at:
+  github: '2026-11-28T08:12:26Z'
+  gitee: '2026-11-28T08:12:26Z'
 hash: ''
 created_at: '2026-11-03T06:33:54Z'
-updated_at: '2026-11-03T06:33:58Z'
+updated_at: '2026-11-28T08:28:59Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
-promoted_children: []
+platform_state: closed
+promoted_children:
+- I-20261103T063354Z-A
 source_candidate: ''
-completed_at: ''
+completed_at: '2026-11-28T08:12:25Z'
 closeout_note: ''
 ---
+
+# fix: pr-merge-guarded 关闭 Gitee PR 时把远端名当成平台名
 
 workflow_kind: fix
 
@@ -50,3 +55,11 @@ Gitee 侧 PR 实际已由平台合并关闭，但该步骤报错噪音，掩盖�
 
 ## 发现场景
 2026-11-03 连续 5 次 guarded merge（owner-lane/chat-help/replica/scan/handler）均复现，PR 最终状态均为 merged。
+
+### comment-20261128T081226Z
+- source: system
+- event: promote_finalized
+- children: ["I-20261103T063354Z-A"]
+
+拆解为以下任务:
+1. [I-20261103T063354Z-A](will-be-updated)

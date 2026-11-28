@@ -2012,6 +2012,10 @@ if __name__ == "__main__":
         )
         print(json.dumps(result, indent=2))
         raise SystemExit(0 if result.get("success") else 1)
+    elif len(a) > 1 and a[1] == "configured-platforms":
+        # Read-only view of the single platform config (#4136). Shell callers
+        # must use configured platform names, never git remote names.
+        print(json.dumps(configured_platforms()))
     elif len(a) > 1 and a[1] == "merge-pr":
         print(json.dumps(merge_pr(a[2], a[3]), indent=2))
     elif len(a) > 1 and a[1] == "close-pr":
