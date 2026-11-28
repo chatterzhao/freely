@@ -16,10 +16,10 @@
 - expected_output: SUMMARY: N ok, 0 failed
 - expected_RED_output: SUMMARY: 至少 1 failed（bin/freely 仍承诺 freely install / checker 缺失）
 - actual_RED_output: "SUMMARY: 4 ok, 6 failed（S1/S2/S3/S5/S6/S7 failed；develop 基线）"
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: "SUMMARY: 10 ok, 0 failed（含 checker 自测反例与 runtime 行预算断言）"
 - evidence_file: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/verification/test-evidence/acceptance-1.log
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: develop 基线中 `bin/freely:23,36,40` 明确写 `freely install`，且不存在契约检查脚本；执行 `python3 docs/system/workspace/scripts/tests/test-command-name-contract.py` 得 4 ok/6 failed，bug 可复现。
 - surface_kind: end_to_end
 - target_lane: premerge-integration
@@ -40,7 +40,7 @@
 - expected_output: rc=0，runtime 行数在预算内
 - expected_RED_output: 不适用（该门禁在 baseline 已通过；作为回归保护）
 - actual_RED_output: "baseline 已通过（回归保护项，非本轮缺陷复现）"
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: "ok (27166 lines, budget 27166)；rc=0"
 - evidence_file: docs/B2-docs/command-wrapper/install-command-parity/raw-20261108T134701Z/verification/test-evidence/acceptance-2.log
 - red-green-status: not_applicable
 - status: not_applicable
@@ -74,3 +74,7 @@
 - target_environment: test-pre-merge-20261108T134701Z-install-command-parity → develop merge chain
 - required_evidence: guarded merge receipts
 - blocker_taxonomy: execution_pending_or_failed
+
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: fix worktree 内实测 checker 通过、合成反例被拒、`bin/check-runtime-size` rc=0；无 runtime 分派新增。

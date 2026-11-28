@@ -83,6 +83,7 @@ CORE=(
   test-issue-sync-write-result.py
   test-session-restore-exit-code.py
   test-b0-keyword-broad-search.py
+  test-command-name-contract.py
   test-comment-root-variable.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py
@@ -156,6 +157,7 @@ CI_CORE=(
   test-issue-sync-write-result.py
   test-session-restore-exit-code.py
   test-b0-keyword-broad-search.py
+  test-command-name-contract.py
   test-comment-root-variable.py
   test-raw-replica-degraded.py
   test-command-lifecycle-raw-metadata.py

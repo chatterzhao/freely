@@ -20,7 +20,8 @@ ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
 
 # ── dev vs prod detection ──
 # dev mode: running from a git checkout (not an installed package).
-# prod mode: installed via 'freely install' to a system path.
+# prod mode: running from a packaged release installed by
+# `freely-package --version auto --activate` (see docs/system/workspace/commands.md).
 _is_dev=false
 if [[ "${FREELY_DEV_MODE:-}" == "1" ]]; then
   _is_dev=true
@@ -33,11 +34,12 @@ if $_is_dev; then
 fi
 
 # ── PATH setup for development ──
-# Add this line to ~/.zshrc (before any 'freely install' PATH entry):
-#   # @freely-dev-path — 安装 freely 时自动移除
+# When working from a checkout, put this repository's bin first in PATH:
 #   export PATH="/path/to/freely/bin:$PATH"
 #
-# The '@freely-dev-path' marker lets 'freely install' auto-remove this line,
-# preventing conflicts between dev and installed versions.
+# Packaged releases manage their own PATH via `freely-package`; remove the
+# development PATH entry manually when switching to a packaged version.
+# Older shells may still carry an inert `# @freely-dev-path` line from the old
+# dev recipe — no installer removes it, delete it manually if present.
 
 exec bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$@"
